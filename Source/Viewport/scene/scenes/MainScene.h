@@ -27,5 +27,8 @@ public:
 	void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
 	          const DisplayOptions& displayOptions) override;
 	void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions) override;
+
+	void loadSettings(ViewportSettings& stg, bool scene, bool global) override;
+	void saveSettings(ViewportSettings& stg, bool scene, bool global) override;
 };
 } // namespace Vp

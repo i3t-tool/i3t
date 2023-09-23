@@ -1759,35 +1759,8 @@ void WorkspaceWindow::initDiwneFromTheme()
 	    App::get().getUI()->getTheme().get(ESize::Workspace_InteractionFocusBorderThickness);
 }
 
-// Node builder functions.
 //
-
-Memento WorkspaceWindow::saveState(Scene* scene)
-{
-	Memento memento;
-
-	SerializationVisitor visitor(memento);
-	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
-
-	return memento;
-}
-
-void WorkspaceWindow::loadState(const Memento& memento, Scene* scene)
-{
-	clearState();
-
-	NodeDeserializer::createFrom(memento);
-}
-
-void WorkspaceWindow::clearState()
-{
-	for (auto& node : getNodeEditor().m_workspaceCoreNodes)
-	{
-		node->deleteActionDiwne();
-	}
-	getNodeEditor().m_workspaceCoreNodes.clear();
-}
-
+// Node builder functions.
 //
 
 WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
@@ -1860,3 +1833,42 @@ bool connectNodesNoSave(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWit
 	lhs->updateDataItemsWidth();
 	return success;
 }
+
+/////////////////////////////////////////
+// State save/load
+/////////////////////////////////////////
+
+Memento WorkspaceWindow::saveScene(Scene* scene)
+{
+	Memento memento;
+
+	SerializationVisitor visitor(memento);
+	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
+
+	return memento;
+}
+
+void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
+{
+	clearScene();
+
+	NodeDeserializer::createFrom(memento);
+}
+
+void WorkspaceWindow::clearScene()
+{
+	for (auto& node : getNodeEditor().m_workspaceCoreNodes)
+	{
+		node->deleteActionDiwne();
+	}
+	getNodeEditor().m_workspaceCoreNodes.clear();
+}
+
+Memento WorkspaceWindow::saveGlobal()
+{
+	return emptyMemento();
+}
+
+void WorkspaceWindow::loadGlobal(const Memento& memento) {}
+
+void WorkspaceWindow::clearGlobal() {}

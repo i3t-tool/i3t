@@ -141,7 +141,7 @@ void ViewportWindow::render()
 	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
 	// interacting with them, hence we draw them beforehand using a channel splitter
 	bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
-	if (m_viewport->getSettings().manipulator_enabled)
+	if (m_viewport->getSettings().scene().manipulator_enabled)
 	{
 		manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
 	}
@@ -156,7 +156,7 @@ void ViewportWindow::render()
 		m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 	}
 
-	m_renderOptions.lightingModel = m_viewport->getSettings().lighting_lightingModel;
+	m_renderOptions.lightingModel = m_viewport->getSettings().global().lighting_lightingModel;
 	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
@@ -185,6 +185,8 @@ bool ViewportWindow::showViewportMenu()
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 
+	Vp::ViewportSettings& stg = m_viewport->getSettings();
+
 	bool userInteractedWithMenus = false;
 	if (ImGui::BeginMenu("Settings"))
 	{
@@ -192,14 +194,14 @@ bool ViewportWindow::showViewportMenu()
 
 		if (ImGui::BeginMenu("Scene"))
 		{
-			ImGui::Checkbox("World space lighting", &m_viewport->getSettings().mainScene_lightFollowsCamera);
+			ImGui::Checkbox("World space lighting", &stg.scene().mainScene_lightFollowsCamera);
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Manipulators"))
 		{
-			ImGui::Checkbox("Show manipulators", &m_viewport->getSettings().manipulator_enabled);
-			ImGui::SliderFloat("Size", &m_viewport->getSettings().manipulator_size, 0.01f, 1.0f, "%.2f");
+			ImGui::Checkbox("Show manipulators", &stg.scene().manipulator_enabled);
+			ImGui::SliderFloat("Size", &stg.global().manipulator_size, 0.01f, 1.0f, "%.2f");
 			ImGui::EndMenu();
 		}
 
@@ -236,38 +238,38 @@ bool ViewportWindow::showViewportMenu()
 			userInteractedWithMenus = true;
 			if (ImGui::MenuItem("Ultra", nullptr, nullptr))
 			{
-				m_viewport->getSettings().highlight_downscaleFactor = 1.0f;
-				m_viewport->getSettings().highlight_kernelSize = 4;
-				m_viewport->getSettings().highlight_outlineCutoff = 0.15f;
-				m_viewport->getSettings().highlight_useDepth = true;
+				stg.global().highlight_downscaleFactor = 1.0f;
+				stg.global().highlight_kernelSize = 4;
+				stg.global().highlight_outlineCutoff = 0.15f;
+				stg.global().highlight_useDepth = true;
 			}
 			if (ImGui::MenuItem("High", nullptr, nullptr))
 			{
-				m_viewport->getSettings().highlight_downscaleFactor = 0.8f;
-				m_viewport->getSettings().highlight_kernelSize = 4;
-				m_viewport->getSettings().highlight_outlineCutoff = 0.18f;
-				m_viewport->getSettings().highlight_useDepth = true;
+				stg.global().highlight_downscaleFactor = 0.8f;
+				stg.global().highlight_kernelSize = 4;
+				stg.global().highlight_outlineCutoff = 0.18f;
+				stg.global().highlight_useDepth = true;
 			}
 			if (ImGui::MenuItem("Medium", nullptr, nullptr))
 			{
-				m_viewport->getSettings().highlight_downscaleFactor = 0.5f;
-				m_viewport->getSettings().highlight_kernelSize = 2;
-				m_viewport->getSettings().highlight_outlineCutoff = 0.23f;
-				m_viewport->getSettings().highlight_useDepth = true;
+				stg.global().highlight_downscaleFactor = 0.5f;
+				stg.global().highlight_kernelSize = 2;
+				stg.global().highlight_outlineCutoff = 0.23f;
+				stg.global().highlight_useDepth = true;
 			}
 			if (ImGui::MenuItem("Low", nullptr, nullptr))
 			{
-				m_viewport->getSettings().highlight_downscaleFactor = 1.0f / 3;
-				m_viewport->getSettings().highlight_kernelSize = 2;
-				m_viewport->getSettings().highlight_outlineCutoff = 0.3f;
-				m_viewport->getSettings().highlight_useDepth = true;
+				stg.global().highlight_downscaleFactor = 1.0f / 3;
+				stg.global().highlight_kernelSize = 2;
+				stg.global().highlight_outlineCutoff = 0.3f;
+				stg.global().highlight_useDepth = true;
 			}
 			if (ImGui::MenuItem("Lowest", nullptr, nullptr))
 			{
-				m_viewport->getSettings().highlight_downscaleFactor = 0.25;
-				m_viewport->getSettings().highlight_kernelSize = 2;
-				m_viewport->getSettings().highlight_outlineCutoff = 0.5f;
-				m_viewport->getSettings().highlight_useDepth = false;
+				stg.global().highlight_downscaleFactor = 0.25;
+				stg.global().highlight_kernelSize = 2;
+				stg.global().highlight_outlineCutoff = 0.5f;
+				stg.global().highlight_useDepth = false;
 			}
 			ImGui::EndMenu();
 		}
@@ -337,39 +339,37 @@ bool ViewportWindow::showViewportMenu()
 	if (ImGui::BeginMenu("View"))
 	{
 		userInteractedWithMenus = true;
-		if (ImGui::MenuItem("Orbit camera", nullptr,
-		                    m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
+		if (ImGui::MenuItem("Orbit camera", nullptr, stg.scene().mainScene_cameraMode == CameraMode::ORBIT))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->switchMode(CameraMode::ORBIT);
-				m_viewport->getSettings().mainScene_cameraMode = CameraMode::ORBIT;
+				stg.scene().mainScene_cameraMode = CameraMode::ORBIT;
 			}
 		}
-		if (ImGui::MenuItem("Trackball camera", nullptr,
-		                    m_viewport->getSettings().mainScene_cameraMode == CameraMode::TRACKBALL))
+		if (ImGui::MenuItem("Trackball camera", nullptr, stg.scene().mainScene_cameraMode == CameraMode::TRACKBALL))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->switchMode(CameraMode::TRACKBALL);
-				m_viewport->getSettings().mainScene_cameraMode = CameraMode::TRACKBALL;
+				stg.scene().mainScene_cameraMode = CameraMode::TRACKBALL;
 			}
 		}
-		if (ImGui::MenuItem("Smooth scroll", nullptr, m_viewport->getSettings().camera_smoothScroll))
+		if (ImGui::MenuItem("Smooth scroll", nullptr, stg.global().camera_smoothScroll))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				m_viewport->getSettings().camera_smoothScroll = !m_viewport->getSettings().camera_smoothScroll;
-				camera->getOrbitCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
-				camera->getTrackballCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
+				stg.global().camera_smoothScroll = !stg.global().camera_smoothScroll;
+				camera->getOrbitCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+				camera->getTrackballCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
 			}
 		}
-		if (ImGui::SliderFloat("Camera fov", &m_viewport->getSettings().camera_fov, 1, 180, "%.1f"))
+		if (ImGui::SliderFloat("Camera fov", &stg.scene().camera_fov, 1, 180, "%.1f"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->getOrbitCamera()->setFov(m_viewport->getSettings().camera_fov);
-				camera->getTrackballCamera()->setFov(m_viewport->getSettings().camera_fov);
+				camera->getOrbitCamera()->setFov(stg.scene().camera_fov);
+				camera->getTrackballCamera()->setFov(stg.scene().camera_fov);
 			}
 		}
 

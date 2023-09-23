@@ -82,7 +82,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 		// In ImGuizmo A * B is actually equivalent to B * A in GLM!
 		// It's important to keep that in mind when browsing ImGuizmo source code!
 
-		ImGuizmo::SetGizmoSizeClipSpace(m_viewport->getSettings().manipulator_size);
+		ImGuizmo::SetGizmoSizeClipSpace(m_viewport->getSettings().global().manipulator_size);
 		// ImGuizmo::GetStyle().RotationOuterLineThickness = 4.0f;
 		ImGuizmo::GetStyle().RotationLineThickness = 3.0f;
 		ImGuizmo::GetStyle().CircleSegmentCount = 48;

@@ -53,6 +53,7 @@ CMakeSettings.json
 # ----------------------------------------------------------------------
 Test/State/TestScene.json
 /UserData/
+Global.json
 Data/imgui.ini
 logs/
 

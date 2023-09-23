@@ -49,10 +49,12 @@ void I3TApplication::onInit()
 
 	m_viewport = new Vp::Viewport();
 	m_viewport->init(Vp::ViewportSettings());
+	App::getModule<StateManager>().addOriginator(m_viewport);
 
 	createModule<ScriptingModule>();
 	createModule<UIModule>();
 
+	stateManager->loadGlobal();
 	stateManager->newScene();
 
 	NewProjectCommand::addListener([]() {

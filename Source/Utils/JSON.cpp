@@ -214,11 +214,11 @@ void to_json_recursively(const instance& obj2, PrettyWriter<StringBuffer>& write
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void fromjson_recursively(instance obj, Value& json_object);
+void fromjson_recursively(instance obj, const Value& json_object);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-variant extract_basic_types(Value& json_value)
+variant extract_basic_types(const Value& json_value)
 {
 	switch (json_value.GetType())
 	{
@@ -261,7 +261,7 @@ variant extract_basic_types(Value& json_value)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-static void write_array_recursively(variant_sequential_view& view, Value& json_array_value)
+static void write_array_recursively(variant_sequential_view& view, const Value& json_array_value)
 {
 	view.set_size(json_array_value.Size());
 	const type array_value_type = view.get_rank_type(1);
@@ -290,7 +290,7 @@ static void write_array_recursively(variant_sequential_view& view, Value& json_a
 	}
 }
 
-variant extract_value(Value::MemberIterator& itr, const type& t)
+variant extract_value(Value::ConstMemberIterator& itr, const type& t)
 {
 	auto& json_value = itr->value;
 	variant extracted_value = extract_basic_types(json_value);
@@ -313,15 +313,15 @@ variant extract_value(Value::MemberIterator& itr, const type& t)
 	return extracted_value;
 }
 
-static void write_associative_view_recursively(variant_associative_view& view, Value& json_array_value)
+static void write_associative_view_recursively(variant_associative_view& view, const Value& json_array_value)
 {
 	for (SizeType i = 0; i < json_array_value.Size(); ++i)
 	{
 		auto& json_index_value = json_array_value[i];
 		if (json_index_value.IsObject()) // a key-value associative view
 		{
-			Value::MemberIterator key_itr = json_index_value.FindMember("key");
-			Value::MemberIterator value_itr = json_index_value.FindMember("value");
+			Value::ConstMemberIterator key_itr = json_index_value.FindMember("key");
+			Value::ConstMemberIterator value_itr = json_index_value.FindMember("value");
 
 			if (key_itr != json_index_value.MemberEnd() && value_itr != json_index_value.MemberEnd())
 			{
@@ -344,14 +344,14 @@ static void write_associative_view_recursively(variant_associative_view& view, V
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void fromjson_recursively(instance obj2, Value& json_object)
+void fromjson_recursively(instance obj2, const Value& json_object)
 {
 	instance obj = obj2.get_type().get_raw_type().is_wrapper() ? obj2.get_wrapped_instance() : obj2;
 	const auto prop_list = obj.get_derived_type().get_properties();
 
 	for (auto prop : prop_list)
 	{
-		Value::MemberIterator ret = json_object.FindMember(prop.get_name().data());
+		Value::ConstMemberIterator ret = json_object.FindMember(prop.get_name().data());
 		if (ret == json_object.MemberEnd())
 			continue;
 		const type value_t = prop.get_type();
@@ -399,12 +399,12 @@ void fromjson_recursively(instance obj2, Value& json_object)
 
 namespace JSON
 {
-std::optional<rapidjson::Document> parse(const fs::path& inputSrc)
+std::optional<rapidjson::Document> parse(const fs::path& inputPath)
 {
-	std::ifstream file(inputSrc);
+	std::ifstream file(inputPath);
 	if (!file.good())
 	{
-		LOG_ERROR("Cannot open input file \"{}\"!", inputSrc.string());
+		LOG_ERROR("Cannot open json file '{}'!", inputPath.string());
 		return std::nullopt;
 	}
 
@@ -414,14 +414,14 @@ std::optional<rapidjson::Document> parse(const fs::path& inputSrc)
 	const auto hasError = document.ParseStream(inputStreamWrapper).HasParseError();
 	if (hasError)
 	{
-		LOG_ERROR("Cannot parse config file!");
+		LOG_ERROR("Cannot parse json file '{}'!", inputPath.string());
 		return std::nullopt;
 	}
 
 	return document;
 }
 
-std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::path& schemaSrc)
+std::optional<rapidjson::Document> parse(const fs::path& inputPath, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
 	I3T_ASSERT(schemaFile.good(), fmt::format("Cannot open schema file {}: {}, working directory is {}",
@@ -436,7 +436,7 @@ std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::pat
 	rapidjson::SchemaDocument schema(schemaDocument);
 	rapidjson::SchemaValidator validator(schema);
 
-	auto maybeDocument = parse(inputSrc);
+	auto maybeDocument = parse(inputPath);
 	if (!maybeDocument.has_value())
 	{
 		return std::nullopt;
@@ -455,6 +455,17 @@ std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::pat
 	}
 
 	return document;
+}
+
+std::optional<rapidjson::Document> parseString(const std::string& jsonStr)
+{
+	rapidjson::Document doc;
+	if (doc.Parse(jsonStr).HasParseError())
+	{
+		LOG_ERROR("Cannot parse json string! String:\n{}", jsonStr);
+		return std::nullopt;
+	}
+	return doc;
 }
 
 bool save(const fs::path& path, const rapidjson::Document& document)
@@ -478,7 +489,7 @@ bool save(const fs::path& path, const rapidjson::Document& document)
 	return true;
 }
 
-Result<std::string, Error> serialize(rttr::instance obj)
+Result<std::string, Error> serializeToString(rttr::instance obj)
 {
 	if (!obj.is_valid())
 	{
@@ -493,9 +504,39 @@ Result<std::string, Error> serialize(rttr::instance obj)
 	return sb.GetString();
 }
 
-Result<Void, Error> serialize(rttr::instance obj, const fs::path& path)
+// TODO: (DR) Should be rewritten to use RTTR to create a rapidjson::Document directly and avoid parsing json again
+//   Martin pls fix someday :).
+Result<rapidjson::Document, Error> serializeToDocument(rttr::instance obj)
 {
-	auto result = serialize(obj);
+	if (!obj.is_valid())
+	{
+		return Err("invalid reflected object to serialize");
+	}
+
+	// Create empty doc
+	rapidjson::Document emptyDoc;
+	emptyDoc.SetObject();
+
+	auto jsonStr = JSON::serializeToString(obj);
+	if (!jsonStr)
+	{
+		return Err(jsonStr.error());
+	}
+
+	// Parse them again (cause they get serialized in a string not a doc //TODO: Fix)
+	std::optional<rapidjson::Document> jsonOpt = JSON::parseString(jsonStr.value());
+	if (!jsonOpt)
+	{
+		return Err("Failed to parse serialized object json!");
+	}
+	rapidjson::Document doc;
+	doc.Swap(jsonOpt.value());
+	return doc;
+}
+
+Result<Void, Error> serializeToFile(rttr::instance obj, const fs::path& path)
+{
+	auto result = serializeToString(obj);
 	if (!result)
 	{
 		return Err(result.error());
@@ -514,7 +555,18 @@ Result<Void, Error> serialize(rttr::instance obj, const fs::path& path)
 	return Void{};
 }
 
-Result<Void, Error> deserialize(const std::string& json, rttr::instance obj)
+Result<Void, Error> deserializeDocument(const rapidjson::Value& document, rttr::instance obj)
+{
+#ifdef GetObject
+#undef GetObject
+#endif
+
+	fromjson_recursively(obj, document);
+
+	return Void{};
+}
+
+Result<Void, Error> deserializeString(const std::string& json, rttr::instance obj)
 {
 	Document document; // Default template parameter uses UTF8 and MemoryPoolAllocator.
 
@@ -526,25 +578,14 @@ Result<Void, Error> deserialize(const std::string& json, rttr::instance obj)
 
 	fromjson_recursively(obj, document);
 
-	return deserialize(document, obj);
+	return deserializeDocument(document, obj);
 }
 
-Result<Void, Error> deserialize(rapidjson::Value& document, rttr::instance obj)
-{
-#ifdef GetObject
-#undef GetObject
-#endif
-
-	fromjson_recursively(obj, document);
-
-	return Void{};
-}
-
-Result<Void, Error> deserialize(const fs::path& path, rttr::instance obj)
+Result<Void, Error> deserializeFile(const fs::path& path, rttr::instance obj)
 {
 	if (auto maybeJson = parse(path))
 	{
-		return deserialize(maybeJson.value(), obj);
+		return deserializeDocument(maybeJson.value(), obj);
 	}
 
 	return Err("unable to open JSON file " + path.string());
@@ -599,4 +640,37 @@ bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::
 
 	return true;
 }
+
+std::string serializeVector(float* v, int componentCount)
+{
+	rapidjson::Document doc;
+	rapidjson::Document::AllocatorType& a = doc.GetAllocator();
+	doc.SetArray();
+	for (int i = 0; i < componentCount; i++)
+	{
+		doc.PushBack(rapidjson::Value().SetFloat(v[i]), a);
+	}
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	return buffer.GetString();
+}
+
+std::vector<float> deserializeVector(std::string str, int componentCount)
+{
+	std::vector<float> out;
+	out.reserve(componentCount);
+	rapidjson::Document doc;
+	if (doc.Parse(str).HasParseError())
+	{
+		return out;
+	}
+	auto arr = doc.GetArray();
+	for (int i = 0; i < componentCount; i++)
+	{
+		out.push_back(arr[i].GetFloat());
+	}
+	return out;
+}
+
 } // namespace JSON

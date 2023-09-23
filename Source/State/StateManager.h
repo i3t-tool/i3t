@@ -56,10 +56,10 @@ public:
 
 	// Scene save/load _________________________________________________________________________________________________
 
-	bool loadScene(const fs::path& path);
-
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
+
+	bool loadScene(const fs::path& path);
 
 	void newScene();
 
@@ -76,10 +76,16 @@ public:
 		return m_currentScene.get();
 	}
 
+	// Global save/load ________________________________________________________________________________________________
+
+	bool saveGlobal();
+	bool loadGlobal();
+	void resetGlobal();
+
 	// User data _______________________________________________________________________________________________________
 
-	void loadUserData();
 	void saveUserData();
+	void loadUserData();
 
 	// Temporary directory _____________________________________________________________________________________________
 
@@ -99,8 +105,6 @@ private:
 
 	std::vector<IStateful*> m_originators;
 
-	std::optional<Memento> createMemento(Scene* scene);
-
 	/// Resets counters, set clean state and takes initial snapshot.
 	void reset();
 
@@ -114,6 +118,14 @@ private:
 	Ptr<State::Scene> m_currentScene;
 
 	bool setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath = "");
+
+	std::optional<Memento> createSceneMemento(Scene* scene);
+
+	// Global save/load ________________________________________________________________________________________________
+
+	const fs::path m_globalFilePath = fs::path("Global.json");
+
+	std::optional<Memento> createGlobalMemento();
 
 	// Temporary directory _____________________________________________________________________________________________
 

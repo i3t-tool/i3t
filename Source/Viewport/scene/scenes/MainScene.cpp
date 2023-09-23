@@ -47,39 +47,41 @@ void MainScene::init()
 {
 	Scene::init();
 
+	ViewportSettings& stg = m_viewport->getSettings();
+
 	// TODO: (DR) Some of these settings should be updated dynamically, not on init only
 	// Camera
 	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
 	{
-		camera->switchMode(m_viewport->m_settings.mainScene_cameraMode);
-		camera->getOrbitCamera()->setRotationX(m_viewport->m_settings.mainScene_orbitCameraRotationX);
-		camera->getOrbitCamera()->setRotationY(m_viewport->m_settings.mainScene_orbitCameraRotationY);
+		camera->switchMode(stg.scene().mainScene_cameraMode);
+		camera->getOrbitCamera()->setRotationX(stg.scene().mainScene_orbitCameraRotationX);
+		camera->getOrbitCamera()->setRotationY(stg.scene().mainScene_orbitCameraRotationY);
 
-		camera->getOrbitCamera()->setRadius(m_viewport->m_settings.mainScene_iorbitCameraRadius);
-		camera->getTrackballCamera()->setRadius(m_viewport->m_settings.mainScene_iorbitCameraRadius);
+		camera->getOrbitCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
+		camera->getTrackballCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
 
-		camera->getOrbitCamera()->setPivot(m_viewport->m_settings.mainScene_iorbitCameraPivot);
-		camera->getTrackballCamera()->setPivot(m_viewport->m_settings.mainScene_iorbitCameraPivot);
+		camera->getOrbitCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
+		camera->getTrackballCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
 
-		camera->getOrbitCamera()->setSmoothScroll(m_viewport->m_settings.camera_smoothScroll);
-		camera->getTrackballCamera()->setSmoothScroll(m_viewport->m_settings.camera_smoothScroll);
+		camera->getOrbitCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+		camera->getTrackballCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
 
-		camera->getOrbitCamera()->setFov(m_viewport->m_settings.camera_fov);
-		camera->getTrackballCamera()->setFov(m_viewport->m_settings.camera_fov);
+		camera->getOrbitCamera()->setFov(stg.scene().camera_fov);
+		camera->getTrackballCamera()->setFov(stg.scene().camera_fov);
 
-		camera->getOrbitCamera()->setZNear(m_viewport->m_settings.camera_zNear);
-		camera->getTrackballCamera()->setZNear(m_viewport->m_settings.camera_zNear);
+		camera->getOrbitCamera()->setZNear(stg.scene().camera_zNear);
+		camera->getTrackballCamera()->setZNear(stg.scene().camera_zNear);
 
-		camera->getOrbitCamera()->setZFar(m_viewport->m_settings.camera_zFar);
-		camera->getTrackballCamera()->setZFar(m_viewport->m_settings.camera_zFar);
+		camera->getOrbitCamera()->setZFar(stg.scene().camera_zFar);
+		camera->getTrackballCamera()->setZFar(stg.scene().camera_zFar);
 
-		camera->getOrbitCamera()->setRotateSpeed(m_viewport->m_settings.orbitCamera_rotateSpeed);
-		camera->getOrbitCamera()->setTranslateSpeed(m_viewport->m_settings.orbitCamera_translateSpeed);
-		camera->getOrbitCamera()->setZoomSpeed(m_viewport->m_settings.orbitCamera_zoomSpeed);
+		camera->getOrbitCamera()->setRotateSpeed(stg.global().orbitCamera_rotateSpeed);
+		camera->getOrbitCamera()->setTranslateSpeed(stg.global().orbitCamera_translateSpeed);
+		camera->getOrbitCamera()->setZoomSpeed(stg.global().orbitCamera_zoomSpeed);
 
-		camera->getTrackballCamera()->setRotateSpeed(m_viewport->m_settings.trackballCamera_rotateSpeed);
-		camera->getTrackballCamera()->setTranslateSpeed(m_viewport->m_settings.trackballCamera_translateSpeed);
-		camera->getTrackballCamera()->setZoomSpeed(m_viewport->m_settings.trackballCamera_zoomSpeed);
+		camera->getTrackballCamera()->setRotateSpeed(stg.global().trackballCamera_rotateSpeed);
+		camera->getTrackballCamera()->setTranslateSpeed(stg.global().trackballCamera_translateSpeed);
+		camera->getTrackballCamera()->setZoomSpeed(stg.global().trackballCamera_zoomSpeed);
 	}
 
 	// Lights
@@ -191,22 +193,24 @@ void MainScene::update(double dt)
 {
 	Scene::update(dt);
 
+	ViewportSettings& stg = m_viewport->getSettings();
+
 	GridShader* gridShader = static_cast<GridShader*>(m_gridObject->m_shader);
-	gridShader->m_gridColor = m_viewport->getSettings().grid_color;
-	gridShader->m_axisXColor = m_viewport->getSettings().grid_axisXColor;
-	gridShader->m_axisYColor = m_viewport->getSettings().grid_axisYColor;
-	gridShader->m_axisZColor = m_viewport->getSettings().grid_axisZColor;
+	gridShader->m_gridColor = stg.global().grid_color;
+	gridShader->m_axisXColor = stg.global().grid_axisXColor;
+	gridShader->m_axisYColor = stg.global().grid_axisYColor;
+	gridShader->m_axisZColor = stg.global().grid_axisZColor;
 
-	gridShader->m_gridSize = m_viewport->getSettings().grid_size;
-	gridShader->m_gridStrength = m_viewport->getSettings().grid_strength;
-	gridShader->m_lineWidth = m_viewport->getSettings().grid_lineWidth;
+	gridShader->m_gridSize = stg.global().grid_size;
+	gridShader->m_gridStrength = stg.global().grid_strength;
+	gridShader->m_lineWidth = stg.global().grid_lineWidth;
 
-	gridShader->m_grid1FadeStart = m_viewport->getSettings().grid_grid1FadeStart;
-	gridShader->m_grid1FadeEnd = m_viewport->getSettings().grid_grid1FadeEnd;
-	gridShader->m_grid2FadeStart = m_viewport->getSettings().grid_grid2FadeStart;
-	gridShader->m_grid2FadeEnd = m_viewport->getSettings().grid_grid2FadeEnd;
+	gridShader->m_grid1FadeStart = stg.global().grid_grid1FadeStart;
+	gridShader->m_grid1FadeEnd = stg.global().grid_grid1FadeEnd;
+	gridShader->m_grid2FadeStart = stg.global().grid_grid2FadeStart;
+	gridShader->m_grid2FadeEnd = stg.global().grid_grid2FadeEnd;
 
-	if (m_viewport->getSettings().mainScene_lightFollowsCamera)
+	if (stg.scene().mainScene_lightFollowsCamera)
 	{
 		m_sun1->direction = glm::inverse(m_camera->getView()) * glm::normalize(glm::vec4(-0.3f, -0.4f, -1.0f, 0.0f));
 		m_sun2->intensity = 0.0f;
@@ -215,5 +219,111 @@ void MainScene::update(double dt)
 	{
 		m_sun1->direction = m_sun1_dir;
 		m_sun2->intensity = m_sun2_intensity;
+	}
+}
+
+void MainScene::loadSettings(ViewportSettings& stg, bool scene, bool global)
+{
+	Scene::loadSettings(stg, scene, global);
+
+	// Camera
+	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
+	{
+		if (scene)
+		{
+			camera->switchMode(stg.scene().mainScene_cameraMode);
+
+			camera->getOrbitCamera()->setRotationX(stg.scene().mainScene_orbitCameraRotationX);
+			camera->getOrbitCamera()->setRotationY(stg.scene().mainScene_orbitCameraRotationY);
+			camera->getTrackballCamera()->setRotation(stg.scene().mainScene_trackballCameraRotation);
+
+			camera->getOrbitCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
+			camera->getTrackballCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
+
+			camera->getOrbitCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
+			camera->getTrackballCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
+
+			camera->getOrbitCamera()->setFov(stg.scene().camera_fov);
+			camera->getTrackballCamera()->setFov(stg.scene().camera_fov);
+
+			camera->getOrbitCamera()->setZNear(stg.scene().camera_zNear);
+			camera->getTrackballCamera()->setZNear(stg.scene().camera_zNear);
+
+			camera->getOrbitCamera()->setZFar(stg.scene().camera_zFar);
+			camera->getTrackballCamera()->setZFar(stg.scene().camera_zFar);
+		}
+		if (global)
+		{
+			camera->getOrbitCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+			camera->getTrackballCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+
+			camera->getOrbitCamera()->setRotateSpeed(stg.global().orbitCamera_rotateSpeed);
+			camera->getOrbitCamera()->setTranslateSpeed(stg.global().orbitCamera_translateSpeed);
+			camera->getOrbitCamera()->setZoomSpeed(stg.global().orbitCamera_zoomSpeed);
+
+			camera->getTrackballCamera()->setRotateSpeed(stg.global().trackballCamera_rotateSpeed);
+			camera->getTrackballCamera()->setTranslateSpeed(stg.global().trackballCamera_translateSpeed);
+			camera->getTrackballCamera()->setZoomSpeed(stg.global().trackballCamera_zoomSpeed);
+		}
+	}
+}
+void MainScene::saveSettings(ViewportSettings& stg, bool scene, bool global)
+{
+	Scene::saveSettings(stg, scene, global);
+
+	// Camera
+	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
+	{
+		if (scene)
+			stg.scene().mainScene_cameraMode = camera->getMode();
+
+		switch (camera->getMode())
+		{
+		case AggregateCamera::CameraMode::ORBIT:
+			if (scene)
+			{
+				stg.scene().mainScene_orbitCameraRotationX = camera->getOrbitCamera()->getRotationX();
+				stg.scene().mainScene_orbitCameraRotationY = camera->getOrbitCamera()->getRotationY();
+
+				stg.scene().mainScene_iorbitCameraRadius = camera->getOrbitCamera()->getRadius();
+				stg.scene().mainScene_iorbitCameraPivot = camera->getOrbitCamera()->getPivot();
+
+				stg.scene().camera_fov = camera->getOrbitCamera()->getFov();
+				stg.scene().camera_zNear = camera->getOrbitCamera()->getZNear();
+				stg.scene().camera_zFar = camera->getOrbitCamera()->getZFar();
+			}
+			if (global)
+			{
+				stg.global().camera_smoothScroll = camera->getOrbitCamera()->getSmoothScroll();
+
+				stg.global().orbitCamera_rotateSpeed = camera->getOrbitCamera()->getRotateSpeed();
+				stg.global().orbitCamera_translateSpeed = camera->getOrbitCamera()->getTranslateSpeed();
+				stg.global().orbitCamera_zoomSpeed = camera->getOrbitCamera()->getZoomSpeed();
+			}
+			break;
+		case AggregateCamera::CameraMode::TRACKBALL:
+			if (scene)
+			{
+				stg.scene().mainScene_trackballCameraRotation = camera->getTrackballCamera()->getRotation();
+
+				stg.scene().mainScene_iorbitCameraRadius = camera->getTrackballCamera()->getRadius();
+				stg.scene().mainScene_iorbitCameraPivot = camera->getTrackballCamera()->getPivot();
+
+				stg.scene().camera_fov = camera->getTrackballCamera()->getFov();
+				stg.scene().camera_zNear = camera->getTrackballCamera()->getZNear();
+				stg.scene().camera_zFar = camera->getTrackballCamera()->getZFar();
+			}
+			if (global)
+			{
+				stg.global().camera_smoothScroll = camera->getTrackballCamera()->getSmoothScroll();
+
+				stg.global().trackballCamera_rotateSpeed = camera->getTrackballCamera()->getRotateSpeed();
+				stg.global().trackballCamera_translateSpeed = camera->getTrackballCamera()->getTranslateSpeed();
+				stg.global().trackballCamera_zoomSpeed = camera->getTrackballCamera()->getZoomSpeed();
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }

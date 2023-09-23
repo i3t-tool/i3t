@@ -5,6 +5,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
+#include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
 void SetupDialog::render()
@@ -19,26 +20,32 @@ void SetupDialog::render()
 	ImGui::Begin(setName("Preferences").c_str(), &windowOpen);
 	{
 		Vp::Viewport* viewport = App::get().viewport();
-		Vp::ViewportSettings& settings = viewport->getSettings();
+		Vp::ViewportSettings& stg = viewport->getSettings();
+
+		if (ImGui::Button("Reset to defaults"))
+		{
+			App::getModule<StateManager>().resetGlobal();
+		}
+
 		if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::Indent();
-			ImGui::SliderFloat("Model preview FOV", &settings.preview_fov, 5, 120, "%f");
-			ImGui::SliderFloat("Model preview radius", &settings.preview_radiusFactor, 0.1f, 10.0f, "%.2f");
-			ImGui::SliderFloat("Model preview rotate speed", &settings.preview_rotateSpeed, 0.f, 100.f, "%f");
+			ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");
+			ImGui::SliderFloat("Model preview radius", &stg.global().preview_radiusFactor, 0.1f, 10.0f, "%.2f");
+			ImGui::SliderFloat("Model preview rotate speed", &stg.global().preview_rotateSpeed, 0.f, 100.f, "%f");
 
-			ImGui::Combo("Lighting model", &settings.lighting_lightingModel, "Phong\0Blinn-Phong\0\0");
+			ImGui::Combo("Lighting model", &stg.global().lighting_lightingModel, "Phong\0Blinn-Phong\0\0");
 
 			if (ImGui::CollapsingHeader("Highlight"))
 			{
 				ImGui::Indent();
 				// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
-				ImGui::SliderFloat("Downscale factor", &settings.highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
-				ImGui::SliderInt("Kernel size", &settings.highlight_kernelSize, 1, 10);
-				ImGui::SliderFloat("Blur cutoff", &settings.highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
-				ImGui::Checkbox("Use depth", &settings.highlight_useDepth);
-				ImGui::SliderFloat("Darken factor", &settings.highlight_useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
-				ImGui::SliderFloat("Desaturate factor", &settings.highlight_useDepth_desaturateFactor, 0.0f, 1.0f,
+				ImGui::SliderFloat("Downscale factor", &stg.global().highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
+				ImGui::SliderInt("Kernel size", &stg.global().highlight_kernelSize, 1, 10);
+				ImGui::SliderFloat("Blur cutoff", &stg.global().highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
+				ImGui::Checkbox("Use depth", &stg.global().highlight_useDepth);
+				ImGui::SliderFloat("Darken factor", &stg.global().highlight_useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
+				ImGui::SliderFloat("Desaturate factor", &stg.global().highlight_useDepth_desaturateFactor, 0.0f, 1.0f,
 				                   "%.2f");
 				ImGui::Unindent();
 			}
@@ -46,18 +53,21 @@ void SetupDialog::render()
 			if (ImGui::CollapsingHeader("Grid"))
 			{
 				ImGui::Indent();
-				ImGui::ColorEdit3("Grid color", glm::value_ptr(settings.grid_color), ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("X axis color", glm::value_ptr(settings.grid_axisXColor), ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Y axis color", glm::value_ptr(settings.grid_axisYColor), ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Z axis color", glm::value_ptr(settings.grid_axisZColor), ImGuiColorEditFlags_Float);
+				ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid_color), ImGuiColorEditFlags_Float);
+				ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid_axisXColor),
+				                  ImGuiColorEditFlags_Float);
+				ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid_axisYColor),
+				                  ImGuiColorEditFlags_Float);
+				ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid_axisZColor),
+				                  ImGuiColorEditFlags_Float);
 
-				ImGui::SliderFloat("Size", &settings.grid_size, 0.01f, 2.f, "%.2f");
-				ImGui::SliderFloat("Strength", &settings.grid_strength, 0.01f, 1.f, "%.2f");
-				ImGui::SliderFloat("Line width", &settings.grid_lineWidth, 0.01f, 5.0f, "%.2f");
-				ImGui::SliderFloat("Fade 1 start", &settings.grid_grid1FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 1 end", &settings.grid_grid1FadeEnd, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 start", &settings.grid_grid2FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 end", &settings.grid_grid2FadeEnd, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Size", &stg.global().grid_size, 0.01f, 2.f, "%.2f");
+				ImGui::SliderFloat("Strength", &stg.global().grid_strength, 0.01f, 1.f, "%.2f");
+				ImGui::SliderFloat("Line width", &stg.global().grid_lineWidth, 0.01f, 5.0f, "%.2f");
+				ImGui::SliderFloat("Fade 1 start", &stg.global().grid_grid1FadeStart, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 1 end", &stg.global().grid_grid1FadeEnd, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 2 start", &stg.global().grid_grid2FadeStart, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 2 end", &stg.global().grid_grid2FadeEnd, 0.0f, 1.f, "%.2f");
 				ImGui::Unindent();
 			}
 

@@ -759,7 +759,7 @@ bool ResourceManager::removeImportedModel(const std::string& alias)
 	return true;
 }
 
-Memento ResourceManager::saveState(Scene* scene)
+Memento ResourceManager::saveScene(Scene* scene)
 {
 	// TODO: (DR) I haven't really thought too much how imported models should be handled during undo/redo operations,
 	//   right now a load triggered by an undo/redo (a load with a NULL Scene pointer passed) is simply ignored.
@@ -921,7 +921,7 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 	return true;
 }
 
-void ResourceManager::loadState(const Memento& memento, Scene* scene)
+void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 {
 	// TODO: (DR) I haven't really thought too much how imported models should be handled during undo/redo operations,
 	//   right now a load triggered by an undo/redo (a load with a NULL Scene pointer passed) is simply ignored.
@@ -933,7 +933,7 @@ void ResourceManager::loadState(const Memento& memento, Scene* scene)
 		LOG_INFO("[RESOURCE MANAGER] Loading imported resources ...");
 		LOG_INFO("");
 
-		clearState();
+		clearScene();
 
 		if (!memento.HasMember("resources"))
 		{
@@ -1004,7 +1004,7 @@ void ResourceManager::loadState(const Memento& memento, Scene* scene)
 	}
 }
 
-void ResourceManager::clearState()
+void ResourceManager::clearScene()
 {
 	// Clear imported resources
 	std::vector importedResourcesCopy = std::vector(m_importedResources);
@@ -1020,6 +1020,13 @@ void ResourceManager::clearState()
 
 	m_filesToAddOnSave.clear();
 }
+
+Memento ResourceManager::saveGlobal()
+{
+	return emptyMemento();
+}
+void ResourceManager::loadGlobal(const Memento& memento) {}
+void ResourceManager::clearGlobal() {}
 
 std::optional<std::vector<Resource>> ResourceManager::readResources(const rapidjson::Value& resources)
 {
