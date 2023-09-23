@@ -25,7 +25,7 @@ typedef std::function<Core::ValueSetResult(float)> setter_function_pointer;
 class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 {
 protected:
-	int m_numberOfVisibleDecimal;
+	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
 	bool m_isLabelBeingEdited = false;
 	bool m_isFirstDraw = true;

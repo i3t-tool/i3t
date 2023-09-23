@@ -255,6 +255,7 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 80.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
+	m_sizes[ESize::Default_VisibleQuaternionPrecision] = 4.0f;
 
 	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
@@ -530,6 +531,7 @@ void Theme::initModernProperties()
 	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 70.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
+	m_sizes[ESize::Default_VisibleQuaternionPrecision] = 4.0f;
 
 	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
@@ -789,6 +791,8 @@ void Theme::initNames()
 	g_SizeNames[ESize::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes_Transformation_TrackingMarkSize";
 
 	g_SizeNames[ESize::Default_VisiblePrecision] = "ngen_Nodes default visible precision";
+	g_SizeNames[ESize::Default_VisibleQuaternionPrecision] = "ngen_Nodes default visible precision for quaternions";
+
 	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes default inactive part marker";
 
 	g_SizeNames[ESize::Links_ControlpointsPositionFraction] =

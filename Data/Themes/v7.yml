@@ -404,6 +404,7 @@ sizes:
   ngen_Nodes left side spacing: 3
   ngen_Nodes right side spacing: 3
   ngen_Nodes default visible precision: 1
+  ngen_Nodes default visible precision for quaternions: 4  
   ngen_Nodes default inactive part marker: 0
   ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
   ngen_Link minimal x distance between controlpoint and start/end of link: 50

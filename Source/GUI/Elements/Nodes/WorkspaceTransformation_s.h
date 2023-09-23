@@ -7,9 +7,13 @@ template <Core::ETransformType T> class WorkspaceTransformation_s : public Works
 public:
 	WorkspaceTransformation_s(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<T>())
 	{
-		updateDataItemsWidth();
 		if (Core::ETransformType::Quat == T)
+		{
 			setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
+			WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(
+			    I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
+		}
+		updateDataItemsWidth();
 	}
 
 	/**

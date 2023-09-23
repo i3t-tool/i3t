@@ -7,6 +7,43 @@ public:
 	WorkspaceOperator(DIWNE::Diwne& diwne)
 	    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
 	{
+		// To avoid rounding-confusion, the operators with quaternion output should have more decimal places to
+		// distinguish small changes near zero or near one
+		//
+		// Example: (0.9986, 0.0, 0.0524, 0.0) is a normalized quaternion
+		//          (1.0, 0.0, 0.1, 0.0)       is its representation rounded to 1 decimal digit
+		//
+		//          Both return length equal to 1.0, but the rounded is clearly not normalized.
+		switch (const Core::EOperatorType t = T)
+		{
+		case Core::EOperatorType::QuatToQuat:
+		case Core::EOperatorType::AngleAxisToQuat:
+		case Core::EOperatorType::ConjQuat:
+		case Core::EOperatorType::EulerToQuat:
+		case Core::EOperatorType::FloatMulQuat:
+		case Core::EOperatorType::FloatVecToQuat:
+		case Core::EOperatorType::FloatsToQuat:
+		case Core::EOperatorType::MatrixToQuat:
+		case Core::EOperatorType::NormalizeQuat:
+		case Core::EOperatorType::QuatToFloats:
+		case Core::EOperatorType::QuatInverse:
+		case Core::EOperatorType::QuatLength:
+		case Core::EOperatorType::QuatMulQuat:
+		case Core::EOperatorType::QuatVecConjQuat:
+		case Core::EOperatorType::VecVecToQuat:
+			WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(
+			    I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
+			break;
+		default:
+		    // leave the default precision;
+		    ;
+		}
+
+		// if (Core::EOperatorType::QuatToQuat == T)
+		//{
+		//	WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(4);
+		// }
+
 		updateDataItemsWidth();
 	}
 
