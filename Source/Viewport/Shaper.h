@@ -15,7 +15,7 @@ namespace Vp
 /**
  * \brief A utility class for constructing simple shapes.
  *
- * Used in Viewport for drawing of world axes, axes of models and wireframe objects (such as projection frustrum)
+ * Used in Viewport for drawing of world axes, axes of models and wireframe objects (such as projection frustum)
  */
 class Shaper
 {
