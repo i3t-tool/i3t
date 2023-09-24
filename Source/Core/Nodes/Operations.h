@@ -377,19 +377,19 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1, vector3Input},   // vec3 - vec3
     {n(EOperatorType::Vector3MulFloat), "float * vec3", 2, floatVector3Input, 1, vector3Input},  // float * vec3
     {n(EOperatorType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},    // normalize vec3
-    {n(EOperatorType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput,
+    {n(EOperatorType::Vector3Length), "length(vec3)", 1, vector3Input, 1, floatInput,
      "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
     {n(EOperatorType::ShowVector3), "show vec3", 1, vector3Input, 1, matrixInput,
      "Create the matrix rotating vector [1, 0, 0] to the input vector. Should "
      "be used for display of rotated "
      "vectors."}, // show vec3
     {n(EOperatorType::MixVector3), "mix vec3", 3, twoVector3FloatInput, 1, vector3Input, NO_TAG,
-     mixInputNames},                                                                           // mix vec3
-    {n(EOperatorType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},                // quat conjugate
-    {n(EOperatorType::FloatVecToQuat), "quatfloat, vec3", 2, floatVector3Input, 1, quatInput}, // quatfloat, vec3
-    {n(EOperatorType::AngleAxisToQuat), "quatangle, axis", 3, twoFloatVector3Input, 1, quatInput, NO_TAG,
+     mixInputNames},                                                                             // mix vec3
+    {n(EOperatorType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},                  // quat conjugate
+    {n(EOperatorType::FloatVecToQuat), "quat(float, vec3)", 2, floatVector3Input, 1, quatInput}, // quatfloat, vec3
+    {n(EOperatorType::AngleAxisToQuat), "quat(angle, axis)", 3, twoFloatVector3Input, 1, quatInput, NO_TAG,
      AngleAxisToQuatInputNames}, // quatangle, axis
-    {n(EOperatorType::VecVecToQuat), "quatvec3, vec3", 2, twoVector3Input, 1, quatInput,
+    {n(EOperatorType::VecVecToQuat), "quat(vec3, vec3)", 2, twoVector3Input, 1, quatInput,
      "Input vector's are normalized."}, // quatvec3, vec3   //PF: floatInput
                                         // changed to quatInput
     {n(EOperatorType::QuatToFloatVec), "quat -> float, vec3", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
@@ -417,7 +417,7 @@ static const std::vector<Operation> operations = {
     // {n(EOperatorType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input}, // qvq*
     {n(EOperatorType::QuatVecConjQuat), "qvq*", 2, vector3QuatInput, 1, vector3Input}, // qvq*
 
-    {n(EOperatorType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput,
+    {n(EOperatorType::QuatLength), "length(quat)", 1, quatInput, 1, floatInput,
      "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
     {n(EOperatorType::ClampFloat), "clamp float", 3, threeFloatInput, 1, floatInput,
      "Clamp val to <min, max> interval.\n Default min = 0 and max = 1", ClampFloatInputNames}, // clamp float
@@ -426,8 +426,8 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::FloatAddFloat), "float + float", 2, twoFloatInput, 1, floatInput},       // float + float
     {n(EOperatorType::FloatPowFloat), "float ^ float", 2, twoFloatInput, 1, floatInput},       // float ^ float
     {n(EOperatorType::MixFloat), "mix float", 3, threeFloatInput, 1, floatInput, NO_TAG, mixInputNames}, // mix float
-    {n(EOperatorType::FloatSinCos), "sin & cos(float)", 1, floatInput, 2, twoFloatInput},    // sin&cos(float)
-    {n(EOperatorType::ASinACos), "asin & acos(float)", 1, floatInput, 2, twoFloatInput},     // asin&acos(float)
+    {n(EOperatorType::FloatSinCos), "sin & cos", 1, floatInput, 2, twoFloatInput},           // sin&cos(float)
+    {n(EOperatorType::ASinACos), "asin & acos", 1, floatInput, 2, twoFloatInput},            // asin&acos(float)
     {n(EOperatorType::Signum), "signum", 1, floatInput, 1, floatInput},                      // signum
     {n(EOperatorType::MatrixToVectors), "mat -> vecs4", 1, matrixInput, 4, fourVectorInput}, // mat -> vecs
     {n(EOperatorType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1, matrixInput, NO_TAG,
@@ -482,7 +482,7 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::MakePerspective), "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG,
      PerspectiveInputNames}, // perspective
     {n(EOperatorType::MakeFrustum), "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG,
-     orthoFrustrumInputNames}, // frustrum
+     orthoFrustrumInputNames},                                                                                // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
     {n(EOperatorType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},

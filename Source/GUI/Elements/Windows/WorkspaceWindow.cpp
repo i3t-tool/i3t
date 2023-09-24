@@ -513,7 +513,7 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Perspective>>();
 			}
-			if (ImGui::MenuItem("frustrum"))
+			if (ImGui::MenuItem("frustum"))
 			{
 				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Frustum>>();
 			}
@@ -557,7 +557,7 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakePerspective>>();
 			}
-			if (ImGui::MenuItem("frustrum"))
+			if (ImGui::MenuItem("frustum"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeFrustum>>();
 			}
@@ -800,11 +800,11 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MixFloat>>();
 			}
-			if (ImGui::MenuItem("sin & cos(float)"))
+			if (ImGui::MenuItem("sin & cos"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatSinCos>>();
 			}
-			if (ImGui::MenuItem("asin & acos(float)"))
+			if (ImGui::MenuItem("asin & acos"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ASinACos>>();
 			}
