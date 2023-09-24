@@ -742,40 +742,36 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatSlerp>::updateValues(i
 template <typename T, glm::precision P>
 GLM_FUNC_DECL glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm::tquat<T, P> const& y, T a);
 
+// Implementation - a copy of glm::slerp with a negated z
 template <typename T, glm::precision P>
 GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm::tquat<T, P> const& y, T a)
 {
-	glm::tquat<T, P> z = y;
+	GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'longWaySlerp' only accept floating-point inputs");
+	glm::qua<T, P> z = y;
 
 	T cosTheta = dot(x, y);
 
-	// If cosTheta < 0, the interpolation will take the long way around the
-	// sphere. To fix this, one quat must be negated. PF force the long way round
-	// interpolation
-	if (cosTheta > T(0))
+	// If cosTheta < 0, the interpolation will take the long way around the sphere.
+	// To force the long way round interpolation, one quat must be negated if cosTheta > 0.
+	if (cosTheta > static_cast<T>(0))
 	{
 		z = -y;
 		cosTheta = -cosTheta;
 	}
 
-	// Perform a linear interpolation when cosTheta is close to 1 to avoid side
-	// effect of sin(angle) becoming a zero denominator
-	if (cosTheta > T(1) - glm::epsilon<T>())
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect
+	// of sin(angle) becoming a zero denominator
+	if (cosTheta > static_cast<T>(1) - glm::epsilon<T>())
 	{
 		// Linear interpolation
-		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
-		                        glm::mix(x.z, z.z, a));
+		return glm::qua<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
+		                      glm::mix(x.z, z.z, a));
 	}
 	else
 	{
 		// Essential Mathematics, page 467
 		T angle = acos(cosTheta);
-		/// \todo operator* override (float and double?)
-		// return (sin((T(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
-		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
-		                        glm::mix(x.z, z.z,
-		                                 a)); // tohle je určitě špatně - je to tu jen abych to
-		                                      // zkompiloval - má tu být to o řádek výš
+		return (sin((static_cast<T>(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
 	}
 }
 

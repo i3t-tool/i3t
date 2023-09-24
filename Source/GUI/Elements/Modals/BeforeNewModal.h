@@ -10,7 +10,7 @@
 class BeforeNewModal : public ModalWindow
 {
 public:
-	BeforeNewModal() : ModalWindow("Create new project?") {}
+	BeforeNewModal() : ModalWindow("Create a new project?") {}
 
 	/**
 	 * Show Close? modal centered in main window.

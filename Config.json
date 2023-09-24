@@ -36,6 +36,36 @@
       "type": "Model"
     },
     {
+      "name": "Axes",
+      "path": "Data/Models/axes.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow X",
+      "path": "Data/Models/arrowX.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow Y",
+      "path": "Data/Models/arrowY.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow Z",
+      "path": "Data/Models/arrowZ.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Metal Box",
+      "path": "Data/Models/box_metal.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Wooden Box",
+      "path": "Data/Models/box_wooden.gltf",
+      "type": "Model"
+    },
+    {
       "name": "ModelShader",
       "path": "Data/Shaders/Model.glsl",
       "type": "Shader"
