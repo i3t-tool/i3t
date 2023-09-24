@@ -17,10 +17,12 @@ void InputBindings::init()
 	InputManager::setInputAction("delete", Keys::del);
 	// InputManager::setInputAction("delete", Keys::backspace);
 
-	InputManager::setInputAction("undo", Keys::b, {Keys::ctrll});
-	InputManager::setInputAction("undo", Keys::z, {Keys::ctrll});
-	InputManager::setInputAction("redo", Keys::n, {Keys::ctrll});
-	InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
+	// See #297
+	// InputManager::setInputAction("undo", Keys::b, {Keys::ctrll});
+	// InputManager::setInputAction("undo", Keys::z, {Keys::ctrll});
+	// InputManager::setInputAction("redo", Keys::n, {Keys::ctrll});
+	// InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
+
 	InputManager::setInputAction("save", Keys::s, {Keys::ctrll});
 	InputManager::setInputAction("saveAs", Keys::s, {Keys::ctrll, Keys::shiftl});
 
