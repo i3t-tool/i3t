@@ -1,6 +1,7 @@
 #include "StateManager.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
@@ -287,6 +288,13 @@ bool StateManager::loadScene(const fs::path& path)
 	pushRecentFile(path);
 
 	reset();
+
+	/// \todo Replace me with a proper event
+	const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+	if (startWindow)
+	{
+		startWindow->hide();
+	}
 
 	return true;
 }
