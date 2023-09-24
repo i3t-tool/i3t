@@ -14,7 +14,7 @@ void BeforeNewModal::onImGui()
 		hide();
 	}
 
-	ImGui::Text("Do you want to save current project?\n\n");
+	ImGui::Text("Do you want to save your current project?\n\n");
 	ImGui::Separator();
 
 	if (ImGui::Button("Yes", ImVec2(100, 0)))

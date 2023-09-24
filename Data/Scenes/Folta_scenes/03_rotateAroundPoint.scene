@@ -2,6 +2,17 @@
     "resources": {
         "imported": []
     },
+    "mainScene_cameraMode": "ORBIT",
+    "mainScene_orbitCameraRotationX": -124.800048828125,
+    "mainScene_orbitCameraRotationY": 16.65999984741211,
+    "mainScene_trackballCameraRotation": "[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]",
+    "mainScene_iorbitCameraRadius": 12.0,
+    "mainScene_iorbitCameraPivot": "[0.0,0.0,0.0]",
+    "mainScene_lightFollowsCamera": true,
+    "camera_fov": 90.0,
+    "camera_zNear": 0.20000000298023225,
+    "camera_zFar": 270.0,
+    "manipulator_enabled": true,
     "workspace": {
         "operators": [
             {
@@ -10,8 +21,8 @@
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    596.3330078125,
-                    -75.2381362915039
+                    654.3330078125,
+                    -36.238136291503909
                 ],
                 "type": "Inversion"
             }
@@ -19,23 +30,25 @@
         "sequences": [
             {
                 "id": 4,
+                "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    853.3804931640625,
-                    130.71426391601563
+                    894.3804931640625,
+                    162.71426391601563
                 ],
                 "transforms": []
             },
             {
                 "id": 10,
+                "label": "Reference point",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    71.2381820678711,
-                    -76.28573608398438
+                    -15.761817932128907,
+                    -68.28573608398438
                 ],
                 "transforms": [
                     {
@@ -44,15 +57,15 @@
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            91.0,
-                            -46.0
+                            4.0,
+                            -38.0
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
                                 -3.0999999046325685,
                                 0.0,
-                                2.0
+                                3.5
                             ]
                         },
                         "savedDefaults": {},
@@ -78,7 +91,7 @@
                             [
                                 -3.0999999046325685,
                                 0.0,
-                                2.0,
+                                3.5,
                                 1.0
                             ]
                         ],
@@ -88,24 +101,14 @@
                 ]
             },
             {
-                "id": 17,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    319.76171875,
-                    131.6666259765625
-                ],
-                "transforms": []
-            },
-            {
                 "id": 30,
+                "label": "Rotation with respect to reference frame",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    596.0758666992188,
-                    -418.3620300292969
+                    500.3330078125,
+                    161.31422424316407
                 ],
                 "transforms": [
                     {
@@ -114,78 +117,19 @@
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            616.0,
-                            -388.0
-                        ],
-                        "type": "Scale",
-                        "defaultValues": {
-                            "scale": [
-                                2.5,
-                                2.5,
-                                2.5
-                            ]
-                        },
-                        "savedDefaults": {},
-                        "value": [
-                            [
-                                2.5,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                2.5,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                2.5,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        ],
-                        "synergies": true,
-                        "locked": true
-                    }
-                ]
-            },
-            {
-                "id": 23,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    584.3330078125,
-                    132.31422424316407
-                ],
-                "transforms": [
-                    {
-                        "id": 29,
-                        "render": true,
-                        "numberOfDecimals": 1,
-                        "LOD": "Full",
-                        "position": [
-                            604.0,
-                            163.0
+                            590.5,
+                            192.0
                         ],
                         "type": "EulerY",
                         "defaultValues": {
-                            "rotation": 0.6435010433197022
+                            "rotation": 0.45102688670158389
                         },
                         "savedDefaults": {},
                         "value": [
                             [
-                                0.800000011920929,
+                                0.8999999761581421,
                                 0.0,
-                                -0.5999999642372131,
+                                -0.43588995933532717,
                                 0.0
                             ],
                             [
@@ -195,9 +139,9 @@
                                 0.0
                             ],
                             [
-                                0.5999999642372131,
+                                0.43588995933532717,
                                 0.0,
-                                0.800000011920929,
+                                0.8999999761581421,
                                 0.0
                             ],
                             [
@@ -211,6 +155,18 @@
                         "locked": true
                     }
                 ]
+            },
+            {
+                "id": 17,
+                "label": "A",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    282.76171875,
+                    159.6666259765625
+                ],
+                "transforms": []
             }
         ],
         "cycles": [],
@@ -223,28 +179,8 @@
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    843.6559448242188,
-                    -416.8954162597656
-                ],
-                "model": "Duck",
-                "visible": false,
-                "showAxes": true,
-                "opaque": true,
-                "opacity": 0.5,
-                "tint": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            {
-                "id": 37,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1082.9521484375,
-                    129.7142791748047
+                    1119.9521484375,
+                    157.7142791748047
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -255,7 +191,30 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 37,
+                "label": "Reference coorfinate frame",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    457.65594482421877,
+                    -281.8954162597656
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
@@ -267,7 +226,7 @@
                 0
             ],
             [
-                23,
+                30,
                 0,
                 4,
                 0
@@ -279,34 +238,28 @@
                 1
             ],
             [
-                10,
-                1,
-                17,
-                1
-            ],
-            [
-                30,
+                4,
                 0,
                 39,
                 0
             ],
             [
-                4,
+                10,
                 0,
                 37,
                 0
             ],
             [
-                10,
+                17,
                 0,
                 30,
                 0
             ],
             [
+                10,
+                1,
                 17,
-                0,
-                23,
-                0
+                1
             ]
         ]
     }
