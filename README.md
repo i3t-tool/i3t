@@ -1,75 +1,48 @@
 # I3T
-Věnujte prosím velkou pozornost [programovacím konvencím projektu](Docs/Conventions.md).
+An Interactive Tool for Teaching Transformations
+
+Pay attention to [project code style](Docs/developer-guide/code-style.md).
 
 ## Build
 You will need C++23 compiler with support for `std::expected`, 
 see [compiler support](https://en.cppreference.com/w/cpp/compiler_support) for more information
 about compiler versions.
 
-For more information about building the project, see [build instructions](Docs/Build.md).
+For more information about building the project, see [build instructions](Docs/developer-guide/build.md).
 
-## Struktura projektu
+### Build documentation
+For local documentation build, you will need Node.js installed.
+```shell
+npm install
+npm run docs:dev
+```
+
+## Project structure
 ````
-Dependencies/           Adresář s knihovnami, které I3T potřebuje.
+Dependencies/               Directory with external dependencies.
 Docs/
     - Doxygen/
 Source/
-    - Commands/             Definice příkazů (událostí). 
-    - Core/                 Základní funkcionality.
-    - GUI/                  ImGui okna, dialogy a modální okna.
-        - Elements/         Jednotlivé GUI elementy.
-            - Dialogs/      Vyskakovací okna. 
-            - Modals/       Vyskakovací blokující okna.
-            - Windows/      Regulerní dokovací okna.
-        - ImGui/            Implementace ImGui callbacků pro GLFW.
-Test/                       Adresář s testy, kopíruje strukturu adresáře 'Source/'
+    - Commands/             Commands for the command pattern.
+    - Core/                 Core of the application.
+    - GUI/                  ImGui windows, dialogs, elements.
+        - Elements
+            - Dialogs/      
+            - Modals/       
+            - Windows/      
+        - ImGui/            Implementation of ImGui backend.
+Test/                       Unit tests, copies structure of Source/ directory.
 ````
 
-## Přispívání - Git
-Dbejte prosím na to, abyste zahrnovali k verzování (``git add``) pouze zdrojový kód 
-a soubory potřebné pro sestavení nebo pro správné fungování aplikace (konfigurace, data).
+## Contributing
+Please make sure, that you include only source code and files needed for building or running the application
+(configuration, data) to version control.
 
-Řekněte gitu, aby ignoroval to, co nemá v repozitáři být, jako je například cmake output.
-- [Jak psát .gitignore](https://www.atlassian.com/git/tutorials/saving-changes/gitignore)
+### Code style
+See [code style](Docs/developer-guide/code-style.md) for more information.
 
-## Konvence
-Takto má vypadat kód v C++, pozorně čtěte [konkrétní pravidla zde](Docs/Conventions.md).
+### Documentation
+Manual is available [here](Docs/manual.md).
 
-````cpp
-/**                                                             
- * \file        GUI\EditBox.h       
- * \author      Jméno Příjmení
- * \date        24.10.2020
- *                                                               
- * Declares the edit box class.                                   
- */                                                             
-#ifndef _EDIT_BOX_H_
-#define _EDIT_BOX_H_
-
-#include <string>
-
-const int g_val = 0;
-
-class EditBox
-{
-public:
-  void setName(const std::string& name)
-  {
-    m_boxName = name;
-  }
-
-private:
-  std::string m_boxName;
-};
-
-#endif // _EDIT_BOX_H_
-```` 
-
-## Tvorba nových krabiček
-Při tvorbě nových krabiček postupujte [takto](Docs/HowToAddNode.md).
-
-## Tvorba nových tutoriálů
-Při tvorbě nových tutoriálů postupujte [takto](Docs/Tutorials.md).
-
-## Manuál programu
-Manuál programu je dostupný [zde](Docs/I3Tmanual.md).
+- See how to [add new node](Docs/developer-guide/how-to-add-new-node.md).
+- See how to [add new tutorial](Docs/tutorials.md).

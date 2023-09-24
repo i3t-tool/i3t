@@ -69,6 +69,6 @@ The ``*.tut`` source files are searched for keywords and symbols that alter the 
 
 Styling, fonts and colors of the window are stored in the ``Theme.cpp`` and ``Theme.h``, which can be modified to style the tutorial window and its contents.
 
-If you need to create new tutorials, follow [these instructions](Docs/Tutorials.md).
+If you need to create new tutorials, follow [these instructions](tutorials.md).
 
 ## etc...

@@ -5,6 +5,13 @@
 # ----------------------------------------------------------------------
 /Binaries/
 
+# Website
+# ----------------------------------------------------------------------
+node_modules/
+dist/
+Docs/.vitepress/cache/
+pnpm-lock.yaml
+
 
 # IDE - are all necessary? Most of them are in already ignored /Binaries
 # ----------------------------------------------------------------------
