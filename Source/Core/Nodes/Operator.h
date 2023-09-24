@@ -669,7 +669,9 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToEuler>::updateValues
 	if (m_inputs[0].isPluggedIn())
 	{
 
-		glm::vec3 e = glm::eulerAngles(m_inputs[0].data().getQuat());
+		// glm::vec3 e = glm::eulerAngles(m_inputs[0].data().getQuat());
+		// normalization on input seem more error prune for a normal user
+		glm::vec3 e = glm::eulerAngles(glm::normalize(m_inputs[0].data().getQuat()));
 
 		setInternalValue(e.x);
 		setInternalValue(e.y, 1);
