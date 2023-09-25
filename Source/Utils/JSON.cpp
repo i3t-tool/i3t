@@ -2,7 +2,7 @@
 
 #include "rttr/type"
 
-namespace
+namespace JSONRTTR
 {
 using namespace rapidjson;
 using namespace rttr;
@@ -169,15 +169,33 @@ bool write_variant(const variant& var, PrettyWriter<StringBuffer>& writer)
 		}
 		else
 		{
+			// Var is an unknown type that isn't directly convertible to a string
+			// (we already tried in write_atomic_types_to_json())
 			bool ok = false;
-			auto text = var.to_string(&ok);
-			if (!ok)
-			{
-				writer.String(text);
-				return false;
-			}
 
-			writer.String(text);
+			// Try convert to std::vector<float>
+			variant vecVar;
+			if (var.can_convert<std::vector<float>>())
+			{
+				vecVar = var.convert<std::vector<float>>(&ok);
+			}
+			if (ok)
+			{
+				// Success
+				write_variant(vecVar, writer);
+			}
+			else
+			{
+				// Try convert to string
+				auto text = var.to_string(&ok);
+				if (!ok)
+				{
+					writer.String(text);
+					return false;
+				}
+
+				writer.String(text);
+			}
 		}
 	}
 
@@ -361,7 +379,25 @@ void fromjson_recursively(instance obj2, const Value& json_object)
 		{
 		case kArrayType:
 		{
-			variant var;
+			variant var = prop.get_value(obj);
+
+			// Check if property type is convertible from std::vector<float> and vice versa
+			variant vecVar = std::vector<float>();
+			if (vecVar.can_convert(value_t) && var.can_convert(vecVar.get_type()))
+			{
+				// Load data into an empty float vector
+				auto seqView = vecVar.create_sequential_view();
+				write_array_recursively(seqView, json_value);
+
+				// Convert float vector into the native type
+				if (vecVar.convert(value_t))
+				{
+					prop.set_value(obj, vecVar);
+					break;
+				}
+				LOG_ERROR("Failed to convert float array to {}!", std::string(value_t.get_name()));
+			}
+
 			if (value_t.is_sequential_container())
 			{
 				var = prop.get_value(obj);
@@ -395,10 +431,13 @@ void fromjson_recursively(instance obj2, const Value& json_object)
 		}
 	}
 }
-} // namespace
+} // namespace JSONRTTR
 
 namespace JSON
 {
+using namespace rapidjson;
+using namespace rttr;
+
 std::optional<rapidjson::Document> parse(const fs::path& inputPath)
 {
 	std::ifstream file(inputPath);
@@ -499,7 +538,7 @@ Result<std::string, Error> serializeToString(rttr::instance obj)
 	StringBuffer sb;
 	PrettyWriter<StringBuffer> writer(sb);
 
-	to_json_recursively(obj, writer);
+	JSONRTTR::to_json_recursively(obj, writer);
 
 	return sb.GetString();
 }
@@ -561,7 +600,7 @@ Result<Void, Error> deserializeDocument(const rapidjson::Value& document, rttr::
 #undef GetObject
 #endif
 
-	fromjson_recursively(obj, document);
+	JSONRTTR::fromjson_recursively(obj, document);
 
 	return Void{};
 }
@@ -576,7 +615,7 @@ Result<Void, Error> deserializeString(const std::string& json, rttr::instance ob
 		return Err("unable to parse JSON");
 	}
 
-	fromjson_recursively(obj, document);
+	JSONRTTR::fromjson_recursively(obj, document);
 
 	return deserializeDocument(document, obj);
 }
@@ -639,38 +678,6 @@ bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::
 	}
 
 	return true;
-}
-
-std::string serializeVector(float* v, int componentCount)
-{
-	rapidjson::Document doc;
-	rapidjson::Document::AllocatorType& a = doc.GetAllocator();
-	doc.SetArray();
-	for (int i = 0; i < componentCount; i++)
-	{
-		doc.PushBack(rapidjson::Value().SetFloat(v[i]), a);
-	}
-	rapidjson::StringBuffer buffer;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	doc.Accept(writer);
-	return buffer.GetString();
-}
-
-std::vector<float> deserializeVector(std::string str, int componentCount)
-{
-	std::vector<float> out;
-	out.reserve(componentCount);
-	rapidjson::Document doc;
-	if (doc.Parse(str).HasParseError())
-	{
-		return out;
-	}
-	auto arr = doc.GetArray();
-	for (int i = 0; i < componentCount; i++)
-	{
-		out.push_back(arr[i].GetFloat());
-	}
-	return out;
 }
 
 } // namespace JSON
