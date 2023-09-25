@@ -216,7 +216,24 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 {
 	const auto& type = value["type"].GetString();
 
-	const auto node = g_OperatorBuilder(type);
+	Ptr<GuiOperator> node;
+
+	// Workaround for #311
+	if (type == n(Core::EOperatorType::AngleAxisToQuat))
+	{
+		auto result = addNodeToNodeEditorNoSave<WorkspaceAngleAxisToQuat>();
+		if (value.HasMember("halfAngle"))
+		{
+			const auto halfAngle = value["halfAngle"].GetBool();
+			result->m_halfAngle = halfAngle;
+		}
+		node = result;
+	}
+	else
+	{
+		node = g_OperatorBuilder(type);
+	}
+
 	node->setSelected(true);
 	node->processSelect();
 	const auto coreNode = node->getNodebase();
