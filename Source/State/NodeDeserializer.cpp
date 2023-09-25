@@ -1,5 +1,7 @@
 #include "State/NodeDeserializer.h"
 
+#include <algorithm>
+
 #include "Core/Nodes/Transform.h"
 #include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
@@ -17,17 +19,14 @@ namespace NodeDeserializer
 {
 std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 {
-	// for edges between nodes
-	std::map<std::size_t, Core::ID> oldToNewId;
-	std::vector<Ptr<GuiNode>> createdNodes;
+	std::map<Core::ID, Ptr<WorkspaceNodeWithCoreData>> createdNodes;
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
 		const auto node = NodeDeserializer::createOperator(value);
-		createdNodes.push_back(node);
 		NodeDeserializer::assignCommon(value, node);
-		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = node;
 	}
 
 	//
@@ -35,9 +34,8 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
 		const auto node = NodeDeserializer::createSequence(value);
-		createdNodes.push_back(node);
 		NodeDeserializer::assignCommon(value, node);
-		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = node;
 	}
 
 	//
@@ -46,7 +44,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
 		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
-		createdNodes.push_back(cycle);
+		createdNodes[value["id"].GetInt()] = cycle;
 		NodeDeserializer::assignCommon(value, cycle);
 
 		if (value.HasMember("from"))
@@ -84,8 +82,6 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 			const auto smooth = value["smooth"].GetBool();
 			coreCycle->setSmoothStep(smooth);
 		}
-
-		oldToNewId[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
 
 	//
@@ -93,15 +89,16 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
-		createdNodes.push_back(camera);
 		NodeDeserializer::assignCommon(value, camera);
-		oldToNewId[value["id"].GetInt()] = camera->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = camera;
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
+		createdNodes[viewValue["id"].GetInt()] = camera->getView();
 
 		const auto& projValue = value["sequences"].GetArray()[1];
 		NodeDeserializer::assignSequence(projValue, camera->getProjection());
+		createdNodes[projValue["id"].GetInt()] = camera->getProjection();
 	}
 
 	//
@@ -109,9 +106,8 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
-		createdNodes.push_back(screen);
 		NodeDeserializer::assignCommon(value, screen);
-		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = screen;
 
 		if (value.HasMember("aspect"))
 		{
@@ -125,9 +121,8 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
-		createdNodes.push_back(model);
 		NodeDeserializer::assignCommon(value, model);
-		oldToNewId[value["id"].GetInt()] = model->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = model;
 
 		auto mesh = model->viewportModel().lock();
 
@@ -178,9 +173,8 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : transforms.GetArray())
 	{
 		const auto transform = NodeDeserializer::createTransform(value);
-		createdNodes.push_back(transform);
 		NodeDeserializer::assignCommon(value, transform);
-		oldToNewId[value["id"].GetInt()] = transform->getNodebase()->getId();
+		createdNodes[value["id"].GetInt()] = transform;
 	}
 
 	// connect edges
@@ -194,31 +188,28 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 	for (auto& edge : edges.GetArray())
 	{
-		if (!oldToNewId.contains(edge[0].GetInt()) || !oldToNewId.contains(edge[2].GetInt()))
+		if (!createdNodes.contains(edge[0].GetInt()) || !createdNodes.contains(edge[2].GetInt()))
 		{
-			LOG_ERROR("Unable to deserialize link between nodes with indexes {} and {}.", edge[0].GetInt(),
-			          edge[2].GetInt());
+			LOG_ERROR("Unable to deserialize link between nodes with indexes {} and {}, nodes not found in JSON data.",
+			          edge[0].GetInt(), edge[2].GetInt());
 			continue;
 		}
 
-		auto lhsID = oldToNewId.at(edge[0].GetInt());
-		auto rhsID = oldToNewId.at(edge[2].GetInt());
+		auto lhs = createdNodes.at(edge[0].GetInt());
+		auto rhs = createdNodes.at(edge[2].GetInt());
 
-		auto maybeLhs = findNodeById(workspaceNodes, lhsID);
-		auto maybeRhs = findNodeById(workspaceNodes, rhsID);
-		if (maybeLhs.has_value() && maybeRhs.has_value())
-		{
-			const auto lhs = maybeLhs.value();
-			const auto rhs = maybeRhs.value();
+		auto lhsPin = edge[1].GetInt();
+		auto rhsPin = edge[3].GetInt();
 
-			auto lhsPin = edge[1].GetInt();
-			auto rhsPin = edge[3].GetInt();
-
-			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
-		}
+		connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	}
 
-	return createdNodes;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> result;
+	std::transform(createdNodes.begin(), createdNodes.end(), std::back_inserter(result), [](auto& pair) {
+		return pair.second;
+	});
+
+	return result;
 }
 
 Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
