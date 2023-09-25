@@ -329,7 +329,7 @@ bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
 	return true;
 }
 
-void StateManager::newScene()
+void StateManager::newScene(bool firstRun)
 {
 	for (const auto& originator : m_originators)
 	{
@@ -340,6 +340,16 @@ void StateManager::newScene()
 
 	createTmpDirectory();
 	wipeTmpDirectory();
+
+	if (!firstRun)
+	{
+		/// \todo Replace me with a proper event
+		const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+		if (startWindow)
+		{
+			startWindow->hide();
+		}
+	}
 
 	reset();
 }

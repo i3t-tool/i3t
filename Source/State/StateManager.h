@@ -61,7 +61,7 @@ public:
 
 	bool loadScene(const fs::path& path);
 
-	void newScene();
+	void newScene(bool firstRun = false);
 
 	/**
 	 * @return Whether a previously saved scene is currently loaded.

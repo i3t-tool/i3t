@@ -55,7 +55,7 @@ void I3TApplication::onInit()
 	createModule<UIModule>();
 
 	stateManager->loadGlobal();
-	stateManager->newScene();
+	stateManager->newScene(true);
 
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
