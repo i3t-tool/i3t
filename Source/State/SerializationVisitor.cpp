@@ -4,6 +4,7 @@
 #include "GUI/Elements/Nodes/WorkspaceCycle.h"
 #include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 #include "GUI/Elements/Nodes/WorkspaceModel.h"
+#include "GUI/Elements/Nodes/WorkspaceOperator.h"
 #include "GUI/Elements/Nodes/WorkspaceScreen.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
@@ -109,6 +110,12 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 	if (props->isConstructor)
 	{
 		addData(op, "value", coreNode->getData());
+	}
+
+	// Workaround for #311
+	if (auto quatAngleAxis = std::dynamic_pointer_cast<WorkspaceAngleAxisToQuat>(node))
+	{
+		op.AddMember("halfAngle", quatAngleAxis->m_halfAngle, alloc);
 	}
 
 	operators.PushBack(op, alloc);
