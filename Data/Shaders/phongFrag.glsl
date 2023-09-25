@@ -66,6 +66,7 @@ struct PointLight {
 
 	float intensity;
 	vec3 color;
+	vec3 specular;
 };
 
 struct SunLight {
@@ -73,6 +74,7 @@ struct SunLight {
 
 	float intensity;
 	vec3 color;
+	vec3 specular;
 };
 
 struct SpotLight {
@@ -85,6 +87,7 @@ struct SpotLight {
 
 	float intensity;
 	vec3 color;
+	vec3 specular;
 };
 
 #define MAX_POINT_LIGHTS 20
@@ -205,6 +208,7 @@ vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 nor
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
 	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
+	specularLight *= light.specular;
 
 	//specularLight *= 0.3f;//Turn down sun specular a bit
 
@@ -233,6 +237,7 @@ vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 n
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
 	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
+	specularLight *= light.specular;
 
 	vec3 outColor = vec3(0);
 
@@ -267,6 +272,7 @@ vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
 	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
+	specularLight *= light.specular;
 
 	float attenuation = calculateAttenuation(lightDist, lightRadius);
 	return light.intensity * attenuation * (ambientLight + diffuseLight + specularLight);

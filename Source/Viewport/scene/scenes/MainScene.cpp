@@ -20,7 +20,7 @@ using namespace Vp;
 MainScene::MainScene(Viewport* viewport) : Scene(viewport)
 {
 	m_sun1_dir = glm::vec3(-0.73, -0.64, -0.21);
-	m_sun2_dir = glm::vec3(0.76, 0.58, -0.12);
+	m_sun2_dir = glm::vec3(0.76, 0.58, 0.19);
 
 	m_sun2_intensity = 0.08f;
 }
@@ -95,6 +95,7 @@ void MainScene::init()
 	m_sun2 = new SunLight();
 	m_sun2->intensity = m_sun2_intensity;
 	m_sun2->color = glm::vec3(0.804, 0.945, 1);
+	m_sun2->specular = glm::vec3(0.0f); // Disable specular
 	m_sun2->direction = m_sun2_dir;
 	m_sun2->pos = glm::vec3(0, 2, 0);
 	m_lighting->addLight(m_sun2);

@@ -32,7 +32,8 @@ void PreviewScene::init()
 	SunLight* sun2 = new SunLight();
 	sun2->intensity = 0.08f;
 	sun2->color = glm::vec3(0.804, 0.945, 1);
-	sun2->direction = glm::vec3(0.76, 0.58, -0.12);
+	sun2->specular = glm::vec3(0.0f); // Disable specular
+	sun2->direction = glm::vec3(0.76, 0.58, 0.19);
 	sun->pos = glm::vec3(0, 2, 0);
 	m_lighting->addLight(sun2);
 }
