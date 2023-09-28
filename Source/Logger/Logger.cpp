@@ -159,16 +159,14 @@ bool Logger::shouldLogMouse()
 void Logger::loadStrings()
 {
 	std::cout << "[info]: Load strings from: " << LOG_STRINGS_PATH << std::endl;
-	const auto maybeDocument = JSON::parse(LOG_STRINGS_PATH);
-
-	if (!maybeDocument.has_value())
+	rapidjson::Document doc;
+	if (!JSON::parse(LOG_STRINGS_PATH, doc))
 	{
 		std::cerr << "[error]: Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
 		return;
 	}
 
-	const auto& document = maybeDocument.value();
-	for (const auto& [name, value] : document.GetObject())
+	for (const auto& [name, value] : doc.GetObject())
 	{
 		logStrings[std::string(name.GetString())] = std::string(value.GetString());
 	}

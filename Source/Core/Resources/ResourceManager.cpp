@@ -875,14 +875,13 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 				continue;
 
 			// Parse the scene file
-			const auto maybeDoc = JSON::parse(entry.path(), "Data/Schemas/Scene.schema.json");
-			if (!maybeDoc.has_value())
+			rapidjson::Document doc;
+			if (!JSON::parse(entry.path(), doc, "Data/Schemas/Scene.schema.json"))
 			{
 				LOG_ERROR("[RESOURCE CLEANUP]: Failed to parse scene file at '{}'!", entry.path().string());
 			}
 			else
 			{
-				const rapidjson::Document& doc = maybeDoc.value();
 				if (!doc.HasMember("resources"))
 				{
 					// Silent fail
