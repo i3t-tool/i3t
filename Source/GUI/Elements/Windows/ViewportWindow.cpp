@@ -112,6 +112,11 @@ void ViewportWindow::render()
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650,
 	// main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
+
+	// Update background according to color
+	ImVec4 bgColor = App::get().getUI()->getTheme().get(EColor::SceneViewBackground);
+	m_renderOptions.clearColor = glm::vec3(bgColor.x, bgColor.y, bgColor.z);
+
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

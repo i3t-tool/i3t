@@ -73,6 +73,7 @@ void Theme::initClassicProperties()
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
 	set(EColor::AddMenuHeader, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+	set(EColor::SceneViewBackground, ImVec4(0.3f, 0.3f, 0.35f, 1.f));
 
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
 	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
@@ -352,6 +353,7 @@ void Theme::initModernProperties()
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
 	set(EColor::AddMenuHeader, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+	set(EColor::SceneViewBackground, ImVec4(0.3f, 0.3f, 0.35f, 1.f));
 
 	// Special color for focused docked windows
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
@@ -637,6 +639,7 @@ void Theme::initNames()
 	g_ColorNames[EColor::PrimaryColor] = "glob_Primary Color (tabs, tiles, ...)";
 	g_ColorNames[EColor::ActiveColor] = "glob_Active Color";
 	g_ColorNames[EColor::TabColor] = "glob_Tab Color";
+	g_ColorNames[EColor::SceneViewBackground] = "glob_Tab SceneView Background";
 
 	g_ColorNames[EColor::DockTabActive] = "glob_Dock Active Color";
 
