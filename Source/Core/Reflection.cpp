@@ -20,50 +20,50 @@ RTTR_REGISTRATION
 	});
 
 	// glm::vec2
-	rttr::type::register_converter_func([](const glm::vec2& vec, bool& ok) -> std::string {
-		ok = true;
-		return JSON::serializeVec2(vec);
+	rttr::type::register_converter_func([](const glm::vec2& v, bool& result) -> std::vector<float> {
+		result = true;
+		return {v.x, v.y};
 	});
-	rttr::type::register_converter_func([](const std::string& str, bool& ok) -> glm::vec2 {
-		bool error;
-		glm::vec2 v = JSON::deserializeVec2(str, &error);
-		ok = !error;
-		return v;
+
+	rttr::type::register_converter_func([](const std::vector<float>& v, bool& result) -> glm::vec2 {
+		result = true;
+		return {v[0], v[1]};
 	});
 
 	// glm::vec3
-	rttr::type::register_converter_func([](const glm::vec3& vec, bool& ok) -> std::string {
-		ok = true;
-		return JSON::serializeVec3(vec);
+	rttr::type::register_converter_func([](const glm::vec3& v, bool& result) -> std::vector<float> {
+		result = true;
+		return {v.x, v.y, v.z};
 	});
-	rttr::type::register_converter_func([](const std::string& str, bool& ok) -> glm::vec3 {
-		bool error;
-		glm::vec3 v = JSON::deserializeVec3(str, &error);
-		ok = !error;
-		return v;
+
+	rttr::type::register_converter_func([](const std::vector<float>& v, bool& result) -> glm::vec3 {
+		result = true;
+		return {v[0], v[1], v[2]};
 	});
 
 	// glm::vec4
-	rttr::type::register_converter_func([](const glm::vec4& vec, bool& ok) -> std::string {
-		ok = true;
-		return JSON::serializeVec4(vec);
+	rttr::type::register_converter_func([](const glm::vec4& v, bool& result) -> std::vector<float> {
+		result = true;
+		return {v.x, v.y, v.z, v.w};
 	});
-	rttr::type::register_converter_func([](const std::string& str, bool& ok) -> glm::vec4 {
-		bool error;
-		glm::vec4 v = JSON::deserializeVec4(str, &error);
-		ok = !error;
-		return v;
+
+	rttr::type::register_converter_func([](const std::vector<float>& v, bool& result) -> glm::vec4 {
+		result = true;
+		return {v[0], v[1], v[2], v[3]};
 	});
 
 	// glm::mat4
-	rttr::type::register_converter_func([](const glm::mat4& mat, bool& ok) -> std::string {
-		ok = true;
-		return JSON::serializeMat4(mat);
+	rttr::type::register_converter_func([](const glm::mat4& mat, bool& result) -> std::vector<float> {
+		result = true;
+		const float* v = glm::value_ptr(mat);
+		return {v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]};
 	});
-	rttr::type::register_converter_func([](const std::string& str, bool& ok) -> glm::mat4 {
-		bool error;
-		glm::mat4 mat = JSON::deserializeMat4(str, &error);
-		ok = !error;
-		return mat;
+
+	rttr::type::register_converter_func([](const std::vector<float>& v, bool& result) -> glm::mat4 {
+		result = true;
+		return {{v[0], v[1], v[2], v[3]},
+		        {v[4], v[5], v[6], v[7]},
+		        {v[8], v[9], v[10], v[11]},
+		        {v[12], v[13], v[14], v[15]}};
 	});
 };
