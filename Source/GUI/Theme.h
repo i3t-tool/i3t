@@ -32,6 +32,7 @@ enum class EColor
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
+	SceneViewBackground,
 
 	DockTabActive,
 
