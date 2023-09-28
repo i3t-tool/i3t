@@ -95,6 +95,15 @@ bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::
 
 //////////////////////////////////////////////
 
+void addFloat(rapidjson::Value& target, const char* key, float value, rapidjson::Value::AllocatorType& alloc);
+void addBool(rapidjson::Value& target, const char* key, bool value, rapidjson::Value::AllocatorType& alloc);
+void addString(rapidjson::Value& target, const char* key, const std::string& value,
+               rapidjson::Value::AllocatorType& alloc);
+void addVector(rapidjson::Value& target, const char* key, const ImVec2& vec, rapidjson::Value::AllocatorType& alloc);
+void addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec, rapidjson::Value::AllocatorType& alloc);
+void addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec, rapidjson::Value::AllocatorType& alloc);
+void addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat, rapidjson::Value::AllocatorType& alloc);
+
 inline ImVec2 getVec2(const rapidjson::Value& value)
 {
 	I3T_ASSERT(value.IsArray(), "Invalid type");

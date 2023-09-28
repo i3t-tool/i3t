@@ -668,4 +668,80 @@ bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::
 	return true;
 }
 
+void addFloat(rapidjson::Value& target, const char* key, float value, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value), alloc);
+}
+
+void addBool(rapidjson::Value& target, const char* key, bool value, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value), alloc);
+}
+
+void addString(rapidjson::Value& target, const char* key, const std::string& value, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value.c_str(), alloc).Move(), alloc);
+}
+
+void addVector(rapidjson::Value& target, const char* key, const ImVec2& vec, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	rapidjson::Value vector(kArrayType);
+	vector.PushBack(vec.x, alloc);
+	vector.PushBack(vec.y, alloc);
+
+	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
+}
+
+void addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	rapidjson::Value vector(kArrayType);
+	vector.PushBack(vec.x, alloc);
+	vector.PushBack(vec.y, alloc);
+	vector.PushBack(vec.z, alloc);
+
+	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
+}
+
+void addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	rapidjson::Value vector(kArrayType);
+	vector.PushBack(vec.x, alloc);
+	vector.PushBack(vec.y, alloc);
+	vector.PushBack(vec.z, alloc);
+	vector.PushBack(vec.w, alloc);
+
+	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
+}
+
+void addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	rapidjson::Value matrix(kArrayType);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		const auto& vec = mat[i];
+
+		rapidjson::Value column(kArrayType);
+		column.PushBack(vec.x, alloc);
+		column.PushBack(vec.y, alloc);
+		column.PushBack(vec.z, alloc);
+		column.PushBack(vec.w, alloc);
+
+		matrix.PushBack(column.Move(), alloc);
+	}
+
+	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(matrix), alloc);
+}
+
 } // namespace JSON
