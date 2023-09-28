@@ -831,7 +831,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 	return ValueSetResult{};
 }
 
-#define PF_DEBUG
+// #define PF_DEBUG
 
 //===-- Quaternion rotation -----------------------------------------------===//
 // todo - what should isValid without synergies return ofr |q| != 1?
