@@ -27,13 +27,73 @@
 
 namespace JSON
 {
-std::optional<rapidjson::Document> parse(const fs::path& inputPath);
 
-std::optional<rapidjson::Document> parse(const fs::path& inputPath, const fs::path& schemaSrc);
+//////////////////////////////////////////////
+// DOCUMENT SAVE/LOAD
+//////////////////////////////////////////////
 
-std::optional<rapidjson::Document> parseString(const std::string& jsonStr);
+/**
+ * Parse json file at inputPath to Document doc.
+ * @return True on success, false otherwise.
+ */
+bool parse(const fs::path& inputPath, rapidjson::Document& doc);
 
+/**
+ * Parse json file at inputPath to Document doc.
+ * Schema file located at schemaSrc is used to validate the json file.
+ * @return True on success, false otherwise.
+ */
+bool parse(const fs::path& inputPath, rapidjson::Document& doc, const fs::path& schemaSrc);
+
+/**
+ * Parse json string to Document doc.
+ * @return True on success, false otherwise.
+ */
+bool parseString(const std::string& jsonStr, rapidjson::Document& doc);
+
+/**
+ * Write Document into a json file at path.
+ * @return True on success, false otherwise.
+ */
 bool save(const fs::path& path, const rapidjson::Document& document);
+
+//////////////////////////////////////////////
+// RTTR SERIALIZE/DESERIALIZE
+//////////////////////////////////////////////
+
+Result<std::string, Error> serializeToString(rttr::instance obj);
+Result<Void, Error> serializeToDocument(rttr::instance obj, rapidjson::Document& doc);
+Result<Void, Error> serializeToFile(rttr::instance obj, const fs::path& path);
+
+Result<Void, Error> deserializeDocument(const rapidjson::Value& document, rttr::instance obj);
+Result<Void, Error> deserializeString(const std::string& json, rttr::instance obj);
+Result<Void, Error> deserializeFile(const fs::path& path, rttr::instance obj);
+
+//////////////////////////////////////////////
+
+// TODO: (DR) Merging should be possible without copying. Take a look.
+
+/// Don't know how to implement this without copying...
+/*
+inline void merge(rapidjson::Value& target, rapidjson::Value& source,
+                  rapidjson::Value::AllocatorType& allocator)
+{
+  // Not working
+  assert(target.IsObject());
+  assert(source.IsObject());
+
+for (auto itr = source.MemberBegin(); itr != source.MemberEnd(); ++itr)
+{
+    const char* str = itr->name.GetString();
+
+    target.AddMember(itr->name, std::move(itr->value), allocator);
+}
+}
+*/
+
+bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::Document::AllocatorType& allocator);
+
+//////////////////////////////////////////////
 
 inline ImVec2 getVec2(const rapidjson::Value& value)
 {
@@ -141,33 +201,5 @@ inline std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EV
 
 	return std::nullopt;
 }
-
-Result<std::string, Error> serializeToString(rttr::instance obj);
-Result<rapidjson::Document, Error> serializeToDocument(rttr::instance obj);
-Result<Void, Error> serializeToFile(rttr::instance obj, const fs::path& path);
-
-Result<Void, Error> deserializeDocument(const rapidjson::Value& document, rttr::instance obj);
-Result<Void, Error> deserializeString(const std::string& json, rttr::instance obj);
-Result<Void, Error> deserializeFile(const fs::path& path, rttr::instance obj);
-
-/// Don't know how to implement this without copying...
-/*
-inline void merge(rapidjson::Value& target, rapidjson::Value& source,
-                  rapidjson::Value::AllocatorType& allocator)
-{
-  // Not working
-  assert(target.IsObject());
-  assert(source.IsObject());
-
-for (auto itr = source.MemberBegin(); itr != source.MemberEnd(); ++itr)
-{
-    const char* str = itr->name.GetString();
-
-    target.AddMember(itr->name, std::move(itr->value), allocator);
-}
-}
-*/
-
-bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::Document::AllocatorType& allocator);
 
 } // namespace JSON

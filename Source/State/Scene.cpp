@@ -6,19 +6,17 @@ namespace State
 {
 bool isReadOnly(const fs::path& scene)
 {
-	const auto maybeScene = JSON::parse(scene, I3T_SCENE_SCHEMA);
-	if (!maybeScene.has_value())
+	rapidjson::Document doc;
+	if (!JSON::parse(scene, doc, I3T_SCENE_SCHEMA))
 	{
 		return false;
 	}
 
-	const auto& sceneJson = maybeScene.value();
-
-	if (!sceneJson.HasMember("readOnly"))
+	if (!doc.HasMember("readOnly"))
 	{
 		return false;
 	}
 
-	return sceneJson["readOnly"].GetBool();
+	return doc["readOnly"].GetBool();
 }
 } // namespace State

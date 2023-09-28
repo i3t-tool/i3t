@@ -199,36 +199,36 @@ Manipulators& Viewport::getManipulators()
 
 Memento Viewport::saveScene(State::Scene* scene)
 {
-	rapidjson::Document jsonDoc;
-	jsonDoc.SetObject();
-
-	// Save viewport settings
-	// TODO: (DR) We need some global save location too
-	//  Maybe IStateful should be expanded with saveScene() split into two:
-	//	- saveScene(Scene* scene) for saving scene specific data
-	//  - saveGlobal() for saving global data
-	//
-	// Other things aside from Viewport that would use the saveGlobal method:
+	// TODO: (DR) Other things aside from Viewport that could use the saveGlobal/Scene method:
 	// - Default models are a global setting and are loaded using the outdated "Config" class
 	// - Themes could be rewritten to use this global mechanism rather than the "ThemeLoader" class
 
 	// Update current settings data with current values
 	m_mainScene->saveSettings(m_settings, true, false);
 
-	// Serialize scene settings
-	auto jsonDocOpt = JSON::serializeToDocument(m_settings.scene());
-	if (!jsonDocOpt)
-	{
-		return jsonDoc;
-	}
-	jsonDoc.Swap(jsonDocOpt.value());
+	rapidjson::Document doc;
+	doc.SetObject();
 
-	return jsonDoc;
+	// Serialize scene settings
+	rapidjson::Document viewportDoc(&doc.GetAllocator());
+	auto result = JSON::serializeToDocument(m_settings.scene(), viewportDoc);
+	if (!result)
+	{
+		return emptyMemento();
+	}
+	doc.AddMember("viewport", viewportDoc, doc.GetAllocator());
+
+	return doc;
 }
 
 void Viewport::loadScene(const Memento& memento, State::Scene* scene)
 {
-	JSON::deserializeDocument(memento, m_settings.scene());
+	if (!memento.HasMember("viewport"))
+	{
+		LOG_ERROR("Cannot load scene viewport data! No 'viewport' entry found!");
+		return;
+	}
+	JSON::deserializeDocument(memento["viewport"], m_settings.scene());
 
 	// Update scene values
 	m_mainScene->loadSettings(m_settings, true, false);
@@ -245,30 +245,32 @@ void Viewport::clearScene()
 
 Memento Viewport::saveGlobal()
 {
-	rapidjson::Document jsonDoc;
-	jsonDoc.SetObject();
+	rapidjson::Document doc;
+	doc.SetObject();
 
 	// Update current settings data with current values
 	m_mainScene->saveSettings(m_settings, false, true);
 
 	// Serialize global settings
-	auto jsonDocOpt = JSON::serializeToDocument(m_settings.global());
-	if (!jsonDocOpt)
+	rapidjson::Document viewportDoc(&doc.GetAllocator());
+	auto result = JSON::serializeToDocument(m_settings.global(), viewportDoc);
+	if (!result)
 	{
-		return jsonDoc;
+		return emptyMemento();
 	}
-	jsonDoc.Swap(jsonDocOpt.value());
+	doc.AddMember("viewport", viewportDoc, doc.GetAllocator());
 
-	return jsonDoc;
+	return doc;
 }
 
 void Viewport::loadGlobal(const Memento& memento)
 {
-	JSON::deserializeDocument(memento, m_settings.global());
-
-	// TODO: (DR) Global settings probably shouldn't (or dont need to) be loaded from within a scene object.
-	//  Although it probably doesn't matter too much and allows scenes to quickly change which settings are scene or
-	//  global specific.
+	if (!memento.HasMember("viewport"))
+	{
+		LOG_ERROR("Cannot load global viewport data! No 'viewport' entry found!");
+		return;
+	}
+	JSON::deserializeDocument(memento["viewport"], m_settings.global());
 
 	// Update scene values
 	m_mainScene->loadSettings(m_settings, false, true);

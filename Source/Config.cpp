@@ -11,11 +11,10 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 {
 	auto conf = std::make_shared<Configuration>();
 
-	const auto result = JSON::parse(filename, "Data/Schemas/Config.schema.json");
+	rapidjson::Document doc;
+	JSON::parse(filename, doc, "Data/Schemas/Config.schema.json");
 
-	const auto& d = *result;
-
-	if (auto resources = Core::ResourceManager::readResources(d["resources"]))
+	if (auto resources = Core::ResourceManager::readResources(doc["resources"]))
 	{
 		conf->Resources = *resources;
 	}

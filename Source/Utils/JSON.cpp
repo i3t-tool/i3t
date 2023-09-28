@@ -438,51 +438,46 @@ namespace JSON
 using namespace rapidjson;
 using namespace rttr;
 
-std::optional<rapidjson::Document> parse(const fs::path& inputPath)
+bool parse(const fs::path& inputPath, rapidjson::Document& doc)
 {
 	std::ifstream file(inputPath);
 	if (!file.good())
 	{
 		LOG_ERROR("Cannot open json file '{}'!", inputPath.string());
-		return std::nullopt;
+		return false;
 	}
 
 	rapidjson::IStreamWrapper inputStreamWrapper(file);
 
-	rapidjson::Document document;
-	const auto hasError = document.ParseStream(inputStreamWrapper).HasParseError();
+	const auto hasError = doc.ParseStream(inputStreamWrapper).HasParseError();
 	if (hasError)
 	{
 		LOG_ERROR("Cannot parse json file '{}'!", inputPath.string());
-		return std::nullopt;
+		return false;
 	}
 
-	return document;
+	return true;
 }
 
-std::optional<rapidjson::Document> parse(const fs::path& inputPath, const fs::path& schemaSrc)
+bool parse(const fs::path& inputPath, rapidjson::Document& doc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
 	I3T_ASSERT(schemaFile.good(), fmt::format("Cannot open schema file {}: {}, working directory is {}",
 	                                          schemaSrc.string(), strerror(errno), fs::current_path().string()));
 
-	rapidjson::Document schemaDocument;
-
 	rapidjson::IStreamWrapper schemaInputStreamWrapper(schemaFile);
-	auto hasError = schemaDocument.ParseStream(schemaInputStreamWrapper).HasParseError();
+	auto hasError = doc.ParseStream(schemaInputStreamWrapper).HasParseError();
 	I3T_ASSERT(!hasError, "Cannot parse schema file!");
 
-	rapidjson::SchemaDocument schema(schemaDocument);
+	rapidjson::SchemaDocument schema(doc);
 	rapidjson::SchemaValidator validator(schema);
 
-	auto maybeDocument = parse(inputPath);
-	if (!maybeDocument.has_value())
+	if (!parse(inputPath, doc))
 	{
-		return std::nullopt;
+		return false;
 	}
-	auto document = std::move(maybeDocument.value());
 
-	if (!document.Accept(validator))
+	if (!doc.Accept(validator))
 	{
 		rapidjson::StringBuffer sb;
 		validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
@@ -492,19 +487,17 @@ std::optional<rapidjson::Document> parse(const fs::path& inputPath, const fs::pa
 		validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
 		LOG_ERROR("Invalid document: {}", sb.GetString());
 	}
-
-	return document;
+	return true;
 }
 
-std::optional<rapidjson::Document> parseString(const std::string& jsonStr)
+bool parseString(const std::string& jsonStr, rapidjson::Document& doc)
 {
-	rapidjson::Document doc;
 	if (doc.Parse(jsonStr).HasParseError())
 	{
 		LOG_ERROR("Cannot parse json string! String:\n{}", jsonStr);
-		return std::nullopt;
+		return false;
 	}
-	return doc;
+	return true;
 }
 
 bool save(const fs::path& path, const rapidjson::Document& document)
@@ -516,7 +509,6 @@ bool save(const fs::path& path, const rapidjson::Document& document)
 		document.Accept(writer);
 
 		const char* data = buffer.GetString();
-
 		std::ofstream file(path);
 		file << data;
 	}
@@ -524,7 +516,6 @@ bool save(const fs::path& path, const rapidjson::Document& document)
 	{
 		return false;
 	}
-
 	return true;
 }
 
@@ -545,16 +536,12 @@ Result<std::string, Error> serializeToString(rttr::instance obj)
 
 // TODO: (DR) Should be rewritten to use RTTR to create a rapidjson::Document directly and avoid parsing json again
 //   Martin pls fix someday :).
-Result<rapidjson::Document, Error> serializeToDocument(rttr::instance obj)
+Result<Void, Error> serializeToDocument(rttr::instance obj, rapidjson::Document& doc)
 {
 	if (!obj.is_valid())
 	{
 		return Err("invalid reflected object to serialize");
 	}
-
-	// Create empty doc
-	rapidjson::Document emptyDoc;
-	emptyDoc.SetObject();
 
 	auto jsonStr = JSON::serializeToString(obj);
 	if (!jsonStr)
@@ -562,15 +549,15 @@ Result<rapidjson::Document, Error> serializeToDocument(rttr::instance obj)
 		return Err(jsonStr.error());
 	}
 
+	doc.SetObject();
+
 	// Parse them again (cause they get serialized in a string not a doc //TODO: Fix)
-	std::optional<rapidjson::Document> jsonOpt = JSON::parseString(jsonStr.value());
-	if (!jsonOpt)
+	bool success = JSON::parseString(jsonStr.value(), doc);
+	if (!success)
 	{
 		return Err("Failed to parse serialized object json!");
 	}
-	rapidjson::Document doc;
-	doc.Swap(jsonOpt.value());
-	return doc;
+	return Void{};
 }
 
 Result<Void, Error> serializeToFile(rttr::instance obj, const fs::path& path)
@@ -622,9 +609,10 @@ Result<Void, Error> deserializeString(const std::string& json, rttr::instance ob
 
 Result<Void, Error> deserializeFile(const fs::path& path, rttr::instance obj)
 {
-	if (auto maybeJson = parse(path))
+	rapidjson::Document doc;
+	if (parse(path, doc))
 	{
-		return deserializeDocument(maybeJson.value(), obj);
+		return deserializeDocument(doc, obj);
 	}
 
 	return Err("unable to open JSON file " + path.string());

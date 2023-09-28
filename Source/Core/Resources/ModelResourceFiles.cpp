@@ -45,14 +45,13 @@ bool Core::ModelResourceFiles::fetchFiles(void* data)
 		if (ext.string() == ".gltf")
 		{
 			// Parse the .gltf file for .bin, .glbin, or .glbuf files
-			const auto maybeDoc = JSON::parse(m_path);
-			if (!maybeDoc.has_value())
+			rapidjson::Document doc;
+			if (!JSON::parse(m_path, doc))
 			{
 				LOG_ERROR("Failed to parse .gltf file at '{}'!", m_path.string());
 			}
 			else
 			{
-				const rapidjson::Document& doc = maybeDoc.value();
 				if (doc.HasMember("buffers"))
 				{
 					for (const auto& entry : doc["buffers"].GetArray())

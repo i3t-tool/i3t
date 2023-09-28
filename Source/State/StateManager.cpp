@@ -208,6 +208,7 @@ std::optional<Memento> StateManager::createGlobalMemento()
 	for (const auto& originator : m_originators)
 	{
 		auto memento = originator->saveGlobal();
+		// TODO: (DR) No need to deep copy merge docs if we simply pass a Document ref to saveScene/saveGlobal methods.
 		JSON::merge(state, memento, state.GetAllocator());
 	}
 
@@ -260,17 +261,17 @@ bool StateManager::loadScene(const fs::path& path)
 		return false;
 	}
 
-	const auto maybeScene = JSON::parse(path, I3T_SCENE_SCHEMA);
-	if (!maybeScene.has_value())
+	rapidjson::Document doc;
+	if (!JSON::parse(path, doc, I3T_SCENE_SCHEMA))
 	{
 		LOG_ERROR("Failed to parse the scene file!");
 		return false;
 	}
 
 	bool readOnly = false;
-	if (maybeScene.value().HasMember("readOnly"))
+	if (doc.HasMember("readOnly"))
 	{
-		readOnly = maybeScene.value()["readOnly"].GetBool();
+		readOnly = doc["readOnly"].GetBool();
 	}
 
 	Ptr<Scene> newScene = std::make_shared<Scene>(this, readOnly);
@@ -282,7 +283,7 @@ bool StateManager::loadScene(const fs::path& path)
 
 	for (auto* originator : m_originators)
 	{
-		originator->loadScene(maybeScene.value(), m_currentScene.get());
+		originator->loadScene(doc, m_currentScene.get());
 	}
 
 	pushRecentFile(path);
@@ -402,8 +403,8 @@ bool StateManager::loadGlobal()
 		return false;
 	}
 
-	const auto maybeDoc = JSON::parse(target, I3T_SCENE_SCHEMA);
-	if (!maybeDoc.has_value())
+	rapidjson::Document doc;
+	if (!JSON::parse(target, doc, I3T_SCENE_SCHEMA))
 	{
 		LOG_WARN("Failed to parse global data file!");
 		return false;
@@ -411,8 +412,8 @@ bool StateManager::loadGlobal()
 
 	for (auto* originator : m_originators)
 	{
-		originator->loadGlobal(maybeDoc.value());
-	}
+		originator->loadGlobal(doc);
+	};
 
 	return true;
 }
