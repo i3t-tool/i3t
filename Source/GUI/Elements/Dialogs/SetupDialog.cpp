@@ -40,12 +40,12 @@ void SetupDialog::render()
 			{
 				ImGui::Indent();
 				// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
-				ImGui::SliderFloat("Downscale factor", &stg.global().highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
-				ImGui::SliderInt("Kernel size", &stg.global().highlight_kernelSize, 1, 10);
-				ImGui::SliderFloat("Blur cutoff", &stg.global().highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
-				ImGui::Checkbox("Use depth", &stg.global().highlight_useDepth);
-				ImGui::SliderFloat("Darken factor", &stg.global().highlight_useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
-				ImGui::SliderFloat("Desaturate factor", &stg.global().highlight_useDepth_desaturateFactor, 0.0f, 1.0f,
+				ImGui::SliderFloat("Downscale factor", &stg.global().highlight.downscaleFactor, 0.01f, 1.0f, "%.2f");
+				ImGui::SliderInt("Kernel size", &stg.global().highlight.kernelSize, 1, 10);
+				ImGui::SliderFloat("Blur cutoff", &stg.global().highlight.outlineCutoff, 0.01f, 1.0f, "%.2f");
+				ImGui::Checkbox("Use depth", &stg.global().highlight.useDepth);
+				ImGui::SliderFloat("Darken factor", &stg.global().highlight.useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
+				ImGui::SliderFloat("Desaturate factor", &stg.global().highlight.useDepth_desaturateFactor, 0.0f, 1.0f,
 				                   "%.2f");
 				ImGui::Unindent();
 			}
@@ -53,21 +53,21 @@ void SetupDialog::render()
 			if (ImGui::CollapsingHeader("Grid"))
 			{
 				ImGui::Indent();
-				ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid_color), ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid_axisXColor),
+				ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid.color), ImGuiColorEditFlags_Float);
+				ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid.axisXColor),
 				                  ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid_axisYColor),
+				ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid.axisYColor),
 				                  ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid_axisZColor),
+				ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid.axisZColor),
 				                  ImGuiColorEditFlags_Float);
 
-				ImGui::SliderFloat("Size", &stg.global().grid_size, 0.01f, 2.f, "%.2f");
-				ImGui::SliderFloat("Strength", &stg.global().grid_strength, 0.01f, 1.f, "%.2f");
-				ImGui::SliderFloat("Line width", &stg.global().grid_lineWidth, 0.01f, 5.0f, "%.2f");
-				ImGui::SliderFloat("Fade 1 start", &stg.global().grid_grid1FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 1 end", &stg.global().grid_grid1FadeEnd, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 start", &stg.global().grid_grid2FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 end", &stg.global().grid_grid2FadeEnd, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Size", &stg.global().grid.size, 0.01f, 2.f, "%.2f");
+				ImGui::SliderFloat("Strength", &stg.global().grid.strength, 0.01f, 1.f, "%.2f");
+				ImGui::SliderFloat("Line width", &stg.global().grid.lineWidth, 0.01f, 5.0f, "%.2f");
+				ImGui::SliderFloat("Fade 1 start", &stg.global().grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 1 end", &stg.global().grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 2 start", &stg.global().grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
+				ImGui::SliderFloat("Fade 2 end", &stg.global().grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
 				ImGui::Unindent();
 			}
 

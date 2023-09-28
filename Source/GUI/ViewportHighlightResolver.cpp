@@ -37,7 +37,7 @@ void ViewportHighlightResolver::resolve()
 			{
 				viewportModel->m_highlight = true;
 				viewportModel->m_highlightColor =
-				    App::get().viewport()->getSettings().global().highlight_highlightColor;
+				    App::get().viewport()->getSettings().global().highlight.highlightColor;
 			}
 		}
 		else

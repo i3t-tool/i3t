@@ -53,35 +53,35 @@ void MainScene::init()
 	// Camera
 	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
 	{
-		camera->switchMode(stg.scene().mainScene_cameraMode);
-		camera->getOrbitCamera()->setRotationX(stg.scene().mainScene_orbitCameraRotationX);
-		camera->getOrbitCamera()->setRotationY(stg.scene().mainScene_orbitCameraRotationY);
+		camera->switchMode(stg.scene().mainScene.camera.mode);
+		camera->getOrbitCamera()->setRotationX(stg.scene().mainScene.camera.orbitCameraRotationX);
+		camera->getOrbitCamera()->setRotationY(stg.scene().mainScene.camera.orbitCameraRotationY);
 
-		camera->getOrbitCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
-		camera->getTrackballCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
+		camera->getOrbitCamera()->setRadius(stg.scene().mainScene.camera.iorbitCameraRadius);
+		camera->getTrackballCamera()->setRadius(stg.scene().mainScene.camera.iorbitCameraRadius);
 
-		camera->getOrbitCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
-		camera->getTrackballCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
+		camera->getOrbitCamera()->setPivot(stg.scene().mainScene.camera.iorbitCameraPivot);
+		camera->getTrackballCamera()->setPivot(stg.scene().mainScene.camera.iorbitCameraPivot);
 
-		camera->getOrbitCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
-		camera->getTrackballCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+		camera->getOrbitCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
+		camera->getTrackballCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
 
-		camera->getOrbitCamera()->setFov(stg.scene().camera_fov);
-		camera->getTrackballCamera()->setFov(stg.scene().camera_fov);
+		camera->getOrbitCamera()->setFov(stg.scene().mainScene.camera.fov);
+		camera->getTrackballCamera()->setFov(stg.scene().mainScene.camera.fov);
 
-		camera->getOrbitCamera()->setZNear(stg.scene().camera_zNear);
-		camera->getTrackballCamera()->setZNear(stg.scene().camera_zNear);
+		camera->getOrbitCamera()->setZNear(stg.scene().mainScene.camera.zNear);
+		camera->getTrackballCamera()->setZNear(stg.scene().mainScene.camera.zNear);
 
-		camera->getOrbitCamera()->setZFar(stg.scene().camera_zFar);
-		camera->getTrackballCamera()->setZFar(stg.scene().camera_zFar);
+		camera->getOrbitCamera()->setZFar(stg.scene().mainScene.camera.zFar);
+		camera->getTrackballCamera()->setZFar(stg.scene().mainScene.camera.zFar);
 
-		camera->getOrbitCamera()->setRotateSpeed(stg.global().orbitCamera_rotateSpeed);
-		camera->getOrbitCamera()->setTranslateSpeed(stg.global().orbitCamera_translateSpeed);
-		camera->getOrbitCamera()->setZoomSpeed(stg.global().orbitCamera_zoomSpeed);
+		camera->getOrbitCamera()->setRotateSpeed(stg.global().camera.orbit_rotateSpeed);
+		camera->getOrbitCamera()->setTranslateSpeed(stg.global().camera.orbit_translateSpeed);
+		camera->getOrbitCamera()->setZoomSpeed(stg.global().camera.orbit_zoomSpeed);
 
-		camera->getTrackballCamera()->setRotateSpeed(stg.global().trackballCamera_rotateSpeed);
-		camera->getTrackballCamera()->setTranslateSpeed(stg.global().trackballCamera_translateSpeed);
-		camera->getTrackballCamera()->setZoomSpeed(stg.global().trackballCamera_zoomSpeed);
+		camera->getTrackballCamera()->setRotateSpeed(stg.global().camera.trackball_rotateSpeed);
+		camera->getTrackballCamera()->setTranslateSpeed(stg.global().camera.trackball_translateSpeed);
+		camera->getTrackballCamera()->setZoomSpeed(stg.global().camera.trackball_zoomSpeed);
 	}
 
 	// Lights
@@ -197,21 +197,21 @@ void MainScene::update(double dt)
 	ViewportSettings& stg = m_viewport->getSettings();
 
 	GridShader* gridShader = static_cast<GridShader*>(m_gridObject->m_shader);
-	gridShader->m_gridColor = stg.global().grid_color;
-	gridShader->m_axisXColor = stg.global().grid_axisXColor;
-	gridShader->m_axisYColor = stg.global().grid_axisYColor;
-	gridShader->m_axisZColor = stg.global().grid_axisZColor;
+	gridShader->m_gridColor = stg.global().grid.color;
+	gridShader->m_axisXColor = stg.global().grid.axisXColor;
+	gridShader->m_axisYColor = stg.global().grid.axisYColor;
+	gridShader->m_axisZColor = stg.global().grid.axisZColor;
 
-	gridShader->m_gridSize = stg.global().grid_size;
-	gridShader->m_gridStrength = stg.global().grid_strength;
-	gridShader->m_lineWidth = stg.global().grid_lineWidth;
+	gridShader->m_gridSize = stg.global().grid.size;
+	gridShader->m_gridStrength = stg.global().grid.strength;
+	gridShader->m_lineWidth = stg.global().grid.lineWidth;
 
-	gridShader->m_grid1FadeStart = stg.global().grid_grid1FadeStart;
-	gridShader->m_grid1FadeEnd = stg.global().grid_grid1FadeEnd;
-	gridShader->m_grid2FadeStart = stg.global().grid_grid2FadeStart;
-	gridShader->m_grid2FadeEnd = stg.global().grid_grid2FadeEnd;
+	gridShader->m_grid1FadeStart = stg.global().grid.grid1FadeStart;
+	gridShader->m_grid1FadeEnd = stg.global().grid.grid1FadeEnd;
+	gridShader->m_grid2FadeStart = stg.global().grid.grid2FadeStart;
+	gridShader->m_grid2FadeEnd = stg.global().grid.grid2FadeEnd;
 
-	if (stg.scene().mainScene_lightFollowsCamera)
+	if (stg.scene().mainScene.lightFollowsCamera)
 	{
 		m_sun1->direction = glm::inverse(m_camera->getView()) * glm::normalize(glm::vec4(-0.3f, -0.4f, -1.0f, 0.0f));
 		m_sun2->intensity = 0.0f;
@@ -232,39 +232,39 @@ void MainScene::loadSettings(ViewportSettings& stg, bool scene, bool global)
 	{
 		if (scene)
 		{
-			camera->switchMode(stg.scene().mainScene_cameraMode);
+			camera->switchMode(stg.scene().mainScene.camera.mode);
 
-			camera->getOrbitCamera()->setRotationX(stg.scene().mainScene_orbitCameraRotationX);
-			camera->getOrbitCamera()->setRotationY(stg.scene().mainScene_orbitCameraRotationY);
-			camera->getTrackballCamera()->setRotation(stg.scene().mainScene_trackballCameraRotation);
+			camera->getOrbitCamera()->setRotationX(stg.scene().mainScene.camera.orbitCameraRotationX);
+			camera->getOrbitCamera()->setRotationY(stg.scene().mainScene.camera.orbitCameraRotationY);
+			camera->getTrackballCamera()->setRotation(stg.scene().mainScene.camera.trackballCameraRotation);
 
-			camera->getOrbitCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
-			camera->getTrackballCamera()->setRadius(stg.scene().mainScene_iorbitCameraRadius);
+			camera->getOrbitCamera()->setRadius(stg.scene().mainScene.camera.iorbitCameraRadius);
+			camera->getTrackballCamera()->setRadius(stg.scene().mainScene.camera.iorbitCameraRadius);
 
-			camera->getOrbitCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
-			camera->getTrackballCamera()->setPivot(stg.scene().mainScene_iorbitCameraPivot);
+			camera->getOrbitCamera()->setPivot(stg.scene().mainScene.camera.iorbitCameraPivot);
+			camera->getTrackballCamera()->setPivot(stg.scene().mainScene.camera.iorbitCameraPivot);
 
-			camera->getOrbitCamera()->setFov(stg.scene().camera_fov);
-			camera->getTrackballCamera()->setFov(stg.scene().camera_fov);
+			camera->getOrbitCamera()->setFov(stg.scene().mainScene.camera.fov);
+			camera->getTrackballCamera()->setFov(stg.scene().mainScene.camera.fov);
 
-			camera->getOrbitCamera()->setZNear(stg.scene().camera_zNear);
-			camera->getTrackballCamera()->setZNear(stg.scene().camera_zNear);
+			camera->getOrbitCamera()->setZNear(stg.scene().mainScene.camera.zNear);
+			camera->getTrackballCamera()->setZNear(stg.scene().mainScene.camera.zNear);
 
-			camera->getOrbitCamera()->setZFar(stg.scene().camera_zFar);
-			camera->getTrackballCamera()->setZFar(stg.scene().camera_zFar);
+			camera->getOrbitCamera()->setZFar(stg.scene().mainScene.camera.zFar);
+			camera->getTrackballCamera()->setZFar(stg.scene().mainScene.camera.zFar);
 		}
 		if (global)
 		{
-			camera->getOrbitCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
-			camera->getTrackballCamera()->setSmoothScroll(stg.global().camera_smoothScroll);
+			camera->getOrbitCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
+			camera->getTrackballCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
 
-			camera->getOrbitCamera()->setRotateSpeed(stg.global().orbitCamera_rotateSpeed);
-			camera->getOrbitCamera()->setTranslateSpeed(stg.global().orbitCamera_translateSpeed);
-			camera->getOrbitCamera()->setZoomSpeed(stg.global().orbitCamera_zoomSpeed);
+			camera->getOrbitCamera()->setRotateSpeed(stg.global().camera.orbit_rotateSpeed);
+			camera->getOrbitCamera()->setTranslateSpeed(stg.global().camera.orbit_translateSpeed);
+			camera->getOrbitCamera()->setZoomSpeed(stg.global().camera.orbit_zoomSpeed);
 
-			camera->getTrackballCamera()->setRotateSpeed(stg.global().trackballCamera_rotateSpeed);
-			camera->getTrackballCamera()->setTranslateSpeed(stg.global().trackballCamera_translateSpeed);
-			camera->getTrackballCamera()->setZoomSpeed(stg.global().trackballCamera_zoomSpeed);
+			camera->getTrackballCamera()->setRotateSpeed(stg.global().camera.trackball_rotateSpeed);
+			camera->getTrackballCamera()->setTranslateSpeed(stg.global().camera.trackball_translateSpeed);
+			camera->getTrackballCamera()->setZoomSpeed(stg.global().camera.trackball_zoomSpeed);
 		}
 	}
 }
@@ -276,51 +276,51 @@ void MainScene::saveSettings(ViewportSettings& stg, bool scene, bool global)
 	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
 	{
 		if (scene)
-			stg.scene().mainScene_cameraMode = camera->getMode();
+			stg.scene().mainScene.camera.mode = camera->getMode();
 
 		switch (camera->getMode())
 		{
 		case AggregateCamera::CameraMode::ORBIT:
 			if (scene)
 			{
-				stg.scene().mainScene_orbitCameraRotationX = camera->getOrbitCamera()->getRotationX();
-				stg.scene().mainScene_orbitCameraRotationY = camera->getOrbitCamera()->getRotationY();
+				stg.scene().mainScene.camera.orbitCameraRotationX = camera->getOrbitCamera()->getRotationX();
+				stg.scene().mainScene.camera.orbitCameraRotationY = camera->getOrbitCamera()->getRotationY();
 
-				stg.scene().mainScene_iorbitCameraRadius = camera->getOrbitCamera()->getRadius();
-				stg.scene().mainScene_iorbitCameraPivot = camera->getOrbitCamera()->getPivot();
+				stg.scene().mainScene.camera.iorbitCameraRadius = camera->getOrbitCamera()->getRadius();
+				stg.scene().mainScene.camera.iorbitCameraPivot = camera->getOrbitCamera()->getPivot();
 
-				stg.scene().camera_fov = camera->getOrbitCamera()->getFov();
-				stg.scene().camera_zNear = camera->getOrbitCamera()->getZNear();
-				stg.scene().camera_zFar = camera->getOrbitCamera()->getZFar();
+				stg.scene().mainScene.camera.fov = camera->getOrbitCamera()->getFov();
+				stg.scene().mainScene.camera.zNear = camera->getOrbitCamera()->getZNear();
+				stg.scene().mainScene.camera.zFar = camera->getOrbitCamera()->getZFar();
 			}
 			if (global)
 			{
-				stg.global().camera_smoothScroll = camera->getOrbitCamera()->getSmoothScroll();
+				stg.global().camera.smoothScroll = camera->getOrbitCamera()->getSmoothScroll();
 
-				stg.global().orbitCamera_rotateSpeed = camera->getOrbitCamera()->getRotateSpeed();
-				stg.global().orbitCamera_translateSpeed = camera->getOrbitCamera()->getTranslateSpeed();
-				stg.global().orbitCamera_zoomSpeed = camera->getOrbitCamera()->getZoomSpeed();
+				stg.global().camera.orbit_rotateSpeed = camera->getOrbitCamera()->getRotateSpeed();
+				stg.global().camera.orbit_translateSpeed = camera->getOrbitCamera()->getTranslateSpeed();
+				stg.global().camera.orbit_zoomSpeed = camera->getOrbitCamera()->getZoomSpeed();
 			}
 			break;
 		case AggregateCamera::CameraMode::TRACKBALL:
 			if (scene)
 			{
-				stg.scene().mainScene_trackballCameraRotation = camera->getTrackballCamera()->getRotation();
+				stg.scene().mainScene.camera.trackballCameraRotation = camera->getTrackballCamera()->getRotation();
 
-				stg.scene().mainScene_iorbitCameraRadius = camera->getTrackballCamera()->getRadius();
-				stg.scene().mainScene_iorbitCameraPivot = camera->getTrackballCamera()->getPivot();
+				stg.scene().mainScene.camera.iorbitCameraRadius = camera->getTrackballCamera()->getRadius();
+				stg.scene().mainScene.camera.iorbitCameraPivot = camera->getTrackballCamera()->getPivot();
 
-				stg.scene().camera_fov = camera->getTrackballCamera()->getFov();
-				stg.scene().camera_zNear = camera->getTrackballCamera()->getZNear();
-				stg.scene().camera_zFar = camera->getTrackballCamera()->getZFar();
+				stg.scene().mainScene.camera.fov = camera->getTrackballCamera()->getFov();
+				stg.scene().mainScene.camera.zNear = camera->getTrackballCamera()->getZNear();
+				stg.scene().mainScene.camera.zFar = camera->getTrackballCamera()->getZFar();
 			}
 			if (global)
 			{
-				stg.global().camera_smoothScroll = camera->getTrackballCamera()->getSmoothScroll();
+				stg.global().camera.smoothScroll = camera->getTrackballCamera()->getSmoothScroll();
 
-				stg.global().trackballCamera_rotateSpeed = camera->getTrackballCamera()->getRotateSpeed();
-				stg.global().trackballCamera_translateSpeed = camera->getTrackballCamera()->getTranslateSpeed();
-				stg.global().trackballCamera_zoomSpeed = camera->getTrackballCamera()->getZoomSpeed();
+				stg.global().camera.trackball_rotateSpeed = camera->getTrackballCamera()->getRotateSpeed();
+				stg.global().camera.trackball_translateSpeed = camera->getTrackballCamera()->getTranslateSpeed();
+				stg.global().camera.trackball_zoomSpeed = camera->getTrackballCamera()->getZoomSpeed();
 			}
 			break;
 		default:

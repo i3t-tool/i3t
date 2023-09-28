@@ -315,7 +315,7 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 	// Note that the term "selection" and "highlight" is used interchangeably here
 	if (drawSelection)
 	{
-		bool useDepth = stg.global().highlight_useDepth;
+		bool useDepth = stg.global().highlight.useDepth;
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -379,8 +379,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 					m_highlightedEntities.push_back(entity.get());
 
 					// Render the whole silhouette with the "covered" color, the uncovered portions will be drawn later.
-					float darkenFactor = stg.global().highlight_useDepth_darkenFactor;
-					float saturationFactor = stg.global().highlight_useDepth_desaturateFactor;
+					float darkenFactor = stg.global().highlight.useDepth_darkenFactor;
+					float saturationFactor = stg.global().highlight.useDepth_desaturateFactor;
 					auto coveredColor = HSLColor::fromRGB(glm::value_ptr(entity->m_highlightColor))
 					                        .desaturate(saturationFactor)
 					                        .darken(darkenFactor)
@@ -418,8 +418,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 		if (atLeastOneEntityHighlighted)
 		{
 			auto boxBlurShader = Shaders::instance().m_boxBlurShader;
-			int kernelSize = stg.global().highlight_kernelSize;
-			float blurFactor = stg.global().highlight_downscaleFactor;
+			int kernelSize = stg.global().highlight.kernelSize;
+			float blurFactor = stg.global().highlight.downscaleFactor;
 			int blurWidth = width * blurFactor;
 			int blurHeight = height * blurFactor;
 
@@ -475,7 +475,7 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 				selectionCompositeShader->use();
 				selectionCompositeShader->m_sourceTextureId = selectionBlurSecondPassFBO->getColorTexture(0);
 				selectionCompositeShader->m_resolution = glm::vec2(width, height);
-				selectionCompositeShader->m_cutoff = stg.global().highlight_outlineCutoff;
+				selectionCompositeShader->m_cutoff = stg.global().highlight.outlineCutoff;
 				selectionCompositeShader->setUniforms();
 
 				// Upscale selection buffer and apply stencil
