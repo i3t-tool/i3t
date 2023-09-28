@@ -1841,9 +1841,14 @@ bool connectNodesNoSave(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWit
 Memento WorkspaceWindow::saveScene(Scene* scene)
 {
 	Memento memento;
+	rapidjson::Value::AllocatorType& a = memento.GetAllocator();
 
 	SerializationVisitor visitor(memento);
 	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
+
+	JSON::addFloat(memento, "workArea_zoom", g_workspaceDiwne->getWorkAreaZoom(), memento.GetAllocator());
+	JSON::addVector(memento, "workArea_min", g_workspaceDiwne->getWorkAreaDiwne().Min, memento.GetAllocator());
+	JSON::addVector(memento, "workArea_max", g_workspaceDiwne->getWorkAreaDiwne().Max, memento.GetAllocator());
 
 	return memento;
 }
@@ -1853,6 +1858,15 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 	clearScene();
 
 	NodeDeserializer::createFrom(memento);
+
+	if (memento.HasMember("workArea_zoom"))
+		g_workspaceDiwne->setWorkAreaZoom(memento["workArea_zoom"].GetFloat());
+
+	if (memento.HasMember("workArea_min") && memento.HasMember("workArea_max"))
+	{
+		g_workspaceDiwne->setWorkAreaDiwne(
+		    ImRect(JSON::getVec2(memento["workArea_min"]), JSON::getVec2(memento["workArea_max"])));
+	}
 }
 
 void WorkspaceWindow::clearScene()

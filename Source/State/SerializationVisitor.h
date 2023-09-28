@@ -43,12 +43,6 @@ private:
 	void dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node);
 	void dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node);
 
-	void addBool(rapidjson::Value& target, const char* key, bool value);
-	void addString(rapidjson::Value& target, const char* key, const std::string& value);
-	void addVector(rapidjson::Value& target, const char* key, const ImVec2& vec);
-	void addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec);
-	void addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec);
-	void addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat);
 	void addData(rapidjson::Value& target, const char* key, const Core::Data& data);
 
 	/// \param target document["edges"] or any JSON array.

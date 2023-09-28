@@ -10,25 +10,11 @@ namespace DIWNE
 
 Diwne::Diwne(SettingsDiwne* settingsDiwne)
     : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
-      m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max)
-
-      ,
-      m_workAreaZoom(settingsDiwne->workAreaInitialZoom)
-
-      ,
-      mp_lastActivePin(nullptr), m_helperLink(diwne, 0)
-
-      ,
-      m_diwneAction(None), m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false)
-
-      ,
-      m_nodesSelectionChanged(false), m_selectionRectangeDiwne(ImRect(0, 0, 0, 0))
-
-      ,
-      m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false), m_tooltipDrawn(false)
-
-      ,
-      m_takeSnap(false)
+      m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max),
+      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), mp_lastActivePin(nullptr), m_helperLink(diwne, 0),
+      m_diwneAction(None), m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false),
+      m_nodesSelectionChanged(false), m_selectionRectangeDiwne(ImRect(0, 0, 0, 0)),
+      m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false), m_tooltipDrawn(false), m_takeSnap(false)
 {
 	m_selectable = false;
 }
@@ -54,30 +40,6 @@ bool Diwne::initializeDiwne()
 
 void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 {
-	//	style.WindowPadding = ImFloor(style.WindowPadding * scale_factor);
-	//	style.WindowRounding = ImFloor(style.WindowRounding * scale_factor);
-	//	style.WindowMinSize = ImFloor(style.WindowMinSize * scale_factor);
-	//	style.ChildRounding = ImFloor(style.ChildRounding * scale_factor);
-	//	style.PopupRounding = ImFloor(style.PopupRounding * scale_factor);
-	//	style.FramePadding = ImFloor(style.FramePadding * scale_factor);
-	//	style.FrameRounding = ImFloor(style.FrameRounding * scale_factor);
-	//	style.ItemSpacing = ImFloor(style.ItemSpacing * scale_factor);
-	//	style.ItemInnerSpacing = ImFloor(style.ItemInnerSpacing * scale_factor);
-	//	style.CellPadding = ImFloor(style.CellPadding * scale_factor);
-	//	style.TouchExtraPadding = ImFloor(style.TouchExtraPadding * scale_factor);
-	//	style.IndentSpacing = ImFloor(style.IndentSpacing * scale_factor);
-	//	style.ColumnsMinSpacing = ImFloor(style.ColumnsMinSpacing * scale_factor);
-	//	style.ScrollbarSize = ImFloor(style.ScrollbarSize * scale_factor);
-	//	style.ScrollbarRounding = ImFloor(style.ScrollbarRounding * scale_factor);
-	//	style.GrabMinSize = ImFloor(style.GrabMinSize * scale_factor);
-	//	style.GrabRounding = ImFloor(style.GrabRounding * scale_factor);
-	//	style.LogSliderDeadzone = ImFloor(style.LogSliderDeadzone * scale_factor);
-	//	style.TabRounding = ImFloor(style.TabRounding * scale_factor);
-	//	style.TabMinWidthForCloseButton = (style.TabMinWidthForCloseButton != FLT_MAX) ?
-	// ImFloor(style.TabMinWidthForCloseButton * scale_factor) : FLT_MAX; 	style.DisplayWindowPadding =
-	// ImFloor(style.DisplayWindowPadding * scale_factor); 	style.DisplaySafeAreaPadding =
-	// ImFloor(style.DisplaySafeAreaPadding * scale_factor); 	style.MouseCursorScale = ImFloor(style.MouseCursorScale
-	// * scale_factor);
 	style.WindowPadding = style.WindowPadding * scale_factor;
 	style.WindowRounding = style.WindowRounding * scale_factor;
 	style.WindowMinSize = style.WindowMinSize * scale_factor;
@@ -104,8 +66,7 @@ void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
 }
 
-bool Diwne::beforeBeginDiwne() /* \todo redesign to
-                                  https://en.wikipedia.org/wiki/Call_super */
+bool Diwne::beforeBeginDiwne() // todo redesign to https://en.wikipedia.org/wiki/Call_super
 {
 	updateWorkAreaRectangles();
 	m_nodesSelectionChanged = false;

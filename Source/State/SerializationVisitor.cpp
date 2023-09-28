@@ -9,6 +9,7 @@
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 #include "Logger/Logger.h"
+#include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
 using namespace rapidjson;
@@ -144,7 +145,7 @@ void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 	dumpCommon(screen, node);
 
 	// screen.AddMember("aspect", node->, alloc);
-	addVector(screen, "aspect", node->getAspect());
+	JSON::addVector(screen, "aspect", node->getAspect(), m_memento.GetAllocator());
 
 	screens.PushBack(screen, alloc);
 
@@ -169,7 +170,7 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	model.AddMember("showAxes", mesh->m_showAxes, alloc);
 	model.AddMember("opaque", mesh->m_opaque, alloc);
 	model.AddMember("opacity", mesh->m_opacity, alloc);
-	addVector(model, "tint", mesh->m_tint);
+	JSON::addVector(model, "tint", mesh->m_tint, m_memento.GetAllocator());
 	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
 
 	models.PushBack(model, alloc);
@@ -195,7 +196,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
 	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
 
-	addVector(target, "position", node->getNodePositionDiwne());
+	JSON::addVector(target, "position", node->getNodePositionDiwne(), m_memento.GetAllocator());
 }
 
 void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node)
@@ -249,11 +250,11 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 	//
 
-	addMatrix(transform, "value", coreNode->getData().getMat4());
+	JSON::addMatrix(transform, "value", coreNode->getData().getMat4(), m_memento.GetAllocator());
 
 	if (coreNode->hasSavedValue())
 	{
-		addMatrix(transform, "savedValue", coreNode->getSavedValue());
+		JSON::addMatrix(transform, "savedValue", coreNode->getSavedValue(), m_memento.GetAllocator());
 
 		/*
 		for (const auto& [key, value] : coreNode->getDefaultValues())
@@ -265,97 +266,13 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 	//
 
-	addBool(transform, "synergies", coreNode->hasSynergies());
-	addBool(transform, "locked", coreNode->isLocked());
+	JSON::addBool(transform, "synergies", coreNode->hasSynergies(), m_memento.GetAllocator());
+	JSON::addBool(transform, "locked", coreNode->isLocked(), m_memento.GetAllocator());
 
 	target.PushBack(transform, alloc);
 }
 
 //
-
-void SerializationVisitor::addBool(rapidjson::Value& target, const char* key, bool value)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value), alloc);
-}
-
-void SerializationVisitor::addString(rapidjson::Value& target, const char* key, const std::string& value)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value.c_str(), alloc).Move(), alloc);
-}
-
-void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const ImVec2& vec)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	rapidjson::Value vector(kArrayType);
-	vector.PushBack(vec.x, alloc);
-	vector.PushBack(vec.y, alloc);
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
-}
-
-void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	rapidjson::Value vector(kArrayType);
-	vector.PushBack(vec.x, alloc);
-	vector.PushBack(vec.y, alloc);
-	vector.PushBack(vec.z, alloc);
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
-}
-
-void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	rapidjson::Value vector(kArrayType);
-	vector.PushBack(vec.x, alloc);
-	vector.PushBack(vec.y, alloc);
-	vector.PushBack(vec.z, alloc);
-	vector.PushBack(vec.w, alloc);
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(vector), alloc);
-}
-
-void SerializationVisitor::addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat)
-{
-	I3T_ASSERT(target.IsObject(), "Invalid value type");
-
-	auto& alloc = m_memento.GetAllocator();
-
-	rapidjson::Value matrix(kArrayType);
-
-	for (int i = 0; i < 4; ++i)
-	{
-		const auto& vec = mat[i];
-
-		rapidjson::Value column(kArrayType);
-		column.PushBack(vec.x, alloc);
-		column.PushBack(vec.y, alloc);
-		column.PushBack(vec.z, alloc);
-		column.PushBack(vec.w, alloc);
-
-		matrix.PushBack(column.Move(), alloc);
-	}
-
-	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(matrix), alloc);
-}
 
 void SerializationVisitor::addData(rapidjson::Value& target, const char* key, const Core::Data& data)
 {
@@ -371,19 +288,19 @@ void SerializationVisitor::addData(rapidjson::Value& target, const char* key, co
 		target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(data.getFloat()), alloc);
 		break;
 	case EValueType::Vec3:
-		addVector(target, key, data.getVec3());
+		JSON::addVector(target, key, data.getVec3(), m_memento.GetAllocator());
 		break;
 	case EValueType::Vec4:
-		addVector(target, key, data.getVec4());
+		JSON::addVector(target, key, data.getVec4(), m_memento.GetAllocator());
 		break;
 	case EValueType::Matrix:
-		addMatrix(target, key, data.getMat4());
+		JSON::addMatrix(target, key, data.getMat4(), m_memento.GetAllocator());
 		break;
 	case EValueType::Quat:
 	{
 		const auto& q = data.getQuat();
 		const glm::vec4 vec = {q.x, q.y, q.z, q.w};
-		addVector(target, key, vec);
+		JSON::addVector(target, key, vec, m_memento.GetAllocator());
 		break;
 	}
 	case EValueType::Pulse:

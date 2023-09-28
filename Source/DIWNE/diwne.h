@@ -175,10 +175,16 @@ public:
 	{
 		return m_workAreaDiwne;
 	};
+	void setWorkAreaDiwne(ImRect rect)
+	{
+		m_workAreaDiwne = rect;
+	};
+
 	ImRect getWorkAreaScreen() const
 	{
 		return m_workAreaScreen;
 	};
+
 	float getWorkAreaZoom() const
 	{
 		return m_workAreaZoom;
