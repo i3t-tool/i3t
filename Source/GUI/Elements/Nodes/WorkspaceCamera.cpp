@@ -247,7 +247,7 @@ bool WorkspaceCamera::isCamera()
 bool WorkspaceCamera::processSelect()
 {
 	auto model = m_viewportCamera.lock();
-	model->m_highlightColor = App::get().viewport()->getSettings().global().highlight_selectionColor;
+	model->m_highlightColor = App::get().viewport()->getSettings().global().highlight.selectionColor;
 	model->m_highlight = true;
 
 	return WorkspaceNodeWithCoreDataWithPins::processSelect();
