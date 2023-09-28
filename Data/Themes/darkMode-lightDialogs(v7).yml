@@ -1,8 +1,8 @@
 colors:
   glob_Text:
-    x: 0.949019611
-    y: 0.949019611
-    z: 0.949019611
+    x: 1
+    y: 1
+    z: 1
     w: 1
   glob_Window Background:
     x: 0.135479093
@@ -34,15 +34,20 @@ colors:
     y: 0.395685673
     z: 0.626556039
     w: 1
+  npop_Connection is possible (text):
+    x: 0.118354835
+    y: 0.786676645
+    z: 0.118354835
+    w: 1
   npop_Connection is not possible (text):
     x: 0.880239546
     y: 0.214789003
     z: 0.214789003
     w: 1
-  npop_Connection is possible (text):
-    x: 0.118354835
-    y: 0.786676645
-    z: 0.118354835
+  glob_Tab SceneView Background:
+    x: 0.300000012
+    y: 0.300000012
+    z: 0.349999994
     w: 1
   npop_Create node popup:
     x: 0.125490203
@@ -160,9 +165,9 @@ colors:
     z: 0.733333349
     w: 1
   npin_Vector 4 Pin:
-    x: 0.41568628
-    y: 0.376470596
-    z: 0.262745112
+    x: 0.436376214
+    y: 0.324484855
+    z: 0
     w: 1
   npin_Screen Pin:
     x: 0
@@ -175,44 +180,44 @@ colors:
     z: 0.611764729
     w: 1
   npin_Inner Color Pulse:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color Float:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color Matrix:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color Quat:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color Vec3:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0975103974
+    y: 0.0975103974
+    z: 0.0975103974
     w: 1
   npin_Inner Color Vec4:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color Screen:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   npin_Inner Color MatrixMul:
-    x: 1
-    y: 1
-    z: 1
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
     w: 1
   ngen_Item selected border:
     x: 0.756736517
@@ -273,7 +278,7 @@ colors:
     x: 0
     y: 0
     z: 0
-    w: 0.282352954
+    w: 0.278431386
   ntrs_Transform LOD Button Text:
     x: 1
     y: 1
@@ -499,7 +504,7 @@ sizes:
   ngen_Nodes_Sequence_Rounding: 5
   ngen_Nodes LOD Button Rounding: 5
   ngen_Nodes_Border_Rounding: 5
-  ngen_Nodes_Border_Thickness: 1.5
+  ngen_Nodes_Border_Thickness: 2
   ngen_Nodes_Transformation_TrackingMarkSize: 5
   glob_StartWindow_WinWidth: 850
   glob_StartWindow_WinHeight: 500
