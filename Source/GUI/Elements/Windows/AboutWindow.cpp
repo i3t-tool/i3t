@@ -20,7 +20,7 @@ AboutWindow::AboutWindow()
 void AboutWindow::render()
 {
 	// Set initial window size
-	ImVec2 windowSize = ImVec2(1100, 650);
+	ImVec2 windowSize = ImVec2(1100, 700);
 	static bool firstTime = true;
 	if (firstTime)
 	{
@@ -32,7 +32,7 @@ void AboutWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_WindowBg,
 	                      Application::get().getUI()->getTheme().get(EColor::AboutWindow_BackgroundLeft));
 
-	ImGui::Begin(setName("About").c_str(), getShowPtr(),
+	ImGui::Begin(setName("").c_str(), getShowPtr(),
 	             ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
 	                 ImGuiWindowFlags_AlwaysUseWindowPadding);
 	{
@@ -60,34 +60,58 @@ void AboutWindow::render()
 
 				ImGui::Dummy(ImVec2(0, 10));
 
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("About");
+				ImGui::SetWindowFontScale(1.0f);
+				ImGui::PopStyleColor();
+				ImGui::PopFont();
+
 				ImGui::TextWrapped("The I3T, The Interactive Tool for Teaching Transformations "
 				                   "is the result of the work of students at three Parts of the Czech Technical "
 				                   "University in Prague:\n");
 				ImGui::Dummy(ImVec2(0, 5));
 				ImGui::BulletText(
-				    "1) the Department of Computer Graphics and Interaction of the Faculty of Electrical Engineering,");
-				ImGui::BulletText("2) the Department of Computer Science of the Faculty of Electrical Engineering,");
-				ImGui::BulletText("3) the Faculty of Information Technology.");
+				    "The Department of Computer Graphics and Interaction of the Faculty of Electrical Engineering,");
+				ImGui::BulletText("The Department of Computer Science of the Faculty of Electrical Engineering,");
+				ImGui::BulletText("The Faculty of Information Technology.");
 				ImGui::TextWrapped("\nThe first version was created by Michal Folta in 2018.\n\n");
 
 				/// \todo Add interactive link to website.
 
-				ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
-				ImGui::Text("I3T Website:");
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("I3T Website");
+				ImGui::SetWindowFontScale(1.0f);
 				ImGui::PopFont();
+				ImGui::PopStyleColor();
 				ImGui::Text("http://www.i3t-tool.org/");
 				ImGui::Text("");
 
-				ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
-				ImGui::Text("Supervisor:");
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("Supervisor");
+				ImGui::SetWindowFontScale(1.0f);
+				ImGui::PopStyleColor();
 				ImGui::PopFont();
 
 				ImGui::Text(Config::SUPERVISOR.c_str());
 				ImGui::Text(Config::SUPERVISOR_MAIL.c_str());
 				ImGui::Text("");
 
-				ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
-				ImGui::Text("Authors:");
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("Authors");
+				ImGui::SetWindowFontScale(1.0f);
+				ImGui::PopStyleColor();
 				ImGui::PopFont();
 
 				ImGui::Text(Config::AUTHOR.c_str());
@@ -100,15 +124,26 @@ void AboutWindow::render()
 				ImGui::Text("");
 
 
-				ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
-				ImGui::Text("Design:");
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("Design");
+				ImGui::SetWindowFontScale(1.0f);
+				ImGui::PopStyleColor();
 				ImGui::PopFont();
 
 				ImGui::Text("Lukáš Pilka, 2018");
 				ImGui::Text("Jaroslav Kolář, 2023");
+				ImGui::Text("");
 
-				ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
-				ImGui::Text("License:");
+				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
+				ImGui::PushStyleColor(ImGuiCol_Text,
+				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::SetWindowFontScale(0.75f);
+				ImGui::Text("License");
+				ImGui::SetWindowFontScale(1.0f);
+				ImGui::PopStyleColor();
 				ImGui::PopFont();
 
 				ImGui::Text("Opensource under MIT License");

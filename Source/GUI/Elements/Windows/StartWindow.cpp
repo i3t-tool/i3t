@@ -121,7 +121,10 @@ void StartWindow::renderLeftPanel() const
 	                  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar |
 	                      ImGuiWindowFlags_NoScrollWithMouse);
 	{
-		ImGui::Dummy(ImVec2(0, titleVerticalOffset));
+		// ImGui::Dummy(ImVec2(0, titleVerticalOffset));
+		// LOGO
+		ImGui::Dummy(ImVec2(0, titleVerticalOffset / 2));
+		ImGui::Image((ImTextureID) m_i3tImage->m_texID, ImVec2(m_i3tImage->m_width / 2, m_i3tImage->m_height / 2));
 
 		// TITLE
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeTitle));
@@ -495,7 +498,6 @@ void StartWindow::render()
 	                      App::get().getUI()->getTheme().get(EColor::StartWindow_ScrollbarGrabActive));
 	ImGui::PushStyleColor(ImGuiCol_Separator, App::get().getUI()->getTheme().get(EColor::StartWindow_Separator));
 	ImGui::PushStyleColor(ImGuiCol_Button, App::get().getUI()->getTheme().get(EColor::StartWindow_DefaultButton));
-	ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::StartWindow_DefaultButton));
 
 
 	ImGui::Begin(setName("").c_str(), getShowPtr(),
@@ -505,10 +507,11 @@ void StartWindow::render()
 		this->updateWindowInfo();
 
 		// LOGO I3T
+		/* TODO: Restore original design
 		ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
 		ImGui::GetForegroundDrawList()->AddImage((ImTextureID) m_i3tImage->m_texID, logoPos,
 		                                         logoPos + ImVec2(m_i3tImage->m_width, m_i3tImage->m_height));
-
+		*/
 		renderLeftPanel();
 
 		ImGui::SameLine();
@@ -544,7 +547,7 @@ void StartWindow::render()
 		ImGui::End(); // window
 	}
 	ImGui::PopStyleVar(5);
-	ImGui::PopStyleColor(8);
+	ImGui::PopStyleColor(7);
 }
 
 void StartWindow::loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut)
