@@ -22,22 +22,49 @@
             }
         ]
     },
-    "mainScene_cameraMode": "ORBIT",
-    "mainScene_orbitCameraRotationX": -121.60994720458985,
-    "mainScene_orbitCameraRotationY": 20.13998794555664,
-    "mainScene_trackballCameraRotation": "[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]",
-    "mainScene_iorbitCameraRadius": 29.79021263122559,
-    "mainScene_iorbitCameraPivot": "[0.0,0.0,0.0]",
-    "mainScene_lightFollowsCamera": true,
-    "camera_fov": 27.100000381469728,
-    "camera_zNear": 0.20000000298023225,
-    "camera_zFar": 270.0,
-    "manipulator_enabled": true,
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -55.19993209838867,
+                "orbitCameraRotationY": 21.299991607666017,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 8.46720027923584,
+                "iorbitCameraPivot": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 173,
+                "id": 1,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -47,13 +74,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 179,
+                        "id": 7,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            -26.0,
-                            233.3333282470703
+                            -26.111083984375,
+                            233.5555419921875
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
@@ -92,7 +119,7 @@
                 ]
             },
             {
-                "id": 166,
+                "id": 8,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -102,13 +129,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 172,
+                        "id": 14,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            250.0,
-                            233.3333282470703
+                            249.4444580078125,
+                            233.5555419921875
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -147,7 +174,7 @@
                 ]
             },
             {
-                "id": 159,
+                "id": 15,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -157,13 +184,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 165,
+                        "id": 21,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            -303.0,
-                            233.3333282470703
+                            -302.5555419921875,
+                            233.5555419921875
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -207,7 +234,7 @@
         "screens": [],
         "models": [
             {
-                "id": 180,
+                "id": 22,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -228,7 +255,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 182,
+                "id": 24,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -249,7 +276,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 184,
+                "id": 26,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -270,7 +297,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 186,
+                "id": 28,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -294,41 +321,52 @@
         "transforms": [],
         "edges": [
             [
-                159,
+                15,
                 0,
-                173,
+                1,
                 0
             ],
             [
-                159,
+                1,
                 0,
-                180,
+                8,
                 0
             ],
             [
-                166,
+                15,
                 0,
-                182,
+                22,
                 0
             ],
             [
-                173,
+                8,
                 0,
-                184,
+                24,
                 0
             ],
             [
-                166,
+                1,
                 0,
-                186,
+                26,
                 0
             ],
             [
-                173,
+                8,
                 0,
-                166,
+                28,
                 0
             ]
-        ]
+        ],
+        "zoom": 1.125,
+        "workArea": {
+            "Min": [
+                -350.111083984375,
+                -49.111114501953128
+            ],
+            "Max": [
+                865.0,
+                852.22216796875
+            ]
+        }
     }
 }

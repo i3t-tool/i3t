@@ -1,22 +1,67 @@
 {
     "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -65.63983917236328,
+                "orbitCameraRotationY": 27.96995544433594,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 8.406620979309082,
+                "iorbitCameraPivot": [
+                    1.3748935461044312,
+                    1.2937798500061036,
+                    -2.212559938430786
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1128,
+                "id": 149,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     806.0,
                     287.0
                 ],
                 "transforms": [
                     {
-                        "id": 1134,
+                        "id": 155,
                         "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            825.4478759765625,
-                            316.73309326171877
+                            825.4505615234375,
+                            317.6444091796875
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -54,8 +99,7 @@
                             ]
                         ],
                         "synergies": false,
-                        "locked": true,
-                        "LOD": "Full"
+                        "locked": true
                     }
                 ]
             }
@@ -63,27 +107,34 @@
         "cycles": [],
         "cameras": [
             {
-                "id": 1135,
+                "id": 156,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    109.20001220703125,
-                    91.19998168945313
+                    277.9273376464844,
+                    62.10908508300781
                 ],
                 "sequences": [
                     {
-                        "id": 1145,
+                        "id": 166,
+                        "label": "view",
                         "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            282.11456298828127,
-                            120.73309326171875
+                            486.814208984375,
+                            92.91716003417969
                         ],
                         "transforms": [
                             {
-                                "id": 1151,
+                                "id": 172,
                                 "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
                                 "position": [
-                                    301.4479064941406,
-                                    151.3997802734375
+                                    506.1778259277344,
+                                    123.46263122558594
                                 ],
                                 "type": "LookAt",
                                 "defaultValues": {
@@ -131,25 +182,29 @@
                                     ]
                                 ],
                                 "synergies": false,
-                                "locked": true,
-                                "LOD": "SetValues"
+                                "locked": true
                             }
                         ]
                     },
                     {
-                        "id": 1139,
+                        "id": 160,
+                        "label": "projection",
                         "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            116.11456298828125,
-                            120.73309326171875
+                            285.4505615234375,
+                            92.91716003417969
                         ],
                         "transforms": [
                             {
-                                "id": 1152,
+                                "id": 173,
                                 "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
                                 "position": [
-                                    136.11456298828126,
-                                    151.3997802734375
+                                    305.4505615234375,
+                                    123.46263122558594
                                 ],
                                 "type": "Frustum",
                                 "defaultValues": {
@@ -188,8 +243,7 @@
                                     ]
                                 ],
                                 "synergies": true,
-                                "locked": true,
-                                "LOD": "SetValues"
+                                "locked": true
                             }
                         ]
                     }
@@ -198,8 +252,10 @@
         ],
         "screens": [
             {
-                "id": 1153,
+                "id": 174,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     804.0,
                     -1.0
@@ -212,11 +268,13 @@
         ],
         "models": [
             {
-                "id": 1157,
+                "id": 178,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    1195.5999755859376,
-                    302.800048828125
+                    1029.78173828125,
+                    286.79998779296877
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -227,23 +285,35 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
         "edges": [
             [
-                1135,
+                156,
                 0,
-                1153,
+                174,
                 0
             ],
             [
-                1128,
+                149,
                 0,
-                1157,
+                178,
                 0
             ]
-        ]
+        ],
+        "zoom": 1.375,
+        "workArea": {
+            "Min": [
+                259.26873779296877,
+                -165.99192810058595
+            ],
+            "Max": [
+                1216.359619140625,
+                571.4625854492188
+            ]
+        }
     }
 }

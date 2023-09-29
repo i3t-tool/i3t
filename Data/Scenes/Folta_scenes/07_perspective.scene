@@ -1,20 +1,67 @@
 {
     "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -55.19984436035156,
+                "orbitCameraRotationY": 21.58994865417481,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 8.406620979309082,
+                "iorbitCameraPivot": [
+                    1.3748935461044312,
+                    1.2937798500061036,
+                    -2.212559938430786
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 286,
+                "id": 118,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    806.0,
-                    287.0
+                    778.8001098632813,
+                    279.00006103515627
                 ],
                 "transforms": [
                     {
-                        "id": 292,
+                        "id": 124,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            874.3690185546875,
-                            319.22845458984377
+                            798.54150390625,
+                            309.64447021484377
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -52,8 +99,7 @@
                             ]
                         ],
                         "synergies": false,
-                        "locked": true,
-                        "LOD": "Full"
+                        "locked": true
                     }
                 ]
             }
@@ -61,24 +107,34 @@
         "cycles": [],
         "cameras": [
             {
-                "id": 293,
+                "id": 125,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    122.0,
-                    72.0
+                    219.6000213623047,
+                    75.19999694824219
                 ],
                 "sequences": [
                     {
-                        "id": 303,
+                        "id": 135,
+                        "label": "view",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            406.3690185546875,
-                            104.82847595214844
+                            451.9051208496094,
+                            106.00807189941406
                         ],
                         "transforms": [
                             {
-                                "id": 309,
+                                "id": 141,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
                                 "position": [
-                                    475.968994140625,
-                                    138.42848205566407
+                                    471.26873779296877,
+                                    136.5535430908203
                                 ],
                                 "type": "LookAt",
                                 "defaultValues": {
@@ -126,23 +182,29 @@
                                     ]
                                 ],
                                 "synergies": false,
-                                "locked": true,
-                                "LOD": "SetValues"
+                                "locked": true
                             }
                         ]
                     },
                     {
-                        "id": 297,
+                        "id": 129,
+                        "label": "projection",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            129.5689697265625,
-                            104.82847595214844
+                            227.26876831054688,
+                            106.00807189941406
                         ],
                         "transforms": [
                             {
-                                "id": 310,
+                                "id": 142,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
                                 "position": [
-                                    199.1689453125,
-                                    138.42848205566407
+                                    247.26876831054688,
+                                    136.5535430908203
                                 ],
                                 "type": "Perspective",
                                 "defaultValues": {
@@ -179,8 +241,7 @@
                                     ]
                                 ],
                                 "synergies": false,
-                                "locked": true,
-                                "LOD": "SetValues"
+                                "locked": true
                             }
                         ]
                     }
@@ -189,10 +250,13 @@
         ],
         "screens": [
             {
-                "id": 311,
+                "id": 143,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    804.0,
-                    -1.0
+                    776.8001098632813,
+                    -9.000000953674317
                 ],
                 "aspect": [
                     282.0,
@@ -202,10 +266,13 @@
         ],
         "models": [
             {
-                "id": 315,
+                "id": 147,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    1194.0008544921876,
-                    296.4000244140625
+                    995.6002807617188,
+                    280.4002380371094
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -216,23 +283,35 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
         "edges": [
             [
-                293,
+                118,
                 0,
-                311,
+                147,
                 0
             ],
             [
-                286,
+                125,
                 0,
-                315,
+                143,
                 0
             ]
-        ]
+        ],
+        "zoom": 1.375,
+        "workArea": {
+            "Min": [
+                207.6324005126953,
+                -155.8101043701172
+            ],
+            "Max": [
+                1164.7232666015626,
+                581.6444091796875
+            ]
+        }
     }
 }

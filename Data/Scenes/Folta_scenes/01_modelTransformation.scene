@@ -3,27 +3,65 @@
     "resources": {
         "imported": []
     },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -90.0,
+                "orbitCameraRotationY": 30.0,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    2.568000316619873,
+                    -0.394907683134079,
+                    0.22800002992153169
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 60,
+                "id": 1,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    262.0001220703125,
-                    73.14285278320313
+                    247.0001220703125,
+                    300.1428527832031
                 ],
                 "transforms": [
                     {
-                        "id": 66,
+                        "id": 7,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            282.0,
-                            104.0
+                            266.5999755859375,
+                            330.79998779296877
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -64,13 +102,13 @@
                         "locked": true
                     },
                     {
-                        "id": 67,
+                        "id": 8,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            458.0,
-                            104.0
+                            443.39996337890627,
+                            330.79998779296877
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -107,13 +145,13 @@
                         "locked": true
                     },
                     {
-                        "id": 68,
+                        "id": 9,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            646.0,
-                            104.0
+                            630.7999877929688,
+                            330.79998779296877
                         ],
                         "type": "Scale",
                         "defaultValues": {
@@ -161,13 +199,13 @@
         "screens": [],
         "models": [
             {
-                "id": 69,
+                "id": 10,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    878.7138671875,
-                    79.42852783203125
+                    863.7138671875,
+                    306.42852783203127
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -178,17 +216,29 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
         "edges": [
             [
-                60,
+                1,
                 0,
-                69,
+                10,
                 0
             ]
-        ]
+        ],
+        "zoom": 1.25,
+        "workArea": {
+            "Min": [
+                158.5999755859375,
+                78.79998779296875
+            ],
+            "Max": [
+                1306.5999755859376,
+                890.0
+            ]
+        }
     }
 }

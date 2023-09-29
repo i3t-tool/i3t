@@ -3,11 +3,49 @@
     "resources": {
         "imported": []
     },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -73.4699478149414,
+                "orbitCameraRotationY": 32.31999969482422,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    -0.3694033622741699,
+                    0.0709863230586052,
+                    0.06278649717569351
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1,
+                "id": 49,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -17,7 +55,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 7,
+                        "id": 55,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -66,7 +104,7 @@
                 ]
             },
             {
-                "id": 15,
+                "id": 56,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -76,7 +114,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 21,
+                        "id": 62,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -125,7 +163,7 @@
                 ]
             },
             {
-                "id": 22,
+                "id": 63,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -135,9 +173,9 @@
                 ],
                 "transforms": [
                     {
-                        "id": 28,
+                        "id": 69,
                         "render": true,
-                        "numberOfDecimals": 4,
+                        "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
                             769.0,
@@ -182,12 +220,12 @@
                         "locked": true
                     },
                     {
-                        "id": 29,
+                        "id": 70,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            1045.0,
+                            945.0,
                             214.0
                         ],
                         "type": "EulerY",
@@ -197,21 +235,21 @@
                         "savedDefaults": {},
                         "value": [
                             [
-                                -0.5,
+                                -0.5000000596046448,
                                 0.0,
                                 -0.8660253882408142,
                                 0.0
                             ],
                             [
                                 0.0,
-                                1.0,
+                                0.9999999403953552,
                                 0.0,
                                 0.0
                             ],
                             [
                                 0.8660253882408142,
                                 0.0,
-                                -0.5,
+                                -0.5000000596046448,
                                 0.0
                             ],
                             [
@@ -225,12 +263,12 @@
                         "locked": true
                     },
                     {
-                        "id": 37,
+                        "id": 71,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            1233.0,
+                            1133.0,
                             214.0
                         ],
                         "type": "Scale",
@@ -274,7 +312,7 @@
                 ]
             },
             {
-                "id": 8,
+                "id": 72,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -284,7 +322,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 14,
+                        "id": 78,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -331,7 +369,7 @@
                         "locked": true
                     },
                     {
-                        "id": 36,
+                        "id": 79,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -385,7 +423,7 @@
         "screens": [],
         "models": [
             {
-                "id": 30,
+                "id": 80,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -402,10 +440,11 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             },
             {
-                "id": 34,
+                "id": 82,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -422,10 +461,11 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             },
             {
-                "id": 32,
+                "id": 84,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -442,47 +482,59 @@
                     1.0,
                     1.0,
                     1.0
-                ]
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
         "edges": [
             [
-                1,
+                49,
                 0,
-                15,
+                56,
                 0
             ],
             [
-                8,
+                72,
                 0,
-                22,
+                63,
                 0
             ],
             [
-                1,
+                49,
                 0,
-                8,
+                72,
                 0
             ],
             [
-                8,
+                72,
                 0,
-                30,
+                80,
                 0
             ],
             [
-                22,
+                63,
                 0,
-                34,
+                82,
                 0
             ],
             [
-                15,
+                56,
                 0,
-                32,
+                84,
                 0
             ]
-        ]
+        ],
+        "zoom": 1.0,
+        "workArea": {
+            "Min": [
+                -16.0,
+                -349.0
+            ],
+            "Max": [
+                1419.0,
+                665.0
+            ]
+        }
     }
 }
