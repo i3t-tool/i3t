@@ -1846,9 +1846,8 @@ Memento WorkspaceWindow::saveScene(Scene* scene)
 	SerializationVisitor visitor(memento);
 	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
 
-	JSON::addFloat(memento, "workArea_zoom", g_workspaceDiwne->getWorkAreaZoom(), memento.GetAllocator());
-	JSON::addVector(memento, "workArea_min", g_workspaceDiwne->getWorkAreaDiwne().Min, memento.GetAllocator());
-	JSON::addVector(memento, "workArea_max", g_workspaceDiwne->getWorkAreaDiwne().Max, memento.GetAllocator());
+	JSON::addFloat(memento["workspace"], "zoom", g_workspaceDiwne->getWorkAreaZoom(), a);
+	JSON::addRect(memento["workspace"], "workArea", g_workspaceDiwne->getWorkAreaDiwne(), a);
 
 	return memento;
 }
@@ -1857,16 +1856,19 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 {
 	clearScene();
 
+	if (!memento.HasMember("workspace"))
+	{
+		LOG_ERROR("Failed to load workspace! No 'workspace' member found.");
+		return;
+	}
+
 	NodeDeserializer::createFrom(memento);
 
-	if (memento.HasMember("workArea_zoom"))
-		g_workspaceDiwne->setWorkAreaZoom(memento["workArea_zoom"].GetFloat());
+	if (memento["workspace"].HasMember("zoom"))
+		g_workspaceDiwne->setWorkAreaZoom(memento["workspace"]["zoom"].GetFloat());
 
-	if (memento.HasMember("workArea_min") && memento.HasMember("workArea_max"))
-	{
-		g_workspaceDiwne->setWorkAreaDiwne(
-		    ImRect(JSON::getVec2(memento["workArea_min"]), JSON::getVec2(memento["workArea_max"])));
-	}
+	if (memento["workspace"].HasMember("workArea"))
+		g_workspaceDiwne->setWorkAreaDiwne(JSON::getRect(memento["workspace"]["workArea"]));
 }
 
 void WorkspaceWindow::clearScene()

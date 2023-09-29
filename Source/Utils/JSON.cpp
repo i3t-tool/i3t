@@ -686,6 +686,17 @@ void addString(rapidjson::Value& target, const char* key, const std::string& val
 	target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(value.c_str(), alloc).Move(), alloc);
 }
 
+void addRect(rapidjson::Value& target, const char* key, const ImRect& rect, Value::AllocatorType& alloc)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	rapidjson::Value object(kObjectType);
+	addVector(object, "Min", rect.Min, alloc);
+	addVector(object, "Max", rect.Max, alloc);
+
+	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(object), alloc);
+}
+
 void addVector(rapidjson::Value& target, const char* key, const ImVec2& vec, Value::AllocatorType& alloc)
 {
 	I3T_ASSERT(target.IsObject(), "Invalid value type");
@@ -742,6 +753,123 @@ void addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat, 
 	}
 
 	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(matrix), alloc);
+}
+
+ImVec2 getVec2(const rapidjson::Value& value)
+{
+	I3T_ASSERT(value.IsArray(), "Invalid type");
+
+	ImVec2 result;
+
+	result.x = value[0].GetFloat();
+	result.y = value[1].GetFloat();
+
+	return result;
+}
+
+ImRect getRect(const rapidjson::Value& value)
+{
+	I3T_ASSERT(value.IsObject(), "Invalid type");
+
+	ImRect result;
+
+	result.Min = getVec2(value["Min"]);
+	result.Max = getVec2(value["Max"]);
+
+	return result;
+}
+
+glm::vec3 getVec3(const rapidjson::Value& value)
+{
+	I3T_ASSERT(value.IsArray(), "Invalid type");
+
+	glm::vec3 result;
+
+	result.x = value[0].GetFloat();
+	result.y = value[1].GetFloat();
+	result.z = value[2].GetFloat();
+
+	return result;
+}
+
+glm::vec4 getVec4(const rapidjson::Value& value)
+{
+	I3T_ASSERT(value.IsArray(), "Invalid type");
+
+	glm::vec4 result;
+
+	result.x = value[0].GetFloat();
+	result.y = value[1].GetFloat();
+	result.z = value[2].GetFloat();
+	result.w = value[3].GetFloat();
+
+	return result;
+}
+
+glm::mat4 getMat(const rapidjson::Value& value)
+{
+	I3T_ASSERT(value.IsArray(), "Invalid type");
+
+	glm::mat4 result;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		const auto& column = value[i].GetArray();
+
+		result[i] = {column[0].GetFloat(), column[1].GetFloat(), column[2].GetFloat(), column[3].GetFloat()};
+	}
+
+	return result;
+}
+
+std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EValueType dataType)
+{
+	switch (dataType)
+	{
+	case Core::EValueType::Float:
+	{
+		if (!value.IsFloat())
+			return std::nullopt;
+
+		return Core::Data{value.GetFloat()};
+	}
+	case Core::EValueType::Vec3:
+	{
+		if (!value.IsArray() || value.GetArray().Size() != 3)
+			return std::nullopt;
+
+		return Core::Data{getVec3(value)};
+	}
+	case Core::EValueType::Vec4:
+	{
+		if (!value.IsArray() || value.GetArray().Size() != 4)
+			return std::nullopt;
+
+		return Core::Data{getVec4(value)};
+	}
+	case Core::EValueType::Matrix:
+	{
+		if (!value.IsArray() || value.GetArray().Size() != 4)
+			return std::nullopt;
+
+		return Core::Data{getMat(value)};
+	}
+	case Core::EValueType::Quat: // PF: is it OK this way?
+	{
+		if (!value.IsArray() || value.GetArray().Size() != 4)
+			return std::nullopt;
+
+		glm::vec4 v = getVec4(value); // to avoid guat(vec4) misuse as euler angles
+		return Core::Data{glm::quat(v.w, glm::vec3(v))};
+	}
+	case Core::EValueType::Pulse:
+	case Core::EValueType::MatrixMul:
+	case Core::EValueType::Screen:
+	case Core::EValueType::Ptr:
+		break;
+	}
+
+	return std::nullopt;
 }
 
 } // namespace JSON
