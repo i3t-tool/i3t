@@ -577,19 +577,19 @@ static inline const std::vector<TransformOperation> g_transforms = {
     {
         {n(ETransformType::EulerX), "eulerAngleX"},
         0b0000011001100000,
-        {{"rotation", EValueType::Float}},
+        {{"angle", EValueType::Float}},
         true
     },
     {
         {n(ETransformType::EulerY), "eulerAngleY"},
         0b1010000010100000,
-        {{"rotation", EValueType::Float}},
+        {{"angle", EValueType::Float}},
         true
     },
     {
         {n(ETransformType::EulerZ), "eulerAngleZ"},
         0b1100110000000000,
-        {{"rotation", EValueType::Float}},
+        {{"angle", EValueType::Float}},
         true
     },
     {
@@ -598,11 +598,11 @@ static inline const std::vector<TransformOperation> g_transforms = {
      {{"scale", EValueType::Vec3}}
     },
     {
-        {n(ETransformType::AxisAngle), "rotate"},
+        {n(ETransformType::AxisAngle), "axisAngle"},
         0b1110111011100000,
         {
             {"axis", EValueType::Vec3},
-            {"rotation", EValueType::Float} // todo - change it to angle
+            {"angle", EValueType::Float}
         },
         true
     },

@@ -108,7 +108,7 @@
                         ],
                         "type": "EulerY",
                         "defaultValues": {
-                            "rotation": 1.159279465675354
+                            "angle": 1.159279465675354
                         },
                         "savedDefaults": {},
                         "value": [

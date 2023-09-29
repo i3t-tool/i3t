@@ -462,7 +462,7 @@ bool parse(const fs::path& inputPath, rapidjson::Document& doc)
 bool parse(const fs::path& inputPath, rapidjson::Document& doc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
-	I3T_ASSERT(schemaFile.good(), fmt::format("Cannot open schema file {}: {}, working directory is {}",
+	I3T_ASSERT(schemaFile.good(), fmt::format("Cannot open schema file {}: {},\n   working directory is {}",
 	                                          schemaSrc.string(), strerror(errno), fs::current_path().string()));
 
 	rapidjson::IStreamWrapper schemaInputStreamWrapper(schemaFile);

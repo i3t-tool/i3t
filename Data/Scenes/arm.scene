@@ -62,7 +62,7 @@
                         ],
                         "type": "EulerX",
                         "defaultValues": {
-                            "rotation": -0.8091534376144409
+                            "angle": -0.8091534376144409
                         },
                         "savedDefaults": {},
                         "value": [
@@ -211,7 +211,7 @@
                         ],
                         "type": "EulerX",
                         "defaultValues": {
-                            "rotation": -1.8477050065994263
+                            "angle": -1.8477050065994263
                         },
                         "savedDefaults": {},
                         "value": [
@@ -306,7 +306,7 @@
                         ],
                         "type": "EulerX",
                         "defaultValues": {
-                            "rotation": 2.287811040878296
+                            "angle": 2.287811040878296
                         },
                         "savedDefaults": {},
                         "value": [
@@ -401,7 +401,7 @@
                         ],
                         "type": "EulerX",
                         "defaultValues": {
-                            "rotation": 0.0
+                            "angle": 0.0
                         },
                         "savedDefaults": {},
                         "value": [
@@ -442,7 +442,7 @@
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
-                            "rotation": 0.0
+                            "angle": 0.0
                         },
                         "savedDefaults": {},
                         "value": [
@@ -537,7 +537,7 @@
                         ],
                         "type": "EulerY",
                         "defaultValues": {
-                            "rotation": 0.0
+                            "angle": 0.0
                         },
                         "savedDefaults": {},
                         "value": [
