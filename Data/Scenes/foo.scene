@@ -62,7 +62,7 @@
                         ],
                         "type": "EulerX",
                         "defaultValues": {
-                            "rotation": 1.0471975803375245
+                            "angle": 1.0471975803375245
                         },
                         "savedDefaults": {},
                         "value": [

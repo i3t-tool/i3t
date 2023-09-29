@@ -240,14 +240,15 @@ bool TransformImpl<ETransformType::EulerX>::isValid() const
 	bool result = validateValues(g_RotateXMask, mat);
 
 	// matrix inner consistency
-	float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
-	float angle2 = glm::atan(mat[1][2], mat[1][1]); // glm::atan executes ::std::atan2
+	const float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
+	// todo:
+	// float angle2 = glm::atan(mat[1][2], mat[1][1]); // glm::atan executes ::std::atan2
 	// result       = result && Math::eq(angle, angle2);
 
 	auto expectedMat = glm::eulerAngleX(angle);
 
 	// consistency defaults <--> matrix
-	float defaultAngle = getDefaultValue("rotation").getFloat();
+	const float defaultAngle = getDefaultValue("angle").getFloat();
 	result = result && Math::eq(angle, defaultAngle);
 
 	expectedMat = glm::eulerAngleX(defaultAngle);
@@ -258,7 +259,7 @@ bool TransformImpl<ETransformType::EulerX>::isValid() const
 
 ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
 {
-	setDefaultValue("rotation", val);
+	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	notifySequence();
@@ -344,7 +345,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		}
 
 		float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
-		setDefaultValueNoUpdate("rotation", angle);
+		setDefaultValueNoUpdate("angle", angle);
 	}
 
 	setInternalValue(mat);
@@ -356,7 +357,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerX>::initDefaults()
 {
-	setDefaultValueNoUpdate("rotation", 0.0f);
+	setDefaultValueNoUpdate("angle", 0.0f);
 }
 
 void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
@@ -364,7 +365,7 @@ void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
 	m_hasSynergies = true;
 	m_isLocked = true;
 
-	setInternalValue(glm::eulerAngleX(getDefaultValue("rotation").getFloat()));
+	setInternalValue(glm::eulerAngleX(getDefaultValue("angle").getFloat()));
 	notifySequence();
 }
 
@@ -387,7 +388,7 @@ bool TransformImpl<ETransformType::EulerY>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	// consistency defaults <--> matrix
-	float defaultAngle = getDefaultValue("rotation").getFloat();
+	const float defaultAngle = getDefaultValue("angle").getFloat();
 	result = result && Math::eq(angle, defaultAngle);
 
 	expectedMat = glm::eulerAngleY(defaultAngle);
@@ -398,7 +399,7 @@ bool TransformImpl<ETransformType::EulerY>::isValid() const
 
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
 {
-	setDefaultValue("rotation", val);
+	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
 
@@ -482,7 +483,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		}
 
 		float angle = glm::atan(mat[2][0], mat[2][2]); // glm::atan executes ::std::atan2
-		setDefaultValueNoUpdate("rotation", angle);
+		setDefaultValueNoUpdate("angle", angle);
 	}
 
 	setInternalValue(mat);
@@ -493,7 +494,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerY>::initDefaults()
 {
-	setDefaultValueNoUpdate("rotation", 0.0f);
+	setDefaultValueNoUpdate("angle", 0.0f);
 }
 void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 {
@@ -502,7 +503,7 @@ void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 	m_hasSynergies = true;
 	m_isLocked = true;
 
-	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
+	setInternalValue(glm::rotate(getDefaultValue("angle").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
 }
 
@@ -524,7 +525,7 @@ bool TransformImpl<ETransformType::EulerZ>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	// consistency defaults <--> matrix
-	float defaultAngle = getDefaultValue("rotation").getFloat();
+	const float defaultAngle = getDefaultValue("angle").getFloat();
 	result = result && Math::eq(angle, defaultAngle);
 
 	expectedMat = glm::eulerAngleZ(defaultAngle);
@@ -534,7 +535,7 @@ bool TransformImpl<ETransformType::EulerZ>::isValid() const
 }
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 {
-	setDefaultValue("rotation", val);
+	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
 
@@ -621,7 +622,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			mat[1][1] = cos;
 		}
 		float angle = glm::atan(mat[0][1], mat[0][0]); // glm::atan executes ::std::atan2
-		setDefaultValueNoUpdate("rotation", angle);
+		setDefaultValueNoUpdate("angle", angle);
 	}
 
 	setInternalValue(mat);
@@ -632,7 +633,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerZ>::initDefaults()
 {
-	setDefaultValueNoUpdate("rotation", 0.0f);
+	setDefaultValueNoUpdate("angle", 0.0f);
 }
 
 void TransformImpl<ETransformType::EulerZ>::resetMatrixFromDefaults()
@@ -642,7 +643,7 @@ void TransformImpl<ETransformType::EulerZ>::resetMatrixFromDefaults()
 	m_hasSynergies = true;
 	m_isLocked = true;
 
-	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
+	setInternalValue(glm::rotate(getDefaultValue("angle").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
 }
 
@@ -736,13 +737,13 @@ bool TransformImpl<ETransformType::AxisAngle>::isValid() const
 
 	// consistency of defaults
 	// axis <> vec3(0) = the rotation vector is of non-zero length
-	glm::vec3 ax = getDefaultValue("axis").getVec3();
+	const glm::vec3 ax = getDefaultValue("axis").getVec3();
 	result = result && glm::dot(ax, ax) != 0.0f;
 
 	// consistency defaults <--> matrix
 	// expected matrix
-	float angle = getDefaultValue("rotation").getFloat();
-	auto expectedMat = glm::rotate(angle, ax);
+	const float angle = getDefaultValue("angle").getFloat();
+	const auto expectedMat = glm::rotate(angle, ax);
 
 	result = result && Math::eq(expectedMat, mat);
 
@@ -753,14 +754,14 @@ bool TransformImpl<ETransformType::AxisAngle>::isValid() const
 void TransformImpl<ETransformType::AxisAngle>::initDefaults()
 {
 	setDefaultValueNoUpdate("axis", glm::vec3{0.0f, 1.0f, 0.0f});
-	setDefaultValueNoUpdate("rotation", 0.0f);
+	setDefaultValueNoUpdate("angle", 0.0f);
 }
 
 void TransformImpl<ETransformType::AxisAngle>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
-	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), getDefaultValue("axis").getVec3()));
+	setInternalValue(glm::rotate(getDefaultValue("angle").getFloat(), getDefaultValue("axis").getVec3()));
 	notifySequence();
 }
 
@@ -786,7 +787,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 	}
 
 	glm::mat4 oldValue = getInternalData().getMat4();
-	float oldAngle = getDefaultValue("rotation").getFloat();
+	float oldAngle = getDefaultValue("angle").getFloat();
 	glm::vec3 oldAxis = getDefaultValue("axis").getVec3();
 
 	// Extract current axis angle from new matrix
@@ -800,7 +801,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 	setInternalValue(newMat);
 
 	// Update default values
-	setDefaultValueNoUpdate("rotation", angle);
+	setDefaultValueNoUpdate("angle", angle);
 	setDefaultValueNoUpdate("axis", axis);
 
 	// Check validity
@@ -808,7 +809,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 	{
 		// Revert changes
 		setInternalValue(oldValue);
-		setDefaultValueNoUpdate("rotation", oldAngle);
+		setDefaultValueNoUpdate("angle", oldAngle);
 		setDefaultValueNoUpdate("axis", oldAxis);
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "AxisAngle synergy not valid!"};
 	}
@@ -819,7 +820,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 
 ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
 {
-	setDefaultValue("rotation", rads);
+	setDefaultValue("angle", rads);
 
 	return ValueSetResult{};
 }
@@ -1068,7 +1069,7 @@ void TransformImpl<ETransformType::Ortho>::setDefaultValueWithSynergies(const st
 	assert(hasSynergies()); // called from setValues after this check
 	assert(val.opValueType == EValueType::Float);
 
-	std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
+	// std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
 
 	float newVal = val.getFloat();
 	setDefaultValueNoUpdate(name, newVal);
@@ -1405,7 +1406,7 @@ void TransformImpl<ETransformType::Frustum>::setDefaultValueWithSynergies(const 
 	assert(hasSynergies()); // called from setValues after this check
 	assert(val.opValueType == EValueType::Float);
 
-	std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
+	// std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
 
 	float newVal = val.getFloat();
 	setDefaultValueNoUpdate(name, newVal);
