@@ -94,14 +94,14 @@ public:
 	}
 
 	/* DIWNE function */
-	virtual bool bypassFocusForInteractionAction();
-	virtual bool beforeContent();
-	virtual bool topContent();
-	virtual bool middleContent();
-	virtual bool leftContent();
-	virtual bool rightContent();
-	virtual bool bottomContent();
-	virtual void deleteAction();
+	virtual bool bypassFocusForInteractionAction() override;
+	virtual bool beforeContent() override;
+	virtual bool topContent() override;
+	virtual bool middleContent() override;
+	virtual bool leftContent() override;
+	virtual bool rightContent() override;
+	virtual bool bottomContent() override;
+	virtual void deleteAction() override;
 
 	bool m_removeFromWorkspaceWindow;
 	bool getRemoveFromWorkspace() const
