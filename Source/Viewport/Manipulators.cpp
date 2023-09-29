@@ -70,12 +70,16 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 		manipulator->m_id = id;
 		const ManipulatorType type = manipulator->m_type;
 
+		auto node = manipulator->m_node.lock();
+		if (!node)
+			continue;
+
 		if (type == ManipulatorType::UNKNOWN || type == ManipulatorType::UNIMPLEMENTED)
 			continue;
 
 		// TODO: (DR) This shouldn't run every frame!! Needs to be called on updateValues, so could use the update
 		// callback? Update the manipulator with the latest data
-		updateManipulatorMatrices(*manipulator, manipulator->m_node);
+		updateManipulatorMatrices(*manipulator, node);
 
 		// IMGUIZMO NOTE:
 		// ImGuizmo's matrix_t * operator multiplies the other way around!
@@ -181,9 +185,8 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			{
 				if (Math::eq(projectionParams[i], 0))
 					continue;
-				Core::ValueSetResult result = manipulator->m_node->setDefaultValue(
-				    paramNames[i],
-				    manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
+				Core::ValueSetResult result = node->setDefaultValue(
+				    paramNames[i], node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
 				if (result.status != Core::ValueSetResult::Status::Ok)
 				{
 					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
@@ -228,7 +231,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 					left += projectionParams[0];
 					right += projectionParams[1];
 					float aspect = (right - left) / (top - bottom);
-					result = manipulator->m_node->setDefaultValue("aspect", aspect);
+					result = node->setDefaultValue("aspect", aspect);
 				}
 				// bottom and top
 				if (i == 2 || i == 3)
@@ -236,14 +239,13 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 					bottom += projectionParams[2];
 					top += projectionParams[3];
 					float angle = 2.0f * glm::degrees(atan((0.5f * (top - bottom)) / (near)));
-					result = manipulator->m_node->setDefaultValue("fovy", glm::radians(angle));
+					result = node->setDefaultValue("fovy", glm::radians(angle));
 				}
 				// near and far
 				if (i == 4 || i == 5)
 				{
-					result = manipulator->m_node->setDefaultValue(
-					    paramNames[i],
-					    manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
+					result = node->setDefaultValue(paramNames[i], node->getDefaultValue(paramNames[i]).getFloat() +
+					                                                  projectionParams[i]);
 				}
 				if (result.status != Core::ValueSetResult::Status::Ok)
 				{
@@ -260,7 +262,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			{
 			case ManipulatorType::SCALE:
 			{
-				if (manipulator->m_node->hasSynergies())
+				if (node->hasSynergies())
 				{
 					// Uniform scaling
 					glm::mat4 localDelta = glm::inverse(combinedMatrix) * deltaMatrix * combinedMatrix;
@@ -296,7 +298,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			}
 
 			// Set the new matrix value, defaults should be updated within setValue by the respective implementation
-			Core::ValueSetResult result = manipulator->m_node->setValue(resultMatrix);
+			Core::ValueSetResult result = node->setValue(resultMatrix);
 			if (result.status != Core::ValueSetResult::Status::Ok)
 			{
 				LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
@@ -311,9 +313,11 @@ bool Manipulators::drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::m
 {
 	bool interacted = false;
 
+	auto node = manipulator->m_node.lock();
+
 	const static std::string pointNames[2] = {"eye", "center"};
-	glm::vec3 points[2] = {manipulator->m_node->getDefaultValue(pointNames[0]).getVec3(),
-	                       manipulator->m_node->getDefaultValue(pointNames[1]).getVec3()};
+	glm::vec3 points[2] = {node->getDefaultValue(pointNames[0]).getVec3(),
+	                       node->getDefaultValue(pointNames[1]).getVec3()};
 
 	// Draw line between eye and center
 	// TODO: (DR) Add some indication of direction (a cube? a point? an arrow?, is a little tricky with imguizmo)
@@ -348,7 +352,7 @@ bool Manipulators::drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::m
 			glm::mat4 localDelta = glm::inverse(combinedMatrix) * deltaMatrix * combinedMatrix;
 			glm::mat4 resultMatrix = pointMat * localDelta;
 
-			const auto result = manipulator->m_node->setDefaultValue(pointNames[i], glm::vec3(resultMatrix[3]));
+			const auto result = node->setDefaultValue(pointNames[i], glm::vec3(resultMatrix[3]));
 			;
 			if (result.status != Core::ValueSetResult::Status::Ok)
 			{
