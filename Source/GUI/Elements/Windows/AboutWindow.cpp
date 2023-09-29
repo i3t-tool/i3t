@@ -20,7 +20,7 @@ AboutWindow::AboutWindow()
 void AboutWindow::render()
 {
 	// Set initial window size
-	ImVec2 windowSize = ImVec2(1100, 700);
+	ImVec2 windowSize = ImVec2(1100, 725);
 	static bool firstTime = true;
 	if (firstTime)
 	{
@@ -53,6 +53,8 @@ void AboutWindow::render()
 		ImGui::PushStyleColor(ImGuiCol_ChildBg,
 		                      Application::get().getUI()->getTheme().get(EColor::AboutWindow_BackgroundRight));
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::AboutWindow_Text));
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(15, 0));
 		ImGui::BeginChild("panelAbout", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 		{
 			ImGui::BeginGroup();
@@ -118,9 +120,9 @@ void AboutWindow::render()
 				ImGui::Text("Martin Herich");
 				ImGui::Text("Jaroslav Holeček");
 				ImGui::Text("Dan Rakušan");
+				ImGui::Text("Adam Loucký");
 				ImGui::Text("Miroslav Mueller");
 				ImGui::Text("Vít Zadina");
-				ImGui::Text("Adam Loucký");
 				ImGui::Text("");
 
 
@@ -153,6 +155,7 @@ void AboutWindow::render()
 
 			ImGui::EndChild(); // right panel
 		}
+		ImGui::PopStyleVar();
 		ImGui::PopStyleColor(2);
 
 
