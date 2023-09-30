@@ -375,10 +375,10 @@ colors:
     z: 1
     w: 1
   ntrs_Nodes_Transformation_ValidIcon_padding:
-    x: 0.721599996
-    y: 0.768599987
-    z: 0.725499988
-    w: 0.768599987
+    x: 0.874509811
+    y: 0.768627465
+    z: 0.886274517
+    w: 0.768627465
   ntrs_Nodes_Transformation_TrackingColor:
     x: 0.300000012
     y: 0.300000012

@@ -179,7 +179,8 @@ void Theme::initClassicProperties()
 	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 	// is now multiplied by the fontSize in WorkspaceTransformation::topContent(), diwne.DrawIcon()
-	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f));
+	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f)); // for cross
+	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.8745f, 0.7686f, 0.8863f, 0.7686f)); // for hyphen
 
 	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
@@ -459,7 +460,8 @@ void Theme::initModernProperties()
 	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 	// is now multiplied by the fontSize in WorkspaceTransformation::topContent(), diwne.DrawIcon()
-	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f));
+	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f)); // for cross
+	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.8745f, 0.7686f, 0.8863f, 0.7686f)); // for hyphen
 
 	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));

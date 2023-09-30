@@ -1,5 +1,5 @@
 /**
- * \file	GUI/style.h
+ * \file	GUI/Theme.h
  * \author Martin Herich <martin.herich@phire.cz>
  *
  * Declares the tab group class

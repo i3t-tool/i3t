@@ -70,7 +70,8 @@ enum IconType
 	TriangleDownRight,
 	GrabDownLeft,
 	GrabDownRight,
-	Cross
+	Cross,
+	Hyphen
 };
 
 enum DiwneAction
