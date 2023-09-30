@@ -85,7 +85,7 @@ Pokud si chceme *zjednodušit manipulaci* s maticemi, můžeme využít *Level O
     * *Label* = pouze *jméno*, zbytek je schovaný
     * *Set values* = *hodnoty, ze kterých matice vzniká*
 
-*Úroveň detailu* bloku nastavíme přes *kontextové menu*
+*Úroveň detailu* bloku nastavíme přes *kontextové menu*, nebo rychleji pomocí *tlačítka na liště* bloku
 
 task: Nastav matici lookAt úroveň detailu "Set values"
 
@@ -159,7 +159,7 @@ task: Vyzkoušej si práci s frustem kamery. Uprav projekci tak, aby kačenka ne
 hint:
 Uprav hodnotu far, tak aby frustum neobsahoval kačenku
 
-Když jsi si vyzkoušel/a práci s *frustem*, můžeš pokračovat na *perspektivní projekci*.
+Když sis vyzkoušel/a práci s *frustem*, můžeš pokračovat na *perspektivní projekci*.
 
 --
 headline: Perspektivní projekce

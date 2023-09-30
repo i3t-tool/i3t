@@ -57,7 +57,7 @@ Pokud nám bloky *zabírají moc místa* ve scéně, nebo chceme *zjednodušit p
     * *Label* = pouze *jméno*, zbytek je schovaný
     * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic.
 
-*Úroveň detailu* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*
+*Úroveň detailu* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*, nebo rychleji pomocí *tlačítka na liště* bloku
 
 ![Menu pro nastavení Level of detail](levelOfDetail.png)
 
@@ -68,7 +68,7 @@ V *Add menu* najdeme i položku *operators*.
 
 ![Menu pro přidání operátorů](operators.png)
 
-Ta obsahuje mnoho různých výpočetních bloků, které nám můžou pomoct s *matematickými operacemi* jako např. *translace* matice, výpočet *determinantu*, *rozklady* matic apod.
+Ta obsahuje mnoho různých výpočetních bloků, které nám můžou pomoct s *matematickými operacemi* jako např. *inverze* matice, výpočet *determinantu*, *rozklady* matic apod.
 
 --
 headline: Tracking

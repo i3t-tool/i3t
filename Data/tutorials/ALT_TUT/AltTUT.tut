@@ -144,7 +144,7 @@ headline: Kamera
 --
 headline: Kamera a Screen
 
-Abychom se podívali na to, co kamera vidí, musíme k ní připojit obrazovku (*"screen"*), která nám ve *Workspace* ukáže *pohled kamery*.
+Abychom se podívali na to, co kamera vidí, musíme k ní připojit obrazovku (*screen*), která nám ve *Workspace* ukáže *pohled kamery*.
 
 ![Ukázka použití kamery](camera_screen.png)
 
