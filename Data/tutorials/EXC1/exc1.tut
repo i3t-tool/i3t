@@ -15,7 +15,7 @@ V tomto cvičení si vyzkoušíme tvorbu *stolu* z objektů v *I3T*.
 
 ![Stůl s konvičkou](table.png)
 
-*P.S.* V modelování se tomuto principu říká *"hierarchické modelování"*.
+*P.S.* V modelování nám pomůže *duch stolu*, který ukazuje, jak má vypadat *výsledek* cvičení
 
 --
 headline: Deska stolu
@@ -50,7 +50,7 @@ task: Dodej stolu další nohy
 --
 headline: Jednotný stůl
 
-task: Posuň celý stůl do úrovně ducha pomocí jedné matice translace
+task: Posuň celý stůl do úrovně ducha pomocí jedné matice translace 
 
 ![Stůl posunutý na úroveň země](table_translated.png)
 
@@ -68,5 +68,5 @@ headline: A máme hotovo!
 
 ![Topologie workspace](scene.png)
 
-Vidíš, že využíváme hlavně možnost *větvit sekvence*, čímž můžeme měnit několik modelů *stejnými transformacemi*.
+Vidíš, že využíváme hlavně možnost *větvit sekvence*. Tím můžeme měnit několik modelů *stejnými transformacemi*.
 

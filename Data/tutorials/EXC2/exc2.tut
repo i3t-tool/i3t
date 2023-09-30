@@ -22,7 +22,7 @@ headline: Pohled zvrchu
 
 Čas se *pohnout*.
 
-task: Vyfoť pohled na místo činu z ptačí perspektivy, tím zajistíme, že nám pachatel neunikne
+task: Vyfoť pohled na místo činu z ptačí perspektivy, ať vidíme, jestli není pachatel venku
 
 ![Vzdušný pohled na dům](house.png)
 
@@ -38,7 +38,7 @@ task: Zaměř pachatele kamerou, je na (0, 3, -6) a pokus se ho najít v okně d
 --
 headline: X-Ray
 
-Kamera je vybavená *rentgenovým viděním*.
+Kamera je vybavena *rentgenovým viděním*.
 
 task: Bez pohnutí kamerou využij rentgen (clipping) k lepšímu náhledu do domu
 
@@ -47,7 +47,7 @@ task: Bez pohnutí kamerou využij rentgen (clipping) k lepšímu náhledu do do
 --
 headline: Detailní fotka
 
-Jako *důkaz* bude potřeba i *detailní* fotka scény v několika záběrech
+Jako *důkaz* bude potřeba i *detailní* fotka scény z několika úhlů
 
 task: Zachyť detail pachatele s obětí z vnitřku budovy
 
