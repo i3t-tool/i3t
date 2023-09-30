@@ -1,8 +1,8 @@
 #include "WorkspaceTransformation.h"
-#include "Tools.h"
 
 #include "../Windows/WorkspaceWindow.h"
 #include "State/StateManager.h"
+#include "Tools.h"
 
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
     : WorkspaceNodeWithCoreData(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
@@ -67,7 +67,8 @@ bool WorkspaceTransformation::topContent()
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
 		diwne.DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
-		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner), DIWNE::IconType::Cross,
+		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
+		               /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
 		               ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
