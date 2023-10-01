@@ -41,7 +41,7 @@ video).
 
 ### Main bars
 The I3T application has a stadard main menu in its top. 
-[Lišta](../Data/tutorials/ADD_TUT/lista.png)
+[Lišta]([alt](../Data/tutorials/ADD_TUT/lista.png)
 - File 
   - Open - standard file dialog for scene file opening. The scenes should be located in Data/Scenes/ directory.
   - Recent - list of recently used scenes for fast opening
