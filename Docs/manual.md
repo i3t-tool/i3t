@@ -3,9 +3,10 @@
 Introduction and a short program description. A good idea is to read the tutorial (In Czech: 1. Začínáme s I3T a 5. Pokročilé funkce programu).
 
 ## User interface
+![startWindow](./assets/startWindow.png?raw=true) 
 The program starts with a *Start window* that serves as a signpost between selecting ready-made tutorials, opening an existing scene, or starting a new one.
 
-Once selected, it enters the workspace mode, consisting of two main windows. [i3tscreens](../Data/tutorials/1TUT/i3tscreens.png)
+Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Data/tutorials/1TUT/i3tscreens.png?raw=true)
 
 In the *workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
@@ -13,15 +14,16 @@ by the graph is immediately visible in the 3D view in the *Scene View* window.
 
 The basic building block in the workspace window is a small rectangle
 with the title and contents, called *box*. 
-[Matrix with a model](../Data/tutorials/1TUT/hintPosun.png)
+![Matrix with a model](../Data/tutorials/1TUT/hintPosun.png?raw=true)
 The matrices are
 boxes with a 4x4 grid of real numbers. Matrices affect the object
 by being combined in the scene graph as they are put into a
 larger box called a sequence.
 
 Sequences have inputs and outputs marked by small icons.
-The [*x icon*](../Data/tutorials/1TUT/mult.png) represents matrix multiplication and matrices are multiplied
-by using the left-to-right order. The remaining [*icons with triangles*](../Data/tutorials/1TUT/vec3.png) represent
+The ![x icon](../Data/tutorials/1TUT/mult.png?raw=true) 
+represents matrix multiplication and matrices are multiplied
+by using the left-to-right order. The remaining ![icons with triangles](../Data/tutorials/1TUT/vec3.png?raw=true) represent
 either input or output of the copy of the box.
 
 The key benefit of the I3T tool is its interactivity. The user can
@@ -41,7 +43,9 @@ video).
 
 ### Main bars
 The I3T application has a stadard main menu in its top. 
-![Lišta](../Data/tutorials/ADD_TUT/lista.png)
+
+![Main menu](../Data/tutorials/ADD_TUT/lista.png?raw=true)
+
 - File 
   - Open - standard file dialog for scene file opening. The scenes should be located in Data/Scenes/ directory.
   - Recent - list of recently used scenes for fast opening
