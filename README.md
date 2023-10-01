@@ -19,8 +19,11 @@ npm run docs:dev
 
 ## Project structure
 ````
+Data/                       All Assets (fonts, models, scenes, textures, tutorials,...)
 Dependencies/               Directory with external dependencies.
 Docs/
+    - assets/
+    - developer-guide/
     - Doxygen/
 Source/
     - Commands/             Commands for the command pattern.
@@ -28,15 +31,16 @@ Source/
     - GUI/                  ImGui windows, dialogs, elements.
         - Elements
             - Dialogs/      
-            - Modals/       
+            - Modals/
+            - Nodes/       
             - Windows/      
         - ImGui/            Implementation of ImGui backend.
-Test/                       Unit tests, copies structure of Source/ directory.
+Test/                       Unit tests, copies structure of the Source/ directory.
 ````
 
 ## Contributing
-Please make sure, that you include only source code and files needed for building or running the application
-(configuration, data) to version control.
+Please make sure, that you include only source code and files needed for building 
+or running the application (configuration, data) to version control.
 
 ### Code style
 See [code style](Docs/developer-guide/code-style.md) for more information.

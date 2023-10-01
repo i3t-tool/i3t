@@ -1,5 +1,9 @@
 # Tutorials
 
+Tutoriály sslouží 
+
+
+
 ## Types of tutorials
 - **Main Tutorials** (_TUT) - contain instructions, tips and tasks, usual goal is to teach 
 the user some essential information for interaction with i3t

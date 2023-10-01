@@ -1,5 +1,14 @@
 # Usage of DIWNE in I3T
-The default DIWNE function is used in I3T as well as some I3T-specific behaviors.
+I3T uses the Immediate Mode Graphical User Interface method to create its user interface. 
+
+Immediate Mode Graphical User Interface, also known as IMGUI, is a type of graphical user interface often used for developing games or interactive applications. IMGUI differs from traditional graphical user interfaces in that it consists of individual elements that are always recreated on the screen with each frame, without being stored in memory.
+
+The particular library used for the development of I3T is DearIMGUI [Cor22]. 
+
+For the 2D Workspace where the use constructs s scene graph using a node editor, we developed 
+DIWNE - Dear Imgui Wrapper Node Editor library. It is   
+
+DIWNE  is a generic library. In I3T, we used its basic functions as well as some specially adapted for I3T
 
 ## WorkspaceDiwne (see WorkspaceDiwne.h)
 
@@ -17,7 +26,7 @@ Important attributes:
 
 The node editor view comprises several types of objects (Nodes, Pins, and Links). 
 
-For example, I3T has many specific types of nodes but often share common attributes and functions. To avoid code repetition, node classes are decomposed into several "layers" of inheritance. You can let your node use a higher-level implementation or override any function you want.
+For example, I3T has many specific nodes but often share common attributes and functions. To avoid code repetition, node classes are decomposed into several "layers" of inheritance. You can let your node use a higher-level implementation or override any function you want.
 
 Operations such as deleting from the node editor are done in a "marking way" - the node marks itself as having been deleted by the user, and only in the next frame is it actually deleted by the node editor.
 
