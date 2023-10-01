@@ -9,7 +9,7 @@
 
 class ScriptingModule : public Module
 {
-	void init() override;
+	void onInit() override;
 
 public:
 	bool runScript(const char* luaSource);

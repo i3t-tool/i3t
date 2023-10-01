@@ -2,9 +2,10 @@
 
 #include "imgui.h"
 
+#include "API.h"
+
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "Core/API.h"
 #include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/WindowManager.h"
 #include "Utils/TextureLoader.h"
@@ -29,8 +30,7 @@ void AboutWindow::render()
 		ImGui::SetNextWindowPos(ImVec2(1000.0f, 500.0f), 0, ImVec2(0.5f, 0.5f));
 	}
 
-	ImGui::PushStyleColor(ImGuiCol_WindowBg,
-	                      Application::get().getUI()->getTheme().get(EColor::AboutWindow_BackgroundLeft));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, I3T::getUI()->getTheme().get(EColor::AboutWindow_BackgroundLeft));
 
 	ImGui::Begin(setName("").c_str(), getShowPtr(),
 	             ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -50,9 +50,8 @@ void AboutWindow::render()
 		// ImGui::NextColumn();
 
 		// right panel
-		ImGui::PushStyleColor(ImGuiCol_ChildBg,
-		                      Application::get().getUI()->getTheme().get(EColor::AboutWindow_BackgroundRight));
-		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::AboutWindow_Text));
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, I3T::getUI()->getTheme().get(EColor::AboutWindow_BackgroundRight));
+		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::AboutWindow_Text));
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(15, 0));
 		ImGui::BeginChild("panelAbout", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
@@ -63,8 +62,7 @@ void AboutWindow::render()
 				ImGui::Dummy(ImVec2(0, 10));
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("About");
 				ImGui::SetWindowFontScale(1.0f);
@@ -84,8 +82,7 @@ void AboutWindow::render()
 				/// \todo Add interactive link to website.
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("I3T Website");
 				ImGui::SetWindowFontScale(1.0f);
@@ -95,8 +92,7 @@ void AboutWindow::render()
 				ImGui::Text("");
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("Supervisor");
 				ImGui::SetWindowFontScale(1.0f);
@@ -108,8 +104,7 @@ void AboutWindow::render()
 				ImGui::Text("");
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("Authors");
 				ImGui::SetWindowFontScale(1.0f);
@@ -127,8 +122,7 @@ void AboutWindow::render()
 
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("Design");
 				ImGui::SetWindowFontScale(1.0f);
@@ -140,8 +134,7 @@ void AboutWindow::render()
 				ImGui::Text("");
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
-				ImGui::PushStyleColor(ImGuiCol_Text,
-				                      Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
 				ImGui::Text("License");
 				ImGui::SetWindowFontScale(1.0f);

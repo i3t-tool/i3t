@@ -8,7 +8,7 @@
 #include "Utils/Random.h"
 #include "Utils/TimeUtils.h"
 
-void StateManager::init()
+void StateManager::onInit()
 {
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
@@ -28,7 +28,7 @@ void StateManager::init()
 	purgeTmpDirectories();
 }
 
-void StateManager::beginFrame()
+void StateManager::onBeginFrame()
 {
 	// Tmp directory lock
 	// If the tmp directory exists, a file containing the current system time is written to it every 5 minutes.

@@ -73,7 +73,7 @@ class WBOITCompositeShader;
  *
  * Further, DisplayOptions are used to toggle visibility of certain objects.
  */
-class Viewport : public IStateful
+class Viewport : public Module, public IStateful
 {
 private:
 	friend class Scene;
@@ -102,7 +102,7 @@ public:
 	/**
 	 * Initializes scenes and loads assets.
 	 */
-	void init(ViewportSettings settings);
+	void onInit() override;
 
 	/**
 	 * Render viewport's main scene into a framebuffer using its own camera.
@@ -159,7 +159,7 @@ public:
 	/**
 	 * Update scene logic
 	 */
-	void update(double dt);
+	void onUpdate(double dt) override;
 
 	// TODO: (DR) A little issue arises if this method were to be called multiple
 	// 	times per frame. I'm not sure if that ever happens (multiple scene viewports of the same scene?).

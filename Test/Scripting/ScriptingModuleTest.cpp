@@ -5,7 +5,7 @@
 TEST(ScriptingModuleTest, VariablesArePerservedBetweenScripts)
 {
 	const auto scripting = std::make_unique<ScriptingModule>();
-	((Module*) scripting.get())->init();
+	((Module*) scripting.get())->onInit();
 
 	scripting->runScript(R"(
 		number = 24

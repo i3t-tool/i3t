@@ -72,7 +72,7 @@ bool WorkspaceScreen::middleContent()
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	Vp::Viewport* viewport = App::get().viewport();
+	Vp::Viewport* viewport = I3T::getViewport();
 	m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
 	viewport->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, m_renderOptions,
 	                     m_displayOptions);

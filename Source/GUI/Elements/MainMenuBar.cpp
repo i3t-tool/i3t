@@ -2,8 +2,8 @@
 
 #include "imgui.h"
 
+#include "API.h"
 #include "Commands/ApplicationCommands.h"
-#include "Core/API.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
@@ -111,6 +111,9 @@ MainMenuBar::MainMenuBar()
 {
 	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() {
 		save();
+	});
+	InputManager::bindGlobalAction("open", EKeyState::Pressed, [&]() {
+		MenuBarDialogs::open();
 	});
 }
 
@@ -257,8 +260,8 @@ void MainMenuBar::showHelpMenu()
 
 		ImGui::Separator();
 
-		ImGui::MenuItem("Debug window manager", nullptr, &App::get().m_debugWindowManager);
-		ImGui::MenuItem("Debug trackball camera", nullptr, &App::get().m_debugTrackball);
+		ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
+		ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 
 		ImGui::EndMenu();
 	}

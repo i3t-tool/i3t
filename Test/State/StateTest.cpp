@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
+#include "API.h"
 #include "Config.h"
-#include "Core/API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "I3T.h"
 #include "State/StateManager.h"
@@ -134,7 +134,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 
 	// due to WorkspaceSequence::setRemoveFromWorkspace
 	for (int i = 0; i < 2; ++i)
-		Application::get().onDisplay();
+		App::get().display();
 
 	App::getModule<StateManager>().takeSnapshot();
 
@@ -150,7 +150,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 
 	// due to WorkspaceSequence::setRemoveFromWorkspace
 	for (int i = 0; i < 2; ++i)
-		Application::get().onDisplay();
+		App::get().display();
 
 	{
 		const auto sequenceNode = getNodes(workspace)[0]->getNodebase()->as<Core::Sequence>();

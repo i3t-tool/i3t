@@ -2,18 +2,15 @@
 
 #include "imgui.h"
 
+#include "I3T.h"
+
 #include "Core/Application.h"
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
 
-// TODO: (DR) This probably shouldn't be in the Core (As its basically a global utility namespace)
+// TODO: (DR) Maybe merge this with the I3TApplication (I3T.h) file?
 namespace I3T
 {
-inline UIModule* getUI()
-{
-	return App::get().getUI();
-}
-
 inline std::vector<Theme>& getThemes()
 {
 	return getUI()->getThemes();

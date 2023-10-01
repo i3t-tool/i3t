@@ -244,7 +244,7 @@ void WorkspaceNodeWithCoreData::drawMenuDuplicate()
 		// duplicate
 		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
 		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-		              App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+		              I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 		// move original node behind new one
 		static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
 	}
@@ -1132,7 +1132,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 	else
 	{
 		// TODO: (DR) (zoom-aware) Uncomment perhaps
-		// ImGui::Dummy(App::get().getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
+		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
 	return inner_interaction_happen;
 }

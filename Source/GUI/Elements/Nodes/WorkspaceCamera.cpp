@@ -50,7 +50,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 
 	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
-	m_viewportCamera = App::get().viewport()->createCamera(getId());
+	m_viewportCamera = I3T::getViewport()->createCamera(getId());
 	auto cameraPtr = m_viewportCamera.lock();
 	cameraPtr->m_showAxes = m_axisOn;
 	cameraPtr->m_visible = m_showCamera;
@@ -74,7 +74,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 
 WorkspaceCamera::~WorkspaceCamera()
 {
-	App::get().viewport()->removeEntity(m_viewportCamera);
+	I3T::getViewport()->removeEntity(m_viewportCamera);
 }
 
 void WorkspaceCamera::popupContent()
@@ -247,7 +247,7 @@ bool WorkspaceCamera::isCamera()
 bool WorkspaceCamera::processSelect()
 {
 	auto model = m_viewportCamera.lock();
-	model->m_highlightColor = App::get().viewport()->getSettings().global().highlight.selectionColor;
+	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
 	model->m_highlight = true;
 
 	return WorkspaceNodeWithCoreDataWithPins::processSelect();

@@ -2,18 +2,20 @@
 
 #include <functional>
 
+#include "GUI/ImGui/imgui_impl_glfw.h"
+#include "GUI/ImGui/imgui_impl_opengl3.h"
+
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/Input/InputManager.h"
-#include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-#include "GUI/UIModule.h" /// \todo Remove this dependency
-#include "Logger/Logger.h"
-#include "Viewport/Viewport.h"
 
 using namespace Core;
 
-double lastFrameSeconds = 0.0; // PF changed to double
+constexpr const char* ImGui_GLSLVersion = "#version 140";
+
+// Statics
+Application* Application::s_instance = nullptr;
 
 Application::Application()
 {
@@ -22,25 +24,160 @@ Application::Application()
 
 Application::~Application()
 {
-	for (auto& [_, m] : m_modules)
+	if (!m_shouldClose)
 	{
-		m->onClose();
+		close();
 	}
 
-	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
-
 	m_window->finalize();
+}
+
+Application& Application::get()
+{
+	return *s_instance;
 }
 
 void Application::init()
 {
 	initWindow();
 
+	// Setup Dear ImGui context after OpenGL context.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void) io;
+
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
+	                                                    // Platform Windows
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+	// Allocate path to the imgui ini file on heap.
+	io.IniFilename = "Data/imgui.ini";
+
 	// Call implementation of init() in derived class
 	onInit();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplGlfw_InitForOpenGL(m_window->get(), true);
+	ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
 }
 
-//===----------------------------------------------------------------------===//
+void Application::run()
+{
+	// TOOD: (DR) m_modules: I'm thinking it might be a good idea to use a data structure that would retain the module
+	// insertion order. That way there would be a consistent order in which modules are iterated/updated in. I suppose
+	// individual operations of module calls should be independent of order but having such consistency in such a major
+	// "loop" of the application might save us some issues in case another C++ implementation decides to iterate in a
+	// different order.
+
+	while (!m_shouldClose)
+	{
+		glfwPollEvents();
+
+		// Process commands.
+		for (auto& command : m_commands)
+		{
+			command->execute();
+		}
+		m_commands.clear();
+
+		beginFrame();
+
+		// Logic update
+		update();
+
+		// Render stuff
+		display();
+
+		endFrame();
+	}
+}
+
+void Application::beginFrame()
+{
+	// Update input (before logic update and rendering)
+	InputManager::beginFrame();
+
+	// Start the Dear ImGui frame ----------------------
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	onBeginFrame();
+}
+
+void Application::endFrame()
+{
+	// Must be called *after* rendering *before* ending the frame.
+	InputManager::endFrame();
+
+	onEndFrame();
+
+	// ImGui rendering ----------------------------------------------------------
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	// Update and Render additional Platform Windows
+	// (Platform functions may change the current OpenGL context, so we
+	// save/restore it to make it easier to paste this code elsewhere.
+	//  For this specific demo app we could also call
+	//  glfwMakeContextCurrent(window) directly)
+	// ImGuiIO& io = ImGui::GetIO(); (void)io;
+	auto& io = ImGui::GetIO();
+	(void) io;
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backup_current_context);
+	}
+
+	m_window->swapBuffers();
+}
+
+void Application::update()
+{
+	// Get delta
+	double current = glfwGetTime();
+	double delta = current - m_lastFrameSeconds;
+	m_lastFrameSeconds = current;
+
+	for (auto& [_, m] : m_modules)
+	{
+		m->onUpdate(delta);
+	}
+
+	onUpdate(delta);
+}
+
+void Application::display()
+{
+	for (auto& [_, m] : m_modules)
+		m->onBeginFrame();
+
+	for (auto& [_, m] : m_modules)
+		m->onEndFrame();
+}
+
+void Application::close()
+{
+	m_shouldClose = true;
+
+	for (auto& [_, m] : m_modules)
+	{
+		m->onClose();
+	}
+
+	onClose();
+}
+
+void Application::enqueueCommand(ICommand* command)
+{
+	m_commands.push_back(command);
+}
 
 static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
                                          "snapshot of the program messages "
@@ -84,7 +221,7 @@ void Application::initWindow()
 	}
 }
 
-GLFWwindow* Application::mainWindow()
+GLFWwindow* Application::getWindow()
 {
 	return m_window->get();
 }
@@ -98,95 +235,3 @@ void Application::setTitle(const std::string& title)
 {
 	m_window->setTitle(title.c_str());
 }
-
-//===----------------------------------------------------------------------===//
-
-void Application::run()
-{
-	while (!m_bShouldClose)
-	{
-		// glfwWaitEvents();
-		glfwPollEvents();
-
-		// Process commands.
-		for (auto& command : m_commands)
-		{
-			command->execute();
-		}
-		m_commands.clear();
-
-		double current = glfwGetTime();
-		double delta = current - lastFrameSeconds;
-		Core::GraphManager::update(delta);
-		lastFrameSeconds = current;
-
-		InputManager::beginFrame(); // Must be called *before* rendering.
-
-		Logger::getInstance().update(); // (DR) I'm assuming this should update after input manager since it uses it?
-
-		// Update and display.
-		onDisplay();
-		logicUpdate(delta);
-
-		InputManager::endFrame(); // Must be called *after* rendering.
-
-		// glfwSwapBuffers(m_window);
-		m_window->swapBuffers();
-	}
-}
-
-void Application::onDisplay()
-{
-	// TODO: (DR) Figure out what this was about, probably just delete these old comments
-	/*
-	 \todo Pause scene update.
-	if (m_isPaused)
-	  return; // True to stop display update. Set by main.setPause(), not used
-	now.
-	 */
-
-	/// \todo after pressing quit, it still updates the logic and fails on
-	/// nonexistent camera in Scene::keyUpdate() \todo move the logic Update to
-	/// the timer
-	// TIME_STEP_ACU -= TIME_STEP;
-
-	for (auto& [_, m] : m_modules)
-		m->beginFrame();
-
-	for (auto& [_, m] : m_modules)
-		m->endFrame();
-}
-
-void Application::logicUpdate(double delta)
-{
-	viewport()->update(delta);
-}
-
-Application& Application::get()
-{
-	return *s_instance;
-}
-
-/// \todo Remove this dependency
-UIModule* Application::getUI()
-{
-	return &getModule<UIModule>();
-}
-
-Vp::Viewport* Application::viewport()
-{
-	return m_viewport;
-}
-
-void Application::onClose()
-{
-	m_bShouldClose = true;
-}
-
-void Application::enqueueCommand(ICommand* command)
-{
-	m_commands.push_back(command);
-}
-
-// Statics
-Application* Application::s_instance = nullptr;
