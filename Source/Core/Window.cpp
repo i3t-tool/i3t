@@ -36,6 +36,8 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 		exit(EXIT_FAILURE);
 	}
 
+	glfwSetWindowUserPointer(m_mainWindow, (void*) this);
+
 	setTitle(BASE_WINDOW_TITLE.c_str());
 
 	int x, y, channels;

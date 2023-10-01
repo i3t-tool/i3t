@@ -5,7 +5,6 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Result.h"
 #include "GUI/Elements/MainMenuBar.h"
-#include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
@@ -57,7 +56,11 @@ void UIModule::onInit()
 	});
 
 	BeforeCloseCommand::addListener([this]() {
-		m_windowManager.openModal<BeforeCloseModal>();
+		// m_windowManager.openModal<BeforeCloseModal>();
+		// m_windowManager.openConfirmModal<BeforeCloseStrategy>();
+		askBeforeExitScene([]() {
+			CloseCommand::dispatch();
+		});
 	});
 
 	// Setup Dear ImGui style

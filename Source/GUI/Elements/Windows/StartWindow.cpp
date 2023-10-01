@@ -13,7 +13,6 @@
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/MainMenuBar.h"
-#include "GUI/Elements/Modals/BeforeNewModal.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
@@ -257,7 +256,7 @@ void StartWindow::renderRightPanel()
 				if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 				{
 					this->hide();
-					App::getModule<UIModule>().openModal<BeforeNewModal>();
+					InputManager::triggerAction("new", EKeyState::Pressed);
 				}
 				if (ImGui::IsItemHovered())
 				{
