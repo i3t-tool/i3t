@@ -5,7 +5,6 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/Elements/Modals/BeforeNewModal.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"

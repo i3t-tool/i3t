@@ -290,13 +290,6 @@ bool StateManager::loadScene(const fs::path& path)
 
 	reset();
 
-	/// \todo Replace me with a proper event
-	const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
-	if (startWindow)
-	{
-		startWindow->hide();
-	}
-
 	return true;
 }
 
@@ -341,16 +334,6 @@ void StateManager::newScene(bool firstRun)
 
 	createTmpDirectory();
 	wipeTmpDirectory();
-
-	if (!firstRun)
-	{
-		/// \todo Replace me with a proper event
-		const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
-		if (startWindow)
-		{
-			startWindow->hide();
-		}
-	}
 
 	reset();
 }
@@ -488,11 +471,11 @@ void StateManager::setWindowTitle()
 		{
 			sceneName += " (Read-only)";
 		}
+	}
 
-		if (isDirty())
-		{
-			sceneName += " - Unsaved";
-		}
+	if (isDirty())
+	{
+		sceneName += " - Unsaved";
 	}
 
 	const auto newTitle = std::string(BASE_WINDOW_TITLE) + " - " + sceneName;

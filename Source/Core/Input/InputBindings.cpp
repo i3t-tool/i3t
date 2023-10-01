@@ -23,6 +23,10 @@ void InputBindings::init()
 	// InputManager::setInputAction("redo", Keys::n, {Keys::ctrll});
 	// InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
 
+	InputManager::setInputAction("new", Keys::n, {Keys::ctrll});
+
+	InputManager::setInputAction("open", Keys::o, {Keys::ctrll});
+
 	InputManager::setInputAction("save", Keys::s, {Keys::ctrll});
 	// TODO: (DR) saveAs action is unused!
 	InputManager::setInputAction("saveAs", Keys::s, {Keys::ctrll, Keys::shiftl});

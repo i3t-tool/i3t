@@ -61,6 +61,11 @@ public:
 		m_windowManager.openModal<T>();
 	}
 
+	template <typename TStrategy> void openConfirmModal()
+	{
+		m_windowManager.openConfirmModal<TStrategy>();
+	}
+
 private:
 	void buildDockspace();
 

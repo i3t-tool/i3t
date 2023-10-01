@@ -17,6 +17,7 @@
 
 #include "Core/Defs.h"
 #include "GUI/Elements/IWindow.h"
+#include "GUI/Elements/Modals/ConfirmModal.h"
 
 static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
@@ -148,6 +149,12 @@ public:
 
 	template <typename T> void openModal();
 	void openModal(UPtr<IWindow> modalInstance);
+
+	template <typename TStrategy> void openConfirmModal()
+	{
+		UPtr<IWindow> modal = std::make_unique<ConfirmModal>(std::make_unique<TStrategy>());
+		openModal(std::move(modal));
+	}
 
 private:
 	void updateWindowFocus();

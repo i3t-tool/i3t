@@ -9,7 +9,7 @@
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-#include "GUI/Elements/Modals/BeforeNewModal.h"
+#include "GUI/Elements/Modals/ConfirmModal.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
@@ -60,7 +60,9 @@ static void showRecentFiles()
 
 	if (sceneToOpen)
 	{
-		App::getModule<StateManager>().loadScene(*sceneToOpen);
+		askBeforeExitScene([sceneToOpen]() {
+			App::getModule<StateManager>().loadScene(*sceneToOpen);
+		});
 	}
 }
 
@@ -84,12 +86,23 @@ static void saveAs()
 
 static void save()
 {
-	auto& sm = App::getModule<StateManager>();
+	auto& stateManager = App::getModule<StateManager>();
 
-	if (sm.hasScene())
-		sm.saveScene();
+	if (stateManager.hasScene())
+	{
+		if (stateManager.getCurrentScene()->m_readOnly)
+		{
+			saveAs();
+		}
+		else
+		{
+			stateManager.saveScene();
+		}
+	}
 	else
+	{
 		saveAs();
+	}
 }
 
 Result<Void, Error> MenuBarDialogs::open()
@@ -112,8 +125,32 @@ MainMenuBar::MainMenuBar()
 	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() {
 		save();
 	});
+
+	InputManager::bindGlobalAction("new", EKeyState::Pressed, [&]() {
+		askBeforeExitScene([]() {
+			NewProjectCommand::dispatch();
+
+			/// \todo Replace me with a proper event
+			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+			if (startWindow)
+			{
+				startWindow->hide();
+			}
+		});
+	});
+
 	InputManager::bindGlobalAction("open", EKeyState::Pressed, [&]() {
-		MenuBarDialogs::open();
+		askBeforeExitScene([]() {
+			if (MenuBarDialogs::open())
+			{
+				/// \todo Replace me with a proper event
+				const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+				if (startWindow)
+				{
+					startWindow->hide();
+				}
+			}
+		});
 	});
 }
 
@@ -146,13 +183,13 @@ void MainMenuBar::showFileMenu()
 	{
 		if (ImGui::MenuItem("New"))
 		{
-			App::getModule<UIModule>().openModal<BeforeNewModal>();
+			InputManager::triggerAction("new", EKeyState::Pressed);
 		}
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Open", "Ctrl+O"))
 		{
-			MenuBarDialogs::open();
+			InputManager::triggerAction("open", EKeyState::Pressed);
 		}
 
 		if (ImGui::BeginMenu("Recent"))

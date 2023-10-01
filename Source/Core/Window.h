@@ -33,6 +33,7 @@ public:
 	void finalize();
 
 private:
+	bool m_closeDisabled = false;
 	std::string m_title;
 	GLFWwindow* m_mainWindow;
 };
