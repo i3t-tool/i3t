@@ -1,23 +1,65 @@
 # I3T Manual
 
-Introduction and a short program description
+Introduction and a short program description. A good idea is to read the tutorial (In Czech: 1. Začínáme s I3T a 5. Pokročilé funkce programu).
 
 ## User interface
+The program starts with a *Start window* that serves as a signpost between selecting ready-made tutorials, opening an existing scene, or starting a new one.
 
-Description of main windows (start window, workspace, scene view), top bar (how to load, append, save...), shortcuts
+Once selected, it enters the workspace mode, consisting of two main windows. [i3tscreens](../Data/tutorials/1TUT/i3tscreens.png)
 
-### Windows
-- Start window - contains tutorials that teach basic controls
-- Workspace - main window for working with the program
+In the *workspace* window, the user prepares individual transformations and models and plugs
+them into the scene graph. The resulting 3D representation of the structure generated
+by the graph is immediately visible in the 3D view in the *Scene View* window. 
+
+The basic building block in the workspace window is a small rectangle
+with the title and contents, called *box*. 
+[Matrix with a model](../Data/tutorials/1TUT/hintPosun.png)
+The matrices are
+boxes with a 4x4 grid of real numbers. Matrices affect the object
+by being combined in the scene graph as they are put into a
+larger box called a sequence.
+
+Sequences have inputs and outputs marked by small icons.
+The [*x icon*](../Data/tutorials/1TUT/mult.png) represents matrix multiplication and matrices are multiplied
+by using the left-to-right order. The remaining [*icons with triangles*](../Data/tutorials/1TUT/vec3.png) represent
+either input or output of the copy of the box.
+
+The key benefit of the I3T tool is its interactivity. The user can
+construct the scene graph interactively by ordering the matrices into
+sequences, the sequences into graphs, and also interactively modify
+the values in the matrices. The effect of the transformation is
+immediately shown in the 3D scene view (Figure 1 and the accompanying
+video).
+
+
+ top bar (how to load, append, save...), shortcuts
+
+### Windows list
+- Start window - sign post, contains a list tutorials that teach basic controls
+- Workspace - main window for working with the program and buildidng the scene graph
 - Scene view - shows what you created in the workspace window
-- Tutorial window - shows tutorials
 
 ### Main bars
-File - ...
-Edit - ...
-Windows - ...
-Tutorials - ...
-Help - ...
+The I3T application has a stadard main menu in its top. 
+[Lišta](../Data/tutorials/ADD_TUT/lista.png)
+- File 
+  - Open - standard file dialog for scene file opening. The scenes should be located in Data/Scenes/ directory.
+  - Recent - list of recently used scenes for fast opening
+  - Save, Save As - sceen file output to disk
+  - Manage Models - Place for including new models into I3T. The format should be .gltf with .bin, or .glfb
+  - Exit - leaves I3T
+Edit - A small menu with a single item
+  - Preferences 
+     - setup of the model preview in the model box in the workspace
+     - setup of the selected model highliht in the Scene View 
+     - setupo of  the grid in the Scene View 
+Windows - window selector
+Tutorials - Link to start window with the list of tutorials available 
+Help 
+  - About window with info about the application
+  - Demo window of the DearImGui library
+  - Style editor for Theme (skin) selection and skin modification 
+  - Debug info
 
 ### Shortcuts
 copy/paste/cut, ...
@@ -56,7 +98,11 @@ If the user already knows what they are doing, they can try **exercises** (the l
 # Technical manual
 
 ## GUI
+tbd
+
 ## DIWNE
+See the [DIWNE documentation](../Source/DIWNE/Docs/docs.md)
+
 ## Tutorials
 
 Main classes for handling tutorials are ``TutorialWindow``, ``StartWindow``, ``TutorialLoader``, ``Tutorial``, an ``Theme``
