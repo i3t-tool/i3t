@@ -2,9 +2,7 @@
 
 #include "imgui.h"
 
-#include "Core/API.h"
-#include "Core/Application.h"
-#include "Core/Input/InputBindings.h"
+#include "API.h"
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
@@ -114,13 +112,13 @@ void ViewportWindow::render()
 	// main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 
 	// Update background according to color
-	ImVec4 bgColor = App::get().getUI()->getTheme().get(EColor::SceneViewBackground);
+	ImVec4 bgColor = I3T::getUI()->getTheme().get(EColor::SceneViewBackground);
 	m_renderOptions.clearColor = glm::vec3(bgColor.x, bgColor.y, bgColor.z);
 
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	auto name = setName("Scene View");
 	ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
 	ImGui::PopStyleColor();

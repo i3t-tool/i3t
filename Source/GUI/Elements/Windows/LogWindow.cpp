@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-#include "Core/API.h"
+#include "API.h"
 #include "Core/Application.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
@@ -51,7 +51,7 @@ LogWindow::LogWindow()
 
 void LogWindow::render()
 {
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::Begin(setName("Log View").c_str(), getShowPtr());
 	ImGui::PopStyleColor();
 

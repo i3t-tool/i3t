@@ -311,8 +311,8 @@ void WorkspaceDiwne::copySelectedNodes()
 			}
 		}
 	}
-	copiedNodes = copyNodes(getSelectedNodesInnerIncluded(),
-	                        App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+	copiedNodes =
+	    copyNodes(getSelectedNodesInnerIncluded(), I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
 void WorkspaceDiwne::deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transform)
@@ -425,7 +425,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	auto selectedNodes = getSelectedNodesInnerIncluded();
 
 	// copy and paste to ensure connections
-	pasteNodes(*copyNodes(selectedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+	pasteNodes(*copyNodes(selectedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 
 	for (auto node : selectedNodes)
 	{
@@ -1079,7 +1079,7 @@ bool WorkspaceDiwne::content()
 	}
 	if (shouldDuplicate)
 	{
-		pasteNodes(*copyNodes(duplicatedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+		pasteNodes(*copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 	}
 
 	int number_of_nodes = m_workspaceCoreNodes.size();
@@ -1573,7 +1573,7 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 {
 	if (getNodesSelectionChanged())
 	{
-		Application::get().viewport()->getManipulators().clearManipulators();
+		I3T::getViewport()->getManipulators().clearManipulators();
 
 		std::vector<Ptr<WorkspaceNodeWithCoreData>> selectedNodes = getSelectedNodesInnerIncluded();
 		for (const auto& node : selectedNodes)
@@ -1582,7 +1582,7 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 			    std::dynamic_pointer_cast<WorkspaceTransformation>(node);
 			if (selected_transformation != nullptr)
 			{
-				Application::get().viewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
+				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
 			}
 		}
 	}
@@ -1660,7 +1660,7 @@ void WorkspaceDiwne::setWorkAreaZoom(float val)
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */
 /* ========================================== */
-WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(Application::get())
+WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(App::get())
 {
 	initDiwneFromTheme();
 	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
@@ -1729,7 +1729,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback
-	App::get().viewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
+	I3T::getViewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
 		// Save information about this callback and perform actions based on it later while in workspace window context.
 		// This is a workaround due to viewport selection occurring in unknown order at unknown time.
 		g_workspaceDiwne->m_viewportSelectionChanged = true;
@@ -1746,17 +1746,16 @@ WorkspaceWindow::~WorkspaceWindow()
 // TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
 void WorkspaceWindow::initDiwneFromTheme()
 {
-	settingsDiwne.selectionRounding = App::get().getUI()->getTheme().get(ESize::Nodes_Rounding);
-	settingsDiwne.itemSelectedBorderColor = App::get().getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
+	settingsDiwne.selectionRounding = I3T::getUI()->getTheme().get(ESize::Nodes_Rounding);
+	settingsDiwne.itemSelectedBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
 	settingsDiwne.itemSelectedBorderThicknessDiwne =
-	    App::get().getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
-	settingsDiwne.objectFocusBorderColor = App::get().getUI()->getTheme().get(EColor::Workspace_FocusBorder);
-	settingsDiwne.objectFocusBorderThicknessDiwne =
-	    App::get().getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
+	    I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
+	settingsDiwne.objectFocusBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder);
+	settingsDiwne.objectFocusBorderThicknessDiwne = I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
 	settingsDiwne.objectFocusForInteractionBorderColor =
-	    App::get().getUI()->getTheme().get(EColor::Workspace_InteractionFocusBorder);
+	    I3T::getUI()->getTheme().get(EColor::Workspace_InteractionFocusBorder);
 	settingsDiwne.objectFocusForInteractionBorderThicknessDiwne =
-	    App::get().getUI()->getTheme().get(ESize::Workspace_InteractionFocusBorderThickness);
+	    I3T::getUI()->getTheme().get(ESize::Workspace_InteractionFocusBorderThickness);
 }
 
 //
@@ -1770,7 +1769,7 @@ WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
 
 void WorkspaceWindow::render()
 {
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(setName("Workspace").c_str(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |

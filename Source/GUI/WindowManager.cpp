@@ -87,7 +87,7 @@ void WindowManager::draw()
 	}
 
 	// Draw debug cursors at mouse position
-	if (App::get().m_debugWindowManager)
+	if (I3T::app().m_debugWindowManager)
 	{
 		float thickness = 1.0f;
 		float size = 32.0f;

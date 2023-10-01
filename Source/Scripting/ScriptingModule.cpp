@@ -18,7 +18,7 @@ std::function<void(const std::string& str)> g_printRef;
 
 static WorkspaceDiwne& getNodeEditor()
 {
-	const auto workspace = App::get().getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
+	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	return workspace->getNodeEditor();
 }
 
@@ -99,7 +99,7 @@ template <typename T> static bool setDefaultValue(Ptr<GuiTransform> guiNode, con
 
 //----------------------------------------------------------------------------//
 
-void ScriptingModule::init()
+void ScriptingModule::onInit()
 {
 	// Setup I3T commands
 	ConsoleCommand::addListener([this](std::string c) {

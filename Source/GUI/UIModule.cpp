@@ -1,8 +1,5 @@
 #include "UIModule.h"
 
-#include "GUI/ImGui/imgui_impl_glfw.h"
-#include "GUI/ImGui/imgui_impl_opengl3.h"
-
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
@@ -28,7 +25,7 @@ UIModule::~UIModule()
 	delete m_menu;
 }
 
-void UIModule::init()
+void UIModule::onInit()
 {
 	// Switch active InputController when window focus changes
 	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
@@ -37,11 +34,7 @@ void UIModule::init()
 
 	Theme::initNames();
 
-	// Setup Dear ImGui context after OpenGL context.
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void) io;
 
 	// Load Themes to be usable in window initializations
 	loadFonts();
@@ -52,7 +45,7 @@ void UIModule::init()
 	m_menu = new MainMenuBar();
 	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
 	m_windowManager.addWindow(std::make_shared<StartWindow>(true));
-	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, App::get().viewport()));
+	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, I3T::getViewport()));
 	m_windowManager.addWindow(std::make_shared<WorkspaceWindow>(true));
 	m_windowManager.addWindow(std::make_shared<Console>(false));
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
@@ -67,12 +60,6 @@ void UIModule::init()
 		m_windowManager.openModal<BeforeCloseModal>();
 	});
 
-	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
-	                                                    // Platform Windows
-	io.ConfigWindowsMoveFromTitleBarOnly = true;
-
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 
@@ -85,24 +72,12 @@ void UIModule::init()
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f; // disable alpha
 	}
 
-	// Allocate path to the imgui ini file on heap.
-	io.IniFilename = "Data/imgui.ini";
-
 	// Apply theme to windows
 	m_currentTheme->apply();
-
-	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(App::get().mainWindow(), true);
-	ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
 }
 
-void UIModule::beginFrame()
+void UIModule::onBeginFrame()
 {
-	// Start the Dear ImGui frame ----------------------
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
 	m_windowManager.updateFocus();
 
 	buildDockspace();
@@ -112,37 +87,6 @@ void UIModule::beginFrame()
 
 	// Draw windows
 	m_windowManager.draw();
-
-	// Run queued delayed UI calls scheduled with UIModule::invokeLater()
-	std::list<Runnable>::iterator it = queuedCalls.begin();
-	while (it != queuedCalls.end())
-	{
-		(*it)(); // Run call
-		queuedCalls.erase(it++);
-	}
-
-	// TODO: (DR) Unused, resolve, old camera handling
-	queryCameraState();
-
-	// ImGui rendering ----------------------------------------------------------
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	// Update and Render additional Platform Windows
-	// (Platform functions may change the current OpenGL context, so we
-	// save/restore it to make it easier to paste this code elsewhere.
-	//  For this specific demo app we could also call
-	//  glfwMakeContextCurrent(window) directly)
-	// ImGuiIO& io = ImGui::GetIO(); (void)io;
-	auto& io = ImGui::GetIO();
-	(void) io;
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		GLFWwindow* backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
 }
 
 void UIModule::onClose()
@@ -337,7 +281,7 @@ void UIModule::buildDockspace()
 	{
 		// Active tab color is set to a special color for docked windows. It does not affect regular tabs.
 		// This style should be pushed for the dockspace here as well as every docked window Begin()
-		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+		ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		ImGui::PopStyleColor();
@@ -346,34 +290,4 @@ void UIModule::buildDockspace()
 	{
 		throw std::runtime_error("ImGui Docking is not enabled!");
 	}
-}
-
-void UIModule::queryCameraState()
-{
-	/// \todo This code causes dockspace crash.
-	// TODO: (DR) Old code used for camera mouse drag handling, unused, probably delete in the future
-	return;
-
-	//	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
-	//		return;
-	//
-	//	// ORBIT camera rotation
-	//	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
-	//	{
-	//		InputManager::beginCameraControl();
-	//	}
-	//	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
-	//	{
-	//		InputManager::endCameraControl();
-	//	}
-	//
-	//	// CAMERA PANNING - set a new orbit center
-	//	if (InputManager::isActionTriggered("pan", EKeyState::Pressed))
-	//	{
-	//		InputManager::beginCameraControl();
-	//	}
-	//	if (InputManager::isActionTriggered("pan", EKeyState::Released))
-	//	{
-	//		InputManager::endCameraControl();
-	//	}
 }

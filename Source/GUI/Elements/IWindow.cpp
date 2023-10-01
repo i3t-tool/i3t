@@ -2,7 +2,6 @@
 
 #include "imgui.h"
 
-#include "Core/Application.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
@@ -52,7 +51,7 @@ void IWindow::updateWindowInfo()
 		LOG_WARN("IWindow '{}' does not have a window manager assigned! (in updateWindowInfo())", imGuiName);
 	}
 
-	if (App::get().m_debugWindowManager)
+	if (I3T::app().m_debugWindowManager)
 	{
 		ImGui::GetForegroundDrawList()->AddRectFilled(GUI::glmToIm(m_windowMin), GUI::glmToIm(m_windowMax),
 		                                              ImColor(0.f, 0.f, 0.f, 0.35f));

@@ -24,7 +24,10 @@ void InputBindings::init()
 	// InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
 
 	InputManager::setInputAction("save", Keys::s, {Keys::ctrll});
+	// TODO: (DR) saveAs action is unused!
 	InputManager::setInputAction("saveAs", Keys::s, {Keys::ctrll, Keys::shiftl});
+
+	InputManager::setInputAction("open", Keys::o, {Keys::ctrll});
 
 	InputManager::setInputAction("scrollUp", Keys::mouseScrlUp);
 	InputManager::setInputAction("scrollDown", Keys::mouseScrlDown);

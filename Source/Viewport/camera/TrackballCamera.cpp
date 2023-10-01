@@ -9,8 +9,8 @@ using namespace Vp;
 #include "Trackball.h"
 
 // For debug purposes
-#include "Core/API.h"
 #include "GUI/Toolkit.h"
+#include "I3T.h"
 
 void TrackballCamera::update()
 {
@@ -41,7 +41,7 @@ void TrackballCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 win
 		m_accumulatedRotation = screenSpaceRotation * m_accumulatedRotation;
 
 		// Debug only
-		if (App::get().m_debugTrackball)
+		if (I3T::app().m_debugTrackball)
 		{
 			glm::vec2 windowPos = I3T::getUI()->getWindowManager().getCurrentWindow()->m_windowPos;
 			glm::vec2 windowCenter = windowPos + glm::vec2(windowSize.x / 2, windowSize.y / 2);

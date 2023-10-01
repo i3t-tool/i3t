@@ -21,7 +21,7 @@ WorkspaceModel::~WorkspaceModel()
 	const auto node = getNodebase()->as<Core::Model>();
 	node->resetModelPosition();
 
-	App::get().viewport()->removeEntity(m_viewportModel);
+	I3T::getViewport()->removeEntity(m_viewportModel);
 }
 
 void WorkspaceModel::popupContent_axis_showmodel()
@@ -179,7 +179,7 @@ void WorkspaceModel::popupContent()
 
 void WorkspaceModel::init()
 {
-	m_viewportModel = App::get().viewport()->createModel(getId());
+	m_viewportModel = I3T::getViewport()->createModel(getId());
 	auto modelPtr = m_viewportModel.lock();
 	modelPtr->m_showAxes = true;
 	modelPtr->m_visible = true;
@@ -227,7 +227,7 @@ bool WorkspaceModel::middleContent()
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
-	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
+	I3T::getViewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
@@ -259,7 +259,7 @@ bool WorkspaceModel::processSelect()
 {
 	auto model = m_viewportModel.lock();
 	model->m_highlight = true;
-	model->m_highlightColor = App::get().viewport()->getSettings().global().highlight.selectionColor;
+	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
 
 	return WorkspaceNodeWithCoreDataWithPins::processSelect();
 }
@@ -270,7 +270,7 @@ bool WorkspaceModel::processUnselect()
 	if (m_influenceHighlight)
 	{
 		model->m_highlight = true;
-		model->m_highlightColor = App::get().viewport()->getSettings().global().highlight.highlightColor;
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
 	}
 	else
 	{

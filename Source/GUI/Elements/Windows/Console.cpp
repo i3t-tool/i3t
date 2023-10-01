@@ -2,8 +2,8 @@
 
 #include "imgui.h"
 
+#include "API.h"
 #include "Commands/ApplicationCommands.h"
-#include "Core/API.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Toolkit.h"
@@ -17,7 +17,7 @@ static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 	return console->textEditCallback(data);
 }
 
-Console::Console(bool show) : IWindow(show), m_oss(Application::get().getModule<ScriptingModule>().outputStream())
+Console::Console(bool show) : IWindow(show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
 {
 	m_oss << "I3T console\n";
 }

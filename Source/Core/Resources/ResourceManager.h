@@ -234,9 +234,9 @@ public:
 	bool importModel(const fs::path& path, bool normalize);
 	bool removeImportedModel(const std::string& alias);
 
-	Memento saveScene(Scene* scene) override;
-	bool cleanUpModelFiles(Scene* scene);
-	void loadScene(const Memento& memento, Scene* scene) override;
+	Memento saveScene(State::Scene* scene) override;
+	bool cleanUpModelFiles(State::Scene* scene);
+	void loadScene(const Memento& memento, State::Scene* scene) override;
 	void clearScene() override;
 
 	Memento saveGlobal() override;

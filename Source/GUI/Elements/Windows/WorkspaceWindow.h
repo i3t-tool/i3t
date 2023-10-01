@@ -24,7 +24,7 @@
 
 #include "Config.h"
 
-#include "Core/API.h"
+#include "API.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"

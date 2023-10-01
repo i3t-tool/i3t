@@ -1,7 +1,7 @@
 #include "I3T.h"
 
+#include "API.h"
 #include "Config.h"
-#include "Core/API.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
@@ -20,22 +20,18 @@ void I3TApplication::onInit()
 	//
 
 	CloseCommand::addListener([this] {
-		onClose();
+		close();
 	});
 
 	InputManager::init();
 
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
 		LOG_INFO("undo triggered");
-		App::getUI()->invokeLater([]() {
-			App::getModule<StateManager>().undo();
-		});
+		App::getModule<StateManager>().undo();
 	});
 	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
 		LOG_INFO("redo triggered");
-		App::getUI()->invokeLater([]() {
-			App::getModule<StateManager>().redo();
-		});
+		App::getModule<StateManager>().redo();
 	});
 
 	auto* stateManager = createModule<StateManager>();
@@ -47,9 +43,8 @@ void I3TApplication::onInit()
 	App::getModule<StateManager>().addOriginator(resourceManager);
 	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
 
-	m_viewport = new Vp::Viewport();
-	m_viewport->init(Vp::ViewportSettings());
-	App::getModule<StateManager>().addOriginator(m_viewport);
+	Vp::Viewport* viewport = createModule<Vp::Viewport>();
+	App::getModule<StateManager>().addOriginator(viewport);
 
 	createModule<ScriptingModule>();
 	createModule<UIModule>();
@@ -61,3 +56,31 @@ void I3TApplication::onInit()
 		App::getModule<StateManager>().newScene();
 	});
 }
+
+void I3TApplication::onUpdate(double delta)
+{
+	Logger::getInstance().update();
+	Core::GraphManager::update(delta);
+}
+
+void I3TApplication::onClose() {}
+
+//////////////////////////////////////////////
+
+namespace I3T
+{
+I3TApplication& app()
+{
+	return static_cast<I3TApplication&>(App::get());
+}
+
+UIModule* getUI()
+{
+	return &App::get().getModule<UIModule>();
+}
+
+Vp::Viewport* getViewport()
+{
+	return &App::get().getModule<Vp::Viewport>();
+}
+} // namespace I3T

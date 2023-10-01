@@ -30,11 +30,9 @@ public:
 	void swapBuffers();
 	GLFWwindow* get();
 
-private:
-	friend class Application;
-
 	void finalize();
 
+private:
 	std::string m_title;
 	GLFWwindow* m_mainWindow;
 };

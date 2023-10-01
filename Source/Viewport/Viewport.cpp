@@ -26,10 +26,8 @@ Viewport::Viewport()
 
 Viewport::~Viewport() = default;
 
-void Viewport::init(ViewportSettings settings)
+void Viewport::onInit()
 {
-	m_settings = settings;
-
 	// Load shaders
 	Shaders::instance().load();
 
@@ -137,7 +135,7 @@ void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int 
 	}
 }
 
-void Viewport::update(double dt)
+void Viewport::onUpdate(double dt)
 {
 	m_mainScene->update(dt);
 

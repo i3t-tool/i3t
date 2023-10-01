@@ -2,6 +2,8 @@
 
 #include "imgui.h"
 
+#include "API.h"
+
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
@@ -16,10 +18,10 @@ void SetupDialog::render()
 	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
 	// style.FramePadding.y = 4;
 	bool windowOpen = true;
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::Begin(setName("Preferences").c_str(), &windowOpen);
 	{
-		Vp::Viewport* viewport = App::get().viewport();
+		Vp::Viewport* viewport = I3T::getViewport();
 		Vp::ViewportSettings& stg = viewport->getSettings();
 
 		if (ImGui::Button("Reset to defaults"))

@@ -36,8 +36,7 @@ void ViewportHighlightResolver::resolve()
 			if (!model->m_selected)
 			{
 				viewportModel->m_highlight = true;
-				viewportModel->m_highlightColor =
-				    App::get().viewport()->getSettings().global().highlight.highlightColor;
+				viewportModel->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
 			}
 		}
 		else

@@ -20,8 +20,8 @@ class StateManager : public Module
 public:
 	StateManager() = default;
 
-	void init() override;
-	void beginFrame() override;
+	void onInit() override;
+	void onBeginFrame() override;
 	void onClose() override;
 
 	void addOriginator(IStateful* originator)
