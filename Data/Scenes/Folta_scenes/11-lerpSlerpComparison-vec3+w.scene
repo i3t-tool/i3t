@@ -44,7 +44,7 @@
     "workspace": {
         "operators": [
             {
-                "id": 923,
+                "id": 714,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
@@ -55,7 +55,7 @@
                 "type": "QuatLength"
             },
             {
-                "id": 891,
+                "id": 717,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -66,7 +66,7 @@
                 "type": "FloatVecToQuat"
             },
             {
-                "id": 929,
+                "id": 721,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -77,7 +77,7 @@
                 "type": "QuatLongWaySlerp"
             },
             {
-                "id": 947,
+                "id": 726,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
@@ -88,7 +88,7 @@
                 "type": "QuatLength"
             },
             {
-                "id": 942,
+                "id": 729,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -99,7 +99,7 @@
                 "type": "QuatLerp"
             },
             {
-                "id": 950,
+                "id": 734,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
@@ -110,7 +110,7 @@
                 "type": "NormalizeQuat"
             },
             {
-                "id": 934,
+                "id": 737,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
@@ -121,7 +121,7 @@
                 "type": "QuatLength"
             },
             {
-                "id": 953,
+                "id": 740,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -132,7 +132,7 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 911,
+                "id": 743,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -143,7 +143,7 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 904,
+                "id": 746,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -154,7 +154,7 @@
                 "type": "FloatVecToQuat"
             },
             {
-                "id": 937,
+                "id": 750,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -165,7 +165,7 @@
                 "type": "QuatSlerp"
             },
             {
-                "id": 888,
+                "id": 755,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -176,7 +176,7 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 908,
+                "id": 758,
                 "label": "start w",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -189,7 +189,7 @@
                 "value": -0.800000011920929
             },
             {
-                "id": 914,
+                "id": 761,
                 "label": "start xyz axis",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -206,7 +206,7 @@
                 ]
             },
             {
-                "id": 917,
+                "id": 764,
                 "label": "end w",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -219,7 +219,7 @@
                 "value": 3.9000000953674318
             },
             {
-                "id": 920,
+                "id": 767,
                 "label": "end xyz axis",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -236,7 +236,7 @@
                 ]
             },
             {
-                "id": 898,
+                "id": 770,
                 "label": "normalized start quat",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -248,7 +248,7 @@
                 "type": "NormalizeQuat"
             },
             {
-                "id": 901,
+                "id": 773,
                 "label": "normalized end quat",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -260,7 +260,7 @@
                 "type": "NormalizeQuat"
             },
             {
-                "id": 895,
+                "id": 776,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -271,7 +271,7 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 926,
+                "id": 779,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -284,7 +284,7 @@
         ],
         "sequences": [
             {
-                "id": 1015,
+                "id": 782,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -295,7 +295,7 @@
                 "transforms": []
             },
             {
-                "id": 977,
+                "id": 788,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -305,7 +305,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 983,
+                        "id": 794,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -354,7 +354,7 @@
                 ]
             },
             {
-                "id": 970,
+                "id": 795,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -364,7 +364,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 976,
+                        "id": 801,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -413,7 +413,7 @@
                 ]
             },
             {
-                "id": 956,
+                "id": 802,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -423,7 +423,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 962,
+                        "id": 808,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -472,7 +472,7 @@
                 ]
             },
             {
-                "id": 991,
+                "id": 809,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -483,7 +483,7 @@
                 "transforms": []
             },
             {
-                "id": 997,
+                "id": 815,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -494,7 +494,7 @@
                 "transforms": []
             },
             {
-                "id": 1003,
+                "id": 821,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -505,7 +505,7 @@
                 "transforms": []
             },
             {
-                "id": 984,
+                "id": 827,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -515,7 +515,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 990,
+                        "id": 833,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -564,7 +564,7 @@
                 ]
             },
             {
-                "id": 963,
+                "id": 834,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -574,7 +574,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 969,
+                        "id": 840,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -623,7 +623,7 @@
                 ]
             },
             {
-                "id": 1009,
+                "id": 841,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -636,7 +636,7 @@
         ],
         "cycles": [
             {
-                "id": 1021,
+                "id": 847,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -649,14 +649,16 @@
                 "manualStep": 0.10000000149011612,
                 "step": 0.4000000059604645,
                 "stepDuration": 0.5,
-                "smooth": true
+                "smooth": true,
+                "isRunning": true,
+                "mode": 2
             }
         ],
         "cameras": [],
         "screens": [],
         "models": [
             {
-                "id": 1037,
+                "id": 863,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -677,7 +679,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1039,
+                "id": 865,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -698,7 +700,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1045,
+                "id": 867,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -719,7 +721,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1043,
+                "id": 869,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -740,7 +742,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1041,
+                "id": 871,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -764,237 +766,237 @@
         "transforms": [],
         "edges": [
             [
-                929,
+                721,
                 0,
-                923,
+                714,
                 0
             ],
             [
-                977,
+                758,
                 0,
-                1015,
+                717,
                 0
             ],
             [
-                888,
+                761,
                 0,
-                1015,
+                717,
                 1
             ],
             [
-                908,
+                770,
                 0,
-                891,
+                721,
                 0
             ],
             [
-                914,
+                773,
                 0,
-                891,
+                721,
                 1
             ],
             [
-                898,
+                847,
                 0,
-                929,
-                0
-            ],
-            [
-                901,
-                0,
-                929,
-                1
-            ],
-            [
-                1021,
-                0,
-                929,
+                721,
                 2
             ],
             [
-                942,
+                729,
                 0,
-                947,
+                726,
                 0
             ],
             [
-                898,
+                770,
                 0,
-                942,
+                729,
                 0
             ],
             [
-                901,
+                773,
                 0,
-                942,
+                729,
                 1
             ],
             [
-                1021,
+                847,
                 0,
-                942,
+                729,
                 2
             ],
             [
-                942,
+                729,
                 0,
-                950,
+                734,
                 0
             ],
             [
-                937,
+                750,
                 0,
-                934,
+                737,
                 0
             ],
             [
-                1015,
+                734,
                 0,
-                1037,
+                740,
                 0
             ],
             [
-                991,
+                721,
                 0,
-                1039,
+                743,
                 0
             ],
             [
-                970,
+                764,
                 0,
-                991,
+                746,
                 0
             ],
             [
-                953,
+                767,
                 0,
-                991,
+                746,
                 1
             ],
             [
-                956,
+                770,
                 0,
-                997,
+                750,
                 0
             ],
             [
-                911,
+                773,
                 0,
-                997,
+                750,
                 1
             ],
             [
-                997,
+                847,
                 0,
-                1045,
-                0
-            ],
-            [
-                950,
-                0,
-                953,
-                0
-            ],
-            [
-                929,
-                0,
-                911,
-                0
-            ],
-            [
-                917,
-                0,
-                904,
-                0
-            ],
-            [
-                920,
-                0,
-                904,
-                1
-            ],
-            [
-                898,
-                0,
-                937,
-                0
-            ],
-            [
-                901,
-                0,
-                937,
-                1
-            ],
-            [
-                1021,
-                0,
-                937,
+                750,
                 2
             ],
             [
-                937,
+                750,
                 0,
-                888,
+                755,
                 0
             ],
             [
-                891,
+                717,
                 0,
-                898,
+                770,
                 0
             ],
             [
-                904,
+                746,
                 0,
-                901,
+                773,
                 0
             ],
             [
-                901,
+                773,
                 0,
-                895,
+                776,
                 0
             ],
             [
-                984,
+                770,
                 0,
-                1003,
+                779,
                 0
             ],
             [
-                926,
+                788,
                 0,
-                1003,
+                782,
+                0
+            ],
+            [
+                755,
+                0,
+                782,
                 1
             ],
             [
-                1003,
+                795,
                 0,
-                1043,
+                809,
                 0
             ],
             [
-                963,
+                740,
                 0,
-                1009,
-                0
-            ],
-            [
-                895,
-                0,
-                1009,
+                809,
                 1
             ],
             [
-                1009,
+                802,
                 0,
-                1041,
+                815,
                 0
             ],
             [
-                898,
+                743,
                 0,
-                926,
+                815,
+                1
+            ],
+            [
+                827,
+                0,
+                821,
+                0
+            ],
+            [
+                779,
+                0,
+                821,
+                1
+            ],
+            [
+                834,
+                0,
+                841,
+                0
+            ],
+            [
+                776,
+                0,
+                841,
+                1
+            ],
+            [
+                782,
+                0,
+                863,
+                0
+            ],
+            [
+                809,
+                0,
+                865,
+                0
+            ],
+            [
+                815,
+                0,
+                867,
+                0
+            ],
+            [
+                821,
+                0,
+                869,
+                0
+            ],
+            [
+                841,
+                0,
+                871,
                 0
             ]
         ],
