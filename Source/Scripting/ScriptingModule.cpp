@@ -179,7 +179,12 @@ void ScriptingModule::onInit()
 			                                return nullptr;
 		                                }
 
-		                                const auto op = g_OperatorBuilder(type.c_str());
+		                                const auto maybeOp = g_OperatorBuilder(type.c_str());
+										if (!maybeOp)
+                                        {
+                                            return nullptr;
+                                        }
+                                        const auto op = *maybeOp;
 		                                const auto ID = op->getNodebase()->getId();
 
 		                                print(fmt::format("ID: {}", ID));
@@ -190,7 +195,7 @@ void ScriptingModule::onInit()
 	m_Lua.new_usertype<GuiTransform>("Transform",
 	                                 "get_position", &GuiTransform::getNodePositionDiwne,
 	                                 "set_position", &GuiTransform::setNodePositionDiwne,
-                                   "get_value", [](Ptr<GuiTransform> self) { return getValue<glm::mat4>(self); },
+                                     "get_value", [](Ptr<GuiTransform> self) { return getValue<glm::mat4>(self); },
 	                                 "set_value", [this](Ptr<GuiTransform> self, float value, const ImVec2& coords)
 	    														 {
 		                                 const auto glmCoords = glm::vec2(coords.x, coords.y);
@@ -227,11 +232,16 @@ void ScriptingModule::onInit()
 			                                 return nullptr;
 		                                 }
 
-		                                 const auto op = g_TransformBuilder(type.c_str());
-		                                 const auto ID = op->getNodebase()->getId();
+		                                 const auto maybeTransform = g_TransformBuilder(type.c_str());
+                                         if (!maybeTransform)
+                                         {
+                                             return nullptr;
+                                         }
+                                         const auto transform = *maybeTransform;
+		                                 const auto ID = transform->getNodebase()->getId();
 		                                 print(fmt::format("ID: {}", ID));
 
-		                                 return std::dynamic_pointer_cast<GuiTransform>(op);
+		                                 return std::dynamic_pointer_cast<GuiTransform>(transform);
 	                                 });
 
 	m_Lua.new_usertype<GuiSequence>("Sequence",

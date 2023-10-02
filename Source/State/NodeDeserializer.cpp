@@ -24,9 +24,13 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
-		const auto node = NodeDeserializer::createOperator(value);
-		NodeDeserializer::assignCommon(value, node);
-		createdNodes[value["id"].GetInt()] = node;
+		const auto maybeNode = NodeDeserializer::createOperator(value);
+		if (maybeNode)
+		{
+			const auto node = *maybeNode;
+			NodeDeserializer::assignCommon(value, node);
+			createdNodes[value["id"].GetInt()] = node;
+		}
 	}
 
 	//
@@ -47,43 +51,43 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes[value["id"].GetInt()] = cycle;
 		NodeDeserializer::assignCommon(value, cycle);
 
-		if (value.HasMember("from"))
+		if (value.HasMember("from") && value["from"].IsFloat())
 		{
 			const auto from = value["from"].GetFloat();
 			coreCycle->setFrom(from);
 		}
 
-		if (value.HasMember("to"))
+		if (value.HasMember("to") && value["to"].IsFloat())
 		{
 			const auto to = value["to"].GetFloat();
 			coreCycle->setTo(to);
 		}
 
-		if (value.HasMember("manualStep"))
+		if (value.HasMember("manualStep") && value["manualStep"].IsFloat())
 		{
 			const auto step = value["manualStep"].GetFloat();
 			coreCycle->setManualStep(step);
 		}
 
-		if (value.HasMember("step"))
+		if (value.HasMember("step") && value["step"].IsFloat())
 		{
 			const auto multiplier = value["step"].GetFloat();
 			coreCycle->setStep(multiplier);
 		}
 
-		if (value.HasMember("stepDuration"))
+		if (value.HasMember("stepDuration") && value["stepDuration"].IsFloat())
 		{
 			const auto duration = value["stepDuration"].GetFloat();
 			coreCycle->setStepDuration(duration);
 		}
 
-		if (value.HasMember("smooth"))
+		if (value.HasMember("smooth") && value["smooth"].IsBool())
 		{
 			const auto smooth = value["smooth"].GetBool();
 			coreCycle->setSmoothStep(smooth);
 		}
 
-		if (value.HasMember("isRunning"))
+		if (value.HasMember("isRunning") && value["isRunning"].IsBool())
 		{
 			const auto isRunning = value["isRunning"].GetBool();
 			if (isRunning)
@@ -92,7 +96,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 			}
 		}
 
-		if (value.HasMember("mode"))
+		if (value.HasMember("mode") && value["mode"].IsInt())
 		{
 			const auto mode = value["mode"].GetInt();
 			coreCycle->setMode((Core::Cycle::EMode) mode);
@@ -141,7 +145,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 		auto mesh = model->viewportModel().lock();
 
-		if (value.HasMember("model"))
+		if (value.HasMember("model") && value["model"].IsString())
 		{
 			const auto* alias = value["model"].GetString();
 			mesh->setModel(alias);
@@ -151,22 +155,22 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 			LOG_WARN("Model node {} has no model set, using the default one.", model->getNodebase()->getId());
 		}
 
-		if (value.HasMember("visible"))
+		if (value.HasMember("visible") && value["visible"].IsBool())
 		{
 			mesh->m_visible = value["visible"].GetBool();
 		}
 
-		if (value.HasMember("showAxes"))
+		if (value.HasMember("showAxes") && value["showAxes"].IsBool())
 		{
 			mesh->m_showAxes = value["showAxes"].GetBool();
 		}
 
-		if (value.HasMember("opaque"))
+		if (value.HasMember("opaque") && value["opaque"].IsBool())
 		{
 			mesh->m_opaque = value["opaque"].GetBool();
 		}
 
-		if (value.HasMember("opacity"))
+		if (value.HasMember("opacity") && value["opacity"].IsFloat())
 		{
 			mesh->m_opacity = value["opacity"].GetFloat();
 		}
@@ -176,7 +180,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 			mesh->m_tint = JSON::getVec3(value["tint"].GetArray());
 		}
 
-		if (value.HasMember("tintStrength"))
+		if (value.HasMember("tintStrength") && value["tintStrength"].IsFloat())
 		{
 			mesh->m_tintStrength = value["tintStrength"].GetFloat();
 		}
@@ -187,9 +191,13 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	const auto& transforms = memento["workspace"]["transforms"];
 	for (auto& value : transforms.GetArray())
 	{
-		const auto transform = NodeDeserializer::createTransform(value);
-		NodeDeserializer::assignCommon(value, transform);
-		createdNodes[value["id"].GetInt()] = transform;
+		const auto maybeTransform = NodeDeserializer::createTransform(value);
+		if (maybeTransform)
+		{
+			const auto transform = maybeTransform.value();
+			NodeDeserializer::assignCommon(value, transform);
+			createdNodes[value["id"].GetInt()] = transform;
+		}
 	}
 
 	// connect edges
@@ -227,7 +235,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	return result;
 }
 
-Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
+std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 {
 	const auto& type = value["type"].GetString();
 
@@ -246,7 +254,13 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 	}
 	else
 	{
-		node = g_OperatorBuilder(type);
+		auto maybeNode = g_OperatorBuilder(type);
+		if (!maybeNode)
+		{
+			LOG_ERROR("Unable to create operator node with id {} of type {}.", value["id"].GetString(), type);
+			return std::nullopt;
+		}
+		node = maybeNode.value();
 	}
 
 	node->setSelected(true);
@@ -311,13 +325,20 @@ Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 	return sequence;
 }
 
-Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
+std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 {
 	I3T_ASSERT(value.IsObject(), "Invalid value type");
 
 	const auto& type = value["type"].GetString();
 
-	const auto node = g_TransformBuilder(type);
+	const auto maybeNode = g_TransformBuilder(type);
+	if (!maybeNode)
+	{
+		LOG_ERROR("Unable to create transform node with id {} of type {}.", value["id"].GetString(), type);
+		return std::nullopt;
+	}
+	auto node = *maybeNode;
+
 	node->setSelected(true);
 	node->processSelect();
 	const auto coreNode = node->getNodebase()->as<Core::Transform>();
@@ -426,7 +447,13 @@ void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)
 	std::vector<Ptr<WorkspaceTransformation>> transforms;
 	for (const auto& transform : value["transforms"].GetArray())
 	{
-		transforms.push_back(NodeDeserializer::createTransform(transform));
+		auto maybeTransform = createTransform(transform);
+		if (!maybeTransform)
+		{
+			LOG_ERROR("Unable to create transform node with id {}.", transform["id"].GetInt());
+			continue;
+		}
+		transforms.push_back(*maybeTransform);
 	}
 
 	// WorkspaceSequence::moveNodeToSequence function pushes new matrix
