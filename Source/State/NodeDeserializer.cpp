@@ -310,7 +310,6 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 	assignCommon(value, node);
 
 	value["synergies"].GetBool() ? coreNode->enableSynergies() : coreNode->disableSynergies();
-	value["locked"].GetBool() ? coreNode->lock() : coreNode->unlock();
 
 	const auto maybeLOD = EnumUtils::value<WorkspaceLevelOfDetail>(std::string(value["LOD"].GetString()));
 	if (maybeLOD.has_value())
@@ -370,6 +369,10 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 			break;
 		}
 	}
+
+	// must be here, because of the default values
+	value["locked"].GetBool() ? coreNode->lock() : coreNode->unlock();
+
 	return node;
 }
 
