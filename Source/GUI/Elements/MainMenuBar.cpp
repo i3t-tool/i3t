@@ -260,8 +260,10 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
+#ifdef I3T_DEBUG
 		ImGui::MenuItem("Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
 		ImGui::MenuItem("Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
+#endif
 
 		ImGui::EndMenu();
 	}
@@ -281,24 +283,30 @@ void MainMenuBar::showHelpMenu()
 {
 	if (ImGui::BeginMenu("Help"))
 	{
+#ifdef I3T_DEBUG
 		if (ImGui::MenuItem("Description"))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<DescriptionDialog>();
 		}
-
+#endif
 		ImGui::MenuItem("About", nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
 
 		ImGui::Separator();
 
+#ifdef I3T_DEBUG
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
 		{}
+#endif
+
 		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
 		{}
 
+#ifdef I3T_DEBUG
 		ImGui::Separator();
 
 		ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 		ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+#endif
 
 		ImGui::EndMenu();
 	}
