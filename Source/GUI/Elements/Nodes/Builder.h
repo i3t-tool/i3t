@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include "imgui.h"
@@ -20,7 +21,7 @@ public:
 		doFor<0, maxCount>();
 	}
 
-	auto operator()(const char* type)
+	std::optional<Ptr<WorkspaceNodeWithCoreData>> operator()(const char* type)
 	{
 		I3T_ASSERT(m_createFns.count(type) == 1, "Cannot find factory function for given operator");
 		return m_createFns.at(type)(ImVec2(0.0f, 0.0f));
@@ -52,7 +53,7 @@ public:
 		doFor<0, maxCount>();
 	}
 
-	auto operator()(const char* type)
+	std::optional<Ptr<WorkspaceTransformation>> operator()(const char* type)
 	{
 		I3T_ASSERT(m_createFns.count(type) == 1, "Cannot find factory function for given transform");
 		return std::static_pointer_cast<WorkspaceTransformation>(m_createFns.at(type)(ImVec2(0.0f, 0.0f)));

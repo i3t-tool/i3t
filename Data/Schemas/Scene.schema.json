@@ -20,6 +20,12 @@
           "$ref": "#/$defs/transform"
         }
       },
+      "cycles": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/cycle"
+        }
+      },
       "edges": {
         "type": "array",
         "items": {
@@ -29,6 +35,16 @@
     }
   },
   "$defs": {
+    "cycle": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        }
+      }
+    },
     "operator": {
       "type": "object",
       "required": [ "id", "type", "position" ],
@@ -65,6 +81,21 @@
           "items": {
             "type": "number"
           }
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "synergies": {
+          "type": "boolean"
+        },
+        "savedValue": "#/$defs/mat4"
+      }
+    },
+    "screen": {
+      "type": "object",
+      "properties": {
+        "aspect": {
+          "type": "#/$defs/vec2"
         }
       }
     },
@@ -74,6 +105,22 @@
       "maxItems": 4,
       "items": {
         "type": "number"
+      }
+    },
+    "vec2": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "mat4": {
+      "type": "array",
+      "minItems": 16,
+      "maxItems": 16,
+      "items": {
+          "type": "number"
       }
     }
   }
