@@ -138,15 +138,40 @@ Ptr<Node> Node::getOwner() const
 	return m_owner->getPtr();
 }
 
-bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
+bool Node::shouldPulse(size_t inputIndex, size_t updatedInputIndex)
 {
-	auto outputPinIndex = getInput(inputIndex).getParentPin()->Index;
-	auto& storage = getInput(inputIndex).data();
+	if (updatedInputIndex == -1)
+	{
+		return false;
+	}
 
-	if (getInput(inputIndex).isPluggedIn() && storage.isPulseTriggered())
+	/*
+	const auto& updatedInput = getInput(updatedInputIndex);
+
+	if (!getInput(inputIndex).isPluggedIn() || updatedInput.ValueType != EValueType::Pulse)
+	{
+	    return false;
+	}
+
+	auto& parentStorage = updatedInput.data();
+	if (parentStorage.isPulseTriggered())
+	{
+	    return true;
+	}
+	 */
+	const auto testedInput = getInput(inputIndex);
+	if (!testedInput.isPluggedIn())
+	{
+		return false;
+	}
+
+	const auto& parentData = testedInput.data();
+
+	if (inputIndex == updatedInputIndex && parentData.isPulseTriggered())
 	{
 		return true;
 	}
+
 	return false;
 }
 
@@ -177,7 +202,7 @@ void Node::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : outputPin.getOutComponents())
 	{
-		inPin->getOwner()->receiveSignal(outIndex);
+		inPin->getOwner()->receiveSignal(inPin->Index);
 	}
 }
 

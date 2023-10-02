@@ -135,40 +135,37 @@ void Cycle::updateValues(int inputIndex)
 	{
 		float val = getInput(I3T_CYCLE_IN_FROM).data().getFloat();
 		setFrom(val);
-		setInternalValue(val, I3T_CYCLE_IN_FROM);
 	}
 
 	if (getInput(I3T_CYCLE_IN_TO).isPluggedIn())
 	{
 		float val = getInput(I3T_CYCLE_IN_TO).data().getFloat();
 		setTo(val);
-		setInternalValue(val, I3T_CYCLE_IN_TO);
 	}
 
 	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
 	{
 		float val = getInput(I3T_CYCLE_IN_MULT).data().getFloat();
 		setStep(val);
-		setInternalValue(val, I3T_CYCLE_IN_MULT);
 	}
 
-	if (getInput(I3T_CYCLE_IN_PLAY).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
+	if (shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
 	{
 		play();
 	}
-	else if (getInput(I3T_CYCLE_IN_PAUSE).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
+	else if (shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
 	{
 		pause();
 	}
-	if (getInput(I3T_CYCLE_IN_STOP).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_STOP, inputIndex))
+	if (shouldPulse(I3T_CYCLE_IN_STOP, inputIndex))
 	{
 		stopAndReset();
 	}
-	if (getInput(I3T_CYCLE_IN_PREV).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PREV, inputIndex))
+	if (shouldPulse(I3T_CYCLE_IN_PREV, inputIndex))
 	{
 		stepBack();
 	}
-	if (getInput(I3T_CYCLE_IN_NEXT).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex))
+	if (shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex))
 	{
 		stepNext();
 	}
