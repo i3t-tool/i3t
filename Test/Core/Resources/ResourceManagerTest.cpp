@@ -22,8 +22,8 @@ private:
 
 TEST_F(ResourceManagerTest, TextureTest)
 {
-	std::string texture1 = "Data/textures/cube.png";
-	std::string texture2 = "Data/textures/dummy.png";
+	std::string texture1 = "Data/Textures/cube.png";
+	std::string texture2 = "Data/Textures/dummy.png";
 
 	GLuint texture1Id = Core::ResourceManager::instance().texture(texture1);
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
@@ -86,8 +86,8 @@ TEST_F(ResourceManagerTest, ShaderTest)
 
 TEST_F(ResourceManagerTest, TypeMismatchTest)
 {
-	std::string texture1 = "Data/textures/cube.png";
-	std::string texture2 = "Data/textures/dummy.png";
+	std::string texture1 = "Data/Textures/cube.png";
+	std::string texture2 = "Data/Textures/dummy.png";
 
 	std::string shader1Vert = "Data/Shaders/phongVert.glsl";
 	std::string shader1Frag = "Data/Shaders/phongFrag.glsl";

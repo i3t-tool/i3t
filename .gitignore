@@ -70,7 +70,7 @@ logs/
 Dependencies/picoc/cmake_install.cmake
 picoc.dir/
 !/data/models/*.obj
-/Data/tutorials/tutorial
+/Data/Tutorials/tutorial
 
 # Temporary entries during development - to be removed 
 # ----------------------------------------------------------------------
