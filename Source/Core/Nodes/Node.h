@@ -309,7 +309,13 @@ public:
 	void pulse(size_t index);
 
 protected:
-	bool shouldPulse(size_t inputIndex, size_t outputIndex);
+	/**
+	 * Tests if the \p updatedInputIndex should be pulsed.
+	 * @param inputIndex Index of the tested input.
+	 * @param updatedInputIndex Index of the input which was updated.
+	 * @return
+	 */
+	bool shouldPulse(size_t inputIndex, size_t updatedInputIndex);
 
 public:
 	/// \todo MH will be removed.
@@ -326,18 +332,11 @@ public:
 	 * Encodes the box function by updating the output values for a
 	 * given \a inputIndex - fired by receiveSignal().
 	 *
-	 * \todo Is it correct also for multiple edges? If the edges from one module
-	 * are connected to more than one input, and the implementation of
-	 * updateValues uses the \a inputIndex, only subset of outputs may be updated.
-	 * PF: This method is intended for complex modules to allow for optimization.
-	 * May be replaced by updateValues() or implemented in such a way. Do such
-	 * optimize-able modules exist?
-	 *
 	 * The base class method calls update callbacks registered with
 	 * addUpdateCallback(). So derived methods should also call their base method
 	 * if they want to inform any outside observers.
 	 *
-	 * \param	inputIndex Index of the modified input (output pin).
+	 * \param	inputIndex Index of the modified input.
 	 */
 	virtual void updateValues(int inputIndex = 0);
 
