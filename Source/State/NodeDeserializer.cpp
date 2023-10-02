@@ -82,6 +82,21 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 			const auto smooth = value["smooth"].GetBool();
 			coreCycle->setSmoothStep(smooth);
 		}
+
+		if (value.HasMember("isRunning"))
+		{
+			const auto isRunning = value["isRunning"].GetBool();
+			if (isRunning)
+			{
+				coreCycle->play();
+			}
+		}
+
+		if (value.HasMember("mode"))
+		{
+			const auto mode = value["mode"].GetInt();
+			coreCycle->setMode((Core::Cycle::EMode) mode);
+		}
 	}
 
 	//

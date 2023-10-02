@@ -88,6 +88,8 @@ void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
 	cycle.AddMember("step", coreNode->getMultiplier(), alloc);
 	cycle.AddMember("stepDuration", coreNode->getStepDuration(), alloc);
 	cycle.AddMember("smooth", coreNode->getSmoothStep(), alloc);
+	cycle.AddMember("isRunning", coreNode->isRunning(), alloc);
+	cycle.AddMember("mode", (int) coreNode->getMode(), alloc);
 
 	cycles.PushBack(cycle, alloc);
 
