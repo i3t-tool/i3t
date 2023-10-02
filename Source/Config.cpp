@@ -194,5 +194,5 @@ float Config::CAM_LERP_DISTTOSTEP_KOEF = 0.05f;
 std::string Config::CONTENT_FILE = "Data/content.cfg";
 std::string Config::LOAD_SCENE = "NONE";
 
-std::string Config::TUTORIALS_FOLDER = "Data/tutorials/";
-std::string Config::TEXTURE_FOLDER = "Data/textures/";
+std::string Config::TUTORIALS_FOLDER = "Data/Tutorials/";
+std::string Config::TEXTURE_FOLDER = "Data/Textures/";

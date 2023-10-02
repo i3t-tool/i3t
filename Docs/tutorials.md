@@ -13,7 +13,7 @@ the user some essential information for interaction with i3t
 You can create new tutorials by looking at old versions and learning from them.
 
 ## How to create tutorials
-- Create a new folder in ``data/tutorials``
+- Create a new folder in ``Data/Tutorials``
     - Each tutorial needs a separate folder to store the .tut file and all images
     - Name the folder according to the tutorial type
 - Create a file with the same name as the folder with the .tut file type
