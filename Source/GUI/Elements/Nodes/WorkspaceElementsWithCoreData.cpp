@@ -1325,6 +1325,20 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
+			if (ImGui::Selectable("2PI (360°)"))
+			{
+				selectedValue = 2 * M_PI;
+				valueSelected = true;
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::Selectable("-2PI (-360°)"))
+			{
+				selectedValue = -2 * M_PI;
+				valueSelected = true;
+			}
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
 			if (ImGui::Selectable("0"))
 			{
 				selectedValue = 0;
@@ -1420,6 +1434,20 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			if (ImGui::Selectable("-3"))
 			{
 				selectedValue = -3.0f;
+				valueSelected = true;
+			}
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			if (ImGui::Selectable("4"))
+			{
+				selectedValue = 4.0f;
+				valueSelected = true;
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::Selectable("-4"))
+			{
+				selectedValue = -4.0f;
 				valueSelected = true;
 			}
 
