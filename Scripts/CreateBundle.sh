@@ -35,20 +35,46 @@ function detect_os_type() {
 CONFIG_TYPE=""
 ARCHIVE_NAME_POSTFIX=""
 
+function print_usage() {
+  echo "Usage: $0 [--postfix <postfix>] <config_type>"
+  echo "  --postfix <postfix> - optional postfix to add to the archive name"
+  echo "  <config_type> - Debug or Release"
+}
+
 function process_args() {
-  case $1 in
-    Debug)
-      CONFIG_TYPE="Debug"
-      ARCHIVE_NAME_POSTFIX="-Debug"
-      ;;
-    Release)
-      CONFIG_TYPE="Release"
-      ;;
-    *)
-      echo "Unknown config type, only Debug and Release are supported."
-      exit 1
-      ;;
-  esac
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --postfix)
+        ARCHIVE_NAME_POSTFIX="$ARCHIVE_NAME_POSTFIX-$2"
+        shift
+        shift
+        ;;
+      Debug)
+        CONFIG_TYPE="Debug"
+        ARCHIVE_NAME_POSTFIX="$ARCHIVE_NAME_POSTFIX-Debug"
+        shift
+        ;;
+      Release)
+        CONFIG_TYPE="Release"
+        shift
+        ;;
+      *)
+        echo "Unknown config type $1, only Debug and Release are supported."
+        echo ""
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$CONFIG_TYPE" ]; then
+    echo "Config type is not specified."
+    echo ""
+    print_usage
+    exit 1
+  else
+    echo "Config type is $CONFIG_TYPE"
+  fi
 }
 
 function zip_cmd() {
@@ -69,7 +95,8 @@ function create_bundle() {
 
   git_version=$(git describe --tags --exact-match HEAD 2> /dev/null || git rev-parse HEAD)
 
-  archive_name="I3T-$git_version$ARCHIVE_NAME_POSTFIX.zip"
+  # archive_name="I3T-$git_version$ARCHIVE_NAME_POSTFIX.zip"
+  archive_name="I3T$ARCHIVE_NAME_POSTFIX.zip"
 
   binaries=$(find "$binaries_directory" -type f -name "*.so" -o -name "*.dll" -o -name "I3T" -o -name "I3T.exe")
   for binary in $binaries; do
@@ -87,5 +114,5 @@ function create_bundle() {
 }
 
 detect_os_type
-process_args $1
+process_args "$@"
 create_bundle

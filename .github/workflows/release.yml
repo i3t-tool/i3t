@@ -35,7 +35,7 @@ jobs:
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release
-          Scripts/CreateBundle.sh Release
+          Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
 
       - name: Publish
         uses: softprops/action-gh-release@v1
