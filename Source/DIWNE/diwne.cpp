@@ -303,21 +303,6 @@ bool Diwne::processDiwneZoom()
 	return false;
 }
 
-void Diwne::setWorkAreaZoom(float val /*=1*/)
-{
-	double old = m_workAreaZoom;
-	if (val < mp_settingsDiwne->minWorkAreaZoom)
-	{
-		m_workAreaZoom = mp_settingsDiwne->minWorkAreaZoom;
-	}
-	else if (val > mp_settingsDiwne->maxWorkAreaZoom)
-	{
-		m_workAreaZoom = mp_settingsDiwne->maxWorkAreaZoom;
-	}
-	else
-		m_workAreaZoom = val;
-}
-
 void Diwne::updateWorkAreaRectangles()
 {
 	ImVec2 windowPos = ImGui::GetWindowPos(); /* \todo JH return negative number while sub-window
@@ -857,6 +842,21 @@ ImRect Diwne::getSelectionRectangleDiwne()
 	return m_selectionRectangeDiwne;
 }
 
+void Diwne::setWorkAreaZoom(float val /*=1*/)
+{
+	double old = m_workAreaZoom;
+	if (val < mp_settingsDiwne->minWorkAreaZoom)
+	{
+		m_workAreaZoom = mp_settingsDiwne->minWorkAreaZoom;
+	}
+	else if (val > mp_settingsDiwne->maxWorkAreaZoom)
+	{
+		m_workAreaZoom = mp_settingsDiwne->maxWorkAreaZoom;
+	}
+	else
+		m_workAreaZoom = val;
+}
+
 bool Diwne::applyZoomScaling()
 {
 	if (m_zoomScalingApplied)
@@ -865,8 +865,8 @@ bool Diwne::applyZoomScaling()
 	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes are
 	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
 	// ImGui::SetWindowFontScale(m_workAreaZoom);
-	m_zoomOriginalFontScale = ImGui::GetFont()->Scale;
-	ImGui::GetFont()->Scale = m_workAreaZoom;
+
+	m_zoomOriginalFontScale = applyZoomScalingToFont(ImGui::GetFont());
 	ImGui::PushFont(ImGui::GetFont());
 
 	//	static int d = 0;
@@ -891,13 +891,47 @@ bool Diwne::restoreZoomScaling()
 		return false;
 
 	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
-	// ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
 
-	ImGui::GetFont()->Scale = m_zoomOriginalFontScale; // Need to reset default font BEFORE popping font
+	// Need to reset default font BEFORE popping font
+	restoreZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
 	ImGui::PopFont();
 
 	m_zoomScalingApplied = false;
 	return true;
+}
+
+float Diwne::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
+{
+	ImFont* f = font;
+	if (largeFont != nullptr)
+	{
+		f = largeFont;
+	}
+	float originalScale = f->Scale;
+	f->Scale = m_workAreaZoom;
+	ImGui::PushFont(f);
+	return originalScale;
+
+	// TODO: Test dynamic font switching based on zoom level
+
+	// Temporary font idea from imgui password impl
+	//	const ImFontGlyph* glyph = g.Font->FindGlyph('*');
+	//	ImFont* password_font = &g.InputTextPasswordFont;
+	//	password_font->FontSize = g.Font->FontSize;
+	//	password_font->Scale = g.Font->Scale;
+	//	password_font->Ascent = g.Font->Ascent;
+	//	password_font->Descent = g.Font->Descent;
+	//	password_font->ContainerAtlas = g.Font->ContainerAtlas;
+	//	password_font->FallbackGlyph = glyph;
+	//	password_font->FallbackAdvanceX = glyph->AdvanceX;
+	//	IM_ASSERT(password_font->Glyphs.empty() && password_font->IndexAdvanceX.empty() &&
+	// password_font->IndexLookup.empty()); 	PushFont(password_font);
+}
+
+void Diwne::restoreZoomScalingToFont(ImFont* font, float originalScale)
+{
+	font->Scale = originalScale;
+	ImGui::PopFont();
 }
 
 bool Diwne::ensureZoomScaling(bool active)

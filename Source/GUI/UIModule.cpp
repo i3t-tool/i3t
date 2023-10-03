@@ -202,35 +202,74 @@ void UIModule::loadFonts()
 	    0,
 	};
 
-	ImFontConfig fontCfg;
-	fontCfg.GlyphExtraSpacing.x = -0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi
-	                                     // na spravnou sirku
+	// Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
+	ImFontConfig ubuntuBoldCfg;
+	ubuntuBoldCfg.OversampleH = 2;
+	ubuntuBoldCfg.OversampleV = 1;
+	ubuntuBoldCfg.GlyphExtraSpacing.x = -0.5f;
+
+	// NOTE: Oversampling is a technique that scales the loaded font by a specific factor in the X (horizontal) or Y
+	// (vertical) direction (or both). In the process the font is also slightly blurred. Such modified font texture is
+	// meant to be rendered at the original smaller size and the blurred edges of letters allow for subpixel
+	// antialiasing. More info here: https://github.com/nothings/stb/blob/master/tests/oversample/README.md
+	// This can be abused to make scaled up text look less pixelated when zoomed in. Although it also makes the zoomed
+	// in text a little blurry.
+
+	// Inspired by:
+	// https://github.com/thedmd/imgui-node-editor/blob/af7fa51bb9d68c9b44477c341f13a7dadee3e359/examples/application/source/application.cpp#L97
+
+	// In the future, dynamically replacing the font for a non-blurry bigger one would be the solution (or outright
+	// always using a big font and scaling it down)
+	// Another solution could be switching to freetype/vector-based fonts which ImGui might include soon. However, this
+	// is a good enough solution for now. Note that using oversampling with high factors dramatically increases the size
+	// of the font atlas texture, hogging video memory, especially if many fonts with large glyph ranges are used.
+
+	// Default config, using lower horizontal oversampling (3 --> 2) than imgui to save some memory
+	// (The difference is, as imgui docs mention, almost non-existent)
+	ImFontConfig lqConfig;
+	lqConfig.OversampleH = 2;
+	lqConfig.OversampleV = 1;
+
+	// More video memory intensive font config that uses high horizontal AND vertical oversampling.
+	// This is ideal for fonts we zoom in on like in the workspace, albeit they become slightly blurry.
+	ImFontConfig hqConfig;
+	hqConfig.OversampleH = 4;
+	hqConfig.OversampleV = 4;
+	hqConfig.PixelSnapH = false;
+
+	ImFontConfig mqConfig;
+	mqConfig.OversampleH = 3;
+	mqConfig.OversampleV = 2;
+	mqConfig.PixelSnapH = false;
+
+	// TODO: (DR) Do we really need all these fonts? Can't we use just a few (small/large variants) and them scale them?
+	//   Currently we're filling the font atlas with huge fonts just to use them once.
+	// As of right now the font atlas size is 2048x4096
 
 	m_fonts = {
-	    // 0
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 14.0f * fontScale, nullptr, ranges),
-	    // 1
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 12.0f * fontScale, nullptr, ranges),
-	    // 2
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 12.0f * fontScale, nullptr, ranges),
-	    // 3
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 24.0f * fontScale, nullptr, ranges),
-	    // 4
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 16.0f * fontScale, nullptr, ranges),
-	    // 5
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 20.0f * fontScale, nullptr, ranges),
-	    // 6
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 18.0f * fontScale, nullptr, ranges),
-	    // 7
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 33.5f * fontScale, &fontCfg, ranges),
-	    // 8
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 17.5f * fontScale, nullptr, ranges),
-	    // 9
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16.0f * fontScale, nullptr, ranges),
-	    // 10
-	    io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Italic.ttf", 16.0f * fontScale, nullptr, ranges),
+	    {"Roboto12",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 12.0f * fontScale, &lqConfig, ranges)}, //
+	    {"Roboto14",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 14.0f * fontScale, &hqConfig, ranges)}, //
+	    {"Roboto16",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
+	    {"Roboto17.5",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 17.5f * fontScale, &lqConfig, ranges)}, //
+	    {"RobotoBold12",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 12.0f * fontScale, &lqConfig, ranges)}, //
+	    {"RobotoBold16",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
+	    {"RobotoBold20",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 20.0f * fontScale, &mqConfig, ranges)}, //
+	    {"RobotoItalic16",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Italic.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
+	    {"UbuntuBold18",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 18.0f * fontScale, &lqConfig, ranges)}, //
+	    {"UbuntuBold24",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 24.0f * fontScale, &lqConfig, ranges)}, //
+	    {"UbuntuBold33.5",
+	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 33.5f * fontScale, &ubuntuBoldCfg, ranges)}, //
 	};
-	// io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();
 }
 
