@@ -66,29 +66,51 @@ bool WorkspaceScreen::middleContent()
 {
 	bool interaction_happen = false;
 
-	// Get projection and view matrix from screen input
-	std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->getData().getScreen();
-
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
-
-	Vp::Viewport* viewport = I3T::getViewport();
-	m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
-	viewport->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, m_renderOptions,
-	                     m_displayOptions);
-	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	ImVec2 zoomedTextureSize = m_textureSize * diwne.getWorkAreaZoom();
 	ImVec2 topLeftCursorPos = ImGui::GetCursorScreenPos();
 
-	if (framebuffer)
+	if (getNodebase()->getInput(0).isPluggedIn())
 	{
-		ImGui::Image((void*) (intptr_t) framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
-		             ImVec2(1.0f, 0.0f)); // vertical flip
+		// Get projection and view matrix from screen input
+		std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->getData().getScreen();
+
+		Vp::Viewport* viewport = I3T::getViewport();
+		m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
+		viewport->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, m_renderOptions,
+		                     m_displayOptions);
+		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
+
+		if (framebuffer)
+		{
+			ImGui::Image((void*) (intptr_t) framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
+			             ImVec2(1.0f, 0.0f)); // vertical flip
+		}
+		else
+		{
+			ImGui::Text("Failed to draw the screen!");
+		}
 	}
 	else
 	{
-		ImGui::Text("Failed to draw the screen!");
+		// No screen input connected
+		ImDrawList& drawList = *ImGui::GetWindowDrawList();
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImRect rect(pos, pos + zoomedTextureSize);
+
+		// Draw background
+		drawList.AddRectFilled(rect.Min, rect.Max,
+		                       ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_background)));
+
+		// Draw no input text
+		ImGui::PushClipRect(rect.Min, rect.Max, true);
+		float origScale = diwne.applyZoomScalingToFont(I3T::getFont(EFont::LargeBold));
+		GUI::TextCentered("NO INPUT", rect,
+		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
+		diwne.restoreZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
+		ImGui::PopClipRect();
 	}
 
 	interaction_happen |= drawResizeHandles(topLeftCursorPos, zoomedTextureSize);

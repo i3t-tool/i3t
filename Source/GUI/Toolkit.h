@@ -27,6 +27,14 @@ inline void Text(const char* text, EFont font)
 	Text(text, I3T::getFont(font));
 }
 
+inline void TextCentered(const char* text, ImRect rect, ImU32 col)
+{
+	ImVec2 textSize = ImGui::CalcTextSize(text);
+	ImVec2 center = ImVec2(rect.Min.x + rect.GetWidth() / 2, rect.Min.y + rect.GetHeight() / 2);
+	ImVec2 textOrigin = center - ImVec2(textSize.x / 2, textSize.y / 2);
+	ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), textOrigin, col, text);
+}
+
 bool Button(const char* id, bool disabled = false);
 
 bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
