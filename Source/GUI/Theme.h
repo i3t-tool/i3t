@@ -161,6 +161,8 @@ enum class EColor
 
 enum class EFont
 {
+	Regular,
+	LargeBold,
 	MenuLarge,
 	MenuSmall,
 	Button,
@@ -354,7 +356,7 @@ private:
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	std::map<EFont, size_t> m_fontsAssoc;
+	std::map<EFont, std::string> m_fontsAssoc;
 
 public:
 	Theme() = default;

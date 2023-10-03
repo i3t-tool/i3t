@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -17,8 +18,7 @@ class UIModule final : public Module
 {
 	friend class Application;
 
-	using Fonts = std::vector<ImFont*>;
-	using Runnable = std::function<void()>;
+	using Fonts = std::unordered_map<std::string, ImFont*>;
 
 public:
 	UIModule() = default;

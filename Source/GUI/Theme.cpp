@@ -49,15 +49,18 @@ void Theme::initFonts()
 {
 	auto& io = ImGui::GetIO();
 
-	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
-	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
-	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, 3));
+	m_fontsAssoc.insert(std::pair(EFont::Regular, "Roboto14"));
+	m_fontsAssoc.insert(std::pair(EFont::LargeBold, "RobotoBold20"));
 
-	io.FontDefault = get(EFont::MenuLarge);
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto14"));
+	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Node, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
+
+	io.FontDefault = get(EFont::Regular);
 }
 
 void Theme::initClassicProperties()
@@ -203,22 +206,22 @@ void Theme::initClassicProperties()
 	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
 	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
 
-	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
-	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
-	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
-	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
+	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Node, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::Header, "RobotoBold20"));
 
 	// Tutorial fonts.
-	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 9));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, 3));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialAssignment, 4));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, 10));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, 7));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeDescription, 8));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, 6));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemDescription, 2));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialAssignment, "RobotoBold16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, "RobotoItalic16"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, "UbuntuBold33.5"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeDescription, "Roboto17.5"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, "UbuntuBold18"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemDescription, "Roboto12"));
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
@@ -485,22 +488,22 @@ void Theme::initModernProperties()
 	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
 	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
 
-	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
-	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
-	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
-	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
-	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
+	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
+	m_fontsAssoc.insert(std::pair(EFont::Node, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, "Roboto12"));
+	m_fontsAssoc.insert(std::pair(EFont::Header, "RobotoBold20"));
 
 	// Tutorial fonts.
-	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 9));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, 3));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialAssignment, 4));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, 10));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, 7));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeDescription, 8));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, 6));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemDescription, 2));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialAssignment, "RobotoBold16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, "RobotoItalic16"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, "UbuntuBold33.5"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeDescription, "Roboto17.5"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, "UbuntuBold18"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemDescription, "Roboto12"));
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;

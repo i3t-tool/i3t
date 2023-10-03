@@ -185,12 +185,6 @@ public:
 		return m_workAreaScreen;
 	};
 
-	float getWorkAreaZoom() const
-	{
-		return m_workAreaZoom;
-	};
-	virtual void setWorkAreaZoom(float val = 1);
-
 	ImVec2 const& getPopupPosition() const
 	{
 		return m_popupPosition;
@@ -430,6 +424,16 @@ public:
 	virtual ImVec2 bypassDiwneGetSelectionRectangleSize();
 	virtual bool processDiwneSelectionRectangle();
 
+	////////////////////////////////////////////
+	// ZOOM SCALING
+	////////////////////////////////////////////
+
+	float getWorkAreaZoom() const
+	{
+		return m_workAreaZoom;
+	};
+	virtual void setWorkAreaZoom(float val = 1);
+
 	/**
 	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
 	 * @return Whether zoom scaling was active before making this call
@@ -443,25 +447,32 @@ public:
 	bool restoreZoomScaling();
 
 	/**
+	 * Modifies the current Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
+
+	void restoreZoomScalingToFont(ImFont* font, float originalScale);
+
+	/**
 	 * Ensure that zoom scaling is active or not based on a passed parameter
 	 * @return Whether zoom scaling was active before making this call, can be later passed to this method again to
 	 * restore original state
 	 */
 	bool ensureZoomScaling(bool active);
 
+	////////////////////////////////////////////
+
 	DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-	bool m_popupDrawn /*!< not draw popup two times \todo maybe unused when every
-	                     object is drawn just one time */
-	    ,
-	    m_tooltipDrawn /*!< not draw tooltip two times \todo maybe unused when
-	                      every object is drawn just one time */
-	    ,
-	    m_objectFocused /*!< only one object can be focused */,
-	    m_allowUnselectingNodes /*!< for example when holding ctrl nodes not going
-	                               unselected when sleection rect get out of them
-	                             */
-	    ;
+	/// not draw popup two times \todo maybe unused when every object is drawn just one time
+	bool m_popupDrawn;
+	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
+	bool m_tooltipDrawn;
+	/// only one object can be focused
+	bool m_objectFocused;
+	/// for example when holding ctrl nodes not going unselected when sleection rect get out of them
+	bool m_allowUnselectingNodes;
 
 protected:
 	DiwneAction m_diwneAction, m_diwneAction_previousFrame;
