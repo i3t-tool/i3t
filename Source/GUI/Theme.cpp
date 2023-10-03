@@ -175,6 +175,8 @@ void Theme::initClassicProperties()
 	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.70f, 0.70f, 0.70f, 0.5f));
 	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
 	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
+	set(EColor::Nodes_Screen_noInput_background, ImVec4(0.0f, 0.0f, 0.0f, 0.65f));
+	set(EColor::Nodes_Screen_noInput_text, ImVec4(1.0f, 1.0f, 1.0f, 0.65f));
 
 	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_ValidIcon_bgInner, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -456,6 +458,8 @@ void Theme::initModernProperties()
 	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
 	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
 	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+	set(EColor::Nodes_Screen_noInput_background, ImVec4(0.0f, 0.0f, 0.0f, 0.65f));
+	set(EColor::Nodes_Screen_noInput_text, ImVec4(1.0f, 1.0f, 1.0f, 0.65f));
 
 	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_ValidIcon_bgInner, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -737,6 +741,9 @@ void Theme::initNames()
 	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes_Screen_resizeBtn_bgInner";
 	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes_Screen_resizeBtn_fgShape";
 	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes_Screen_resizeBtn_fgInner";
+
+	g_ColorNames[EColor::Nodes_Screen_noInput_background] = "nscr_Nodes_Screen_noInput_background";
+	g_ColorNames[EColor::Nodes_Screen_noInput_text] = "nscr_Nodes_Screen_noInput_text";
 
 	// Links
 	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
