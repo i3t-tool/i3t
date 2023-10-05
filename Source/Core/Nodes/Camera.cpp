@@ -20,10 +20,10 @@ Camera::Camera() : Node(&g_cameraProperties) {}
 void Camera::createComponents()
 {
 	m_proj = GraphManager::createSequence();
-	m_proj->setOwner(getPtr().get());
+	appendChildNode(m_proj);
 
 	m_view = GraphManager::createSequence();
-	m_view->setOwner(getPtr().get());
+	appendChildNode(m_view);
 
 	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)
 	{

@@ -218,7 +218,10 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 
 	std::vector<Ptr<Node>> stack;
 
-	stack.push_back(output.getOwner());
+	if (!output.getOwner()->getOperation()->ignoreCycleDetection)
+	{
+		stack.push_back(output.getOwner());
+	}
 
 	while (!stack.empty())
 	{
@@ -230,20 +233,33 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 			return ENodePlugResult::Err_Loop;
 		}
 
-		for (auto& pin : act->getInputPins())
-		{
+		const auto tryPushToStack = [&stack](const Pin& pin) {
 			if (pin.isPluggedIn())
 			{
 				Pin* ct = pin.m_input;
-				// stack.push_back(ct->Owner.getRootOwner());
-				stack.push_back(ct->getOwner());
+
+				auto toPush = ct->Owner.getRootOwner();
+				if (!toPush->getOperation()->ignoreCycleDetection)
+				{
+					stack.push_back(ct->Owner.getRootOwner());
+					// stack.push_back(ct->getOwner());
+				}
+			}
+		};
+
+		for (auto& pin : act->getInputPins())
+		{
+			tryPushToStack(pin);
+		}
+
+		// process nested nodes, for example camera subsequences
+		for (auto& node : act->m_children)
+		{
+			for (auto& pin : node->getInputPins())
+			{
+				tryPushToStack(pin);
 			}
 		}
-	}
-
-	if (input.Owner.m_isPlugCorrectFn)
-	{
-		return input.Owner.m_isPlugCorrectFn(input, output);
 	}
 
 	return ENodePlugResult::Ok;

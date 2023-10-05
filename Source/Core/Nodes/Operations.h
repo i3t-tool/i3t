@@ -63,6 +63,8 @@ struct Operation
 	const bool isConstructor = false; //< this is a standard operator node - processes only the connected
 	                                  // pins and has no GUI  editable values
 
+	bool ignoreCycleDetection = false;
+
 	/**
 	 * \brief Constructor used for definition of editable values in static const
 	 * std::vector<TransformOperation> g_transforms \param keyWord enum defined in
@@ -142,6 +144,16 @@ struct Operation
 	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText)
 	    : keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
 	      numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText)
+	{}
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
+	          const std::vector<std::string>& defaultInputNames, const std::vector<std::string>& defaultOutputNames,
+	          const bool isConstructor, bool ignoreCycleDetection)
+	    : keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+	      numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
+	      defaultInputNames(defaultInputNames), defaultOutputNames(defaultOutputNames), isConstructor(isConstructor),
+	      ignoreCycleDetection(ignoreCycleDetection)
 	{}
 
 	// \todo NEVER USED
@@ -485,7 +497,17 @@ static const std::vector<Operation> operations = {
      orthoFrustrumInputNames},                                                                                // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
-    {n(EOperatorType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},
+    Operation{n(EOperatorType::Screen),
+              "screen",
+              1,
+              {EValueType::Screen},
+              2,
+              {EValueType::Screen, EValueType::Float},
+              NO_TAG,
+              {},
+              {},
+              false,
+              true},
     {n(EOperatorType::Pulse), "pulse", 1, {EValueType::Pulse}, 1, {EValueType::Pulse}}};
 
 /**

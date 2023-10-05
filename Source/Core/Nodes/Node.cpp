@@ -54,6 +54,13 @@ void Node::init()
 	onInit();
 }
 
+void Node::appendChildNode(Ptr<Node> node)
+{
+	auto* self = getPtr().get();
+	node->setOwner(self);
+	m_children.push_back(node.get());
+}
+
 ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsigned toIndex)
 {
 	I3T_ASSERT(childNode->getInputPins().size() > toIndex, "Node does not have input pin with given index!");

@@ -1,4 +1,45 @@
 {
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -90.0,
+                "orbitCameraRotationY": 30.0,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [],
@@ -7,6 +48,17 @@
         "screens": [],
         "models": [],
         "transforms": [],
-        "edges": []
+        "edges": [],
+        "zoom": 1.0,
+        "workArea": {
+            "Min": [
+                0.0,
+                0.0
+            ],
+            "Max": [
+                0.0,
+                0.0
+            ]
+        }
     }
 }
