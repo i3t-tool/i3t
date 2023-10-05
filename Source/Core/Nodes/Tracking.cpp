@@ -248,7 +248,9 @@ void setActivePart(Ptr<Node> node, float value)
 
 MatrixTracker::MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model)
     : m_model(std::move(model)), m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
-{}
+{
+	update();
+}
 
 void MatrixTracker::update()
 {
