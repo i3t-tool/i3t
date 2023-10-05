@@ -7,8 +7,6 @@
  * \author 	Michal Folta, CTU Prague
  */
 
-// TODO: (DR) Pretty sure this is all obsolete at this point and some parts of it should be moved somewhere else
-
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
@@ -29,10 +27,16 @@ struct Configuration
 
 	static inline const fs::path root = fs::current_path();
 	static inline const fs::path sceneRoot = root / "Data/Scenes";
+
+	static inline const fs::path logEventsDefinition = root / "Data/LogEventsDefinition.json";
+	static inline const fs::path appLog = root / "Logs/App.log";
+	static inline const fs::path userInteractionLog = root / "Logs/UserInteraction.log";
+	static inline const fs::path mouseLog = root / "Logs/Mouse.log";
 };
 
 Ptr<Configuration> loadConfig(const fs::path& filename);
 
+// TODO: (DR) Pretty sure this is all obsolete at this point and some parts of it should be moved somewhere else
 /**
  * A configuration structure.
  *

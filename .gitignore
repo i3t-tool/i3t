@@ -4,7 +4,6 @@
 # Compilation directory
 # ----------------------------------------------------------------------
 /Binaries/
-Test/State/EmptyScene.json
 
 # Website
 # ----------------------------------------------------------------------
@@ -63,7 +62,8 @@ Test/State/TestScene.json
 /UserData/
 Global.json
 Data/imgui.ini
-logs/
+[L|l]ogs/
+Test/State/EmptyScene.json
 
 
 # Obsolete entries - to be removed
