@@ -105,7 +105,7 @@ If the user already knows what they are doing, they can try **exercises** (the l
 tbd
 
 ## DIWNE
-See the [DIWNE documentation](../Source/DIWNE/Docs/docs.md)
+See the [DIWNE documentation](developer-guide/diwne).
 
 ## Tutorials
 
