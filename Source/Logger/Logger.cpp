@@ -7,8 +7,10 @@
 #endif
 
 #include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
 
+#include "Config.h"
 #include "Core/Window.h"
 /// \todo Test JustPressed keys in Application and set set logging options there.
 #include "Core/Input/InputManager.h"
@@ -69,15 +71,21 @@ void Logger::initLogger(int argc, char* argv[])
 	sinks[0]->set_level(spdlog::level::trace);
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
+	constexpr auto maxFileCount = 1;
+	constexpr auto maxLogSize = 1024 * 1024 * 50; // 50 MB
+
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
-	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/main.log"));
+	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::appLog.string(),
+	                                                                                    maxLogSize, maxFileCount));
 
 	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
-	logger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/user_interaction.log"));
+	logger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+	    Configuration::userInteractionLog.string(), maxLogSize, maxFileCount));
 	logger->set_level(spdlog::level::trace);
 
 	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
-	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/mouse_log.log"));
+	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+	    Configuration::mouseLog.string(), maxLogSize, maxFileCount));
 	mouseLogger->set_level(spdlog::level::trace);
 
 	std::ostringstream init_message;
@@ -158,11 +166,11 @@ bool Logger::shouldLogMouse()
 
 void Logger::loadStrings()
 {
-	std::cout << "[info]: Load strings from: " << LOG_STRINGS_PATH << std::endl;
+	std::cout << "[info]: Load strings from: " << Configuration::logEventsDefinition << std::endl;
 	rapidjson::Document doc;
-	if (!JSON::parse(LOG_STRINGS_PATH, doc))
+	if (!JSON::parse(Configuration::logEventsDefinition, doc))
 	{
-		std::cerr << "[error]: Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
+		std::cerr << "[error]: Failed to load logger config from " << Configuration::logEventsDefinition << std::endl;
 		return;
 	}
 

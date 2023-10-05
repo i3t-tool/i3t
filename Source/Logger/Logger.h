@@ -183,7 +183,6 @@ private:
 
 	int previousTime = 0;
 	const int MOUSE_MOVEMENT_LOG_INTERVALS = 2000;
-	const std::string LOG_STRINGS_PATH = "Data/events_definition.json";
 
 	/// \todo This should not be at Logger
 	int tutorialCount = 1; // #TUTORIAL
