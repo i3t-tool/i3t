@@ -130,16 +130,17 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 
 void WorkspaceSequence::popupContentTracking()
 {
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
 	if (Core::GraphManager::isTrackingEnabled() &&
-	    dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getSequence()->getId() == this->getNodebase()->getId())
+	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
 		if (ImGui::MenuItem("Stop tracking", ""))
 		{
-			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
+			workspaceDiwne.trackingSwitchOff();
 		}
-		if (ImGui::MenuItem("Smooth tracking", "", dynamic_cast<WorkspaceDiwne&>(diwne).smoothTracking, true))
+		if (ImGui::MenuItem("Smooth tracking", "", workspaceDiwne.smoothTracking, true))
 		{
-			dynamic_cast<WorkspaceDiwne&>(diwne).trackingModeSwitch();
+			workspaceDiwne.trackingModeSwitch();
 		}
 	}
 	else
@@ -147,9 +148,11 @@ void WorkspaceSequence::popupContentTracking()
 		if (ImGui::MenuItem("Start tracking", ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
-				dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
-			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(
-			    std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+			{
+				workspaceDiwne.trackingSwitchOff();
+			}
+
+			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 		}
 	}
 }

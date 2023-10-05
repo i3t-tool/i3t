@@ -110,56 +110,58 @@ bool WorkspaceTransformation::middleContent()
 
 bool WorkspaceTransformation::afterContent()
 {
-	if (Core::GraphManager::isTrackingEnabled())
+	if (!Core::GraphManager::isTrackingEnabled())
 	{
-		ImVec2 topleft = m_middleRectDiwne.Min;
-		ImVec2 bottomright = m_middleRectDiwne.Max;
-		bool trackingFromLeft = dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft;
+		return false;
+	}
 
-		ImVec2 size = bottomright - topleft;
-		float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
-		if (trackingFromLeft)
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
+
+	ImVec2 topleft = m_middleRectDiwne.Min;
+	ImVec2 bottomright = m_middleRectDiwne.Max;
+	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
+
+	ImVec2 size = bottomright - topleft;
+	float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
+	if (trackingFromLeft)
+	{
+		if (inactiveMark != 1) // Left tracking
 		{
-			if (inactiveMark != 1) // Left tracking
-			{
-				bottomright.x -= (inactiveMark) *size.x;
-				diwne.AddRectFilledDiwne(topleft, bottomright,
-				                         I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-			}
-			else if (inactiveMark == 1)
-			{ // accounting for yellow mark placement
-				bottomright.x -= (inactiveMark) *size.x;
-			}
-		}
-		else if (inactiveMark != 0) // RIGHT TRACKING
-		{
-			topleft.x += (1 - inactiveMark) * size.x;
+			bottomright.x -= (inactiveMark) *size.x;
 			diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 		}
-		else if (inactiveMark == 0)
-		{
-			topleft.x += (1 - inactiveMark) * size.x;
+		else if (inactiveMark == 1)
+		{ // accounting for yellow mark placement
+			bottomright.x -= (inactiveMark) *size.x;
 		}
+	}
+	else if (inactiveMark != 0) // RIGHT TRACKING
+	{
+		topleft.x += (1 - inactiveMark) * size.x;
+		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+	}
+	else if (inactiveMark == 0)
+	{
+		topleft.x += (1 - inactiveMark) * size.x;
+	}
 
-		auto maybeInterpolatedTransform =
-		    findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
-		                 dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID());
+	auto maybeInterpolatedTransform =
+	    findNodeById(workspaceDiwne.getAllNodesInnerIncluded(), workspaceDiwne.tracking->getInterpolatedTransformID());
 
-		if (!maybeInterpolatedTransform)
-		{
-			Core::GraphManager::stopTracking();
-			return false;
-		}
+	if (!maybeInterpolatedTransform)
+	{
+		Core::GraphManager::stopTracking();
+		return false;
+	}
 
-		if (std::dynamic_pointer_cast<WorkspaceTransformation>(maybeInterpolatedTransform.value()).get() == this)
-		{
-			ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
-			ImVec2 markSize =
-			    ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
+	auto interpolatedTransform = std::dynamic_pointer_cast<WorkspaceTransformation>(maybeInterpolatedTransform.value());
+	if (interpolatedTransform.get() == this)
+	{
+		ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
+		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
-			diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-			                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
-		}
+		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
+		                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
 	}
 
 	return false;
