@@ -100,6 +100,8 @@ public:
 
 	virtual void onInit() {}
 
+	void appendChildNode(Ptr<Node> node);
+
 	/**
 	 * Prepares node for its destruction, after that the destructor can be called.
 	 */
@@ -471,6 +473,9 @@ protected:
 	/// Owner of the node, used in complex type of nodes, such as sequence or
 	/// camera.
 	Node* m_owner = nullptr;
+
+	/// Nested nodes.
+	std::vector<Node*> m_children;
 
 	/// Used by Camera
 	ENodePlugResult (*m_isPlugCorrectFn)(const Pin& input, const Pin& output) = nullptr;

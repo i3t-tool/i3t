@@ -39,7 +39,7 @@ Ptr<Model> GraphManager::createModel()
 
 ENodePlugResult GraphManager::isPlugCorrect(const Pin& input, const Pin& output)
 {
-	auto& lhs = input.Owner;
+	auto& lhs = output.Owner;
 	return lhs.isPlugCorrect(input, output);
 }
 

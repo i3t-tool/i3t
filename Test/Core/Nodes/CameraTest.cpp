@@ -37,3 +37,27 @@ TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
 	const auto result = GraphManager::plug(camera, sequence, I3T_CAMERA_OUT_MUL, I3T_SEQ_IN_MUL);
 	EXPECT_EQ(result, ENodePlugResult::Err_DisabledPin);
 }
+
+TEST(CameraNodeTest, AllowedCameraScreenProjectionLoop)
+{
+	auto camera = GraphManager::createCamera();
+	auto screen = Builder::createOperator<EOperatorType::Screen>();
+	auto perspective = Builder::createOperator<EOperatorType::MakePerspective>();
+
+	plug_expectOk(camera, screen, 0, 0);
+	plug_expectOk(screen, perspective, 1 /* 0 is screen type output */, 1);
+	plug_expectOk(perspective, camera->getProj(), 0, I3T_SEQ_IN_MAT);
+}
+
+TEST(CameraNodeTest, UnallowedCameraMatrixMatrixLoop)
+{
+	auto camera = GraphManager::createCamera();
+	auto matrix1 = Builder::createOperator<EOperatorType::MatrixToMatrix>();
+	auto matrix2 = Builder::createOperator<EOperatorType::MatrixToMatrix>();
+
+	plug_expectOk(camera, matrix1, 1, 0);
+	plug_expectOk(matrix1, matrix2, 0, 0);
+
+	auto result = GraphManager::plug(matrix2, camera->getProj(), 0, I3T_SEQ_IN_MAT);
+	EXPECT_EQ(result, ENodePlugResult::Err_Loop);
+}
