@@ -3,7 +3,7 @@ title: Cvičení - Stůl
 description: Procvičení práce s I3T kde vytvoříme stůl!
 thumbnail: table_thumb.png
 language: cs
-scene: exc1.scene
+scene: EXC1/exc1.scene
 ---
 headline: První cvičení
 

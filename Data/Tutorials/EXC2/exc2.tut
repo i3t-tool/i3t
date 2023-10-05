@@ -3,7 +3,7 @@ title: Cvičení - Detektiv
 description: Procvičení práce s kamerou, němž mezi námi hledáme vraha
 thumbnail: detective_thumb.png
 language: cs
-scene: exc2.scene
+scene: EXC2/exc2.scene
 ---
 headline: Vražda
 
