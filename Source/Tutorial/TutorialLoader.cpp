@@ -52,7 +52,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	std::string scene = "undefined";
 	if (tutorial_yaml["scene"])
 	{
-		scene = "Data/Scenes/" + tutorial_yaml["scene"].as<std::string>();
+		scene = "Data/Tutorials/" + tutorial_yaml["scene"].as<std::string>();
 		LOG_DEBUG(scene);
 	}
 	else
