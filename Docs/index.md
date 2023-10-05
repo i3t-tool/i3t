@@ -6,10 +6,13 @@ hero:
   name: "I3T"
   tagline: An Interactive Tool for Teaching Transformations
   image: 
-    src: /assets/logo.svg
+    src: logo.svg
     alt: I3T logo
   actions:
     - theme: brand
+      text: Download
+      link: https://github.com/i3t-tool/i3t/releases/latest
+    - theme: alt
       text: Manual
       link: /introduction
     - theme: alt
