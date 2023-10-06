@@ -1,5 +1,16 @@
 # DIWNE - Dear Imgui Wrapper Node Editor
 
+## Reasons, Background and Story
+
+DIWNE was written as one UI part of I3T. On the other hand, intention was DIWNE as independent generally usable utility/library that is (only) also used in I3T. Graphical part of I3T is based on DearImgui library, therefore DIWNE is based on DearImgui as well.
+
+DearImgui itself has no "node-editor" support. Other libraries based on providing node-editing has some limitations (some hard-coded graphical settings like margins etc., usually there is no support for "nodes inside other nodes" - this funcionality is necessary in I3T, more over other libraries often provide their own rendering function which can easily leads to uncompatibility with newer version of DearImgui)
+
+DIWNE is designed only as wrapper of DearImgui function (call DearImgui orginal function in right order). It provide absolute freedom in graphical setting of any part od node-editor as well as absolute freedom for re-setting actions possible with object in node editor. Default behavior is not hard-coded and is prepared to be (hopefully) easilly changed.
+
+Benefits of DIWNE is high variability and only one dependence (DearImgui).
+TODO and improvements are in the end of this document.
+
 ## Node editor
 
 Node editor is utitilty that provide organizing grafical view in graph style. Graph consist of nodes (verticies) that can be connected via links (edges). Content and graphical representation of nodes are up to you, as well as graphical representation of links.
@@ -84,7 +95,7 @@ Functions with "Diwne" in name ( drawDiwne(), xxxDiwne() etc. ) are not intended
 
 	Object representing point (usualy square) from and to which link is connected. Pin will be probably part of your node (can be invisible) and link will lead to it.
 
-	Pull the link from pin is possible by mouse and pin is only possible place from with it is possible (by default).
+	Pull the link from pin is possible by mouse and pin is only place from with it is possible (by default).
 
 	Main atributes:
 
@@ -97,6 +108,8 @@ Functions with "Diwne" in name ( drawDiwne(), xxxDiwne() etc. ) are not intended
 
 
 ## TODO
-
+Some part of DIWNE are not well programmed and will be great to improve it:
 - Minimal working example
 - Re-name bypass functions
+- Proccesing of user action and inter-object interactions. Nowadays its very messy in different part of code and objects. It seems that good idea is only store information, that some action/interaction happens in particular object and leave reaction to this (and all other inter/actions that can happen in one frame) inter/action to the ond of frame-processing. With this aproach could be possible to create clear and easy to check (action to action) matrix. With this matrix will be possible easilly solve situation where two actions interfer. It violate ImGui philosophy, but in complicated (a lot of mutualy interacting objects) is very messy to react immediately after action in every single object, because this action can interfer with previous and/or subsequent events. 
+- Zooming of node-editor is now solved by increasing size on font and icons (and therfore whole nodes). It is not well worked aproach because it could affect other parts of application too and some unpredictible consequencies can happen. Better aproach provide for example https://github.com/thedmd/imgui-node-editor but resources demands are not known.  
