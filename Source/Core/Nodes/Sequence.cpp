@@ -61,11 +61,6 @@ Sequence::~Sequence()
 	stopTracking();
 }
 
-Ptr<Node> Sequence::clone()
-{
-	return Builder::createSequence(m_tracker);
-}
-
 ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix) noexcept
 {
 	const auto result = addMatrix(matrix, m_storage.m_matrices.size());

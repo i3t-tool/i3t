@@ -75,8 +75,6 @@ public:
 	Sequence(MatrixTracker* tracker);
 	~Sequence() override;
 
-	Ptr<Node> clone() override;
-
 	ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept;
 
 	/**

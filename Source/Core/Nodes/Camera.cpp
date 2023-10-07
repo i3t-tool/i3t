@@ -33,11 +33,6 @@ void Camera::createComponents()
 	getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);
 }
 
-Ptr<Node> Camera::clone()
-{
-	return Builder::createCamera();
-}
-
 void Camera::updateValues(int inputIndex)
 {
 	const auto& projMat = m_proj->getData(I3T_OUTPUT1).getMat4();

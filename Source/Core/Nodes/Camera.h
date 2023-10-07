@@ -37,8 +37,6 @@ public:
 
 	Camera();
 
-	Ptr<Node> clone() override;
-
 	void createComponents();
 
 	const SequencePtr& getProj()

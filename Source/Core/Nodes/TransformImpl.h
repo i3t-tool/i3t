@@ -39,7 +39,6 @@
  *        \todo - where is it used?
  *        World/Components/FreeManipulator.cpp::561
  *        State/SerializationVisitor.cpp:445
- *				Source/Core/Nodes/TransformImpl.h/ I3T_TRANSFORM_CLONE macro
  *
  * Test setValue must check:
  *    - float  - setDefault + update matrix - respect synergies
@@ -97,7 +96,7 @@ initDefaults(), resetMatrixFromDefaults use default|
  *	                                      - the editable coords only
  *	\todo:
  *	  - setValue(mat) does not respect the synergies - It is used in
- *	    FreeManipulator, SerializationVisitor, and I3T_TRANSFORM_CLONE macro.
+ *	    FreeManipulator, SerializationVisitor.
  *	- setDefaultValue - now just sets something, but omits the synergies.
  *	    For quat it is done in resetMatrixFromDefault().
  *	    Is it the right place?
@@ -108,22 +107,6 @@ initDefaults(), resetMatrixFromDefaults use default|
 
 namespace Core
 {
-#define I3T_TRANSFORM_CLONE(T)                                                                                         \
-	Ptr<Node> clone() override                                                                                         \
-	{                                                                                                                  \
-		auto node = Builder::createTransform<T>();                                                                     \
-                                                                                                                       \
-		isLocked() ? node->lock() : node->unlock();                                                                    \
-		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies() : node->disableSynergies();                   \
-                                                                                                                       \
-		node->setDefaultValues(getDefaultValues());                                                                    \
-		node->setValue(getData(0).getMat4());                                                                          \
-                                                                                                                       \
-		return node;                                                                                                   \
-	}
-//hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
-
-// PF todo: hasSynergies have only nodes with m_hasMenuSynergies
 
 template <ETransformType T> class TransformImpl : public Transform
 {};
@@ -148,8 +131,6 @@ template <> class TransformImpl<ETransformType::Free> : public Transform
 {
 public:
 	TransformImpl() : Transform(getTransformOperation(ETransformType::Free)) {}
-
-	I3T_TRANSFORM_CLONE(ETransformType::Free)
 
 	bool isValid() const override
 	{
@@ -185,8 +166,6 @@ public:
 		enableSynergies();
 	}
 
-	I3T_TRANSFORM_CLONE(ETransformType::Scale)
-
 	bool isValid() const override;
 	void initDefaults() override;
 
@@ -215,8 +194,6 @@ public:
 		m_hasMenuSynergies = true;
 		enableSynergies();
 	}
-
-	I3T_TRANSFORM_CLONE(ETransformType::EulerX)
 
 	bool isValid() const override;
 	void initDefaults() override;
@@ -249,8 +226,6 @@ public:
 		enableSynergies();
 	}
 
-	I3T_TRANSFORM_CLONE(ETransformType::EulerY)
-
 	bool isValid() const override;
 	void initDefaults() override;
 
@@ -282,8 +257,6 @@ public:
 		enableSynergies();
 	}
 
-	I3T_TRANSFORM_CLONE(ETransformType::EulerZ)
-
 	bool isValid() const override;
 	void initDefaults() override;
 
@@ -303,8 +276,6 @@ template <> class TransformImpl<ETransformType::Translation> : public Transform
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Translation)) {}
 
-	I3T_TRANSFORM_CLONE(ETransformType::Translation)
-
 	bool isValid() const override;
 	void initDefaults() override;
 
@@ -322,8 +293,6 @@ template <> class TransformImpl<ETransformType::AxisAngle> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::AxisAngle)) {}
-
-	I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
 
 	bool isValid() const override;
 	void initDefaults() override;
@@ -357,8 +326,6 @@ public:
 		enableSynergies(); ///> PF: enableSynergies(); means "normalize" the set
 		                   /// quaternion
 	}
-
-	I3T_TRANSFORM_CLONE(ETransformType::Quat)
 
 	/**
 	 * \brief Is the quaternion normalized?
@@ -399,8 +366,6 @@ public:
 		enableSynergies();
 	} // PF> enableSynergies(); // means manage symmetric frustum
 
-	I3T_TRANSFORM_CLONE(ETransformType::Ortho)
-
 	bool isValid() const override;
 	void initDefaults() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -419,8 +384,6 @@ template <> class TransformImpl<ETransformType::Perspective> : public Transform
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Perspective)) {}
 
-	I3T_TRANSFORM_CLONE(ETransformType::Perspective)
-
 	bool isValid() const override;
 	void initDefaults() override;
 
@@ -437,8 +400,6 @@ public:
 		m_hasMenuSynergies = true;
 		enableSynergies();
 	} // PF> enableSynergies(); // means manage symmetric frustum
-
-	I3T_TRANSFORM_CLONE(ETransformType::Frustum)
 
 	bool isValid() const override;
 	void initDefaults() override;
@@ -462,8 +423,6 @@ template <> class TransformImpl<ETransformType::LookAt> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::LookAt)) {}
-
-	I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 
 	bool isValid() const override;
 	void initDefaults() override;

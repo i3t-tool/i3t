@@ -17,12 +17,6 @@ void Model::updateValues(int inputIndex)
 	Node::updateValues(inputIndex); // Callback
 }
 
-Ptr<Node> Model::clone()
-{
-	/// \todo MH - assign model on clone
-	return GraphManager::createModel();
-}
-
 void Model::onUnplugInput(size_t index)
 {
 	m_modelMatrix = glm::mat4(1.0f);

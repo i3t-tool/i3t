@@ -11,11 +11,3 @@ template <typename T> using Ptr = std::shared_ptr<T>;
 template <typename T> using UPtr = std::unique_ptr<T>;
 
 template <typename T> using WPtr = std::weak_ptr<T>;
-
-//
-
-template <typename BaseClass> class ICloneable
-{
-public:
-	virtual Ptr<BaseClass> clone() = 0;
-};
