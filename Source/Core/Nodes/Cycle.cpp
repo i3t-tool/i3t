@@ -13,11 +13,6 @@ Ptr<Cycle> Builder::createCycle()
 	return ret;
 }
 
-Ptr<Node> Cycle::clone()
-{
-	return Builder::createCycle();
-}
-
 void Cycle::update(double deltaSeconds)
 {
 	if (!m_isRunning)

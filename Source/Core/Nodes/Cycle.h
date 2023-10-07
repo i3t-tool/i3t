@@ -43,8 +43,6 @@ public:
 public:
 	Cycle() : Node(&g_CycleProperties) {}
 
-	Ptr<Node> clone() override;
-
 	void update(double deltaSeconds);
 
 	void play();

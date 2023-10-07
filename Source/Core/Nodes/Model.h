@@ -15,7 +15,6 @@ public:
 	glm::mat4 m_modelMatrix{};
 
 	void updateValues(int inputIndex = 0) override;
-	Ptr<Node> clone() override;
 
 	void onUnplugInput(size_t index) override;
 

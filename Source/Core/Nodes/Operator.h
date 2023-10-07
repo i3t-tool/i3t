@@ -53,21 +53,6 @@ public:
 	Operator();
 	~Operator() override = default;
 
-	Ptr<Node> clone() override
-	{
-		auto node = Builder::createOperator<T>();
-
-		if (m_operation->isConstructor)
-		{
-			for (auto i = 0L; i < m_internalData.size(); ++i)
-			{
-				node->getInternalData() = m_internalData[i];
-			}
-		}
-
-		return node;
-	}
-
 	/**
 	 * Implementation of virtual function Node::updateValues(int).
 	 *

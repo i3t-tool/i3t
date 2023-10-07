@@ -56,7 +56,7 @@ inline constexpr size_t I3T_DATA2 = 2;
 /**
  * Base class interface for all boxes.
  */
-class Node : public ICloneable<Node>, public std::enable_shared_from_this<Node>
+class Node : public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
 	friend class Pin;
