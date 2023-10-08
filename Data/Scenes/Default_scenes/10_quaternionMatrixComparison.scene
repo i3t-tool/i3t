@@ -1,5 +1,4 @@
 {
-    "readOnly": true,
     "resources": {
         "imported": []
     },
@@ -44,7 +43,7 @@
     "workspace": {
         "operators": [
             {
-                "id": 830,
+                "id": 529,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -55,7 +54,7 @@
                 "type": "FloatSinCos"
             },
             {
-                "id": 827,
+                "id": 533,
                 "label": "dělitel 2",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -68,7 +67,7 @@
                 "value": 2.0
             },
             {
-                "id": 800,
+                "id": 536,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -79,7 +78,7 @@
                 "type": "Vector3ToFloats"
             },
             {
-                "id": 817,
+                "id": 541,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -90,7 +89,7 @@
                 "type": "NormalizeVector3"
             },
             {
-                "id": 834,
+                "id": 544,
                 "label": "Úhel / 2",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -102,7 +101,7 @@
                 "type": "FloatDivFloat"
             },
             {
-                "id": 820,
+                "id": 548,
                 "label": "Osa otáčení",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -119,7 +118,7 @@
                 ]
             },
             {
-                "id": 838,
+                "id": 551,
                 "label": " rotace jako rotační matice",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -131,7 +130,7 @@
                 "type": "MakeAxisAngle"
             },
             {
-                "id": 823,
+                "id": 555,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -142,7 +141,7 @@
                 "type": "Vector3MulFloat"
             },
             {
-                "id": 805,
+                "id": 559,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -153,7 +152,7 @@
                 "type": "FloatsToQuat"
             },
             {
-                "id": 814,
+                "id": 565,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -164,7 +163,7 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 811,
+                "id": 568,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -177,7 +176,7 @@
         ],
         "sequences": [
             {
-                "id": 842,
+                "id": 571,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -188,7 +187,7 @@
                 "transforms": []
             },
             {
-                "id": 848,
+                "id": 577,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -199,7 +198,7 @@
                 "transforms": []
             },
             {
-                "id": 854,
+                "id": 583,
                 "label": "Společný posun obou kostek",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -210,12 +209,12 @@
                 ],
                 "transforms": [
                     {
-                        "id": 860,
+                        "id": 589,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            922.5616455078125,
+                            922.5615234375,
                             356.5291748046875
                         ],
                         "type": "Translation",
@@ -259,7 +258,7 @@
                 ]
             },
             {
-                "id": 861,
+                "id": 590,
                 "label": "Relativní posun zelené",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -270,7 +269,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 867,
+                        "id": 596,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -321,7 +320,7 @@
         ],
         "cycles": [
             {
-                "id": 868,
+                "id": 597,
                 "label": "cycle - Úhel natočení",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -331,39 +330,20 @@
                     159.11614990234376
                 ],
                 "from": 0.0,
-                "to": 10.0,
+                "to": 6.283180236816406,
                 "manualStep": 0.10000000149011612,
                 "step": 0.699999988079071,
                 "stepDuration": 0.5,
-                "smooth": true
+                "smooth": true,
+                "isRunning": true,
+                "mode": 1
             }
         ],
         "cameras": [],
         "screens": [],
         "models": [
             {
-                "id": 884,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1528.06591796875,
-                    142.2666473388672
-                ],
-                "model": "default_cube",
-                "visible": true,
-                "showAxes": true,
-                "opaque": true,
-                "opacity": 0.5,
-                "tint": [
-                    0.64000004529953,
-                    0.64000004529953,
-                    0.9599999785423279
-                ],
-                "tintStrength": 1.0
-            },
-            {
-                "id": 886,
+                "id": 615,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -382,140 +362,161 @@
                     0.64000004529953
                 ],
                 "tintStrength": 1.0
+            },
+            {
+                "id": 613,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1528.06591796875,
+                    142.2666473388672
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    0.64000004529953,
+                    0.64000004529953,
+                    0.9599999785423279
+                ],
+                "tintStrength": 1.0
             }
         ],
         "transforms": [],
         "edges": [
             [
-                834,
+                544,
                 0,
-                830,
+                529,
                 0
             ],
             [
-                823,
+                555,
                 0,
-                800,
+                536,
                 0
             ],
             [
-                820,
+                548,
                 0,
-                817,
+                541,
                 0
             ],
             [
-                868,
+                597,
                 0,
-                834,
+                544,
                 0
             ],
             [
-                827,
+                533,
                 0,
-                834,
+                544,
                 1
             ],
             [
-                868,
+                597,
                 0,
-                838,
+                551,
                 0
             ],
             [
-                817,
+                541,
                 0,
-                838,
+                551,
                 1
             ],
             [
-                854,
+                529,
                 0,
-                842,
+                555,
                 0
             ],
             [
-                814,
+                541,
                 0,
-                842,
+                555,
                 1
             ],
             [
-                842,
+                536,
                 0,
-                884,
+                559,
                 0
             ],
             [
-                830,
-                0,
-                823,
-                0
-            ],
-            [
-                817,
-                0,
-                823,
-                1
-            ],
-            [
-                800,
-                0,
-                805,
-                0
-            ],
-            [
-                800,
+                536,
                 1,
-                805,
+                559,
                 1
             ],
             [
-                800,
+                536,
                 2,
-                805,
+                559,
                 2
             ],
             [
-                830,
+                529,
                 1,
-                805,
+                559,
                 3
             ],
             [
-                811,
+                568,
                 0,
-                814,
+                565,
                 0
             ],
             [
-                805,
+                559,
                 0,
-                811,
+                568,
                 0
             ],
             [
-                861,
+                583,
                 0,
-                848,
+                571,
                 0
             ],
             [
-                838,
+                565,
                 0,
-                848,
+                571,
                 1
             ],
             [
-                848,
+                590,
                 0,
-                886,
+                577,
                 0
             ],
             [
-                854,
+                551,
                 0,
-                861,
+                577,
+                1
+            ],
+            [
+                583,
+                0,
+                590,
+                0
+            ],
+            [
+                577,
+                0,
+                615,
+                0
+            ],
+            [
+                571,
+                0,
+                613,
                 0
             ]
         ],
@@ -526,7 +527,7 @@
                 -309.91204833984377
             ],
             "Max": [
-                1718.1947021484376,
+                1675.1588134765626,
                 936.8986206054688
             ]
         }

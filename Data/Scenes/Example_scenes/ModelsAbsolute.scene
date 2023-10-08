@@ -2,22 +2,49 @@
     "resources": {
         "imported": []
     },
-    "mainScene_cameraMode": "ORBIT",
-    "mainScene_orbitCameraRotationX": -89.12994384765625,
-    "mainScene_orbitCameraRotationY": 56.10000228881836,
-    "mainScene_trackballCameraRotation": "[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]",
-    "mainScene_iorbitCameraRadius": 13.563648223876954,
-    "mainScene_iorbitCameraPivot": "[4.848966598510742,-0.2872302234172821,1.9607208967208863]",
-    "mainScene_lightFollowsCamera": true,
-    "camera_fov": 90.0,
-    "camera_zNear": 0.20000000298023225,
-    "camera_zFar": 270.0,
-    "manipulator_enabled": true,
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -90.0,
+                "orbitCameraRotationY": 30.0,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    3.516000509262085,
+                    -0.3637307584285736,
+                    0.21000003814697269
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 50,
+                "id": 1371,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -27,7 +54,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 56,
+                        "id": 1377,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -76,7 +103,7 @@
                 ]
             },
             {
-                "id": 78,
+                "id": 1378,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -86,7 +113,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 84,
+                        "id": 1384,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -135,7 +162,7 @@
                 ]
             },
             {
-                "id": 57,
+                "id": 1385,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -145,7 +172,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 63,
+                        "id": 1391,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -194,7 +221,7 @@
                 ]
             },
             {
-                "id": 8,
+                "id": 1392,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -204,7 +231,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 14,
+                        "id": 1398,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -253,7 +280,7 @@
                 ]
             },
             {
-                "id": 85,
+                "id": 1399,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -263,7 +290,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 91,
+                        "id": 1405,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -312,7 +339,7 @@
                 ]
             },
             {
-                "id": 15,
+                "id": 1406,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -322,7 +349,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 21,
+                        "id": 1412,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -371,7 +398,7 @@
                 ]
             },
             {
-                "id": 71,
+                "id": 1413,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -381,7 +408,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 77,
+                        "id": 1419,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -430,7 +457,7 @@
                 ]
             },
             {
-                "id": 64,
+                "id": 1420,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -440,7 +467,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 70,
+                        "id": 1426,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -489,7 +516,7 @@
                 ]
             },
             {
-                "id": 1,
+                "id": 1427,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -499,7 +526,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 7,
+                        "id": 1433,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -548,7 +575,7 @@
                 ]
             },
             {
-                "id": 22,
+                "id": 1434,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -558,7 +585,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 28,
+                        "id": 1440,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -607,7 +634,7 @@
                 ]
             },
             {
-                "id": 29,
+                "id": 1441,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -617,7 +644,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 35,
+                        "id": 1447,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -666,7 +693,7 @@
                 ]
             },
             {
-                "id": 36,
+                "id": 1448,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -676,7 +703,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 42,
+                        "id": 1454,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -725,7 +752,7 @@
                 ]
             },
             {
-                "id": 43,
+                "id": 1455,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -735,7 +762,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 49,
+                        "id": 1461,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -789,7 +816,7 @@
         "screens": [],
         "models": [
             {
-                "id": 94,
+                "id": 1462,
                 "label": "Axes",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -811,7 +838,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 96,
+                "id": 1464,
                 "label": "Teapot",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -833,7 +860,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 98,
+                "id": 1466,
                 "label": "Suzanne",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -855,7 +882,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 100,
+                "id": 1468,
                 "label": "ArrowZ",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -877,7 +904,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 104,
+                "id": 1470,
                 "label": "Bunny",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -899,7 +926,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 106,
+                "id": 1472,
                 "label": "Wooden Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -921,7 +948,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 108,
+                "id": 1474,
                 "label": "ArrowY",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -943,7 +970,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 110,
+                "id": 1476,
                 "label": "Sphere",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -965,7 +992,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 114,
+                "id": 1478,
                 "label": "Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -987,7 +1014,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 116,
+                "id": 1480,
                 "label": "ArrowX",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -1009,7 +1036,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 92,
+                "id": 1482,
                 "label": "Metal Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -1031,7 +1058,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 112,
+                "id": 1484,
                 "label": "Duck",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -1053,7 +1080,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 102,
+                "id": 1486,
                 "label": "Plane",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -1078,83 +1105,94 @@
         "transforms": [],
         "edges": [
             [
-                29,
+                1441,
                 0,
-                94,
+                1462,
                 0
             ],
             [
-                43,
+                1455,
                 0,
-                96,
+                1464,
                 0
             ],
             [
-                64,
+                1420,
                 0,
-                98,
+                1466,
                 0
             ],
             [
-                22,
+                1434,
                 0,
-                100,
+                1468,
                 0
             ],
             [
-                71,
+                1413,
                 0,
-                104,
+                1470,
                 0
             ],
             [
-                1,
+                1427,
                 0,
-                106,
+                1472,
                 0
             ],
             [
-                15,
+                1406,
                 0,
-                108,
+                1474,
                 0
             ],
             [
-                50,
+                1371,
                 0,
-                110,
+                1476,
                 0
             ],
             [
-                8,
+                1392,
                 0,
-                114,
+                1478,
                 0
             ],
             [
-                85,
+                1399,
                 0,
-                116,
+                1480,
                 0
             ],
             [
-                36,
+                1448,
                 0,
-                92,
+                1482,
                 0
             ],
             [
-                57,
+                1385,
                 0,
-                112,
+                1484,
                 0
             ],
             [
-                78,
+                1378,
                 0,
-                102,
+                1486,
                 0
             ]
-        ]
+        ],
+        "zoom": 0.8885828852653503,
+        "workArea": {
+            "Min": [
+                -97.44436645507813,
+                59.38237380981445
+            ],
+            "Max": [
+                1219.2589111328126,
+                1200.525146484375
+            ]
+        }
     }
 }

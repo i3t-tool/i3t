@@ -2,22 +2,49 @@
     "resources": {
         "imported": []
     },
-    "mainScene_cameraMode": "ORBIT",
-    "mainScene_orbitCameraRotationX": -96.66993713378906,
-    "mainScene_orbitCameraRotationY": 50.88002014160156,
-    "mainScene_trackballCameraRotation": "[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]",
-    "mainScene_iorbitCameraRadius": 14.183504104614258,
-    "mainScene_iorbitCameraPivot": "[-2.1452550888061525,-1.6537396907806397,3.1636157035827638]",
-    "mainScene_lightFollowsCamera": true,
-    "camera_fov": 90.0,
-    "camera_zNear": 0.20000000298023225,
-    "camera_zFar": 270.0,
-    "manipulator_enabled": true,
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -90.0,
+                "orbitCameraRotationY": 30.0,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    -2.2560007572174074,
+                    -0.5923615097999573,
+                    0.3420000374317169
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1,
+                "id": 1488,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -28,7 +55,7 @@
                 "transforms": []
             },
             {
-                "id": 7,
+                "id": 1494,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -39,7 +66,7 @@
                 "transforms": []
             },
             {
-                "id": 13,
+                "id": 1500,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -50,7 +77,7 @@
                 "transforms": []
             },
             {
-                "id": 19,
+                "id": 1506,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -61,7 +88,7 @@
                 "transforms": []
             },
             {
-                "id": 25,
+                "id": 1512,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -72,7 +99,7 @@
                 "transforms": []
             },
             {
-                "id": 31,
+                "id": 1518,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -83,7 +110,7 @@
                 "transforms": []
             },
             {
-                "id": 37,
+                "id": 1524,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -94,7 +121,7 @@
                 "transforms": []
             },
             {
-                "id": 43,
+                "id": 1530,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -105,7 +132,7 @@
                 "transforms": []
             },
             {
-                "id": 49,
+                "id": 1536,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -116,7 +143,7 @@
                 "transforms": []
             },
             {
-                "id": 55,
+                "id": 1542,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -127,7 +154,7 @@
                 "transforms": []
             },
             {
-                "id": 61,
+                "id": 1548,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -138,7 +165,7 @@
                 "transforms": []
             },
             {
-                "id": 67,
+                "id": 1554,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -149,7 +176,7 @@
                 "transforms": []
             },
             {
-                "id": 73,
+                "id": 1560,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
@@ -159,7 +186,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 79,
+                        "id": 1566,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -208,7 +235,7 @@
                 ]
             },
             {
-                "id": 80,
+                "id": 1567,
                 "label": "dX",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -219,13 +246,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 86,
+                        "id": 1573,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            -357.0,
-                            379.0
+                            -357.99896240234377,
+                            378.71588134765627
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -268,7 +295,7 @@
                 ]
             },
             {
-                "id": 87,
+                "id": 1574,
                 "label": "dY",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -279,13 +306,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 93,
+                        "id": 1580,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            -358.0,
-                            553.0
+                            -357.99896240234377,
+                            552.8947143554688
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -328,7 +355,7 @@
                 ]
             },
             {
-                "id": 94,
+                "id": 1581,
                 "label": "Base",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -339,13 +366,13 @@
                 ],
                 "transforms": [
                     {
-                        "id": 100,
+                        "id": 1587,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            -353.0,
-                            197.0
+                            -352.760498046875,
+                            196.6793212890625
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -393,7 +420,7 @@
         "screens": [],
         "models": [
             {
-                "id": 101,
+                "id": 1588,
                 "label": "Plane",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -415,7 +442,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 103,
+                "id": 1590,
                 "label": "Axes",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -437,7 +464,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 105,
+                "id": 1592,
                 "label": "Teapot",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -459,7 +486,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 107,
+                "id": 1594,
                 "label": "Suzanne",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -481,7 +508,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 109,
+                "id": 1596,
                 "label": "ArrowZ",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -503,7 +530,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 111,
+                "id": 1598,
                 "label": "Bunny",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -525,7 +552,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 113,
+                "id": 1600,
                 "label": "Wooden Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -547,7 +574,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 115,
+                "id": 1602,
                 "label": "ArrowY",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -569,7 +596,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 117,
+                "id": 1604,
                 "label": "Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -591,7 +618,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 119,
+                "id": 1606,
                 "label": "ArrowX",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -613,7 +640,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 121,
+                "id": 1608,
                 "label": "Metal Box",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -635,7 +662,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 123,
+                "id": 1610,
                 "label": "Duck",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -657,7 +684,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 125,
+                "id": 1612,
                 "label": "Sphere",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -682,239 +709,250 @@
         "transforms": [],
         "edges": [
             [
-                94,
+                1581,
                 0,
-                1,
+                1488,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                1,
+                1488,
                 1
             ],
             [
-                1,
+                1488,
                 0,
-                7,
+                1494,
                 0
             ],
             [
+                1488,
                 1,
-                1,
-                7,
+                1494,
                 1
             ],
             [
-                7,
+                1494,
                 0,
-                13,
+                1500,
                 0
             ],
             [
-                7,
+                1494,
                 1,
-                13,
+                1500,
                 1
             ],
             [
-                73,
+                1560,
                 0,
-                19,
+                1506,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                19,
+                1506,
                 1
             ],
             [
-                19,
+                1506,
                 0,
-                25,
+                1512,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                25,
+                1512,
                 1
             ],
             [
-                25,
+                1512,
                 0,
-                31,
+                1518,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                31,
+                1518,
                 1
             ],
             [
-                61,
+                1548,
                 0,
-                37,
+                1524,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                37,
+                1524,
                 1
             ],
             [
-                37,
+                1524,
                 0,
-                43,
+                1530,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                43,
+                1530,
                 1
             ],
             [
-                43,
+                1530,
                 0,
-                49,
+                1536,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                49,
+                1536,
                 1
             ],
             [
-                67,
+                1554,
                 0,
-                55,
+                1542,
                 0
             ],
             [
-                80,
+                1567,
                 1,
-                55,
+                1542,
                 1
             ],
             [
-                73,
+                1560,
                 0,
-                61,
+                1548,
                 0
             ],
             [
-                87,
+                1574,
                 2,
-                61,
+                1548,
                 1
             ],
             [
-                61,
+                1548,
                 0,
-                67,
+                1554,
                 0
             ],
             [
-                87,
+                1574,
                 2,
-                67,
+                1554,
                 1
             ],
             [
-                94,
+                1581,
                 0,
-                73,
+                1560,
                 0
             ],
             [
-                87,
+                1574,
                 1,
-                73,
+                1560,
                 1
             ],
             [
-                55,
+                1542,
                 0,
-                101,
+                1588,
                 0
             ],
             [
-                13,
+                1500,
                 0,
-                103,
+                1590,
                 0
             ],
             [
-                49,
+                1536,
                 0,
-                105,
+                1592,
                 0
             ],
             [
-                43,
+                1530,
                 0,
-                107,
+                1594,
                 0
             ],
             [
-                7,
+                1494,
                 0,
-                109,
+                1596,
                 0
             ],
             [
-                37,
+                1524,
                 0,
-                111,
+                1598,
                 0
             ],
             [
-                25,
+                1512,
                 0,
-                113,
+                1600,
                 0
             ],
             [
-                1,
+                1488,
                 0,
-                115,
+                1602,
                 0
             ],
             [
-                73,
+                1560,
                 0,
-                117,
+                1604,
                 0
             ],
             [
-                94,
+                1581,
                 0,
-                119,
+                1606,
                 0
             ],
             [
-                31,
+                1518,
                 0,
-                121,
+                1608,
                 0
             ],
             [
-                61,
+                1548,
                 0,
-                123,
+                1610,
                 0
             ],
             [
-                67,
+                1554,
                 0,
-                125,
+                1612,
                 0
             ]
-        ]
+        ],
+        "zoom": 0.7635828852653503,
+        "workArea": {
+            "Min": [
+                -598.0142822265625,
+                -57.38609313964844
+            ],
+            "Max": [
+                934.23583984375,
+                1270.5640869140626
+            ]
+        }
     }
 }
