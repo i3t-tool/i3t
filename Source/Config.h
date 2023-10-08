@@ -55,6 +55,7 @@ struct Config
 	static std::string OFFICIAL_SITE;   ///< The official site
 	static std::string INFO_TEXT;       ///< The information text \todo Add year and
 	                                    ///< note of the continual development.
+	static std::string COPYRIGHT_TEXT;  ///< printed on the console
 	static glm::vec3 LINK_COLOR;
 	///< The url link (mailTo: and http:) color used in aboutForm.h \todo Move to
 	///< the config structure

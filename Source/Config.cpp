@@ -148,6 +148,14 @@ std::string Config::INFO_TEXT = "Learn geometric transformations.\n\n"
                                 "This tool is a result of master's thesis done "
                                 "at the Department of Computer "
                                 "Graphics and Interaction, FEL, CTU in Prague";
+std::string Config::COPYRIGHT_TEXT = "I3T - The Interactive Tool for Teaching Transformations\n\n"
+                                     "  Copyright(C) 2023 Martin Herich, Dan Rakusan, Adam Loucky, Jaroslav Holecek,\n"
+                                     "  Miroslav Muller, Filip Uhlik, Michal Folta, Lukas Pilka, Jaroslav Kolar,\n"
+                                     "  Petr Felkel.\n\n"
+                                     "  This program comes with ABSOLUTELY NO WARRANTY. This is free software,\n"
+                                     "  and you are welcome to redistribute it under certain conditions.\n"
+                                     "  For details, read the attached file COPYING.txt.\n";
+
 glm::vec3 Config::LINK_COLOR = glm::vec3(0.55f, 0.8f, 1.0f);
 
 std::string Config::DEF_DESC =

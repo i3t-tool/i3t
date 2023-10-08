@@ -125,6 +125,9 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
  */
 int main(int argc, char* argv[])
 {
+
+	std::cout << (Config::COPYRIGHT_TEXT);
+
 	// init the logging library
 	INIT_LOGGER(argc, argv);
 
