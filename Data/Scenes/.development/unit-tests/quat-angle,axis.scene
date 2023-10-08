@@ -1,0 +1,211 @@
+{
+    "resources": {
+        "imported": []
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 7,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    499.0,
+                    205.0
+                ],
+                "type": "NormalizeQuat"
+            },
+            {
+                "id": 10,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    733.0,
+                    305.0
+                ],
+                "type": "QuatToAngleAxis"
+            },
+            {
+                "id": 14,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    262.0,
+                    98.0
+                ],
+                "type": "QuatToQuat",
+                "value": [
+                    0.8700000047683716,
+                    0.0,
+                    0.0,
+                    1.1100000143051148
+                ]
+            },
+            {
+                "id": 1,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1039.0,
+                    270.0
+                ],
+                "type": "FloatToFloat",
+                "value": 1.3295488357543946
+            },
+            {
+                "id": 17,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    748.0,
+                    501.0
+                ],
+                "type": "QuatToFloatVec"
+            },
+            {
+                "id": 27,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1225.0,
+                    328.0
+                ],
+                "type": "AngleAxisToQuat"
+            },
+            {
+                "id": 4,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1037.0,
+                    370.0
+                ],
+                "type": "Vector3ToVector3",
+                "value": [
+                    1.000000238418579,
+                    0.0,
+                    0.0
+                ]
+            },
+            {
+                "id": 24,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1029.0,
+                    515.0
+                ],
+                "type": "FloatToFloat",
+                "value": 0.7870559692382813
+            },
+            {
+                "id": 37,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1253.0,
+                    568.0
+                ],
+                "type": "FloatVecToQuat"
+            },
+            {
+                "id": 21,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1027.0,
+                    615.0
+                ],
+                "type": "Vector3ToVector3",
+                "value": [
+                    0.6168816685676575,
+                    0.0,
+                    0.0
+                ]
+            }
+        ],
+        "sequences": [],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [],
+        "transforms": [],
+        "edges": [
+            [
+                14,
+                0,
+                7,
+                0
+            ],
+            [
+                7,
+                0,
+                10,
+                0
+            ],
+            [
+                10,
+                0,
+                1,
+                0
+            ],
+            [
+                7,
+                0,
+                17,
+                0
+            ],
+            [
+                1,
+                0,
+                27,
+                0
+            ],
+            [
+                4,
+                0,
+                27,
+                2
+            ],
+            [
+                10,
+                1,
+                4,
+                0
+            ],
+            [
+                17,
+                0,
+                24,
+                0
+            ],
+            [
+                24,
+                0,
+                37,
+                0
+            ],
+            [
+                21,
+                0,
+                37,
+                1
+            ],
+            [
+                17,
+                1,
+                21,
+                0
+            ]
+        ]
+    }
+}
