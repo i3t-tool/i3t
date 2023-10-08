@@ -2,79 +2,81 @@
 
 ## Reasons, Background and Story
 
-DIWNE was written as one UI part of I3T. On the other hand, intention was DIWNE as independent generally usable utility/library that is (only) also used in I3T. Graphical part of I3T is based on DearImgui library, therefore DIWNE is based on DearImgui as well.
+DIWNE was written as one part of the I3T user interface. On the other hand, DIWNE was intended as an independent general-purpose tool/library that is (only) used in I3T. The graphical part of I3T is based on the DearImgui library, so DIWNE is also based on DearImgui.
 
-DearImgui itself has no "node-editor" support. Other libraries based on providing node-editing has some limitations (some hard-coded graphical settings like margins etc., usually there is no support for "nodes inside other nodes" - this funcionality is necessary in I3T, more over other libraries often provide their own rendering function which can easily leads to uncompatibility with newer version of DearImgui)
+DearImgui itself has no support for a "node-editor". Other libraries based on providing node-editing have some limitations (some fixed graphical settings like borders etc., and usually no support for "nodes inside other nodes" - this functionality is necessary in I3T, plus other libraries often provide their own rendering functions, which can easily lead to incompatibility with newer versions of DearImgui).
 
-DIWNE is designed only as wrapper of DearImgui function (call DearImgui orginal function in right order). It provide absolute freedom in graphical setting of any part od node-editor as well as absolute freedom for re-setting actions possible with object in node editor. Default behavior is not hard-coded and is prepared to be (hopefully) easilly changed.
+DIWNE is designed only as a wrapper function of DearImgui (calling the original DearImgui functions in the correct order). It provides absolute freedom in the graphical setup of any part of the node-editor, as well as absolute freedom to override the actions possible with an object in the node-editor. The default behavior is not hard-coded and is ready to be (hopefully) easily changed.
 
-Benefits of DIWNE is high variability and only one dependence (DearImgui).
-TODO and improvements are in the end of this document.
+DIWNE has the advantage of high variability and only one dependency (DearImgui).
+TODOs and enhancements are described at the end of this document.
 
 ## Node editor
 
-Node editor is utitilty that provide organizing grafical view in graph style. Graph consist of nodes (verticies) that can be connected via links (edges). Content and graphical representation of nodes are up to you, as well as graphical representation of links.
+The node editor is a tool that allows you to arrange a graphical view in a graph style. A graph consists of nodes (vertices) that can be connected by links (edges). The content and graphical representation of the nodes is up to you, as is the graphical representation of the links.
 
-Nodes are placed in infinty 2D space and they are movable over this space within window, as well as you can move whole space. Nodes can overlap, as well as links.
+The nodes are placed in an infinite 2D space and can be moved around within the window, as well as the entire space. Nodes can overlap, as well as links.
 
-## Philosophy of DIWNE
+## Philosophy of the DIWNE Library
 
-DIWNE is "node editor" extension of DearImgui library. Base idea is not implement any additional function (such as rendering or input functions), but only wrap existing DearImgui functions. All DIWNE functions provide (just) right order of calling of DearImgui functions that leads to node editor behavior.
+DIWNE is a "node editor", an extension of the DearImgui library. The basic idea is not to implement any additional features (such as rendering or input functions), but only to wrap existing DearImgui features. All DIWNE functions provide (just) the correct order of calling DearImgui functions, which leads to the behavior of the node editor.
 
-DIWNE is coded in OOP style and all functions can be override. This allow you ulimited customization of view and behavior.
+DIWNE is coded in OOP style and all functions can be overridden. This allows unlimited customization of the view and behavior.
 
-DIWNE do not provide structure where are nodes and links stored. You can store them wherever you want as well as it is up to you call "draw" function on those you want to be drawn.
+DIWNE does not provide a structure for storing nodes and links. You can store them where you want, just as it is up to you to call the "draw" function on the ones you want to draw.
 
-## Base architecture of DIWNE
+## Basic architecture of DIWNE
 
-DIWNE is coded in OOP style and [Template method pattern](https://en.wikipedia.org/wiki/Template_method_pattern). That means, that DIWNE function implement right order of calling functions and you will fill in (override) function just for (for example) content of node.
+DIWNE is coded in the OOP style and [Template method pattern](https://en.wikipedia.org/wiki/Template_method_pattern). This means that DIWNE functions implement the correct order of function calls and you add (override), for example, a function just for the contents of a node.
 
-All objects have acces to "Diwne (see below)" object, so they can share information via it if needed.
+All objects have access to the "Diwne object (see below)", so they can share information through it if needed.
 
-Your objects for node, link, editor etc. will be inhereted from DIWNE objects and so they can add any atributes or functionality.
+Your objects for node, link, editor, etc. will be derived from the DIWNE objects, and can add any attributes or functions.
 
-Simplified procedure is override content() function of object and call drawDiwne() function in place in code where you want to draw it.
+A simplified approach is to override the content() function of the object and call drawDiwne() at the place in the code where you want to render it.
 
-Functions with "Diwne" in name ( drawDiwne(), xxxDiwne() etc. ) are not intended to override (but you can do it). Be aware what you are doing while overriding those functions.
+Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not meant to be overridden (but you can still do it). When overriding these functions, be aware of what you are doing.
 
 ### OOP structure
 - DiwneObject (see DiwneObject.h)
 
-	Class from with all DIWNE objects inherit. Provide base atributes:
+  The class from which all DIWNE objects inherit. Provides basic attributes:
 
-	- diwne : reference to "node-editor object" that represents whole node-editor
+	- diwne : a reference to a "node-editor object" that represents the entire node-editor.
 
-	Provides sharing inter-object information.
+  Provides information sharing between objects.
 
-	- m_idDiwne, m_labelDiwne, m_popupLabelDiwne : identification atributes used for creating ImGui id
+	- m_idDiwne, m_labelDiwne, m_popupLabelDiwne : identification attributes used to create the ImGui ID.
 
 	- m_inner_interaction_happen, m_inner_interaction_happen_previous_draw : interaction information 
 
-	- m_drawMode, m_selectable, m_isHeld, m_isDragged, etc. : actual usage information
+	- m_drawMode, m_selectable, m_isHeld, m_isDragged, etc. : current  usage information
+
+
+
 
 - Diwne (see diwne.h)
-	
-	Class that represents whole node-editor. Process "workarea" aka "2D space" operation.
 
-	Your main (node-editor) object will inherit from this and then override content() function with all content you want to see. When you want draw node-editor, call drawDiwne() on this object. 
+   	A class that represents the entire node editor. It handles the operation "workarea" aka "2D space".
 
-	Provide shared functions and informations and workarea information:
+	Your main object (node-editor) will inherit from this class and then override the content() function with all the content you want to display. When you want to render the node-editor, call the drawDiwne() function on this object. 
 
-	- mp_settingsDiwne : store infomration with setting (colors, margins, sizes etc.)
-	- m_diwneAction, m_diwneAction_previousFrame : actual and previous user action
-	- mp_lastActivePin, mp_lastActiveNode : last active objects used by user
-	- m_workAreaScreen, m_workAreaDiwne : what part of workarea is visible on screen. m_workAreaScreen is basiclly just window, m_workAreaDiwne depends on user translation of space (m_workAreaDiwne.Min), window size and zoom. See Diwne::updateWorkAreaRectangles()
-	- transform coordinates between ImGui-screen-workarea
+	PIt provides shared functions and information and workspace information:
+	- mp_settingsDiwne : stores setting information (colors, margins, sizes, etc.)
+	- m_diwneAction, m_diwneAction_previousFrame : current and previous user actions
+	- mp_lastActivePin, mp_lastActiveNode : last active objects that the user recently used
+	- m_workAreaScreen, m_workAreaDiwne : what part of the workspace is visible on the screen. The m_workAreaScreen is basically just a window, m_workAreaDiwne depends on the user's translation of the space (m_workAreaDiwne.Min), the window size and the zoom. See Diwne::updateWorkAreaRectangles()
+	- transform coordinates between ImGui-screen-workareas
 	- draw some basic icons
-	- bypass...() functions: name "bypass" is confusing a little bit. Wrap original ImGui functions which allows you to change default ImGui behavior by override bypass...() function. 
+	- Bypass...() function: the name "bypass" is a bit confusing. It wraps the original ImGui functions, allowing you to change the default ImGui behavior by overriding it. 
 
 - Node (see Node.h)
 	
-	Object representing node (vertex). Your Node will inherit from this object.
+	The object representing the node (vertex). Your node object will inherit from this Node object.
 
-	For draw node call drawDiwne() on object
+	To draw a node, call the drawDiwne() function on this object.
 
-	Node has graphical parts:
+	A node has graphical parts:
    ```
    -------------------
    |      Top        |
@@ -84,32 +86,36 @@ Functions with "Diwne" in name ( drawDiwne(), xxxDiwne() etc. ) are not intended
    |     Bottom      |
    -------------------
    ```
+   
+   To change the content of the node, define the functions topContent(), leftContent() etc..
 
-   For change content of Node override topContent(), leftContent() etc. functions.
+   The content() function is already prepared (see Node::content()), so you don't need to override it (if you don't want to).
 
-   content() function is already prepared (see Node::content()) so you need not override it (if you do not want).
+   The size of the node and its parts is updated at the end of the node drawing (see Node::updateSizes()).
 
-   Size of node and its parts are updated in the end of node drawing (see Node::updateSizes())
+ 
 
 - Pin (see Pin.h)
 
-	Object representing point (usualy square) from and to which link is connected. Pin will be probably part of your node (can be invisible) and link will lead to it.
+	An object representing a point (usually a square) from which and to which the links are connected. The pin is likely to be part of your node (it may be invisible) and the link will lead to it.
 
-	Pull the link from pin is possible by mouse and pin is only place from with it is possible (by default).
+	You can pull the link from the pin with the mouse, and the pin is the only place from which this is possible (by default).
 
-	Main atributes:
+	Main attributes:
 
-	- m_connectionPointDiwne : point to/from which will be link drawn (by default)
-
+	- m_connectionPointDiwne : the point to/from which the link will be pulled (by default).
+	
 - Link (see Link.h)
 
-	Object representing link (edge in graph). It is Bezier curve with four parameters - end points and one control point for each end point.
-
-
+	An object representing a connection (an edge in the graph). It is a Bezier curve with four parameters - two endpoints and one control point for each endpoint.
 
 ## TODO
-Some part of DIWNE are not well programmed and will be great to improve it:
-- Minimal working example
-- Re-name bypass functions
-- Proccesing of user action and inter-object interactions. Nowadays its very messy in different part of code and objects. It seems that good idea is only store information, that some action/interaction happens in particular object and leave reaction to this (and all other inter/actions that can happen in one frame) inter/action to the ond of frame-processing. With this aproach could be possible to create clear and easy to check (action to action) matrix. With this matrix will be possible easilly solve situation where two actions interfer. It violate ImGui philosophy, but in complicated (a lot of mutualy interacting objects) is very messy to react immediately after action in every single object, because this action can interfer with previous and/or subsequent events. 
-- Zooming of node-editor is now solved by increasing size on font and icons (and therfore whole nodes). It is not well worked aproach because it could affect other parts of application too and some unpredictible consequencies can happen. Better aproach provide for example https://github.com/thedmd/imgui-node-editor but resources demands are not known.  
+Some parts of DIWNE are not well programmed and it would be great to improve them:
+- A minimal example of how to work with the library
+- Renaming the bypass() functions
+- Handling user actions and interactions between objects. 
+
+There is currently a big mess in various parts of the code and objects. It seems like a good idea to just store the information that an action/interaction is taking place in a given object, and leave the response to that (and any other interactions that may take place in a single frame) interaction/action for the end of the frame processing.  
+
+With this approach, it would be possible to create a clear and easily auditable (action to action) matrix. Using this matrix, it would be easy to deal with situations where two actions interfere. This goes against the ImGui philosophy, but in a complicated environment (many interacting objects) it is very complicated to react immediately after an action in each individual object, as this action may interfere with previous and/or subsequent events. 
+- The zooming of the node editor is now solved by increasing the size of the font and icons (and thus the whole nodes). This is not a well thought out approach as it could affect other parts of the application and could have unpredictable consequences. A better approach is offered by https://github.com/thedmd/imgui-node-editor, for example, but the resource requirements are unknown.    
