@@ -67,91 +67,91 @@ enum class EOperatorType
 	Transpose,
 	Determinant,
 	MatrixMulMatrix,
-	MatrixAddMatrix,           // done SS
-	MatrixMulVector,           // done SS
-	VectorMulMatrix,           // done SS
-	MatrixMulFloat,            // done SS
-	VectorDotVector,           // done SS
-	VectorAddVector,           // done SS
-	VectorSubVector,           // done SS
-	VectorMulFloat,            // done SS
-	VectorPerspectiveDivision, // done SS
-	NormalizeVector,           // done JH
-	MixVector,                 // done SS
-	Vector3CrossVector3,       // done SS
-	Vector3DotVector3,         // done SS
-	Vector3AddVector3,         // done SS
-	Vector3SubVector3,         // done SS
-	Vector3MulFloat,           // done SS
-	NormalizeVector3,          // done SS
-	Vector3Length,             // done SS
-	ShowVector3,               // done SS
-	MixVector3,                // done SS
-	ConjQuat,                  // done SS
-	FloatVecToQuat,            // done SS
-	AngleAxisToQuat,           // done SS
-	VecVecToQuat,              // done SS
-	QuatToFloatVec,            // done SS
-	QuatToAngleAxis,           // done SS
-	QuatToEuler,               // done SS
-	EulerToQuat,               // done SS
-	QuatInverse,               // done SS
-	QuatSlerp,                 // done SS
-	QuatLongWaySlerp,          // done SS
-	QuatLerp,                  // done SS
-	FloatMulQuat,              // done SS
-	QuatMulQuat,               // done SS
-	QuatVecConjQuat,           // done SS
-	QuatLength,                // done SS
-	ClampFloat,                // done SS
-	FloatMulFloat,             // done SS
-	FloatDivFloat,             // done SS
-	FloatAddFloat,             // done SS
-	FloatPowFloat,             // done SS
-	MixFloat,                  // done SS
-	FloatSinCos,               // done SS
-	ASinACos,                  // done SS
-	Signum,                    // done SS
-	MatrixToVectors,           // done SS
-	Vectors3ToMatrix,          // done SS
-	VectorsToMatrix,           // done SS
-	MatrixToFloats,            // done SS
-	FloatsToMatrix,            // done SS
-	MatrixToTR,                // done SS
-	TRToMatrix,                // done SS
-	MatrixToQuat,              // done SS
-	QuatToMatrix,              // done SS
-	VectorToFloats,            // done SS
-	FloatsToVector,            // done SS
-	Vector3ToFloats,           // done SS
-	FloatsToVector3,           // done SS
-	VectorToVector3,           // done SS
-	Vector3ToVector,           // done SS
-	QuatToFloats,              // done SS
-	FloatsToQuat,              // done SS
-	NormalizeQuat,             // done SS
-	FloatToFloat,              // done SS
-	Vector3ToVector3,          // done JH
-	Vector4ToVector4,          // done JH
-	MatrixToMatrix,            // done JH
-	QuatToQuat,                // done SS
+	MatrixAddMatrix,
+	MatrixMulVector,
+	VectorMulMatrix,
+	MatrixMulFloat,
+	VectorDotVector,
+	VectorAddVector,
+	VectorSubVector,
+	VectorMulFloat,
+	VectorPerspectiveDivision,
+	NormalizeVector,
+	MixVector,
+	Vector3CrossVector3,
+	Vector3DotVector3,
+	Vector3AddVector3,
+	Vector3SubVector3,
+	Vector3MulFloat,
+	NormalizeVector3,
+	Vector3Length,
+	ShowVector3,
+	MixVector3,
+	ConjQuat,
+	FloatVecToQuat,
+	AngleAxisToQuat,
+	VecVecToQuat,
+	QuatToFloatVec,
+	QuatToAngleAxis,
+	QuatToEuler,
+	EulerToQuat,
+	QuatInverse,
+	QuatSlerp,
+	QuatLongWaySlerp,
+	QuatLerp,
+	FloatMulQuat,
+	QuatMulQuat,
+	QuatVecConjQuat,
+	QuatLength,
+	ClampFloat,
+	FloatMulFloat,
+	FloatDivFloat,
+	FloatAddFloat,
+	FloatPowFloat,
+	MixFloat,
+	FloatSinCos,
+	ASinACos,
+	Signum,
+	MatrixToVectors,
+	Vectors3ToMatrix,
+	VectorsToMatrix,
+	MatrixToFloats,
+	FloatsToMatrix,
+	MatrixToTR,
+	TRToMatrix,
+	MatrixToQuat,
+	QuatToMatrix,
+	VectorToFloats,
+	FloatsToVector,
+	Vector3ToFloats,
+	FloatsToVector3,
+	VectorToVector3,
+	Vector3ToVector,
+	QuatToFloats,
+	FloatsToQuat,
+	NormalizeQuat,
+	FloatToFloat,
+	Vector3ToVector3,
+	Vector4ToVector4,
+	MatrixToMatrix,
+	QuatToQuat,
 
 	// Transform matrices "constructors"
-	MakeTranslation, // done SS
-	MakeEulerX,      // done SS
-	MakeEulerY,      // done SS
-	MakeEulerZ,      // done SS
-	MakeScale,       // done SS
-	MakeAxisAngle,   // done SS
-	MakeOrtho,       // done SS
-	MakePerspective, // done SS
-	MakeFrustum,     // done SS
-	MakeLookAt,      // done SS
+	MakeTranslation,
+	MakeEulerX,
+	MakeEulerY,
+	MakeEulerZ,
+	MakeScale,
+	MakeAxisAngle,
+	MakeOrtho,
+	MakePerspective,
+	MakeFrustum,
+	MakeLookAt,
 
-	Screen, // done SS
-	Pulse   // done SS
+	Screen,
+	Pulse
 
-	// SS trackball (trackcube) is done, waiting for Core
+	// todo trackball (trackcube)
 };
 
 enum class ETransformType
