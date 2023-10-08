@@ -141,7 +141,7 @@ void AboutWindow::render()
 				ImGui::PopStyleColor();
 				ImGui::PopFont();
 
-				ImGui::Text("Copyright (C) 2023. Opensource under GNU GPL v3 License "
+				ImGui::Text("Copyright (C) 2023. Open source under GNU GPL v3.0 License "
 				            "(for details see the attached file COPYING.txt)");
 
 				ImGui::EndGroup();
