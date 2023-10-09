@@ -630,6 +630,8 @@ void Theme::initNames()
 	// All category keys must be I3T_PROPERTY_NAME_OFFSET characters long.
 	g_CategoryNames["glob_"] = "Global";
 	g_CategoryNames["tuts_"] = "Tutorials";
+	g_CategoryNames["star_"] = "Start Window";
+	g_CategoryNames["abut_"] = "About Window";
 	g_CategoryNames["npin_"] = "Node Editor Pins";
 	g_CategoryNames["ngen_"] = "Node Editor General";
 	g_CategoryNames["nops_"] = "Node Editor Operators";
@@ -639,7 +641,7 @@ void Theme::initNames()
 	g_CategoryNames["nscr_"] = "Node Editor ScreenNode";
 	g_CategoryNames["nlnk_"] = "Node Editor Link";
 
-	// Global colors.
+	// Global
 	g_ColorNames[EColor::Text] = "glob_Text";
 	g_ColorNames[EColor::Border] = "glob_Border";
 	g_ColorNames[EColor::WindowBackground] = "glob_Window Background";
@@ -649,11 +651,11 @@ void Theme::initNames()
 	g_ColorNames[EColor::ActiveColor] = "glob_Active Color";
 	g_ColorNames[EColor::TabColor] = "glob_Tab Color";
 	g_ColorNames[EColor::SceneViewBackground] = "glob_Tab SceneView Background";
-
 	g_ColorNames[EColor::DockTabActive] = "glob_Dock Active Color";
-
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";
+
+	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	// Tutorials
 	g_ColorNames[EColor::TutorialBgColor] = "tuts_Background";
@@ -670,6 +672,50 @@ void Theme::initNames()
 	g_ColorNames[EColor::TutorialButtonActive] = "tuts_Button Active";
 	g_ColorNames[EColor::TutorialButtonHovered] = "tuts_Button Hovered";
 	g_ColorNames[EColor::TutorialTaskBg] = "tuts_Task Background";
+
+
+	// Start Window
+	g_ColorNames[EColor::StartWindow_DescriptionBackground] = "star_Description Background";
+	g_ColorNames[EColor::StartWindow_WindowBackground] = "star_Window Background";
+	g_ColorNames[EColor::StartWindow_ScrollbarBackground] = "star_Scrollbar Background";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrab] = "star_Scrollbar Grab";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrabHovered] = "star_Scrollbar Grab Hovered";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrabActive] = "star_Scrollbar Grab Active";
+	g_ColorNames[EColor::StartWindow_Separator] = "star_Separator";
+	g_ColorNames[EColor::StartWindow_DefaultButton] = "star_Default Button";
+	g_ColorNames[EColor::StartWindow_NewSceneButton] = "star_New Scene Button";
+	g_ColorNames[EColor::StartWindow_NewSceneButtonFont] = "star_New Scene Button Font";
+	g_ColorNames[EColor::StartWindow_TitleFont] = "star_Title Font Color";
+	g_ColorNames[EColor::StartWindow_DescriptionFont] = "star_Description Font Color";
+	g_ColorNames[EColor::StartWindow_YourSceneWinBackground] = "star_Your Scene Section Background";
+
+	g_SizeNames[ESize::StartWindow_WinWidth] = "star_Window Width";
+	g_SizeNames[ESize::StartWindow_WinHeight] = "star_Window Height";
+	g_SizeNames[ESize::StartWindow_WinRounding] = "star_Window Rounding";
+	g_SizeNames[ESize::StartWindow_TitleVerticalOffset] = "star_Title Vertical Offset";
+	g_SizeNames[ESize::StartWindow_LeftBarWidth] = "star_Left Bar Width";
+	g_SizeNames[ESize::StartWindow_LoadButtonWidth] = "star_Load Button Width";
+	g_SizeNames[ESize::StartWindow_StartNewButtonWidth] = "star_Start New Button Width";
+	g_SizeNames[ESize::StartWindow_ButtonHeight] = "star_Button Height";
+	g_SizeNames[ESize::StartWindow_ThumbImageSize] = "star_I3T Image Size";
+	g_SizeNames[ESize::StartWindow_StartButtonWidth] = "star_Start Button Width";
+	g_SizeNames[ESize::StartWindow_FrameRounding] = "star_Frame Rounding";
+	g_SizeNames[ESize::StartWindow_ScrollbarSize] = "star_Scrollbar Size";
+	g_SizeNames[ESize::StartWindow_YourSceneWinRounding] = "star_Your Scene Section Rounding";
+	g_SizeNames[ESize::StartWindow_DotSize] = "star_Dot Size";
+	g_SizeNames[ESize::StartWindow_DotSpacing] = "star_Dot Spacing";
+
+	g_SizeVecNames[ESizeVec2::StartWindow_WinSize] = "star_Window Size";
+	g_SizeVecNames[ESizeVec2::StartWindow_LogoOffset] = "star_Logo Offset";
+	g_SizeVecNames[ESizeVec2::StartWindow_WinPadding] = "star_Window Padding";
+	g_SizeVecNames[ESizeVec2::StartWindow_LeftWinPadding] = "star_Left Window Padding";
+	g_SizeVecNames[ESizeVec2::StartWindow_RightWinOuterPadding] = "star_Right Window OuterPadding";
+	g_SizeVecNames[ESizeVec2::StartWindow_RightWinInnerPadding] = "star_Right Window InnerPadding";
+
+	// About Window
+	g_ColorNames[EColor::AboutWindow_BackgroundLeft] = "abut_AboutWindow BackgroundLeft";
+	g_ColorNames[EColor::AboutWindow_BackgroundRight] = "abut_AboutWindow BackgroundRight";
+	g_ColorNames[EColor::AboutWindow_Text] = "abut_AboutWindow Text";
 
 	// Node editor colors
 	// ------------------
@@ -695,10 +741,15 @@ void Theme::initNames()
 
 
 	// 2. General unspecified node
-	g_ColorNames[EColor::NodeBg] = "ngen_General node Background";
-	g_ColorNames[EColor::NodeHeader] = "ngen_General node Header";
-	g_ColorNames[EColor::NodeFont] = "ngen_General node font (text)";
-	g_ColorNames[EColor::Item_SelectedBorder] = "ngen_Item selected border";
+	g_ColorNames[EColor::NodeBg] = "ngen_General Node Background";
+	g_ColorNames[EColor::NodeHeader] = "ngen_General Node Header";
+	g_ColorNames[EColor::NodeFont] = "ngen_General Node Font (text)";
+	g_ColorNames[EColor::Item_SelectedBorder] = "ngen_Item Selected Border";
+	g_ColorNames[EColor::NodeBorder] = "ngen_Node Border";
+	g_ColorNames[EColor::NodeLODButtonColorText] = "ngen_LOD Button Text";
+	g_ColorNames[EColor::NodeLODButtonColor] = "ngen_LOD Button Color";
+	g_ColorNames[EColor::NodeLODButtonColorActive] = "ngen_LOD Button Active Color";
+	g_ColorNames[EColor::NodeLODButtonColorHovered] = "ngen_LOD Button Hover Color";
 
 	// 3. Operator
 	g_ColorNames[EColor::NodeBgOperator] = "nops_Operator Background";
@@ -710,21 +761,16 @@ void Theme::initNames()
 	// 4. Transforms
 	g_ColorNames[EColor::NodeBgTransformation] = "ntrs_Transform Background";
 	g_ColorNames[EColor::NodeHeaderTranformation] = "ntrs_Transform Header";
-	g_ColorNames[EColor::NodeBorder] = "ntrs_Transform Border";
-	g_ColorNames[EColor::NodeLODButtonColorText] = "ntrs_Transform LOD Button Text";
-	g_ColorNames[EColor::NodeLODButtonColor] = "ntrs_Transform LOD Button Color";
-	g_ColorNames[EColor::NodeLODButtonColorActive] = "ntrs_Transform LOD Button Active Color";
-	g_ColorNames[EColor::NodeLODButtonColorHovered] = "ntrs_Transform LOD Button Hover Color";
 	g_ColorNames[EColor::FloatBgTransformation] = "ntrs_Transform Float Background";
 	g_ColorNames[EColor::FloatBgTransformationActive] = "ntrs_Transform Float Active";
 	g_ColorNames[EColor::FloatBgTransformationHovered] = "ntrs_Transform Float Hovered";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] = "ntrs_Nodes_Transformation_ValidIcon_bgShape";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] = "ntrs_Nodes_Transformation_ValidIcon_bgInner";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] = "ntrs_Nodes_Transformation_ValidIcon_fgShape";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] = "ntrs_Nodes_Transformation_ValidIcon_fgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] = "ntrs_Nodes Transformation ValidIcon bgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] = "ntrs_Nodes Transformation ValidIcon bgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] = "ntrs_Nodes Transformation ValidIcon fgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] = "ntrs_Nodes Transformation ValidIcon fgInner";
 	// Padding stored as color - is multiplied by the fontSize in WorkspaceTransformation::topContent() diwne.DrawIcon()
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] = "ntrs_Nodes_Transformation_ValidIcon_padding";
-	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] = "ntrs_Nodes_Transformation_TrackingColor";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] = "ntrs_Nodes Transformation ValidIcon padding";
+	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] = "ntrs_Nodes Transformation TrackingColor";
 
 	// 5. Popups
 	g_ColorNames[EColor::Nodes_ConnectionPossible] = "npop_Connection is possible (text)";
@@ -732,15 +778,15 @@ void Theme::initNames()
 	g_ColorNames[EColor::Nodes_CreateNode] = "npop_Create node popup";
 
 	// Floats
-	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies_FloatBg";
-	g_ColorNames[EColor::Synergies_FloatBgHovered] = "nflo_Synergies_FloatBgHovered";
-	g_ColorNames[EColor::Synergies_FloatBgActive] = "nflo_Synergies_FloatBgActive";
+	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies FloatBg";
+	g_ColorNames[EColor::Synergies_FloatBgHovered] = "nflo_Synergies FloatBgHovered";
+	g_ColorNames[EColor::Synergies_FloatBgActive] = "nflo_Synergies FloatBgActive";
 
 	// Screen
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] = "nscr_Nodes_Screen_resizeBtn_bgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes_Screen_resizeBtn_bgInner";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes_Screen_resizeBtn_fgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes_Screen_resizeBtn_fgInner";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] = "nscr_Nodes Screen resizeBtn bgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes Screen resizeBtn bgInner";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes Screen resizeBtn fgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes Screen resizeBtn fgInner";
 
 	g_ColorNames[EColor::Nodes_Screen_noInput_background] = "nscr_Nodes_Screen_noInput_background";
 	g_ColorNames[EColor::Nodes_Screen_noInput_text] = "nscr_Nodes_Screen_noInput_text";
@@ -748,36 +794,14 @@ void Theme::initNames()
 	// Links
 	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
 
-	g_ColorNames[EColor::StartWindow_DescriptionBackground] = "glob_StartWindow_DescriptionBackground";
-	g_ColorNames[EColor::StartWindow_WindowBackground] = "glob_StartWindow_WinBackground";
-	g_ColorNames[EColor::StartWindow_ScrollbarBackground] = "glob_StartWindow_ScrollbarBackground";
-	g_ColorNames[EColor::StartWindow_ScrollbarGrab] = "glob_StartWindow_ScrollbarGrab";
-	g_ColorNames[EColor::StartWindow_ScrollbarGrabHovered] = "glob_StartWindow_ScrollbarGrabHovered";
-	g_ColorNames[EColor::StartWindow_ScrollbarGrabActive] = "glob_StartWindow_ScrollbarGrabActive";
-	g_ColorNames[EColor::StartWindow_Separator] = "glob_StartWindow_Separator";
-	g_ColorNames[EColor::StartWindow_DefaultButton] = "glob_StartWindow_DefaultButton";
-	g_ColorNames[EColor::StartWindow_NewSceneButton] = "glob_StartWindow_NewSceneButton";
-	g_ColorNames[EColor::StartWindow_NewSceneButtonFont] = "glob_StartWindow_NewSceneButtonFont";
-	g_ColorNames[EColor::StartWindow_TitleFont] = "glob_StartWindow_TitleFontColor";
-	g_ColorNames[EColor::StartWindow_DescriptionFont] = "glob_StartWindow_DescriptionFontColor";
-	g_ColorNames[EColor::StartWindow_YourSceneWinBackground] = "glob_StartWindow_YourSceneWinBackground";
-
-	g_ColorNames[EColor::AboutWindow_BackgroundLeft] = "glob_AboutWindow_BackgroundLeft";
-	g_ColorNames[EColor::AboutWindow_BackgroundRight] = "glob_AboutWindow_BackgroundRight";
-	g_ColorNames[EColor::AboutWindow_Text] = "glob_AboutWindow_Text";
-
-	/// \todo ???
-	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a
-	// color!)";
-
 	// Global spacing and other size properties.
 	g_SizeNames[ESize::Float_inactive_alphaMultiplicator] = "ngen_Float_inactive_alphaMultiplicator";
 
-	g_SizeNames[ESize::Nodes_Operators_Rounding] = "ngen_Nodes_Operators_Rounding";
-	g_SizeNames[ESize::Nodes_Sequence_Rounding] = "ngen_Nodes_Sequence_Rounding";
+	g_SizeNames[ESize::Nodes_Operators_Rounding] = "ngen_Nodes Operators Rounding";
+	g_SizeNames[ESize::Nodes_Sequence_Rounding] = "ngen_Nodes Sequence Rounding";
 	g_SizeNames[ESize::Nodes_LOD_Button_Rounding] = "ngen_Nodes LOD Button Rounding";
-	g_SizeNames[ESize::Nodes_Border_Rounding] = "ngen_Nodes_Border_Rounding";
-	g_SizeNames[ESize::Nodes_Border_Thickness] = "ngen_Nodes_Border_Thickness";
+	g_SizeNames[ESize::Nodes_Border_Rounding] = "ngen_Nodes Border Rounding";
+	g_SizeNames[ESize::Nodes_Border_Thickness] = "ngen_Nodes Border Thickness";
 
 	g_SizeNames[ESize::Nodes_Rounding] = "ngen_Nodes Rounding";
 	g_SizeNames[ESize::Nodes_FloatWidth] = "ngen_Nodes Float Width";
@@ -786,12 +810,12 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_LabelIndent] = "ngen_Pin labels Indent";
 	g_SizeNames[ESize::Nodes_HeaderLabelIndent] = "ngen_Header Label Indent";
-	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "ngen_Trackball button height";
+	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "ngen_Trackball Button Height";
 	g_SizeNames[ESize::Nodes_TrackBallSensitivity] = "ngen_Trackball Sensitivity";
 
-	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "ngen_Float inner padding";
+	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "ngen_Float Inner Padding";
 
-	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "ngen_Drag speed fo float";
+	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "ngen_Drag Speed fo Float";
 	g_SizeNames[ESize::Nodes_CtrlMultiplicator] = "ngen_CTRL Multiplicator";
 	g_SizeNames[ESize::Nodes_SHIFTMultiplicator] = "ngen_SHIFT Multiplicator";
 	g_SizeNames[ESize::Nodes_ALTMultiplicator] = "ngen_ALT Multiplicator";
@@ -800,15 +824,15 @@ void Theme::initNames()
 	g_SizeNames[ESize::Nodes_MiddleAlignment] = "ngen_Nodes Middle Alignment";
 	g_SizeNames[ESize::Nodes_OutputsAlignment] = "ngen_Nodes Outputs Alignment";
 
-	g_SizeNames[ESize::Nodes_leftSideSpacing] = "ngen_Nodes left side spacing";
-	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes right side spacing";
+	g_SizeNames[ESize::Nodes_leftSideSpacing] = "ngen_Nodes Left Side spacing";
+	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes Right Side spacing";
 
-	g_SizeNames[ESize::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes_Transformation_TrackingMarkSize";
+	g_SizeNames[ESize::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes Transformation TrackingMarkSize";
 
-	g_SizeNames[ESize::Default_VisiblePrecision] = "ngen_Nodes default visible precision";
-	g_SizeNames[ESize::Default_VisibleQuaternionPrecision] = "ngen_Nodes default visible precision for quaternions";
+	g_SizeNames[ESize::Default_VisiblePrecision] = "ngen_Nodes Default Visible Precision";
+	g_SizeNames[ESize::Default_VisibleQuaternionPrecision] = "ngen_Nodes Default Visible Precision For Quaternions";
 
-	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes default inactive part marker";
+	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes Default Inactive Part Marker";
 
 	g_SizeNames[ESize::Links_ControlpointsPositionFraction] =
 	    "ngen_Link x distance between controlpoint and start/end of link - "
@@ -818,31 +842,14 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Links_Thickness] = "ngen_Link Thickness";
 	g_SizeNames[ESize::Links_ThicknessSelectedBorder] = "ngen_Link Additional thickness when selected";
-	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links_selected_alpha";
+	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links Selected Alpha";
 
-	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins_IconPadding";
+	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins IconPadding";
 
-	g_SizeNames[ESize::StartWindow_WinWidth] = "glob_StartWindow_WinWidth";
-	g_SizeNames[ESize::StartWindow_WinHeight] = "glob_StartWindow_WinHeight";
-	g_SizeNames[ESize::StartWindow_WinRounding] = "glob_StartWindow_WinRounding";
-	g_SizeNames[ESize::StartWindow_TitleVerticalOffset] = "glob_StartWindow_TitleVerticalOffset";
-	g_SizeNames[ESize::StartWindow_LeftBarWidth] = "glob_StartWindow_LeftBarWidth";
-	g_SizeNames[ESize::StartWindow_LoadButtonWidth] = "glob_StartWindow_LoadButtonWidth";
-	g_SizeNames[ESize::StartWindow_StartNewButtonWidth] = "glob_StartWindow_StartNewButtonWidth";
-	g_SizeNames[ESize::StartWindow_ButtonHeight] = "glob_StartWindow_ButtonHeight";
-	g_SizeNames[ESize::StartWindow_ThumbImageSize] = "glob_StartWindow_ThumbImageSize";
-	g_SizeNames[ESize::StartWindow_StartButtonWidth] = "glob_StartWindow_StartButtonWidth";
-	g_SizeNames[ESize::StartWindow_FrameRounding] = "glob_StartWindow_FrameRounding";
-	g_SizeNames[ESize::StartWindow_ScrollbarSize] = "glob_StartWindow_ScrollbarSize";
-	g_SizeNames[ESize::StartWindow_YourSceneWinRounding] = "glob_StartWindow_YourSceneWinRounding";
-	g_SizeNames[ESize::StartWindow_DotSize] = "glob_StartWindow_DotSize";
-	g_SizeNames[ESize::StartWindow_DotSpacing] = "glob_StartWindow_DotSpacing";
+	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes Screen ResizeButtonSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes Sequence DummySpaceSize";
+	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode PositionShift";
 
-	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes_Screen_resizeButtonSize";
-	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes_Sequence_DummySpaceSize";
-	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode_positionShift";
-
-	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	g_SizeVecNames[ESizeVec2::Nodes_IconSize] = "ngen_Nodes Icon Size";
 	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] = "ngen_Nodes Pivot Alignment";
@@ -850,7 +857,7 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing] = "ngen_Nodes Items Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_FloatPadding] = "ngen_Nodes Float Padding";
 
-	g_SizeVecNames[ESizeVec2::Nodes_PivotSize] = "ngen_Nodes Pivot size";
+	g_SizeVecNames[ESizeVec2::Nodes_PivotSize] = "ngen_Nodes Pivot Size";
 
 	g_SizeVecNames[ESizeVec2::Nodes_InputsSize] = "ngen_Nodes Inputs Size";
 	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "ngen_Nodes Middle Size";
@@ -858,17 +865,10 @@ void Theme::initNames()
 
 	g_SizeVecNames[ESizeVec2::Nodes_LODButtonSize] = "ngen_Nodes LOD Button Size";
 
-	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle button size";
+	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle Button Size";
 	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "ngen_Nodes Screen Texture Size";
 
 	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
-
-	g_SizeVecNames[ESizeVec2::StartWindow_WinSize] = "glob_StartWindow_WinSize";
-	g_SizeVecNames[ESizeVec2::StartWindow_LogoOffset] = "glob_StartWindow_LogoOffset";
-	g_SizeVecNames[ESizeVec2::StartWindow_WinPadding] = "glob_StartWindow_WinPadding";
-	g_SizeVecNames[ESizeVec2::StartWindow_LeftWinPadding] = "glob_StartWindow_LeftWinPadding";
-	g_SizeVecNames[ESizeVec2::StartWindow_RightWinOuterPadding] = "glob_StartWindow_RightWinOuterPadding";
-	g_SizeVecNames[ESizeVec2::StartWindow_RightWinInnerPadding] = "glob_StartWindow_RightWinInnerPadding";
 }
 
 void Theme::apply()
