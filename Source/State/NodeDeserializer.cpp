@@ -263,8 +263,6 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 		node = maybeNode.value();
 	}
 
-	node->setSelected(true);
-	node->processSelect();
 	const auto coreNode = node->getNodebase();
 
 	assignCommon(value, node);
@@ -320,8 +318,6 @@ Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 
 	assignCommon(value, sequence);
 	assignSequence(value, sequence);
-	sequence->setSelected(true);
-	sequence->processSelect();
 	return sequence;
 }
 
@@ -339,8 +335,6 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 	}
 	auto node = *maybeNode;
 
-	node->setSelected(true);
-	node->processSelect();
 	const auto coreNode = node->getNodebase()->as<Core::Transform>();
 
 	assignCommon(value, node);
