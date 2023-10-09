@@ -21,7 +21,7 @@ AboutWindow::AboutWindow()
 void AboutWindow::render()
 {
 	// Set initial window size
-	ImVec2 windowSize = ImVec2(1100, 725);
+	ImVec2 windowSize = ImVec2(1100, 735);
 	static bool firstTime = true;
 	if (firstTime)
 	{
@@ -118,6 +118,7 @@ void AboutWindow::render()
 				ImGui::Text("Adam Loucký");
 				ImGui::Text("Miroslav Mueller");
 				ImGui::Text("Vít Zadina");
+				ImGui::Text("Filip´Uhlík");
 				ImGui::Text("");
 
 
