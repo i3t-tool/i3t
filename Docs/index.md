@@ -20,10 +20,14 @@ hero:
       link: /developer-guide/
 
 features:
-#  - title: Feature A
-#    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-#  - title: Feature B
-#    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-#  - title: Feature C
-#    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Interactive
+    details: Explore interactively the transformations used in 3D computer graphics.
+  - title: Import your models
+    details: Import your own models and explore them in 3D.
+  - title: Learn with examples 
+    details: Deeply understand the way transformations are applied - track their application step by step!
+  - title: Learn with tutorials
+    details: Use Tutorials to speed up learning theory and tool control.
+  - title: Experience an improved user interface
+    details: Toggle the level of detail to see different views of transformations. Adjust tool colors and shapes to your taste!
 ---
