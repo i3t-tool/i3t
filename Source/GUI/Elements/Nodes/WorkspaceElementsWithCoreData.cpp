@@ -65,6 +65,14 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
+	bool interaction_happen = false;
+
+	float zoom = diwne.getWorkAreaZoom();
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
+	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
+
 	// adding a border
 	diwne.AddRectDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBorder),
 	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawCornerFlags_All,
@@ -106,14 +114,7 @@ bool WorkspaceNodeWithCoreData::topContent()
 	ImGui::PopStyleColor(4);
 	ImGui::PopStyleVar();
 
-	ImGui::Indent((I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize)[0] - 5) * diwne.getWorkAreaZoom());
-
-	ImGui::SameLine();
-
-	bool interaction_happen = false;
-
-	float zoom = diwne.getWorkAreaZoom();
-	ImGuiStyle& style = ImGui::GetStyle();
+	ImGui::SameLine(0, style.FramePadding.x);
 
 	//	// Left frame padding, shouldn't be necessary as LabelText already includes frame padding
 	//	float paddingWidth = ImGui::GetStyle().FramePadding.x; // Already scaled
@@ -159,10 +160,6 @@ bool WorkspaceNodeWithCoreData::topContent()
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
-
-	// Adding dummy space for grabbing the header
-	ImGui::SameLine();
-	ImGui::Dummy(ImVec2(50 * zoom, 0)); /* dummy for snap some item for same space on left right of label  */
 
 	return interaction_happen;
 }

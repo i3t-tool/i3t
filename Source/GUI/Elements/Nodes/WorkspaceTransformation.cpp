@@ -1,6 +1,7 @@
 #include "WorkspaceTransformation.h"
 
 #include "../Windows/WorkspaceWindow.h"
+#include "GUI/Toolkit.h"
 #include "State/StateManager.h"
 #include "Tools.h"
 
@@ -45,16 +46,19 @@ bool WorkspaceTransformation::beforeContent()
 bool WorkspaceTransformation::topContent()
 {
 	bool interaction_happen = false;
+	ImGuiStyle& style = ImGui::GetStyle();
+
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeHeaderTranformation), I3T::getSize(ESize::Nodes_Rounding),
 	                         ImDrawCornerFlags_Top);
 
 	interaction_happen |= WorkspaceNodeWithCoreData::topContent();
-	ImGui::SameLine();
+	ImGui::SameLine(0, 0);
 
 	if (!isMatrixValid())
 	{
 		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
+
 		//     \todo JH Right Align
 		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX()-ImGui::GetStyle().ItemSpacing.x-1);
 		//    /* remove spacing after Dummy in
@@ -65,7 +69,8 @@ bool WorkspaceTransformation::topContent()
 		//    /*actual free space*/ - iconSize.x -
 		//    m_topOversizeSpace)*diwne.getWorkAreaZoom());
 
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
+		// Drawing the validity icon and moving it down vertically by FramePadding.y
+		GUI::startVerticalAlign(style.FramePadding.y);
 		diwne.DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
 		               /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
@@ -74,6 +79,11 @@ bool WorkspaceTransformation::topContent()
 		               ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
 		                   I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
 		               false);
+		GUI::endVerticalAlign();
+
+		// Frame padding x spacing gap at the end
+		ImGui::SameLine(0, 0);
+		ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
