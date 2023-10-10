@@ -132,7 +132,8 @@ bool WorkspaceNodeWithCoreData::topContent()
 	//	ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + style.FramePadding, cursorPos + textSize +
 	//  style.FramePadding, IM_COL32(0, 255, 255, 120));
 
-	ImGui::PushItemWidth(textSize.x + style.FramePadding.x * 2);
+	float labelWidth = textSize.x + style.FramePadding.x * 2;
+	ImGui::PushItemWidth(labelWidth);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
 	if (m_isLabelBeingEdited)
@@ -160,6 +161,22 @@ bool WorkspaceNodeWithCoreData::topContent()
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
+
+	float widthSoFar =
+	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
+
+	// Header extra space
+	float trailingDummyWidth = style.FramePadding.x / zoom;
+	if (m_headerMinWidth > 0)
+	{
+		float diff = m_headerMinWidth - widthSoFar;
+		if (diff > 0)
+		{
+			trailingDummyWidth += diff;
+		}
+	}
+	ImGui::SameLine(0, 0);
+	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
 	return interaction_happen;
 }

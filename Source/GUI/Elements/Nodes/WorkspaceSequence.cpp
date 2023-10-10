@@ -11,6 +11,7 @@ WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
       m_isCameraSequence(isCameraSequence)
 {
 	updateDataItemsWidth();
+	m_headerMinWidth = 120;
 }
 
 bool WorkspaceSequence::allowDrawing()
