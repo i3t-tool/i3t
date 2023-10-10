@@ -27,6 +27,7 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
+	float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
 	bool m_isLabelBeingEdited = false;
 	bool m_isFirstDraw = true;
 	FloatPopupMode m_floatPopupMode;

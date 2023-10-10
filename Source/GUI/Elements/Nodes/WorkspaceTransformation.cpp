@@ -81,9 +81,9 @@ bool WorkspaceTransformation::topContent()
 		               false);
 		GUI::endVerticalAlign();
 
-		// Frame padding x spacing gap at the end
+		// 2x Frame padding x spacing gap at the end
 		ImGui::SameLine(0, 0);
-		ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+		ImGui::Dummy(ImVec2(2 * style.FramePadding.x, 0));
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
