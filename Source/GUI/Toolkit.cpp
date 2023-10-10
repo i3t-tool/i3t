@@ -167,6 +167,18 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 	}
 }
 
+void startVerticalAlign(float yOffset)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	ImGui::BeginGroup();
+	ImGui::Dummy(ImVec2(0, yOffset));
+}
+
+void endVerticalAlign()
+{
+	ImGui::EndGroup();
+	ImGui::PopStyleVar(1);
+}
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {
