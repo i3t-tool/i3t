@@ -1731,19 +1731,36 @@ bool drawDataQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const 
 	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	valueChanged = false;
+
 	ImGui::BeginGroup();
-	for (int columns = 0; columns < 4; columns++)
+
+	// Top labels
+	constexpr char const* labels[4] = {"x", "y", "z", "w"};
+	for (int column = 0; column < 4; column++)
 	{
-		valueOfChange[columns] = data[columns];
+		float labelHeight = ImGui::GetFontSize();
+		ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+		ImRect rect(cursorPos, cursorPos + ImVec2(dataWidth, labelHeight));
+		GUI::TextCentered(labels[column], rect, ImGui::GetColorU32(ImGuiCol_Text));
+		ImGui::Dummy(ImVec2(rect.GetWidth(), rect.GetHeight()));
+		if (column < 3)
+			ImGui::SameLine();
+	}
+
+	// Quat values
+	for (int column = 0; column < 4; column++)
+	{
+		valueOfChange[column] = data[column];
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
-		    valueOfChange[columns], dataState[columns], actualValueChanged);
+		    diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, column),
+		    valueOfChange[column], dataState[column], actualValueChanged);
 
 		if (actualValueChanged)
 			valueChanged = true;
-		if (columns < 3)
+		if (column < 3)
 			ImGui::SameLine();
 	}
+
 	ImGui::EndGroup();
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar();
