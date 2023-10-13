@@ -46,16 +46,17 @@ struct Config
 {
 	//@{
 	/** \name Text for the about window */
-	static std::string VERSION;         ///< The I3T version
-	static std::string AUTHOR;          ///< The author (Michla Folta)
-	static std::string MAIL;            ///< The author's mail
-	static std::string SUPERVISOR;      ///< The supervisor (PF)
-	static std::string SUPERVISOR_MAIL; ///< The supervisor's mail
-	static std::string WEB_LINK;        ///< The web link to the thesis page
-	static std::string OFFICIAL_SITE;   ///< The official site
-	static std::string INFO_TEXT;       ///< The information text \todo Add year and
-	                                    ///< note of the continual development.
-	static std::string COPYRIGHT_TEXT;  ///< printed on the console
+	static std::string VERSION;              ///< The I3T version
+	static std::string AUTHOR;               ///< The author (Michal Folta)
+	static std::string MAIL;                 ///< The author's mail
+	static std::string SUPERVISOR;           ///< The supervisor (PF)
+	static std::string SUPERVISOR_MAIL;      ///< The supervisor's mail
+	static std::string WEB_LINK;             ///< The web link to the thesis page
+	static std::string OFFICIAL_SITE;        ///< The official site
+	static std::string INFO_TEXT;            ///< The information text \todo Add year and
+	                                         ///< note of the continual development.
+	static std::string COPYRIGHT_TEXT;       ///< printed on the console
+	static std::string COPYRIGHT_TEXT_SHORT; ///< printed on the console
 	static glm::vec3 LINK_COLOR;
 	///< The url link (mailTo: and http:) color used in aboutForm.h \todo Move to
 	///< the config structure
