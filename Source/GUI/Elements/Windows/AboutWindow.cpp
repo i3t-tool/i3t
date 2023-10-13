@@ -118,7 +118,8 @@ void AboutWindow::render()
 				ImGui::Text("Adam Loucký");
 				ImGui::Text("Miroslav Mueller");
 				ImGui::Text("Vít Zadina");
-				ImGui::Text("Filip´Uhlík");
+				ImGui::Text("Filip Uhlík");
+				// ImGui::Text("Marek Nechanský"); // after addition of the Automatic box placement
 				ImGui::Text("");
 
 
@@ -143,7 +144,7 @@ void AboutWindow::render()
 				ImGui::PopFont();
 
 				ImGui::Text("Copyright (C) 2023. Open source under GNU GPL v3.0 License "
-				            "(for details see the attached file COPYING.txt)");
+				            "(for details see the attached file LICENSE.txt)");
 
 				ImGui::EndGroup();
 			}
