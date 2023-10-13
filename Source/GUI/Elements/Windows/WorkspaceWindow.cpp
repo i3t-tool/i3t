@@ -1799,18 +1799,30 @@ void WorkspaceWindow::showEditMenu()
 {
 	if (ImGui::BeginMenu("Edit"))
 	{
+		/*
 		if (ImGui::MenuItem("Undo"))
 		{
-			// B
-			/// \todo Undo.
-			// UndoRedo::undo();
+		    // B
+		    /// \todo Undo.
+		    // UndoRedo::undo();
 		}
 
 		if (ImGui::MenuItem("Redo"))
 		{
-			// N
-			/// \todo Redo.
-			// UndoRedo::redo();
+		    // N
+		    /// \todo Redo.
+		    // UndoRedo::redo();
+		}
+		 */
+
+		if (ImGui::MenuItem("Select all"))
+		{
+			g_workspaceDiwne->selectAll();
+		}
+
+		if (ImGui::MenuItem("Zoom all"))
+		{
+			g_workspaceDiwne->zoomToAll();
 		}
 
 		ImGui::EndMenu();
