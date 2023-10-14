@@ -59,6 +59,11 @@ colors:
     y: 0.137254909
     z: 0.137254909
     w: 1
+  glob_Selected node border:
+    x: 1
+    y: 0.913725495
+    z: 0
+    w: 0.509803951
   tuts_Background:
     x: 0.137254909
     y: 0.137254909
@@ -219,22 +224,22 @@ colors:
     y: 0.0980392173
     z: 0.0980392173
     w: 1
-  ngen_Item selected border:
+  ngen_Item Selected Border:
     x: 0.756736517
     y: 0.756736517
     z: 0.756736517
     w: 1
-  ngen_General node Background:
+  ngen_General Node Background:
     x: 0.19535929
     y: 0.19535929
     z: 0.19535929
     w: 1
-  ngen_General node Header:
+  ngen_General Node Header:
     x: 0.0196078438
     y: 0.34117648
     z: 0.0117647061
     w: 1
-  ngen_General node font (text):
+  ngen_General Node Font (text):
     x: 1
     y: 1
     z: 1
@@ -274,27 +279,27 @@ colors:
     y: 0.137254909
     z: 0.0901960805
     w: 1
-  ntrs_Transform Border:
+  ngen_Node Border:
     x: 0
     y: 0
     z: 0
     w: 0.278431386
-  ntrs_Transform LOD Button Text:
+  ngen_LOD Button Text:
     x: 1
     y: 1
     z: 1
     w: 1
-  ntrs_Transform LOD Button Color:
+  ngen_LOD Button Color:
     x: 0
     y: 0
     z: 0
     w: 0.100000001
-  ntrs_Transform LOD Button Active Color:
+  ngen_LOD Button Active Color:
     x: 0
     y: 0
     z: 0
     w: 0.0500000007
-  ntrs_Transform LOD Button Hover Color:
+  ngen_LOD Button Hover Color:
     x: 0
     y: 0
     z: 0
@@ -319,67 +324,77 @@ colors:
     y: 0.200000003
     z: 0.200000003
     w: 0
-  nflo_Synergies_FloatBg:
+  nflo_Synergies FloatBg:
     x: 0
     y: 0.27040112
     z: 0
     w: 1
-  nflo_Synergies_FloatBgHovered:
+  nflo_Synergies FloatBgHovered:
     x: 0.0565612987
     y: 0.53592813
     z: 0.0565612987
     w: 1
-  nflo_Synergies_FloatBgActive:
+  nflo_Synergies FloatBgActive:
     x: 0
     y: 0.702627957
     z: 0
     w: 1
-  nscr_Nodes_Screen_resizeBtn_bgShape:
+  nscr_Nodes Screen resizeBtn bgShape:
     x: 1
     y: 1
     z: 1
     w: 0.600000024
-  nscr_Nodes_Screen_resizeBtn_bgInner:
+  nscr_Nodes Screen resizeBtn bgInner:
     x: 0.400000006
     y: 0.200000003
     z: 0.200000003
     w: 0.600000024
-  nscr_Nodes_Screen_resizeBtn_fgShape:
+  nscr_Nodes Screen resizeBtn fgShape:
     x: 0.400000006
     y: 0.400000006
     z: 0.600000024
     w: 0.600000024
-  nscr_Nodes_Screen_resizeBtn_fgInner:
+  nscr_Nodes Screen resizeBtn fgInner:
     x: 0.400000006
     y: 0.400000006
     z: 0.600000024
     w: 0.600000024
-  ntrs_Nodes_Transformation_ValidIcon_bgShape:
+  nscr_Nodes_Screen_noInput_background:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.649999976
+  nscr_Nodes_Screen_noInput_text:
+    x: 1
+    y: 1
+    z: 1
+    w: 0.649999976
+  ntrs_Nodes Transformation ValidIcon bgShape:
     x: 1
     y: 0
     z: 0
     w: 1
-  ntrs_Nodes_Transformation_ValidIcon_bgInner:
+  ntrs_Nodes Transformation ValidIcon bgInner:
     x: 1
     y: 0
     z: 0
     w: 1
-  ntrs_Nodes_Transformation_ValidIcon_fgShape:
+  ntrs_Nodes Transformation ValidIcon fgShape:
     x: 1
     y: 1
     z: 1
     w: 1
-  ntrs_Nodes_Transformation_ValidIcon_fgInner:
+  ntrs_Nodes Transformation ValidIcon fgInner:
     x: 1
     y: 1
     z: 1
     w: 1
-  ntrs_Nodes_Transformation_ValidIcon_padding:
+  ntrs_Nodes Transformation ValidIcon padding:
     x: 0.874509811
     y: 0.768627465
     z: 0.886274517
     w: 0.768627465
-  ntrs_Nodes_Transformation_TrackingColor:
+  ntrs_Nodes Transformation TrackingColor:
     x: 0.300000012
     y: 0.300000012
     z: 0.100000001
@@ -449,17 +464,17 @@ colors:
     y: 0.0980392173
     z: 0.0980392173
     w: 1
-  abut_AboutWindow_BackgroundLeft:
+  abut_AboutWindow BackgroundLeft:
     x: 0.117647059
     y: 0.117647059
     z: 0.117647059
     w: 1
-  abut_AboutWindow_BackgroundRight:
+  abut_AboutWindow BackgroundRight:
     x: 0.137254909
     y: 0.137254909
     z: 0.137254909
     w: 1
-  abut_AboutWindow_Text:
+  abut_AboutWindow Text:
     x: 0.90196079
     y: 0.90196079
     z: 0.90196079
@@ -478,34 +493,35 @@ sizes:
   ngen_Nodes BorderWidth: 0
   ngen_Pin labels Indent: 12
   ngen_Header Label Indent: 2
-  ngen_Trackball button height: 20
+  ngen_Trackball Button Height: 20
   ngen_Trackball Sensitivity: 5
-  ngen_Float inner padding: 1
-  ngen_Drag speed fo float: 0.0149999997
+  ngen_Float Inner Padding: 1
+  ngen_Drag Speed fo Float: 0.0149999997
   ngen_CTRL Multiplicator: 0.100000001
   ngen_SHIFT Multiplicator: 10
   ngen_ALT Multiplicator: 0.00999999978
   ngen_Nodes Inputs Alignment: 0
   ngen_Nodes Middle Alignment: 0
   ngen_Nodes Outputs Alignment: 0
-  ngen_Nodes left side spacing: 3
-  ngen_Nodes right side spacing: 3
-  ngen_Nodes default visible precision: 1
-  ngen_Nodes default visible precision for quaternions: 4
-  ngen_Nodes default inactive part marker: 0
+  ngen_Nodes Left Side spacing: 3
+  ngen_Nodes Right Side spacing: 3
+  glob_Selected node border thickness: 2.5
+  ngen_Nodes Default Visible Precision: 1
+  ngen_Nodes Default Visible Precision For Quaternions: 4
+  ngen_Nodes Default Inactive Part Marker: 0
   ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
   ngen_Link minimal x distance between controlpoint and start/end of link: 50
   ngen_Link Thickness: 5
   ngen_Link Additional thickness when selected: 2
-  ngen_Pins_IconPadding: 2
-  ngen_Links_selected_alpha: 0.800000012
+  ngen_Pins IconPadding: 2
+  ngen_Links Selected Alpha: 0.800000012
   ngen_Float_inactive_alphaMultiplicator: 0.5
-  ngen_Nodes_Operators_Rounding: 5
-  ngen_Nodes_Sequence_Rounding: 5
+  ngen_Nodes Operators Rounding: 5
+  ngen_Nodes Sequence Rounding: 5
   ngen_Nodes LOD Button Rounding: 5
-  ngen_Nodes_Border_Rounding: 5
-  ngen_Nodes_Border_Thickness: 2
-  ngen_Nodes_Transformation_TrackingMarkSize: 5
+  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Border Thickness: 2
+  ngen_Nodes Transformation TrackingMarkSize: 5
   star_Window Width: 850
   star_Window Height: 500
   star_Window Rounding: 6
@@ -520,7 +536,7 @@ sizes:
   star_Scrollbar Size: 14
   star_Your Scene Section Rounding: 6
 size vectors:
-  ngen_Nodes Pivot size:
+  ngen_Nodes Pivot Size:
     x: 0
     y: 0
   glob_Windows Frame Padding:
@@ -553,7 +569,7 @@ size vectors:
   ngen_Nodes Icon Size:
     x: 12
     y: 12
-  ngen_Nodes Float Cycle button size:
+  ngen_Nodes Float Cycle Button Size:
     x: 32
     y: 32
   ngen_Nodes Screen Texture Size:
@@ -562,30 +578,30 @@ size vectors:
   ngen_Builder Item Spacing:
     x: 0
     y: 0
-  ngen_Nodes_Screen_resizeButtonSize:
+  ngen_Nodes Screen ResizeButtonSize:
     x: 20
     y: 20
-  ngen_Nodes_Sequence_DummySpaceSize:
+  ngen_Nodes Sequence DummySpaceSize:
     x: 100
     y: 1
-  ngen_NewNode_positionShift:
+  ngen_NewNode PositionShift:
     x: 10
     y: 0
-  glob_StartWindow_WinSize:
+  star_Window Size:
     x: 1020
     y: 600
-  glob_StartWindow_LogoOffset:
+  star_Logo Offset:
     x: 5
     y: -20
-  glob_StartWindow_WinPadding:
+  star_Window Padding:
     x: 0
     y: 0
-  glob_StartWindow_LeftWinPadding:
+  star_Left Window Padding:
     x: 30
     y: 30
-  glob_StartWindow_RightWinOuterPadding:
+  star_Right Window OuterPadding:
     x: 10
     y: 10
-  glob_StartWindow_RightWinInnerPadding:
+  star_Right Window InnerPadding:
     x: 10
     y: 10
