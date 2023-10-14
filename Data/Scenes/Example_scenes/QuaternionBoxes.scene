@@ -43,197 +43,9 @@
     "workspace": {
         "operators": [
             {
-                "id": 676,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2556.786376953125,
-                    32.02627944946289
-                ],
-                "type": "AngleAxisToQuat",
-                "halfAngle": false
-            },
-            {
-                "id": 672,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2337.534423828125,
-                    32.01821517944336
-                ],
-                "type": "FloatVecToQuat"
-            },
-            {
-                "id": 681,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2355.478515625,
-                    134.9857635498047
-                ],
-                "type": "QuatToFloatVec"
-            },
-            {
-                "id": 791,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    3079.038330078125,
-                    211.0045166015625
-                ],
-                "type": "QuatToMatrix"
-            },
-            {
-                "id": 766,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2528.0283203125,
-                    136.99435424804688
-                ],
-                "type": "QuatToAngleAxis"
-            },
-            {
-                "id": 762,
+                "id": 703,
                 "render": true,
                 "numberOfDecimals": 4,
-                "LOD": "Full",
-                "position": [
-                    3085.028564453125,
-                    343.93096923828127
-                ],
-                "type": "QuatVecConjQuat"
-            },
-            {
-                "id": 696,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    3071.8828125,
-                    39.875267028808597
-                ],
-                "type": "QuatToEuler"
-            },
-            {
-                "id": 688,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2822.42822265625,
-                    35.18742370605469
-                ],
-                "type": "FloatMulQuat"
-            },
-            {
-                "id": 753,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2365.712158203125,
-                    319.5218505859375
-                ],
-                "type": "QuatToFloats"
-            },
-            {
-                "id": 852,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    3071.572998046875,
-                    137.69464111328126
-                ],
-                "type": "QuatLength"
-            },
-            {
-                "id": 720,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2507.88671875,
-                    318.694091796875
-                ],
-                "type": "FloatsToQuat"
-            },
-            {
-                "id": 706,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2563.541259765625,
-                    490.26153564453127
-                ],
-                "type": "QuatSlerp"
-            },
-            {
-                "id": 613,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2784.1298828125,
-                    490.013916015625
-                ],
-                "type": "QuatLongWaySlerp"
-            },
-            {
-                "id": 645,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    3017.9248046875,
-                    541.3613891601563
-                ],
-                "type": "VecVecToQuat"
-            },
-            {
-                "id": 685,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2356.770751953125,
-                    585.5725708007813
-                ],
-                "type": "QuatInverse"
-            },
-            {
-                "id": 602,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2566.836181640625,
-                    584.8319091796875
-                ],
-                "type": "NormalizeQuat"
-            },
-            {
-                "id": 759,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    2782.515380859375,
-                    585.5427856445313
-                ],
-                "type": "ConjQuat"
-            },
-            {
-                "id": 669,
-                "render": true,
-                "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
                     2354.2138671875,
@@ -248,40 +60,51 @@
                 ]
             },
             {
-                "id": 782,
+                "id": 641,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    2563.948974609375,
-                    667.8986206054688
+                    2355.478515625,
+                    134.9857635498047
                 ],
-                "type": "MatrixToQuat"
+                "type": "QuatToFloatVec"
             },
             {
-                "id": 701,
+                "id": 637,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2337.534423828125,
+                    32.01821517944336
+                ],
+                "type": "FloatVecToQuat"
+            },
+            {
+                "id": 648,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    3012.548095703125,
-                    626.6312866210938
+                    2528.0283203125,
+                    136.99435424804688
                 ],
-                "type": "EulerToQuat"
+                "type": "QuatToAngleAxis"
             },
             {
-                "id": 692,
+                "id": 674,
                 "render": true,
-                "numberOfDecimals": 1,
+                "numberOfDecimals": 4,
                 "LOD": "Full",
                 "position": [
-                    2779.977783203125,
-                    669.7412109375
+                    2507.88671875,
+                    318.694091796875
                 ],
-                "type": "QuatMulQuat"
+                "type": "FloatsToQuat"
             },
             {
-                "id": 711,
+                "id": 718,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -290,6 +113,183 @@
                     491.07672119140627
                 ],
                 "type": "QuatLerp"
+            },
+            {
+                "id": 661,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    3013.156494140625,
+                    34.35456466674805
+                ],
+                "type": "FloatMulQuat"
+            },
+            {
+                "id": 656,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    3329.238525390625,
+                    39.875267028808597
+                ],
+                "type": "QuatToEuler"
+            },
+            {
+                "id": 632,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2654.23291015625,
+                    32.026283264160159
+                ],
+                "type": "AngleAxisToQuat",
+                "halfAngle": false
+            },
+            {
+                "id": 685,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    2994.847900390625,
+                    491.6795349121094
+                ],
+                "type": "QuatLongWaySlerp"
+            },
+            {
+                "id": 697,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2674.277099609375,
+                    588.1634521484375
+                ],
+                "type": "NormalizeQuat"
+            },
+            {
+                "id": 706,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2671.389892578125,
+                    671.2301635742188
+                ],
+                "type": "MatrixToQuat"
+            },
+            {
+                "id": 700,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2993.2333984375,
+                    587.208740234375
+                ],
+                "type": "ConjQuat"
+            },
+            {
+                "id": 680,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    2670.982177734375,
+                    493.59295654296877
+                ],
+                "type": "QuatSlerp"
+            },
+            {
+                "id": 665,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2365.712158203125,
+                    319.5218505859375
+                ],
+                "type": "QuatToFloats"
+            },
+            {
+                "id": 694,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2356.770751953125,
+                    585.5725708007813
+                ],
+                "type": "QuatInverse"
+            },
+            {
+                "id": 714,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    2990.69580078125,
+                    671.4071655273438
+                ],
+                "type": "QuatMulQuat"
+            },
+            {
+                "id": 652,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    3350.71044921875,
+                    551.315185546875
+                ],
+                "type": "QuatVecConjQuat"
+            },
+            {
+                "id": 645,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    3344.72021484375,
+                    418.3883056640625
+                ],
+                "type": "QuatToMatrix"
+            },
+            {
+                "id": 671,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    3338.92041015625,
+                    345.9112548828125
+                ],
+                "type": "QuatLength"
+            },
+            {
+                "id": 709,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    3143.308837890625,
+                    150.2311553955078
+                ],
+                "type": "EulerToQuat"
+            },
+            {
+                "id": 690,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    3162.84326171875,
+                    257.353515625
+                ],
+                "type": "VecVecToQuat"
             }
         ],
         "sequences": [],
@@ -299,13 +299,13 @@
         "models": [],
         "transforms": [
             {
-                "id": 928,
+                "id": 723,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "SetValues",
                 "position": [
-                    2839.08984375,
-                    223.92762756347657
+                    2985.672119140625,
+                    313.04437255859377
                 ],
                 "type": "Quat",
                 "defaultValues": {
@@ -348,15 +348,15 @@
             }
         ],
         "edges": [],
-        "zoom": 1.3256715536117554,
+        "zoom": 1.2006715536117554,
         "workArea": {
             "Min": [
-                2300.614990234375,
-                -3.92608642578125
+                2258.521728515625,
+                -20.653533935546876
             ],
             "Max": [
-                3523.3916015625,
-                774.5473022460938
+                3556.9619140625,
+                823.8739013671875
             ]
         }
     }
