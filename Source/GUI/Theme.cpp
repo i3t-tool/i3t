@@ -654,7 +654,9 @@ void Theme::initNames()
 	g_ColorNames[EColor::DockTabActive] = "glob_Dock Active Color";
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";
+	g_ColorNames[EColor::Workspace_SelectedBorder] = "glob_Selected node border";
 
+	g_SizeNames[ESize::Workspace_SelectedBorderThickness] = "glob_Selected node border thickness";
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	// Tutorials
