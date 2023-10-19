@@ -1,5 +1,30 @@
 # I3T
-An Interactive Tool for Teaching Transformations
+I3T - An Interactive Tool for Teaching Transformations
+
+I3T is an educational application that allows the study of 3D transformations 
+and their hierarchy in an illustrative way. 
+
+It is the result of the work of students of three Parts of the Czech Technical University in Prague:
+- The Department of Computer Graphics and Interaction of the Faculty of Electrical Engineering,
+- The Department of Computer Science of the Faculty of Electrical Engineering,
+- The Faculty of Information Technology.
+
+Start I3T and try the Tutorials. Or read the [manual](Docs/manual.md).
+
+##Authors
+The first version of I3T was created by Michal Folta in 2016. 
+
+- Martin Herich
+- Jaroslav Holeček
+- Dan Rakušan¨
+- Adam Loucký
+- Miroslav Mueller
+- Vít Zadina
+- Filip Uhlík
+
+
+
+## Info for the developers
 
 Pay attention to [project code style](Docs/developer-guide/code-style.md).
 
