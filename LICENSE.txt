@@ -16,9 +16,10 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License.
-  with this program in the attached file COPYING.txt.  If not, see <https://www.gnu.org/licenses/>.
+  with this program in the attached file COPYING.txt.
+  If not, see <https://www.gnu.org/licenses/>.
 
   SPDX-License-Identifier: GPL-3.0-only
 
-  Contact: Petr Felkel, Department of Computer Graphics and Applications, 
-           FEE, Czech Technical University in Prague, felkel@fel.cvut.cz```
+  Contact: Petr Felkel, Department of Computer Graphics and Interaction,
+           FEE, Czech Technical University in Prague, felkel@fel.cvut.cz
