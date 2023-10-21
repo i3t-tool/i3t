@@ -116,7 +116,7 @@ public:
 
 	void setStepDuration(float stepDuration)
 	{
-		m_stepDuration = stepDuration;
+		m_stepDuration = std::clamp(stepDuration, 0.0f, FLT_MAX);
 	}
 
 	float getStepDuration() const
