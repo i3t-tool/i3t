@@ -103,7 +103,7 @@ void Cycle::setTo(float to)
 
 void Cycle::setStep(float v)
 {
-	m_step = abs(v);
+	m_step = std::clamp(v, 0.0f, FLT_MAX);
 }
 
 void Cycle::setManualStep(float v)
