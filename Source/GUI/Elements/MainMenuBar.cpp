@@ -74,6 +74,12 @@ static void showRecentFiles()
 	{
 		askBeforeExitScene([sceneToOpen]() {
 			App::getModule<StateManager>().loadScene(*sceneToOpen);
+
+			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+			if (startWindow)
+			{
+				startWindow->hide();
+			}
 		});
 	}
 }
