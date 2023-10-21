@@ -1,10 +1,15 @@
-//---------------------------------------------------------------------------
 /**
- * \file	mathUtils.h
+ * \file
+ * \brief Declares some math functions
+ * \authors Michal Folta, Petr Felkel, Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Declares some math functions
- * \date  2014/11/16, 2022/09/11
- * \author Michal Folta, Petr Felkel, CTU Prague
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ *
  *
  * Test functions modified
  * - eq(A,B) use the interval test based on interval around values of size factor * nearest bigger / smaller float value
@@ -12,7 +17,6 @@
  *
  * \todo Test the appropriate factors
  */
-//---------------------------------------------------------------------------
 #pragma once
 
 #include "Core/Defs.h"

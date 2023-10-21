@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \authors Michal Folta, Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "Config.h"
 
 #include <fstream>
@@ -20,116 +32,6 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 	}
 
 	return conf;
-}
-
-bool Config::getValue(std::istream& is, const std::string& input, const std::string& attribName, float& val)
-{
-	if (input == attribName)
-	{
-		is >> val;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getBool(std::istream& is, const std::string& input, const std::string& attribName, bool& val)
-{
-	if (input == attribName)
-	{
-		float f;
-		is >> f;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val << std::endl;
-			f != 0 ? val = true : val = false;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getWord(std::istream& is, const std::string& input, const std::string& attribName, std::string& val)
-{
-	if (input == attribName)
-	{
-		is >> val;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getVec2(std::istream& is, const std::string& input, const std::string& attribName, glm::vec2& val)
-{
-	if (input == attribName)
-	{
-		is >> val.x >> val.y;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val.x << ", " << val.y << ", " << val.z
-			// << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getVec3(std::istream& is, const std::string& input, const std::string& attribName, glm::vec3& val)
-{
-	if (input == attribName)
-	{
-		is >> val.x >> val.y >> val.z;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val.x << ", " << val.y << ", " << val.z
-			// << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getVec4(std::istream& is, const std::string& input, const std::string& attribName, glm::vec4& val)
-{
-	if (input == attribName)
-	{
-		is >> val.x >> val.y >> val.z >> val.w;
-		if (is.good())
-		{
-			// cout << attribName << " : " << val.x << ", " << val.y << ", " << val.z
-			// << std::endl;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Config::getMat4(std::istream& is, const std::string& input, const std::string& attribName, glm::mat4& val)
-{
-	if (input == attribName)
-	{
-		is >> val[0][0] >> val[1][0] >> val[2][0] >> val[3][0] >> val[0][1] >> val[1][1] >> val[2][1] >> val[3][1] >>
-		    val[0][2] >> val[1][2] >> val[2][2] >> val[3][2] >> val[0][3] >> val[1][3] >> val[2][3] >> val[3][3];
-		if (is.good())
-		{
-			// cout << key << " : " << std::endl;
-			// cout << val[0][0] << ", " << val[1][0] << ", " << val[2][0] << ", " <<
-			// val[3][0] << std::endl; cout << val[0][1] << ", " << val[1][1] << ", "
-			// << val[2][1] << ", " << val[3][1] << std::endl; cout << val[0][2] << ",
-			// " << val[1][2] << ", " << val[2][2] << ", " << val[3][2] << std::endl;
-			// cout << val[0][3] << ", " << val[1][3] << ", " << val[2][3] << ", " <<
-			// val[3][3] << std::endl;
-			return true;
-		}
-	}
-	return false;
 }
 
 // statics

@@ -1,16 +1,17 @@
-//---------------------------------------------------------------------------
 /**
- * \file	color.h
+ * \file
+ * \brief Class for representing color helper class
+ * \author Michal Folta
+ * \date 2014/11/16
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Class for representing color helper class
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
  *
- * \date  2014/11/16
- * \author Michal Folta, CTU Prague
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-//---------------------------------------------------------------------------
-
-#ifndef _COLOR_H_
-#define _COLOR_H_
+#pragma once
 
 #include <glm/glm.hpp>
 
@@ -43,5 +44,3 @@ struct Color final
 		return glm::vec3((rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f, (rand() % 1000) / 1000.0f);
 	}
 };
-
-#endif

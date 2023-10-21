@@ -1,11 +1,15 @@
 /**
- * \file	GUI\inputController.h
+ * \file
+ * \brief Declares the input controller class. Header for representing keyboard/mouse tracker.
+ * \authors Michal Folta, Martin Herich <martin.herich@phire.cz>
+ * \date: 2014/11/16, 2020/09/09, 2020/12/07
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Declares the input controller class.
- * Header for representing keyboard/mouse tracker
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
  *
- * \date:	2014/11/16, 2020/09/09, 2020/12/07
- * \author: Michal Folta, CTU Prague, Martin Herich <hericmar@fel.cvut.cz>
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 

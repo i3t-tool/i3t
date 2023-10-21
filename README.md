@@ -11,18 +11,16 @@ It is the result of the work of students of three Parts of the Czech Technical U
 
 Start I3T and try the Tutorials. Or read the [manual](Docs/manual.md).
 
-##Authors
+## Authors
 The first version of I3T was created by Michal Folta in 2016. 
 
 - Martin Herich
 - Jaroslav Holeček
-- Dan Rakušan¨
+- Dan Rakušan
 - Adam Loucký
-- Miroslav Mueller
+- Miroslav Müller
 - Vít Zadina
 - Filip Uhlík
-
-
 
 ## Info for the developers
 
@@ -75,3 +73,19 @@ Manual is available [here](Docs/manual.md).
 
 - See how to [add new node](Docs/developer-guide/how-to-add-new-node.md).
 - See how to [add new tutorial](Docs/tutorials.md).
+
+## Used libraries
+- [assimp](https://github.com/assimp/assimp) (BSD-3-Clause)
+- [glfw](https://www.glfw.org/) (Zlib)
+- [glm](https://github.com/g-truc/glm) (MIT)
+- [gtest](https://github.com/google/googletest) (BSD-3-Clause)
+- [ImGui](https://github.com/ocornut/imgui) (MIT)
+- [imgui_markdown](https://github.com/juliettef/imgui_markdown) (Zlib)
+- [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) (MIT)
+- [lua](https://github.com/lua/lua) (MIT)
+- [magic_enum](https://github.com/Neargye/magic_enum) (MIT)
+- [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) (WTFPL)
+- [rttr](https://www.rttr.org/) (MIT)
+- [sol2](https://github.com/ThePhD/sol2) (MIT)
+- [spdlog](https://github.com/gabime/spdlog) (MIT)
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp) (MIT)

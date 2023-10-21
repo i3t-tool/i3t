@@ -1,11 +1,16 @@
 /**
- * \file        Source/GUI/WindowManager.h
- * \author      Dan Rakušan <rakusdan(at)fit.cvut.cz>
- * \date        14.12.2022
+ * \file
+ * \brief Application window manager.
+ * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \date 14.12.2022
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Application window manager.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-
 #pragma once
 
 #include <map>

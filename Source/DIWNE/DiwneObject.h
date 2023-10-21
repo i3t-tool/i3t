@@ -1,10 +1,19 @@
-/*!
- * \file DIWNE/DiwneObject.h
- * \author Jaroslav Holeček, holecek.jaroslav@email.cz
+/**
+ * \file
+ * \brief
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
  * \date 20.3.2022
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  *
  * Declaration of abstract object from which all other object inherit
  */
+#pragma once
 
 #include "diwne_include.h"
 
