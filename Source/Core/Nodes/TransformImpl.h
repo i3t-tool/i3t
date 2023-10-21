@@ -1,7 +1,7 @@
 /**
 * \file
 * \brief Implementation of individual transformation functionality
-* \authors Martin Herich <martin.herich@phire.cz>, Petr Felkel, felkepet@fel.cvut.cz (updates)
+* \authors Martin Herich <martin.herich@phire.cz>, Petr Felkel <felkel@fel.cvut.cz> (updates)
 * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
 * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
 *

@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \authors Martin Herich, Dan Rakušan
+ * \authors Martin Herich <martin.herich@phire.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
