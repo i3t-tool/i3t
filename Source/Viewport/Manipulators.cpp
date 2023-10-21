@@ -20,7 +20,6 @@
 #include "Core/Nodes/Camera.h"
 #include "Core/Nodes/Tracking.h"
 #include "Core/Nodes/Transform.h"
-#include "GUI/Toolkit.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 

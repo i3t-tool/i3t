@@ -12,11 +12,9 @@
  */
 #include "Config.h"
 
-#include <fstream>
 #include <istream>
 
 #include "Core/Resources/ResourceManager.h"
-#include "Logger/Logger.h"
 #include "Utils/JSON.h"
 
 Ptr<Configuration> loadConfig(const fs::path& filename)

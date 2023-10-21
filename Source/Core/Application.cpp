@@ -18,11 +18,8 @@
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Config.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-
-using namespace Core;
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 

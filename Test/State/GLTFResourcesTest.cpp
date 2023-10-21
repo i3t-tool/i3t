@@ -17,13 +17,10 @@
 #include <iostream>
 
 #include "assimp/Importer.hpp"
-#include "assimp/scene.h"
 
 #include "Config.h"
-#include "Core/Application.h"
 #include "I3T.h"
 
-// #include "Common.h"
 #include "Core/Resources/ResourceManager.h"
 
 using namespace std::string_literals;

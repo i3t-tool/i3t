@@ -18,7 +18,6 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Theme.h"
-#include "GUI/UIModule.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 

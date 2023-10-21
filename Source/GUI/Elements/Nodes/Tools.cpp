@@ -19,7 +19,6 @@
 
 #include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 #include "GUI/Elements/Nodes/WorkspaceModel.h"
-#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"

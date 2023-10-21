@@ -13,13 +13,10 @@
 #include "gtest/gtest.h"
 
 #include "API.h"
-#include "Config.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "I3T.h"
 #include "State/StateManager.h"
-#include "State/Stateful.h"
 
-// #include "Common.h"
 #include "Generator.h"
 
 using namespace Core;

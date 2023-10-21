@@ -13,16 +13,11 @@
 #include "TutorialLoader.h"
 
 #include "Logger/Logger.h"
-#include "State/StateManager.h"
 #include "Tutorial/Tutorial.h"
-#include "imgui.h"
-#include "pgr.h"
 #include "stb_image.h"
 #include "yaml-cpp/yaml.h"
-#include <cstdint>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 
 std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& path)
 {

@@ -15,7 +15,6 @@
 #include <imgui.h>
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/Application.h"
 
 DescriptionDialog::DescriptionDialog()
 {

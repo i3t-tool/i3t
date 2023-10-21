@@ -12,8 +12,6 @@
  */
 #include "Resource.h"
 
-#include "Config.h"
-
 using namespace Core;
 
 Resource::Resource(std::string alias, std::string path, ResourceType type)

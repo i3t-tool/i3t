@@ -13,7 +13,6 @@
 #include "UIModule.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Result.h"
 #include "GUI/Elements/MainMenuBar.h"

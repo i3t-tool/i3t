@@ -14,9 +14,6 @@
 
 #include "gtest/gtest.h"
 
-#include "../Test/Generator.h"
-#include "Config.h"
-#include "Logger/Logger.h"
 #include "Utils/Format.h"
 #include "Utils/Math.h"
 
