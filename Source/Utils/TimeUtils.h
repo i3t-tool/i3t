@@ -1,13 +1,16 @@
-#pragma once
-
 /**
- * \file	TimeUtils.h
+ * \file
+ * \brief Declares the common time function. Previously common.h.
+ * \authors Michal Folta, Dan Rakušan
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Declares the common time function. Previously common.h.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
  *
- * \author  Michal Folta, Dan Rakušan
- * \date    2014/11/16
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
+#pragma once
 
 #include <string>
 

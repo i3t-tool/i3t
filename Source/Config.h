@@ -1,14 +1,16 @@
 /**
- * \file	config.h
+ * \file
+ * \brief
+ * \authors Michal Folta, Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Declares the configuration structure
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
  *
- * \date  	2014/11/16
- * \author 	Michal Folta, CTU Prague
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#pragma once
 
 #include <glm/glm.hpp>
 
@@ -96,144 +98,4 @@ struct Config
 	static std::string LOAD_SCENE; ///< The load scene
 	static std::string TUTORIALS_FOLDER;
 	static std::string TEXTURE_FOLDER;
-
-	//@{
-
-	/**
-	    \name Readers of standard data types.
-
-	    The caller provides the \a attribName and the \a variable to be
-	    read to; and also the std::string just read from the file \a input.
-	    When the std::string \a input equals to the \a attribName, the
-	    routine reads the value(s) of the attribute from the stream
-	    consuming the bytes following \a attribName text. Otherwise
-	    it reads nothing leaving the input stream \a is untouched.
-	    These routines are all called on each read attribute name,
-	    serving similarly as a switch(input).
-	 */
-
-	/**
-	 * Read a float of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-	static bool getValue(std::istream& is, const std::string& input, const std::string& attribName, float& val);
-
-	/**
-	 * Read a bool of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getBool(std::istream& is, const std::string& input, const std::string& attribName, bool& val);
-
-	/**
-	 * Read a word (string) of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getWord(std::istream& is, const std::string& input, const std::string& attribName, std::string& val);
-
-	/**
-	 * Read vector 2 of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getVec2(std::istream& is, const std::string& input, const std::string& attribName, glm::vec2& val);
-
-	/**
-	 * Read vector 3 of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getVec3(std::istream& is, const std::string& input, const std::string& attribName, glm::vec3& val);
-
-	/**
-	 * Read a vector 4 of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getVec4(std::istream& is, const std::string& input, const std::string& attribName, glm::vec4& val);
-
-	/**
-	 * Read a matrix 4 of given name from the input stream
-	 *
-	 * \param [in]		is   		The input stream.
-	 * \param 		  	input		The std::string just read from the stream containing
-	 * the name of the attribute which follows. Is provided by the file reader.
-	 * \param attribName 	The std::string with the attribute name to be read from
-	 * the stream. This value is being compared with the input \param [out]		val
-	 * The read value is stored to the given variable.
-	 *
-	 * \return	True if it succeeds to read the attribute value, false if it
-	 * fails.
-	 */
-
-	static bool getMat4(std::istream& is, const std::string& input, const std::string& attribName, glm::mat4& val);
-
-	/**
-	 * Skip comments. This routine consumes either a single line comment (starting
-	 * with # or //) or a multiline comment
-	 * - Does not allow nested comments! \todo the only method changing the value
-	 * of input and only for multiline comments - change to blank...
-	 *
-	 * \param [in]	is   	The input stream.
-	 * \param 	  	input	The std::string just read from the stream.
-	 */
-
-	static void skipComments(std::istream& is, std::string input);
 };
-
-#endif
