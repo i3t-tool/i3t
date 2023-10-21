@@ -17,7 +17,6 @@ using namespace Vp;
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Core/Input/InputManager.h"
-#include "Logger/Logger.h"
 #include "Trackball.h"
 
 // For debug purposes

@@ -27,7 +27,6 @@
 
 #include "Trackball.h"
 
-#include "Logger/Logger.h"
 #include "Utils/Math.h"
 
 using namespace Vp;

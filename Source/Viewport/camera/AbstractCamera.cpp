@@ -15,7 +15,6 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtx/matrix_interpolation.hpp"
 
-#include "Core/Application.h"
 #include "Core/Defs.h"
 
 #include "GUI/Elements/Windows/WorkspaceWindow.h"

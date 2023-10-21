@@ -12,11 +12,9 @@
  */
 #include "gtest/gtest.h"
 
-#include "Common.h"
 #include "Core/Resources/ResourceManager.h"
 #include "Core/Window.h"
 #include "I3T.h"
-#include "Logger/Logger.h"
 #include "Utils/Color.h"
 #include "Viewport/Shaper.h"
 

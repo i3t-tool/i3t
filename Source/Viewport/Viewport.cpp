@@ -17,7 +17,6 @@
 
 #include "Viewport/Shaper.h"
 #include "Viewport/camera/AggregateCamera.h"
-#include "Viewport/camera/OrbitCamera.h"
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/entity/nodes/SceneCamera.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -25,7 +24,6 @@
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/FrustumShader.h"
 #include "Viewport/shader/GridShader.h"
-#include "Viewport/shader/PhongShader.h"
 #include "Viewport/shader/WBOITCompositeShader.h"
 
 using namespace Vp;

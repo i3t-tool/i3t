@@ -12,8 +12,6 @@
  */
 #include "GameObject.h"
 
-#include <glm/glm.hpp>
-
 #include "Viewport/shader/ObjectShader.h"
 #include "Viewport/shader/Shaders.h"
 

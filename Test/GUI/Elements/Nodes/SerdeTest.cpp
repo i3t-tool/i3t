@@ -10,16 +10,16 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#include "gtest/gtest.h"
+// #include "gtest/gtest.h"
 
-#include <memory>
+// #include <memory>
 
-#include "GUI/Elements/Nodes/WorkspaceSequence.h"
-#include "GUI/Elements/Nodes/WorkspaceTransformation_s.h"
-#include "State/NodeDeserializer.h"
-#include "State/SerializationVisitor.h"
+// #include "GUI/Elements/Nodes/WorkspaceSequence.h"
+// #include "GUI/Elements/Nodes/WorkspaceTransformation_s.h"
+// #include "State/NodeDeserializer.h"
+// #include "State/SerializationVisitor.h"
 
-#include "Core/Nodes/Utils.h"
+// #include "Core/Nodes/Utils.h"
 
 /*
 class SerdeTest : public GraphManagerTestFixture {};

@@ -11,7 +11,6 @@
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #include "WorkspaceElements.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 
 /// \todo Remove these.
 

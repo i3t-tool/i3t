@@ -17,7 +17,6 @@
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-#include "Config.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Loader/ThemeLoader.h"

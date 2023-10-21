@@ -16,7 +16,6 @@
 
 #include "API.h"
 #include "Core/Input/InputManager.h"
-#include "Logger/Logger.h"
 
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 

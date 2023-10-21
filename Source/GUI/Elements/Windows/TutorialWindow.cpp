@@ -32,8 +32,6 @@
 #include "imgui_markdown.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Config.h"
-#include "Core/Application.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"

@@ -16,18 +16,8 @@
 
 #include "API.h"
 
-#include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "GUI/Elements/Windows/StartWindow.h"
-#include "GUI/WindowManager.h"
-
-AboutWindow::AboutWindow()
-{
-	/// \todo MH Load DCGI logo.
-	// dcgiReg =
-	// std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f,
-	// 0.0f, 1.0f, 1.0f);
-}
 
 void AboutWindow::render()
 {

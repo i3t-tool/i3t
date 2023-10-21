@@ -15,12 +15,9 @@
 #include "imgui.h"
 
 #include "API.h"
-#include "Core/Application.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
-#include "Core/Nodes/GraphManager.h"
 #include "GUI/Theme.h"
-#include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 
 LogWindow::LogWindow()

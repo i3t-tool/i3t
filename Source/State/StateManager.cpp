@@ -13,8 +13,6 @@
 #include "StateManager.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "GUI/Elements/Windows/StartWindow.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"

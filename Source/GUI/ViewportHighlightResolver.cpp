@@ -13,7 +13,6 @@
 #include "ViewportHighlightResolver.h"
 
 #include <list>
-#include <memory>
 #include <unordered_set>
 
 #include "Core/Nodes/Node.h"
