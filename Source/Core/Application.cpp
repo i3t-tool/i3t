@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Martin Herich
+ * \author Martin Herich <martin.herich@phire.cz>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -188,7 +188,7 @@ void Application::enqueueCommand(ICommand* command)
 	m_commands.push_back(command);
 }
 
-static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
+static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkel@fel.cvut.cz with the "
                                          "snapshot of the program messages "
                                          "as they appear in the program console.\n";
 

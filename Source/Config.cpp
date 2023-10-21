@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \authors Michal Folta, Martin Herich
+ * \authors Michal Folta, Martin Herich <martin.herich@phire.cz>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
