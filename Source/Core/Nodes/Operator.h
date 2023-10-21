@@ -93,7 +93,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::Inversion>::updateValues(i
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(1.0f));
 	}
 }
 
@@ -106,7 +106,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::Transpose>::updateValues(i
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(1.0f));
 	}
 }
 
@@ -142,11 +142,11 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulMatrix>::updateVa
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(1.0f));
 	}
 }
 
-// MatrixAddMatrix
+// MatrixAddMatrix - todo probably a never used operation
 template <> FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
@@ -163,7 +163,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateVa
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(0.0f)); // todo The zero matrix or should it be an Identity?
 	}
 }
 
@@ -199,12 +199,11 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorMulMatrix>::updateVa
 	}
 	else
 	{
-		// setInternalValue(glm::mat4());
-		setInternalValue(glm::vec4()); // PF - should be vector, not matrix
+		setInternalValue(glm::vec4()); // PF - should be a vector, not a matrix
 	}
 }
 
-// FloatMulMatrix
+// MatrixMulFloat - todo probably a never used operation
 template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
@@ -215,15 +214,20 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateVal
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		setInternalValue(m_inputs[0].data().getFloat() * glm::mat4());
+		// todo A zero matrix or should it be an Identity?
+		// Either a zero matrix
+		setInternalValue(glm::mat4(0.0f));
+		// or float * Identity?
+		// setInternalValue(m_inputs[0].data().getFloat() * glm::mat4(1.0f));
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
+		// implicit float == 1.0f
 		setInternalValue(m_inputs[1].data().getMat4());
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(0.0f)); // todo A zero matrix or an Identity?
 	}
 }
 
@@ -472,7 +476,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValu
 
 // ShowVector3
 // Create the matrix rotating vector (1,0,0) to the input vector direction.
-// Should be used with the VectorX model to show the inout vector.
+// Should be used with the VectorX model to show the input vector.
 template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
@@ -482,26 +486,26 @@ template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues
 
 		glm::mat4 m = glm::mat4(1.0f);
 
-		glm::vec3 inNor = glm::normalize(m_inputs[0].data().getVec3());
+		glm::vec3 inNormalized = glm::normalize(m_inputs[0].data().getVec3());
 
-		float angle = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), inNor));
+		float angle = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), inNormalized));
 
 		if (angle != 0)
 		{
-			glm::vec3 cross = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), inNor);
+			glm::vec3 cross = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), inNormalized);
 
 			if (glm::length2(cross) != 0)
 				m = glm::rotate(m, angle, glm::normalize(cross));
 			else
 				m = glm::rotate(m, angle, glm::vec3(0.0f, 0.0f, 1.0f));
 		}
-		m[0] = glm::vec4(inNor, 0.0f);
+		m[0] = glm::vec4(inNormalized, 0.0f);
 
 		setInternalValue(m);
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(1.0f));
 	}
 }
 
@@ -691,7 +695,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues
 	}
 	else
 	{
-		setInternalValue(glm::quat());
+		setInternalValue(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	}
 }
 
@@ -704,7 +708,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatInverse>::updateValues
 	}
 	else
 	{
-		setInternalValue(glm::quat());
+		setInternalValue(glm::quat()); // (0,0,0,0)
 	}
 }
 
@@ -1082,7 +1086,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToVectors>::updateVa
 // Vectors3ToMatrix
 template <> FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateValues(int inputIndex)
 {
-	glm::mat4 tmp = glm::mat4();
+	glm::mat4 tmp = glm::mat4(1.0f); // Identity is probably more useful for graphics
 
 	if (m_inputs[0].isPluggedIn())
 		tmp[0] = glm::vec4(m_inputs[0].data().getVec3(), 0.0f);
@@ -1099,7 +1103,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateV
 // VectorsToMatrix
 template <> FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateValues(int inputIndex)
 {
-	glm::mat4 tmp = glm::mat4();
+	glm::mat4 tmp = glm::mat4(1.0f); // Identity is probably more useful for graphics
 
 	if (m_inputs[0].isPluggedIn())
 		tmp[0] = m_inputs[0].data().getVec4();
@@ -1116,7 +1120,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateVa
 // MatrixToFloats
 template <> FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateValues(int inputIndex)
 {
-	glm::mat4 tmp = glm::mat4();
+	glm::mat4 tmp = glm::mat4(0.0f);
 
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1135,7 +1139,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateVal
 // FloatsToMatrix
 template <> FORCE_INLINE void Operator<EOperatorType::FloatsToMatrix>::updateValues(int inputIndex)
 {
-	glm::mat4 tmp = glm::mat4();
+	glm::mat4 tmp = glm::mat4(0.0f);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -1154,22 +1158,22 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToTR>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		glm::mat4 T = glm::mat4();
+		glm::mat4 T = glm::mat4(1.0f);
 		T[3] = glm::vec4(glm::vec3(m_inputs[0].data().getMat4()[3]), 1.0f);
 		setInternalValue(T);
 		setInternalValue(glm::mat4(glm::mat3(m_inputs[0].data().getMat4())), 1);
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
-		setInternalValue(glm::mat4(), 1);
+		setInternalValue(glm::mat4(1.0f));
+		setInternalValue(glm::mat4(1.0f), 1);
 	}
 }
 
 // TRToMatrix
 template <> FORCE_INLINE void Operator<EOperatorType::TRToMatrix>::updateValues(int inputIndex)
 {
-	glm::mat4 tmp = glm::mat4();
+	glm::mat4 tmp = glm::mat4(1.0f);
 
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1195,7 +1199,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToQuat>::updateValue
 	}
 	else
 	{
-		setInternalValue(glm::quat());
+		setInternalValue(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	}
 }
 
@@ -1208,7 +1212,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToMatrix>::updateValue
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(1.0f));
 	}
 }
 
@@ -1324,10 +1328,10 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValue
 	}
 	else
 	{
-		setInternalValue(1.0f); // PF - to return a unit quaternion
+		setInternalValue(0.0f);
 		setInternalValue(0.0f, 1);
 		setInternalValue(0.0f, 2);
-		setInternalValue(0.0f, 3);
+		setInternalValue(1.0f, 3); // PF - to return a unit quaternion
 	}
 }
 
