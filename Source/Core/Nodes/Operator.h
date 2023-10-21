@@ -471,6 +471,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValu
 }
 
 // ShowVector3
+// Create the matrix rotating vector (1,0,0) to the input vector direction.
+// Should be used with the VectorX model to show the inout vector.
 template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
@@ -478,7 +480,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues
 
 		// setInternalValue(glm::normalize(m_inputs[0].data().getVec3()));
 
-		glm::mat4 m = glm::mat4();
+		glm::mat4 m = glm::mat4(1.0f);
 
 		glm::vec3 inNor = glm::normalize(m_inputs[0].data().getVec3());
 
@@ -493,7 +495,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues
 			else
 				m = glm::rotate(m, angle, glm::vec3(0.0f, 0.0f, 1.0f));
 		}
-		m[0] = glm::vec4(m_inputs[0].data().getVec3(), 0.0f);
+		m[0] = glm::vec4(inNor, 0.0f);
 
 		setInternalValue(m);
 	}
