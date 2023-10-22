@@ -12,14 +12,15 @@ jobs:
     name: Release
     strategy:
       matrix:
-        kind: ['Linux', 'Windows', 'MacOS']
+        # kind: ['Linux', 'Windows', 'MacOS']
+        kind: ['Linux', 'Windows']
         include:
           - kind: 'Linux'
             os: ubuntu-latest
           - kind: 'Windows'
             os: windows-latest
-          - kind: 'MacOS'
-            os: macos-latest
+          # - kind: 'MacOS'
+          #   os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
