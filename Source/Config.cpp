@@ -49,14 +49,16 @@ std::string Config::INFO_TEXT = "Learn geometric transformations.\n\n"
                                 "at the Department of Computer "
                                 "Graphics and Interaction, FEL, CTU in Prague";
 std::string Config::COPYRIGHT_TEXT = "I3T - The Interactive Tool for Teaching Transformations\n\n"
-                                     "  Copyright(C) 2023 Martin Herich, Dan Rakusan, Adam Loucky, Jaroslav Holecek,\n"
-                                     "  Miroslav Muller, Filip Uhlik, Michal Folta, Lukas Pilka, Jaroslav Kolar,\n"
-                                     "  Petr Felkel, Czech technical university in Prague, Czech Republic.\n\n"
+
+                                     "  Copyright (C) 2016-2023 I3T team, Department of Computer Graphics\n"
+                                     "  and Interaction, FEE, Czech Technical University in Prague, Czech Republic.\n\n"
+
                                      "I3T - The Interactive Tool for Teaching Transformations\n"
                                      "  is free software: you can redistribute it and/or modify\n"
                                      "  it under the terms of the GNU General Public License as published by\n"
                                      "  the Free Software Foundation, either version 3 of the License, or\n"
                                      "  (at your option) any later version.\n\n"
+
                                      "I3T - The Interactive Tool for Teaching Transformations\n"
                                      "  is distributed in the hope that it will be useful,\n"
                                      "  but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -64,16 +66,16 @@ std::string Config::COPYRIGHT_TEXT = "I3T - The Interactive Tool for Teaching Tr
                                      "  See the GNU General Public License for more details.\n\n"
 
                                      "You should have received a copy of the GNU General Public License.\n"
-                                     "  with this program in the attached file COPYING.txt. \n"
-                                     "  If not, see <https://www.gnu.org/licenses/>.\n\n"
+                                     "  with this program in the attached file LICENSE.txt. \n"
+                                     "  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.\n\n"
 
-                                     "Contact : Petr Felkel, Department of Computer Graphics and Applications, FEE,\n"
-                                     "  Czech Technical University in Prague, felkel@fel.cvut.cz\n\n\n";
+                                     "Project home: http://www.i3t-tool.org\n\n\n";
 std::string Config::COPYRIGHT_TEXT_SHORT =
     "I3T - The Interactive Tool for Teaching Transformations\n\n"
-    "  Copyright(C) 2023 Martin Herich, Dan Rakusan, Adam Loucky, Jaroslav Holecek,\n"
-    "  Miroslav Muller, Filip Uhlik, Michal Folta, Lukas Pilka, Jaroslav Kolar,\n"
-    "  Petr Felkel, Czech technical university in Prague, Czech Republic.\n\n"
+
+    "  Copyright (C) 2016-2023 I3T team, Department of Computer Graphics\n"
+    "  and Interaction, FEE, Czech Technical University in Prague, Czech Republic.\n\n"
+
     "  This program comes with ABSOLUTELY NO WARRANTY. This is free software,\n"
     "  and you are welcome to redistribute it under certain conditions.\n"
     "  For details, read the attached file LICENSE.txt.\n";

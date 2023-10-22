@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Martin Herich <martin.herich@phire.cz>
+ * \author Martin Herich <martin.herich@phire.cz>, Petr Felkel, felkel@fel.cvut.cz (bug fixes)
  * \date 18.11.2020
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
