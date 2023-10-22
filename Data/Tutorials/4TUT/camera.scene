@@ -1,0 +1,224 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -51.429988861083987,
+                "orbitCameraRotationY": 8.829995155334473,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 16.147199630737306,
+                "iorbitCameraPivot": [
+                    -1.5954935550689698,
+                    0.1116061583161354,
+                    2.767773151397705
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 1,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1163.284912109375,
+                    218.0666961669922
+                ],
+                "transforms": [
+                    {
+                        "id": 7,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1183.228515625,
+                            247.93328857421876
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                0.800000011920929,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.800000011920929,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.5,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1165.666748046875,
+                    57.47618865966797
+                ],
+                "transforms": [
+                    {
+                        "id": 14,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1185.5142822265626,
+                            87.93330383300781
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                1.7000000476837159,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.7000000476837159,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.7000000476837159,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                -1.5,
+                                1.5,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 17,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1430.126953125,
+                    219.5397186279297
+                ],
+                "model": "Cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 15,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1429.2379150390626,
+                    57.76190948486328
+                ],
+                "model": "Duck",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                1,
+                0,
+                17,
+                0
+            ],
+            [
+                8,
+                0,
+                15,
+                0
+            ]
+        ],
+        "zoom": 0.875,
+        "workArea": {
+            "Min": [
+                -210.48568725585938,
+                -10.352409362792969
+            ],
+            "Max": [
+                1965.5142822265626,
+                419.36187744140627
+            ]
+        }
+    }
+}

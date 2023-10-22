@@ -1,27 +1,34 @@
 /**
- * \file Core/Defs.h
- * \author Martin Herich
+ * \file
+ * \brief A bunch of useful definitions and shortcuts.
+ * \author Martin Herich <martin.herich@phire.cz>
  * \date 24.10.2020
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * A bunch of useful definitions and shortcuts.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
 #include <cassert>
+#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <variant>
 
 #include "magic_enum.hpp"
 #include "spdlog/formatter.h"
 
+#include "Core/Types.h"
+#include "Logger/Logger.h"
+
 namespace fs = std::filesystem;
-
-constexpr const size_t MAX_PATH_LENGTH = 4096L;
-
-#define I3T_CONST inline constexpr
 
 /// Inlining macro.
 #ifdef _MSC_VER
@@ -42,94 +49,49 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #undef Assert /* \todo JH due to compile error */
 #endif
 
-#ifdef I3T_DEBUG
-#define I3T_ASSERT(cond) assert(cond)
-#define I3T_ABORT(message) assert(false && message)
-#else
-#define I3T_ASSERT(cond, description)
-#endif
-
-namespace Debug
-{
-template <typename... Args>
-void Assert(bool condition, const std::string& message = "", Args&&... args)
-{
-#ifdef I3T_DEBUG
-	if (!condition) throw std::logic_error(fmt::format(message, std::forward<Args>(args)...));
-#endif
-}
-} // namespace Debug
-
-/// Definition of more friendly shared_ptr usage.
-template <typename T>
-using Ptr = std::shared_ptr<T>;
-
-/// Unique pointer shortcut.
-template <typename T>
-using UPtr = std::unique_ptr<T>;
-
-template <typename T>
-using WPtr = std::weak_ptr<T>;
-
-
-/// Singleton helper class.
-template <typename T>
-class Singleton
-{
-public:
-	static T& instance();
-
-	Singleton(const Singleton&) = delete;
-	Singleton& operator=(const Singleton) = delete;
-
-protected:
-	Singleton() {}
-};
-
-template <typename T>
-T& Singleton<T>::instance()
-{
-	static const std::unique_ptr<T> instance{new T{}};
-	return *instance;
-}
-
-
-template <typename BaseClass>
-class ICloneable
-{
-public:
-	virtual Ptr<BaseClass> clone() = 0;
-};
-
+/// We need to log message here since all assertions are removed
+/// on Windows in Release config.
+#define I3T_ASSERT(cond, message)                                                                                      \
+	if (!(cond))                                                                                                       \
+	{                                                                                                                  \
+		LOG_FATAL(message);                                                                                            \
+	}                                                                                                                  \
+	assert(cond)
+#define I3T_ABORT(message)                                                                                             \
+	LOG_FATAL(message);                                                                                                \
+	std::abort()
 
 /// Enum utils
 
 /**
- * Get string name of enum field.
- * \tparam T
- * \param val
- * \return
+ * Get string name from enum value.
+ * \tparam T enum definition (such as EOperatorType or ETransformType)
+ * \param val Enum value
+ * \return String name of the enum value
  */
-template <typename T>
-auto n(T val)
+template <typename T> auto n(T val)
 {
 	return std::string(magic_enum::enum_name(val));
 }
 
-template <typename T>
-constexpr T enumVal(const std::string& str)
+namespace EnumUtils
 {
-	constexpr auto& enumEntries = magic_enum::enum_entries<T>();
-	for (const auto& entry : enumEntries)
-	{
-		if constexpr(entry.first == str)
-		{
-			return entry.first;
-		}
-	}
+template <typename T> auto name(T val)
+{
+	return n(val);
 }
 
-#define COND_TO_DEG(x)                                                                                                 \
-	(SetupForm::radians ? (x)                                                                                            \
-											: glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
+template <typename T> std::optional<T> value(const std::string& str)
+{
+	return magic_enum::enum_cast<T>(str);
+}
 
+template <typename T> std::optional<T> value(std::string_view str)
+{
+	return magic_enum::enum_cast<T>(str);
+}
+} // namespace EnumUtils
+
+#define COND_TO_DEG(x)                                                                                                 \
+	(SetupForm::radians ? (x) : glm::degrees(x)) ///< Converts from radians to degrees if the
+	                                             ///< application set up for degrees

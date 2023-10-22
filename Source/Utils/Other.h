@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -15,16 +27,18 @@ inline bool contains(const std::string& str, const std::string& substr)
 	// Check if window can be focused (no menu is active).
 	if ((index = str.find(substr, 0L)) != std::string::npos)
 	{
-		if (index == 0) { return true; }
+		if (index == 0)
+		{
+			return true;
+		}
 	}
 	return false;
 }
-}
+} // namespace String
 
 namespace Utils
 {
-template <typename A, typename Predicate>
-inline int indexOf(A&& array, Predicate p)
+template <typename A, typename Predicate> inline int indexOf(A&& array, Predicate p)
 {
 	auto it = std::find_if(array.begin(), array.end(), p);
 	if (it != array.end())
@@ -33,8 +47,7 @@ inline int indexOf(A&& array, Predicate p)
 	}
 	return -1;
 }
-}
-
+} // namespace Utils
 
 /**
  * Convert enum to integer (or any other underlying type
@@ -50,15 +63,27 @@ template <typename E> constexpr auto toUnderlying(E e) noexcept
 
 struct COutRedirect
 {
-  COutRedirect() { m_default = std::cout.rdbuf(m_buffer.rdbuf()); }
+	COutRedirect()
+	{
+		m_default = std::cout.rdbuf(m_buffer.rdbuf());
+	}
 
-  ~COutRedirect() { std::cout.rdbuf(m_default); }
+	~COutRedirect()
+	{
+		std::cout.rdbuf(m_default);
+	}
 
-  std::stringstream& GetBuffer() { return m_buffer; }
+	std::stringstream& GetBuffer()
+	{
+		return m_buffer;
+	}
 
-  std::string GetStr() { return m_buffer.str(); }
+	std::string GetStr()
+	{
+		return m_buffer.str();
+	}
 
 private:
-  std::stringstream m_buffer;
-  std::streambuf* m_default;
+	std::stringstream m_buffer;
+	std::streambuf* m_default;
 };

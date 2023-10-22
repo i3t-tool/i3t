@@ -1,673 +1,357 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "SerializationVisitor.h"
 
-#include <numeric>
-#include <unordered_map>
-
-#include "yaml-cpp/yaml.h"
-
-#include "GuiAdapter.h"
-#include "Core/Nodes/GraphManager.h"
+#include "GUI/Elements/Nodes/WorkspaceCamera.h"
+#include "GUI/Elements/Nodes/WorkspaceCycle.h"
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
+#include "GUI/Elements/Nodes/WorkspaceModel.h"
+#include "GUI/Elements/Nodes/WorkspaceOperator.h"
+#include "GUI/Elements/Nodes/WorkspaceScreen.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
+#include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 #include "Logger/Logger.h"
-#include "Utils/Format.h"
-#include "Core/Nodes/Operations.h"
+#include "Utils/JSON.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
-/// Base format string for node.
-constexpr const char* g_baseFormatString = "  - id: {}\n"
-																					 "    type: {}\n"
-																					 "    position: [{}, {}]\n";
+using namespace rapidjson;
 
-std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform);
-
-std::string dumpValue(EValueType value, const Core::NodePtr& node)
+void SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 {
-	std::string str;
+	m_memento.SetObject();
 
-	switch (value)
+	rapidjson::Value workspace(rapidjson::kObjectType);
+
+	rapidjson::Value operators(rapidjson::kArrayType);
+	workspace.AddMember("operators", std::move(operators), m_memento.GetAllocator());
+
+	rapidjson::Value sequences(rapidjson::kArrayType);
+	workspace.AddMember("sequences", std::move(sequences), m_memento.GetAllocator());
+
+	rapidjson::Value cycles(rapidjson::kArrayType);
+	workspace.AddMember("cycles", std::move(cycles), m_memento.GetAllocator());
+
+	rapidjson::Value cameras(rapidjson::kArrayType);
+	workspace.AddMember("cameras", std::move(cameras), m_memento.GetAllocator());
+
+	rapidjson::Value screens(rapidjson::kArrayType);
+	workspace.AddMember("screens", std::move(screens), m_memento.GetAllocator());
+
+	rapidjson::Value models(rapidjson::kArrayType);
+	workspace.AddMember("models", std::move(models), m_memento.GetAllocator());
+
+	rapidjson::Value transforms(rapidjson::kArrayType);
+	workspace.AddMember("transforms", std::move(transforms), m_memento.GetAllocator());
+
+	rapidjson::Value edges(rapidjson::kArrayType);
+	workspace.AddMember("edges", std::move(edges), m_memento.GetAllocator());
+
+	m_memento.AddMember("workspace", std::move(workspace), m_memento.GetAllocator());
+
+	for (const auto& node : nodes)
 	{
-	case EValueType::Pulse:
-		break;
+		node->accept(*this);
+	}
+}
+
+void SerializationVisitor::visit(const Ptr<GuiCamera>& node)
+{
+	const auto& coreNode = node->getNodebase()->as<Core::Camera>();
+	auto& alloc = m_memento.GetAllocator();
+	auto& cameras = m_memento["workspace"]["cameras"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value camera(rapidjson::kObjectType);
+	dumpCommon(camera, node);
+
+	rapidjson::Value sequences(kArrayType);
+	dumpSequence(sequences, node->getView());
+	dumpSequence(sequences, node->getProjection());
+	camera.AddMember("sequences", sequences.Move(), alloc);
+
+	cameras.PushBack(camera, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
+{
+	const auto& coreNode = node->getNodebase()->as<Core::Cycle>();
+	auto& alloc = m_memento.GetAllocator();
+	auto& cycles = m_memento["workspace"]["cycles"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value cycle(rapidjson::kObjectType);
+	dumpCommon(cycle, node);
+
+	cycle.AddMember("from", coreNode->getFrom(), alloc);
+	cycle.AddMember("to", coreNode->getTo(), alloc);
+	cycle.AddMember("manualStep", coreNode->getManualStep(), alloc);
+	cycle.AddMember("step", coreNode->getMultiplier(), alloc);
+	cycle.AddMember("stepDuration", coreNode->getStepDuration(), alloc);
+	cycle.AddMember("smooth", coreNode->getSmoothStep(), alloc);
+	cycle.AddMember("isRunning", coreNode->isRunning(), alloc);
+	cycle.AddMember("mode", (int) coreNode->getMode(), alloc);
+
+	cycles.PushBack(cycle, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
+{
+	const auto& coreNode = node->getNodebase();
+	auto& alloc = m_memento.GetAllocator();
+	auto& operators = m_memento["workspace"]["operators"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	const auto* props = coreNode->getOperation();
+
+	rapidjson::Value op(rapidjson::kObjectType);
+	dumpCommon(op, node);
+
+	op.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+
+	if (props->isConstructor)
+	{
+		addData(op, "value", coreNode->getData());
+	}
+
+	// Workaround for #311
+	if (auto quatAngleAxis = std::dynamic_pointer_cast<WorkspaceAngleAxisToQuat>(node))
+	{
+		op.AddMember("halfAngle", quatAngleAxis->m_halfAngle, alloc);
+	}
+
+	operators.PushBack(op, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiSequence>& node)
+{
+	dumpSequence(m_memento["workspace"]["sequences"], node);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
+{
+	dumpTransform(m_memento["workspace"]["transforms"].GetArray(), node);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
+{
+	const auto& coreNode = node->getNodebase()->as<Core::Operator<Core::EOperatorType::Screen>>();
+	auto& alloc = m_memento.GetAllocator();
+	auto& screens = m_memento["workspace"]["screens"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value screen(rapidjson::kObjectType);
+	dumpCommon(screen, node);
+
+	// screen.AddMember("aspect", node->, alloc);
+	JSON::addVector(screen, "aspect", node->getAspect(), m_memento.GetAllocator());
+
+	screens.PushBack(screen, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiModel>& node)
+{
+	const auto& coreNode = node->getNodebase()->as<Core::Model>();
+	auto& alloc = m_memento.GetAllocator();
+	auto& models = m_memento["workspace"]["models"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value model(rapidjson::kObjectType);
+	dumpCommon(model, node);
+
+	const auto mesh = node->viewportModel().lock();
+	const auto modelAlias = mesh->getModel();
+	model.AddMember("model", rapidjson::Value(modelAlias.c_str(), alloc), alloc);
+
+	model.AddMember("visible", mesh->m_visible, alloc);
+	model.AddMember("showAxes", mesh->m_showAxes, alloc);
+	model.AddMember("opaque", mesh->m_opaque, alloc);
+	model.AddMember("opacity", mesh->m_opacity, alloc);
+	JSON::addVector(model, "tint", mesh->m_tint, m_memento.GetAllocator());
+	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
+
+	models.PushBack(model, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+//
+
+void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNode>& node)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	const auto& coreNode = node->getNodebase();
+	auto& alloc = m_memento.GetAllocator();
+
+	target.AddMember("id", coreNode->getId(), alloc);
+	if (node->getTopLabel() != node->getNodebase()->getLabel())
+	{
+		target.AddMember("label", node->getTopLabel(), alloc);
+	}
+	target.AddMember("render", node->getRender(), alloc);
+	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
+	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
+
+	JSON::addVector(target, "position", node->getNodePositionDiwne(), m_memento.GetAllocator());
+}
+
+void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node)
+{
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
+
+	const auto& coreNode = node->getNodebase()->as<Core::Sequence>();
+	auto& alloc = m_memento.GetAllocator();
+	auto& sequences = target;
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value sequence(rapidjson::kObjectType);
+	dumpCommon(sequence, node);
+
+	sequence.AddMember("transforms", rapidjson::Value(kArrayType), alloc);
+
+	for (const auto& transform : node->getInnerWorkspaceNodes())
+	{
+		dumpTransform(sequence["transforms"].GetArray(), std::static_pointer_cast<WorkspaceTransformation>(transform));
+	}
+
+	sequences.PushBack(sequence, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node)
+{
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
+
+	const auto& coreNode = node->getNodebase()->as<Core::Transform>();
+	auto& alloc = m_memento.GetAllocator();
+
+	const auto* props = coreNode->getOperation();
+
+	rapidjson::Value transform(rapidjson::kObjectType);
+	dumpCommon(transform, node);
+
+	transform.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+
+	if (!coreNode->getDefaultValues().empty())
+	{
+		transform.AddMember("defaultValues", rapidjson::Value(rapidjson::kObjectType), alloc);
+		transform.AddMember("savedDefaults", rapidjson::Value(rapidjson::kObjectType), alloc);
+	}
+
+	for (const auto& [key, value] : coreNode->getDefaultValues())
+	{
+		addData(transform["defaultValues"], key.c_str(), value);
+	}
+
+	//
+
+	JSON::addMatrix(transform, "value", coreNode->getData().getMat4(), m_memento.GetAllocator());
+
+	if (coreNode->hasSavedValue())
+	{
+		JSON::addMatrix(transform, "savedValue", coreNode->getSavedValue(), m_memento.GetAllocator());
+
+		/*
+		for (const auto& [key, value] : coreNode->getDefaultValues())
+		{
+		  addData(transform["savedDefaults"], key.c_str(), value);
+		}
+		 */
+	}
+
+	//
+
+	JSON::addBool(transform, "synergies", coreNode->hasSynergies(), m_memento.GetAllocator());
+	JSON::addBool(transform, "locked", coreNode->isLocked(), m_memento.GetAllocator());
+
+	target.PushBack(transform, alloc);
+}
+
+//
+
+void SerializationVisitor::addData(rapidjson::Value& target, const char* key, const Core::Data& data)
+{
+	using namespace Core;
+
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	auto& alloc = m_memento.GetAllocator();
+
+	switch (data.opValueType)
+	{
 	case EValueType::Float:
-		str = Utils::toString(node->getData().getFloat());
+		target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(data.getFloat()), alloc);
 		break;
 	case EValueType::Vec3:
-		str = Utils::toString(node->getData().getVec3());
+		JSON::addVector(target, key, data.getVec3(), m_memento.GetAllocator());
 		break;
 	case EValueType::Vec4:
-		str = Utils::toString(node->getData().getVec4());
+		JSON::addVector(target, key, data.getVec4(), m_memento.GetAllocator());
 		break;
 	case EValueType::Matrix:
-		str = Utils::toString(node->getData().getMat4());
+		JSON::addMatrix(target, key, data.getMat4(), m_memento.GetAllocator());
 		break;
 	case EValueType::Quat:
-		str = Utils::toString(node->getData().getQuat());
+	{
+		const auto& q = data.getQuat();
+		const glm::vec4 vec = {q.x, q.y, q.z, q.w};
+		JSON::addVector(target, key, vec, m_memento.GetAllocator());
 		break;
+	}
+	case EValueType::Pulse:
 	case EValueType::MatrixMul:
 	case EValueType::Screen:
 	case EValueType::Ptr:
 		break;
 	}
-
-	return str;
 }
 
-/**
- * \param pin Right pin – must be plugged!
- * \return Value in format: - [leftNode, leftNodePin, rightNode, rightNodePin]
- */
-std::string dumpEdge(const Core::Pin& pin)
+void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node)
 {
-	auto* leftPin = pin.getParentPin();
-	I3T_ASSERT(leftPin != nullptr && "Pin is not plugged, cannot create edge entry.");
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
 
-	return fmt::format("  - [{}, {}, {}, {}]", leftPin->getOwner()->getId(), leftPin->getIndex(), pin.getOwner()->getId(),
-										 pin.getIndex());
-}
-
-std::string dumpTransformIds(const Ptr<GuiSequence>& sequence)
-{
-	std::vector<std::string> transformIds;
-	auto& transforms = sequence->getNodebase()->as<Core::Sequence>()->getMatrices();
-
-	for (const auto& transform : transforms) { transformIds.push_back(std::to_string(transform->getId())); }
-	return "[" + Utils::concat(transformIds, ", ") + "]";
-}
-
-std::string dumpCycle(const Core::Cycle& cycle) { return fmt::format(""); }
-
-NodeData dumpCamera(const Ptr<GuiCamera>& camera)
-{
-	static std::string formatString = std::string(g_baseFormatString) +
-			"    proj_transforms: {}\n"
-			"    view_transforms: {}\n";
-
-	std::string projTransforms = dumpTransformIds(camera->getProjection());
-	std::string viewTransforms = dumpTransformIds(camera->getView());
-
-    const auto& node = camera->getNodebase();
-	NodeData data;
-	data.node = fmt::format(formatString, camera->getId(), node->getOperation()->keyWord,
-                            camera->getNodePositionDiwne().x, camera->getNodePositionDiwne().y,
-                            projTransforms, viewTransforms);
-	for (const auto& in : node->getInputPins())
+	for (const auto& input : node->getInputPins())
 	{
-		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
-	}
-	return data;
-}
-
-NodeData dumpSequence(const Ptr<GuiSequence>& guiSequence)
-{
-	auto sequence = guiSequence->getNodebase()->as<Core::Sequence>();
-
-	static std::string formatString = std::string(g_baseFormatString) + "    transforms: {}\n";
-
-	std::string transforms = dumpTransformIds(guiSequence);
-
-	NodeData data;
-	data.node = fmt::format(formatString, sequence->getId(), sequence->getOperation()->keyWord,
-													guiSequence->getNodePositionDiwne().x, guiSequence->getNodePositionDiwne().y,
-													transforms);
-	for (const auto& in : sequence->getInputPins())
-	{
-		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
-	}
-	return data;
-}
-
-/**
- * \param node
- * \return Nested block in YAML format.
- */
-NodeData dumpOperator(Ptr<GuiNode> guiNode)
-{
-	auto node = guiNode->getNodebase();
-
-#ifdef I3T_DEBUG
-	auto operatorType = magic_enum::enum_cast<ENodeType>(node->getOperation()->keyWord);
-	I3T_ASSERT(operatorType.has_value() && "Not an operator class.");
-#endif
-
-	/// \todo MH consider multiple editable inputs for operator.
-	static std::string formatString = std::string(g_baseFormatString) + "    value: {}\n";
-
-	static std::string noOutputValueFormatString = std::string(g_baseFormatString);
-
-	NodeData data;
-
-	if (!node->getOutputPins().empty())
-	{
-		data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,            // id and type
-														guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y,  // position
-														dumpValue(node->getOutPin(0).getType(), node));                        // value
-	}
-	else
-	{
-		data.node = fmt::format(noOutputValueFormatString, node->getId(), node->getOperation()->keyWord,
-														guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y);
-	}
-
-	for (const auto& in : node->getInputPins())
-	{
-		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
-	}
-
-	return data;
-}
-
-std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform)
-{
-	auto transform = guiTransform->getNodebase()->as<Core::Transformation>();
-
-	static std::string formatString = std::string(g_baseFormatString) +
-			"    value: {}\n"
-			"    synergies: {}\n"
-			"    locked: {}\n";
-
-	auto sequence = transform->getCurrentSequence();
-
-	NodeData data;
-	data.node = fmt::format(formatString, transform->getId(), transform->getOperation()->keyWord,
-													guiTransform->getNodePositionDiwne().x, guiTransform->getNodePositionDiwne().y,  // position
-													dumpValue(EValueType::Matrix, transform),
-													transform->hasSynergies(), transform->isLocked());
-
-	auto				defaultValues = transform->getDefaultValues();
-	const auto& expectedKeys	= Core::getTransformDefaults(transform->getOperation()->keyWord);
-
-	for (auto& [key, _] : expectedKeys)  // validate values
-	{
-		if (defaultValues.count(key) == 0)
+		if (!input.isPluggedIn())
 		{
-			Log::error("Member function of transform '{}' does not export default value with key '{}'.",
-								 transform->getOperation()->keyWord, key);
-			return std::nullopt;
-		}
-	}
-	data.node += "    defaults: {" + Utils::concat(Utils::concat(defaultValues, ": "), ", ") + "}\n";
-
-	if (transform->hasSavedValue())
-	{
-		data.node += "    saved_value: " + Utils::toString(transform->getSavedValue());
-	}
-
-	return data;
-}
-
-std::optional<NodeData> dumpScreen(Ptr<GuiScreen> guiScreen)
-{
-	auto coreNode = guiScreen->getNodebase();
-
-	static std::string formatString = std::string(g_baseFormatString) +
-			"    size: {}\n";
-
-	return dumpOperator(guiScreen);
-}
-
-std::optional<NodeData> dumpModel(const Ptr<GuiModel>& guiModel) {
-	return dumpOperator(guiModel);
-}
-
-//===----------------------------------------------------------------------===//
-
-std::string SceneRawData::toString() const
-{
-	std::string result;
-
-	result += "operators:\n";
-	for (const auto& op : operators) { result += op; }
-	if (operators.empty()) result += "    {}\n";
-
-	result += "transforms:\n";
-	for (const auto& transform : transforms) { result += transform; }
-	if (transforms.empty()) result += "    {}\n";
-
-	result += "sequences:\n";
-	for (const auto& sequence : sequences) { result += sequence; }
-	if (sequences.empty()) result += "    {}\n";
-
-	result += "cameras:\n";
-	for (const auto& camera : cameras) { result += camera; }
-	if (cameras.empty()) result += "    {}\n";
-
-	result += "screens:\n";
-	for (const auto& screen : screens) { result += screen; }
-	if (screens.empty()) result += "    {}\n";
-
-	result += "edges:\n";
-	if (edges.empty()) result += "    {}\n";
-	else result += Utils::concat(edges, "\n");
-
-	return result;
-}
-
-//===----------------------------------------------------------------------===//
-
-/// \see addNodeToPosition(ImVec2 const)
-std::map<
-    std::string_view,
-    std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
-> createFns;
-
-std::map<
-    std::string_view,
-	std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
-> createTransformFns;
-
-template <int N, int Max>
-void doForOperator()
-{
-	constexpr auto enumValue = static_cast<ENodeType>(N);
-	createFns[magic_enum::enum_name(enumValue)]
-			= addNodeToNodeEditor<WorkspaceOperator<enumValue>>;
-
-	if constexpr (N < Max) { doForOperator<N + 1, Max>(); }
-}
-
-template <int N, int Max>
-void doForTransform()
-{
-	constexpr auto enumValue = static_cast<ETransformType>(N);
-	createTransformFns[magic_enum::enum_name(enumValue)] = createTransform<enumValue>;
-
-	if constexpr (N < Max) { doForTransform<N + 1, Max>(); }
-}
-
-void initCreateFns()
-{
-	constexpr std::size_t operatorCount = magic_enum::enum_count<ENodeType>() - 1;
-	doForOperator<0, operatorCount>();
-
-	constexpr std::size_t transformCount = magic_enum::enum_count<ETransformType>() - 1;
-	doForTransform<0, transformCount>();
-}
-
-//===-- Visitors ----------------------------------------------------------===//
-
-bool SerializationVisitor::m_isInitialized = false;
-
-SerializationVisitor::SerializationVisitor()
-{
-	if (!m_isInitialized)
-	{
-		initCreateFns();
-		createFns[n(ENodeType::Model)] = addNodeToNodeEditor<WorkspaceModel>;
-		m_isInitialized = true;
-	}
-}
-
-std::string SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
-{
-	m_sceneData.clear();
-
-	for (const auto& node : nodes)
-	{
-		node->accept(*this); // calls visit(node) and populates m_result variable.
-	}
-
-	return m_sceneData.toString();
-}
-
-void SerializationVisitor::visit(const Ptr<GuiCamera>& node)
-{
-	// Dump camera sequences.
-	m_sceneData.addCamera(dumpCamera(node));
-
-	for (const auto& transform : node->getProjection()->getInnerWorkspaceNodes())
-		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
-			m_sceneData.addTransform(*result);
-
-	for (const auto& transform : node->getView()->getInnerWorkspaceNodes())
-		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
-			m_sceneData.addTransform(*result);
-}
-
-void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
-{
-
-}
-
-void SerializationVisitor::visit(const Ptr<GuiOperator>& guiNode)
-{
-	auto node = guiNode->getNodebase();
-	m_sceneData.addOperator(dumpOperator(guiNode));
-}
-
-void SerializationVisitor::visit(const Ptr<GuiSequence>& node)
-{
-	// Dump sequence and its transforms.
-	m_sceneData.addSequence(dumpSequence(node));
-
-	for (const auto& transform : node->getInnerWorkspaceNodes())
-		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
-			m_sceneData.addTransform(*result);
-}
-
-void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
-{
-	// Dump orphaned transform.
-	auto result = dumpTransform(node);
-
-	if (result.has_value()) m_sceneData.addTransform(*result);
-}
-
-void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
-{
-	if (auto result = dumpScreen(node))
-		m_sceneData.addScreen(*result);
-}
-
-void SerializationVisitor::visit(const Ptr<GuiModel>& node)
-{
-	if (auto result = dumpModel(node))
-		m_sceneData.addScreen(*result);
-}
-
-bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
-
-//===-- Builder helpers ---------------------------------------------------===//
-
-GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
-{
-	for (const auto& node : nodes)
-		if (node->getNodebase()->getId() == id)
-			return node;
-
-	return nullptr;
-}
-
-void insertTransformsToSequence(YAML::Node& transformIds, Ptr<GuiSequence> sequence, std::vector<GuiNodePtr>& nodes)
-{
-	int i = 0;
-
-	for (auto&& transformIdRaw : transformIds)
-	{
-		auto transformId = transformIdRaw.as<int>();
-		auto transform = findNode(nodes, transformId);
-
-		if (transform)
-		{
-			sequence->moveNodeToSequence(transform, i);
-			++i;
-		}
-	}
-}
-
-glm::vec3 buildVec3(YAML::Node& node)
-{
-	return glm::make_vec3(node.as<std::vector<float>>().data());
-}
-
-glm::vec4 buildVec4(YAML::Node& node)
-{
-	return glm::make_vec4(node.as<std::vector<float> >().data());
-}
-
-glm::vec3 buildVec3(YAML::Node&& node)
-{
-	auto vec = node.as<std::vector<float>>();
-
-	return glm::make_vec3(vec.data());
-}
-
-glm::vec4 buildVec4(YAML::Node&& node)
-{
-	return glm::make_vec4(node.as<std::vector<float> >().data());
-}
-
-glm::mat4 buildMat4(YAML::Node& node)
-{
-	glm::mat4 result;
-
-	for (int i = 0; i < 4; ++i)
-		result[i] = buildVec4(node[i]);
-
-	return result;
-}
-
-glm::mat4 buildMat4(YAML::Node&& node)
-{
-	glm::mat4 result;
-
-	for (int i = 0; i < 4; ++i)
-		result[i] = buildVec4(node[i]);
-
-	return result;
-}
-
-//===-- Builders ----------------------------------------------------------===//
-
-void buildOperator(YAML::Node& node)
-{
-	if (node["type"])
-	{
-		auto enumVal = node["type"].as<std::string>();
-
-		if (!createFns.contains(enumVal))
-			Log::error("Does not know how to load {} operator from file.", enumVal);
-
-		auto id = node["id"].as<int>();
-
-		auto posX = node["position"][0].as<float>();
-		auto posY = node["position"][1].as<float>();
-
-		auto op = createFns[enumVal](ImVec2{ posX, posY });
-		auto coreNode = op->getNodebase();
-
-		const auto* props = coreNode->getOperation();
-
-		ValueSetResult valueResult;
-
-		if (props->isConstructor)
-		{
-			const auto outputType = props->outputTypes[0];
-
-			switch (outputType)
-			{
-			case EValueType::Float:
-				valueResult = coreNode->setValue(node["value"].as<float>());
-				break;
-			case EValueType::Vec3:
-				valueResult = coreNode->setValue(buildVec3(node["value"]));
-				break;
-			case EValueType::Vec4:
-				valueResult = coreNode->setValue(buildVec4(node["value"]));
-				break;
-			case EValueType::Matrix:
-				valueResult = coreNode->setValue(buildMat4(node["value"]));
-				break;
-			default:
-				break;
-			}
+			continue;
 		}
 
-		I3T_ASSERT(valueResult.status == ValueSetResult::Status::Ok);
+		auto parent = input.getParentPin()->getOwner();
 
-		if (coreNode->getOperation()->keyWord == n(ENodeType::Model)) {
-			// op->initialize();
-		}
+		const auto fromId = parent->getId();
+		const auto fromPin = input.getParentPin()->Index;
+		const auto toId = node->getId();
+		const auto toPin = input.Index;
 
-		op->getNodebase()->changeId(id);
+		rapidjson::Value e(kArrayType);
+
+		auto& alloc = m_memento.GetAllocator();
+
+		e.PushBack(fromId, alloc);
+		e.PushBack(fromPin, alloc);
+		e.PushBack(toId, alloc);
+		e.PushBack(toPin, alloc);
+
+		target.PushBack(e.Move(), alloc);
 	}
-}
-
-void buildCamera(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
-{
-	if (node["type"])
-	{
-		auto enumVal = node["type"].as<std::string>();
-
-		auto id = node["id"].as<int>();
-
-		auto posX = node["position"][0].as<float>();
-		auto posY = node["position"][1].as<float>();
-
-		auto camera = addNodeToNodeEditor<WorkspaceCamera>(ImVec2{ posX, posY });
-
-		auto projTransforms = node["proj_transforms"];
-		insertTransformsToSequence(projTransforms, camera->getProjection(), workspaceNodes);
-
-		auto viewTransforms = node["view_transforms"];
-		insertTransformsToSequence(viewTransforms, camera->getView(), workspaceNodes);
-
-		camera->getNodebase()->changeId(id);
-	}
-}
-
-void buildTransform(YAML::Node& node)
-{
-	if (node["type"])
-	{
-		auto enumVal = node["type"].as<std::string>();
-
-		if (!createTransformFns.contains(enumVal))
-			Log::error("Does not know how to load {} transform from file.", enumVal);
-
-		auto id = node["id"].as<int>();
-
-		auto posX = node["position"][0].as<float>();
-		auto posY = node["position"][1].as<float>();
-
-		auto transform = createTransformFns[enumVal](ImVec2{ posX, posY });
-
-		auto coreTransform = transform->getNodebase()->as<Core::Transformation>();
-
-		// transform default values
-		const auto& transformDefaults = Core::getTransformDefaults(enumVal);
-		// for (auto&& [key, val] : node["defaults"])
-		for (auto it = node["defaults"].begin(); it != node["defaults"].end(); ++it)
-		{
-			auto key = it->first.as<std::string>();
-			auto val = it->second;
-
-			auto type = transformDefaults.at(key);
-			switch (type)
-			{
-			case EValueType::Float:
-				coreTransform->setDefaultValue(key, val.as<float>());
-				break;
-			case EValueType::Vec3:
-				coreTransform->setDefaultValue(key, buildVec3(val));
-				break;
-			case EValueType::Quat:
-			{
-				const auto vec4 = buildVec4(val);
-				coreTransform->setDefaultValue(key,glm::make_quat(glm::value_ptr(vec4)));
-				break;
-			}
-			default:
-				break;
-			}
-			// coreTransform->setDefaultValue(keyStr, node["defaults"][key]);
-		}
-
-		coreTransform->getInternalData(0).setValue(buildMat4(node["value"]));
-
-		if (node["saved_value"])
-		{ coreTransform->setSavedValue(buildMat4(node["saved_value"]));
-		}
-
-		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
-		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();
-
-		coreTransform->changeId(id);
-	}
-}
-
-/// Should be called after processing transformation.
-void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
-{
-	if (node["type"])
-	{
-		auto enumVal = node["type"].as<std::string>();
-		I3T_ASSERT(enumVal == Core::g_sequence.keyWord);
-
-		auto id = node["id"].as<int>();
-
-		auto posX = node["position"][0].as<float>();
-		auto posY = node["position"][1].as<float>();
-
-		auto sequence = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().addNodeToPosition<WorkspaceSequence>({ posX, posY });
-
-		auto transformIds = node["transforms"];
-		insertTransformsToSequence(transformIds, sequence, workspaceNodes);
-
-		sequence->getNodebase()->changeId(id);
-	}
-}
-
-void buildScreen(YAML::Node& node)
-{
-	if (node["type"])
-	{
-		auto id = node["id"].as<int>();
-
-		auto posX = node["position"][0].as<float>();
-		auto posY = node["position"][1].as<float>();
-
-		auto screen = addNodeToNodeEditor<GuiScreen>(ImVec2{ posX, posY });
-
-		screen->getNodebase()->changeId(id);
-	}
-}
-
-//===----------------------------------------------------------------------===//
-
-void connectNodes(YAML::Node& sceneData, SceneData& scene, GuiNodes& workspaceNodes)
-{
-	auto edges = sceneData["edges"];
-	for (auto&& edge : edges)
-	{
-		if (edge.size() != 4) continue; // Edge is not valid.
-
-		auto lhs = findNode(workspaceNodes, edge[0].as<unsigned int>());
-		auto rhs = findNode(workspaceNodes, edge[2].as<unsigned int>());
-		if (lhs && rhs)
-		{
-			auto lhsPin = edge[1].as<unsigned int>();
-			auto rhsPin = edge[3].as<unsigned int>();
-
-			auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
-			if (plugResult != ENodePlugResult::Ok)
-				Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSig(), rhs->getNodebase()->getSig(), lhsPin, rhsPin);
-            else
-                std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(rhs)->getInputs().at(rhsPin)->setConnectedWorkspaceOutput(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(lhs)->getOutputs().at(lhsPin).get());
-		}
-	}
-}
-
-SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes)
-{
-	SceneData scene;
-
-	/// \todo MH
-	SerializationVisitor visitor;
-
-	auto sceneData = YAML::Load(rawScene);
-	if (isParsedSceneValid(sceneData))
-	{
-		// Process operators.
-		auto operators = sceneData["operators"];
-		for (auto&& op : operators) buildOperator(op);
-
-		// Process transforms
-		auto transforms = sceneData["transforms"];
-		for (auto&& transform : transforms) buildTransform(transform);
-
-		auto sequences = sceneData["sequences"];
-		for (auto&& sequence : sequences)
-			buildSequence(sequence, workspaceNodes);
-
-		auto cameras = sceneData["cameras"];
-		for (auto&& camera : cameras)
-			buildCamera(camera, workspaceNodes);
-
-		auto screens = sceneData["screens"];
-		for (auto&& screen : screens)
-			buildScreen(screen);
-
-		// Connect all nodes.
-		connectNodes(sceneData, scene, workspaceNodes);
-	}
-	return scene;
 }

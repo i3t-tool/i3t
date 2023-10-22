@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -8,9 +20,9 @@ using namespace Core;
 
 TEST(PlugTest, DotProductOfTwoVec3NodesShouldBeCorrect)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto dotNode = Builder::createNode<ENodeType::Vector3DotVector3>();
+	auto vec1 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto dotNode = Builder::createOperator<EOperatorType::Vector3DotVector3>();
 
 	// Plug vec1 and vec2 to dotNode inputs.
 	plug_expectOk(vec1, dotNode, 0, 0);
@@ -24,8 +36,8 @@ TEST(PlugTest, DotProductOfTwoVec3NodesShouldBeCorrect)
 
 TEST(PlugTest, DifferentPinTypes_NodeShouldNotBeConnected)
 {
-	auto fl = Builder::createNode<ENodeType::FloatToFloat>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto fl = Builder::createOperator<EOperatorType::FloatToFloat>();
+	auto vec3 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
 
 	auto result = GraphManager::plug(vec3, fl, 0, 0);
 
@@ -34,7 +46,7 @@ TEST(PlugTest, DifferentPinTypes_NodeShouldNotBeConnected)
 
 TEST(PlugTest, PlugNodeOuputToTheSameNodeInput_NodeShouldNotBeConnected)
 {
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec3 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
 
 	auto result = GraphManager::plug(vec3, vec3, 0, 0);
 
@@ -49,10 +61,10 @@ TEST(PlugTest, PlugNodeOuputToTheSameNodeInput_NodeShouldNotBeConnected)
  */
 TEST(PlugTest, PlugCannotCreateCycle)
 {
-	auto f1 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f2 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f3 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f4 = Builder::createNode<ENodeType::FloatToFloat>();
+	auto f1 = Builder::createOperator<EOperatorType::FloatToFloat>();
+	auto f2 = Builder::createOperator<EOperatorType::FloatToFloat>();
+	auto f3 = Builder::createOperator<EOperatorType::FloatToFloat>();
+	auto f4 = Builder::createOperator<EOperatorType::FloatToFloat>();
 
 	plug_expectOk(f2, f1, 0, 0);
 	plug_expectOk(f3, f2, 0, 0);
@@ -65,8 +77,8 @@ TEST(PlugTest, PlugCannotCreateCycle)
 
 TEST(PlugTest, UnplugMeFromPluggedNode)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec1 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, vec2, 0, 0);
 
@@ -82,9 +94,9 @@ TEST(PlugTest, UnplugMeFromPluggedNode)
 
 TEST(PlugTest, UnplugInTheMiddleOfChainShouldBePossible)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec1 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec3 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, vec2, 0, 0);
 	plug_expectOk(vec2, vec3, 0, 0);

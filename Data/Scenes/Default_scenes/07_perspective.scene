@@ -1,0 +1,317 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -55.19984436035156,
+                "orbitCameraRotationY": 21.58994865417481,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 8.406620979309082,
+                "iorbitCameraPivot": [
+                    1.3748935461044312,
+                    1.2937798500061036,
+                    -2.212559938430786
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 118,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    778.8001098632813,
+                    279.00006103515627
+                ],
+                "transforms": [
+                    {
+                        "id": 124,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            798.54150390625,
+                            309.64447021484377
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                0.0,
+                                -3.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -3.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [
+            {
+                "id": 125,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    219.6000213623047,
+                    75.19999694824219
+                ],
+                "sequences": [
+                    {
+                        "id": 135,
+                        "label": "view",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            451.9051208496094,
+                            106.00807189941406
+                        ],
+                        "transforms": [
+                            {
+                                "id": 141,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
+                                "position": [
+                                    471.26873779296877,
+                                    136.5535430908203
+                                ],
+                                "type": "LookAt",
+                                "defaultValues": {
+                                    "eye": [
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "center": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "up": [
+                                        0.0,
+                                        1.0,
+                                        0.0
+                                    ]
+                                },
+                                "savedDefaults": {},
+                                "value": [
+                                    [
+                                        1.0,
+                                        0.0,
+                                        -0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        -0.0,
+                                        1.0,
+                                        -0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0
+                                    ],
+                                    [
+                                        -0.0,
+                                        -0.0,
+                                        -1.0,
+                                        1.0
+                                    ]
+                                ],
+                                "synergies": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": 129,
+                        "label": "projection",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            227.26876831054688,
+                            106.00807189941406
+                        ],
+                        "transforms": [
+                            {
+                                "id": 142,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
+                                "position": [
+                                    247.26876831054688,
+                                    136.5535430908203
+                                ],
+                                "type": "Perspective",
+                                "defaultValues": {
+                                    "fovy": 1.0,
+                                    "aspect": 1.3300000429153443,
+                                    "near": 1.0,
+                                    "far": 6.0
+                                },
+                                "savedDefaults": {},
+                                "value": [
+                                    [
+                                        1.3763065338134766,
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        1.8304877281188965,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        -1.399999976158142,
+                                        -1.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        -2.4000000953674318,
+                                        0.0
+                                    ]
+                                ],
+                                "synergies": false,
+                                "locked": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "screens": [
+            {
+                "id": 143,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    776.8001098632813,
+                    -9.000000953674317
+                ],
+                "aspect": [
+                    282.0,
+                    226.0
+                ]
+            }
+        ],
+        "models": [
+            {
+                "id": 147,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    995.6002807617188,
+                    280.4002380371094
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                118,
+                0,
+                147,
+                0
+            ],
+            [
+                125,
+                0,
+                143,
+                0
+            ]
+        ],
+        "zoom": 1.375,
+        "workArea": {
+            "Min": [
+                207.6324005126953,
+                -155.8101043701172
+            ],
+            "Max": [
+                1164.7232666015626,
+                581.6444091796875
+            ]
+        }
+    }
+}

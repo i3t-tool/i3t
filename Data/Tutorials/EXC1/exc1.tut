@@ -1,0 +1,72 @@
+---
+title: Cvičení - Stůl
+description: Procvičení práce s I3T kde vytvoříme stůl!
+thumbnail: table_thumb.png
+language: cs
+scene: EXC1/exc1.scene
+---
+headline: První cvičení
+
+Vítej u *prvního cvičení*!
+
+Cvičení budou *podobná tutoriálům*, rozdíl bude v tom, že se budou skládat jen z *úkolů*.
+
+V tomto cvičení si vyzkoušíme tvorbu *stolu* z objektů v *I3T*.
+
+![Stůl s konvičkou](table.png)
+
+*P.S.* V modelování nám pomůže *duch stolu*, který ukazuje, jak má vypadat *výsledek* cvičení
+
+--
+headline: Deska stolu
+
+task: Přidej stolu desku a uprav ji tak, aby pasovala na nohy ducha
+
+![Deska stolu](table_board.png)
+
+task: Přejmeuj si blok na "Deska"
+
+--
+headline: Noha
+
+task: Přidej do scény novou kostku a uprav ji tak, aby vypadala jako noha stolu
+
+![Deska stolu s nohou](leg.png)
+
+--
+headline: Napojení nohy
+
+task: Nohu napoj na roh stolu
+
+![Noha napojená na desku stolu](leg_positioned.png)
+
+--
+headline: Další nohy stolu
+
+task: Dodej stolu další nohy
+
+![Stůl se všemi napojenými nohami](legs.png)
+
+--
+headline: Jednotný stůl
+
+task: Posuň celý stůl do úrovně ducha pomocí jedné matice translace 
+
+![Stůl posunutý na úroveň země](table_translated.png)
+
+--
+headline: Konvička
+
+task: Přidej konvičku na stůl tak, aby byla součástí stolu a pasovala do ducha konvičky
+
+![Stůl s pootočenou konvičou ](table_teapot.png)
+
+--
+headline: A máme hotovo!
+
+*Stůl* je hotový. Topologie *Workspace* by měla vypadat zhruba takhle:
+
+![Topologie workspace](scene.png)
+
+Vidíš, že využíváme hlavně možnost *větvit sekvence*. Tím můžeme měnit několik modelů *stejnými transformacemi*.
+

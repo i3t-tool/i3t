@@ -13,21 +13,21 @@ class MeshShaderProgram;
 /// manages rendering of a MeshGeometry
 class MeshNode : public SceneNode {
 public:
-  MeshNode(const std::string & name = "<MeshNode>", SceneNode* parent = NULL);
-  ~MeshNode();
+  explicit MeshNode(const std::string& name = "<MeshNode>", SceneNode* parent = NULL);
+  ~MeshNode() override;
 
   /// associates mesh with this node (also calls loadProgram())
   void setGeometry(MeshGeometry* mesh);
 
   /// reimplemented draw
-  void draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix);
+  void draw(const glm::mat4& view_matrix, const glm::mat4& projection_matrix) const override;
 
 protected:
   /// creates shader
   virtual void loadProgram();
 
   /// shader program to use during the draw() procedure
-  MeshShaderProgram * m_program;
+  MeshShaderProgram* m_program;
   /// identifier for the vertex array object
   GLuint m_vertexArrayObject;
   /// geometry associated with this MeshObject

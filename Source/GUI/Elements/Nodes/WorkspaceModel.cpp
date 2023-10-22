@@ -1,195 +1,283 @@
+/**
+ * \file
+ * \brief
+ * \authors Martin Herich, Petr Felkel, Dan Rakušan
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "WorkspaceModel.h"
 
-#include "World/HardcodedMeshes.h"
-#include "World/RenderTexture.h" // FBO
+#include "Commands/Command.h"
+#include "Core/Resources/ResourceManager.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "Utils/Color.h"
+#include "Utils/HSLColor.h"
+#include "Viewport/Viewport.h"
+#include "Viewport/entity/nodes/SceneModel.h"
+#include "Viewport/shader/PhongShader.h"
 
-#undef TEST
-#define TEST1
-
-const pgr::MeshData* g_meshes[] = { //todo - remove
-		&unitcubeMesh, &three_axisMesh};
-
-const char* g_meshesNames[] = { //todo - remove
-		"cube", "axes"};
-
-const float angleX = 30.0; //degree
-const float angleY = 55.0; //degree
-
-WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne) :
-		WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Model>()), m_axisOn(false),
-		m_showModel(false)
+WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createModelNode())
 {
 	init();
-	//setDataItemsWidth();
+	// setDataItemsWidth();
 }
 
 WorkspaceModel::~WorkspaceModel()
 {
-	// delete model from the World
-	App::get().world()->removeModel(m_sceneModel);
+	const auto node = getNodebase()->as<Core::Model>();
+	node->resetModelPosition();
 
-	// delete local workspace model
-	if (m_workspaceModel) delete (m_workspaceModel);
-
-	if (renderTexture) delete (renderTexture);
-
-	if (m_camera) delete (m_camera);
+	I3T::getViewport()->removeEntity(m_viewportModel);
 }
 
 void WorkspaceModel::popupContent_axis_showmodel()
 {
+	auto model = m_viewportModel.lock();
 
-	if (ImGui::MenuItem(fmt::format("Switch axis {}", m_axisOn ? "off" : "on").c_str())) { m_axisOn = !m_axisOn; }
-	if (ImGui::MenuItem(fmt::format("{} model", m_showModel ? "Hide" : "Show").c_str())) { m_showModel = !m_showModel; }
+	if (ImGui::MenuItem("Show axes", NULL, model->m_showAxes))
+	{
+		model->m_showAxes = !model->m_showAxes;
+	}
+	if (ImGui::MenuItem("Show model", NULL, model->m_visible))
+	{
+		model->m_visible = !model->m_visible;
+	}
+	if (ImGui::BeginMenu("Transparency"))
+	{
+		if (ImGui::Checkbox("Opaque", &model->m_opaque))
+		{
+			// model->m_opaque = !model->m_opaque;
+		}
+		ImGui::Checkbox("Back-face cull", &model->m_backFaceCull);
+		ImGui::SliderFloat("Opacity", &model->m_opacity, 0.0f, 1.0f, "%.2f");
+		ImGui::EndMenu();
+	}
+
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+	if (ImGui::BeginMenu("Set tint"))
+	{
+		if (ImGui::BeginMenu("Color"))
+		{
+			if (ImGui::MenuItem("None"))
+			{
+				model->m_tint = glm::vec3(1.0f);
+			}
+			if (ImGui::MenuItem("Red"))
+			{
+				model->m_tint = calculateTint(Color::RED, model);
+			}
+			if (ImGui::MenuItem("Green"))
+			{
+				model->m_tint = calculateTint(Color::GREEN, model);
+			}
+			if (ImGui::MenuItem("Blue"))
+			{
+				model->m_tint = calculateTint(Color::BLUE, model);
+			}
+			if (ImGui::MenuItem("Yellow"))
+			{
+				model->m_tint = calculateTint(Color::YELLOW, model);
+			}
+			if (ImGui::MenuItem("Teal"))
+			{
+				model->m_tint = calculateTint(Color::TEAL, model);
+			}
+			if (ImGui::MenuItem("Magenta"))
+			{
+				model->m_tint = calculateTint(Color::MAGENTA, model);
+			}
+			if (ImGui::MenuItem("Light Blue"))
+			{
+				model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
+			}
+			if (ImGui::MenuItem("Orange"))
+			{
+				model->m_tint = calculateTint(Color::ORANGE, model);
+			}
+			if (ImGui::MenuItem("Brown"))
+			{
+				model->m_tint = calculateTint(Color::BROWN, model);
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+		ImGui::SliderFloat("Strength", &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
+		ImGui::EndMenu();
+	}
+	ImGui::PopItemFlag();
+
+	if (ImGui::BeginMenu("Change model"))
+	{
+		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
+		{
+			if (ImGui::MenuItem(resource.alias.c_str()))
+			{
+				model->setModel(resource.alias);
+			}
+		}
+		std::vector<std::string> importedResources = RMI.getImportedResourceAliases();
+		if (!importedResources.empty())
+		{
+			ImGui::Separator();
+			for (const auto& alias : importedResources)
+			{
+				Core::Mesh* importedModel = RMI.meshByAlias(alias);
+				if (importedModel)
+				{
+					if (ImGui::MenuItem(alias.c_str()))
+					{
+						model->setModel(alias);
+					}
+				}
+				else
+				{
+					ImGui::MenuItem(alias.c_str(), NULL, false, false);
+				}
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
+
+glm::vec3 WorkspaceModel::calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model)
+{
+	//	if (model->m_mesh->m_textureCount > 0)
+	//	{
+	//		glm::vec3 hsl;
+	//		rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
+	//		hsl.y = 0.8;
+	//		hsl.z = 0.8;
+	//		hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
+	//	}
+	return color;
 }
 
 void WorkspaceModel::popupContent()
 {
-	WorkspaceNodeWithCoreDataWithPins::popupContent();
-	popupContent_axis_showmodel();
-}
+	WorkspaceNodeWithCoreData::drawMenuSetEditable();
 
-//bool WorkspaceModel::drawDataFull(, int index)
-//{
-//	ImGui::PushItemWidth(getDataItemsWidth(diwne));
-//
-//	if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
-//	{
-//		auto* mesh = g_meshes[m_currentModelIdx];
-//	}
-//
-//	ImGui::PopItemWidth();
-//	return false;
-//}
+	ImGui::Separator();
+
+	popupContent_axis_showmodel();
+
+	ImGui::Separator();
+
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
+}
 
 void WorkspaceModel::init()
 {
+	m_viewportModel = I3T::getViewport()->createModel(getId());
+	auto modelPtr = m_viewportModel.lock();
+	modelPtr->m_showAxes = true;
+	modelPtr->m_visible = true;
 
-	auto* object = App::get().world()->addModel("CubeGray"); // object added into the scene graph
-	m_sceneModel = object;
+	// Setup preview render options
+	m_renderOptions.framebufferAlpha = true;
 
-	// second object just for preview in this box in the Workspace
-	m_workspaceModel = new GameObject(unitcubeMesh, &World::shader0, World::textures["cube"]);
-	m_workspaceModel->addComponent(new Renderer());
-
-	// nice initial transformation
-	m_workspaceModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
-	m_workspaceModel->rotate(glm::vec3(0, 1, 0), angleY);
-	m_workspaceModel->rotate(glm::vec3(1, 0, 0), angleX);
-
-	// pass object pointer to the core
-	// to remove the warning:
-	ValueSetResult result = m_nodebase->setValue(
-			static_cast<void*>(object)); //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
+	// Callback that gets called when the underlying Model node updates values
+	// The Model node also updates a public model matrix variable which we can
+	// read
+	m_nodebase->addUpdateCallback([this](Core::Node* node) {
+		Core::Model* modelNode = dynamic_cast<Core::Model*>(node);
+		if (modelNode)
+		{
+			m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
+		}
+	});
 }
 
+bool WorkspaceModel::topContent()
+{
+	// TODO: (DR) This call might be unnecessary as the same call is made in WorkspaceNode, for color
+	// override perhaps? Similarly in WorkspaceScreen. (Note sure, noting so I don't forget)
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+
+	return WorkspaceNodeWithCoreData::topContent();
+}
 
 bool WorkspaceModel::middleContent()
 {
-
-
 	bool interaction_happen = false;
 
-#ifdef TEST1
-	ImGui::Text("Nad texturou      ");
-
-	ImGui::PushItemWidth(50);
-	interaction_happen = ImGui::DragFloat("float: ", &val, 0.01f, -1.0f, 1.0f);
-	ImGui::PopItemWidth();
-#endif
-
-#if 1
-	auto pin = m_nodebase->getInPin(0);
-	//const DataStore& data;
-
-	//if(pin.isPluggedIn())
-	//data = pin.data();
-	//else
-	//	auto data = nullptr;
-
-	//auto data = m_nodebase->getInPin(0).data();
-#endif
-
-	// Lazy texture creation
-	if (!m_textureID)
+	if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
 	{
-		renderTexture = new RenderTexture(
-				&m_textureID, static_cast<int>(m_textureSize.x),
-				static_cast<int>(m_textureSize.y)); // create and get the FBO and color Attachment for rendering
-
-#ifdef TEST
-		// block of control checks
-		m_fbo				 = renderTexture->getFbo();
-		GLuint color = renderTexture->getColor(); //todo getColorAttachmentID
-		IM_ASSERT(renderTexture->getColor() == m_textureID);
-		IM_ASSERT(renderTexture->getWidth() == w);
-		IM_ASSERT(renderTexture->getHeight() == h);
-#endif
-
-		// Create camera rendering to the user-defined framebuffer
-		// Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
-		// m_camera = new Camera(60.0f, m_sceneModel, renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
-		m_camera = new Camera(60.0f, m_workspaceModel,
-													renderTexture); // version with the additional object just for this box in the workspace
-		// m_camera->m_perspective = glm::perspective(glm::radians(60.0f), float(m_textureSize.x) / float(m_textureSize.y), 0.2f, 1000.0f);
+		return interaction_happen;
 	}
 
-#ifdef TEST
-	// Trial draw to new fbo - works fine, but I should use camera
-	GLint viewport[4]; // 3D view viewport
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, static_cast<GLsizei>(m_textureSize.x), static_cast<GLsizei>(m_textureSize.y));
-	glClearColor(val, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	int width = m_textureSize.x * diwne.getWorkAreaZoom();
+	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-#endif
+#define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
+	ImVec2 zoomedTextureSize =
+	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 
-	//const float angleZ = 45.0;  //degree
-	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
-	// m_sceneModel->rotate(glm::vec3(0,1,0),angleY);
-	// m_sceneModel->rotate(glm::vec3(1,0,0),angleX);
-	m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -val));
-	m_camera->update();
+	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
-	//m_sceneModel->rotate(glm::vec3(1,0,0),-angleX);
-	//m_sceneModel->rotate(glm::vec3(0,1,0),-angleY);
-	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, 4.5));
+	I3T::getViewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
+	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
-	// \todo correct image size in the box
-	//float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
-	//float imageWidth = m_textureSize.x + 2 * padding;
-
-	//ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
-	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  // fixed texture may be enough
-	//ImGui::Image((ImTextureID)m_textureID, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f),
-							 ImVec2(1.0f, 0.0f)); //vertiocal flip
-
-	//if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
-	//{
-	//	auto* mesh = g_meshes[m_currentModelIdx];
-
-	//	auto* object = App::get().world()->addModel("CubeGray");
-	//m_nodebase->setValue(static_cast<void*>(object));
-	//}
-
-	//ImGui::Text("Pod texturou");
+	if (framebuffer)
+	{
+		ImGui::Image((void*) (intptr_t) framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
+		             ImVec2(1.0f, 0.0f) // vertical flip
+		);
+	}
+	else
+	{
+		ImGui::Text("Failed to draw preview!");
+	}
 
 	return interaction_happen;
 }
 
-int WorkspaceModel::maxLenghtOfData() //todo
+int WorkspaceModel::maxLengthOfData() // todo
 {
-	//    Debug::Assert(false, "Calling WorkspaceModel::maxLenghtOfData() make no sense because Model has no float data to show");
-	//    return -1; /* should be unused */
-	return 0; /* \todo JH not sure where it is used... fall on zoom with Model on Workspace */
+	return 0;
 }
 
-void WorkspaceModel::drawMenuLevelOfDetail() //todo
+void WorkspaceModel::drawMenuLevelOfDetail() // todo
 {
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-																{WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
+bool WorkspaceModel::processSelect()
+{
+	auto model = m_viewportModel.lock();
+	model->m_highlight = true;
+	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+
+	return WorkspaceNodeWithCoreDataWithPins::processSelect();
+}
+
+bool WorkspaceModel::processUnselect()
+{
+	auto model = m_viewportModel.lock();
+	if (m_influenceHighlight)
+	{
+		model->m_highlight = true;
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
+	}
+	else
+	{
+		model->m_highlight = false;
+	}
+
+	return WorkspaceNodeWithCoreDataWithPins::processUnselect();
 }

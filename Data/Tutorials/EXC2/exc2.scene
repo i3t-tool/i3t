@@ -1,0 +1,1289 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -52.3000602722168,
+                "orbitCameraRotationY": 34.3499870300293,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 36.53987121582031,
+                "iorbitCameraPivot": [
+                    -0.40460947155952456,
+                    2.134119272232056,
+                    0.2379298210144043
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 95,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    799.0820922851563,
+                    57.714271545410159
+                ],
+                "transforms": [
+                    {
+                        "id": 101,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1292.865234375,
+                            76.98422241210938
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                4.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.10000000149011612,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                3.200000047683716,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 144,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    580.0842895507813,
+                    153.51400756835938
+                ],
+                "transforms": [
+                    {
+                        "id": 150,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "position": [
+                            1377.6650390625,
+                            316.9842224121094
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 151,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1545.865234375,
+                            316.9842224121094
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 116,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    800.2832641601563,
+                    97.04740142822266
+                ],
+                "transforms": [
+                    {
+                        "id": 122,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1323.26513671875,
+                            131.38421630859376
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                2.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                2.0,
+                                0.0
+                            ],
+                            [
+                                -1.0,
+                                0.0,
+                                -6.5,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 109,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    795.4149780273438,
+                    138.91424560546876
+                ],
+                "transforms": [
+                    {
+                        "id": 115,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1318.465087890625,
+                            174.58421325683595
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                0.10000000149011612,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.900000095367432,
+                                0.0
+                            ],
+                            [
+                                4.400000095367432,
+                                3.0,
+                                -2.799999952316284,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 102,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    797.6819458007813,
+                    182.71429443359376
+                ],
+                "transforms": [
+                    {
+                        "id": 108,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1321.6650390625,
+                            217.78421020507813
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                1.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.10000000149011612,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.5,
+                                0.0
+                            ],
+                            [
+                                2.5,
+                                0.0,
+                                -6.5,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 130,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    804.7501220703125,
+                    214.91444396972657
+                ],
+                "transforms": [
+                    {
+                        "id": 136,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1374.465087890625,
+                            323.38421630859377
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                4.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.10000000149011612,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                -8.800000190734864,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 137,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    818.8167114257813,
+                    252.5806884765625
+                ],
+                "transforms": [
+                    {
+                        "id": 143,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1315.26513671875,
+                            296.1842346191406
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                4.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.10000000149011612,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                6.099999904632568,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                -0.10000000149011612,
+                                -2.799999952316284,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 123,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    811.681640625,
+                    291.71435546875
+                ],
+                "transforms": [
+                    {
+                        "id": 129,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1430.465087890625,
+                            384.1842346191406
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                0.10000000149011612,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                3.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.900000095367432,
+                                0.0
+                            ],
+                            [
+                                -4.400000095367432,
+                                3.0,
+                                -2.799999952316284,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 152,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    810.6861572265625,
+                    338.4476013183594
+                ],
+                "transforms": [
+                    {
+                        "id": 158,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1334.465087890625,
+                            377.78424072265627
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                6.699999809265137,
+                                -7.599999904632568
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                6.699999809265137,
+                                -7.599999904632568,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 159,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1511.26513671875,
+                            377.78424072265627
+                        ],
+                        "type": "EulerX",
+                        "defaultValues": {
+                            "angle": -0.45102688670158389
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.8999999761581421,
+                                -0.43588995933532717,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.43588995933532717,
+                                0.8999999761581421,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 160,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1698.6650390625,
+                            377.78424072265627
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                6.599999904632568,
+                                0.10000000149011612,
+                                5.400000095367432
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                6.599999904632568,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.10000000149011612,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.400000095367432,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 161,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    797.4175415039063,
+                    18.981081008911134
+                ],
+                "transforms": [
+                    {
+                        "id": 167,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1364.865234375,
+                            443.38421630859377
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                6.699999809265137,
+                                2.0999999046325685
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                6.699999809265137,
+                                2.0999999046325685,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 168,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1541.6650390625,
+                            443.38421630859377
+                        ],
+                        "type": "EulerX",
+                        "defaultValues": {
+                            "angle": 0.45102688670158389
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.8999999761581421,
+                                0.43588995933532717,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                -0.43588995933532717,
+                                0.8999999761581421,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 169,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            1729.065185546875,
+                            443.38421630859377
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                6.599999904632568,
+                                0.10000000149011612,
+                                5.400000095367432
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                6.599999904632568,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.10000000149011612,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.400000095367432,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [
+            {
+                "id": 170,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    67.98992919921875,
+                    102.22850799560547
+                ],
+                "sequences": [
+                    {
+                        "id": 180,
+                        "label": "view",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            300.265380859375,
+                            132.98422241210938
+                        ],
+                        "transforms": [
+                            {
+                                "id": 186,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
+                                "position": [
+                                    320.0653076171875,
+                                    163.38424682617188
+                                ],
+                                "type": "LookAt",
+                                "defaultValues": {
+                                    "eye": [
+                                        0.0,
+                                        0.0,
+                                        10.0
+                                    ],
+                                    "center": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "up": [
+                                        0.0,
+                                        1.0,
+                                        0.0
+                                    ]
+                                },
+                                "savedDefaults": {},
+                                "value": [
+                                    [
+                                        1.0,
+                                        0.0,
+                                        -0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        -0.0,
+                                        1.0,
+                                        -0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0
+                                    ],
+                                    [
+                                        -0.0,
+                                        -0.0,
+                                        -10.0,
+                                        1.0
+                                    ]
+                                ],
+                                "synergies": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": 174,
+                        "label": "projection",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            74.46533203125,
+                            132.98422241210938
+                        ],
+                        "transforms": [
+                            {
+                                "id": 187,
+                                "render": true,
+                                "numberOfDecimals": 1,
+                                "LOD": "SetValues",
+                                "position": [
+                                    94.46533203125,
+                                    163.38424682617188
+                                ],
+                                "type": "Perspective",
+                                "defaultValues": {
+                                    "fovy": 1.2217304706573487,
+                                    "aspect": 1.3300000429153443,
+                                    "near": 2.0,
+                                    "far": 6.5
+                                },
+                                "savedDefaults": {},
+                                "value": [
+                                    [
+                                        1.0737954378128052,
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        1.4281480312347413,
+                                        0.0,
+                                        0.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        -1.8888888359069825,
+                                        -1.0
+                                    ],
+                                    [
+                                        0.0,
+                                        0.0,
+                                        -5.777777671813965,
+                                        0.0
+                                    ]
+                                ],
+                                "synergies": false,
+                                "locked": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "screens": [
+            {
+                "id": 188,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    576.0192260742188,
+                    2.180924892425537
+                ],
+                "aspect": [
+                    415.4759521484375,
+                    357.0954895019531
+                ]
+            }
+        ],
+        "models": [
+            {
+                "id": 206,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    982.8662719726563,
+                    11.866767883300782
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 204,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    989.4634399414063,
+                    54.80024719238281
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 192,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    992.7310180664063,
+                    90.66664123535156
+                ],
+                "model": "Duck",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 208,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1001.1303100585938,
+                    139.53347778320313
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 198,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1016.7964477539063,
+                    180.33335876464845
+                ],
+                "model": "Duck",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 196,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1007.2650146484375,
+                    213.86671447753907
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 202,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1002.5299682617188,
+                    254.86672973632813
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 194,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1012.7304077148438,
+                    290.3336486816406
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 200,
+                "render": false,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1028.266357421875,
+                    333.4666748046875
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                161,
+                0,
+                206,
+                0
+            ],
+            [
+                95,
+                0,
+                204,
+                0
+            ],
+            [
+                144,
+                0,
+                95,
+                0
+            ],
+            [
+                144,
+                0,
+                116,
+                0
+            ],
+            [
+                116,
+                0,
+                192,
+                0
+            ],
+            [
+                109,
+                0,
+                208,
+                0
+            ],
+            [
+                144,
+                0,
+                109,
+                0
+            ],
+            [
+                144,
+                0,
+                102,
+                0
+            ],
+            [
+                102,
+                0,
+                198,
+                0
+            ],
+            [
+                130,
+                0,
+                196,
+                0
+            ],
+            [
+                144,
+                0,
+                130,
+                0
+            ],
+            [
+                144,
+                0,
+                137,
+                0
+            ],
+            [
+                144,
+                0,
+                123,
+                0
+            ],
+            [
+                144,
+                0,
+                152,
+                0
+            ],
+            [
+                137,
+                0,
+                202,
+                0
+            ],
+            [
+                123,
+                0,
+                194,
+                0
+            ],
+            [
+                152,
+                0,
+                200,
+                0
+            ],
+            [
+                144,
+                0,
+                161,
+                0
+            ],
+            [
+                170,
+                0,
+                188,
+                0
+            ]
+        ],
+        "zoom": 0.625,
+        "workArea": {
+            "Min": [
+                -855.1346435546875,
+                -94.21576690673828
+            ],
+            "Max": [
+                2191.26513671875,
+                507.38421630859377
+            ]
+        }
+    }
+}

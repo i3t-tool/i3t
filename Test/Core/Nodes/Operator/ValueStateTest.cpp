@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -6,13 +18,13 @@ using namespace Core;
 
 TEST(ValueStateTest, _)
 {
-	auto vec3 = GraphManager::createNode<ENodeType::Vector3ToVector3>();
-	EXPECT_EQ(vec3->getState(0), EValueState::Editable);
+	auto leftNode = GraphManager::createNode<EOperatorType::Vector3ToVector3>();
+	EXPECT_EQ(leftNode->getState(0), EValueState::Editable);
 
-	auto tmp = GraphManager::createNode<ENodeType::Vector3ToVector3>();
-	GraphManager::plug(tmp, vec3, 0, 0);
-	EXPECT_EQ(vec3->getState(0), EValueState::Locked);
+	auto rightNode = GraphManager::createNode<EOperatorType::Vector3ToVector3>();
+	GraphManager::plug(leftNode, rightNode, 0, 0);
+	EXPECT_EQ(rightNode->getState(0), EValueState::Locked);
 
-	GraphManager::unplugAll(tmp);
-	EXPECT_EQ(vec3->getState(0), EValueState::Editable);
+	GraphManager::unplugAll(rightNode);
+	EXPECT_EQ(rightNode->getState(0), EValueState::Editable);
 }

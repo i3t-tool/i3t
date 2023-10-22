@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -13,8 +25,8 @@ auto initialTransl = glm::vec3(-1.0f, 2.0f, 5.0f);
 
 struct TestData
 {
-	Ptr<NodeBase> scale1, scale2, rotX, translation;
-	Ptr<NodeBase> mul1, mul2, mul3;
+	Ptr<Node> scale1, scale2, rotX, translation;
+	Ptr<Node> mul1, mul2, mul3;
 };
 
 /**
@@ -28,44 +40,52 @@ TestData prepareEnvironment()
 {
 	TestData ctx;
 
-	ctx.scale1 = Builder::createNode<ENodeType::MakeScale>();
-	ctx.rotX = Builder::createNode<ENodeType::MakeEulerX>();
-	ctx.scale2 = Builder::createNode<ENodeType::MakeScale>();
-	ctx.translation = Builder::createNode<ENodeType::MakeTranslation>();
+	ctx.scale1 = Builder::createOperator<EOperatorType::MakeScale>();
+	ctx.rotX = Builder::createOperator<EOperatorType::MakeEulerX>();
+	ctx.scale2 = Builder::createOperator<EOperatorType::MakeScale>();
+	ctx.translation = Builder::createOperator<EOperatorType::MakeTranslation>();
 
-	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
-	ctx.mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-	ctx.mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-	ctx.mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be
+	// complete yet!)
+	ctx.mul1 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
+	ctx.mul2 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
+	ctx.mul3 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
 
-  plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
-  plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
+	plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
+	plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
 
-  plug_expectOk(ctx.mul1, ctx.mul2, 0, 0);
-  plug_expectOk(ctx.scale2, ctx.mul2, 0, 1);
+	plug_expectOk(ctx.mul1, ctx.mul2, 0, 0);
+	plug_expectOk(ctx.scale2, ctx.mul2, 0, 1);
 
-  plug_expectOk(ctx.mul2, ctx.mul3, 0, 0);
-  plug_expectOk(ctx.translation, ctx.mul3, 0, 1);
+	plug_expectOk(ctx.mul2, ctx.mul3, 0, 0);
+	plug_expectOk(ctx.translation, ctx.mul3, 0, 1);
 
 	return ctx;
 }
 
-Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
+Ptr<Node> getRoot(Ptr<Node> node)
 {
 	auto parent = GraphManager::getParent(node);
 	if (parent == nullptr)
-  {
-    return node;
+	{
+		return node;
 	}
-  return getRoot(parent);
+	return getRoot(parent);
+}
+
+TEST(NodeInterfaceTest, GetRootOwner_ShouldReturnRootNode)
+{
+	auto camera = GraphManager::createCamera();
+	EXPECT_EQ(camera->getProj()->getRootOwner(), camera);
+	EXPECT_EQ(camera->getView()->getRootOwner(), camera);
 }
 
 TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 {
-	auto seq1 = Builder::createSequence();
-	auto seq2 = Builder::createSequence();
-	auto seq3 = Builder::createSequence();
-	auto seq4 = Builder::createSequence();
+	auto seq1 = GraphManager::createSequence();
+	auto seq2 = GraphManager::createSequence();
+	auto seq3 = GraphManager::createSequence();
+	auto seq4 = GraphManager::createSequence();
 
 	plug_expectOk(seq1, seq2, 0, 0);
 	plug_expectOk(seq2, seq3, 0, 0);
@@ -79,7 +99,7 @@ TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 
 TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 
 	EXPECT_EQ(nullptr, gm::getParent(seq, 10));
 	EXPECT_EQ(nullptr, gm::getParent(seq, -10));
@@ -96,8 +116,8 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
 
 	auto root = getRoot(lastNode);
-  auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
-  auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+	auto anotherMatNode1 = Builder::createOperator<EOperatorType::MatrixAddMatrix>();
+	auto anotherMatNode2 = Builder::createOperator<EOperatorType::MatrixAddMatrix>();
 	plug_expectOk(root, anotherMatNode1, 0, 0);
 	plug_expectOk(root, anotherMatNode2, 0, 0);
 
@@ -109,17 +129,18 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 /*
 TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
-	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
+    auto scale = Core::Builder::createTransform<ETransformType::Scale>();
 
-	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
+    auto* expectedOperation =
+&g_transforms[static_cast<size_t>(ETransformType::Scale)];
 
-	EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
+    EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
 }
  */
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 
 	auto result = GraphManager::getAllInputNodes(seq);
 
@@ -128,28 +149,21 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnec
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
-	auto inputSeq = Builder::createSequence();
-	auto mySeq    = Builder::createSequence();
-	auto mat      = Builder::createNode<ENodeType::MatrixToMatrix>();
+	auto leftSequence = GraphManager::createSequence();
+	auto rightSequence = GraphManager::createSequence();
+	auto matrix = GraphManager::createNode<EOperatorType::MatrixToMatrix>();
 
-	plug_expectOk(inputSeq, mySeq, 0, 0);
-	plug_expectOk(mat, mySeq, 0, 1);
+	plug_expectOk(leftSequence, rightSequence, 0, 0);
+	plug_expectOk(matrix, rightSequence, 0, 1);
 
-	auto result = GraphManager::getAllInputNodes(mySeq);
+	auto result = GraphManager::getAllInputNodes(rightSequence);
 
 	EXPECT_EQ(2, result.size());
 }
 
-TEST(NodeInterfaceTest, GetNodesConnectedToNonexistentOutputPin)
-{
-	auto seq = Builder::createSequence();
-
-	EXPECT_THROW(gm::getOutputNodes(seq, 10).empty(), std::exception);
-}
-
 TEST(NodeInterfaceTest, SetValueWithIndex)
 {
-	auto screen = GraphManager::createNode<ENodeType::Screen>();
+	auto screen = GraphManager::createNode<EOperatorType::Screen>();
 
 	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
 	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);

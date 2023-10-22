@@ -1,75 +1,97 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "LogWindow.h"
 
 #include "imgui.h"
 
-#include "Core/Nodes/GraphManager.h"
+#include "API.h"
+#include "Core/Input/InputBindings.h"
+#include "Core/Input/InputManager.h"
+#include "GUI/Theme.h"
 #include "Logger/Logger.h"
 
 LogWindow::LogWindow()
 {
 #ifdef I3T_DEBUG
 	Input.bindAction("MyTestAction", EKeyState::Pressed, [] {
-    Log::info("MyTestAction triggered!");
+		LOG_INFO("MyTestAction triggered!");
 	});
 
 	Input.bindAxis("MyTestAxis", [](float val) {
-	  Log::info("MyTestAxis triggered: {}!", val);
-  });
+		LOG_INFO("MyTestAxis triggered: {}!", val);
+	});
 
 	////
 	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
 		const auto isActionTriggered = InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
-		Log::info("InputManager::isActionTriggered(\"createAndPlugConstructor\") = {}", isActionTriggered);
+		LOG_INFO("InputManager::isActionTriggered("
+		         "\"createAndPlugConstructor\") = {}",
+		         isActionTriggered);
 	});
 	////
 
 	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
-		Log::info("bind: (mouse click + left ctrl) pressed");
+		LOG_INFO("bind: (mouse click + left ctrl) pressed");
 	});
 
 	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
-		Log::info("scrollUp");
+		LOG_INFO("scrollUp");
 	});
 
 	Input.bindAction("scrollDown", EKeyState::Pressed, []() {
-		Log::info("scrollDown");
+		LOG_INFO("scrollDown");
 	});
 
 	Input.bindAxis("scroll", [](float val) {
-		Log::info("scroll: {}", val);
+		LOG_INFO("scroll: {}", val);
 	});
 #endif
 }
 
 void LogWindow::render()
 {
-	ImGui::Begin(getName("Log View").c_str(), getShowPtr());
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::Begin(setName("Log View").c_str(), getShowPtr());
+	ImGui::PopStyleColor();
+
+	this->updateWindowInfo();
 
 	ImGui::Text("Log output");
 
 	/// \todo MH test code, remove
-  static bool val = true;
+	static bool val = true;
 
-  ImGui::Text("Switch fire action key"); ImGui::SameLine();
-  std::string s;
-  for (auto action : InputBindings::getActionMapping("fire"))
-  {
+	ImGui::Text("Switch fire action key");
+	ImGui::SameLine();
+	std::string s;
+	for (auto action : InputBindings::getActionMapping("fire"))
+	{
 		s += std::to_string(action.code);
 	}
 	ImGui::Text("Current keys: %s", s.c_str());
 	if (ImGui::Button("Switch"))
-  {
+	{
 #ifdef I3T_DEBUG
 		val = !val;
 		if (val)
-    {
+		{
 			InputBindings::setActionKey("fire", Keys::Code::b);
 			InputBindings::removeActionKey("fire", Keys::Code::v);
 		}
 		else
-    {
-      InputBindings::setActionKey("fire", Keys::Code::v);
-      InputBindings::removeActionKey("fire", Keys::Code::b);
+		{
+			InputBindings::setActionKey("fire", Keys::Code::v);
+			InputBindings::removeActionKey("fire", Keys::Code::b);
 		}
 #endif
 	}
@@ -83,7 +105,7 @@ void LogWindow::render()
 
 	if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released))
 	{
-		Log::info("query: (mouse click + left ctrl) pressed");
+		LOG_INFO("query: (mouse click + left ctrl) pressed");
 	}
 
 	ImGui::EndChild();

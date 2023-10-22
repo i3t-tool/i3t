@@ -1,22 +1,30 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "Window.h"
 
-#include <pgr.h>
 #include "stb_image.h"
+#include <pgr.h>
 
 #include "Commands/ApplicationCommands.h"
-#include "Logger/LoggerInternal.h"
+#include "Config.h"
+#include "Logger/Logger.h"
 
 void glfwErrorCallback(int error, const char* description)
 {
 	pgr::dieWithError(description);
 }
 
-Window::~Window()
-{
-	glfwTerminate();
-}
-
-void Window::init()
+void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat)
 {
 	glfwSetErrorCallback(glfwErrorCallback);
 	if (!glfwInit())
@@ -25,14 +33,14 @@ void Window::init()
 		exit(EXIT_FAILURE);
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, oglVersionMajor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, oglVersionMinor);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, oglForwardCompat ? GLFW_TRUE : GLFW_FALSE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, oglDebug ? GLFW_TRUE : GLFW_FALSE);
 
-	m_mainWindow =
-			glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle, nullptr, nullptr);
+	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, BASE_WINDOW_TITLE.c_str(), nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -40,14 +48,16 @@ void Window::init()
 		exit(EXIT_FAILURE);
 	}
 
-	setTitle(g_baseTitle);
+	glfwSetWindowUserPointer(m_mainWindow, (void*) this);
+
+	setTitle(BASE_WINDOW_TITLE.c_str());
 
 	int x, y, channels;
 	constexpr int desiredChannels = 4;
-	auto* pixels = stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
+	auto* pixels = stbi_load("Data/Textures/logoi3t.png", &x, &y, &channels, desiredChannels);
 	if (pixels)
 	{
-		GLFWimage image{ x, y, pixels };
+		GLFWimage image{x, y, pixels};
 		glfwSetWindowIcon(m_mainWindow, 1, &image);
 	}
 	stbi_image_free(pixels);
@@ -55,14 +65,9 @@ void Window::init()
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.
 
-	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
-
-	/*
-	glfwSetKeyCallback(m_mainWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-  {
-
-  });
-	 */
+	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) {
+		BeforeCloseCommand::dispatch();
+	});
 }
 
 GLFWwindow* Window::get()
@@ -84,4 +89,9 @@ void Window::setTitle(const char* title)
 void Window::swapBuffers()
 {
 	glfwSwapBuffers(m_mainWindow);
+}
+
+void Window::finalize()
+{
+	glfwTerminate();
 }

@@ -1,39 +1,18 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "Id.h"
 
-#include "Node.h"
-
-using namespace Core;
-
-IdGenerator::IdGenerator()
+namespace Core
 {
-	for (unsigned i = 0; i < MAX_NODES_COUNT; ++i)
-	{
-		m_IDs.insert(i);
-	}
-}
-
-bool IdGenerator::hasNext()
-{
-	return !m_IDs.empty();
-}
-
-ID IdGenerator::next()
-{
-	I3T_ASSERT(hasNext() && "hasNext() == false");
-
-	auto it = m_IDs.begin();
-	auto result = *it;
-	m_IDs.erase(it);
-
-	return result;
-}
-
-void IdGenerator::markAsUsed(ID id)
-{
-	m_IDs.erase(id);
-}
-
-void IdGenerator::returnId(ID id)
-{
-	m_IDs.insert(id);
+ID IdGenerator::m_NextId = 0;
 }

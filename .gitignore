@@ -1,40 +1,86 @@
-.idea/
-/Docs/Doxygen/html/
-*.swp
+# reordered .gitignore file
 
+
+# Compilation directory
+# ----------------------------------------------------------------------
+/Binaries/
+
+# Website
+# ----------------------------------------------------------------------
+node_modules/
+dist/
+Docs/.vitepress/cache/
+pnpm-lock.yaml
+
+
+# IDE - are all necessary? Most of them are in already ignored /Binaries
+# ----------------------------------------------------------------------
+.idea/
+bin/
+lib/
+x64/
+out/
+.vs/
 *.sln
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+
+
+# cmake and doxygen
+# ----------------------------------------------------------------------
 *.cmake
+cmake-*
 cmake_install.cmake
 CMakeFiles/
 CMakeDoxyfile.in
 CMakeCache.txt
-Dependencies/picoc/cmake_install.cmake
-*.bak
+/CmakeOutputDebug/
+CMakeSettings.json
+/CMakeSettings.json
+/Docs/Doxygen/html/
 
-/Binaries/
-I3T.dir/
-I3TTEST.dir/
-picoc.dir/
-bin/
-lib/
-x64/
-cmake-*
-Solution/
-out/
+# system and other generated files
+# ----------------------------------------------------------------------
+*.bak
+*.lnk
+*.swp
 *.dll
 *.lib
 *.exe
 *.obj
-!/data/models/bunny.obj
-!/data/models/monkey.obj
-!/data/models/teapot.obj
-/CmakeOutputDebug/
-CMakeSettings.json
+/*.zip
+
+# Files used during development - to be preserved, but not put to release
+# ----------------------------------------------------------------------
+# /Data/Scenes/todo
+# /Data/Scenes/unit-tests
+
+# Working files while the program is running
+# ----------------------------------------------------------------------
+Test/State/TestScene.json
+/UserData/
+Global.json
 Data/imgui.ini
-.vs/
-logs/
-/CMakeSettings.json
-/Data/tutorials/tutorial
+[L|l]ogs/
+Test/State/EmptyScene.json
+
+
+# Obsolete entries - to be removed
+# ----------------------------------------------------------------------
+Dependencies/picoc/cmake_install.cmake
+picoc.dir/
+!/data/models/*.obj
+/Data/Tutorials/tutorial
+
+# Temporary entries during development - to be removed 
+# ----------------------------------------------------------------------
+temp/
+I3T.dir/
+I3TTEST.dir/
+Solution/
+# PF:
+/Data/Scenes/tests-PF
+/Data/Scenes/scenes-new
+/Data/Scenes/Folta_scenes/tests
+/Data/Scenes/Folta_scenes/new-236-kill

@@ -1,0 +1,85 @@
+---
+title: Cvičení - Detektiv
+description: Procvičení práce s kamerou, němž mezi námi hledáme vraha
+thumbnail: detective_thumb.png
+language: cs
+scene: EXC2/exc2.scene
+---
+headline: Vražda
+
+Zaujmi roli *detektiva* a zachyť sérii *fotek*, které budou potřeba k usvědčení pachatele.
+
+Zobraz na *bloku screen* to, co vidíš na obrázku v tutoriálovém okně.
+
+task: První vyfoť stěnu domu, ta nám dá adresu místa činu
+
+![Stěna domu](wall.png)
+
+Nezapomeň, že máš kameru s *nekonečným dosahem*!
+
+--
+headline: Pohled zvrchu
+
+Čas se *pohnout*.
+
+task: Vyfoť pohled na místo činu z ptačí perspektivy, ať vidíme, jestli není pachatel venku
+
+![Vzdušný pohled na dům](house.png)
+
+--
+headline: Pachatel
+
+Právě jsme dostali přesnou pozici *pachatele* ve *3D* prostoru!
+
+task: Zaměř pachatele kamerou, je na (0, 3, -6) a pokus se ho najít v okně domu
+
+![Pohled do okna](window_peek.png)
+
+--
+headline: X-Ray
+
+Kamera je vybavena *rentgenovým viděním*.
+
+task: Bez pohnutí kamerou využij rentgen (clipping) k lepšímu náhledu do domu
+
+![Využítí clippingu pro náhled](clipping_peek.png)
+
+--
+headline: Detailní fotka
+
+Jako *důkaz* bude potřeba i *detailní* fotka scény z několika úhlů
+
+task: Zachyť detail pachatele s obětí z vnitřku budovy
+
+![Detailní záběr činu](detail.png)
+--
+headline: Zoom
+
+task: Využij zoomu kamery k zachycení detailu obličeje pachatele
+
+![Detailní záběr pachatele](detail_zoom.png)
+--
+headline: Aspekt fotky
+
+Nakonec musíme zachytit *celou místnost* jednou fotkou, pro to bude potřeba *širokoúhlá* fotka.
+
+task: Zachyť celou místnost pomocí jedné fotky
+
+![Široký záběr celé místnosti](wide_shot.png)
+--
+headline: Vězení
+
+Dobrá práce *detektive*, chytili jsme ho!
+
+![jail.](jail.png)
+
+S *kamerou* to opravdu umíš!
+
+
+
+
+
+
+
+
+

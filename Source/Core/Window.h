@@ -1,9 +1,15 @@
 /**
- * \file Core/GlfwWindow
- * \author Martin Herich
+ * \file
+ * \brief Wrapper for GLFW window.
+ * \author Martin Herich <martin.herich@phire.cz>
  * \date 30.10.2020
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Wrapper for GLFW window.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
@@ -15,14 +21,14 @@
 class Window
 {
 public:
-	~Window();
+	~Window() = default;
 
 	/**
 	 * Initialize GLFW window.
 	 *
 	 * Exit the program if a window cannot be created.
 	 */
-	void init();
+	void init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat);
 
 	const std::string& getTitle();
 	void setTitle(const char* title);
@@ -30,7 +36,10 @@ public:
 	void swapBuffers();
 	GLFWwindow* get();
 
+	void finalize();
+
 private:
+	bool m_closeDisabled = false;
 	std::string m_title;
 	GLFWwindow* m_mainWindow;
 };

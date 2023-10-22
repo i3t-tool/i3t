@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
 #include <algorithm>
@@ -8,15 +20,15 @@
 #include <utility>
 #include <vector>
 
-#include <string>
 #include "spdlog/fmt/fmt.h"
+#include <string>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "API.h"
 #include "Config.h"
-#include "Core/API.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/IWindow.h"
 
@@ -34,7 +46,6 @@ enum class PinKind
 	Input
 };
 
-
 enum class WorkspaceLevelOfDetail
 {
 	Full,
@@ -45,73 +56,91 @@ enum class WorkspaceLevelOfDetail
 
 enum FloatPopupMode
 {
-    Angle,
-    Value
+	Angle,
+	Value
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
 
-/* DIWNE - \todo JH to remove, but I need something what use instead -> from Type get Shape and Color */
-extern std::map<EValueType, EColor> WorkspacePinColorBackground;
+/* DIWNE - \todo JH \todo MH see in .cpp to remove, but I need something what
+ * use instead -> from Type get Shape and Color */
+extern std::map<Core::EValueType, EColor> WorkspacePinColorBackground;
 
-extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground;
+extern std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeBackground;
 
-extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground;
+extern std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeForeground;
 
-extern std::map<EValueType, EColor> WorkspacePinColorForeground;
+extern std::map<Core::EValueType, EColor> WorkspacePinColorForeground;
 
 // endtodo
-
 
 class WorkspaceNode : public DIWNE::Node
 {
 protected:
-    std::string m_topLabel;
-    std::string m_middleLabel;
+	std::string m_topLabel;
+	std::string m_middleLabel;
+
 public:
-    WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel="Header", std::string const middleLabel="Content");
+	WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel = "Header",
+	              std::string const middleLabel = "Content");
+	~WorkspaceNode();
 
-    std::string getTopLabel(){return m_topLabel;};
-    std::string getMiddleLabel(){return m_middleLabel;};
+	std::string getTopLabel()
+	{
+		return m_topLabel;
+	}
 
-    void setTopLabel(std::string label){m_topLabel = label;};
-    void setMiddleLabel(std::string label){m_middleLabel = label;};
+	std::string getMiddleLabel()
+	{
+		return m_middleLabel;
+	}
+
+	void setTopLabel(std::string label)
+	{
+		m_topLabel = label;
+	}
+
+	void setMiddleLabel(std::string label)
+	{
+		m_middleLabel = label;
+	}
 
 	/* DIWNE function */
-	virtual bool bypassFocusForInteractionAction();
-	virtual bool beforeContent();
-    virtual bool topContent();
-    virtual bool middleContent();
-    virtual bool leftContent();
-    virtual bool rightContent();
-    virtual bool bottomContent();
+	virtual bool bypassFocusForInteractionAction() override;
+	virtual bool beforeContent() override;
+	virtual bool topContent() override;
+	virtual bool middleContent() override;
+	virtual bool leftContent() override;
+	virtual bool rightContent() override;
+	virtual bool bottomContent() override;
+	virtual void deleteAction() override;
 
-    bool m_removeFromWorkspaceWindow;
-    bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};
-	void setRemoveFromWorkspace(bool value) {m_removeFromWorkspaceWindow=value;};
+	bool m_removeFromWorkspaceWindow;
+	bool getRemoveFromWorkspace() const
+	{
+		return m_removeFromWorkspaceWindow;
+	};
+	void setRemoveFromWorkspace(bool value)
+	{
+		m_removeFromWorkspaceWindow = value;
+	};
+
+	bool m_duplicateNode = false;
+	bool getDuplicateNode() const
+	{
+		return m_duplicateNode;
+	};
+	void setDuplicateNode(bool value)
+	{
+		m_duplicateNode = value;
+	};
 
 	virtual void drawMenuDelete();
 	virtual void popupContent();
 };
 
 class WorkspacePin : public DIWNE::Pin
-{
-protected:
-	bool        m_showLabel;
-	std::string m_label;		/*! \brief Name of Pin */
-
-public:
-    WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
-
-	bool getShowLabel() const { return m_showLabel; };
-	std::string const getLabel() const { return m_label; };
-
-    void setShowLabel(bool showLabel) { m_showLabel = showLabel; };
-	void setLabel(std::string label) { m_label = label; };
-};
-
-
+{};
 
 /* static functions */
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
-

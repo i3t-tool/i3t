@@ -1,71 +1,95 @@
-# I3T
-Věnujte prosím velkou pozornost [programovacím konvencím projektu](Docs/Conventions.md).
+ I3T
+I3T - An Interactive Tool for Teaching Transformations
 
-## Sestavení
-Následující tabulka popisuje, na jaké platformě s jakými nástroji je projekt možné sestavit.
-Naší ambicí je, aby fungoval na všech uvedených platformách.
+I3T is an educational application that allows the study of 3D transformations 
+and their hierarchy in an illustrative way. 
 
-| Platforma  | Arch.       | Konfigurace | CMake generátor      | Kompilátor | Stav  |
-|------------|-------------|-------------|----------------------|------------|-------|
-| Windows    | Win32, x64  | Všechny     | Visual Studio        | cl.exe     | ✅    |
-| Windows    | Win32, x64  | Všechny     | NMake Makefiles      | cl.exe     | ✅    |
-| Unix-like  | x86/x64     | Všechny     | Unix Makefiles       | g++, clang | ✅    |
+It is the result of the work of students of three Parts of the Czech Technical University in Prague:
+- The Department of Computer Graphics and Interaction of the Faculty of Electrical Engineering,
+- The Department of Computer Science of the Faculty of Electrical Engineering,
+- The Faculty of Information Technology.
 
-Pro sestavení postupujte prosím dle [návodu](Docs/Build.md).
+Start I3T and try the Tutorials. Or read the [manual](Docs/manual.md).
 
-## Struktura projektu
+## Authors
+The first version of I3T was created by Michal Folta in 2016. 
+
+- Martin Herich
+- Jaroslav Holeček
+- Dan Rakušan
+- Adam Loucký
+- Miroslav Müller
+- Vít Zadina
+- Filip Uhlík
+
+Design
+- Lukáš Pilka
+- Jaroslav Kolář
+
+## Info for the developers
+
+Pay attention to [project code style](Docs/developer-guide/code-style.md).
+
+## Build
+You will need C++23 compiler with support for `std::expected`, 
+see [compiler support](https://en.cppreference.com/w/cpp/compiler_support) for more information
+about compiler versions.
+
+For more information about building the project, see [build instructions](Docs/developer-guide/build.md).
+
+### Build documentation
+For local documentation build, you will need Node.js installed.
+```shell
+npm install
+npm run docs:dev
+```
+
+## Project structure
 ````
-Dependencies/           Adresář s knihovnami, které I3T potřebuje.
+Data/                       All Assets (fonts, models, scenes, textures, tutorials,...)
+Dependencies/               Directory with external dependencies.
 Docs/
+    - assets/
+    - developer-guide/
     - Doxygen/
 Source/
-    - Commands/             Definice příkazů (událostí). 
-    - Core/                 Základní funkcionality.
-    - GUI/                  ImGui okna, dialogy a modální okna.
-        - Elements/         Jednotlivé GUI elementy.
-            - Dialogs/      Vyskakovací okna. 
-            - Modals/       Vyskakovací blokující okna.
-            - Windows/      Regulerní dokovací okna.
-        - ImGui/            Implementace ImGui callbacků pro GLFW.
-Test/                       Adresář s testy, kopíruje strukturu adresáře 'Source/'
+    - Commands/             Commands for the command pattern.
+    - Core/                 Core of the application.
+    - GUI/                  ImGui windows, dialogs, elements.
+        - Elements
+            - Dialogs/      
+            - Modals/
+            - Nodes/       
+            - Windows/      
+        - ImGui/            Implementation of ImGui backend.
+Test/                       Unit tests, copies structure of the Source/ directory.
 ````
 
-## Přispívání - Git
-Dbejte prosím na to, abyste zahrnovali k verzování (``git add``) pouze zdrojový kód 
-a soubory potřebné pro sestavení nebo pro správné fungování aplikace (konfigurace, data).
+## Contributing
+Please make sure, that you include only source code and files needed for building 
+or running the application (configuration, data) to version control.
 
-Řekněte gitu, aby ignoroval to, co nemá v repozitáři být, jako je například cmake output.
-- [Jak psát .gitignore](https://www.atlassian.com/git/tutorials/saving-changes/gitignore)
+### Code style
+See [code style](Docs/developer-guide/code-style.md) for more information.
 
-## Konvence
-Takto má vypadat kód v C++, pozorně čtěte [konkrétní pravidla zde](Docs/Conventions.md).
+### Documentation
+Manual is available [here](Docs/manual.md).
 
-````cpp
-/**                                                             
- * \file        GUI\EditBox.h       
- * \author      Jméno Příjmení
- * \date        24.10.2020
- *                                                               
- * Declares the edit box class.                                   
- */                                                             
-#ifndef _EDIT_BOX_H_
-#define _EDIT_BOX_H_
+- See how to [add new node](Docs/developer-guide/how-to-add-new-node.md).
+- See how to [add new tutorial](Docs/tutorials.md).
 
-#include <string>
-
-const int g_val = 0;
-
-class EditBox
-{
-public:
-  void setName(const std::string& name)
-  {
-    m_boxName = name;
-  }
-
-private:
-  std::string m_boxName;
-};
-
-#endif // _EDIT_BOX_H_
-```` 
+## Used libraries
+- [assimp](https://github.com/assimp/assimp) (BSD-3-Clause)
+- [glfw](https://www.glfw.org/) (Zlib)
+- [glm](https://github.com/g-truc/glm) (MIT)
+- [gtest](https://github.com/google/googletest) (BSD-3-Clause)
+- [ImGui](https://github.com/ocornut/imgui) (MIT)
+- [imgui_markdown](https://github.com/juliettef/imgui_markdown) (Zlib)
+- [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) (MIT)
+- [lua](https://github.com/lua/lua) (MIT)
+- [magic_enum](https://github.com/Neargye/magic_enum) (MIT)
+- [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) (WTFPL)
+- [rttr](https://www.rttr.org/) (MIT)
+- [sol2](https://github.com/ThePhD/sol2) (MIT)
+- [spdlog](https://github.com/gabime/spdlog) (MIT)
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp) (MIT)

@@ -1,60 +1,91 @@
+/**
+ * \file
+ * \brief
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 #include "WorkspaceElementsWithCoreData.h"
 
 class WorkspaceTransformation : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
+	WPtr<WorkspaceSequence> m_parentSequence{};
 
-	//===-- Double dispatch ---------------------------------------------------===//
+	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
+
+	//===-- Double dispatch
+	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
 		visitor.visit(std::static_pointer_cast<WorkspaceTransformation>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 
+	bool beforeBegin() override;
+	bool beforeContent() override;
+	bool topContent() override;
+	bool middleContent() override;
+	bool afterContent() override;
+	virtual void deleteAction() override;
+	virtual bool allowDrawing() override;
+
+	void popupContent() override;
+	virtual void drawMenuLevelOfDetail() override = 0;
+	void drawMenuDelete() override;
+
+	void updateSizes() override;
+
+	//
+
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 
 	bool m_removeFromSequence;
-	bool getRemoveFromSequence() const { return m_removeFromSequence; };
-	void setRemoveFromSequence(bool value) { m_removeFromSequence = value; };
+	bool getRemoveFromSequence() const
+	{
+		return m_removeFromSequence;
+	};
+	void setRemoveFromSequence(bool value)
+	{
+		m_removeFromSequence = value;
+	};
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
 	float m_topOversizeSpace;
 
-	Ptr<Core::NodeBase> getNodebaseSequence();
+	Ptr<Core::Node> getNodebaseSequence();
 
-
-	virtual Core::ETransformState dataAreValid() { return Core::ETransformState::Valid; };
+	/**
+	 * \brief helper function used for decision about showing the corrupted
+	 * transform flag in topContent(). Overriden in WorkspaceTransformation_s.h
+	 *
+	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
+	 */
+	virtual bool isMatrixValid() = 0; ///{return true;}; // todo = 0
 
 	virtual void drawMenuSetDataMap();
 
 	virtual bool drawDataFull();
-	virtual bool inline drawDataSetValues() { return drawDataFull(); };
+	virtual bool inline drawDataSetValues()
+	{
+		return drawDataFull();
+	};
 
-	virtual int maxLenghtOfData();
+	virtual int maxLengthOfData() override;
 
-	bool beforeBegin();
-    bool beforeContent();
-	bool topContent();
-	bool middleContent();
-	bool afterContent();
-
-	void popupContent();
-	virtual void drawMenuLevelOfDetail()=0;
-	void drawMenuDelete();
-	void drawMenuTracking();
 	void drawMenuStorevalues();
 
-	void updateSizes();
-
-    virtual bool drawDataSetValues_InsideTablebuilder( std::vector<std::string> const& labels,
-                                            std::vector<float*> const& local_data,
-                                            bool &value_changed);
-    virtual bool drawDataSetValuesTable_builder( std::string const cornerLabel,
-                                                std::vector<std::string> const& columnLabels,
-                                                std::vector<std::string> const& rowLabels,
-                                                std::vector<float*> const& local_data,
-                                                bool &value_changed,
-                                                int&index_of_change);
+	virtual bool drawDataSetValues_InsideTablebuilder(std::vector<std::string> const& labels,
+	                                                  std::vector<float*> const& local_data, bool& value_changed);
+	virtual bool drawDataSetValuesTable_builder(std::string const cornerLabel,
+	                                            std::vector<std::string> const& columnLabels,
+	                                            std::vector<std::string> const& rowLabels,
+	                                            std::vector<float*> const& local_data, bool& value_changed,
+	                                            int& index_of_change);
 };

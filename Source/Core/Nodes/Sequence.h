@@ -1,7 +1,15 @@
 /**
- * \file Core/Nodes/Sequence
- * \author Martin Herich, hericmar@fel.cvut.cz
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
  * \date 20.12.2020
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
@@ -9,24 +17,27 @@
 
 namespace Core
 {
-using Matrices = std::vector<Ptr<Transformation>>;
+class IModelProxy;
+class MatrixTracker;
 
-constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
-constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
+using Matrices = std::vector<Ptr<Transform>>;
 
-constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
-constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
-constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
+constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
+constexpr size_t I3T_SEQ_IN_MAT = 1; // owned by storage
+
+constexpr size_t I3T_SEQ_OUT_MUL = 0; // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MAT = 1; // owned by storage
+constexpr size_t I3T_SEQ_OUT_MOD = 2; // owned by multiplier
 
 constexpr size_t I3T_SEQ_MUL = 0;
-constexpr size_t I3T_SEQ_MAT = 1;  // local transform
-constexpr size_t I3T_SEQ_MOD = 2;  // world transform
+constexpr size_t I3T_SEQ_MAT = 1; // local transform
+constexpr size_t I3T_SEQ_MOD = 2; // world transform
 
 class Sequence;
 
 namespace Builder
 {
-	Ptr<Sequence> createSequence();
+Ptr<Sequence> createSequence(MatrixTracker* tracker);
 } // namespace Builder
 
 /**
@@ -42,90 +53,37 @@ class Sequence : public Node
 {
 	friend class GraphManager;
 
-	using Matrix       = NodeBase;
-	using SequencePins = std::vector<Pin>;
+	using Matrix = Node;
 
-	friend class Multiplier;
 	friend class Storage;
 
 	/** Structure for storing transform matrices. */
-	class Storage : public Node
+	class Storage
 	{
 		friend class Core::Sequence;
-		friend class Multiplier;
-
-		Matrices m_matrices;
 
 	public:
-		Storage();
+		Storage(Sequence& sequence) : m_sequence(sequence) {}
 
-		Ptr<Node> clone() override
+		ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept
 		{
-			I3T_ABORT("Don't clone this class!");
-
-			return nullptr;
-		}
-
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
-		DataStore& getInternalData(size_t index = 0) override;
-
-		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
-		Ptr<Transformation> popMatrix(const int index);
+			return addMatrix(matrix, 0);
+		};
+		ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+		Ptr<Transform> popMatrix(const int index);
 		void swap(int from, int to);
 
-		/**
-		 * Updates local transform.
-		 * @param inputIndex
-		 */
-		void updateValues(int inputIndex) override;
+	private:
+		std::vector<Ptr<Transform>> m_matrices;
+
+		Sequence& m_sequence;
 	};
-
-
-	/** Structure which represents sequences multiplication. */
-	class Multiplier : public Node
-	{
-		friend class Core::Sequence;
-
-	public:
-		Multiplier();
-
-		Ptr<Node> clone() override
-		{
-			I3T_ABORT("Don't clone this class!");
-
-			return nullptr;
-		}
-
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
-		DataStore& getInternalData(size_t index = 0) override;
-
-		/**
-		 * Updates mul. output and world transform.
-		 * @param inputIndex
-		 */
-		void updateValues(int inputIndex) override;
-	};
-
-	Ptr<Storage>    m_storage;
-	Ptr<Multiplier> m_multiplier;
 
 public:
-	Sequence();
+	Sequence(MatrixTracker* tracker);
+	~Sequence() override;
 
-	Ptr<Node> clone() override;
-
-	Pin& getIn(size_t i) override;
-	Pin& getOut(size_t i) override;
-
-	void createComponents();
-
-	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
-	{
-		return addMatrix(matrix, m_storage->m_matrices.size());
-	}
+	ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept;
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -133,14 +91,12 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
+	ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+
+	const Matrices& getMatrices() const
 	{
-		return m_storage->addMatrix(matrix, index);
+		return m_storage.m_matrices;
 	}
-
-	DataStore& getInternalData(size_t index = 0) override;
-
-	const Matrices& getMatrices() const { return m_storage->m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -151,29 +107,37 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage->m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transform>& getMatRef(size_t idx)
+	{
+		return m_storage.m_matrices.at(idx);
+	}
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
+	[[nodiscard]] Ptr<Transform> popMatrix(const int index);
 
-	void swap(int from, int to) { return m_storage->swap(from, to); }
+	void swap(int from, int to);
 
 	void updateValues(int inputIndex) override;
 
+	MatrixTracker* startTracking(UPtr<IModelProxy> modelProxy);
+	void stopTracking();
+
 private:
-	void receiveSignal(int inputIndex) override;
+	Storage m_storage;
+
+	MatrixTracker* m_tracker;
 };
 
-FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
+FORCE_INLINE Ptr<Sequence> toSequence(Ptr<Node> node)
 {
 	if (node == nullptr)
 		return nullptr;
 	return node->as<Sequence>();
 }
 
-FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices)
 {
 	glm::mat4 result(1.0f);
 	for (const auto& mat : matrices)
@@ -182,11 +146,4 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& mat
 }
 
 using SequencePtr = Ptr<Sequence>;
-
-FORCE_INLINE bool isSequence(const NodePtr& p)
-{
-	auto* op = p->getOperation();
-	auto* expected = &g_sequence;
-	return p->getOperation() == &g_sequence;
-}
 } // namespace Core

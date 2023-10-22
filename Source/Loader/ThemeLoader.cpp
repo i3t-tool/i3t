@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "ThemeLoader.h"
 
 #include <fstream>
@@ -6,10 +18,9 @@
 #include "yaml-cpp/yaml.h"
 
 #include "GUI/Theme.h"
-#include "Utils/Filesystem.h"
+#include "Utils/FilesystemUtils.h"
 
-template <typename T>
-std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
+template <typename T> std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
 	for (const auto& [key, val] : map)
 	{
@@ -61,6 +72,11 @@ ImVec4 parseVec4(YAML::Node& node)
 
 void saveTheme(const fs::path& path, Theme& theme)
 {
+	if (path.empty())
+	{
+		return;
+	}
+
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 
@@ -70,9 +86,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	{
 		if (auto str = enumToStr(Theme::getColorNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value;
-			dumpVec4(out, (const float*)&val);
+			dumpVec4(out, (const float*) &val);
 		}
 	}
 	out << YAML::EndMap;
@@ -81,9 +97,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	out << YAML::Value << YAML::BeginMap;
 	for (const auto& [key, val] : theme.getSizesRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value << val;
 		}
 	}
@@ -93,9 +109,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	out << YAML::Value << YAML::BeginMap;
 	for (const auto& [key, val] : theme.getSizesVecRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeVecNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value;
 			dumpVec2(out, (const float*) &val);
 		}
@@ -109,12 +125,22 @@ void saveTheme(const fs::path& path, Theme& theme)
 	outfile.close();
 }
 
-std::optional<Theme> loadTheme(const fs::path& path)
+std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
-	if (!doesFileExists(path.string().c_str()))
-		return std::nullopt;
+	if (!FilesystemUtils::doesFileExists(path.string().c_str()))
+	{
+		return Err("File does not exist");
+	}
 
-	auto yaml = YAML::LoadFile(path.string());
+	YAML::Node yaml;
+	try
+	{
+		yaml = YAML::LoadFile(path.string());
+	}
+	catch (const std::exception& e)
+	{
+		return Err(std::string(e.what()));
+	}
 
 	auto name = path.stem().string();
 
@@ -133,6 +159,8 @@ std::optional<Theme> loadTheme(const fs::path& path)
 			{
 				colors[*en] = parseVec4(node);
 			}
+			else
+				LOG_ERROR("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
 		}
 	}
 	if (yaml["sizes"])

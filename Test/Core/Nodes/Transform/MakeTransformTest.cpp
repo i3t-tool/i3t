@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -10,10 +22,10 @@ using namespace Core;
 
 TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 {
-	auto vec3 = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec3 = Core::Builder::createOperator<EOperatorType::Vector3ToVector3>();
 	auto initialTranslation = generateVec3();
 
-	auto makeTranslation = Core::Builder::createNode<ENodeType::MakeTranslation>();
+	auto makeTranslation = Core::Builder::createOperator<EOperatorType::MakeTranslation>();
 
 	plug_expectOk(vec3, makeTranslation, 0, 0);
 
@@ -25,12 +37,12 @@ TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 
 TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 {
-	auto floatNode = Core::Builder::createNode<ENodeType::FloatToFloat>();
+	auto floatNode = Core::Builder::createOperator<EOperatorType::FloatToFloat>();
 	auto rotRads = generateFloat();
 
-	auto makeRotX = Core::Builder::createNode<ENodeType::MakeEulerX>();
-	auto makeRotY = Core::Builder::createNode<ENodeType::MakeEulerY>();
-	auto makeRotZ = Core::Builder::createNode<ENodeType::MakeEulerZ>();
+	auto makeRotX = Core::Builder::createOperator<EOperatorType::MakeEulerX>();
+	auto makeRotY = Core::Builder::createOperator<EOperatorType::MakeEulerY>();
+	auto makeRotZ = Core::Builder::createOperator<EOperatorType::MakeEulerZ>();
 
 	plug_expectOk(floatNode, makeRotX, 0, 0);
 	plug_expectOk(floatNode, makeRotY, 0, 0);
@@ -48,12 +60,12 @@ TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 
 TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 {
-	auto floatNode = Core::Builder::createNode<ENodeType::FloatToFloat>();
-	auto axisNode = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto floatNode = Core::Builder::createOperator<EOperatorType::FloatToFloat>();
+	auto axisNode = Core::Builder::createOperator<EOperatorType::Vector3ToVector3>();
 	float rotRads = generateFloat();
 	auto axis = generateVec3();
 
-	auto makeAxisRotNode = Core::Builder::createNode<ENodeType::MakeAxisAngle>();
+	auto makeAxisRotNode = Core::Builder::createOperator<EOperatorType::MakeAxisAngle>();
 
 	plug_expectOk(floatNode, makeAxisRotNode, 0, 0);
 	plug_expectOk(axisNode, makeAxisRotNode, 0, 1);
@@ -67,7 +79,7 @@ TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 
 TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 {
-	auto makeOrthoNode = Core::Builder::createNode<ENodeType::MakeOrtho>();
+	auto makeOrthoNode = Core::Builder::createOperator<EOperatorType::MakeOrtho>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeOrthoNode);
 
@@ -78,7 +90,7 @@ TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 
 TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 {
-	auto makePerspectiveNode = Core::Builder::createNode<ENodeType::MakePerspective>();
+	auto makePerspectiveNode = Core::Builder::createOperator<EOperatorType::MakePerspective>();
 
 	auto [inputValues, inputNodes] = generateFloatInputs<4>(makePerspectiveNode);
 
@@ -89,7 +101,7 @@ TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 
 TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 {
-	auto makeFrustumNode = Core::Builder::createNode<ENodeType::MakeFrustum>();
+	auto makeFrustumNode = Core::Builder::createOperator<EOperatorType::MakeFrustum>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeFrustumNode);
 
@@ -100,11 +112,11 @@ TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 
 TEST(MakeTransformTest, MakeLookAtShouldBeValid)
 {
-	auto makeLookAtNode = Builder::createNode<ENodeType::MakeLookAt>();
+	auto makeLookAtNode = Builder::createOperator<EOperatorType::MakeLookAt>();
 
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec1 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
+	auto vec3 = Builder::createOperator<EOperatorType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, makeLookAtNode, 0, 0);
 	plug_expectOk(vec2, makeLookAtNode, 0, 1);

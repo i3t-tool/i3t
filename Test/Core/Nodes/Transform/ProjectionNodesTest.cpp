@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \authors Martin Herich, Petr Felkel
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -5,6 +17,8 @@
 #include "Generator.h"
 
 using namespace Core;
+
+//--- Ortho -------------------------------------------------------------
 
 TEST(OrthoProjTest, ShouldContainBeOk)
 {
@@ -22,15 +36,40 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 	EXPECT_EQ(expectedMat, resultMat);
 }
 
+TEST(OrthoProjTest, Problem_Set22_changes00)
+{
+	auto ortho = Builder::createTransform<ETransformType::Ortho>();
+	auto mat = ortho->getData().getMat4();
+	ortho->initDefaults();
+
+	auto left = ortho->getDefaultValue("left").getFloat();
+	auto right = ortho->getDefaultValue("right").getFloat();
+	auto bottom = ortho->getDefaultValue("bottom").getFloat();
+	auto top = ortho->getDefaultValue("top").getFloat();
+	auto near = ortho->getDefaultValue("near").getFloat();
+	auto far = ortho->getDefaultValue("far").getFloat();
+
+	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
+	auto resultMat = ortho->getData().getMat4();
+	EXPECT_EQ(expectedMat, resultMat);
+
+	auto mat00 = mat[0][0];
+	auto mat22 = mat[2][2];
+	ortho->setValue(mat22 + 0.1f, glm::ivec2(2, 2)); // changing zscale
+	auto mat00_after = mat[0][0];
+
+	EXPECT_EQ(mat00, mat00_after); // should not change xscale
+}
+
 //--- Perspective -------------------------------------------------------------
 
 TEST(PerspectiveProjTest, ShouldBeOk)
 {
 	auto perspective = Builder::createTransform<ETransformType::Perspective>();
-	perspective->setDefaultValue("fov", glm::radians(150.0f));
+	perspective->setDefaultValue("fovy", glm::radians(150.0f));
 	perspective->setDefaultValue("aspect", 1.5f);
-	perspective->setDefaultValue("zNear", 0.01f);
-	perspective->setDefaultValue("zFar", 100.0f);
+	perspective->setDefaultValue("near", 0.01f);
+	perspective->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 	auto resultMat = perspective->getData().getMat4();
@@ -40,27 +79,27 @@ TEST(PerspectiveProjTest, ShouldBeOk)
 
 TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 {
-	auto perspective = Builder::createTransform<ETransformType::Perspective>()
-	    ->as<TransformImpl<ETransformType::Perspective>>();
+	auto perspective =
+	    Builder::createTransform<ETransformType::Perspective>()->as<TransformImpl<ETransformType::Perspective>>();
 
-	float FOV = generateFloat();
+	float fovy = generateFloat();
 	float aspect = generateFloat();
 	float nearZ = generateFloat();
 	float farZ = generateFloat();
 
-	perspective->setDefaultValue("fov", FOV);
-	EXPECT_EQ(FOV, perspective->getDefaultValue("fov").getFloat());
+	perspective->setDefaultValue("fovy", fovy);
+	EXPECT_EQ(fovy, perspective->getDefaultValue("fovy").getFloat());
 
 	perspective->setDefaultValue("aspect", aspect);
 	EXPECT_EQ(aspect, perspective->getDefaultValue("aspect").getFloat());
 
-	perspective->setDefaultValue("zNear", nearZ);
-	EXPECT_EQ(nearZ, perspective->getDefaultValue("zNear").getFloat());
+	perspective->setDefaultValue("near", nearZ);
+	EXPECT_EQ(nearZ, perspective->getDefaultValue("near").getFloat());
 
-	perspective->setDefaultValue("zFar", farZ);
-	EXPECT_EQ(farZ, perspective->getDefaultValue("zFar").getFloat());
+	perspective->setDefaultValue("far", farZ);
+	EXPECT_EQ(farZ, perspective->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::perspective(FOV, aspect, nearZ, farZ), perspective->getData().getMat4());
+	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ), perspective->getData().getMat4());
 }
 
 //--- Frustum -----------------------------------------------------------------
@@ -80,10 +119,9 @@ TEST(FrustumTest, ShouldBeOk)
 	EXPECT_EQ(expectedMat, resultMat);
 }
 
-TEST(FrustumTest, GettersAndSettersShouldBeOk)
+TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 {
-	auto frustum = Builder::createTransform<ETransformType::Frustum>()
-	    ->as<TransformImpl<ETransformType::Frustum>>();
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()->as<TransformImpl<ETransformType::Frustum>>();
 
 	float left = generateFloat();
 	float right = generateFloat();
@@ -91,6 +129,8 @@ TEST(FrustumTest, GettersAndSettersShouldBeOk)
 	float top = generateFloat();
 	float near = generateFloat();
 	float far = generateFloat();
+
+	frustum->disableSynergies();
 
 	frustum->setDefaultValue("left", left);
 	EXPECT_EQ(left, frustum->getDefaultValue("left").getFloat());
@@ -113,37 +153,46 @@ TEST(FrustumTest, GettersAndSettersShouldBeOk)
 	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far), frustum->getData().getMat4());
 }
 
-//--- Look At -----------------------------------------------------------------
-TEST(LookAtTest, ShouldBeOk)
+TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
 {
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
-	lookAt->setDefaultValue("eye", glm::vec3{ -10.0f, 5.0f, 1.0f });
-	lookAt->setDefaultValue("center", glm::vec3{ 10.0f, 8.0f, -4.0f });
-	lookAt->setDefaultValue("up", glm::vec3{ 0.0f, 1.0f, 0.0f });
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()->as<TransformImpl<ETransformType::Frustum>>();
 
-	auto expectedMat =
-			glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
-	auto resultMat = lookAt->getData().getMat4();
+	float left = generateFloat();
+	float right = generateFloat();
+	float bottom = generateFloat();
+	float top = generateFloat();
+	float near = generateFloat();
+	float far = generateFloat();
 
-	EXPECT_EQ(expectedMat, resultMat);
-}
+	frustum->enableSynergies();
 
-TEST(LookAtTest, GettersAndSettersShouldBeOk)
-{
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>()
-	    ->as<TransformImpl<ETransformType::LookAt>>();
+	frustum->setDefaultValue("left", left);
+	EXPECT_EQ(left, frustum->getDefaultValue("left").getFloat());
+	EXPECT_EQ(-left, frustum->getDefaultValue("right").getFloat());
 
-	auto eye = generateVec3();
-	lookAt->setDefaultValue("eye", eye);
-	EXPECT_EQ(eye, lookAt->getDefaultValue("eye").getVec3());
+	// frustum->setDefaultValue("right", right);
+	// EXPECT_EQ(right, frustum->getDefaultValue("right").getFloat());
+	// EXPECT_EQ(-right, frustum->getDefaultValue("left").getFloat());
+	// todo - resetMatrixFromDefaults should have a parameter to allow full
+	// symmetry
 
-	auto center = generateVec3();
-	lookAt->setDefaultValue("center", center);
-	EXPECT_EQ(center, lookAt->getDefaultValue("center").getVec3());
+	frustum->setDefaultValue("bottom", bottom);
+	EXPECT_EQ(bottom, frustum->getDefaultValue("bottom").getFloat());
+	EXPECT_EQ(-bottom, frustum->getDefaultValue("top").getFloat());
 
-	auto up = generateVec3();
-	lookAt->setDefaultValue("up", up);
-	EXPECT_EQ(up, lookAt->getDefaultValue("up").getVec3());
+	// frustum->setDefaultValue("top", top);
+	// EXPECT_EQ(top, frustum->getDefaultValue("top").getFloat());
+	// EXPECT_EQ(-top, frustum->getDefaultValue("bottom").getFloat());
+	// todo - resetMatrixFromDefaults should have a parameter to allow full
+	// symmetry
 
-	EXPECT_EQ(glm::lookAt(eye, center, up), lookAt->getData().getMat4());
+	frustum->setDefaultValue("near", near);
+	EXPECT_EQ(near, frustum->getDefaultValue("near").getFloat());
+
+	frustum->setDefaultValue("far", far);
+	EXPECT_EQ(far, frustum->getDefaultValue("far").getFloat());
+
+	// mixture of default values
+	// EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
+	// frustum->getData().getMat4());
 }

@@ -1,35 +1,35 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
+#include <array>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
+#include "imgui.h"
+
+#include "Core/Nodes/Node.h"
+#include "Core/Nodes/NodeData.h"
 #include "State/NodeVisitor.h"
-#include "State/SceneData.h"
+#include "State/Stateful.h"
 
 class SerializationVisitor : public NodeVisitor
 {
 public:
-	SerializationVisitor();
+	SerializationVisitor(Memento& memento) : m_memento(memento) {}
 
-	/**
-	 * Get string representation of current scene.
-	 *
-	 * Example output for two operator nodes connected with each other.
-	 * \code
-	 * operators:
-	 *   - id: 1
-	 *     type: FloatToFloat
-	 *     position: [0.0, 0.0]
-	 *     value: 1.0
-	 *   - id: 4
-	 *     type: FloatToFloat
-	 *  	 position: [0.0, 0.0]
-	 *  	 value: -1.0
-	 * edges:
-	 *   - [1, 0, 4, 0]
-	 * \endcode
-	 */
-	std::string dump(const std::vector<Ptr<GuiNode>>& nodes);
+	void dump(const std::vector<Ptr<GuiNode>>& nodes);
 
 private:
 	/**
@@ -44,13 +44,21 @@ private:
 	void visit(const Ptr<GuiScreen>& node) override;
 	void visit(const Ptr<GuiModel>& node) override;
 
-	/// Stores last scene representation.
-	SceneRawData m_sceneData;
+	/// id and position
+	///
+	/// \param target
+	/// \param node
+	///
+	/// \pre target is JSON object
+	void dumpCommon(rapidjson::Value& target, const Ptr<GuiNode>& node);
 
-	static bool m_isInitialized;
+	void dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node);
+	void dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node);
+
+	void addData(rapidjson::Value& target, const char* key, const Core::Data& data);
+
+	/// \param target document["edges"] or any JSON array.
+	void addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node);
+
+	Memento& m_memento;
 };
-
-/**
- * Creates all nodes in the workspace.
- */
-SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);

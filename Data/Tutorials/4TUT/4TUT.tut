@@ -1,0 +1,232 @@
+---
+title: 4. Kamera a projekce
+description: Nauč se pracovat s kamerami a projekčními maticemi
+thumbnail: thumb4.png
+language: cs
+scene: 4TUT/camera.scene
+---
+headline: Kamera, akce!
+
+Vítej v *kamerovém* tutoriálu. Tentokrát si ukážeme, jak pracovat s *kamerami* ve 3D prostoru.
+
+Taky se dozvíš něco o maticích *view* a *projection*.
+
+![Kamera s objekty](showcase.png)
+
+Do scény se ti načetly *dva objekty*, které budeme kamerou zachycovat!
+
+--
+headline: Blok kamery
+
+task: Přidej do scény kameru
+
+![Blok kamery](camera_block.png)
+
+*Kamera* je unikátní - má v sobě dvě *sekvence*:
+    * *projection* - pouzdro pro matici *projekce*
+    * *view* - pouzdro pro pohledovou matici *lookAt*
+
+Má tři *výstupy*:
+    * ![Symbol obrazovky](screensym.png) - výstup pro *obrazovku* (screen)
+    * ![Symbol matice 4x4](matrixsym.png) - výstup pro *zkopírování* výsledné matice
+    * ![Symbol maticového násobení](mult.png) - výstup pro *násobení* kamerovými maticemi
+
+My budeme využívat hlavně *první* výstup. Napojením krabičky *screen* totiž uvidíme to, co vidí *kamera*.
+
+--
+headline: Screen
+
+Abychom se mohli podívat, co naše *kamera* vidí, musíme si do *workspace* přidat i *screen*.
+
+task: Přidej do workspace blok "screen"
+
+task: Propoj screen a kameru
+
+Velikost *screenu* můžeš upravit tažením za *červené rohy* obrazovky.
+
+![Připojený screen](resize_screen.png)
+
+--
+headline: Ostatní výstupy kamery
+
+Druhý výstup *kamery* funguje podobně, jako v *sekvenci* - slouží k předání hodnoty *výsledné matice*.
+
+![Předání hodnot pomocí maticového výstupu](sequence_duplicate.png)
+
+Třetí výstup *kamery* se sám propojuje se všemi *modely* nebo *sekvencemi* což naznačuje, že kamera modely "vidí".
+
+![Propojení](camera_connections.png)
+
+*Zelený drát* znázorňuje násobení všech modelů maticemi *projection* a *view* - tak jako v *OpenGL*.
+
+![Výsledná matice PVM, kterou násobíme všechny objekty](PVMmatrix.png)
+
+--
+headline: View
+
+*View matice* nám říká, *kde* bude naše kamera ležet a *jak* bude natočená. Používáme pro to speciální matici *lookAt*
+
+task: Přidej si do workspace lookAt matici (transformation/lookAt)
+
+Matice *lookAt* se vytváří ze tří trojrozměrných vektorů:
+    * *eye vector* - souřadnice kamery
+    * *center vector* - souřadnice středu pohledu
+    * *up vector* - vektor orientace kamery (kde je nahoru)
+
+![Look at matice](look_at.png)
+
+*Problém:* matice *nevypadá* jako na obrázku, nemůžeme v ní *měnit hodnoty*.
+
+--
+headline: Level Of Detail
+
+Pokud si chceme *zjednodušit manipulaci* s maticemi, můžeme využít *Level Of Detail*:
+    * *Full* = plný detail, vidíme *všechny hodnoty*
+    * *Label* = pouze *jméno*, zbytek je schovaný
+    * *Set values* = *hodnoty, ze kterých matice vzniká*
+
+*Úroveň detailu* bloku nastavíme přes *kontextové menu*, nebo rychleji pomocí *tlačítka na liště* bloku
+
+task: Nastav matici lookAt úroveň detailu "Set values"
+
+![Menu pro nastavení Level of detail](level_of_detail.png)
+
+V našem případě budeme používat hlavně možnost *Set values*.
+
+--
+headline: Příprava lookAt
+
+task: Vlož lookAt do části "view" bloku kamery
+
+![Matice look At správně vložená v kameře](look_at_in_cam.png)
+
+Vidíme, že se nám *kamera posunula* pryč ze středu scény.
+
+![Scene view po vložení lookAt do kamery](moved_camera.png)
+
+K *lookAt* se ještě vrátíme, teď ale potřebujeme *projekci*.
+
+--
+headline: Projekční matice
+
+*Projekce* nám umožňuje zobrazovat *3D* objekty ve *2D*.
+
+*Projekční matice* ovlivňuje, jak vypadá *frustum* kamery (*frustum* je objem, který kamera "vidí").
+
+Existují dva základní typy *projekcí*:
+    * *rovnoběžná (paralelní) projekce* - "plochý" (kolmý) pohled
+    * *perspektivní projekce* - "realistický" pohled
+
+![Kamera s perspektivní projekční maticí](projections.png)
+zdroj:[NeHe:lesson 21]
+
+--
+headline: Rovnoběžná projekce
+
+*Rovnoběžná projekce* představuje *"kolmý"* pohled na scénu, kvůli tomu má frustum tvar *hranolu*.
+
+task: Přidej do workspace matici Rovnoběžné projekce (transformation/projection/ortho)
+
+Při *rovnoběžné projekci* neovlivňuje *vzdálenost* objektů od kamery jejich *velikost*.
+
+![Rovnoběžná projekce](ortographic_projection.png)
+
+*Rovnoběžná projekce* je důležitá při *modelování* objektů, můžeme se s ní podívat na *profil* našeho objektu.
+
+--
+headline: Parametry rovnoběžné projekce
+
+task: Nastav si u projekce úroveň detailu "Set value"
+
+![Parametry rovnoběžné projekce](ortho_proj_matrix.png)
+
+Hodnoty nastavují *hranice frustu* matice:
+    * *left/right/top/bottom* - levá/pravá/vrchni/spodní hranice frusta
+    * *near/far* - kde frustum začíná a kde končí
+
+Hodnoty *left/right* a *bottom/top* jsou původně *propojené*, ale můžeme si je pomocí *"disable synergies"* odemknout.
+
+--
+headline: Pohled s rovnoběžnou projekcí
+
+task: Vlož do kamery rovnoběžnou projekci
+
+![Náhled obrazovky](screen.png)
+
+Ve *screenu* vidíme profil naší scény - vidíme kačenku i kostku.
+
+task: Vyzkoušej si práci s frustem kamery. Uprav projekci tak, aby kačenka nebyla vidět
+hint:
+Uprav hodnotu far, tak aby frustum neobsahoval kačenku
+
+Když sis vyzkoušel/a práci s *frustem*, můžeš pokračovat na *perspektivní projekci*.
+
+--
+headline: Perspektivní projekce
+
+*Perspektivní projekce* funguje podobně jako naše *oči* - objekty se se vzdáleností *zmenšují*.
+
+task: Přidej do workspace matici perspektivní projekce
+
+![Perspektivní projekce](perspective_projection.png)
+
+*Frustum* perspektivní projekce vychází z *jednoho bodu* (kamery nebo oka) a má tvar *komolého jehlanu*.
+
+*Perspektivní projekci* používáme častěji než *rovnoběžnou projekci*.
+
+--
+headline: Parametry perspektivní projekce
+
+task: Nastav si perspektivní projekci na úroveň detailu "Set value"
+
+![Parametry perspektivní projekce](perspective_proj_matrix.png)
+
+Matice má tyto *parametry*:
+    * *fovy* - úhel frusta *na výšku*
+    * *aspect* - *poměr* stran frusta
+    * *near* - kde frustum *začíná*
+    * *far* - kde frustum *končí*
+
+Matice *perspektivní projekce* se stěnami frusta manipuluje *symetricky*.
+
+Pro *nesymetrickou* manipulací můžeme přidat matici *"frustum".*
+
+--
+
+headline: Pohled na scénu s perspektivní projekcí
+
+task: Vyměň v kameře rovnoběžnou projekci za perspektivní projekci
+
+![Náhled obrazovky na perspektivní projekci](perspective_screen.png)
+
+*Kachničku nevidíme*, i když je očividně ve *frustu*. Kostka ji totiž *zakrývá*!
+
+--
+headline: lookAt kačenka
+
+task: Uprav matici lookAt tak, aby byla kačenka ve středu záběru kamery
+
+To nám zajistí, že se *kamera* bude koukat *vždy* na kačenku.
+
+task: Posuň kameru tak, abychom kačenku viděli
+hint:
+Uprav eye souřadnice dokud kačenku neuvidíš a center souřadnice nastav na souřadnice kačenky (v úrovni detailu Set value).
+
+![Kuk na kachničku](duck_peek_screen.png)
+
+*Tady je!* Hodnoty *projekce* i *lookAt* si dál můžeš *upravovat* a zkoušet další práci s kamerou.
+
+--
+headline: Klapka!
+
+![Splněno!](checkbox.png)
+
+Co jsme si ukázali:
+  * jak pracovat s *kamerou*
+  * druhy *projekce*
+  * matici *lookAt*
+
+Klikni na *Finish* ![Dole](down.png) pro návrat do úvodního okna.
+
+
+

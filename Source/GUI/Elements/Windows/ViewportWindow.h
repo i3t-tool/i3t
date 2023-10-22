@@ -1,7 +1,14 @@
 /**
- * \file	GUI/Elements/Windows/ViewportWindows.h
+ * \file
+ * \brief
+ * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * A viewport element.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
@@ -9,26 +16,35 @@
 
 #include "GUI/Elements/IWindow.h"
 
-class World;
+#include "Viewport/data/DisplayOptions.h"
+#include "Viewport/data/RenderOptions.h"
+
+namespace Vp
+{
+class Viewport;
+class SceneRenderTarget;
+} // namespace Vp
 
 namespace UI
 {
-class Viewport : public IWindow
+class ViewportWindow : public IWindow
 {
 public:
-	I3T_WINDOW(Viewport)
+	I3T_WINDOW(ViewportWindow)
 
-	Viewport(bool show, World* world);
+	ViewportWindow(bool show, Vp::Viewport* viewport);
 	void render() override;
 
 private:
-	World* m_world;
-	unsigned int m_fboMain;
-	unsigned int m_texColBufMain;
-	unsigned int m_rboMain;
-	ImVec2 m_wcMin;
-	ImVec2 m_wcMax;
+	Vp::Viewport* m_viewport;
 
-	void showViewportsMenu();
+	Vp::DisplayOptions m_displayOptions;
+	Vp::RenderOptions m_renderOptions;
+
+	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
+
+	ImDrawListSplitter m_channelSplitter;
+
+	bool showViewportMenu();
 };
 } // namespace UI

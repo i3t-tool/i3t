@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \authors Martin Herich <martin.herich@phire.cz>, Petr Felkel <felkel@fel.cvut.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "Transform.h"
 
 #include "Logger/Logger.h"
@@ -5,15 +17,10 @@
 
 namespace Core
 {
-/**
- * @param mask
- * @param coords {x, y} x is column and y is row.
- * @param value
- * @return
- */
 bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const uint8_t maskValue = mask[coords.y * 4 + coords.x];
+	const int8_t maskValue = mask[coords.y * 4 + coords.x]; // mask is in the ROW order (see Value
+	                                                        // masks in TransformImpl.cpp)
 
 	if (maskValue == VM_ANY)
 		return true;
@@ -27,9 +34,9 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 	{
 		for (int r = 0; r < 4; ++r)
 		{
-			const float value = matrix[c][r];
+			const float value = matrix[c][r]; /// column order
 
-			if (!validateValue(mask, { c, r }, value))
+			if (!validateValue(mask, {c, r}, value))
 			{
 				return false;
 			}
@@ -40,47 +47,78 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 
 //===----------------------------------------------------------------------===//
 
-Transformation::Transformation(const TransformOperation& transformType)
-		: NodeBase(&(transformType.operation))
+Transform::Transform(const TransformOperation& transformType) : Node(&(transformType.operation))
 {
-	m_internalData.push_back(DataStore(EValueType::Matrix));
-	m_savedData = DataStore(EValueType::Matrix);
+	m_internalData.push_back(Data(EValueType::Matrix));
+	m_savedData = Data(EValueType::Matrix);
 }
 
-void Transformation::createDefaults()
+void Transform::createDefaults()
 {
-	const auto& opName        = getOperation()->keyWord;
+	const auto& opName = getOperation()->keyWord;
 	const auto& transformType = getTransformOperation(magic_enum::enum_cast<ETransformType>(opName).value());
 
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
-		m_defaultValues[key] = Data(valueType);
+		m_defaultValues.push_back({key, Data(valueType)});
+		m_savedValues.push_back({key, Data(valueType)});
 	}
 }
 
-const Data& Transformation::getDefaultValue(const std::string& name) const
+Ptr<Node> Transform::getCurrentSequence()
 {
-	return m_defaultValues.at(name);
+	if (m_currentSequence == nullptr)
+	{
+		return nullptr;
+	}
+	return m_currentSequence->getPtr();
 }
 
-TransformOperation::ValueMap Transformation::getDefaultTypes()
+TransformOperation* Transform::properties() const
+{
+	return *getTransformOperation(getOperation()->keyWord);
+}
+
+const Data& Transform::getDefaultValue(const std::string& name) const
+{
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(), [&name](const auto value) {
+		return value.name == name;
+	});
+
+	I3T_ASSERT(it != m_defaultValues.end(), "Invalid value name!");
+
+	return it->data;
+}
+
+Data& Transform::getDefaultValueMut(const std::string& name)
+{
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(), [&name](const auto value) {
+		return value.name == name;
+	});
+
+	I3T_ASSERT(it != m_defaultValues.end(), "Invalid value name!");
+
+	return it->data;
+}
+
+TransformOperation::ValueMap Transform::getDefaultTypes() const
 {
 	return getTransformDefaults(getOperation()->keyWord);
 }
 
-Transformation::DefaultValues& Transformation::getDefaultValues()
+Transform::DefaultValues& Transform::getDefaultValues()
 {
 	return m_defaultValues;
 }
 
-EValueState Transformation::getValueState(glm::ivec2 coords)
+EValueState Transform::getValueState(glm::ivec2 coords) const
 {
 	const int idx = coords.y * 4 + coords.x;
 	auto& map = getTransformMap(getOperation()->keyWord);
 
 	std::bitset<2> bitResult;
-	bitResult[0] = map[15 - idx] && m_hasEnabledSynergies;  // synergies bit
-	bitResult[1] = map[15 - idx] || !m_isLocked;            // editable bit
+	bitResult[0] = map[15 - idx] && m_hasSynergies; // synergies bit
+	bitResult[1] = map[15 - idx] || !m_isLocked;    // editable bit
 
 	auto result = bitResult.to_ulong();
 
@@ -89,50 +127,60 @@ EValueState Transformation::getValueState(glm::ivec2 coords)
 
 //===----------------------------------------------------------------------===//
 
-bool Transformation::isLocked() const
+bool Transform::isLocked() const
 {
 	return m_isLocked;
 }
 
-void Transformation::lock()
+void Transform::lock()
 {
-	// m_currentMap = &Transform::g_AllLocked;
 	m_isLocked = true;
 }
 
-void Transformation::unlock()
+void Transform::unlock()
 {
-	// m_currentMap = &Transform::g_Free;
 	m_isLocked = false;
 }
 
-void Transformation::saveValue()
+void Transform::saveValue()
 {
 	m_savedData = getData(0);
+	m_savedValues = m_defaultValues;
 
 	m_hasSavedData = true;
 }
 
-void Transformation::reloadValue()
+void Transform::reloadValue()
 {
 	if (!m_hasSavedData)
+	{
 		return;
+	}
 
 	setInternalValue(m_savedData.getMat4(), 0);
+	if (!m_defaultValues.empty())
+	{
+		m_defaultValues = m_savedValues;
+		resetMatrixFromDefaults();
+	}
+
 	notifySequence();
 }
 
-const glm::mat4& Transformation::getSavedValue() const
+const glm::mat4& Transform::getSavedValue() const
 {
 	return m_savedData.getMat4();
 }
 
-void Transformation::setSavedValue(const glm::mat4& values)
+void Transform::setSavedValue(const glm::mat4& values)
 {
 	m_savedData.setValue(values);
+
+	m_hasSavedData = true; // PF: was missing in comparison to saveValue()
 }
 
-ValueSetResult Transformation::setValue(const glm::mat4& mat)
+// PF todo - check for synergies????
+ValueSetResult Transform::setValue(const glm::mat4& mat)
 {
 	ValueSetResult result;
 
@@ -140,14 +188,14 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 	{
 		for (int r = 0; r < 4; ++r)
 		{
-			auto coords           = glm::ivec2(c, r);
+			auto coords = glm::ivec2(c, r);
 			const auto valueState = getValueState(coords);
 
 			if (canEditValue(valueState))
 			{
 				const float val = mat[c][r];
 
-				// MSVC was unable to compile this expresion without using Node::
+				// MSVC was unable to compile this expression without using Node::
 				result = setValue(val, coords);
 
 				if (result.status != ValueSetResult::Status::Ok)
@@ -164,21 +212,38 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 	return ValueSetResult{};
 }
 
-void Transformation::notifySequence()
+ValueSetResult Transform::setValue(float val, glm::ivec2 coords) // PF
+{
+	// Default implementation, potentially overriden by subclasses
+	if (isLocked())
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+	}
+
+	setInternalValue(val, coords);
+	notifySequence();
+
+	return ValueSetResult{};
+}
+
+void Transform::notifySequence()
 {
 	if (m_currentSequence)
 	{
-		m_currentSequence->updateValues(-1);
+		m_currentSequence->receiveSignal(-1);
 	}
 }
 
-bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
+bool Transform::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const auto valueState = getValueState(coords);
-	const auto isValid    = m_isLocked ? validateValue(mask, coords, value) : true;
+	if (m_isLocked)
+	{
+		const auto valueState = getValueState(coords);
+		const auto isValid = m_isLocked ? validateValue(mask, coords, value) : true;
 
-	return canEditValue(valueState) && isValid;
+		return canEditValue(valueState) && isValid;
+	}
+	else
+		return true;
 }
-
-//===----------------------------------------------------------------------===//
-}
+} // namespace Core

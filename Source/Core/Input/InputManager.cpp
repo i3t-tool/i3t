@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \authors Martin Herich, Dan Rakušan
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "InputManager.h"
 
 #include <imgui.h>
@@ -6,17 +18,39 @@
 #include "Core/Application.h"
 #include "Core/Window.h"
 #include "InputBindings.h"
-#include "Logger/LoggerInternal.h"
-
-#include "GUI/Elements/Windows/ViewportWindow.h"
+#include "Logger/Logger.h"
 
 #define IM_MOUSE_KEYS_COUNT 3
+
+// TODO: (DR) This class is still somewhat confusing.
+//  Yes it handles stuff like InputControllers, useful for custom keybinds later.
+//  However it also handles key presses and mouse. But in an odd way, some stuff like mouse button and key presses are
+//  updated directly from glfw callbacks in the glfw backend but then other stuff (mouse position) is updated from ImGui
+//  That's a little odd. It works as a nice facade for the ImGui IO, which is fine, but maybe we should take all info
+//  directly from ImGui and avoid customizing the ImGui backend to directly intercept glfw callbacks.
 
 constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle};
 
 ImGuiConfigFlags g_mousedFlags;
 
 InputController InputManager::s_globalInputController;
+std::vector<InputController*> InputManager::m_inputControllers;
+InputController* InputManager::s_activeInput = nullptr;
+
+std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
+
+// TODO: (DR) Never accessed, unused?
+bool InputManager::m_ignoreImGuiEvents = false;
+
+float InputManager::m_mouseX = 0;
+float InputManager::m_mouseY = 0;
+float InputManager::m_mouseXPrev = 0;
+float InputManager::m_mouseYPrev = 0;
+float InputManager::m_mouseXDelta = 0;
+float InputManager::m_mouseYDelta = 0;
+float InputManager::m_mouseXDragDelta = 0;
+float InputManager::m_mouseYDragDelta = 0;
+float InputManager::m_mouseWheelOffset = 0;
 
 void InputManager::init()
 {
@@ -54,24 +88,63 @@ void InputManager::setInputAxis(const char* action, float scale, Keys::Code code
 	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
+/**
+ * If you change order of modifiers, change it also in
+ * InputManager::areModifiersActive function.
+ */
+Modifiers InputManager::createModifiers(ModifiersList& list)
+{
+	Modifiers mods = {false, false, false, false, false, false};
+	for (auto mod : list)
+	{
+		switch (mod)
+		{
+		case Keys::Code::ctrll:
+			mods[0] = true;
+			break;
+		case Keys::Code::altl:
+			mods[1] = true;
+			break;
+		case Keys::Code::shiftl:
+			mods[2] = true;
+			break;
+		case Keys::Code::ctrlr:
+			mods[3] = true;
+			break;
+		case Keys::Code::altr:
+			mods[4] = true;
+			break;
+		case Keys::Code::shiftr:
+			mods[5] = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return mods;
+}
+
 bool InputManager::areModifiersActive(Modifiers mods)
 {
-	bool active = mods[0] ? isKeyPressed(Keys::Code::ctrll) : true;
-	active &= mods[1] ? isKeyPressed(Keys::Code::altl) : true;
-	active &= mods[2] ? isKeyPressed(Keys::Code::shiftl) : true;
-
+	bool active = mods[0] == isKeyPressed(Keys::Code::ctrll);
+	active &= mods[1] == isKeyPressed(Keys::Code::altl);
+	active &= mods[2] == isKeyPressed(Keys::Code::shiftl);
+	active &= mods[3] == isKeyPressed(Keys::Code::ctrlr);
+	active &= mods[4] == isKeyPressed(Keys::Code::altr);
+	active &= mods[5] == isKeyPressed(Keys::Code::shiftr);
 	return active;
 }
 
 void InputManager::setActiveInput(InputController* input)
 {
-	I3T_ASSERT(input != nullptr);
+	I3T_ASSERT(input != nullptr, "Input parameter is null");
 	s_activeInput = input;
 }
 
 bool InputManager::isInputActive(InputController* input)
 {
-	I3T_ASSERT(input != nullptr);
+	I3T_ASSERT(input != nullptr, "Input parameter is null");
 	return s_activeInput == input;
 }
 
@@ -141,38 +214,97 @@ bool InputManager::isMouseDown()
 	return false;
 }
 
-void InputManager::processViewportEvents()
+// TODO: (DR) Unused, different mouse drag handling strategy was used, might be handy in the future
+void InputManager::beginCameraControl()
+{
+	// Disable system cursor. The cursor will be hidden and at the
+	// endCameraControl the cursor will be at the same position.
+	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	m_ignoreImGuiEvents = true;
+
+	// Tell ImGui to don't capture mouse position. No widgets will be set to the
+	// hovered state.
+	auto& io = ImGui::GetIO();
+	g_mousedFlags = io.ConfigFlags; // Store current IO configuration flags.
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
+}
+
+void InputManager::endCameraControl()
+{
+	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+	m_ignoreImGuiEvents = false;
+
+	auto& io = ImGui::GetIO();
+	io.ConfigFlags = g_mousedFlags;
+}
+
+void InputManager::processEvents(InputController& controller)
+{
+	for (const auto& [action, state, callback] : controller.m_actions)
+	{
+		auto& keys = InputBindings::m_inputActions[action];
+		for (const auto& [key, mods] : keys)
+		{
+			// Check if key is in desired state.
+			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+			                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
+			                     areModifiersActive(mods);
+
+			if (shouldProcess)
+				callback();
+		}
+	}
+
+	for (const auto& [action, callback] : controller.m_axis)
+	{
+		auto keys = InputBindings::m_inputAxis[action];
+		for (const auto& [key, scale, mods] : keys)
+		{
+			bool shouldProcess =
+			    (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
+
+			if (shouldProcess)
+			{
+				callback(scale);
+			}
+		}
+	}
+}
+
+void InputManager::beginFrame()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	m_mouseOffset.x = ImGui::GetWindowPos().x;
-	m_mouseOffset.y = ImGui::GetWindowPos().y + ImGui::GetFrameHeight();
-
-	// Get cursor position, consider window offset and tab height.
-	float cursorXPos = io.MousePos.x - m_mouseOffset.x;
-	float cursorYPos = io.MousePos.y - m_mouseOffset.y;
-
-	double x = 0;
-	double y = 0;
-	glfwGetCursorPos(Application::get().mainWindow(), &x, &y);
-
+	// Update mouse position
 	if (ImGui::IsMousePosValid())
 	{
-		m_mouseX = cursorXPos;
-		m_mouseY = cursorYPos;
+		m_mouseX = io.MousePos.x;
+		m_mouseY = io.MousePos.y;
 	}
 
-	/// \todo MH check if this code is active.
+	m_mouseXDelta = io.MouseDelta.x;
+	m_mouseYDelta = io.MouseDelta.y;
 
-	/*
-	// Avoid catching events outside of window.
-	if (!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered())
-	  return;
-	*/
-	// if (!isFocused<UI::Viewport>())
-	// 		return;
+	m_mouseXPrev = io.MousePosPrev.x;
+	m_mouseYPrev = io.MousePosPrev.y;
 
-	// Check left, right and middle button.
+	// TODO: (DR) drag delta is unused, haven't tested if it works properly after changes, should be
+	/* \todo JH \todo MH probably very naive */
+	if (isMouseDown())
+	{
+		m_mouseXDragDelta += m_mouseXDelta;
+		m_mouseYDragDelta += m_mouseYDelta;
+	}
+	else
+	{
+		m_mouseXDragDelta = m_mouseYDragDelta = 0;
+	}
+
+	LOG_EVENT_MOUSE_POS(std::to_string(m_mouseX), std::to_string(m_mouseY));
+
+	// Update left, right and middle button.
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)
 	{
 		if (ImGui::IsMouseClicked(i))
@@ -191,97 +323,27 @@ void InputManager::processViewportEvents()
 	}
 }
 
-void InputManager::beginCameraControl()
+void InputManager::endFrame()
 {
-	// Disable system cursor. The cursor will be hidden and at the endCameraControl the cursor will
-	// be at the same position.
-	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// TODO: (DR) REWRITE NEEDED
+	//  The InputManager should be taking input FROM IMGUI ONLY
+	//  We should not be changing the glfw backend whatsoever, its not necessary
+	//  The code updating the InputManager values with ImGui should run at the BEGINNING of a frame, however
+	//  currently its written to partially update at the beginning in glfw backend and then again at the end with this
+	//  code. A relic of the old codebase.
+	//  Also the logging of events needs to be changed and tested.
+	//  I've added beginFrame and endFrame methods (similar to Module) that get called accordingly and started moving
+	//  stuff from this method to beginFrame, starting with mouse button updates which were broken.
+	//  I also moved the mouse position update, hoping that doesn't break something.
+	//  Note that this fixed an issue with actions that caused InputManager::isActionTriggered(pressed) to always return
+	//  false if the action was bound to one of the mouse buttons.
 
-	m_ignoreImGuiEvents = true;
-
-	// Tell ImGui to don't capture mouse position. No widgets will be set to the hovered state.
-	auto& io = ImGui::GetIO();
-	g_mousedFlags = io.ConfigFlags; // Store current IO configuration flags.
-	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
-}
-
-void InputManager::endCameraControl()
-{
-	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-	m_ignoreImGuiEvents = false;
-
-	auto& io = ImGui::GetIO();
-	io.ConfigFlags = g_mousedFlags;
-}
-
-void InputManager::preUpdate()
-{
-	m_mouseButtonState.left = isKeyPressed(Keys::mouseLeft);
-	m_mouseButtonState.right = isKeyPressed(Keys::mouseRight);
-	m_mouseButtonState.middle = isKeyPressed(Keys::mouseMiddle);
-}
-
-void InputManager::processEvents(InputController& controller)
-{
-	for (const auto& [action, state, callback] : controller.m_actions)
-	{
-		auto& keys = InputBindings::m_inputActions[action];
-		for (const auto& [key, mods] : keys)
-		{
-			// Check if key is in desired state.
-			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
-														m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
-													 areModifiersActive(mods);
-
-			if (shouldProcess) callback();
-		}
-	}
-
-	for (const auto& [action, callback] : controller.m_axis)
-	{
-		auto keys = InputBindings::m_inputAxis[action];
-		for (const auto& [key, scale, mods] : keys)
-		{
-			bool shouldProcess =
-					(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
-
-			if (shouldProcess) callback(scale);
-		}
-	}
-}
-
-void InputManager::update()
-{
-	m_mouseXDelta = m_mouseX - m_mouseXPrev;
-	m_mouseYDelta = m_mouseY - m_mouseYPrev;
-
-	m_mouseXPrev = m_mouseX;
-	m_mouseYPrev = m_mouseY;
-
-	/* \todo JH probably very naive */
-	if (isMouseDown())
-    {
-        m_mouseXDragDelta += m_mouseXDelta;
-        m_mouseYDragDelta += m_mouseYDelta;
-    }else
-    {
-        m_mouseXDragDelta = m_mouseYDragDelta = 0;
-    }
-
-	double x = 0, y = 0;
-	glfwGetCursorPos(Application::get().mainWindow(), &x, &y);
-
-	LOG_EVENT_MOUSE_POS(std::to_string(m_mouseX), std::to_string(m_mouseY));
-
-	// mouseXDelta = 0;
-	// mouseYDelta = 0;
-
+	// Process events (Note: Dispatches callbacks)
 	processEvents(s_globalInputController);
 	if (s_activeInput)
 		processEvents(*s_activeInput);
 
-	// Process keys.
+	// Process keys
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)
@@ -297,6 +359,7 @@ void InputManager::update()
 	/// \todo MH mouse scroll release.
 	m_keyMap[Keys::Code::mouseScrlUp] = KeyState::UP;
 	m_keyMap[Keys::Code::mouseScrlDown] = KeyState::UP;
+	m_mouseWheelOffset = 0;
 }
 
 void InputManager::keyDown(int keyPressed)
@@ -739,33 +802,9 @@ GLFWwindow* InputManager::getCurrentViewport()
 	{
 		if (platformIO.Viewports[n]->ID == g->MouseViewport->ID)
 		{
-			window = (GLFWwindow*)platformIO.Viewports[n]->PlatformHandle;
+			window = (GLFWwindow*) platformIO.Viewports[n]->PlatformHandle;
 		}
 	}
 
 	return window;
 }
-
-//===-- Statics -----------------------------------------------------------===//
-MouseButtonState InputManager::m_mouseButtonState;
-
-std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
-
-std::vector<InputController*> InputManager::m_inputControllers;
-InputController* InputManager::s_activeInput = nullptr;
-
-bool InputManager::m_ignoreImGuiEvents = false;
-glm::vec2 InputManager::m_mouseOffset;
-float InputManager::m_mouseX = 0;
-float InputManager::m_mouseY = 0;
-float InputManager::m_mouseXPrev = 0;
-float InputManager::m_mouseYPrev = 0;
-
-float InputManager::m_mouseXDelta = 0;
-float InputManager::m_mouseYDelta = 0;
-
-float InputManager::m_mouseXDragDelta = 0;
-float InputManager::m_mouseYDragDelta = 0;
-
-int InputManager::m_winWidth = 0;
-int InputManager::m_winHeight = 0;

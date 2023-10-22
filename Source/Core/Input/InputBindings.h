@@ -1,5 +1,14 @@
 /**
- * \author Martin Herich <hericmar@fel.cvut.cz>
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
@@ -9,39 +18,8 @@
 #include <vector>
 
 #include "Core/Defs.h"
-
+#include "InputManager.h"
 #include "KeyCodes.h"
-
-using Modifiers = std::array<bool, 4L>;
-using ModifiersList = std::vector<Keys::Code>;
-
-/**
- * If you change order of modifiers, change it also in
- * InputManager::areModifiersActive function.
- */
-FORCE_INLINE Modifiers createModifiers(const ModifiersList& list)
-{
-	Modifiers mods = {false, false, false, false};
-	for (auto mod : list)
-	{
-		switch (mod)
-		{
-		case Keys::Code::ctrll:
-			mods[0] = true;
-			break;
-		case Keys::Code::altl:
-			mods[1] = true;
-			break;
-		case Keys::Code::shiftl:
-			mods[2] = true;
-			break;
-		default:
-			break;
-		}
-	}
-
-	return mods;
-}
 
 struct InputBindings final
 {
@@ -63,7 +41,6 @@ struct InputBindings final
 	using AxesMap = std::unordered_map<std::string, std::vector<AxisMapping>>;
 
 	friend class InputManager;
-
 
 	static void init();
 

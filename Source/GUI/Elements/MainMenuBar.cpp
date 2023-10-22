@@ -1,95 +1,173 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "MainMenuBar.h"
 
 #include "imgui.h"
 
+#include "API.h"
 #include "Commands/ApplicationCommands.h"
-#include "Core/API.h"
-#include "GUI/Elements/Dialogs/AboutDialog.h"
+#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
+#include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "GUI/Elements/Modals/ConfirmModal.h"
+#include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "Scripting/Scripting.h"
-#include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
-// #include "RecentFiles.h"
 
 using namespace UI;
 
-static bool saveSceneDialog(std::string& result, const std::string& title)
-{
-	std::string root = Config::getAbsolutePath("./");
-	static std::vector<std::string> filter = {
-			"I3T scene files",
-			"*.scene"
-	};
+using namespace std::literals;
 
-	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
+static bool saveSceneDialog(std::filesystem::path& result, const std::string& title)
+{
+	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
+
+	return SystemDialogs::SaveSingleFileDialog(result, title, Configuration::sceneRoot.string(), filter);
 }
 
-static bool openSceneDialog(std::string& result, const std::string& title)
+static bool openSceneDialog(std::filesystem::path& result, const std::string& title)
 {
-	std::string root = Config::getAbsolutePath("./");
-	static std::vector<std::string> filter = {
-			"I3T scene files",
-			"*.scene"
-	};
+	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
 
-	return SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
+	return SystemDialogs::OpenSingleFileDialog(result, title, Configuration::sceneRoot.string(), filter);
+}
+
+//
+
+static void showRecentFiles()
+{
+	const auto& recentFiles = getUserData().recentFiles;
+	if (recentFiles.empty())
+	{
+		ImGui::Text("No recent files");
+	}
+
+	std::optional<std::filesystem::path> sceneToOpen;
+	for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it)
+	{
+		if (ImGui::MenuItem(it->string().c_str()))
+		{
+			sceneToOpen = *it;
+		}
+	}
+
+	if (sceneToOpen)
+	{
+		askBeforeExitScene([sceneToOpen]() {
+			App::getModule<StateManager>().loadScene(*sceneToOpen);
+
+			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+			if (startWindow)
+			{
+				startWindow->hide();
+			}
+		});
+	}
 }
 
 static void saveAs()
 {
-	std::string filename;
+	std::filesystem::path filename;
 	bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
 	if (hasFilename)
 	{
 		fs::path path(filename);
-		if (path.extension().string() != ".scene")
+		if (path.extension().string() != I3T_SCENE_EXTENSION)
 		{
-			filename += ".scene";
+			filename += I3T_SCENE_EXTENSION;
 		}
 
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 
-		StateManager::instance().saveScene(filename);
-		StateManager::instance().setScene(filename);
+		App::getModule<StateManager>().saveScene(filename);
 	}
 }
 
 static void save()
 {
-	auto& sm = StateManager::instance();
+	auto& stateManager = App::getModule<StateManager>();
 
-	if (sm.hasScene())
-		sm.saveScene();
+	if (stateManager.hasScene())
+	{
+		if (stateManager.getCurrentScene()->m_readOnly)
+		{
+			saveAs();
+		}
+		else
+		{
+			stateManager.saveScene();
+		}
+	}
 	else
+	{
 		saveAs();
+	}
 }
 
-static void open()
+Result<Void, Error> MenuBarDialogs::open()
 {
-	std::string sceneFile;
+	std::filesystem::path sceneFile;
 	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
 	if (hasFile)
 	{
-		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-		StateManager::instance().loadScene(sceneFile);
+		App::getModule<StateManager>().loadScene(sceneFile);
+		return Void{};
 	}
+
+	return Err("No file selected");
 }
 
 //===----------------------------------------------------------------------===//
 
 MainMenuBar::MainMenuBar()
 {
-	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
+	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() {
 		save();
+	});
+
+	InputManager::bindGlobalAction("new", EKeyState::Pressed, [&]() {
+		askBeforeExitScene([]() {
+			NewProjectCommand::dispatch();
+
+			/// \todo Replace me with a proper event
+			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+			if (startWindow)
+			{
+				startWindow->hide();
+			}
+		});
+	});
+
+	InputManager::bindGlobalAction("open", EKeyState::Pressed, [&]() {
+		askBeforeExitScene([]() {
+			if (MenuBarDialogs::open())
+			{
+				/// \todo Replace me with a proper event
+				const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
+				if (startWindow)
+				{
+					startWindow->hide();
+				}
+			}
+		});
 	});
 }
 
@@ -102,6 +180,7 @@ void MainMenuBar::render()
 		showFileMenu();
 		showEditMenu();
 		showWindowsMenu();
+		showTutorialMenu();
 		showHelpMenu();
 
 		ImGui::EndMenuBar();
@@ -110,7 +189,9 @@ void MainMenuBar::render()
 	ImGui::End();
 
 	if (m_showDemoWindow)
+	{
 		ImGui::ShowDemoWindow(&m_showDemoWindow);
+	}
 }
 
 void MainMenuBar::showFileMenu()
@@ -119,22 +200,24 @@ void MainMenuBar::showFileMenu()
 	{
 		if (ImGui::MenuItem("New"))
 		{
-			// TabSpace::onOpenScene(TabSpace::RESET);
+			InputManager::triggerAction("new", EKeyState::Pressed);
 		}
 		ImGui::Separator();
 
+		if (ImGui::MenuItem("Open", "Ctrl+O"))
+		{
+			InputManager::triggerAction("open", EKeyState::Pressed);
+		}
+
 		if (ImGui::BeginMenu("Recent"))
 		{
-			/// \todo Handle recent files.
+			showRecentFiles();
+
 			ImGui::EndMenu();
 		}
+		ImGui::Separator();
 
-		if (ImGui::MenuItem("Open"))
-		{
-			open();
-		}
-
-		if (ImGui::MenuItem("Save"))
+		if (ImGui::MenuItem("Save", "Ctrl+S", false, !App::getModule<StateManager>().getCurrentScene()->m_readOnly))
 		{
 			save();
 		}
@@ -146,17 +229,9 @@ void MainMenuBar::showFileMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Import Content"))
+		if (ImGui::MenuItem("Manage Models"))
 		{
-			/// \todo Import custom content? Use Utils/System.h.
-			// Reader::openContentDialog();
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Setup"))
-		{
-			I3T::getUI()->showUniqueWindow<SetupDialog>();
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
 		}
 
 		ImGui::Separator();
@@ -172,17 +247,23 @@ void MainMenuBar::showFileMenu()
 
 void MainMenuBar::showEditMenu()
 {
+	// See #297
 	if (ImGui::BeginMenu("Edit"))
 	{
-		if (ImGui::MenuItem("Undo", nullptr, false, StateManager::instance().canUndo()))
+		/*
+		if (ImGui::MenuItem("Undo", "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
 		{
-			InputManager::triggerAction("undo", EKeyState::Pressed);
+		    InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem("Redo", nullptr, false, StateManager::instance().canRedo()))
+		if (ImGui::MenuItem("Redo", "Ctrl+Y", false, App::getModule<StateManager>().canRedo()))
 		{
-			InputManager::triggerAction("redo", EKeyState::Pressed);
+		    InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
-
+		 */
+		if (ImGui::MenuItem("Preferences"))
+		{
+			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
+		}
 		ImGui::EndMenu();
 	}
 }
@@ -192,11 +273,24 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
+		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
+		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
-		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
-		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
+#ifdef I3T_DEBUG
+		ImGui::MenuItem("Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
+		ImGui::MenuItem("Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
+#endif
+
+		ImGui::EndMenu();
+	}
+}
+
+void MainMenuBar::showTutorialMenu()
+{
+	if (ImGui::BeginMenu("Tutorials"))
+	{
+		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}
@@ -206,20 +300,30 @@ void MainMenuBar::showHelpMenu()
 {
 	if (ImGui::BeginMenu("Help"))
 	{
+#ifdef I3T_DEBUG
 		if (ImGui::MenuItem("Description"))
 		{
-			I3T::getUI()->showUniqueWindow<DescriptionDialog>();
+			I3T::getUI()->getWindowManager().showUniqueWindow<DescriptionDialog>();
 		}
-
-		if (ImGui::MenuItem("About"))
-		{
-			I3T::getUI()->showUniqueWindow<AboutDialog>();
-		}
+#endif
+		ImGui::MenuItem("About", nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow)) {}
-		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr())) {}
+#ifdef I3T_DEBUG
+		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
+		{}
+#endif
+
+		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
+		{}
+
+#ifdef I3T_DEBUG
+		ImGui::Separator();
+
+		ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
+		ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+#endif
 
 		ImGui::EndMenu();
 	}

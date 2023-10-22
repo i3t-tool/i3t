@@ -1,0 +1,959 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -90.0,
+                "orbitCameraRotationY": 30.0,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    -2.2560007572174074,
+                    -0.5923615097999573,
+                    0.3420000374317169
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 1488,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    288.0,
+                    702.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1494,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    502.0,
+                    701.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1500,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    715.0,
+                    699.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1506,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    288.33331298828127,
+                    864.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1512,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    502.0,
+                    863.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1518,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    717.0,
+                    860.0
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1524,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    287.8571472167969,
+                    1021.5714721679688
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1530,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    502.14276123046877,
+                    1022.2852783203125
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1536,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    715.142822265625,
+                    1020.2852783203125
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1542,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    289.1428527832031,
+                    1186.2855224609376
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1548,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    -90.8946304321289,
+                    1032.513916015625
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1554,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    -102.8058090209961,
+                    1186.247802734375
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1560,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    -117.29464721679688,
+                    856.3143920898438
+                ],
+                "transforms": [
+                    {
+                        "id": 1566,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            -371.0,
+                            901.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 1567,
+                "label": "dX",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    -376.7950134277344,
+                    348.3980407714844
+                ],
+                "transforms": [
+                    {
+                        "id": 1573,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            -357.99896240234377,
+                            378.71588134765627
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                3.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                3.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 1574,
+                "label": "dY",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    -377.2001953125,
+                    522.3562622070313
+                ],
+                "transforms": [
+                    {
+                        "id": 1580,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            -357.99896240234377,
+                            552.8947143554688
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                0.0,
+                                3.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                3.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 1581,
+                "label": "Base",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    -372.6528625488281,
+                    166.25099182128907
+                ],
+                "transforms": [
+                    {
+                        "id": 1587,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            -352.760498046875,
+                            196.6793212890625
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                -5.900000095367432,
+                                0.0,
+                                -3.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                -5.900000095367432,
+                                0.0,
+                                -3.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 1588,
+                "label": "Plane",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    270.0,
+                    489.0
+                ],
+                "model": "Plane",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1590,
+                "label": "Axes",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    585.0,
+                    42.0
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1592,
+                "label": "Teapot",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    582.0,
+                    340.0
+                ],
+                "model": "Teapot",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1594,
+                "label": "Suzanne",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    412.0,
+                    338.0
+                ],
+                "model": "Suzanne",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1596,
+                "label": "ArrowZ",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    428.0,
+                    38.0
+                ],
+                "model": "Arrow Z",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1598,
+                "label": "Bunny",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    260.0,
+                    335.0
+                ],
+                "model": "Bunny",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1600,
+                "label": "Wooden Box",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    358.0,
+                    189.0
+                ],
+                "model": "Wooden Box",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1602,
+                "label": "ArrowY",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    272.0,
+                    38.0
+                ],
+                "model": "Arrow Y",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1604,
+                "label": "Box",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    118.0,
+                    189.0
+                ],
+                "model": "Cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1606,
+                "label": "ArrowX",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    113.0,
+                    39.0
+                ],
+                "model": "Arrow X",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1608,
+                "label": "Metal Box",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    550.0,
+                    189.0
+                ],
+                "model": "Metal Box",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1610,
+                "label": "Duck",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    117.0,
+                    334.0
+                ],
+                "model": "Duck",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 1612,
+                "label": "Sphere",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    116.0,
+                    488.0
+                ],
+                "model": "Sphere",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                1581,
+                0,
+                1488,
+                0
+            ],
+            [
+                1567,
+                1,
+                1488,
+                1
+            ],
+            [
+                1488,
+                0,
+                1494,
+                0
+            ],
+            [
+                1488,
+                1,
+                1494,
+                1
+            ],
+            [
+                1494,
+                0,
+                1500,
+                0
+            ],
+            [
+                1494,
+                1,
+                1500,
+                1
+            ],
+            [
+                1560,
+                0,
+                1506,
+                0
+            ],
+            [
+                1567,
+                1,
+                1506,
+                1
+            ],
+            [
+                1506,
+                0,
+                1512,
+                0
+            ],
+            [
+                1567,
+                1,
+                1512,
+                1
+            ],
+            [
+                1512,
+                0,
+                1518,
+                0
+            ],
+            [
+                1567,
+                1,
+                1518,
+                1
+            ],
+            [
+                1548,
+                0,
+                1524,
+                0
+            ],
+            [
+                1567,
+                1,
+                1524,
+                1
+            ],
+            [
+                1524,
+                0,
+                1530,
+                0
+            ],
+            [
+                1567,
+                1,
+                1530,
+                1
+            ],
+            [
+                1530,
+                0,
+                1536,
+                0
+            ],
+            [
+                1567,
+                1,
+                1536,
+                1
+            ],
+            [
+                1554,
+                0,
+                1542,
+                0
+            ],
+            [
+                1567,
+                1,
+                1542,
+                1
+            ],
+            [
+                1560,
+                0,
+                1548,
+                0
+            ],
+            [
+                1574,
+                2,
+                1548,
+                1
+            ],
+            [
+                1548,
+                0,
+                1554,
+                0
+            ],
+            [
+                1574,
+                2,
+                1554,
+                1
+            ],
+            [
+                1581,
+                0,
+                1560,
+                0
+            ],
+            [
+                1574,
+                1,
+                1560,
+                1
+            ],
+            [
+                1542,
+                0,
+                1588,
+                0
+            ],
+            [
+                1500,
+                0,
+                1590,
+                0
+            ],
+            [
+                1536,
+                0,
+                1592,
+                0
+            ],
+            [
+                1530,
+                0,
+                1594,
+                0
+            ],
+            [
+                1494,
+                0,
+                1596,
+                0
+            ],
+            [
+                1524,
+                0,
+                1598,
+                0
+            ],
+            [
+                1512,
+                0,
+                1600,
+                0
+            ],
+            [
+                1488,
+                0,
+                1602,
+                0
+            ],
+            [
+                1560,
+                0,
+                1604,
+                0
+            ],
+            [
+                1581,
+                0,
+                1606,
+                0
+            ],
+            [
+                1518,
+                0,
+                1608,
+                0
+            ],
+            [
+                1548,
+                0,
+                1610,
+                0
+            ],
+            [
+                1554,
+                0,
+                1612,
+                0
+            ]
+        ],
+        "zoom": 0.7635828852653503,
+        "workArea": {
+            "Min": [
+                -598.0142822265625,
+                -57.38609313964844
+            ],
+            "Max": [
+                934.23583984375,
+                1270.5640869140626
+            ]
+        }
+    }
+}

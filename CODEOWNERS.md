@@ -2,14 +2,14 @@
 
 ``/Source/Core/`` - Martin Herich
 
-``/Source/GUI/`` - Jaroslav Holeček, Sofie Šašorina, Martin Herich
+``/Source/GUI/`` - Jaroslav Holeček, Martin Herich, Dan Rakušan
 
 ``/Source/Logger/`` - Filip Uhlík, Martin Herich
 
-``/Source/Scripting/`` - Daniel Gruncl
+``/Source/Scripting/`` - Martin Herich
 
-``/Source/Tutorial/`` - Miroslav Müller
+``/Source/Tutorial/`` - Adam Loucký, Miroslav Müller
 
-``/Source/World/`` - Daniel Gruncl
+``/Source/Viewport/`` - Dan Rakušan
 
 ``/Test/`` - Martin Herich

@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -7,9 +19,12 @@
 
 using namespace Core;
 
-TEST(ScreenTest, _)
+class ScreenTest : public GraphManagerTestFixture
+{};
+
+TEST_F(ScreenTest, _)
 {
-	auto screen = Builder::createNode<ENodeType::Screen>();
+	auto screen = Builder::createOperator<EOperatorType::Screen>();
 	auto camera = GraphManager::createCamera();
 
 	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
@@ -30,8 +45,5 @@ TEST(ScreenTest, _)
 	EXPECT_EQ(camera, parent->as<Camera>());
 
 	// Get camera transform from screen node.
-	EXPECT_TRUE(Math::eq(
-			camera->getData(2).getMat4(),
-			GraphManager::getParent(screen)->getData(2).getMat4()
-	));
+	EXPECT_TRUE(Math::eq(camera->getData(2).getMat4(), GraphManager::getParent(screen)->getData(2).getMat4()));
 }

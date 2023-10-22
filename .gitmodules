@@ -17,10 +17,6 @@
 	path = Dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
 	ignore = dirty
-[submodule "Dependencies/jsonlib"]
-	path = Dependencies/jsonlib
-	url = https://github.com/nlohmann/json.git
-	ignore = dirty
 [submodule "Dependencies/portable-file-dialogs"]
 	path = Dependencies/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git
@@ -39,4 +35,18 @@
 	path = Dependencies/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+
+[submodule "Dependencies/sol2"]
+	path = Dependencies/sol2
+	url = https://github.com/ThePhD/sol2.git
+	ignore = dirty
+[submodule "Dependencies/lua/lua"]
+	path = Dependencies/lua/lua
+	url = https://github.com/lua/lua.git
+[submodule "Dependencies/ImGuizmo/ImGuizmo"]
+	path = Dependencies/ImGuizmo/ImGuizmo
+	url = https://github.com/xDUDSSx/ImGuizmo.git
+[submodule "Dependencies/rttr"]
+	path = Dependencies/rttr
+	url = https://github.com/i3t-tool/rttr.git
 

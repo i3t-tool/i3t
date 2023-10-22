@@ -1,0 +1,74 @@
+{
+  "resources": [
+    {
+      "name": "Bunny",
+      "path": "Data/Models/Bunny.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Cube",
+      "path": "Data/Models/CubeFixed.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Duck",
+      "path": "Data/Models/Duck.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Suzanne",
+      "path": "Data/Models/Suzanne.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Teapot",
+      "path": "Data/Models/Teapot.gltf",
+      "type": "Model"
+    },
+	{
+      "name": "Plane",
+      "path": "Data/Models/Plane.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Sphere",
+      "path": "Data/Models/sphere.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Axes",
+      "path": "Data/Models/axes.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow X",
+      "path": "Data/Models/arrowX.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow Y",
+      "path": "Data/Models/arrowY.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Arrow Z",
+      "path": "Data/Models/arrowZ.glb",
+      "type": "Model"
+    },
+    {
+      "name": "Metal Box",
+      "path": "Data/Models/box_metal.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Wooden Box",
+      "path": "Data/Models/box_wooden.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "ModelShader",
+      "path": "Data/Shaders/Model.glsl",
+      "type": "Shader"
+    }
+  ]
+}

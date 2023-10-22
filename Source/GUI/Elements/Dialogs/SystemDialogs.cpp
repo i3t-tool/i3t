@@ -1,35 +1,96 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #include "SystemDialogs.h"
+
+#include <codecvt>
 
 #include "portable-file-dialogs.h"
 
-bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
+#include "Logger/Logger.h"
+
+bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
                                          const std::vector<std::string>& filter)
 {
-	auto dialog = pfd::open_file(title, root, filter);
-
-	while (!dialog.ready(40) && result.empty())
+	std::vector<fs::path> results;
+	if (OpenFilesDialog(results, title, root, filter, true))
 	{
-		if (dialog.result().size() > 0)
-		{
-			result = dialog.result()[0];
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool SystemDialogs::SaveSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
-                                         const std::vector<std::string>& filter)
-{
-	auto destination = pfd::save_file(title, root, filter).result();
-	if (!destination.empty())
-	{
-		result = destination;
+		result = results.at(0);
 		return true;
 	}
+	else
+	{
+		return false;
+	}
+}
 
-	return false;
+bool SystemDialogs::OpenFilesDialog(std::vector<fs::path>& result, const std::string& title, fs::path root,
+                                    const std::vector<std::string>& filter, bool singleSelect)
+{
+	const auto pwd = fs::current_path();
+
+	auto files = pfd::open_file(title, root.make_preferred().string(), filter,
+	                            (singleSelect ? pfd::opt::none : pfd::opt::multiselect))
+	                 .result();
+
+	if (files.empty())
+	{
+		return false;
+	}
+
+	result.clear();
+	for (const auto& fileStr : files)
+	{
+#ifdef _WIN32
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		std::wstring wideFilename = converter.from_bytes(fileStr);
+		result.push_back(fs::path(wideFilename));
+#else
+		result.push_back(fs::path(fileStr));
+#endif
+	}
+
+	if (fs::current_path() != pwd)
+	{
+		LOG_WARN("Current path changed by file dialog from {} to {}. Restoring.", pwd.string(),
+		         fs::current_path().string());
+		fs::current_path(pwd);
+	}
+
+	return true;
+}
+
+bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
+                                         const std::vector<std::string>& filter)
+{
+	const auto pwd = fs::current_path();
+
+	auto destination = pfd::save_file(title, root.make_preferred().string(), filter).result();
+
+	if (destination.empty())
+	{
+		return false;
+	}
+
+	result = destination;
+
+	if (fs::current_path() != pwd)
+	{
+		fs::current_path(pwd);
+		LOG_WARN("Current path changed by file dialog from {} to {}. Restoring.", pwd.string(),
+		         fs::current_path().string());
+	}
+
+	return true;
 }
 
 void SystemDialogs::FireErrorMessageDialog(const std::string& title, const std::string& message)

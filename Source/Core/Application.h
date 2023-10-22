@@ -1,82 +1,96 @@
 /**
- * \file	GUI\App.h
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Application class.
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
-#include <array>
 #include <map>
+#include <memory>
+#include <string>
 #include <vector>
 
-#include "gl_core_4_4.h"
-#include "imgui.h"
-
 #include "Core/Defs.h"
+#include "Core/Module.h"
 #include "Core/Window.h"
-#include "State/Stateful.h"
 
-constexpr const char* g_baseTitle = "I3T - An Interactive Tool for Teaching Transformations";
-
-class Module;
 class ICommand;
 class Window;
 class MainMenuBar;
-class World;
-class Scripting;
 class UIModule;
+
+static inline const std::string BASE_WINDOW_TITLE = "I3T - An Interactive Tool for Teaching Transformations";
 
 /**
  * Application class.
  * A wrapper for UI windows.
  */
-class Application : public IStateful
+class Application
 {
-public:
-	Application();
-	~Application();
+protected:
+	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 
-	/**
-	 * \fn	void finalize()
-	 *
-	 * \brief	Finalize application
-	 *
-	 * 			Delete the object tree, world, shaders, textures, geometries, tabSpace, shaper.
-	 */
-	void finalize();
+	bool m_shouldClose = false;
+	double m_lastFrameSeconds{0.0}; // PF changed to double
+
+	Window* m_window;
+
+	/// Array of commands which the application is going to process in its main loop.
+	std::vector<ICommand*> m_commands;
+
+	static Application* s_instance;
+
+	Application();
+
+private:
+	Application(const Application&) = default;
+	Application& operator=(const Application&) = default;
+
+public:
+	virtual ~Application();
 
 	static Application& get();
-	UIModule* getUI();
-
-	//===----------------------------------------------------------------------===//
 
 	/**
-	 * Init OpenGL stuffs before display loop.
-	 * Taken from Muller GLFW. Initializes ImGui and I3T stuffs.
+	 * Performs initialization of the application.
+	 * @see onInit()
 	 */
-	void initWindow();
-
-	GLFWwindow* mainWindow();
-
-	const std::string& getTitle();
-
-	void setTitle(const std::string& title);
-
-	//===----------------------------------------------------------------------===//
+	void init();
 
 	/**
 	 * Enter main loop.
-	 *
-	 * Sequence of actions:
-	 *   -# Update the mouse button state.
-	 *   -# Update World = handle 2D and 3D interaction.
-	 *   -# Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap array
-	 *        (JUST_UP -> UP, JUST_DOWN -> DOWN).
-	 *   -# Query ImGui states (active window position, ...).
 	 */
 	void run();
 
-	World* world();
+	void beginFrame();
+	void endFrame();
+
+	/**
+	 * Perform logic update.
+	 * @see onUpdate()
+	 */
+	void update();
+
+	void display();
+
+	/**
+	 * Shutdown the whole application.
+	 * Called when CloseCommand is received.
+	 * @see onClose()
+	 */
+	void close();
+
+	/// Creates instance of module, registers it to the application, and calls its init() method.
+	template <typename T, typename... Args> static T* createModule(Args&&... args);
+
+	template <typename T> static T& getModule();
 
 	/**
 	 * Issue command.
@@ -87,76 +101,46 @@ public:
 	 */
 	void enqueueCommand(ICommand* command);
 
-	void init();
-
-	/// \todo MH This function must be called after world instantiation.
-	void initModules();
-
 	/**
-	 * \brief	Initializes renderer and scene.
+	 * Init OpenGL stuffs before display loop.
+	 * Taken from Muller GLFW. Initializes ImGui and I3T stuffs.
 	 */
-	bool initI3T();
+	void initWindow();
 
-	//===-- State functions ---------------------------------------------------===//
+	GLFWwindow* getWindow();
 
-	Memento getState() override;
+	const std::string& getTitle();
+	void setTitle(const std::string& title);
 
-	void setState(const Memento &) override;
-
-	void onStateChange(const std::string &winTitlePostfix) override;
-
-	//===----------------------------------------------------------------------===//
-
-private:
-	static Application* s_instance;
-
-	std::vector<Module*> m_modules;
-
-	/**
-	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no
-	 * 			window update.
-	 */
-	bool m_isPaused;
-
-	bool m_bShouldClose = false;
-
-	World* m_world;
-	Scripting* m_scriptInterpreter;
-	// GLFWwindow* m_window;
-	Window* m_window;
-
-	/// Array of commands which the application is going to process in its main loop.
-	std::vector<ICommand*> m_commands;
-
-	/**
-	 * \brief	GLUT Callback: render the whole I3T window (update the Logic, draw 3D scene and 2D workspace)
-	 *
-	 * - logicUpdate() - handles events, 3D interaction, editor, 3D scene
-	 * - World::render(); - draw 3D scene
-	 * - TabSpace::draw(); - draw the workspace with all boxes
-	 */
-	void onDisplay();
-
-	/**
-	 * Called when BeforeCloseCommand is received.
-	 *
-	 * If current project is in unsaved state, a modal window "Do your really want to leave?"
-	 * is displayed. Otherwise, the CloseCommand is issued.
-	 */
-	void onBeforeClose();
-
-	/**
-	 * Called when CloseCommand is received.
-	 *
-	 * Shutdown whole application.
-	 */
-	void onClose();
-
-	/**
-	 * \brief	Updates the world and the mouse button state, mouseDelta, mousePrev and throws JUST_Pressed to PRESSED
-	 * 			PreUpdate, world update, update
-	 */
-	void logicUpdate();
+protected:
+	virtual void onInit() {}
+	virtual void onBeginFrame() {}
+	virtual void onEndFrame() {}
+	virtual void onUpdate(double delta) {}
+	virtual void onClose() {}
 };
+
+template <typename T, typename... Args> inline T* Application::createModule(Args&&... args)
+{
+	static_assert(std::is_base_of_v<Module, T>, "Class T must be derived from the Module class");
+
+	const auto hash = typeid(T).hash_code();
+	auto& self = Application::get();
+	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
+	self.m_modules[hash]->onInit();
+
+	return (T*) self.m_modules[hash].get();
+}
+
+template <typename T> T& Application::getModule()
+{
+	const auto hash = typeid(T).hash_code();
+	const auto& self = Application::get();
+
+	I3T_ASSERT(self.m_modules.count(hash) != 0, "Module is not created!");
+	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr, "Invalid type.");
+
+	return *(T*) self.m_modules.at(hash).get();
+}
 
 typedef Application App;

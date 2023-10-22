@@ -1,8 +1,14 @@
 /**
- * \file	GUI/style.h
+ * \file
+ * \brief
  * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
- * Declares the tab group class
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #pragma once
 
@@ -28,16 +34,43 @@ enum class EColor
 	MenuBarBackground,
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
-	TabColor,
+	TabColor, // TODO: (DR) Unused
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
+	SceneViewBackground,
+
+	DockTabActive,
+
+	Synergies_FloatBg,
+	Synergies_FloatBgActive,
+	Synergies_FloatBgHovered,
+
+	Workspace_SelectedBorder,
+	Workspace_FocusBorder,
+	Workspace_InteractionFocusBorder,
 
 	TutorialBgColor,
+	TutorialText,
+	TutorialBarBg,
+	TutorialScrollbarBg,
+	TutorialScrollbarGrab,
+	TutorialScrollbarHovered,
+	TutorialScrollbarActive,
+	TutorialTitleText,
+	TutorialHighlightText,
+	TutorialButtonText,
+	TutorialButtonBg,
+	TutorialButtonActive,
+	TutorialButtonHovered,
+	TutorialTaskBg,
 
-    SelectionRectFull,
-    SelectionRectTouch,
+	SelectionRectFull,
+	SelectionRectTouch,
 
+	TrackingSequenceTint,
+
+	AddMenuHeader,
 
 	// 2. Pins
 	PulsePin,
@@ -63,6 +96,7 @@ enum class EColor
 	// General unspecified node
 	NodeBg,
 	NodeHeader,
+	NodeFont,
 
 	// Sequence
 	NodeBgSequence,
@@ -77,23 +111,67 @@ enum class EColor
 
 	// 4. Transform
 	NodeBgTransformation,
+	NodeBorder,
 	NodeHeaderTranformation,
+	NodeLODButtonColorText,
+	NodeLODButtonColor,
+	NodeLODButtonColorActive,
+	NodeLODButtonColorHovered,
 	FloatBgTransformation,
 	FloatBgTransformationActive,
 	FloatBgTransformationHovered,
-
-	Nodes_Font,
 
 	// 5. Popups
 	Nodes_ConnectionPossible,
 	Nodes_ConnectionNotPossible,
 	Nodes_CreateNode,
 
+	Nodes_Screen_resizeBtn_bgShape,
+	Nodes_Screen_resizeBtn_bgInner,
+
+	Nodes_Screen_resizeBtn_fgShape,
+	Nodes_Screen_resizeBtn_fgInner,
+
+	Nodes_Screen_noInput_background,
+	Nodes_Screen_noInput_text,
+
+	Nodes_Transformation_TrackingMarkColor,
+	Nodes_Transformation_TrackingColor,
+
+	Nodes_Transformation_ValidIcon_bgShape,
+	Nodes_Transformation_ValidIcon_bgInner,
+	Nodes_Transformation_ValidIcon_fgShape,
+	Nodes_Transformation_ValidIcon_fgInner,
+	Nodes_Transformation_ValidIcon_padding,
+
+	// 6. Links
+	Links_selected_colorShift,
+
 	Builder_NodePadding, // not a color but i need a vec4
+
+	StartWindow_DescriptionBackground,
+	StartWindow_WindowBackground,
+	StartWindow_ScrollbarBackground,
+	StartWindow_ScrollbarGrab,
+	StartWindow_ScrollbarGrabHovered,
+	StartWindow_ScrollbarGrabActive,
+	StartWindow_Separator,
+	StartWindow_DefaultButton,
+	StartWindow_NewSceneButton,
+	StartWindow_NewSceneButtonFont,
+	StartWindow_TitleFont,
+	StartWindow_DescriptionFont,
+	StartWindow_YourSceneWinBackground,
+
+	AboutWindow_BackgroundLeft,
+	AboutWindow_BackgroundRight,
+	AboutWindow_Text
 };
 
 enum class EFont
 {
+	Regular,
+	LargeBold,
 	MenuLarge,
 	MenuSmall,
 	Button,
@@ -135,6 +213,19 @@ enum class ESize
 	Nodes_leftSideSpacing,
 	Nodes_rightSideSpacing,
 
+	Workspace_SelectedBorderThickness,
+	Workspace_FocusBorderThickness,
+	Workspace_InteractionFocusBorderThickness,
+	Workspace_CopyPasteOffset,
+	Workspace_TrackingTimeBetweenTracks,
+
+	TutorialTaskSquareXPadding,
+	TutorialWindow_FrameRounding,
+	TutorialWindow_ScrollbarSize,
+	TutorialWindow_ScrollbarRounding,
+	TutorialWindow_BackButtonWidth,
+	TutorialWindow_MainMenuButtonWidth,
+
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
 	Links_Thickness,
@@ -142,14 +233,56 @@ enum class ESize
 	Links_OffsetFraction,
 	Links_OffsetMin,
 
-	Default_VisiblePrecision,
-	Default_InactiveMark
+	Links_selected_alpha,
 
+	Pins_IconPadding,
+
+	Nodes_Operators_Rounding,
+	Nodes_Sequence_Rounding,
+	Nodes_LOD_Button_Rounding,
+	Nodes_Border_Rounding,
+	Nodes_Border_Thickness,
+
+	Nodes_Transformation_TrackingMarkSize,
+
+	Float_inactive_alphaMultiplicator,
+
+	Default_VisiblePrecision,
+	Default_VisibleQuaternionPrecision,
+	Default_InactiveMark,
+
+	Tracking_SmoothScrollSpeed,
+	Tracking_JaggedScrollSpeed,
+
+	Tooltip_Rounding,
+
+	Window_Rounding,
+
+	StartWindow_WinWidth,
+	StartWindow_WinHeight,
+	StartWindow_WinRounding,
+	StartWindow_TitleVerticalOffset,
+	StartWindow_LeftBarWidth,
+	StartWindow_LoadButtonWidth,
+	StartWindow_StartNewButtonWidth,
+	StartWindow_ButtonHeight,
+	StartWindow_ThumbImageSize,
+	StartWindow_StartButtonWidth,
+	StartWindow_FrameRounding,
+	StartWindow_ScrollbarSize,
+	StartWindow_YourSceneWinRounding,
+	StartWindow_DotSize,
+	StartWindow_DotSpacing
 };
 
 enum class ESizeVec2
 {
 	Window_FramePadding,
+	Window_Padding,
+
+	TutorialWindow_Padding,
+
+	Tooltip_Padding,
 
 	Nodes_ItemsSpacing,
 	Nodes_FloatPadding,
@@ -161,14 +294,30 @@ enum class ESizeVec2
 	Nodes_MiddleSize,
 	Nodes_OutputSize,
 
+	Nodes_LODButtonSize,
+
 	Nodes_IconSize,
 	Nodes_FloatCycleButtonSize,
 	Nodes_ScreenTextureSize,
 
+	Nodes_Screen_resizeButtonSize,
+	Nodes_Sequence_DummySpaceSize,
+
+	Nodes_noPinsSpacing,
+
+	NewNode_positionShift,
+
 	Builder_ItemSpacing,
+
+	StartWindow_WinSize,
+	StartWindow_LogoOffset,
+	StartWindow_WinPadding,
+	StartWindow_LeftWinPadding,
+	StartWindow_RightWinOuterPadding,
+	StartWindow_RightWinInnerPadding
 };
 
-constexpr inline EColor asColor(EValueType type)
+constexpr inline EColor asColor(Core::EValueType type)
 {
 	return EColor(type);
 }
@@ -176,19 +325,21 @@ constexpr inline EColor asColor(EValueType type)
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
-	color.x = (float)r / 255.0f;
-	color.y = (float)g / 255.0f;
-	color.z = (float)b / 255.0f;
-	color.w = (float)a / 255.0f;
+	color.x = (float) r / 255.0f;
+	color.y = (float) g / 255.0f;
+	color.z = (float) b / 255.0f;
+	color.w = (float) a / 255.0f;
 
 	return color;
 }
 
-template <typename T> const char* enumToStr(std::map<T, const char*>& map, T en)
+template <typename T> const char* enumToStr(const std::map<T, const char*>& map, T en)
 {
 	if (!map.contains(en))
+	{
 		return nullptr;
-	return map[en];
+	}
+	return map.at(en);
 }
 
 /**
@@ -197,11 +348,12 @@ template <typename T> const char* enumToStr(std::map<T, const char*>& map, T en)
 class Theme
 {
 public:
-	using Colors   = std::unordered_map<EColor, ImVec4>;
-	using Sizes    = std::unordered_map<ESize, float>;
+	using Colors = std::unordered_map<EColor, ImVec4>;
+	using Sizes = std::unordered_map<ESize, float>;
 	using SizesVec = std::unordered_map<ESizeVec2, ImVec2>;
 
-	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a (std::unordered_map cannot be used).
+	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a
+	/// (std::unordered_map cannot be used).
 	using CategoryNames = std::map<std::string, const char*>;
 
 private:
@@ -213,7 +365,7 @@ private:
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	std::map<EFont, size_t> m_fontsAssoc;
+	std::map<EFont, std::string> m_fontsAssoc;
 
 public:
 	Theme() = default;
@@ -239,8 +391,8 @@ public:
 	/**
 	 * Function which initializes all style properties names.
 	 *
-	 * \warning All values are kept in a table (key, value). If you want to edit or add new name,
-	 * keep in mind, that name (value) must be unique.
+	 * \warning All values are kept in a table (key, value). If you want to edit
+	 * or add new name, keep in mind, that name (value) must be unique.
 	 */
 	static void initNames();
 
@@ -259,11 +411,14 @@ public:
 
 	ImFont* get(EFont font);
 
-	float get(ESize size) { return m_sizes[size]; }
+	float get(ESize size)
+	{
+		return m_sizes[size];
+	}
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
+		I3T_ASSERT(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];
 	}
 
@@ -273,25 +428,47 @@ public:
 	static std::map<ESize, const char*>& getSizeNames();
 	static std::map<ESizeVec2, const char*>& getSizeVecNames();
 
-	const std::string& getName() const { return m_name; }
+	const std::string& getName() const
+	{
+		return m_name;
+	}
 
-	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
+	void set(EColor color, ImVec4 value)
+	{
+		m_colors.insert(std::pair(color, value));
+	}
 
-	[[nodiscard]] const Colors& getColors() const { return m_colors; }
-	Colors& getColorsRef() { return m_colors; }
-	void setColors(const Colors& colors) { m_colors = colors; }
+	[[nodiscard]] const Colors& getColors() const
+	{
+		return m_colors;
+	}
+	Colors& getColorsRef()
+	{
+		return m_colors;
+	}
+	void setColors(const Colors& colors)
+	{
+		m_colors = colors;
+	}
 
-	Sizes& getSizesRef() { return m_sizes; }
-	SizesVec& getSizesVecRef() { return m_sizesVec2; }
+	Sizes& getSizesRef()
+	{
+		return m_sizes;
+	}
+	SizesVec& getSizesVecRef()
+	{
+		return m_sizesVec2;
+	}
 
-// JH unused -> maybe for "InputItems" only - drag float etc... but probably not needed
-//	void operatorColorTheme();
-//	void transformationColorTheme();
+	// JH unused -> maybe for "InputItems" only - drag float etc... but probably
+	// not needed
+	//	void operatorColorTheme();
+	//	void transformationColorTheme();
 	void returnFloatColorToDefault();
 
-// JH unused
-//	ImVec4 getHeader();
-//	ImVec4 getBg();
+	// JH unused
+	//	ImVec4 getHeader();
+	//	ImVec4 getBg();
 
 private:
 	template <typename E, typename T>

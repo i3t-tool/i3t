@@ -1,22 +1,34 @@
+/**
+ * \file
+ * \brief
+ * \author Martin Herich <martin.herich@phire.cz>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
+#include <cstdint>
 #include <set>
 
 namespace Core
 {
-typedef unsigned int ID;
+using ID = std::int64_t;
+constexpr ID NIL_ID = 0;
 
 class IdGenerator
 {
 public:
-	IdGenerator();
-
-	bool hasNext();
-	ID next();
-	void markAsUsed(ID id);
-	void returnId(ID id);
+	static ID next()
+	{
+		return ++m_NextId;
+	}
 
 private:
-	std::set<ID> m_IDs;
+	static ID m_NextId;
 };
 } // namespace Core

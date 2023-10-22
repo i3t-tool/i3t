@@ -1,24 +1,48 @@
+/**
+ * \file
+ * \brief
+ * \authors Martin Herich <martin.herich@phire.cz>, Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
 #include <deque>
+#include <filesystem>
+#include <vector>
 
 #include "Core/Defs.h"
+#include "Core/Module.h"
+#include "Scene.h"
+#include "State/Stateful.h"
+#include "UserData.h"
 
-#include "Memento.h"
-#include "SceneData.h"
+using namespace std::literals;
 
-constexpr int MAX_STATES = 32;
+constexpr auto I3T_SCENE_EXTENSION = ".scene";
 
-class IStateful;
-
-/**
- * Holds global state and takes state snapshots.
- */
-class StateManager : public Singleton<StateManager>
+/// Handles app state management.
+class StateManager : public Module
 {
 public:
-	StateManager();
-	void setOriginator(IStateful* originator) { m_originator = originator; }
+	StateManager() = default;
+
+	void onInit() override;
+	void onBeginFrame() override;
+	void onClose() override;
+
+	void addOriginator(IStateful* originator)
+	{
+		m_originators.push_back(originator);
+	}
+
+	// Undo/Redo _______________________________________________________________________________________________________
+
 	void takeSnapshot();
 	void undo();
 	void redo();
@@ -26,49 +50,116 @@ public:
 	[[nodiscard]] bool canUndo() const;
 	[[nodiscard]] bool canRedo() const;
 
-	[[nodiscard]] Memento getCurrentState() const;
+	int getMementosCount() const;
+	int getPossibleUndosCount() const;
+	int getPossibleRedosCount() const;
 
-	bool isDirty() const { return m_dirty; }
+	[[nodiscard]] const Memento& getCurrentState() const;
 
-	/// \pre m_originator is set.
-	void createEmptyScene();
+	bool isDirty() const
+	{
+		if (m_hashes.empty() || m_currentStateIdx == -1)
+		{
+			return m_dirty;
+		}
 
-	//===-- Files manipulation functions --------------------------------------===//
+		return m_currentScene->m_hash != m_hashes[m_currentStateIdx] && m_dirty;
+	}
 
-	bool loadScene(const fs::path& scene);
-	// SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);
+	// Scene save/load _________________________________________________________________________________________________
 
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
 
-	void setScene(const fs::path& scene);
+	bool loadScene(const fs::path& path);
 
-	bool hasScene() { return !m_currentScene.empty(); }
-	auto scenePath() { return m_currentScene; }
+	void newScene(bool firstRun = false);
 
-	//===----------------------------------------------------------------------===//
+	/**
+	 * @return Whether a previously saved scene is currently loaded.
+	 */
+	bool hasScene()
+	{
+		return m_currentScene->isSaved();
+	}
 
-	//===-- Recent files ------------------------------------------------------===//
+	Scene* getCurrentScene()
+	{
+		return m_currentScene.get();
+	}
 
-	const std::vector<std::string>& getRecentFiles() { return m_recentFiles; }
+	// Global save/load ________________________________________________________________________________________________
 
-	//===----------------------------------------------------------------------===//
+	bool saveGlobal();
+	bool loadGlobal();
+	void resetGlobal();
+
+	// User data _______________________________________________________________________________________________________
+
+	void saveUserData();
+	void loadUserData();
+
+	// Temporary directory _____________________________________________________________________________________________
+
+	const fs::path getTmpDirectory() const;
+	/**
+	 * Returns the temporary directory path just like getTmpDirectory() but creates it if it doesn't exist yet.
+	 */
+	const fs::path fetchTmpDirectory();
+
+	fs::path getTmpDirectoryLockFileName()
+	{
+		return m_tmpDirectoryLockFileName;
+	}
 
 private:
-	void setUnsavedWindowTitle();
-	void setSavedWindowTitle();
+	friend class Application;
 
-	void resetState();
+	std::vector<IStateful*> m_originators;
 
-	[[nodiscard]] bool hasNewestState() const;
+	/// Resets counters, set clean state and takes initial snapshot.
+	void reset();
 
-	fs::path m_currentScene;
-	bool m_dirty = false;
+	void setWindowTitle();
+	void pushRecentFile(const fs::path& file);
 
-	IStateful* m_originator;
+	// Scene save/load _________________________________________________________________________________________________
+
+	const fs::path m_sceneDataFolderName = fs::path("scene_data");
+
+	Ptr<State::Scene> m_currentScene;
+
+	bool setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath = "");
+
+	std::optional<Memento> createSceneMemento(Scene* scene);
+
+	// Global save/load ________________________________________________________________________________________________
+
+	const fs::path m_globalFilePath = fs::path("Global.json");
+
+	std::optional<Memento> createGlobalMemento();
+
+	// Temporary directory _____________________________________________________________________________________________
+
+	const fs::path m_tmpDirectoryRootName = fs::path("temp");
+	const fs::path m_tmpDirectoryDefaultName = fs::path("tmp");
+	const fs::path m_tmpDirectoryLockFileName = fs::path(".lock");
+	const long long m_tmpDirectoryLockFileInterval = 5;
+	const long long m_tmpDirectoryLockFileTimeout = m_tmpDirectoryLockFileInterval * 3;
+
+	fs::path m_tmpDirectory;
+	long long m_lastTmpDirectoryLockTimestamp{0};
+
+	void createTmpDirectory();
+	void deleteTmpDirectory();
+	void wipeTmpDirectory();
+	void purgeTmpDirectories();
+
+	// Undo/Redo _______________________________________________________________________________________________________
 
 	int m_currentStateIdx;
 	std::deque<Memento> m_mementos;
+	std::deque<long> m_hashes;
 
-	std::vector<std::string> m_recentFiles;
+	bool m_dirty = false;
 };
