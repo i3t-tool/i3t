@@ -1,8 +1,10 @@
 name: Release
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - feature/github-actions-build
+#     tags:
+#       - '*'
 
 permissions:
   contents: write
@@ -25,18 +27,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: Install Linux dependencies
         if: matrix.kind == 'Linux'
         run: |
-          sudo apt-get install -y build-essential \
+          sudo apt-get install -y build-essential g++-12 libgl-dev libopengl0 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+          sudo rm -f /usr/bin/g++
+          sudo ln /usr/bin/g++-12 /usr/bin/g++
 
       - name: Build and create archive
         shell: bash
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release
-          Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
+          cmake --build build --config Release --target I3T
+          bash Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
 
       - name: Publish
         uses: softprops/action-gh-release@v1
