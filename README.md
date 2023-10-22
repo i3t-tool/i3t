@@ -1,4 +1,4 @@
-# I3T
+ I3T
 I3T - An Interactive Tool for Teaching Transformations
 
 I3T is an educational application that allows the study of 3D transformations 
@@ -21,6 +21,10 @@ The first version of I3T was created by Michal Folta in 2016.
 - Miroslav Müller
 - Vít Zadina
 - Filip Uhlík
+
+Design
+- Lukáš Pilka
+- Jaroslav Kolář
 
 ## Info for the developers
 
