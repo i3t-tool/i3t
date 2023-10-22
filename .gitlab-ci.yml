@@ -86,21 +86,6 @@ test:
 
 ###
 
-release:
-  stage: release
-  only:
-    - master
-  script:
-    - mkdir relase-out && cd release-out
-    - cmake -DCMAKE_BUILD_TYPE=Release ..
-    - cmake --build . -j 8 --target I3T
-    - bash Scripts/CreateBundle.sh
-  artifacts:
-    paths:
-      - I3T*.zip
-  dependencies:
-    - test
-
 pass:
   script:
     - echo "Pipeline passed"

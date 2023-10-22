@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 FILES="Data Config.json LICENSE.txt"
 
@@ -79,7 +79,7 @@ function process_args() {
 
 function zip_cmd() {
   if [ $IS_UNIX_LIKE = 1 ]; then
-      zip --recurse --junk-paths "$@"
+      zip -r "$@"
   elif [ $IS_WINDOWS = 1 ]; then
       7z a -tzip "$@"
   fi
