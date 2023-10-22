@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Declares the input controller class. Header for representing keyboard/mouse tracker.
- * \authors Michal Folta, Martin Herich <martin.herich@phire.cz>
+ * \authors Michal Folta <michal.fol@gmail.com>, Martin Herich <martin.herich@phire.cz>
  * \date: 2014/11/16, 2020/09/09, 2020/12/07
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
