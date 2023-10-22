@@ -6,7 +6,7 @@ Introduction and a short program description. A good idea is to read the tutoria
 ![startWindow](./assets/startWindow.png?raw=true) 
 The program starts with a *Start window* that serves as a signpost between selecting ready-made tutorials, opening an existing scene, or starting a new one.
 
-Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Data/tutorials/1TUT/i3tscreens.png?raw=true)
+Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Data/Tutorials/1TUT/i3tscreens.png?raw=true)
 
 In the *workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
