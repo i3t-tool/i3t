@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Class for representing color helper class
- * \author Michal Folta
+ * \author Michal Folta <michal.fol@gmail.com>
  * \date 2014/11/16
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic

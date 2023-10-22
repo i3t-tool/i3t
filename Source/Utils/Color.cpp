@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Michal Folta
+ * \author Michal Folta <michal.fol@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *

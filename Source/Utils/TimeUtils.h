@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Declares the common time function. Previously common.h.
- * \authors Michal Folta, Dan Rakušan <rakusan.dan@gmail.com>
+ * \authors Michal Folta <michal.fol@gmail.com>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
