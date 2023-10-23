@@ -95,9 +95,9 @@ function create_bundle() {
 
   git_version=$(git describe --tags --exact-match HEAD 2> /dev/null || git rev-parse HEAD)
 
-  # archive_name="I3T-$git_version$ARCHIVE_NAME_POSTFIX.zip"
   archive_name="I3T$ARCHIVE_NAME_POSTFIX.zip"
 
+  cp Data/imgui_default.ini Data/imgui.ini
   binaries=$(find "$binaries_directory" -type f -name "*.so" -o -name "*.dll" -o -name "I3T" -o -name "I3T.exe")
   for binary in $binaries; do
       cp -f "$binary" "$(basename $binary)"
