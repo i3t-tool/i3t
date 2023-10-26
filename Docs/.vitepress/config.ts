@@ -40,7 +40,5 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/i3t-tool/i3t' }
     ],
-  },
-  // TODO Remove me after setting custom domain
-  base: '/i3t/',
+  }
 })
