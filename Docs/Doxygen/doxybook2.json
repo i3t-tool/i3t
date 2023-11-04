@@ -1,0 +1,21 @@
+{
+    "baseUrl": "/cpp-api-reference/",
+    "indexInFolders": true,
+    "linkLowercase": true,
+    "linkSuffix": "",
+    "indexClassesName": "index",
+    "indexFilesName": "index",
+    "indexGroupsName": "index",
+    "indexRelatedPagesName": "index",
+    "indexExamplesName": "index",
+    "indexNamespacesName": "index",
+    "mainPageInRoot": true,
+    "mainPageName": "index",
+    "folderGroupsName": "modules",
+    "folderClassesName": "classes",
+    "folderFilesName": "files",
+    "folderRelatedPagesName": "pages",
+    "folderNamespacesName": "namespaces",
+    "folderExamplesName": "examples",
+    "foldersToGenerate": ["modules", "namespaces", "classes", "pages"]
+}

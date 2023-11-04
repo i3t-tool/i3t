@@ -1,8 +1,5 @@
 # Tutorials
-
-Tutoriály sslouží 
-
-
+Tutorials are a way to teach the user how to use I3T and how transformations in 3D work.
 
 ## Types of tutorials
 - **Main Tutorials** (_TUT) - contain instructions, tips and tasks, usual goal is to teach 

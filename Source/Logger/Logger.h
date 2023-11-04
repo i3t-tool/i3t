@@ -30,14 +30,14 @@
 #include "spdlog/spdlog.h"
 
 #ifdef _DEBUG
-#define LOG_DEBUG(...) Logger::getInstance().getConsoleLogger()->trace(__VA_ARGS__);
+#define LOG_DEBUG(...) Logger::getInstance().getAppLogger()->trace(__VA_ARGS__);
 #else
 #define LOG_DEBUG(...)
 #endif
-#define LOG_INFO(...) Logger::getInstance().getConsoleLogger()->info(__VA_ARGS__);
-#define LOG_WARN(...) Logger::getInstance().getConsoleLogger()->warn(__VA_ARGS__);
-#define LOG_ERROR(...) Logger::getInstance().getConsoleLogger()->error(__VA_ARGS__);
-#define LOG_FATAL(...) Logger::getInstance().getConsoleLogger()->critical(__VA_ARGS__);
+#define LOG_INFO(...) Logger::getInstance().getAppLogger()->info(__VA_ARGS__);
+#define LOG_WARN(...) Logger::getInstance().getAppLogger()->warn(__VA_ARGS__);
+#define LOG_ERROR(...) Logger::getInstance().getAppLogger()->error(__VA_ARGS__);
+#define LOG_FATAL(...) Logger::getInstance().getAppLogger()->critical(__VA_ARGS__);
 #define LOG_EVENT_MOUSE_POS(mouseX, mouseY)                                                                            \
 	Logger::getInstance().log(LoggingOption::MOUSE_MOVEMENT, Logger::getInstance().getLogString("mousePos"), mouseX,   \
 	                          mouseY)
@@ -133,10 +133,6 @@ public:
 	std::shared_ptr<spdlog::logger> getAppLogger()
 	{
 		return appLogger;
-	};
-	std::shared_ptr<spdlog::logger> getConsoleLogger()
-	{
-		return getAppLogger();
 	}
 
 	std::string getLogString(const std::string& key) const;
@@ -152,13 +148,16 @@ public:
 	std::ostringstream& getBuffer()
 	{
 		return m_buffer;
-	};
+	}
 
 private:
+	/// Main logger for the application.
 	std::shared_ptr<spdlog::logger> appLogger;
 
-	/// \todo MH Merge logger and appLogger?
-	std::shared_ptr<spdlog::logger> logger;
+	/// Interaction logger for logging user interactions, has special format.
+	std::shared_ptr<spdlog::logger> interactionLogger;
+
+	/// Interaction logger for logging user interactions, has special format.
 	std::shared_ptr<spdlog::logger> mouseLogger;
 
 	std::ostringstream m_buffer;
@@ -207,6 +206,6 @@ template <typename... Args> void Logger::log(const LoggingOption& logType, const
 	}
 	else
 	{
-		flushBuffer(logger);
+		flushBuffer(interactionLogger);
 	}
 }

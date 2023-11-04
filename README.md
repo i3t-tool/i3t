@@ -1,4 +1,4 @@
- I3T
+# I3T
 I3T - An Interactive Tool for Teaching Transformations
 
 I3T is an educational application that allows the study of 3D transformations 
