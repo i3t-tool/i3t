@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <time.h>
 
-namespace
+namespace Detail
 {
 struct RandInitializer
 {
@@ -26,7 +26,7 @@ struct RandInitializer
 };
 
 static RandInitializer randInitializer;
-} // namespace
+} // namespace Detail
 
 long randLong()
 {

@@ -268,9 +268,9 @@ public:
 	bool m_trackingFromLeft;
 };
 
-/*! \class class for Workspace window object
-        \brief Store everything what Workspace window need
-*/
+/**
+ * \brief Class for Workspace window object, stores everything what Workspace window need
+ */
 class WorkspaceWindow : public IWindow, public IStateful
 {
 public:

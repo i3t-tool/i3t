@@ -1,11 +1,35 @@
 import { defineConfig } from 'vitepress'
-// import { generateSidebar } from "vitepress-sidebar";
+import { generateSidebar } from "vitepress-sidebar";
 
+const autogenerate = (text: string, link: string) => {
+  const base = `cpp-api-reference/${link}`
+  const result = generateSidebar({
+    documentRootPath: 'Docs',
+    scanStartPath: base,
+    useTitleFromFrontmatter: true,
+    rootGroupLink: `/${base}/`,
+    rootGroupText: text,
+    rootGroupCollapsed: true,
+  })
+
+  for (const item of result) {
+    for (const subitem of item.items) {
+      subitem.link = base + '/' + subitem.link
+    }
+  }
+
+  return result
+}
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "I3T",
   description: "I3T",
+  // Disable markdown-it-anchor which breaks markdown interpolation
+  // ```
+  // # Your title {#your-custom-id}
+  // ```
+  markdown: { attrs: { disable: true } },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -33,6 +57,16 @@ export default defineConfig({
           { text: 'DIWNE library', link: '/developer-guide/diwne' },
           { text: 'DIWNE in I3T', link: '/developer-guide/diwne-in-i3t' },
           { text: 'How to add new node', link: '/developer-guide/how-to-add-new-node' },
+        ]
+      },
+      {
+        text: 'C++ API Reference',
+        link: '/cpp-api-reference/',
+        collapsed: true,
+        items: [
+          ...autogenerate('Classes', 'classes'),
+          ...autogenerate('Modules', 'modules'),
+          ...autogenerate('Namespaces', 'namespaces'),
         ]
       }
     ],

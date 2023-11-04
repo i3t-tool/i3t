@@ -11,7 +11,7 @@
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 /**
- * \brief	\mainpage Documentation before refactoring
+ * \mainpage Documentation before refactoring
  *
  *  I3T is an educational application which enables the study of 3D
  * transformations and their hierarchy in an illustrative way. This tool is a

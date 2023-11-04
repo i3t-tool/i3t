@@ -176,15 +176,15 @@ bool DiwneObject::processInteractionsDiwne()
 {
 	bool interaction_happen = false;
 
-	// Logger::getInstance().getConsoleLogger()->info("MouseDown: "
+	// Logger::getInstance().getAppLogger()->info("MouseDown: "
 	// +std::to_string(ImGui::IsMouseDown(0)));
-	// Logger::getInstance().getConsoleLogger()->info("MouseReleased: " +
+	// Logger::getInstance().getAppLogger()->info("MouseReleased: " +
 	// std::to_string(ImGui::IsMouseReleased(0)));
-	// Logger::getInstance().getConsoleLogger()->info("MouseDragging: " +
+	// Logger::getInstance().getAppLogger()->info("MouseDragging: " +
 	// std::to_string(ImGui::IsMouseDragging(0)));
-	// Logger::getInstance().getConsoleLogger()->info("MouseClicked: " +
+	// Logger::getInstance().getAppLogger()->info("MouseClicked: " +
 	// std::to_string(ImGui::IsMouseClicked(0, false)));
-	// Logger::getInstance().getConsoleLogger()->info("MouseClickedRepeat: " +
+	// Logger::getInstance().getAppLogger()->info("MouseClickedRepeat: " +
 	// std::to_string(ImGui::IsMouseClicked(0, true)));
 
 	if (m_drawMode == Interacting && !m_inner_interaction_happen)

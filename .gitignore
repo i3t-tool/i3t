@@ -27,7 +27,7 @@ out/
 *.vcxproj.user
 
 
-# cmake and doxygen
+# cmake
 # ----------------------------------------------------------------------
 *.cmake
 cmake-*
@@ -38,7 +38,12 @@ CMakeCache.txt
 /CmakeOutputDebug/
 CMakeSettings.json
 /CMakeSettings.json
+
+# doxygen
+# ----------------------------------------------------------------------
 /Docs/Doxygen/html/
+/Docs/Doxygen/xml/
+/Docs/cpp-api-reference/
 
 # system and other generated files
 # ----------------------------------------------------------------------

@@ -47,7 +47,7 @@ Logger::Logger()
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
-	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
+	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
 	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
 }
 
@@ -83,17 +83,18 @@ void Logger::initLogger(int argc, char* argv[])
 	sinks[0]->set_level(spdlog::level::trace);
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
-	constexpr auto maxFileCount = 1;
+	constexpr auto maxFileCount = 2;
 	constexpr auto maxLogSize = 1024 * 1024 * 50; // 50 MB
 
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::appLog.string(),
 	                                                                                    maxLogSize, maxFileCount));
+	appLogger->flush_on(spdlog::level::info);
 
-	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
-	logger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
+	interactionLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
 	    Configuration::userInteractionLog.string(), maxLogSize, maxFileCount));
-	logger->set_level(spdlog::level::trace);
+	interactionLogger->set_level(spdlog::level::trace);
 
 	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
 	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
@@ -103,13 +104,13 @@ void Logger::initLogger(int argc, char* argv[])
 	std::ostringstream init_message;
 	init_message << " >> Logger strings version: " << getLogString("version") << " <<";
 
-	logger->trace(getLogString("logInit") + init_message.str());
+	interactionLogger->trace(getLogString("logInit") + init_message.str());
 	mouseLogger->trace(getLogString("mouseLogInit") + init_message.str());
 }
 
 void Logger::endLogger() const
 {
-	logger->trace(getLogString("logEnd"));
+	interactionLogger->trace(getLogString("logEnd"));
 	mouseLogger->trace(getLogString("mouseLogEnd"));
 }
 
