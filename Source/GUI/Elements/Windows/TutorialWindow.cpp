@@ -532,8 +532,9 @@ void TutorialWindow::renderHint(Hint* hint)
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 	}
-	// Hint button
-	if (ImGui::Button("Tip", ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
+
+	// Hint button, pass the hint content to create a unique id
+	if (ImGui::Button(fmt::format("Tip##{}", hint->m_content).c_str(), ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
 		hint->m_expanded = !hint->m_expanded;
 	}
