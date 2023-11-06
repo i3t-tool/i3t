@@ -233,9 +233,10 @@ bool WorkspaceSequence::middleContent()
 		return false;
 	}
 
-	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
+	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
+	if (matrixInput->isConnected())
 	{
-		if (getInputs().at(Core::I3T_SEQ_IN_MAT)->connectionChanged())
+		if (matrixInput->connectionChanged())
 		{
 			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
 			updateDataItemsWidth();
@@ -243,8 +244,9 @@ bool WorkspaceSequence::middleContent()
 		bool valueChanged = false;
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
-		return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-		                   m_nodebase->getData(0).getMat4() /* \todo JM \todo HM better selection (index) of data*/,
+		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
+
+		return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode, inputMatrix,
 		                   {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
 		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
 		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
