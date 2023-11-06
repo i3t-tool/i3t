@@ -63,6 +63,7 @@ void BeforeNewTutModal::submit()
 	Ptr<Tutorial> tut = windowManager.getWindowPtr<StartWindow>()->getTutorial();
 	if (!App::getModule<StateManager>().loadScene(tut->m_header->m_scene))
 	{
+		// Tutorial has no scene, create new one.
 		NewProjectCommand::dispatch();
 	}
 	hide();
