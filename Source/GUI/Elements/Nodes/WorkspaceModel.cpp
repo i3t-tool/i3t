@@ -194,7 +194,7 @@ void WorkspaceModel::init()
 	// read
 	m_nodebase->addUpdateCallback([this](Core::Node* node) {
 		Core::Model* modelNode = dynamic_cast<Core::Model*>(node);
-		if (modelNode)
+		if (modelNode && !m_viewportModel.expired())
 		{
 			m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
 		}
