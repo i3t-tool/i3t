@@ -176,6 +176,7 @@ void Pin::unplug()
 		for (const auto& otherPin : m_outputs)
 		{
 			otherPin->m_input = nullptr;
+			otherPin->Owner.updateValues();
 			Owner.triggerUnplugCallback(&Owner, otherPin->getOwner().get(), Index, otherPin->Index);
 		}
 
