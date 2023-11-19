@@ -36,6 +36,24 @@ using namespace UI;
 
 using namespace std::literals;
 
+/// \todo Move to some common place, generalize with event?
+static void beforeExitScene()
+{
+	if (const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>())
+	{
+		startWindow->hide();
+	}
+
+	if (const auto tutorialWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<TutorialWindow>())
+	{
+		if (tutorialWindow->hasTutorial())
+		{
+			tutorialWindow->emptyTutorial();
+		}
+		tutorialWindow->hide();
+	}
+}
+
 static bool saveSceneDialog(std::filesystem::path& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
@@ -74,11 +92,7 @@ static void showRecentFiles()
 		askBeforeExitScene([sceneToOpen]() {
 			App::getModule<StateManager>().loadScene(*sceneToOpen);
 
-			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
-			if (startWindow)
-			{
-				startWindow->hide();
-			}
+			beforeExitScene();
 		});
 	}
 }
@@ -147,12 +161,7 @@ MainMenuBar::MainMenuBar()
 		askBeforeExitScene([]() {
 			NewProjectCommand::dispatch();
 
-			/// \todo Replace me with a proper event
-			const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
-			if (startWindow)
-			{
-				startWindow->hide();
-			}
+			beforeExitScene();
 		});
 	});
 
@@ -160,12 +169,7 @@ MainMenuBar::MainMenuBar()
 		askBeforeExitScene([]() {
 			if (MenuBarDialogs::open())
 			{
-				/// \todo Replace me with a proper event
-				const auto startWindow = App::getModule<UIModule>().getWindowManager().getWindowPtr<StartWindow>();
-				if (startWindow)
-				{
-					startWindow->hide();
-				}
+				beforeExitScene();
 			}
 		});
 	});
