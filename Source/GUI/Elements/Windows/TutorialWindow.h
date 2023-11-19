@@ -28,6 +28,10 @@ public:
 	I3T_WINDOW(TutorialWindow)
 	TutorialWindow(bool show);
 
+	bool hasTutorial() const;
+
+	void emptyTutorial();
+
 	/**
 	 * @brief Sets the passed tutorial as the current one
 	 * @param tutorial Ptr to an already loaded tutorial

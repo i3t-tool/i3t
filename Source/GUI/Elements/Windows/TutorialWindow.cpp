@@ -71,12 +71,22 @@ const int MIN_WIN_HEIGHT = 600;
 // INIT
 TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 {
-	m_tutorial = nullptr;
-	m_currentStep = 0;
-	m_progressBarAnimationPosition = 0;
+	emptyTutorial();
 	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
 		setTutorial(std::move(tutorial)); // COMMAND
 	});
+}
+
+bool TutorialWindow::hasTutorial() const
+{
+	return m_tutorial != nullptr;
+}
+
+void TutorialWindow::emptyTutorial()
+{
+	m_tutorial = nullptr;
+	m_currentStep = 0;
+	m_progressBarAnimationPosition = 0;
 }
 
 inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
