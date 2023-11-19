@@ -9,6 +9,8 @@ It is the result of the work of students of three Parts of the Czech Technical U
 - The Department of Computer Science of the Faculty of Electrical Engineering,
 - The Faculty of Information Technology.
 
+![I3T](Data/Tutorials/ALT_TUT/I3Tpreview.png)
+
 Start I3T and try the Tutorials. Or read the [manual](Docs/manual.md).
 
 ## Authors
