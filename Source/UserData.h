@@ -22,7 +22,8 @@ constexpr auto USER_DATA_FILE = "UserData/Global.json";
 /// This struct is reflected by RTTR \see UserData.cpp file.
 struct UserData
 {
-	std::string themeName = "classic";
+	/// If empty, LightMode or DarkMode is used based on system settings.
+	std::string customThemeName;
 
 	/// Last file is the most recent.
 	std::vector<std::filesystem::path> recentFiles;

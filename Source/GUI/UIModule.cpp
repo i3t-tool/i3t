@@ -118,10 +118,11 @@ void UIModule::loadThemes()
 	const std::string themesDir = "Data/Themes";
 
 	m_allThemes.push_back(Theme::createDefaultClassic());
-	m_allThemes.push_back(Theme::createDefaultModern());
+
+	// Not needed now.
+	// m_allThemes.push_back(Theme::createDefaultModern());
 
 	// Load all themes at Data/Themes directory.
-	bool canLoadDefault = false;
 	const auto entries = fs::directory_iterator(themesDir);
 
 	//
@@ -137,6 +138,7 @@ void UIModule::loadThemes()
 
 		if (entry.path().filename().string()[0] == '.' || entry.is_directory())
 		{
+			// ignore nested directories and hidden files
 			continue;
 		}
 
@@ -155,33 +157,34 @@ void UIModule::loadThemes()
 
 		const auto& theme = result.value();
 
-		// Check if theme name doesn't collide with default Themes names.
-		bool canLoadTheme = true;
-		for (const auto& otherTheme : m_allThemes)
-		{
-			if (otherTheme.getName() == theme.getName())
-			{
-				canLoadTheme = false;
-			}
-		}
+		bool themeNameCollides =
+		    std::find_if(m_allThemes.begin(), m_allThemes.end(), [&theme](const Theme& otherTheme) {
+			    return theme.getName() == otherTheme.getName();
+		    }) != m_allThemes.end();
 
-		if (canLoadTheme)
+		if (!themeNameCollides)
 		{
 			m_allThemes.push_back(theme);
-			if (theme.getName() == getUserData().themeName)
-			{
-				canLoadDefault = true;
-				m_currentTheme = &m_allThemes.back();
-				setTheme(m_allThemes.back());
-
-				LOG_INFO("Set default theme: {}", theme.getName());
-			}
 		}
 	}
 
-	if (!canLoadDefault)
+	if (!getUserData().customThemeName.empty())
 	{
-		setTheme(m_allThemes.front());
+		const auto maybeTheme = getThemeByName(getUserData().customThemeName);
+		if (!maybeTheme)
+		{
+			setDefaultTheme();
+		}
+		else
+		{
+			const auto& theme = *maybeTheme.value();
+			LOG_INFO("Set default theme: {}", theme.getName());
+			setTheme(*maybeTheme.value());
+		}
+	}
+	else
+	{
+		setDefaultTheme();
 	}
 }
 
@@ -196,8 +199,47 @@ void UIModule::setTheme(const Theme& theme)
 	m_currentTheme = (Theme*) &theme;
 	m_currentTheme->apply();
 
-	getUserData().themeName = theme.getName();
+	getUserData().customThemeName = theme.getName();
 	Application::getModule<StateManager>().saveUserData();
+}
+
+void UIModule::setDefaultTheme()
+{
+	const auto maybeLightTheme = getThemeByName(I3T_DEFAULT_THEME_LIGHT_NAME);
+	const auto maybeDarkTheme = getThemeByName(I3T_DEFAULT_THEME_DARK_NAME);
+
+	const auto themeQueryResult = Detail::isLightThemeSet();
+
+	if (!maybeLightTheme.has_value() || !maybeDarkTheme.has_value() || !themeQueryResult)
+	{
+		LOG_ERROR("Failed to set default theme: {} or {} not found", I3T_DEFAULT_THEME_LIGHT_NAME,
+		          I3T_DEFAULT_THEME_DARK_NAME);
+		// Fallback to default "Folta" theme
+		setTheme(m_allThemes.front());
+	}
+	else
+	{
+		const bool hasLightTheme = themeQueryResult.value();
+
+		hasLightTheme ? setTheme(*maybeLightTheme.value()) : setTheme(*maybeDarkTheme.value());
+	}
+
+	getUserData().customThemeName = "";
+	App::getModule<StateManager>().saveUserData();
+}
+
+std::optional<Theme*> UIModule::getThemeByName(const std::string& name) const
+{
+	auto it = std::find_if(m_allThemes.begin(), m_allThemes.end(), [&name](const Theme& theme) {
+		return theme.getName() == name;
+	});
+
+	if (it != m_allThemes.end())
+	{
+		return (Theme*) &(*it);
+	}
+
+	return std::nullopt;
 }
 
 void UIModule::loadFonts()

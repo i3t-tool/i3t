@@ -57,6 +57,13 @@ public:
 
 	void setTheme(const Theme& theme);
 
+	/**
+	 * Set the theme to the default one based on the system settings (LightMode or DarkMode only on Windows).
+	 */
+	void setDefaultTheme();
+
+	std::optional<Theme*> getThemeByName(const std::string& name) const;
+
 	Fonts& getFonts()
 	{
 		return m_fonts;

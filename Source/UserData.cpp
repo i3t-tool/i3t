@@ -19,7 +19,7 @@
 RTTR_REGISTRATION
 {
 	rttr::registration::class_<UserData>("UserData")
-	    .property("themeName", &UserData::themeName)
+	    .property("themeName", &UserData::customThemeName)
 	    .property("recentFiles", &UserData::recentFiles);
 }
 

@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Martin Herich
+ * \author Martin Herich <martin.herich@phire.cz>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -20,6 +20,7 @@
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Loader/ThemeLoader.h"
+#include "UserData.h"
 #include "Utils/FilesystemUtils.h"
 #include "Utils/Other.h"
 
@@ -33,19 +34,19 @@ void StyleEditor::render()
 
 	this->updateWindowInfo();
 
-	auto& curr = I3T::getTheme();
+	auto& currThemeName = getUserData().customThemeName.empty() ? "default" : I3T::getTheme().getName();
 
-	// Theme selector
+	// Custom theme selector
 	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-	if (ImGui::BeginCombo("Themes", curr.getName().c_str()))
+	if (ImGui::BeginCombo("Custom theme", currThemeName.c_str()))
 	{
 		for (size_t n = 0; n < I3T::getThemes().size(); ++n)
 		{
 			const bool isSelected = (m_currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
-				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) {
-					return t.getName() == curr.getName();
+				auto currIndex = Utils::indexOf(I3T::getThemes(), [&currThemeName](Theme& t) {
+					return t.getName() == currThemeName;
 				});
 				if (n != currIndex)
 				{
@@ -62,6 +63,12 @@ void StyleEditor::render()
 			}
 		}
 		ImGui::EndCombo();
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Use default theme"))
+	{
+		I3T::getUI()->setDefaultTheme();
 	}
 
 	ImGui::Separator();
@@ -98,7 +105,9 @@ void StyleEditor::renderSaveRevertField()
 
 	ImGui::TextUnformatted("Save current modifications to file (discards unsaved changes on other Themes)");
 
-	if (curr.getName() != "classic" && curr.getName() != "modern")
+	// Classic theme cannot be overwritten.
+	/// \todo Add list of default themes (LightMode and DarkMode) when they be finished.
+	if (curr.getName() != I3T_CLASSIC_THEME_NAME)
 	{
 		if (ImGui::Button("Overwrite"))
 		{
@@ -117,7 +126,7 @@ void StyleEditor::renderSaveRevertField()
 		{
 			m_infoMessage = "Theme name cannot be empty.";
 		}
-		else if (m_newThemeName == "classic" || m_newThemeName == "modern")
+		else if (m_newThemeName == I3T_CLASSIC_THEME_NAME)
 		{
 			m_infoMessage = "Cannot overwrite default Themes.";
 		}
@@ -175,7 +184,7 @@ void StyleEditor::revertChangesOnCurrentTheme()
 {
 	auto& curr = I3T::getTheme();
 
-	if (curr.getName() == "classic")
+	if (curr.getName() == I3T_CLASSIC_THEME_NAME)
 	{
 		I3T::emplaceTheme(Theme::createDefaultClassic());
 	}

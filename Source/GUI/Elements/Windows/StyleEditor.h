@@ -39,7 +39,7 @@ private:
 	void saveCurrentTheme(const std::string& name = "");
 	void revertChangesOnCurrentTheme();
 
-	int m_currentThemeIdx = 0;
+	int m_currentThemeIdx = -1;
 	std::string m_newThemeName;
 	std::string m_infoMessage;
 };
