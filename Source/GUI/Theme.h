@@ -21,8 +21,18 @@
 
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
+#include "Core/Result.h"
 
 constexpr int I3T_PROPERTY_NAME_OFFSET = 5;
+
+constexpr auto I3T_CLASSIC_THEME_NAME = "Classic";
+constexpr auto I3T_DEFAULT_THEME_LIGHT_NAME = "LightMode";
+constexpr auto I3T_DEFAULT_THEME_DARK_NAME = "DarkMode";
+inline const std::set<std::string> I3T_DEFAULT_THEMES = {
+    I3T_CLASSIC_THEME_NAME,
+    I3T_DEFAULT_THEME_LIGHT_NAME,
+    I3T_DEFAULT_THEME_DARK_NAME,
+};
 
 enum class EColor
 {
@@ -478,3 +488,8 @@ private:
 			target[key] = val;
 	}
 };
+
+namespace Detail
+{
+Result<bool, Error> isLightThemeSet();
+}
