@@ -23,6 +23,7 @@ namespace Vp
 class OrbitCamera : public AbstractOrbitCamera
 {
 protected:
+	/// Horizontal rotation, 0 at +X, positive anti-clockwise
 	float m_rotationX = -90.0f;
 	float m_rotationY = 30.0f;
 

@@ -19,6 +19,7 @@ using namespace Vp;
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "Logger/Logger.h"
+#include "Utils/Math.h"
 
 AggregateCamera::AggregateCamera()
 {
@@ -71,15 +72,26 @@ void AggregateCamera::switchMode(CameraMode newMode)
 	}
 	if (prevMode == CameraMode::TRACKBALL && newMode == CameraMode::ORBIT)
 	{
-		// TODO: (DR) Orbit camera will always be upright, so if the trackball camera is upside down it does a barrel
-		// roll
-
 		// Calculate azimuth and elevation from trackball's camera direction vector
-		// A conversion from cartesian to spherical coordinates
+		// A kind of conversion from cartesian to spherical coordinates
+		float angleX;
 		glm::vec3 dir = m_trackballCamera->getDirection();
-		float angleX = -glm::degrees(glm::atan(dir.z, dir.x));
-		angleX = -glm::sign(angleX) * (180 - glm::abs(angleX)); // Adjust range
+		glm::vec3 up = m_trackballCamera->getUp();
+		if (Math::eqToZero(dir.z) && Math::eqToZero(dir.x))
+		{
+			// The camera direction is fully vertical -> determine X rotation using the up vector
+			angleX = -glm::sign(dir.y) * glm::degrees(glm::atan(up.z, up.x));
+		}
+		else
+		{
+			angleX = -glm::degrees(glm::atan(dir.z, dir.x));
+			if (up.y >= 0) // Trackball camera is NOT upside down
+				angleX = angleX == 0 ? 180 : -glm::sign(angleX) * (180 - glm::abs(angleX)); // Adjust range
+		}
 		float angleY = -glm::degrees(glm::atan(dir.y, (float) hypot(dir.x, dir.z)));
+		if (up.y < 0) // Trackball camera is upside down
+			angleY = glm::sign(angleY) * (180 - abs(angleY));
+
 		m_orbitCamera->setRotationX(angleX);
 		m_orbitCamera->setRotationY(angleY);
 

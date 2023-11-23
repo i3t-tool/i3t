@@ -38,6 +38,8 @@ public:
 	glm::mat4 getRotation() const;
 	void setRotation(glm::mat4 rotation);
 
+	void viewpoint(AbstractCamera::Viewpoint viewpoint) override;
+
 	float getZoomSpeed() const;
 	void setZoomSpeed(float zoomSpeed);
 	float getRotateSpeed() const;
