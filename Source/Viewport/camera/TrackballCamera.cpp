@@ -104,10 +104,39 @@ void TrackballCamera::mouseWheel(float scroll)
 	}
 }
 
+void TrackballCamera::viewpoint(AbstractCamera::Viewpoint viewpoint)
+{
+	glm::mat4 from = m_view;
+	switch (viewpoint)
+	{
+	case AbstractCamera::Viewpoint::RIGHT:
+		setRotation(glm::mat4(1));
+		break;
+	case AbstractCamera::Viewpoint::LEFT:
+		this->setRotation(glm::mat4({-1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, -1, 0}, {0, 0, 0, 1}));
+		break;
+	case AbstractCamera::Viewpoint::TOP:
+		this->setRotation(glm::mat4({0, 1, 0, 0}, {0, 0, 1, 0}, {1, 0, 0, 0}, {0, 0, 0, 1}));
+		break;
+	case AbstractCamera::Viewpoint::BOTTOM:
+		this->setRotation(glm::mat4({0, -1, 0, 0}, {0, 0, -1, 0}, {1, 0, 0, 0}, {0, 0, 0, 1}));
+		break;
+	case AbstractCamera::Viewpoint::FRONT:
+		this->setRotation(glm::mat4({0, 0, -1, 0}, {0, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 1}));
+		break;
+	case AbstractCamera::Viewpoint::BACK:
+		this->setRotation(glm::mat4({0, 0, 1, 0}, {0, 1, 0, 0}, {-1, 0, 0, 0}, {0, 0, 0, 1}));
+		break;
+	}
+	update();
+	interpolate(from, m_view);
+}
+
 glm::mat4 TrackballCamera::getRotation() const
 {
 	return m_accumulatedRotation;
 }
+
 void TrackballCamera::setRotation(glm::mat4 rotation)
 {
 	m_accumulatedRotation = rotation;

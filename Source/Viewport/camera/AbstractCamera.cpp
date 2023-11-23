@@ -75,7 +75,10 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 	}
 }
 
-void AbstractCamera::viewpoint(AbstractCamera::Viewpoint viewpoint) {}
+void AbstractCamera::viewpoint(AbstractCamera::Viewpoint viewpoint)
+{
+	// No-op
+}
 
 void AbstractCamera::interpolate(glm::mat4 from, glm::mat4 to)
 {

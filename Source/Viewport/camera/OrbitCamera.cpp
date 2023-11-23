@@ -89,8 +89,8 @@ void OrbitCamera::mouseDrag(float dx, float dy, bool rotate, bool pan)
 		{
 			dx *= -1;
 		}
-		m_rotationX += -dx * m_rotateSpeed;
-		m_rotationY += dy * m_rotateSpeed;
+		setRotationX(m_rotationX + -dx * m_rotateSpeed);
+		setRotationY(m_rotationY + dy * m_rotateSpeed);
 
 		m_isRotating = true;
 	}
@@ -162,7 +162,7 @@ float OrbitCamera::getRotationX() const
 }
 void OrbitCamera::setRotationX(float rotationX)
 {
-	m_rotationX = rotationX;
+	m_rotationX = fmodf(rotationX, 360.f);
 }
 
 float OrbitCamera::getRotationY() const
@@ -171,7 +171,7 @@ float OrbitCamera::getRotationY() const
 }
 void OrbitCamera::setRotationY(float rotationY)
 {
-	m_rotationY = rotationY;
+	m_rotationY = fmodf(rotationY, 360.f);
 }
 
 float OrbitCamera::getZoomSpeed() const
