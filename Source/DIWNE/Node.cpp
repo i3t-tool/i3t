@@ -165,19 +165,6 @@ bool Node::afterEndDiwne()
 			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
 			                   diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 		}
-
-		if (prev_selected != m_selected)
-		{
-			if (m_selected)
-			{
-				processSelect();
-			}
-			else
-			{
-				processUnselect();
-			}
-			diwne.m_takeSnap = true;
-		}
 	}
 
 	/* always block interactions with other nodes */
@@ -187,6 +174,22 @@ bool Node::afterEndDiwne()
 	return DiwneObject::afterEndDiwne();
 }
 
+bool Node::setSelected(const bool selected)
+{
+	bool prevSelected = m_selected;
+	DiwneObject::setSelected(selected);
+	if (prevSelected != m_selected)
+	{
+		if (m_selected)
+			processSelect();
+		else
+			processUnselect();
+		diwne.m_takeSnap = true;
+	}
+	return m_selected;
+}
+
+// TODO: (DR) process/processUnselect seem to always return true, what is the purpose of the return value?
 bool Node::processSelect()
 {
 	diwne.setNodesSelectionChanged(true);

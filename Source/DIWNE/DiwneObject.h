@@ -71,22 +71,32 @@ public:                               /* \todo some atributes should be private/
 		return !m_inner_interaction_happen && m_inner_interaction_happen_previous_draw;
 	};
 
-	// TODO: (DR) Why aren't these functions virtual? There are redefinitions in Node.h.
-	/*! \brief Setter of selection state
-	 *
-	 * \param selected is new state of object
+	/*!
+	 * Setter of selection state
+	 * \param selected is the new requested state of the object
+	 * \return New state of selection
 	 */
-	void setSelected(bool const selected)
+	virtual bool setSelected(bool const selected)
 	{
 		m_selected = m_selectable ? selected : false;
+		return m_selected;
 	};
 
-	/*! \brief Getter
-	 * \return actual selection state of object
+	/*! \brief Getter of selection state
+	 * \return Current selection state of the object.
 	 */
-	bool getSelected() const
+	virtual bool getSelected() const
 	{
 		return m_selected;
+	};
+
+	virtual void setSelectable(bool const selectable)
+	{
+		m_selectable = selectable;
+	};
+	virtual bool getSelectable()
+	{
+		return m_selectable;
 	};
 
 	/*! \brief Content of popup menu raise on this object

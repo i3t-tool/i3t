@@ -62,8 +62,6 @@ void WorkspaceDiwne::selectAll()
 		if (!workspaceCoreNode->getSelected())
 		{
 			workspaceCoreNode->setSelected(true);
-			workspaceCoreNode->processSelect();
-			g_workspaceDiwne->m_takeSnap = true;
 		}
 	}
 }
@@ -76,15 +74,6 @@ void WorkspaceDiwne::invertSelection()
 		if (workspaceCoreNode->getSelected() != selected)
 		{
 			workspaceCoreNode->setSelected(selected);
-			if (selected)
-			{
-				workspaceCoreNode->processSelect();
-			}
-			else
-			{
-				workspaceCoreNode->processUnselect();
-			}
-			g_workspaceDiwne->m_takeSnap = true;
 		}
 	}
 }
@@ -331,8 +320,6 @@ void WorkspaceDiwne::deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transf
 	if (transform->getSelected())
 	{
 		transform->setSelected(false);
-		transform->processUnselect();
-		g_workspaceDiwne->m_takeSnap = true;
 	}
 }
 
@@ -1337,8 +1324,6 @@ bool WorkspaceDiwne::afterContent()
 					if (node->getSelected())
 					{
 						node->setSelected(false);
-						node->processUnselect();
-						g_workspaceDiwne->m_takeSnap = true;
 					}
 				}
 			}
@@ -1382,8 +1367,6 @@ bool WorkspaceDiwne::afterContent()
 						if (!node->getSelected())
 						{
 							node->setSelected(true);
-							node->processSelect();
-							g_workspaceDiwne->m_takeSnap = true;
 						}
 					}
 					validSelection = true;
@@ -1495,6 +1478,12 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllNodesInnerIncl
 		}
 
 		/* inner of Sequences in Camera */
+		// TODO: (DR) What about the sequence nodes inside the Camera? Those are omitted, that caused problems with for
+		//   example these inner sequences not gettinng the proper zoom changed events. Overall its just an
+		//   inconsistency that I elected to not fix yet as to not distrub other systems which may not account for this.
+		//   Should be changed after a discussion. Namely I'm not sure how node duplication would handle this.
+		//   WorkspaceCamera currently overrides the updateDataItemsWidth() to overcome this but that should be reverted
+		//   if the above is fixed.
 		Ptr<WorkspaceCamera> cam = std::dynamic_pointer_cast<WorkspaceCamera>(workspaceCoreNode);
 		if (cam != nullptr)
 		{

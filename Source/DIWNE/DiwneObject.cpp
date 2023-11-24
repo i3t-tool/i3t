@@ -420,8 +420,6 @@ bool DiwneObject::processObjectSelect()
 	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
 	{
 		setSelected(true);
-		diwne.m_takeSnap = true;
-		return processSelect();
 	}
 	return false;
 }
@@ -439,8 +437,6 @@ bool DiwneObject::processObjectUnselect()
 	if (bypassUnselectAction() && allowProcessUnselect())
 	{
 		setSelected(false);
-		diwne.m_takeSnap = true;
-		return processUnselect();
 	}
 	return false;
 }
