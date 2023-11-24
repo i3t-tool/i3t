@@ -25,7 +25,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 {
 	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
 
-	m_projection->m_selectable = false;
+	m_projection->setSelectable(false);
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
 	{
 		if (i != 1)
@@ -44,7 +44,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);
 	m_projection->setTopLabel("projection");
 
-	m_view->m_selectable = false;
+	m_view->setSelectable(false);
 	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
 	{
 		m_view->getNodebase()->getInputPins()[k].setRenderPins(false);
@@ -87,6 +87,14 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 WorkspaceCamera::~WorkspaceCamera()
 {
 	I3T::getViewport()->removeEntity(m_viewportCamera);
+}
+
+float WorkspaceCamera::updateDataItemsWidth()
+{
+	// TODO: (DR) This is (hopefully) just a temporary fix, see TODO in WorkspaceDiwne::getAllNodesInnerIncluded()
+	m_view->updateDataItemsWidth();
+	m_projection->updateDataItemsWidth();
+	return WorkspaceNodeWithCoreData::updateDataItemsWidth();
 }
 
 void WorkspaceCamera::popupContent()

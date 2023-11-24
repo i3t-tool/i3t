@@ -56,7 +56,6 @@ void pasteNodes(const Memento& memento)
 	for (const auto& node : newNodes)
 	{
 		node->setSelected(true);
-		node->processSelect();
 	}
 }
 

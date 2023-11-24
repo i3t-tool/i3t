@@ -75,8 +75,9 @@ public:
 	//	bool leftContent(DIWNE::Diwne &diwne);
 	//	bool rightContent(DIWNE::Diwne &diwne);
 
-	bool processSelect();
-	bool processUnselect();
+	bool processSelect() override;
+	bool processUnselect() override;
+	float updateDataItemsWidth() override;
 
 private:
 	glm::vec3 calculateFrustumColor(glm::vec3 color);

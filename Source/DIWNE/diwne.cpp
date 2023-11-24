@@ -28,7 +28,7 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
       m_nodesSelectionChanged(false), m_selectionRectangeDiwne(ImRect(0, 0, 0, 0)),
       m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false), m_tooltipDrawn(false), m_takeSnap(false)
 {
-	m_selectable = false;
+	setSelectable(false);
 }
 
 DiwneAction Diwne::getDiwneActionActive() const

@@ -124,6 +124,8 @@ public:
 		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
 	};
 
+	bool setSelected(const bool selected) override;
+
 	virtual bool processSelect();
 	virtual bool processUnselect();
 
@@ -157,15 +159,6 @@ public:
 	ImVec2 getNodeRectSizeDiwne()
 	{
 		return m_bottomRectDiwne.Max - m_topRectDiwne.Min;
-	};
-
-	bool getSelected() const
-	{
-		return m_selected;
-	};
-	void setSelected(bool selected)
-	{
-		m_selected = selected;
 	};
 
 	bool getRender()

@@ -73,7 +73,7 @@ public:
 	virtual int maxLengthOfData() = 0;
 
 	float getDataItemsWidth();
-	float updateDataItemsWidth();
+	virtual float updateDataItemsWidth();
 	bool getIsLabelBeingEdited()
 	{
 		return m_isLabelBeingEdited;

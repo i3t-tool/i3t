@@ -18,7 +18,7 @@ namespace DIWNE
 Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwnePin"*/)
     : DiwneObject(diwne, id, labelDiwne), m_pinRectDiwne(ImRect(0, 0, 0, 0)), m_connectionPointDiwne(ImVec2(0, 0))
 {
-	m_selectable = false;
+	setSelectable(false);
 }
 
 void Pin::begin()
