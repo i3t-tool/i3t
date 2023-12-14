@@ -24,12 +24,13 @@ protected:
 	int m_position_of_dummy_data = -1;
 	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
 
-	bool m_drawPins;
+	// bool m_drawPins;  // \todo (PF) was not used - remove
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;
 
 public:
 	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
-	                  bool drawPins = true, bool isCameraSequence = false);
+	                  /* bool drawPins = true, \todo (PF) was not used - remove */
+	                  bool isCameraSequence = false);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//

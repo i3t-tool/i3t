@@ -18,8 +18,10 @@
 
 WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
                                      Ptr<Core::Node> nodebase /*= Core::GraphManager::createSequence()*/,
-                                     bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
-    : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false), m_drawPins(drawPins),
+                                     /* bool drawPins, - (PF) was not used, remove */ /*=true*/
+                                     bool isCameraSequence /*=false*/)
+    : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false),
+      /* m_drawPinsNOT_USED(drawPins), \todo (PF) was not used - remove*/
       m_isCameraSequence(isCameraSequence)
 {
 	updateDataItemsWidth();

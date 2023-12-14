@@ -97,7 +97,7 @@ const std::string& Pin::getLabel() const
 
 	/*
 	// default names for pins, we don't show them in the UI
-	if (shouldRenderPins())
+	if (isRendered())
 	{
 	    return defaultIoNames[static_cast<size_t>(ValueType)];
 	}

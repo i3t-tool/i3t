@@ -95,13 +95,13 @@ public:
 		m_isDisabled = disabled;
 	}
 
-	[[nodiscard]] bool shouldRenderPins() const
+	[[nodiscard]] bool isRendered() const
 	{
-		return m_renderPins;
+		return m_isRendered;
 	}
-	void setRenderPins(bool value)
+	void setRendered(bool value)
 	{
-		m_renderPins = value;
+		m_isRendered = value;
 	}
 
 public:
@@ -118,9 +118,10 @@ public:
 	Node& Owner;
 
 private:
-	bool m_isDisabled = false;
+	bool m_isDisabled = false; //< Pin is visible, but cannot be interactively connected to
+	                           //(used for Camera mult output)
 
-	bool m_renderPins = true;
+	bool m_isRendered = true; //< Render this pin. Used in Camera P and V matrices. todo PF - should be in singular
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component

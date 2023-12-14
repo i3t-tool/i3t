@@ -138,13 +138,13 @@ bool WorkspaceNodeWithCoreData::topContent()
 		m_topLabel = m_nodebase->getLabel();
 	}
 	const char* topLabel = m_topLabel.c_str();
-	ImVec2 textSize = ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel));
+	const ImVec2 textSize = ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel));
 
 	//	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 	//	ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + style.FramePadding, cursorPos + textSize +
 	//  style.FramePadding, IM_COL32(0, 255, 255, 120));
 
-	float labelWidth = textSize.x + style.FramePadding.x * 2;
+	const float labelWidth = textSize.x + style.FramePadding.x * 2;
 	ImGui::PushItemWidth(labelWidth);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
@@ -174,14 +174,14 @@ bool WorkspaceNodeWithCoreData::topContent()
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 
-	float widthSoFar =
+	const float widthSoFar =
 	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
 	// Header extra space
 	float trailingDummyWidth = style.FramePadding.x / zoom;
 	if (m_headerMinWidth > 0)
 	{
-		float diff = m_headerMinWidth - widthSoFar;
+		const float diff = m_headerMinWidth - widthSoFar;
 		if (diff > 0)
 		{
 			trailingDummyWidth += diff;
@@ -216,12 +216,12 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::updateDataItemsWidth()
 {
-	bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
-	float fontSize = ImGui::GetFontSize();
-	float oneCharWidth = fontSize / 2;
-	float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getWorkAreaZoom();
-	float maxLength = maxLengthOfData();
-	m_dataItemsWidth = (float) (maxLength) *oneCharWidth + 2 * padding;
+	const bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+	const float fontSize = ImGui::GetFontSize();
+	const float oneCharWidth = fontSize / 2;
+	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getWorkAreaZoom();
+	const float maxLength = static_cast<float>(maxLengthOfData());
+	m_dataItemsWidth = maxLength * oneCharWidth + 2 * padding;
 	// LOG_INFO("SetDataItemsWidth() in node: '{}'\nfS: {}, oCW: {}, mLOD: {}, dataWidth: {}",
 	//         this->getNodebase()->getLabel(), fontSize, oneCharWidth, maxLengthOfData, m_dataItemsWidth);
 	diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
@@ -271,7 +271,7 @@ void WorkspaceNodeWithCoreData::drawMenuDuplicate()
 		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
 		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
 		              I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-		// move original node behind new one
+		// move original node behind the new one
 		static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
 	}
 }
@@ -371,21 +371,21 @@ WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core
 /* DIWNE function */
 bool WorkspaceCorePin::content()
 {
-	bool interaction_happen = false;
-	if (getCorePin().shouldRenderPins())
+	const bool interaction_happen = false; // no interaction in this function allowed
+	if (getCorePin().isRendered())
 	{
-		float alpha = ImGui::GetStyle().Alpha;
+		const float alpha = ImGui::GetStyle().Alpha;
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
-		ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
-		DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
-		ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
+		const DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
+		const ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
+		const DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
+		const ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
 
-		ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
+		const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
 
-		float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
+		const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
 		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 		//   not visible anyway so we're just drawing stuff twice for no reason
@@ -434,8 +434,8 @@ bool WorkspaceCorePin::isConnected() const
 
 bool WorkspaceCorePin::processDrag()
 {
-	ImVec2 origin = getLinkConnectionPointDiwne();
-	ImVec2 actual = diwne.screen2diwne(ImGui::GetIO().MousePos);
+	const ImVec2 origin = getLinkConnectionPointDiwne();
+	const ImVec2 actual = diwne.screen2diwne(ImGui::GetIO().MousePos);
 
 	if (getKind() == PinKind::Output)
 		diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
@@ -485,18 +485,18 @@ bool WorkspaceCorePin::processConnectionPrepared()
 		diwne.showTooltipLabel("Mismatched pin Kinds (in/out)", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 		break;
 	case Core::ENodePlugResult::Err_Loopback: /// Same nodes.
-		diwne.showTooltipLabel("Loop to same node", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		diwne.showTooltipLabel("Loop to the same node", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 		break;
 	case Core::ENodePlugResult::Err_NonexistentPin:
-		diwne.showTooltipLabel("Pin not exists :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		diwne.showTooltipLabel("Pin does not exist :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 		break;
 	case Core::ENodePlugResult::Err_Loop:
-		diwne.showTooltipLabel("Unallowed loop", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		diwne.showTooltipLabel("Loop not allowed", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 		break;
 	case Core::ENodePlugResult::Err_DisabledPin:
-		diwne.showTooltipLabel("Pin is desabled :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		diwne.showTooltipLabel("Pin is disabled :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 		break;
-	default:
+	default: // unreachable - all enum values are covered
 		diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 	}
 	return true;
@@ -510,12 +510,13 @@ WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID co
 bool WorkspaceCoreOutputPin::content()
 {
 	const std::string& label = m_pin.getLabel();
+	// todo PF: label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
 	if (!label.empty())
 	{
 		ImGui::TextUnformatted(label.c_str());
 		ImGui::SameLine();
 	}
-	const auto inner_interaction_happen = WorkspaceCorePin::content();
+	const auto inner_interaction_happen = WorkspaceCorePin::content(); // value + icon
 	return inner_interaction_happen;
 }
 
@@ -666,11 +667,13 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-	if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str()))
-	{
-		getNode().getNodebase()->pulse(getIndex());
-		return true;
-	}
+	// todo (PF) Remove the output button. If used, than on not-connected input pins
+	// if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str()))
+	// {
+	//	getNode().getNodebase()->pulse(getIndex());
+	//	return true;
+	// }
+	ImGui::Dummy(ImVec2(0.0, 0.0)); // to avoid unlimited cycle width
 	return false;
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData()
@@ -964,8 +967,7 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 			// Core to Workspace");
 		}
 	}
-	if (!m_showDataOnPins) /* for example sequence do not show data in output pins
-	                        */
+	if (!m_showDataOnPins) /* default true, false for Camera and Sequence - they don't show data on their output pins*/
 	{
 		for (Core::Pin const& pin : outputPins)
 		{
@@ -1054,7 +1056,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 
 	for (auto pin : this->getNodebase()->getInputPins())
 	{
-		if (pin.shouldRenderPins())
+		if (pin.isRendered())
 		{
 			pinsVisible = true;
 			break;
@@ -1071,7 +1073,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if (!pin->getCorePin().shouldRenderPins())
+				if (!pin->getCorePin().isRendered())
 					continue;
 
 				pin->setConnectionPointDiwne(pinConnectionPoint);
@@ -1085,7 +1087,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 		{
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if (!pin->getCorePin().shouldRenderPins())
+				if (!pin->getCorePin().isRendered())
 				{
 					continue;
 				}
@@ -1110,7 +1112,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 
 	for (auto pin : this->getNodebase()->getOutputPins())
 	{
-		if (pin.shouldRenderPins())
+		if (pin.isRendered())
 		{
 			pinsVisible = true;
 			break;
@@ -1125,7 +1127,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
 			{
-				if (!pin->getCorePin().shouldRenderPins())
+				if (!pin->getCorePin().isRendered())
 					continue;
 
 				pin->setConnectionPointDiwne(pinConnectionPoint);
@@ -1139,7 +1141,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			m_minRightAlignOfRightPins = FLT_MAX;
 			for (auto const& pin : getOutputsToShow())
 			{
-				if (!pin->getCorePin().shouldRenderPins())
+				if (!pin->getCorePin().isRendered())
 					continue;
 
 				act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *

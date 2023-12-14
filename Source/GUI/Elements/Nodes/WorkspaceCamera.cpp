@@ -20,8 +20,12 @@
 
 WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
     : WorkspaceNodeWithCoreDataWithPins(diwne, Core::GraphManager::createCamera(), false),
-      m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true, true)),
-      m_view(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true, true))
+      m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(),
+                                                       /* true, \todo (PF) was not used */
+                                                       true)),
+      m_view(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView(),
+                                                 /* true, \todo (PF) was not used */
+                                                 true))
 {
 	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
 
@@ -30,35 +34,36 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	{
 		if (i != 1)
 		{
-			m_projection->getNodebase()->getInputPins()[i].setRenderPins(false);
+			m_projection->getNodebase()->getInputPins()[i].setRendered(false);
 		}
 	}
 	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
 	{
 		if (j != 1)
 		{
-			m_projection->getNodebase()->getOutputPins()[j].setRenderPins(false);
+			m_projection->getNodebase()->getOutputPins()[j].setRendered(false);
 		}
 	}
-	m_projection->getNodebase()->getInputPins()[1].setRenderPins(true);
-	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);
+	// todo refactor - use the constant Core::I3T_CAMERA_OUT_MATRIX
+	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
+	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_projection->setTopLabel("projection");
 
 	m_view->setSelectable(false);
 	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
 	{
-		m_view->getNodebase()->getInputPins()[k].setRenderPins(false);
+		m_view->getNodebase()->getInputPins()[k].setRendered(false);
 	}
 	for (int l = 0; l < m_view->getNodebase()->getOutputPins().size(); l++)
 	{
-		m_view->getNodebase()->getOutputPins()[l].setRenderPins(false);
+		m_view->getNodebase()->getOutputPins()[l].setRendered(false);
 	}
-	m_view->getNodebase()->getInputPins()[1].setRenderPins(true);
-	m_view->getNodebase()->getOutputPins()[1].setRenderPins(true);
+	m_view->getNodebase()->getInputPins()[1].setRendered(true);
+	m_view->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_view->setTopLabel("view");
 
 	// Hide multiplication output to discourage interaction
-	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRenderPins(false);
+	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 
 	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
