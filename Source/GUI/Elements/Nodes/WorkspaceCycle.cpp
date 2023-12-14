@@ -15,8 +15,8 @@
 #include "../Windows/WorkspaceWindow.h"
 
 WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
-                               bool drawPins /*=true*/)
-    : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
+                               bool showDataOnPins /*=true*/)
+    : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, showDataOnPins)
 {
 	updateDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node
 	                        and run settings data width in it */

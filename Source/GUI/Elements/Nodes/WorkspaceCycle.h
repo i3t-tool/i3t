@@ -28,7 +28,7 @@ public:
 	//===----------------------------------------------------------------------===//
 
 	WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createCycle(),
-	               bool drawPins = true);
+	               bool showDataOnPins = true);
 	bool isCycle();
 
 	bool buttonStepNext();

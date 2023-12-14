@@ -89,13 +89,13 @@ public:
 	void drawMenuSetEditable();
 
 	/* DIWNE function */
-	virtual bool topContent();
+	bool topContent() override;
 
 	virtual void drawMenuLevelOfDetail() = 0;
 	void drawMenuSetPrecision();
 
-	virtual void popupContent();
-	bool processObjectDrag();
+	void popupContent() override;
+	bool processObjectDrag() override;
 
 	bool processSelect() override;
 	bool processUnselect() override;
@@ -145,10 +145,10 @@ public:
 	};
 	void unplug();
 
-	virtual void popupContent();
-	virtual bool initialize();
+	void popupContent() override;
+	bool initialize() override;
 
-	void updateEndpoints();
+	void updateEndpoints() override;
 	void updateControlPointsOffsets();
 };
 
@@ -183,14 +183,14 @@ public:
 	PinKind getKind() const;
 	Core::EValueType getType() const;
 	bool isConnected() const;
-	void popupContent();
+	void popupContent() override;
 
 	/* DIWNE function */
-	virtual bool content();
-	virtual bool processDrag();
-	virtual bool processConnectionPrepared();
+	bool content() override;
+	bool processDrag() override;
+	bool processConnectionPrepared() override;
 
-	virtual bool bypassFocusForInteractionAction();
+	bool bypassFocusForInteractionAction() override;
 };
 
 class WorkspaceCoreInputPin : public WorkspaceCorePin
@@ -206,13 +206,13 @@ public:
 	WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                      WorkspaceNodeWithCoreData& node);
 
-	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting);
+	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting) override;
 
 	WorkspaceCoreLink& getLink()
 	{
 		return m_link;
 	};
-	void updateConnectionPointDiwne()
+	void updateConnectionPointDiwne() override
 	{
 		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
 	};
@@ -223,8 +223,8 @@ public:
 	bool connectionChanged() const;
 
 	/* DIWNE function */
-	virtual bool content();
-	virtual bool processInteractions();
+	bool content() override;
+	bool processInteractions() override;
 	virtual bool processCreateAndPlugConstrutorNode();
 	bool processUnplug();
 
@@ -240,7 +240,7 @@ public:
 	WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                       WorkspaceNodeWithCoreData& node);
 
-	void updateConnectionPointDiwne()
+	void updateConnectionPointDiwne() override
 	{
 		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
 	};
@@ -254,7 +254,7 @@ public:
 	WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                               WorkspaceNodeWithCoreData& node);
 
-	virtual bool content();
+	bool content() override;
 
 	virtual bool drawData() = 0;
 	virtual int maxLengthOfData() = 0;
@@ -267,8 +267,8 @@ public:
 	                                WorkspaceNodeWithCoreData& node)
 	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinVector4 : public WorkspaceCoreOutputPinWithData
@@ -278,8 +278,8 @@ public:
 	                              WorkspaceNodeWithCoreData& node)
 	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinVector3 : public WorkspaceCoreOutputPinWithData
@@ -289,8 +289,8 @@ public:
 	                              WorkspaceNodeWithCoreData& node)
 	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinFloat : public WorkspaceCoreOutputPinWithData
@@ -300,8 +300,8 @@ public:
 	                            WorkspaceNodeWithCoreData& node)
 	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
@@ -311,8 +311,8 @@ public:
 	                                 WorkspaceNodeWithCoreData& node)
 	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
@@ -326,8 +326,8 @@ public:
 		m_buttonText = m_pin.getLabel();
 	};
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
@@ -339,8 +339,8 @@ public:
 	WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                             WorkspaceNodeWithCoreData& node);
 
-	bool drawData();
-	int maxLengthOfData();
+	bool drawData() override;
+	int maxLengthOfData() override;
 };
 
 /* MatrixMulPin is Output and Input because of different
@@ -369,7 +369,7 @@ private:
 protected:
 	std::vector<Ptr<WorkspaceCoreInputPin>> m_workspaceInputs;
 	std::vector<Ptr<WorkspaceCoreOutputPin>> m_workspaceOutputs;
-	bool m_showDataOnPins;
+	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
 public:
 	std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const
@@ -388,10 +388,10 @@ public:
 
 	WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
-	virtual bool leftContent();
-	virtual bool rightContent();
+	bool leftContent() override;
+	bool rightContent() override;
 
-	virtual bool finalize();
+	bool finalize() override;
 };
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
