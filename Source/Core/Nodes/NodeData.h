@@ -43,7 +43,10 @@ public:
 	};
 };
 
-/** An operator value type = type of the interconnection wire. */
+/**
+ * \brief An operator value type = type of the interconnection wire.
+ * The string names are defined in Operations.h, defaultIoNames
+ */
 enum class EValueType
 {
 	Pulse = 0,

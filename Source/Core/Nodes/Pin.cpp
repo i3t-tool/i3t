@@ -89,11 +89,11 @@ const std::string& Pin::getLabel() const
 			return op->defaultOutputNames[Index];
 		}
 	}
-
-	if (!IsInput && ValueType == EValueType::Pulse)
-	{
-		return defaultIoNames[static_cast<size_t>(ValueType)];
-	}
+	// (PF) no output label for pulse
+	// if (!IsInput && ValueType == EValueType::Pulse)
+	// {
+	//	return defaultIoNames[static_cast<size_t>(ValueType)];
+	// }
 
 	/*
 	// default names for pins, we don't show them in the UI

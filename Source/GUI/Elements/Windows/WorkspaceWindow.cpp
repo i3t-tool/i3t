@@ -900,7 +900,7 @@ void WorkspaceDiwne::popupContent()
 	}
 	if (ImGui::MenuItem("pulse"))
 	{
-		addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Pulse>>();
+		addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::PulseToPulse>>();
 	}
 	if (ImGui::MenuItem("screen"))
 	{
@@ -1417,8 +1417,11 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
 	{
 		switch (getLastActivePin<WorkspaceCoreInputPin>()->getType())
 		{
-		case Core::EValueType::Matrix:
-			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::MatrixToMatrix>>();
+		case Core::EValueType::Pulse:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::PulseToPulse>>();
+			break;
+		case Core::EValueType::Float:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::FloatToFloat>>();
 			break;
 		case Core::EValueType::Vec3:
 			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Vector3ToVector3>>();
@@ -1426,25 +1429,25 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
 		case Core::EValueType::Vec4:
 			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Vector4ToVector4>>();
 			break;
+		case Core::EValueType::Matrix:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::MatrixToMatrix>>();
+			break;
 		case Core::EValueType::Quat:
 			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::QuatToQuat>>();
-			break;
-		case Core::EValueType::Float:
-			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::FloatToFloat>>();
-			break;
-		case Core::EValueType::Pulse:
-			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Pulse>>();
-			break;
-		case Core::EValueType::Screen:
-			addTypeConstructorNode<WorkspaceCamera>();
 			break;
 		case Core::EValueType::MatrixMul:
 			addTypeConstructorNode<WorkspaceSequence>();
 			break;
+		case Core::EValueType::Screen:
+			addTypeConstructorNode<WorkspaceCamera>();
+			break;
+			// case Core::EValueType::Ptr:
+			//	addTypeConstructorNode<XXXXXX>();
+			//	break;
 		}
 		return true;
 	}
-	return false;
+	return false; // for Ptr and for a possible non-existent wire type in EValueType
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getSelectedNodesInnerIncluded()

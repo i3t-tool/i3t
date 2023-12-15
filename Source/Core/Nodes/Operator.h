@@ -1503,7 +1503,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::Pulse>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::PulseToPulse>::updateValues(int inputIndex)
 {
 	if (m_outputs[0].isPluggedIn())
 	{

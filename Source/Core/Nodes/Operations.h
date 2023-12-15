@@ -30,12 +30,15 @@
 
 namespace Core
 {
-static const std::vector<std::string> emptyNames = {};
+using PinGroup = std::vector<EValueType>;
+using PinNames = std::vector<std::string>;
+
+static const PinNames emptyNames = {};
 
 #define NO_TAG ""
 #define DEFAULT_NAMES emptyNames
 
-static const std::vector<std::string> matrixIndexNames()
+static const PinNames matrixIndexNames()
 {
 	std::vector<std::string> names;
 	for (int i = 0; i < 4; i++)
@@ -50,8 +53,6 @@ static const std::vector<std::string> matrixIndexNames()
 	return names;
 }
 
-using PinGroup = std::vector<EValueType>;
-
 /**
  * \brief Description of each graph node (operation enum, default label, input
  * and output pin names and types)
@@ -60,17 +61,26 @@ struct Operation
 {
 	std::string keyWord;
 	std::string defaultLabel;
-	std::vector<EValueType> inputTypes;
-	std::vector<EValueType> outputTypes;
+	PinGroup inputTypes;
+	PinGroup outputTypes;
 	std::string defaultTagText = NO_TAG;
-	std::vector<std::string> defaultInputNames = DEFAULT_NAMES; // if the names differ from the names of the OpValueType
-	std::vector<std::string> defaultOutputNames =
-	    DEFAULT_NAMES; // if the names differ from the names of the OpValueType
+	PinNames defaultInputNames = DEFAULT_NAMES;  // if the names differ from the names of the OpValueType
+	PinNames defaultOutputNames = DEFAULT_NAMES; // if the names differ from the names of the OpValueType
 
-	bool isConstructor = false; //< this is a standard operator node - processes only the connected
-	                            // pins and has no GUI  editable values
+	/**
+	 * \brief Constructor is an operator that can generate value (such as float, vec3, vec4, mat4, pulse,...).
+	 *
+	 * Its behaviour depends on whether its single input is connected.
+	 * - For a connected input, the value is taken from the incoming wire.
+	 * - For an unconnected input, the value is editable.
+	 *
+	 * Value
+	 * - false - a standard operator node processes only the connected pins and has no GUI editable values
+	 * - true - not connected inputs are editable
+	 */
+	bool isConstructor = false;
 
-	bool ignoreCycleDetection = false;
+	bool ignoreCycleDetection = false; ///< used in isPlugCorrect()
 };
 
 enum class EOperatorType
@@ -142,11 +152,14 @@ enum class EOperatorType
 	QuatToFloats,
 	FloatsToQuat,
 	NormalizeQuat,
+
+	// constructors
 	FloatToFloat,
 	Vector3ToVector3,
 	Vector4ToVector4,
 	MatrixToMatrix,
 	QuatToQuat,
+	PulseToPulse,
 
 	// Transform matrices "constructors"
 	MakeTranslation,
@@ -161,7 +174,6 @@ enum class EOperatorType
 	MakeLookAt,
 
 	Screen,
-	Pulse
 
 	// todo trackball (trackcube)
 };
@@ -183,86 +195,86 @@ enum class ETransformType
 	LookAt,      // 11 PREP-
 };
 
-// default string name of each OpValueType (defined in NodeData.h)
-static const std::array<std::string, 8> defaultIoNames = {
+// default string name for each EValueType (enum class defined in NodeData.h)
+static const std::array<std::string, 9> defaultIoNames = {
     "pulse",  // PULSE		MN dodelat
     "float",  // Float
     "vec3",   // Vec3
     "vec4",   // Vec4
     "matrix", // Matrix
     "quat",   // Quat
-    "",       // Matrix_MULL	MN dodelat
-    ""        // SCREEN		MN dodelat
+    "MatMul", // Matrix_MULL	MN dodelat
+    "screen", // SCREEN		MN dodelat
+    "pointer" // Ptr
 };
 
 // variants of input and output pins
-static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
-static const std::vector<EValueType> vectorInput = {EValueType::Vec4};
-static const std::vector<EValueType> vector3Input = {EValueType::Vec3};
-static const std::vector<EValueType> floatInput = {EValueType::Float};
-static const std::vector<EValueType> quatInput = {EValueType::Quat};
+static const PinGroup matrixInput = {EValueType::Matrix};
+static const PinGroup vectorInput = {EValueType::Vec4};
+static const PinGroup vector3Input = {EValueType::Vec3};
+static const PinGroup floatInput = {EValueType::Float};
+static const PinGroup quatInput = {EValueType::Quat};
+static const PinGroup pulseInput = {EValueType::Pulse};
+static const PinGroup screenInput = {EValueType::Screen};
 
-static const std::vector<EValueType> twoMatrixInput = {EValueType::Matrix, EValueType::Matrix};
-static const std::vector<EValueType> twoVectorInput = {EValueType::Vec4, EValueType::Vec4};
-static const std::vector<EValueType> twoVector3Input = {EValueType::Vec3, EValueType::Vec3};
-static const std::vector<EValueType> twoFloatInput = {EValueType::Float, EValueType::Float};
-static const std::vector<EValueType> twoQuatInput = {EValueType::Quat, EValueType::Quat};
+static const PinGroup twoMatrixInput = {EValueType::Matrix, EValueType::Matrix};
+static const PinGroup twoVectorInput = {EValueType::Vec4, EValueType::Vec4};
+static const PinGroup twoVector3Input = {EValueType::Vec3, EValueType::Vec3};
+static const PinGroup twoFloatInput = {EValueType::Float, EValueType::Float};
+static const PinGroup twoQuatInput = {EValueType::Quat, EValueType::Quat};
 
-static const std::vector<EValueType> threeVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3};
-static const std::vector<EValueType> threeFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float};
+static const PinGroup threeVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3};
+static const PinGroup threeFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> fourVectorInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Vec4,
-                                                        EValueType::Vec4};
-static const std::vector<EValueType> fourVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3,
-                                                         EValueType::Vec3};
-static const std::vector<EValueType> fourFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float,
-                                                       EValueType::Float};
+static const PinGroup fourVectorInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Vec4, EValueType::Vec4};
+static const PinGroup fourVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3, EValueType::Vec3};
+static const PinGroup fourFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> sixFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float,
-                                                      EValueType::Float, EValueType::Float, EValueType::Float};
+static const PinGroup sixFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float,
+                                       EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> sixteenFloatInput = {
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float};
+static const PinGroup sixteenFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+                                           EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+                                           EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+                                           EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> twoVectorFloatInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Float};
-static const std::vector<EValueType> twoVector3FloatInput = {EValueType::Vec3, EValueType::Vec3, EValueType::Float};
-static const std::vector<EValueType> twoFloatVector3Input = {EValueType::Float, EValueType::Float, EValueType::Vec3};
-static const std::vector<EValueType> twoQuatFloatInput = {EValueType::Quat, EValueType::Quat, EValueType::Float};
+static const PinGroup twoVectorFloatInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Float};
+static const PinGroup twoVector3FloatInput = {EValueType::Vec3, EValueType::Vec3, EValueType::Float};
+static const PinGroup twoFloatVector3Input = {EValueType::Float, EValueType::Float, EValueType::Vec3};
+static const PinGroup twoQuatFloatInput = {EValueType::Quat, EValueType::Quat, EValueType::Float};
 
-static const std::vector<EValueType> matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
-static const std::vector<EValueType> vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
-static const std::vector<EValueType> vector3FloatInput = {EValueType::Vec3, EValueType::Float};
-static const std::vector<EValueType> vector3QuatInput = {EValueType::Vec3, EValueType::Quat};
-static const std::vector<EValueType> floatMatrixInput = {EValueType::Float, EValueType::Matrix};
-static const std::vector<EValueType> floatVectorInput = {EValueType::Float,
-                                                         EValueType::Vec4}; // PF: vec3 changed to vec4
-static const std::vector<EValueType> floatVector3Input = {EValueType::Float, EValueType::Vec3};
-static const std::vector<EValueType> floatQuatInput = {EValueType::Float, EValueType::Quat};
-// static const std::vector<EValueType> quatVector3Input = {EValueType::Quat, EValueType::Vec3};
+static const PinGroup matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
+static const PinGroup vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
+static const PinGroup vector3FloatInput = {EValueType::Vec3, EValueType::Float};
+static const PinGroup vector3QuatInput = {EValueType::Vec3, EValueType::Quat};
+static const PinGroup floatMatrixInput = {EValueType::Float, EValueType::Matrix};
+static const PinGroup floatVectorInput = {EValueType::Float, EValueType::Vec4};
+static const PinGroup floatVector3Input = {EValueType::Float, EValueType::Vec3};
+static const PinGroup floatQuatInput = {EValueType::Float, EValueType::Quat};
+static const PinGroup screenFloatInput = {EValueType::Screen, EValueType::Float};
+// static const PinGroup quatVector3Input = {EValueType::Quat, EValueType::Vec3};
 
-static const std::vector<EValueType> matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
-static const std::vector<EValueType> matrixMulInput = {EValueType::MatrixMul};
+static const PinGroup matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
+static const PinGroup matrixMulInput = {EValueType::MatrixMul};
 
 // explicitly defined pin names
-static const std::vector<std::string> mixInputNames = {"from", "to", "t"};
-static const std::vector<std::string> AngleAxisToQuatInputNames = {"angle", "angle / 2", "vec3"};
-static const std::vector<std::string> QuatToFloatVecInputNames = {"w", "(x,y,z)"};
-static const std::vector<std::string> AngleAxisInputNames = {"angle", "axis"};
-static const std::vector<std::string> Vectors3ToMatrixInputNames = {"vec3 X", "vec3 Y", "vec3 Z", "vec3 T"};
-static const std::vector<std::string> VectorsToMatrixInputNames = {"vec4 X", "vec4 Y", "vec4 Z", "vec4 T"};
-static const std::vector<std::string> ClampFloatInputNames = {"val", "min", "max"};
-static const std::vector<std::string> xyz = {"x", "y", "z"};
-static const std::vector<std::string> xyzw = {"x", "y", "z", "w"};
-static const std::vector<std::string> tr = {"T", "R"};
-static const std::vector<std::string> eulerInputNames = {"angle"};
-static const std::vector<std::string> orthoFrustrumInputNames = {"left", "right", "bottom", "top", "near", "far"};
-static const std::vector<std::string> PerspectiveInputNames = {"fovy", "aspect", "near", "far"};
-static const std::vector<std::string> lookAtInputNames = {"eye", "center", "up"};
+static const PinNames mixInputNames = {"from", "to", "t"};
+static const PinNames AngleAxisToQuatInputNames = {"angle", "angle / 2", "vec3"};
+static const PinNames QuatToFloatVecInputNames = {"w", "(x,y,z)"};
+static const PinNames AngleAxisInputNames = {"angle", "axis"};
+static const PinNames Vectors3ToMatrixInputNames = {"vec3 X", "vec3 Y", "vec3 Z", "vec3 T"};
+static const PinNames VectorsToMatrixInputNames = {"vec4 X", "vec4 Y", "vec4 Z", "vec4 T"};
+static const PinNames ClampFloatInputNames = {"val", "min", "max"};
+static const PinNames xyz = {"x", "y", "z"};
+static const PinNames xyzw = {"x", "y", "z", "w"};
+static const PinNames tr = {"T", "R"};
+static const PinNames eulerInputNames = {"angle"};
+static const PinNames orthoFrustrumInputNames = {"left", "right", "bottom", "top", "near", "far"};
+static const PinNames PerspectiveInputNames = {"fovy", "aspect", "near", "far"};
+static const PinNames lookAtInputNames = {"eye", "center", "up"};
 
 /**
- * \brief Table with configuration parameters for OPERATORS
+ * \brief Table with configuration parameters for OPERATORS. Must be in the same order as in EOperatorType!!!
  */
 static const std::vector<Operation> operations = {
     {n(EOperatorType::Inversion), "inversion", matrixInput, matrixInput},              // inversion
@@ -296,7 +308,7 @@ static const std::vector<Operation> operations = {
      "vectors."},                                                                                          // show vec3
     {n(EOperatorType::MixVector3), "mix vec3", twoVector3FloatInput, vector3Input, NO_TAG, mixInputNames}, // mix vec3
     {n(EOperatorType::ConjQuat), "quat conjugate", quatInput, quatInput},                  // quat conjugate
-    {n(EOperatorType::FloatVecToQuat), "quat(float, vec3)", floatVector3Input, quatInput}, // quatfloat, vec3
+    {n(EOperatorType::FloatVecToQuat), "quat(float, vec3)", floatVector3Input, quatInput}, // quat(float, vec3)
     {n(EOperatorType::AngleAxisToQuat), "quat(angle, axis)", twoFloatVector3Input, quatInput, NO_TAG,
      AngleAxisToQuatInputNames}, // quatangle, axis
     {n(EOperatorType::VecVecToQuat), "quat(vec3, vec3)", twoVector3Input, quatInput,
@@ -357,20 +369,14 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::FloatsToQuat), "floats -> quat", fourFloatInput, quatInput, NO_TAG, xyzw}, // floats -> quat
     {n(EOperatorType::NormalizeQuat), "normalize quat", quatInput, quatInput},                   // normalize quat
 
-    // Value nodes.
+    // Value nodes - constructors
     {n(EOperatorType::FloatToFloat), "float", floatInput, floatInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, true},
     {n(EOperatorType::Vector3ToVector3), "vec3", vector3Input, vector3Input, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES,
      true},
     {n(EOperatorType::Vector4ToVector4), "vec4", vectorInput, vectorInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, true},
     {n(EOperatorType::MatrixToMatrix), "matrix", matrixInput, matrixInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, true},
-    {n(EOperatorType::QuatToQuat),
-     "quat",
-     {EValueType::Quat},
-     {EValueType::Quat},
-     NO_TAG,
-     DEFAULT_NAMES,
-     DEFAULT_NAMES,
-     true},
+    {n(EOperatorType::QuatToQuat), "quat", quatInput, quatInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, true},
+    {n(EOperatorType::PulseToPulse), "pulse", pulseInput, pulseInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, true},
 
     // Transform matrices constructors
     // PF: I have deleted the world constructor from all operators
@@ -385,17 +391,9 @@ static const std::vector<Operation> operations = {
      PerspectiveInputNames}, // perspective
     {n(EOperatorType::MakeFrustum), "frustum", sixFloatInput, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", threeVector3Input, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
+    {n(EOperatorType::Screen), "screen", screenInput, screenFloatInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, false,
+     true}};
 
-    Operation{n(EOperatorType::Screen),
-              "screen",
-              {EValueType::Screen},
-              {EValueType::Screen, EValueType::Float},
-              NO_TAG,
-              {},
-              {},
-              false,
-              true},
-    {n(EOperatorType::Pulse), "pulse", {EValueType::Pulse}, {EValueType::Pulse}}};
 
 /**
  * From, to, multiplier, receive (play, pause, stopAndReset, prev, next).
@@ -410,7 +408,7 @@ static const PinGroup cycleInputs = {
  */
 static const PinGroup cycleOutputs = {
     EValueType::Float, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse,
-    EValueType::Pulse, EValueType::Pulse, EValueType::Pulse,
+    EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse,
 };
 
 // clang-format off
@@ -418,7 +416,8 @@ static const Operation g_CycleProperties = {
 	"Cycle", "cycle", cycleInputs, cycleOutputs,
     NO_TAG,
 	{"from", "to", "step", "play", "pause", "stop", "prev", "next"},
-	{"value", "play", "pause", "stop", "prev", "next", "end"}
+	// {"value", "play", "pause", "stop", "prev", "next", "end"}
+    {"value", "", "pause", "stop", "prev", "next", "begin", "end"}
 };
 // clang-format on
 

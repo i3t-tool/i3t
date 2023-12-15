@@ -20,7 +20,7 @@ constexpr auto I3T_CYCLE_STEP_DURATION_SECONDS = 0.5f;
 
 constexpr size_t I3T_CYCLE_IN_FROM = 0;
 constexpr size_t I3T_CYCLE_IN_TO = 1;
-constexpr size_t I3T_CYCLE_IN_MULT = 2; /* JH is not step + instead of *  ??? */
+constexpr size_t I3T_CYCLE_IN_STEP = 2;
 constexpr size_t I3T_CYCLE_IN_PLAY = 3;
 constexpr size_t I3T_CYCLE_IN_PAUSE = 4;
 constexpr size_t I3T_CYCLE_IN_STOP = 5;
