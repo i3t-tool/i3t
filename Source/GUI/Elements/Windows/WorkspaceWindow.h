@@ -133,6 +133,10 @@ public:
 	std::vector<WorkspaceCoreLink*> m_linksToDraw;
 	std::vector<WorkspaceCoreLink> m_linksCameraToSequence;
 
+	/**
+	 * \brief For a given input, create appropriate constructor box and plug it to this input
+	 * \return true if successful (input was not a Ptr)
+	 */
 	bool processCreateAndPlugTypeConstructor();
 
 	/**

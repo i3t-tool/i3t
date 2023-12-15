@@ -30,6 +30,7 @@
 
 namespace Core
 {
+struct Operation; // \todo (PF) needed by Intellisense
 class Node;
 class Pin;
 

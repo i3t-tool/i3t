@@ -318,13 +318,12 @@ public:
 class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
 {
 public:
-	std::string m_buttonText;
+	// std::string m_buttonText;
 	WorkspaceCoreOutputPinPulse(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                            WorkspaceNodeWithCoreData& node)
-	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node)
-	{
-		m_buttonText = m_pin.getLabel();
-	};
+	    : WorkspaceCoreOutputPinWithData(diwne, id, pin, node){
+	          // m_buttonText = m_pin.getLabel();
+	      };
 
 	bool drawData() override;
 	int maxLengthOfData() override;

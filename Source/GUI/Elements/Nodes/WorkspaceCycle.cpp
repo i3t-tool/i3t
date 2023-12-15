@@ -83,11 +83,15 @@ bool WorkspaceCycle::buttonStepNext()
 
 bool WorkspaceCycle::leftContent()
 {
+	// TODO
+	// - icons for input pins
+	// - no labels for pulse pins - put them to the hover
+
 	bool inner_interaction_happen = false;
 
 	if (m_levelOfDetail == WorkspaceLevelOfDetail::LightCycle)
 	{
-		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
+		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_STEP})
 		{
 			m_workspaceInputs.at(i)->drawDiwne();
 		}
@@ -118,6 +122,10 @@ bool WorkspaceCycle::leftContent()
 
 bool WorkspaceCycle::rightContent()
 {
+	// TODO
+	// - icons for output pins
+	// - no labels for pulse pins - put them to the hover
+
 	bool inner_interaction_happen = false;
 	if (m_levelOfDetail == WorkspaceLevelOfDetail::LightCycle)
 	{
@@ -198,7 +206,11 @@ bool WorkspaceCycle::middleContent()
 
 		break;
 	case WorkspaceLevelOfDetail::Full:
-
+		// TODO
+		// 1. center
+		// 2. big buttons with icons
+		// 4. radio button once/repeat/ping-pong
+		// 5. reorder the rest
 		inner_interaction_happen |= buttonPlayPause();
 		ImGui::SameLine();
 		inner_interaction_happen |= buttonStopAndReset();
@@ -333,7 +345,7 @@ bool WorkspaceCycle::middleContent()
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_MULT)->isConnected() ? Core::EValueState::Locked
+		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->isConnected() ? Core::EValueState::Locked
 		                                                                 : Core::EValueState::Editable,
 		    valueChanged);
 		if (ImGui::IsItemHovered())

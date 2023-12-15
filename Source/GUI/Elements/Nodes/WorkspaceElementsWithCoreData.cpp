@@ -667,13 +667,29 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-	// todo (PF) Remove the output button. If used, than on not-connected input pins
-	// if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str()))
-	// {
-	//	getNode().getNodebase()->pulse(getIndex());
-	//	return true;
-	// }
-	ImGui::Dummy(ImVec2(0.0, 0.0)); // to avoid unlimited cycle width
+	// (PF) The Pulse button appears if no input is connected
+	const Core::EValueState& state = getNode().getNodebase()->getState(getIndex());
+	if (state == Core::EValueState::Editable)
+	{
+		if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", "Pulse", getNode().getId(), m_idDiwne).c_str()))
+		{
+			getNode().getNodebase()->pulse(getIndex());
+			return true;
+		}
+	}
+	else // Pulse with a connected Input. Cycle Pulse outputs.
+	{
+		// const std::string& label = m_pin.getLabel();
+		// if (!label.empty())
+		// {
+		//	ImGui::TextUnformatted(label.c_str());
+		//	ImGui::SameLine();
+		// }
+
+		// ImGui::TextUnformatted(m_buttonText.c_str());
+
+		ImGui::Dummy(ImVec2(0.0, 0.0)); // to avoid unlimited cycle width
+	}
 	return false;
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData()

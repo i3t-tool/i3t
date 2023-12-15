@@ -150,9 +150,9 @@ void Cycle::updateValues(int inputIndex)
 		setTo(val);
 	}
 
-	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
+	if (m_inputs[I3T_CYCLE_IN_STEP].isPluggedIn())
 	{
-		float val = getInput(I3T_CYCLE_IN_MULT).data().getFloat();
+		float val = getInput(I3T_CYCLE_IN_STEP).data().getFloat();
 		setStep(val);
 	}
 
