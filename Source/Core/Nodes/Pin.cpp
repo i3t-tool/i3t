@@ -19,8 +19,8 @@ namespace Core
 {
 static IdGenerator generator;
 
-Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index)
-    : ValueType(valueType), IsInput(isInput), Owner(*owner.get()), Index(index)
+Pin::Pin(EValueType valueType, bool isInput, Node& owner, int index)
+    : ValueType(valueType), IsInput(isInput), Owner(owner), Index(index)
 {
 	Id = generator.next();
 }
@@ -134,54 +134,39 @@ ENodePlugResult Pin::plug(Pin& input, Pin& output)
 
 void Pin::unplug()
 {
+	I3T_ASSERT(IsInput, "Must be input pin!");
+
 	if (!isPluggedIn())
 	{
 		return;
 	}
 
-	if (IsInput)
+	auto* output = m_input;
+
+	auto it = std::find(output->m_outputs.begin(), output->m_outputs.end(), this);
+	I3T_ASSERT(it != output->m_outputs.end(), "Can't find pointer to input pin in other node outputs!");
+	if (it != output->m_outputs.end())
 	{
-		auto* output = m_input;
+		/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
+		LOG_DEBUG("Erasing input pin {} of node {} from output pin {} outputs of node {}.", Index, Owner.getSignature(),
+		          output->Index, output->Owner.getSignature());
+		output->m_outputs.erase(it);
+	}
 
-		auto it = std::find(output->m_outputs.begin(), output->m_outputs.end(), this);
-		if (it != output->m_outputs.end())
-		{
-			/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
-			output->m_outputs.erase(it);
-		}
-		else
-		{
-			I3T_ABORT("Can't find pointer to input pin in other node outputs!");
-		}
+	m_input = nullptr;
 
-		m_input = nullptr;
-
-		if (Owner.m_operation->isConstructor)
+	if (Owner.m_operation->isConstructor)
+	{
+		if (Owner.areAllInputsUnplugged())
 		{
-			if (Owner.areAllInputsUnplugged())
+			for (auto& state : Owner.m_OperatorState)
 			{
-				for (auto& state : Owner.m_OperatorState)
-				{
-					state = EValueState::Editable;
-				}
+				state = EValueState::Editable;
 			}
 		}
-
-		Owner.updateValues(Index);
 	}
-	else
-	{
-		// pin is output
-		// Set all connected nodes input as nullptr.
-		for (const auto& otherPin : m_outputs)
-		{
-			otherPin->m_input = nullptr;
-			otherPin->Owner.updateValues();
-			Owner.triggerUnplugCallback(&Owner, otherPin->getOwner().get(), Index, otherPin->Index);
-		}
 
-		m_outputs.clear();
-	}
+	Owner.updateValues(Index);
 }
 
 ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)

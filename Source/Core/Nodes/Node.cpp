@@ -19,8 +19,14 @@ namespace Core
 {
 static IdGenerator generator;
 
+Node::~Node()
+{
+	LOG_DEBUG("~Node called on {}.", getSignature());
+}
+
 void Node::finalize()
 {
+	LOG_DEBUG("Finalizing node {}.", getSignature());
 	unplugAll();
 	triggerDeleteCallback(this);
 }
@@ -32,13 +38,13 @@ void Node::init()
 	// Create input pins.
 	for (auto i = 0; i < m_operation->inputTypes.size(); i++)
 	{
-		m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i);
+		m_inputs.emplace_back(m_operation->inputTypes[i], true, *this, i);
 	}
 
 	// Create output pins and data storage for each output.
 	for (auto i = 0; i < m_operation->outputTypes.size(); i++)
 	{
-		m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
+		m_outputs.emplace_back(m_operation->outputTypes[i], false, *this, i);
 		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
@@ -80,6 +86,11 @@ ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsig
 
 	auto& input = childNode->getInput(toIndex);
 	auto& output = getOutput(fromIndex);
+
+	if (input.isPluggedIn())
+	{
+		input.unplug();
+	}
 
 	const auto result = output.plug(input);
 
@@ -211,7 +222,6 @@ void Node::spreadSignal()
 
 void Node::spreadSignal(size_t outIndex)
 {
-	/// \todo MH This should not happen, remove it.
 	if (getOutputPins().empty())
 	{
 		return;
@@ -221,7 +231,7 @@ void Node::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : outputPin.getOutComponents())
 	{
-		inPin->getOwner()->receiveSignal(inPin->Index);
+		inPin->Owner.receiveSignal(inPin->Index);
 	}
 }
 
@@ -285,6 +295,8 @@ void Node::unplugInput(size_t index)
 {
 	I3T_ASSERT(m_inputs.size() > index, "The node's input pin that you want to unplug does not exist.");
 
+	LOG_DEBUG("Unplugging input {} of node {}.", index, getSignature());
+
 	auto& input = m_inputs[index];
 
 	if (!input.isPluggedIn())
@@ -308,7 +320,13 @@ void Node::unplugOutput(size_t index)
 {
 	I3T_ASSERT(index < m_outputs.size(), "The node's output pin that you want to unplug does not exists.");
 
-	m_outputs[index].unplug();
+	LOG_DEBUG("Unplugging output {} of node {}.", index, getSignature());
+
+	for (auto* input : m_outputs[index].getOutComponents())
+	{
+		// Called through Node function to trigger callbacks.
+		input->Owner.unplugInput(input->Index);
+	}
 }
 
 const DataMap* Node::getDataMap()

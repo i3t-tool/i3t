@@ -88,12 +88,6 @@ void GraphManager::unplugInput(const Ptr<Core::Node>& node, int index)
 	node.get()->unplugInput(index);
 }
 
-void GraphManager::unplugOutput(Ptr<Core::Node>& node, int index)
-{
-	node.get()->unplugOutput(index);
-	// tryToDoSequenceProcedure(node);
-}
-
 std::vector<Ptr<Node>> GraphManager::getAllInputNodes(const Ptr<Node>& node)
 {
 	std::vector<Ptr<Node>> result;
