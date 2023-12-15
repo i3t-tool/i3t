@@ -30,7 +30,7 @@
 #include "spdlog/spdlog.h"
 
 #ifdef _DEBUG
-#define LOG_DEBUG(...) Logger::getInstance().getAppLogger()->trace(__VA_ARGS__);
+#define LOG_DEBUG(...) Logger::getInstance().getAppLogger()->trace(__VA_ARGS__)
 #else
 #define LOG_DEBUG(...)
 #endif

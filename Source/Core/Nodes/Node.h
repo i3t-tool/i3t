@@ -30,7 +30,6 @@
 
 namespace Core
 {
-struct Operation; // \todo (PF) needed by Intellisense
 class Node;
 class Pin;
 
@@ -87,7 +86,7 @@ protected:
 	 * \pre All inputs and outputs must be unplugged (calls Node::finalize
 	 * function)!
 	 */
-	virtual ~Node() = default;
+	virtual ~Node();
 
 public:
 	bool operator==(const Node& other) const

@@ -38,7 +38,7 @@ enum class ENodePlugResult
 class Pin
 {
 public:
-	Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index);
+	Pin(EValueType valueType, bool isInput, Node& owner, int index);
 
 	Ptr<Node> getOwner() const;
 
@@ -74,6 +74,10 @@ private:
 	ENodePlugResult plug(Pin& other);
 
 	static ENodePlugResult plug(Pin& input, Pin& output);
+
+	/**
+	 * Called only on input pin.
+	 */
 	void unplug();
 
 public:
@@ -108,7 +112,7 @@ public:
 	ID Id;
 
 	/// Index within a node.
-	int Index = -1;
+	const int Index = -1;
 
 	/// Pin type.
 	const bool IsInput;
@@ -139,8 +143,6 @@ private:
 	 */
 	std::vector<Pin*> m_outputs;
 
-	/// \todo MH Remove after refactoring.
-	friend class GraphManager;
 	friend class Node;
 };
 } // namespace Core

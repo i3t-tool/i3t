@@ -43,7 +43,7 @@ Logger::Logger()
 {
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
-	sinks[0]->set_level(spdlog::level::trace);
+	sinks[0]->set_level(spdlog::level::info);
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
@@ -89,6 +89,7 @@ void Logger::initLogger(int argc, char* argv[])
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::appLog.string(),
 	                                                                                    maxLogSize, maxFileCount));
+	appLogger->set_level(spdlog::level::trace);
 	appLogger->flush_on(spdlog::level::info);
 
 	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());

@@ -139,14 +139,6 @@ public:
 	static void unplugInput(const Ptr<Core::Node>& node, int index);
 
 	/**
-	 * Unplug all nodes connected to given output pin of this node.
-	 *
-	 * \param node \todo Why single node here?
-	 * \param index Index of the output pin
-	 */
-	static void unplugOutput(Ptr<Core::Node>& node, int index);
-
-	/**
 	 * Returns parent node of given node (the topmost one).
 	 *
 	 * For example for a node plugged into a sequence node, the real parent
