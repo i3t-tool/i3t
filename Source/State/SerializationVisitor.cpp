@@ -97,7 +97,7 @@ void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
 	cycle.AddMember("from", coreNode->getFrom(), alloc);
 	cycle.AddMember("to", coreNode->getTo(), alloc);
 	cycle.AddMember("manualStep", coreNode->getManualStep(), alloc);
-	cycle.AddMember("step", coreNode->getMultiplier(), alloc);
+	cycle.AddMember("step", coreNode->getStep(), alloc);
 	cycle.AddMember("stepDuration", coreNode->getStepDuration(), alloc);
 	cycle.AddMember("smooth", coreNode->getSmoothStep(), alloc);
 	cycle.AddMember("isRunning", coreNode->isRunning(), alloc);

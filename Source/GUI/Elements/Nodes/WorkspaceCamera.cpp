@@ -241,10 +241,10 @@ bool WorkspaceCamera::middleContent()
 {
 	bool inner_interaction_happen = false;
 	inner_interaction_happen |=
-	    m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+	    m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
 	ImGui::SameLine();
 	inner_interaction_happen |=
-	    m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+	    m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
 	return inner_interaction_happen;
 }
 

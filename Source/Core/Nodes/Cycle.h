@@ -33,7 +33,8 @@ constexpr size_t I3T_CYCLE_OUT_PAUSE = 2;
 constexpr size_t I3T_CYCLE_OUT_STOP = 3;
 constexpr size_t I3T_CYCLE_OUT_PREV = 4;
 constexpr size_t I3T_CYCLE_OUT_NEXT = 5;
-constexpr size_t I3T_CYCLE_OUT_END = 6;
+constexpr size_t I3T_CYCLE_OUT_BEGIN = 6; // PF
+constexpr size_t I3T_CYCLE_OUT_END = 7;
 
 class Cycle;
 
@@ -55,6 +56,11 @@ public:
 public:
 	Cycle() : Node(&g_CycleProperties) {}
 
+	/**
+	 * \brief Perform a regular cycle value update (if running). Called by the GraphManager::update(double tick)
+	 * Adjusts the increment and calls updateValue(increment).
+	 * \param deltaSeconds elapsed time
+	 */
 	void update(double deltaSeconds);
 
 	void play();
@@ -62,6 +68,8 @@ public:
 	void stopAndReset();
 	void stepBack();
 	void stepNext();
+	void rewind();
+	void wind();
 
 	EMode getMode()
 	{
@@ -73,14 +81,14 @@ public:
 		if (m_mode != mode)
 		{ // \todo A better variant - use value changed in WorkspaceCycle.cpp
 			m_mode = mode;
-			m_directionMultiplier = 1.0f;
+			m_directionMultiplier = 1.0f; ///< direction from m_from to m_to
 		}
 	}
 
 	bool isRunning() const;
 	float getFrom() const;
 	float getTo() const;
-	float getMultiplier() const;
+	float getStep() const;
 	float getManualStep() const;
 
 	/**
@@ -94,7 +102,7 @@ public:
 	void setTo(float to);
 
 	/**
-	 * \param v should be a loop increment - \todo to be renamed to setStep
+	 * \param v should be a loop increment
 	 */
 	void setStep(float v);
 
@@ -125,15 +133,26 @@ public:
 	}
 
 	/**
-	 * update inner state from connected inputs (values and pulse inputs)
+	 * Update the inner state from all connected inputs (take values from the from, to, step and pulse inputs).
+	 * \todo (PF) Why does it ignore the input pin????
 	 */
 	void updateValues(int inputIndex) override;
 
 private:
+	/**
+	 * \brief Perform a single value update during the cycle loop (update()) or the manual step (stepBack and stepNext)
+	 * according to the current \a m_mode.
+	 *
+	 * Compute newValue as \a value + \a increment.
+	 * - if newValue is in interval <from, to> then set it unchanged
+	 * - if newValue is out of bounds <from, to>, modify the newValue and use the modified newValue
+	 *
+	 * \param increment An increment to the current cycle value
+	 */
 	void updateValue(float increment);
+	float m_from = 0.0f; ///< The initial cycle value (begin) - if here, fire the I3T_CYCLE_OUT_BEGIN pulse
+	float m_to = 10.0f;  ///< The final value of the cycle (end0 - if here, fire the I3T_CYCLE_OUT_END pulse
 
-	float m_from = 0.0f;
-	float m_to = 10.0f;
 	/// step after pressing of Prev or Next button
 	float m_manualStep = 0.1f;
 	/// increment per second

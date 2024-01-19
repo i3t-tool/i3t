@@ -56,7 +56,7 @@ public:
 	void drawMenuLevelOfDetail(); // todo
 	void popupContent() override;
 
-	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const
+	std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const override
 	{
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */

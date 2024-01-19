@@ -417,7 +417,8 @@ static const Operation g_CycleProperties = {
     NO_TAG,
 	{"from", "to", "step", "play", "pause", "stop", "prev", "next"},
 	// {"value", "play", "pause", "stop", "prev", "next", "end"}
-    {"value", "", "pause", "stop", "prev", "next", "begin", "end"}
+    {"value", "", "pause", "stop", "prev", "next", "begin", "end"},
+    //true
 };
 // clang-format on
 

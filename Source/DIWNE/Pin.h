@@ -49,17 +49,17 @@ public:
 		return DiwneAction::TouchPin;
 	};
 
-	virtual void begin();
-	virtual void end();
-	virtual void updateSizes();
-	virtual bool processInteractionsAlways();
+	void begin() override;
+	void end() override;
+	void updateSizes() override;
+	bool processInteractionsAlways() override;
 
 	virtual const ImVec2& getLinkConnectionPointDiwne()
 	{
 		return m_connectionPointDiwne;
 	};
 
-	virtual bool processDrag();
+	bool processDrag() override;
 
 	/*! \brief Wrapper is run when new link is created and goal pin is hovered but
 	 * action not released yet
@@ -74,19 +74,19 @@ public:
 	virtual bool processConnectionPrepared(); /*!< your content/actions when new link hovered
 	                                             goal pin but not released yet */
 
-	virtual void setConnectionPointDiwne(ImVec2 value)
+	virtual void setConnectionPointDiwne(const ImVec2 value)
 	{
 		m_connectionPointDiwne = value;
 	};
 
-	virtual ImRect getRectDiwne() const
+	ImRect getRectDiwne() const override
 	{
 		return m_pinRectDiwne;
 	};
 
 protected:
-	ImRect m_pinRectDiwne;
-	ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin */
+	ImRect m_pinRectDiwne;         ///< PIN bounding rectangle
+	ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin (wire start or end) */
 
 	virtual void updateConnectionPointDiwne()
 	{

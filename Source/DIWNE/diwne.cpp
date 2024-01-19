@@ -415,6 +415,28 @@ void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor inner
 		idl->AddRectFilled(topLeft + thickness, bottomRight - thickness, innerColor, rounding);
 	}
 }
+void Diwne::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                          bool filled, ImVec2 thickness, float rounding) const
+{
+	const float width = bottomRight.x - topLeft.x;
+	// const float columnWidth = width / 3.0f;
+	const float columnWidth = width * 6.0f / 15.0f;
+	ImVec2 bottomRight1;
+	bottomRight1.x = topLeft.x + columnWidth;
+	bottomRight1.y = bottomRight.y;
+
+	ImVec2 topLeft2;
+	topLeft2.x = bottomRight.x - columnWidth;
+	topLeft2.y = topLeft.y;
+
+	idl->AddRectFilled(topLeft, bottomRight1, shapeColor, rounding);
+	idl->AddRectFilled(topLeft2, bottomRight, shapeColor, rounding);
+	if (!filled)
+	{
+		idl->AddRectFilled(topLeft + thickness, bottomRight1 - thickness, innerColor, rounding);
+		idl->AddRectFilled(topLeft2 + thickness, bottomRight - thickness, innerColor, rounding);
+	}
+}
 
 void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
@@ -429,6 +451,156 @@ void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor in
 	}
 }
 
+// | I < | --- 1 1 1 4 1
+void Diwne::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                             ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
+	ImVec2 bottomRight1;
+	bottomRight1.x = topLeft.x + columnWidth; // vertical bar
+	bottomRight1.y = bottomRight.y;
+
+	// float Left2x = bottomRight.x - 5.0f * columnWidth; // triangle
+	ImVec2 middleLeft2;
+	middleLeft2.x = bottomRight.x - 5.0f * columnWidth; // triangle
+	middleLeft2.y = (topLeft.y + bottomRight.y) / 2;
+
+	idl->AddRectFilled(topLeft, bottomRight1, shapeColor);
+	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), middleLeft2, bottomRight, shapeColor);
+	if (!filled)
+	{
+		idl->AddRectFilled(topLeft + ImVec2(thickness, thickness), bottomRight1 - ImVec2(thickness, thickness),
+		                   innerColor);
+		idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y) + ImVec2(-thickness, 2 * thickness),
+		                       middleLeft2 + ImVec2(2.0f * thickness, 0.0f),
+		                       bottomRight - ImVec2(thickness, 2 * thickness), innerColor);
+	}
+}
+
+void Diwne::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                              ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
+
+	ImVec2 middleLeft1 = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2); // triangle
+	ImVec2 topRight1 = ImVec2(topLeft.x + 5.0f * columnWidth, topLeft.y);
+	ImVec2 bottomRight1 = ImVec2(topRight1.x, bottomRight.y);
+
+	ImVec2 topLeft2 = ImVec2(bottomRight.x - 1.0f * columnWidth, topLeft.y); // rectangle
+
+	idl->AddTriangleFilled(middleLeft1, topRight1, bottomRight1, shapeColor);
+	idl->AddRectFilled(topLeft2, bottomRight, shapeColor);
+	if (!filled)
+	{
+		idl->AddTriangleFilled(middleLeft1 + ImVec2(2.0f * thickness, 0.0f),
+		                       topRight1 + ImVec2(-thickness, 2 * thickness),
+		                       bottomRight1 + ImVec2(-thickness, -2 * thickness), innerColor);
+		idl->AddRectFilled(topLeft2 + ImVec2(thickness, thickness), bottomRight - ImVec2(thickness, thickness),
+		                   innerColor);
+	}
+}
+void Diwne::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                           bool filled, float thickness) const
+{
+	const ImVec2 middleLeft = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2.0f);
+
+	const ImVec2 middlePoint = (topLeft + bottomRight) / 2.0f;
+	const ImVec2 topMiddle = ImVec2(middlePoint.x, topLeft.y);
+	const ImVec2 bottomMiddle = ImVec2(middlePoint.x, bottomRight.y);
+
+	const ImVec2 topRight = ImVec2(bottomRight.x, topLeft.y);
+
+	idl->AddTriangleFilled(topMiddle, middleLeft, bottomMiddle, shapeColor);
+	idl->AddTriangleFilled(topRight, middlePoint, bottomRight, shapeColor);
+
+	if (!filled)
+	{
+		idl->AddTriangleFilled(topMiddle + ImVec2(-thickness, 2 * thickness), middleLeft + ImVec2(2 * thickness, 0.0f),
+		                       bottomMiddle + ImVec2(-thickness, -2 * thickness), innerColor);
+		idl->AddTriangleFilled(topRight + ImVec2(-thickness, 2 * thickness),
+		                       middlePoint + ImVec2(2 * thickness, thickness),
+		                       bottomRight + ImVec2(-thickness, -2.0f * thickness), innerColor);
+	}
+}
+
+void Diwne::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
+
+	// float right1x = topLeft.x + 5.0f * columnWidth;               // triangle
+
+	ImVec2 middleRight1;
+	middleRight1.x = topLeft.x + 5.0f * columnWidth; // triangle
+	middleRight1.y = (topLeft.y + bottomRight.y) / 2;
+
+	ImVec2 topLeft2;
+	topLeft2.x = bottomRight.x - columnWidth; // vertical bar
+	topLeft2.y = topLeft.y;
+
+	idl->AddTriangleFilled(topLeft, middleRight1, ImVec2(topLeft.x, bottomRight.y), shapeColor);
+	idl->AddRectFilled(topLeft2, bottomRight, shapeColor);
+
+	if (!filled)
+	{
+		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness),
+		                       middleRight1 - ImVec2(2.0f * thickness, 0.0f),
+		                       ImVec2(topLeft.x, bottomRight.y) + ImVec2(thickness, -2 * thickness), innerColor);
+		idl->AddRectFilled(topLeft2 + ImVec2(thickness, thickness), bottomRight - ImVec2(thickness, thickness),
+		                   innerColor);
+	}
+}
+
+void Diwne::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
+
+	ImVec2 bottomRight1;
+	bottomRight1.x = topLeft.x + columnWidth; // vertical bar
+	bottomRight1.y = bottomRight.y;
+
+	ImVec2 topLeft2 = ImVec2(bottomRight.x - 5.0f * columnWidth, topLeft.y); // triangle
+	ImVec2 bottomLeft2 = ImVec2(topLeft2.x, bottomRight.y);
+
+	ImVec2 middleRight2 = ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2.0f);
+
+	idl->AddRectFilled(topLeft, bottomRight1, shapeColor);
+	idl->AddTriangleFilled(topLeft2, bottomLeft2, middleRight2, shapeColor);
+
+	if (!filled)
+	{
+		idl->AddRectFilled(topLeft + ImVec2(thickness, thickness), bottomRight1 - ImVec2(thickness, thickness),
+		                   innerColor);
+
+		idl->AddTriangleFilled(topLeft2 + ImVec2(thickness, 2 * thickness),
+		                       bottomLeft2 + ImVec2(thickness, -2 * thickness),
+		                       middleRight2 + ImVec2(-2.0f * thickness, 0.0f), innerColor);
+	}
+}
+void Diwne::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                ImVec2 bottomRight, bool filled, float thickness) const
+{
+	const ImVec2 bottomLeft = ImVec2(topLeft.x, bottomRight.y);
+
+	const ImVec2 middlePoint = (topLeft + bottomRight) / 2.0f;
+	const ImVec2 topMiddle = ImVec2(middlePoint.x, topLeft.y);
+	const ImVec2 bottomMiddle = ImVec2(middlePoint.x, bottomRight.y);
+
+	const ImVec2 middleRight = ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2.0f);
+
+	idl->AddTriangleFilled(topLeft, middlePoint, bottomLeft, shapeColor);
+	idl->AddTriangleFilled(topMiddle, middleRight, bottomMiddle, shapeColor);
+
+	if (!filled)
+	{
+		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness), middlePoint + ImVec2(-2 * thickness, 0.0f),
+		                       bottomLeft + ImVec2(thickness, -2 * thickness), innerColor);
+		idl->AddTriangleFilled(topMiddle + ImVec2(thickness, 2 * thickness), middleRight + ImVec2(-2 * thickness, 0.0f),
+		                       bottomMiddle + ImVec2(thickness, -2 * thickness), innerColor);
+	}
+}
+
 void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
@@ -436,14 +608,14 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor i
 	                       ImVec2(topLeft.x, bottomRight.y), shapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(topLeft + ImVec2(thickness, thickness),
-		                       ImVec2(bottomRight.x - thickness, (topLeft.y + bottomRight.y) / 2),
-		                       ImVec2(topLeft.x + thickness, bottomRight.y - thickness), innerColor);
+		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness), // (PF 2x for better border)
+		                       ImVec2(bottomRight.x - 2 * thickness, (topLeft.y + bottomRight.y) / 2),
+		                       ImVec2(topLeft.x + thickness, bottomRight.y - 2 * thickness), innerColor);
 	}
 }
 
 void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
+                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
 	ImVec2 p2 = bottomRight - ImVec2(0.5f, 0.5f);
@@ -452,13 +624,13 @@ void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImCol
 	idl->AddTriangleFilled(p1, p2, p3, shapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(p1 + ImVec2(2 * thicknes, -thicknes), p2 - ImVec2(thicknes, thicknes),
-		                       p3 + ImVec2(-thicknes, 2 * thicknes), innerColor);
+		idl->AddTriangleFilled(p1 + ImVec2(2 * thickness, -thickness), p2 - ImVec2(thickness, thickness),
+		                       p3 + ImVec2(-thickness, 2 * thickness), innerColor);
 	}
 }
 
 void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
+                                     ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = topLeft + ImVec2(0.5f, 0.5f);
 	ImVec2 p2 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
@@ -467,8 +639,8 @@ void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColo
 	idl->AddTriangleFilled(p1, p2, p3, shapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(p1 + ImVec2(thicknes, 2 * thicknes), p2 + ImVec2(thicknes, -thicknes),
-		                       p3 - ImVec2(2 * thicknes, thicknes), innerColor);
+		idl->AddTriangleFilled(p1 + ImVec2(thickness, 2 * thickness), p2 + ImVec2(thickness, -thickness),
+		                       p3 - ImVec2(2 * thickness, thickness), innerColor);
 	}
 }
 
@@ -594,17 +766,26 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
                      ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	ImVec2 icon_min = ImGui::GetCursorScreenPos();
-	ImVec2 icon_max = icon_min + size;
-	ImVec2 inner_icon_min = icon_min + ImVec2(padding.x, padding.w);
-	ImVec2 inner_icon_max = icon_max - ImVec2(padding.z, padding.y);
+	const ImVec2 icon_min = ImGui::GetCursorScreenPos();
+	const ImVec2 icon_max = icon_min + size;
+	const ImVec2 inner_icon_min = icon_min + ImVec2(padding.x, padding.w);
+	const ImVec2 inner_icon_max = icon_max - ImVec2(padding.z, padding.y);
+	const ImVec2 inner_icon_min2 = icon_min + ImVec2(1.5f * padding.x, 1.5f * padding.w);
+	const ImVec2 inner_icon_max2 = icon_max - ImVec2(1.5f * padding.z, 1.5f * padding.y);
 
 	switch (bgIconType)
 	{
 	case Circle:
 		DrawIconCircle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
+	case AtFrom:
+	case AtTo:
 	case Rectangle:
+	case Pause:
+	case SkipBack:
+	case SkipBack2:
+	case SkipForward:
+	case SkipForward2:
 		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleLeft:
@@ -668,6 +849,32 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 		break;
 	case GrabDownRight:
 		DrawIconGrabDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
+		break;
+	case Stop:
+		DrawIconRectangle(idl, fgShapeColor, fgInnerColor, inner_icon_min2, inner_icon_max2, filled);
+		break;
+	case Pause:
+		DrawIconPause(idl, fgShapeColor, fgInnerColor, inner_icon_min2, inner_icon_max2, filled);
+		break;
+	case SkipBack:
+		DrawIconSkipBack(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+		break;
+	case SkipBack2:
+		DrawIconSkipBack2(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+		break;
+	case SkipForward:
+		DrawIconSkipForward(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+		break;
+	case SkipForward2:
+		DrawIconSkipForward2(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+		break;
+	case Rewind:
+	case AtFrom:
+		DrawIconRewind(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+		break;
+	case FastForward:
+	case AtTo:
+		DrawIconFastForward(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case NoIcon:
 	default:

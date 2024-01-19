@@ -96,6 +96,7 @@ ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsig
 
 	if (result == ENodePlugResult::Ok)
 	{
+
 		for (auto& state : childNode->m_OperatorState)
 		{
 			state = EValueState::Locked;
@@ -306,6 +307,9 @@ void Node::unplugInput(size_t index)
 	}
 
 	auto* otherPin = input.getParentPin();
+
+	LOG_DEBUG("m_input == nullptr: {}", otherPin == nullptr);
+
 	auto otherPinOwner = otherPin->getOwner().get();
 	auto otherPinIndex = otherPin->Index;
 

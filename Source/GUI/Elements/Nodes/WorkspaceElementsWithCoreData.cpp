@@ -103,7 +103,8 @@ bool WorkspaceNodeWithCoreData::topContent()
 	{
 		if (detail == WorkspaceLevelOfDetail::Full)
 		{
-			if (std::dynamic_pointer_cast<WorkspaceTransformation>(shared_from_this()))
+			if (std::dynamic_pointer_cast<WorkspaceTransformation>(shared_from_this()) ||
+			    std::dynamic_pointer_cast<WorkspaceCycle>(shared_from_this()))
 			{
 				setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
 			}
@@ -316,7 +317,7 @@ bool WorkspaceNodeWithCoreData::processObjectDrag()
 {
 	if (bypassDragAction() && allowProcessDrag())
 	{
-		m_isDraged = true;
+		m_isDragged = true;
 		if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
 		{
 			static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
@@ -339,7 +340,7 @@ bool WorkspaceNodeWithCoreData::processUnselect()
 	return WorkspaceNode::processUnselect();
 }
 
-const char* WorkspaceNodeWithCoreData::getButtonSymbolFromLOD(WorkspaceLevelOfDetail detail)
+const char* WorkspaceNodeWithCoreData::getButtonSymbolFromLOD(const WorkspaceLevelOfDetail detail)
 {
 	if (detail == WorkspaceLevelOfDetail::Full)
 		return "v";
@@ -369,6 +370,12 @@ WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core
 // }
 
 /* DIWNE function */
+
+
+/**
+ * \brief Draw the pin icon
+ * \return false - no interaction allowed
+ */
 bool WorkspaceCorePin::content()
 {
 	const bool interaction_happen = false; // no interaction in this function allowed
@@ -378,9 +385,23 @@ bool WorkspaceCorePin::content()
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		const DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
+		const DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()]; // from WorkspaceElements.cpp
 		const ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
-		const DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
+		DIWNE::IconType iconTypeFg;
+		if (getType() == Core::EValueType::Pulse)
+		{
+			iconTypeFg = m_iconType; // (PF) icon for the cycle box, Triangle elsewhere
+			                         // iconTypeFg = DIWNE::IconType::SkipBack;
+			                         // iconTypeFg = DIWNE::IconType::SkipBack2;
+			                         // iconTypeFg = DIWNE::IconType::SkipForward;
+			                         // iconTypeFg = DIWNE::IconType::SkipForward2;
+			                         // iconTypeFg = DIWNE::IconType::Rewind;
+			                         // iconTypeFg = DIWNE::IconType::FastForward;
+		}
+		else
+		{
+			iconTypeFg = WorkspacePinShapeForeground[getType()];
+		}
 		const ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
 
 		const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
@@ -389,7 +410,9 @@ bool WorkspaceCorePin::content()
 
 		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 		//   not visible anyway so we're just drawing stuff twice for no reason
-		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+		// todo (PF) - I have temporally added the pin border drawing of not-connected pins
+		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
+		               createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
 		               ImVec4(padding, padding, padding, padding), isConnected());
 		m_iconRectDiwne =
 		    ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
@@ -507,16 +530,22 @@ WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID co
     : WorkspaceCorePin(diwne, id, pin, node)
 {}
 
+/**
+ * \brief Draw the output Pin: label and icon [float >]
+ * \return true if value changed
+ */
 bool WorkspaceCoreOutputPin::content()
 {
 	const std::string& label = m_pin.getLabel();
-	// todo PF: label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
-	if (!label.empty())
+	// todo (PF) Label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
+	// probably not - would be good for scalars, but wrong for mat4
+	// if (!label.empty())
+	if (!(m_pin.ValueType == Core::EValueType::Pulse) && !label.empty()) // no labels for pulse and cycle
 	{
 		ImGui::TextUnformatted(label.c_str());
 		ImGui::SameLine();
 	}
-	const auto inner_interaction_happen = WorkspaceCorePin::content(); // value + icon
+	const auto inner_interaction_happen = WorkspaceCorePin::content(); // icon
 	return inner_interaction_happen;
 }
 
@@ -528,12 +557,13 @@ WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diw
 bool WorkspaceCoreOutputPinWithData::content()
 {
 	bool interaction_happen = false;
-	if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full)
+	if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full ||
+	    getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues) // for cycle box
 	{
 		interaction_happen |= drawData();
 		ImGui::SameLine();
 	}
-	interaction_happen |= WorkspaceCoreOutputPin::content();
+	interaction_happen |= WorkspaceCoreOutputPin::content(); // label and icon
 	return interaction_happen;
 }
 
@@ -667,7 +697,7 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-	// (PF) The Pulse button appears if no input is connected
+	// (PF) Pulse box: The Pulse button appears only if no input is connected.
 	const Core::EValueState& state = getNode().getNodebase()->getState(getIndex());
 	if (state == Core::EValueState::Editable)
 	{
@@ -734,7 +764,7 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID cons
 bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode /*=DIWNE::DrawMode::Interacting*/)
 {
 	m_connectionChanged = false;
-	bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
+	const bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
 	if (isConnected())
 	{
 		// inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
@@ -793,27 +823,29 @@ bool WorkspaceCoreInputPin::connectionChanged() const
 
 bool WorkspaceCoreInputPin::content()
 {
-	float inner_interaction_happen = WorkspaceCorePin::content();
-	const std::string& label = m_pin.getLabel();
-	if (!label.empty())
+	float inner_interaction_happen = WorkspaceCorePin::content(); // icon
+
+	const std::string& label = m_pin.getLabel();                         // label
+	if (!(m_pin.ValueType == Core::EValueType::Pulse) && !label.empty()) // no labels for pulse and cycle
 	{
 		ImGui::SameLine();
 		ImGui::TextUnformatted(label.c_str());
 	}
+	// std::cout << "Input Pin connected = " << isConnected() << std::endl;
 	return inner_interaction_happen;
 }
 
-bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction()
+bool WorkspaceCoreInputPin::bypassCreateAndPlugConstructorNodeAction()
 {
 	return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);
 }
-bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction()
+bool WorkspaceCoreInputPin::allowCreateAndPlugConstructorNodeAction()
 {
 	return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
 }
 bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
-	if (allowCreateAndPlugConstrutorNodeAction() && bypassCreateAndPlugConstrutorNodeAction())
+	if (allowCreateAndPlugConstructorNodeAction() && bypassCreateAndPlugConstructorNodeAction())
 	{
 		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction =
 		    WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
@@ -1070,6 +1102,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 	bool inner_interaction_happen = false;
 	bool pinsVisible = false;
 
+	// todo (PF) effectivity???
 	for (auto pin : this->getNodebase()->getInputPins())
 	{
 		if (pin.isRendered())
@@ -1089,13 +1122,13 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if (!pin->getCorePin().isRendered())
-					continue;
-
-				pin->setConnectionPointDiwne(pinConnectionPoint);
-				if (pin->isConnected())
+				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
-					wd.m_linksToDraw.push_back(&pin->getLink());
+					pin->setConnectionPointDiwne(pinConnectionPoint);
+					if (pin->isConnected())
+					{
+						wd.m_linksToDraw.push_back(&pin->getLink());
+					}
 				}
 			}
 		}
@@ -1103,18 +1136,16 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 		{
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if (!pin->getCorePin().isRendered())
+				if (pin->getCorePin().isRendered())
 				{
-					continue;
+					inner_interaction_happen |= pin->drawDiwne();
+					/* is in pin->drawDiwne()
+					      if (pin->isconnected())
+					      {
+					        wd.m_linkstodraw.push_back(&pin->getlink());
+					      }
+					*/
 				}
-
-				inner_interaction_happen |= pin->drawDiwne();
-				/* is in pin->drawDiwne()
-				      if (pin->isconnected())
-				      {
-				        wd.m_linkstodraw.push_back(&pin->getlink());
-				      }
-				*/
 			}
 		}
 	}
@@ -1137,39 +1168,41 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 
 	if (pinsVisible)
 	{
-		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label ||   // Label draws the wires only
+		    m_levelOfDetail == WorkspaceLevelOfDetail::SetValues) // SetValues must add the invisible Pulse outputs
 		{
-			ImRect nodeRect = getNodeRectDiwne();
-			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
+			const ImRect nodeRect = getNodeRectDiwne();
+
+			// todo (PF) pinConnectionPoint is wrong when output pulse pins are not drawn
+			const ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
 			{
-				if (!pin->getCorePin().isRendered())
-					continue;
-
-				pin->setConnectionPointDiwne(pinConnectionPoint);
+				if (pin->getCorePin().isRendered())
+					pin->setConnectionPointDiwne(pinConnectionPoint);
 			}
 		}
-		else
+		// else - include SetValues
+		if (m_levelOfDetail != WorkspaceLevelOfDetail::Label) // SetValues must draw the value pin
 		{
-			float act_align, cursor_pos, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
-			                                                                     smaller (for example when switch from
-			                                                                     precision 2 to precision 0) */
+			const float prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
+			                                                                smaller (for example when switch from
+			                                                                precision 2 to precision 0) */
 			m_minRightAlignOfRightPins = FLT_MAX;
-			for (auto const& pin : getOutputsToShow())
+			for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
 			{
-				if (!pin->getCorePin().isRendered())
-					continue;
-
-				act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
-				                               diwne.getWorkAreaZoom()); /* no shift to left */
-				m_minRightAlignOfRightPins =
-				    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
-				                                                        between two node sizes */
-				cursor_pos = ImGui::GetCursorPosX();
-				// LOG_INFO(cursor_pos);
-				ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all output
-				                                                                      pins have same width */
-				inner_interaction_happen |= pin->drawDiwne();
+				if (pin->getCorePin().isRendered())
+				{
+					float act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
+					                                     diwne.getWorkAreaZoom()); /* no shift to the left */
+					m_minRightAlignOfRightPins =
+					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
+					                                                        between two node sizes */
+					const float cursor_pos = ImGui::GetCursorPosX();
+					// LOG_INFO(cursor_pos);
+					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all output
+					                                                                      pins have the same width */
+					inner_interaction_happen |= pin->drawDiwne();
+				}
 			}
 		}
 	}
@@ -1209,7 +1242,6 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfVisibleD
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
-
 		                    ImGui::GetStyle().Alpha * I3T::getSize(ESize::Float_inactive_alphaMultiplicator));
 	}
 

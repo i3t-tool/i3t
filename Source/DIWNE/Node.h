@@ -19,25 +19,30 @@ namespace DIWNE
 {
 class Pin;
 
-/** Parts of Node:
- *  -------------------
- *  |      Top        |
- *  -------------------
- *  |Left|Middle|Right|    -> |L|M|R| == Center
- *  -------------------
- *  |     Bottom      |
- *  -------------------
+/**
  */
 
-/*! \brief Used when one node is inside of other -> inner node is drawn
- * OnCoursorPosition when outer node is draw
+/*! \brief Used when one node is inside of another -> the inner node is drawn
+ * OnCursorPosition when outer node is drawn
  */
 enum DrawModeNodePosition
 {
-	OnCoursorPosition,
-	OnItsPosition
+	OnCursorPosition, ///< cursor position in screen coordinates
+	OnItsPosition     ///< node position in Diwne coordinates
 };
 
+/**
+ * \brief graphical representation od a box in the workspace node editor
+ *
+ *  Parts of the Node:
+ * - -------------------
+ * - |      Top        |
+ * - -------------------
+ * - |Left|Middle|Right|    -> |L|M|R| == Center
+ * - -------------------
+ * - |     Bottom      |
+ * - -------------------
+ */
 class Node : public DiwneObject
 {
 public:
@@ -75,16 +80,16 @@ public:
 		return DiwneAction::TouchNode;
 	};
 
-	void updateSizes();
+	void updateSizes() override;
 	void deleteActionDiwne();
 	virtual void deleteAction(){};
 
-	virtual bool allowDrawing();
-	virtual bool beforeBeginDiwne();
-	virtual void begin();
-	virtual bool content();
-	virtual void end();
-	virtual bool afterEndDiwne();
+	bool allowDrawing() override;
+	bool beforeBeginDiwne() override;
+	void begin() override;
+	bool content() override;
+	void end() override;
+	bool afterEndDiwne() override;
 
 	template <typename T>
 	bool drawNodeDiwne(DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
@@ -126,10 +131,10 @@ public:
 
 	bool setSelected(const bool selected) override;
 
-	virtual bool processSelect();
-	virtual bool processUnselect();
+	bool processSelect() override;
+	bool processUnselect() override;
 
-	virtual bool processDrag();
+	bool processDrag() override;
 
 	virtual bool topContent();
 	virtual bool leftContent();
@@ -152,16 +157,16 @@ public:
 		translateNodeRectsDiwne(amount);
 	};
 
-	ImRect getNodeRectDiwne()
+	ImRect getNodeRectDiwne() const
 	{
 		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
 	};
-	ImVec2 getNodeRectSizeDiwne()
+	ImVec2 getNodeRectSizeDiwne() const
 	{
 		return m_bottomRectDiwne.Max - m_topRectDiwne.Min;
 	};
 
-	bool getRender()
+	bool getRender() const
 	{
 		return m_render;
 	};
@@ -170,26 +175,26 @@ public:
 		m_render = render;
 	};
 
-	float m_drawAnywhere; /*!< you have to draw node anywhere for example in first
-	                         frame after you created it -> for obtain its real
-	                         size */
+	float m_drawAnyway; /*!< you have to draw the node anyway.
+	                         For example in the first frame after you created it
+	                         -> to obtain its real size */
 
 protected:
-	ImVec2 m_nodePositionDiwne; /* can be public */
+	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
 	/* Border rects of node - are computed every frame based on node content and
 	 * m_nodePositionDiwne */
 	ImRect m_topRectDiwne, m_leftRectDiwne, m_middleRectDiwne, m_rightRectDiwne,
 	    m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
-	float m_centerDummySpace;
+	float m_centerDummySpace; ///< indent value to center the middle part
 	DrawModeNodePosition m_nodePosMode;
 	bool m_toDelete; ///< Set to true after node delete action
 	bool m_render = true;
 
 private:
 	void setNodeRectsPositionDiwne(ImVec2 const& position);
-	void translateNodeRectsDiwne(ImVec2 const& amount);
+	void translateNodeRectsDiwne(ImVec2 const& distance);
 };
 
 } /* namespace DIWNE */

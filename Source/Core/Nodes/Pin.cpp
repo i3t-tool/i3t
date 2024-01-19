@@ -123,10 +123,10 @@ ENodePlugResult Pin::plug(Pin& input, Pin& output)
 		return result;
 	}
 
-	// Insert to toPlug output pin outputs this operator input pin.
+	// Insert the input-pin to the vector of the output-pin outputs
 	output.m_outputs.push_back(&input);
 
-	// Attach given operator output pin to this operator input pin.
+	// Attach given output-pin to the input-pin.
 	input.m_input = &output;
 
 	return ENodePlugResult::Ok;
@@ -134,7 +134,7 @@ ENodePlugResult Pin::plug(Pin& input, Pin& output)
 
 void Pin::unplug()
 {
-	I3T_ASSERT(IsInput, "Must be input pin!");
+	I3T_ASSERT(IsInput, "Must be an input pin!");
 
 	if (!isPluggedIn())
 	{

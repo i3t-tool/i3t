@@ -248,12 +248,39 @@ void UIModule::loadFonts()
 
 	float fontScale = 1.2f;
 
+	// https://www.unicode.org/roadmaps/bmp/
+	// to show the atlas, use
+	//  ImGuiIO& io = ImGui::GetIO();
+	//  ImFontAtlas* atlas = io.Fonts;
+	//  ImGui::ShowFontAtlas(atlas);
+	// or
+	// ImGui Demo / Configuration / Style / Fonts
+
+	// (PF) minimalistic font set - 1024x2048 font atlas texture
 	const ImWchar ranges[] = {
-	    0x0020, 0x00FF, // Basic Latin + Latin Supplement
-	    0x0080, 0x07FF, // Czech
-	    0x25FC, 0x2BC8, // media buttons
+	    0x0020,
+	    0x007F, // Basic Latin
+	    0x0080,
+	    0x017F, // Czech mini (Latin-1 Supplement + Latin extended A)
+	    // 0x0080, 0x07FF, // Czech + lot of right to left characters -- too many never used characters
+	    // 0x25FC, 0x2BC8, // Geometric shapes media buttons stop and play - are not in our fonts
+	    // - this is a too long range instead of two characters
 	    0,
 	};
+	// https://symbl.cc/en/unicode/table/
+	// These icons should be in unicode, but are not in our roboto fonts...
+	// “User interface symbols” subblock of the “Miscellaneous Technical”
+	//  ◼ 0x25FC
+	//  ⯈ 0x2BC8 Black Medium Right-Pointing Triangle Centred
+	// ▶ 25B6 Play Button, play.
+	// ⏩ 23E9 Fast-Forward Button, fast forward.
+	// ⏪ 23EA Fast Reverse Button, fast rewind, rewind.
+	// ⏭ 23ED Next Track Button.
+	// ⏮ 23EE Last Track Button.
+	// ⏯ 23EF Play Or Pause Button.
+	// ⏸ 23F8 Pause Button, pause.
+	// ⏹ 23F9 Stop Button, stop.
+
 
 	// Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
 	ImFontConfig ubuntuBoldCfg;
@@ -298,6 +325,7 @@ void UIModule::loadFonts()
 	// TODO: (DR) Do we really need all these fonts? Can't we use just a few (small/large variants) and them scale them?
 	//   Currently we're filling the font atlas with huge fonts just to use them once.
 	// As of right now the font atlas size is 2048x4096
+	// (PF) reduced font ranges above -> font atlas 1024x2048
 
 	m_fonts = {
 	    {"Roboto12",

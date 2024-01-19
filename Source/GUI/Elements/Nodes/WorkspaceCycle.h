@@ -35,13 +35,25 @@ public:
 	bool buttonStepBack();
 	bool buttonStopAndReset();
 	bool buttonPlayPause();
+	bool buttonRewind(); ///< Set the current value to \a From
+	bool buttonWind();   ///< Set the current value to \a To
 
-	bool topContent();
-	bool middleContent();
-	bool leftContent();
-	bool rightContent();
+	bool topContent() override;
+	bool middleContent() override;
+	bool leftContent() override;
+	bool rightContent() override;
 
-	void drawMenuLevelOfDetail();
+	void drawMenuLevelOfDetail() override;
 
-	int maxLengthOfData();
+	int maxLengthOfData() override;
+
+	bool myRadioButton(const char* label, int* v, int v_button);
+	std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const override
+	{
+		if (m_levelOfDetail == WorkspaceLevelOfDetail::SetValues ||
+		    m_levelOfDetail == WorkspaceLevelOfDetail::LightCycle)
+			return {getOutputs()[0]}; // output value only
+		else
+			return {getOutputs()}; // value and all Pulse outputs
+	};
 };

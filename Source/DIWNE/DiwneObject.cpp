@@ -20,16 +20,18 @@ namespace DIWNE
 /* ========= D i w n e  O b j e c t =========== */
 /* ============================================ */
 
-/* Order of action is important -> usually are objects drawn in order
- * Link-Pin-Node-Diwne, so Pin do not know about process that WILL happen in
- * Node (have to ask for previous frame action) */
+/* Order of actions is important -> usually,  objects are drawn in the order
+ * Link-Pin-Node-Diwne, so Pin does not know about process that WILL happen in
+ * Node (has to ask for previous frame action) */
 
 DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne)
     : diwne(diwne), m_idDiwne(id), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
       m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne)), m_inner_interaction_happen(false), m_isHeld(false),
-      m_isDraged(false), m_selected(false), m_focusedForInteraction(false), m_focused(false), m_isActive(false),
+      m_isDragged(false), m_selected(false), m_focusedForInteraction(false), m_focused(false), m_isActive(false),
       m_drawMode(DrawMode::Interacting), m_selectable(true)
-{}
+{
+	// \TODO m_inner_interaction_happen_previous_draw is not initialized
+}
 
 bool DiwneObject::allowDrawing()
 {
@@ -72,7 +74,7 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /* = DrawMode::Interacting */)
 			ImGui::TextUnformatted(m_labelDiwne.c_str());
 			if (m_isHeld)
 				ImGui::TextUnformatted("Held");
-			if (m_isDraged)
+			if (m_isDragged)
 				ImGui::TextUnformatted("Dragged");
 			if (m_selected)
 				ImGui::TextUnformatted("Selected");
@@ -378,11 +380,11 @@ bool DiwneObject::processObjectUnhold()
 	if (bypassUnholdAction() && allowProcessUnhold())
 	{
 		m_isHeld = false;
-		if (m_isDraged)
+		if (m_isDragged)
 		{
 			diwne.m_takeSnap = true;
 		}
-		m_isDraged = false;
+		m_isDragged = false;
 		return processUnhold();
 	}
 	return false;
@@ -400,7 +402,7 @@ bool DiwneObject::processObjectDrag()
 {
 	if (bypassDragAction() && allowProcessDrag())
 	{
-		m_isDraged = true;
+		m_isDragged = true;
 		diwne.setDiwneAction(getDragActionType());
 		return processDrag();
 	}
@@ -413,7 +415,7 @@ bool DiwneObject::processSelect()
 }
 bool DiwneObject::allowProcessSelect()
 {
-	return m_isHeld && !m_isDraged;
+	return m_isHeld && !m_isDragged;
 }
 bool DiwneObject::processObjectSelect()
 {
@@ -430,7 +432,7 @@ bool DiwneObject::processUnselect()
 }
 bool DiwneObject::allowProcessUnselect()
 {
-	return m_isHeld && !m_isDraged;
+	return m_isHeld && !m_isDragged;
 }
 bool DiwneObject::processObjectUnselect()
 {

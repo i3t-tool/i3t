@@ -319,9 +319,9 @@ bool WorkspaceSequence::middleContent()
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
 		 * action to do and in WorkspaceDiwne react to this action  */
 		interaction_with_transformation_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(
-		    DIWNE::DrawModeNodePosition::OnCoursorPosition, m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw
-		                                                        ? DIWNE::DrawMode::JustDraw
-		                                                        : DIWNE::DrawMode::Interacting);
+		    DIWNE::DrawModeNodePosition::OnCursorPosition, m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw
+		                                                       ? DIWNE::DrawMode::JustDraw
+		                                                       : DIWNE::DrawMode::Interacting);
 
 		ImGui::SameLine();
 

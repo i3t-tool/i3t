@@ -75,7 +75,7 @@ void Application::init()
 
 void Application::run()
 {
-	// TOOD: (DR) m_modules: I'm thinking it might be a good idea to use a data structure that would retain the module
+	// TODO: (DR) m_modules: I'm thinking it might be a good idea to use a data structure that would retain the module
 	// insertion order. That way there would be a consistent order in which modules are iterated/updated in. I suppose
 	// individual operations of module calls should be independent of order but having such consistency in such a major
 	// "loop" of the application might save us some issues in case another C++ implementation decides to iterate in a
