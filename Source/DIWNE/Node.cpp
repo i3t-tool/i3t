@@ -21,7 +21,7 @@ namespace DIWNE
 Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwneNode"*/)
     : DiwneObject(diwne, id, labelDiwne), m_topRectDiwne(ImRect(0, 0, 0, 0)), m_leftRectDiwne(ImRect(0, 0, 0, 0)),
       m_middleRectDiwne(ImRect(0, 0, 0, 0)), m_rightRectDiwne(ImRect(0, 0, 0, 0)),
-      m_bottomRectDiwne(ImRect(0, 0, 0, 0)), m_centerDummySpace(0), m_drawAnywhere(true), m_nodePosMode(OnItsPosition),
+      m_bottomRectDiwne(ImRect(0, 0, 0, 0)), m_centerDummySpace(0), m_drawAnyway(true), m_nodePosMode(OnItsPosition),
       m_toDelete(false)
 {}
 
@@ -60,7 +60,7 @@ void Node::deleteActionDiwne()
 
 bool Node::allowDrawing()
 {
-	return m_drawAnywhere || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne());
+	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne());
 }
 
 bool Node::beforeBeginDiwne()
@@ -70,12 +70,12 @@ bool Node::beforeBeginDiwne()
 	case DrawModeNodePosition::OnItsPosition:
 		ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
 		break;
-	case DrawModeNodePosition::OnCoursorPosition:
+	case DrawModeNodePosition::OnCursorPosition:
 		setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
 		break;
 	}
-	if (m_drawAnywhere)
-		m_drawAnywhere = false;
+	if (m_drawAnyway)
+		m_drawAnyway = false;
 
 	return beforeBegin();
 }
@@ -342,7 +342,7 @@ void Node::updateSizes()
 
 	m_centerDummySpace = maxWidth - centerWidth; /* how much shift middle or right content for
 	                                                right-alignation */
-	/* \todo span graphic of middle backgrount to fill middle of node or left it
+	/* \todo span graphic of middle background to fill middle of node or left it
 	  just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
 	  + spacing.x; m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth -
 	  spacing.x;*/ /* space between middle-right */

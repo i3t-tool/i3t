@@ -19,7 +19,7 @@ Ptr<Cycle> Builder::createCycle()
 {
 	auto ret = std::make_shared<Cycle>();
 	ret->init();
-	ret->updateValues(-1);
+	ret->updateValues(-1); // pin[-1] => effectively does no update at all
 	ret->stopAndReset();
 
 	return ret;
@@ -37,7 +37,7 @@ void Cycle::update(double deltaSeconds)
 		const auto increment = static_cast<float>(deltaSeconds * m_step / m_stepDuration);
 		updateValue(increment);
 	}
-	else if (m_secondsSinceLastStep >= m_stepDuration)
+	else if (m_secondsSinceLastStep >= m_stepDuration) // wait for a next discrete step
 	{
 		const auto increment = static_cast<float>(m_step);
 		updateValue(increment);
@@ -49,14 +49,16 @@ void Cycle::update(double deltaSeconds)
 
 void Cycle::play()
 {
-	float currentValue = getData().getFloat();
 
 	if (m_mode == EMode::Once)
 	{
-		// rewind to start (to m_from) after stop at m_to
+		float currentValue = getData().getFloat();
+
+		// rewind to start (to m_from) before the loop start after stop at m_to
 		if ((m_from <= m_to && currentValue >= m_to) || (m_from > m_to && currentValue <= m_to))
 		{
 			setInternalValue(m_from);
+			pulse(I3T_CYCLE_OUT_BEGIN);
 		}
 	}
 
@@ -75,7 +77,7 @@ void Cycle::stopAndReset()
 {
 	m_isRunning = false;
 	setInternalValue(m_from); // PF was missing
-
+	pulse(I3T_CYCLE_OUT_BEGIN);
 	pulse(I3T_CYCLE_OUT_STOP);
 }
 
@@ -90,6 +92,20 @@ void Cycle::stepNext()
 	updateValue(m_manualStep);
 	pulse(I3T_CYCLE_OUT_NEXT);
 }
+
+void Cycle::rewind()
+{
+	setInternalValue(m_from);
+	pulse(I3T_CYCLE_OUT_BEGIN);
+}
+
+void Cycle::wind()
+{
+
+	setInternalValue(m_to);
+	pulse(I3T_CYCLE_OUT_END);
+}
+
 
 void Cycle::setFrom(float from)
 {
@@ -126,7 +142,7 @@ float Cycle::getTo() const
 	return m_to;
 }
 
-float Cycle::getMultiplier() const
+float Cycle::getStep() const
 {
 	return m_step;
 }
@@ -136,8 +152,9 @@ float Cycle::getManualStep() const
 	return m_manualStep;
 }
 
-void Cycle::updateValues(int inputIndex)
+void Cycle::updateValues(const int inputIndex)
 {
+	// value inputs
 	if (m_inputs[I3T_CYCLE_IN_FROM].isPluggedIn())
 	{
 		float val = getInput(I3T_CYCLE_IN_FROM).data().getFloat();
@@ -156,6 +173,7 @@ void Cycle::updateValues(int inputIndex)
 		setStep(val);
 	}
 
+	// pulse inputs
 	if (shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
 	{
 		play();
@@ -226,15 +244,17 @@ void Cycle::updateValue(float increment)
 			if (m_from <= m_to) // and out of the range <m_from, m_to> or <m_to, m_from>
 			{
 				newValue = newValue > m_to ? m_to : m_from;
+				pulse(I3T_CYCLE_OUT_END);
 			}
 			else
 			{
 				newValue = newValue > m_from ? m_from : m_to;
+				pulse(I3T_CYCLE_OUT_BEGIN);
 			}
 
 			m_directionMultiplier *= -1.0f;
 
-			pulse(I3T_CYCLE_OUT_END);
+			// pulse(I3T_CYCLE_OUT_END);
 
 			break;
 		}

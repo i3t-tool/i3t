@@ -273,17 +273,25 @@ public:
 	                std::string const id) const;
 
 	// padding - top, right, bottom, left
-	/** \brief Draw an Icon combined from two parts (foreground and background) to the window ImDrawList
+
+	/**
+	 * \brief Draw an Icon combined from two parts (foreground and background)
+	 * to the window \a ImDrawList filled with a \a ShapeColor.
+	 * When \a filled == true, both shapes have a border.
+	 * Then, the border color is the ShapeColor and the shape is filled with the
+	 * \a InnerColor
 	 *
-	 * \param bgIconType type of background shape
-	 * \param bgShapeColor color of background shape
-	 * \param bgInnerColor color of middle of background shape
-	 * \param fgIconType type of foreground shape
-	 * \param fgShapeColor color of foreground shape
-	 * \param fgInnerColor color of middle of foreground shape
-	 * \param size of the icon
-	 * \param padding of bg shape and fg shape (top, right, bottom, left)
-	 * \param filled true if the inner colors mot used
+	 * \param bgIconType background shape (typically a Rectangle)
+	 * \param bgShapeColor color of the background shape (or a border color if not filled)
+	 * \param bgInnerColor color of the background shape interior if filled == false
+	 * \param fgIconType foreground shape (typically a Triangle or Cross)
+	 * \param fgShapeColor color of the foreground shape if filled == false
+	 * \param fgInnerColor color of foreground shape interior if filled == false
+	 * \param size of the icon in screen coordinates
+	 * \param padding of the fg shape (top, right, bottom, left)
+	 * \param filled means
+	 *  - true fill both shapes with their ShapeColor
+	 *  - false draw both shapes with a ShapeColor border and fill them with InnerColor
 	 * \return void
 	 */
 	void DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
@@ -293,30 +301,40 @@ public:
 	 * \brief Draw a circle icon
 	 * \param idl ImDrawList* where to draw
 	 * \param shapeColor color of the whole shape (border line if not filled)
-	 * \param innerColor color of the inner (middle) of shape
+	 * \param innerColor color of the inner part (middle) of shape
 	 * \param topLeft position of the icon in screen coords
 	 * \param bottomRight of the icon in screen coords
-	 * \param filled false if use InnerColor in middle
-	 * \param thickness size of the Shape for zoomFactor = 1.0
+	 * \param filled false means use the InnerColor in the foreground Shape
+	 * \param thickness of the border for zoomFactor = 1.0
 	 */
 	void DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
 	                    bool filled, float thickness = 1) const;
 
-	/**
-	 * \brief see \a DrawIconCircle for the signature
-	 */
 	void DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
 	                       bool filled, ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
-	/** \brief see DrawIconCircle for the signature
-	 */
+
+	void DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                   bool filled, ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
 	void DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
-	/** \brief see DrawIconCircle for the signature
-	 */
+	void DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                      bool filled, float thickness = 1) const;
+	void DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                       bool filled, float thickness = 1) const;
+	void DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                    bool filled, float thickness = 1) const;
+
 	void DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
-	/** \brief see DrawIconCircle for the signature
-	 */
+
+	void DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                         ImVec2 bottomRight, bool filled, float thickness = 1) const;
+	void DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
+	void DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                         ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
 	void DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
 	                   bool filled, float shapeThickness = 2, float innerThickness = 1) const;
 
@@ -324,10 +342,10 @@ public:
 	                    bool filled, float thickness = 3.0f) const;
 
 	void DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-	                              ImVec2 bottomRight, bool filled, float thicknes = 1) const;
+	                              ImVec2 bottomRight, bool filled, float thickness = 1) const;
 
 	void DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-	                               ImVec2 bottomRight, bool filled, float thicknes = 1) const;
+	                               ImVec2 bottomRight, bool filled, float thickness = 1) const;
 
 	void DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;

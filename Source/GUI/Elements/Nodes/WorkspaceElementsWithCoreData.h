@@ -163,6 +163,10 @@ protected:
 	ImRect m_iconRectDiwne;
 
 public:
+	// (PF) icon for the cycle box, Triangle elsewhere
+	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
+
+
 	WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
 	//    bool allowInteraction() const override;
@@ -206,6 +210,10 @@ public:
 	WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                      WorkspaceNodeWithCoreData& node);
 
+	/**
+	 * \brief Draw pin icon + label and register the connected wire
+	 * \return interaction happened
+	 */
 	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting) override;
 
 	WorkspaceCoreLink& getLink()
@@ -223,14 +231,18 @@ public:
 	bool connectionChanged() const;
 
 	/* DIWNE function */
+	/**
+	 * \brief Draw icon and label, if defined
+	 * \return false - both icon and label do not allow interactions
+	 */
 	bool content() override;
 	bool processInteractions() override;
 	virtual bool processCreateAndPlugConstrutorNode();
 	bool processUnplug();
 
 	bool bypassUnplugAction();
-	bool allowCreateAndPlugConstrutorNodeAction();
-	bool bypassCreateAndPlugConstrutorNodeAction();
+	bool allowCreateAndPlugConstructorNodeAction();
+	bool bypassCreateAndPlugConstructorNodeAction();
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
@@ -254,7 +266,7 @@ public:
 	WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                               WorkspaceNodeWithCoreData& node);
 
-	bool content() override;
+	bool content() override; ///< draw data, label, and pin
 
 	virtual bool drawData() = 0;
 	virtual int maxLengthOfData() = 0;
@@ -371,15 +383,22 @@ protected:
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
 public:
+	/**
+	 * \brief get vector of input pins
+	 * \return m_workspaceInputs
+	 */
 	std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const
 	{
 		return m_workspaceInputs;
 	};
+	/**
+	 * \brief get vector of output pins
+	 * \return m_workspaceOutputs
+	 */
 	std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const
 	{
 		return m_workspaceOutputs;
 	};
-
 	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const
 	{
 		return getOutputs();

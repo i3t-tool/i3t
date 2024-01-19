@@ -24,12 +24,12 @@ namespace DIWNE
 /* ===== D i w n e  O b j e c t ===== */
 /* ================================== */
 /** \brief All objects in DIWNE are inherited from DiwneObject
- *  DiwneObject cover funkcionality common for all Objects in node editor - such
+ *  DiwneObject cover functionality common for all Objects in node editor - such
  * as selecting, dragging, hovering
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
-public:                               /* \todo some atributes should be private/protected */
+public:                               /* \todo some attributes should be private/protected */
 	DIWNE::Diwne& diwne;              /*!< Every object have access to Diwne - is used for
 	                                     share information if needed */
 	DIWNE::ID const m_idDiwne;        /*!< Used for creating ImGui id/labels */
@@ -44,7 +44,7 @@ public:                               /* \todo some atributes should be private/
 	DrawMode m_drawMode;                                                       /*!< \see enum DrawMode */
 	bool m_selectable;
 	bool m_isHeld;                /*!< Is object held. When dragged it is still held. */
-	bool m_isDraged;              /*!< Is object draged */
+	bool m_isDragged;             /*!< Is object dragged */
 	bool m_selected;              /*!< Is object selected */
 	bool m_focusedForInteraction; /*!< Is object focus on area that allow
 	                                 interaction with object */
@@ -109,7 +109,7 @@ public:                               /* \todo some atributes should be private/
 	virtual bool allowDrawing();
 
 	/*! \brief Main function for drawing object and deal with interactions
-	 * \param drawMode allow interactions with object
+	 * \param drawMode allows interactions with object
 	 * \return true if some interaction with object (or inner of this object)
 	 * happen, false otherwise
 	 */
@@ -199,9 +199,9 @@ public:                               /* \todo some atributes should be private/
 		return m_idDiwne;
 	};
 
-	/*! \brief Show colored text for example for imediate hints
-	 * \param label is text to show
-	 * \param color is color of tooltip
+	/*! \brief Show a colored text for example for immediate hints
+	 * \param label is the text to show
+	 * \param color is the color of the tooltip
 	 */
 	void showTooltipLabel(std::string const& label, ImColor const&& color);
 };

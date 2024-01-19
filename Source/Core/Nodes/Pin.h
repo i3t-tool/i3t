@@ -123,9 +123,9 @@ public:
 
 private:
 	bool m_isDisabled = false; //< Pin is visible, but cannot be interactively connected to
-	                           //(used for Camera mult output)
+	                           //< (used for Camera mult output)
 
-	bool m_isRendered = true; //< Render this pin. Used in Camera P and V matrices. todo PF - should be in singular
+	bool m_isRendered = true; //< Render this pin. Used in Camera P and V matrices.
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component

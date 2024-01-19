@@ -115,9 +115,13 @@ public:
 	 */
 	void finalize();
 
-	/// Connect this node output to \p childNode input.
-	///
-	/// \return Result enum is returned from the function. \see ENodePlugResult.
+	/**
+	 * \brief Connect this (parent) node output to the \p childNode input.
+	 * \param childNode this node's \a toIndex input will be connected
+	 * \param fromIndex index of the parent (this) node output
+	 * \param toIndex index of the \a childNode input
+	 * \return Result enum is returned from the function. \see ENodePlugResult.
+	 */
 	ENodePlugResult plug(const Ptr<Node>& childNode, unsigned fromIndex, unsigned toIndex);
 
 	//===-- Helper functions --------------------------------------------------===//

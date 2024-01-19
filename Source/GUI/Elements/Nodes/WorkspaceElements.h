@@ -42,8 +42,8 @@ class WorkspacePinProperties;
  */
 enum class PinKind
 {
-	Output,
-	Input
+	Output, ///< on the box right hand side
+	Input   ///< on the box left hand side
 };
 
 enum class WorkspaceLevelOfDetail
@@ -54,10 +54,13 @@ enum class WorkspaceLevelOfDetail
 	LightCycle
 };
 
+/**
+ * \brief Values in the popup menu for floats
+ */
 enum FloatPopupMode
 {
-	Angle,
-	Value
+	Angle, ///< angles in radians (and degs in the brackets)
+	Value  ///< selected sin and cos values and numbers from 0 to 4
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;

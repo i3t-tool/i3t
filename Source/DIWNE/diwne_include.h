@@ -16,26 +16,30 @@
  *
  * Including all libraries and declaration of objects in right order.
  *
- * All functions return true if some interaction happen inside of them (in
- * cascade way from inner elements) All objects have access to one DIWNE::Diwne
- * (and inhereted) object so they can share information if needed Overwrite
- * whatever function you want - be aware of calling (so simply call) overwrited
- * function (of parent class) in your function for maintain all funkcionality
- * Base concept is call-super https://en.wikipedia.org/wiki/Call_super , where
- * you fill in function, that is called in middle of whole code You probably
- * need not overwrite function with "Diwne" in name - they are intended as
- * internal - be very careful when you do it DIWNE offer you only wrappers of
- * ImGui functions - so storing your object and drawing them in some order is up
- * to you \see TODOexample for inspiration
+ * All functions return true if some interaction happens inside (in a
+ * cascade way from inner elements).
+ * All objects have access to one DIWNE::Diwne (and inherited) object
+ * so they can share information if needed.
+ * Overwrite whatever function you want - do not forget to call the overwritten
+ * function (of the parent class) in your function for maintain all functionality.
+ * Base concept is call-super https://en.wikipedia.org/wiki/Call_super, where
+ * you fill in function, that is called in the middle of the whole code.
  *
- * See DiwneObject::drawDiwne() for inspect what functions are called when
+ * You probably do not need to overwrite any function with "Diwne" in its name
+ * - they are intended as internal - be very careful when you do it.
+ *
+ * DIWNE offers you only wrappers of ImGui functions - so storing your object
+ * and drawing them in some order is up to you.
+ * \see TODOexample for inspiration
+ *
+ * See DiwneObject::drawDiwne() to see what functions are called when
  * processing object
  *
- * Node editor is infinite surface where you can positioning (and moving) your
- * nodes. When somewhere is used diwne (position, coords etc.) this surface is
- * meant There are "two" workareas coords (in DINWE::Diwne) 1) is position and
- * size of node editor window on screen 2) is position of node editor surface in
- * window
+ * Node editor is an infinite surface where you can position (and move) your
+ * nodes. When diwne (position, coords etc.) is used anywhere, this surface is
+ * meant. There are "two" workareas coords (in DINWE::Diwne)
+ * 1) is position and size of node editor window on screen
+ * 2) is position of node editor surface in window
  */
 
 #include "spdlog/fmt/fmt.h"
@@ -78,7 +82,17 @@ enum IconType
 	GrabDownLeft,
 	GrabDownRight,
 	Cross,
-	Hyphen
+	Hyphen,
+	Stop,
+	Pause,
+	SkipBack,
+	SkipBack2,
+	SkipForward,
+	SkipForward2,
+	Rewind,
+	FastForward,
+	AtFrom,
+	AtTo,
 };
 
 enum DiwneAction

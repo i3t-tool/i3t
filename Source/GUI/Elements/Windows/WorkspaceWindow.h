@@ -173,7 +173,7 @@ public:
 
 		if (shiftToLeftByNodeWidth)
 		{
-			node->drawDiwne(); /* for obtain size */
+			node->drawDiwne(); /* to obtain size */
 			node->translateNodePositionDiwne(
 			    ImVec2(-node->getNodeRectSizeDiwne().x - I3T::getSize(ESizeVec2::NewNode_positionShift).x,
 			           I3T::getSize(ESizeVec2::NewNode_positionShift).y));
