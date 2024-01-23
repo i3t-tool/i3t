@@ -1166,11 +1166,14 @@ bool WorkspaceDiwne::content()
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
 
-	/* \todo JH \todo MH maybe some different/other actions */
+	/// \todo see #111, wrongly computed m_takeSnap value.
+	/*
 	if (m_diwneAction == DIWNE::DiwneAction::InteractingContent)
 	{
-		m_takeSnap |= interaction_happen;
+	    m_takeSnap |= interaction_happen;
 	}
+	 */
+
 	return interaction_happen;
 }
 

@@ -31,9 +31,9 @@ void InputBindings::init()
 
 	// See #297
 	// InputManager::setInputAction("undo", Keys::b, {Keys::ctrll});
-	// InputManager::setInputAction("undo", Keys::z, {Keys::ctrll});
+	InputManager::setInputAction("undo", Keys::z, {Keys::ctrll});
 	// InputManager::setInputAction("redo", Keys::n, {Keys::ctrll});
-	// InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
+	InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
 
 	InputManager::setInputAction("new", Keys::n, {Keys::ctrll});
 
