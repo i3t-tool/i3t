@@ -18,6 +18,9 @@
 
 #include "Config.h"
 #include "GUI/Elements/Windows/StartWindow.h"
+#include "Utils/System.h"
+
+static const char* I3T_WEBSITE = "https://i3t-tool.org/";
 
 void AboutWindow::render()
 {
@@ -80,8 +83,6 @@ void AboutWindow::render()
 				ImGui::BulletText("The Faculty of Information Technology.");
 				ImGui::TextWrapped("\nThe first version was created by Michal Folta in 2018.\n\n");
 
-				/// \todo Add interactive link to website.
-
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
 				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 				ImGui::SetWindowFontScale(0.75f);
@@ -89,7 +90,15 @@ void AboutWindow::render()
 				ImGui::SetWindowFontScale(1.0f);
 				ImGui::PopFont();
 				ImGui::PopStyleColor();
-				ImGui::Text("http://www.i3t-tool.org/");
+
+				ImGui::PushStyleColor(ImGuiCol_Button,
+				                      I3T::getUI()->getTheme().get(EColor::AboutWindow_BackgroundRight));
+				if (ImGui::Button(I3T_WEBSITE))
+				{
+					systemOpen(I3T_WEBSITE);
+				}
+				ImGui::PopStyleColor();
+
 				ImGui::Text("");
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
