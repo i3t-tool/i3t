@@ -334,10 +334,8 @@ bool WorkspaceTransformation::drawDataFull()
 	if (valueChanged)
 	{
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-		//				/// TEST ///////////////////////////////////////////////// /* snap
-		// is taken in the end of frame
-		//*/ 				App::getModule<StateManager>().takeSnapshot();
-		//				//////////////////////////////////////////////////////////
+		/// \todo see #111
+		// App::getModule<StateManager>().takeSnapshot();
 		updateDataItemsWidth();
 	}
 	return interaction_happen;

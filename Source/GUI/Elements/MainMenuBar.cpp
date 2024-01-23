@@ -254,16 +254,14 @@ void MainMenuBar::showEditMenu()
 	// See #297
 	if (ImGui::BeginMenu("Edit"))
 	{
-		/*
 		if (ImGui::MenuItem("Undo", "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
 		{
-		    InputManager::triggerAction("undo", EKeyState::Pressed);
+			InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
 		if (ImGui::MenuItem("Redo", "Ctrl+Y", false, App::getModule<StateManager>().canRedo()))
 		{
-		    InputManager::triggerAction("redo", EKeyState::Pressed);
+			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
-		 */
 		if (ImGui::MenuItem("Preferences"))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
