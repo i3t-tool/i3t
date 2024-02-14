@@ -31,7 +31,7 @@ TEST_F(ScreenTest, _)
 	t1->setDefaultValue("eye", generateVec3());
 	t1->setDefaultValue("center", generateVec3());
 
-	camera->getView()->addMatrix(t1);
+	camera->getView()->pushMatrix(t1);
 
 	// Check if camera contains t1.
 	EXPECT_TRUE(Math::eq(t1->getData().getMat4(), camera->getData(2).getMat4()));

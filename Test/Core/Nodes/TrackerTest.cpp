@@ -24,8 +24,8 @@ using namespace Core;
 
 struct MyTree
 {
-	SequencePtr s1;
-	SequencePtr s2;
+	Ptr<Sequence> s1;
+	Ptr<Sequence> s2;
 
 	Ptr<Transform> mat1;
 	Ptr<Transform> mat2;
@@ -44,11 +44,11 @@ MyTree arrange()
 	    Builder::createTransform<ETransformType::Translation>(),
 	};
 
-	ret.s1->addMatrix(ret.mat1);
-	ret.s1->addMatrix(ret.mat2);
+	ret.s1->pushMatrix(ret.mat1);
+	ret.s1->pushMatrix(ret.mat2);
 
-	ret.s2->addMatrix(ret.mat3);
-	ret.s2->addMatrix(ret.mat4);
+	ret.s2->pushMatrix(ret.mat3);
+	ret.s2->pushMatrix(ret.mat4);
 
 	plug_expectOk(ret.s1, ret.s2);
 
@@ -177,7 +177,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 {
 	auto sequence = GraphManager::createSequence();
-	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
+	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
 	// start full tracking
 	auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
@@ -186,7 +186,7 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	// add new matrix
 	auto mat = Builder::createTransform<ETransformType::Translation>();
 	mat->setDefaultValue("translation", generateVec3());
-	sequence->addMatrix(mat);
+	sequence->pushMatrix(mat);
 
 	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getInterpolatedMatrix()));
 	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getModel()->getData().getMat4()));
@@ -199,7 +199,7 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 		auto sequence = GraphManager::createSequence();
 		auto mat = Builder::createTransform<ETransformType::Translation>();
 		mat->setDefaultValue("translation", generateVec3());
-		sequence->addMatrix(mat);
+		sequence->pushMatrix(mat);
 
 		// start full tracking
 		auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
@@ -216,8 +216,8 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 TEST_F(TrackerTest, EmptySequence)
 {
 	auto sequence = GraphManager::createSequence();
-	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
-	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
+	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
 	// start full tracking
 	auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
