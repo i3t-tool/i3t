@@ -29,18 +29,22 @@ class SequenceTree
 	Sequence* m_beginSequence;
 
 public:
+	/// Iterator for traversing sequence tree.
+	///
+	/// Goes from leaf to root, skipping empty sequences.
 	class MatrixIterator
 	{
 		friend class SequenceTree;
-		SequenceTree* m_tree;
-		Sequence* m_currentSequence;
-		Ptr<Node> m_currentMatrix;
 
 	public:
 		explicit MatrixIterator(Sequence* sequence);
 		MatrixIterator(Sequence* sequence, Ptr<Node> node);
 
 		MatrixIterator(const MatrixIterator& mt);
+
+		/// \returns Non-owned pointer to the current sequence.
+		///     Never null.
+		Sequence* getSequence() const;
 
 		/// Move iterator to root sequence.
 		MatrixIterator& operator++();
@@ -72,18 +76,26 @@ public:
 		///
 		/// \todo Not implemented correctly for sequences with matrix input plugged.
 		void withdraw();
+
+		/// Sets m_currentMatrix to nullptr.
+		void invalidate();
+
+		SequenceTree* m_tree;
+		Sequence* m_currentSequence;
+		Ptr<Node> m_currentMatrix;
 	};
 
 public:
 	explicit SequenceTree(Ptr<Node> sequence);
 
 	/**
-	 * \return Iterator which points to the sequence.
+	 * \return Iterator which points to starting sequence and its last matrix.
 	 */
 	MatrixIterator begin();
 
 	/**
-	 * \return Iterator which points to the sequence root.
+	 * \return Points to the root sequence and matrix is nullptr,
+	 *     so it is not possible to dereference it (as any other STL iterator).
 	 */
 	MatrixIterator end();
 };
@@ -174,6 +186,7 @@ private:
 	/// On sequence destruction, tracker is destroyed too.
 	Sequence* m_beginSequence = nullptr;
 
+	/// \todo Redundant information, remove.
 	ID m_interpolatedTransformID = 0;
 	std::map<ID, float> m_trackingProgress;
 };

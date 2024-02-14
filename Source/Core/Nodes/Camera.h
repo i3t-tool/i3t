@@ -51,11 +51,12 @@ public:
 
 	void createComponents();
 
-	const SequencePtr& getProj()
+	const Ptr<Sequence>& getProj()
 	{
 		return m_proj;
 	}
-	const SequencePtr& getView()
+
+	const Ptr<Sequence>& getView()
 	{
 		return m_view;
 	}

@@ -26,8 +26,8 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	auto perspectiveProj = Builder::createTransform<ETransformType::Perspective>();
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
 
-	cameraNode->getProj()->addMatrix(perspectiveProj);
-	cameraNode->getView()->addMatrix(lookAt);
+	cameraNode->getProj()->pushMatrix(perspectiveProj);
+	cameraNode->getView()->pushMatrix(lookAt);
 
 	EXPECT_TRUE(
 	    Math::eq(cameraNode->getProj()->getData(I3T_SEQ_OUT_MAT).getMat4(), perspectiveProj->getData().getMat4()));

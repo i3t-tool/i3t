@@ -104,7 +104,7 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 	{
 		node_t->setRemoveFromSequence(false);
 		m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin() + index, node_t);
-		m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transform>(), index);
+		m_nodebase->as<Core::Sequence>()->pushMatrix(node_t->getNodebase()->as<Core::Transform>(), index);
 		node_t->m_parentSequence = std::static_pointer_cast<WorkspaceSequence>(shared_from_this());
 	}
 }

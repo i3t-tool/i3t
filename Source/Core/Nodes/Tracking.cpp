@@ -39,7 +39,7 @@ SequenceTree::MatrixIterator SequenceTree::end()
 {
 	auto cur = m_beginSequence;
 	Ptr<Sequence> parent;
-	while ((parent = toSequence(GraphManager::getParent(cur->getPtr(), 0))) != nullptr)
+	while ((parent = getNonemptyParentSequence(cur->getPtr()->as<Sequence>())))
 	{
 		cur = parent.get();
 	}
@@ -80,9 +80,15 @@ SequenceTree::MatrixIterator::MatrixIterator(const SequenceTree::MatrixIterator&
 	m_currentMatrix = mt.m_currentMatrix;
 }
 
+Sequence* SequenceTree::MatrixIterator::getSequence() const
+{
+	return m_currentSequence;
+}
+
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
 {
 	advance();
+
 	return *this;
 }
 
@@ -136,45 +142,48 @@ bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator
 
 void SequenceTree::MatrixIterator::advance()
 {
-	const auto parentSequence = GraphManager::getParent(m_currentSequence->getPtr());
+	bool hasNext = true;
+	const auto parentNonEmptySequence = getNonemptyParentSequence(m_currentSequence->getPtr()->as<Sequence>());
 
-	// Find index of current matrix in current sequence.
-	auto& matrices = m_currentSequence->getMatrices();
-	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn() && !parentNonEmptySequence)
+	{
+		hasNext = false;
+	}
+
+	const auto& matrices = m_currentSequence->getMatrices();
+	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
 	auto index = std::distance(matrices.begin(), it);
+	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+	{
+		// The sequence has matrix input plugged in. We are at the end of the sequence.
+		index = 0;
+	}
+
+	if (index == 0 && !parentNonEmptySequence)
+	{
+		hasNext = false;
+	}
+
+	if (!hasNext)
+	{
+		invalidate();
+		return;
+	}
 
 	if (index == 0)
 	{
+		const auto matrixPluggedIntoParent = GraphManager::getParent(parentNonEmptySequence, I3T_SEQ_IN_MAT);
+
 		// We are at the beginning of the sequence. Go to the next sequence.
-
-		// Check if current matrix is not first in the graph.
-		if (parentSequence)
+		if (matrixPluggedIntoParent)
 		{
-			// Check if there is a node plugged into parent sequence matrix input.
-			auto parentNode = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MAT);
-			if (parentNode)
-			{
-				m_currentSequence = parentSequence->as<Sequence>().get();
-				m_currentMatrix = parentNode;
-
-				return;
-			}
-
-			// Sequence is not the root, there is another parent sequence.
-			m_currentSequence = parentSequence->as<Sequence>().get();
-			if (!m_currentSequence->getMatrices().empty())
-			{
-				m_currentMatrix = m_currentSequence->getMatrices().back();
-			}
-			else
-			{
-				m_currentMatrix = nullptr;
-			}
+			m_currentMatrix = matrixPluggedIntoParent;
 		}
 		else
 		{
-			m_currentMatrix = nullptr;
+			m_currentMatrix = parentNonEmptySequence->getMatrices().back();
 		}
+		m_currentSequence = parentNonEmptySequence.get();
 	}
 	else
 	{
@@ -182,69 +191,79 @@ void SequenceTree::MatrixIterator::advance()
 	}
 }
 
-void SequenceTree::MatrixIterator::withdraw()
+/// \pre parentSequence is direct or indirect parent of startSequence.
+/// \return Nonempty child sequence of parentSequence or nullptr if there is no such sequence.
+Ptr<Sequence> getNonemptyChildSequence(Ptr<Sequence> startSequence, Ptr<Sequence> parentSequence)
 {
-	// helper function
-	const auto toSequenceFn = [](Ptr<Node> node) -> Sequence* {
-		if (node == nullptr)
-		{
-			return nullptr;
-		}
+	Ptr<Sequence> sequence = startSequence;
+	Ptr<Sequence> prevSequence = nullptr;
 
-		return node->as<Sequence>().get();
-	};
-
-	// Find index of current matrix in current sequence.
-	auto& matrices = m_currentSequence->getMatrices();
-	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
-	auto index = std::distance(matrices.begin(), it);
-
-	// Not C++ standard compliant, but we need to be able to decrement end iterator.
-	// m_currentMatrix == nullptr when iterator is at the end.
-	if (m_currentMatrix == nullptr)
+	while (sequence != parentSequence)
 	{
-		index = -1;
+		if (!sequence->getMatrices().empty() || sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+		{
+			prevSequence = sequence;
+		}
+		sequence = GraphManager::getParent(sequence->getPtr(), I3T_SEQ_IN_MUL)->as<Sequence>();
 	}
 
-	if (matrices.empty() || m_currentMatrix == matrices.back())
+	return prevSequence;
+}
+
+void SequenceTree::MatrixIterator::withdraw()
+{
+	bool hasPrevMatrix = true;
+	auto prevNonEmptySequence = getNonemptyChildSequence(m_tree->m_beginSequence->getPtr()->as<Sequence>(),
+	                                                     m_currentSequence->getPtr()->as<Sequence>());
+
+	// Find index of current matrix in current sequence.
+	const auto& matrices = m_currentSequence->getMatrices();
+	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	auto index = std::distance(matrices.begin(), it);
+	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
-		// Current matrix is last matrix in a sequence. Go to the previous sequence.
+		// The sequence has matrix input plugged in. We are at the beginning of the sequence.
+		index = matrices.size() - 1;
+	}
 
-		auto prevSequence = m_tree->m_beginSequence;
-		auto prevSequenceParent = m_tree->m_beginSequence;
+	if (index == matrices.size() - 1 && prevNonEmptySequence == nullptr)
+	{
+		hasPrevMatrix = false;
+	}
 
-		// Find previous sequence.
-		// We must begin from the root sequence, because parent sequence may have multiple children.
-		while ((prevSequenceParent = toSequenceFn(GraphManager::getParent(prevSequence->getPtr()))) !=
-		       m_currentSequence)
+	if (!hasPrevMatrix)
+	{
+		return;
+	}
+
+	if (index == matrices.size() - 1)
+	{
+		const auto matrixPluggedIntoChild = GraphManager::getParent(prevNonEmptySequence, I3T_SEQ_IN_MAT);
+
+		if (matrixPluggedIntoChild)
 		{
-			prevSequence = prevSequenceParent;
-		}
-
-		// Check if there is a node plugged into parent sequence matrix input.
-		auto parentNode = GraphManager::getParent(prevSequence->getPtr(), I3T_SEQ_IN_MAT);
-		if (parentNode)
-		{
-			m_currentMatrix = parentNode;
-			m_currentSequence = prevSequence;
-
-			return;
-		}
-
-		m_currentSequence = prevSequence;
-		if (m_currentSequence->getMatrices().empty())
-		{
-			m_currentMatrix = nullptr;
+			m_currentMatrix = matrixPluggedIntoChild;
 		}
 		else
 		{
-			m_currentMatrix = m_currentSequence->getMatrices().front();
+			m_currentMatrix = prevNonEmptySequence->getMatrices().front();
 		}
+		m_currentSequence = prevNonEmptySequence.get();
+	}
+	else if (m_currentMatrix == nullptr)
+	{
+		// iterator is at the end
+		m_currentMatrix = matrices.front();
 	}
 	else
 	{
 		m_currentMatrix = matrices[++index];
 	}
+}
+
+void SequenceTree::MatrixIterator::invalidate()
+{
+	m_currentMatrix = nullptr;
 }
 
 //------------------------------------------------------------------------------------------------//

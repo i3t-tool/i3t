@@ -41,7 +41,7 @@ TEST_F(SequenceTest, AddMatrixToTail)
 	auto seq = GraphManager::createSequence();
 	auto mat = Builder::createTransform<ETransformType::Free>();
 
-	seq->addMatrix(mat);
+	seq->pushMatrix(mat);
 	EXPECT_EQ(1, seq->getMatrices().size());
 }
 
@@ -60,8 +60,8 @@ TEST_F(SequenceTest, MatricesCanBeMoved)
 	}
 
 	// Add them back.
-	seq->addMatrix(mat2, 1);
-	seq->addMatrix(mat1, 2);
+	seq->pushMatrix(mat2, 1);
+	seq->pushMatrix(mat1, 2);
 	EXPECT_TRUE(mat1->isInSequence() && mat2->isInSequence());
 	{
 		auto expectedSequenceValue = getMatProduct(seq->getMatrices());
@@ -233,7 +233,7 @@ TEST_F(SequenceTest, MultipleNotifyKeepsSameValue)
 
 	EXPECT_FALSE(Math::eq(initialValue, newValue));
 
-	seq->addMatrix(transform);
+	seq->pushMatrix(transform);
 
 	for (int i = 0; i < 10; ++i)
 	{
@@ -249,7 +249,7 @@ TEST_F(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 	auto transform = GraphManager::createTransform<ETransformType::Translation>();
 	transform->unlock();
 
-	sequence->addMatrix(transform);
+	sequence->pushMatrix(transform);
 
 	auto initial = sequence->getData().getMat4();
 
@@ -289,7 +289,7 @@ TEST_F(SequenceTest, WhenPluggingSequenceWithMatrixInputToSequenceWithMatrixInsi
 	auto transform = GraphManager::createTransform<ETransformType::Free>();
 	transform->setValue(2.0f, {0, 0});
 	auto seq1 = GraphManager::createSequence();
-	seq1->addMatrix(transform);
+	seq1->pushMatrix(transform);
 
 	auto seq2 = GraphManager::createSequence();
 	plug_expectOk(seq1, seq2, 0, 0);

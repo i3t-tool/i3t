@@ -83,7 +83,12 @@ public:
 	Sequence(MatrixTracker* tracker);
 	~Sequence() override;
 
-	ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept;
+	/**
+	 * Push \p matrix to the end of the sequence.
+	 * @param matrix
+	 * @return
+	 */
+	ValueSetResult pushMatrix(Ptr<Transform> matrix) noexcept;
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -91,7 +96,7 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+	ValueSetResult pushMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 
 	const Matrices& getMatrices() const
 	{
@@ -130,6 +135,9 @@ private:
 	MatrixTracker* m_tracker;
 };
 
+/// \returns nullptr if there is no nonempty sequence in the parent chain.
+Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence);
+
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<Node> node)
 {
 	if (node == nullptr)
@@ -144,6 +152,4 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices
 		result *= mat->getData().getMat4();
 	return result;
 }
-
-using SequencePtr = Ptr<Sequence>;
 } // namespace Core

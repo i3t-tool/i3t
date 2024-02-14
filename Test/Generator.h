@@ -104,9 +104,9 @@ inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 	}
 
 	// Insert matrices into the seq.
-	seq->addMatrix(std::move(mat1), 0);
-	seq->addMatrix(std::move(mat2), 1);
-	seq->addMatrix(std::move(mat3), 2);
+	seq->pushMatrix(std::move(mat1), 0);
+	seq->pushMatrix(std::move(mat2), 1);
+	seq->pushMatrix(std::move(mat3), 2);
 
 	return seq;
 }

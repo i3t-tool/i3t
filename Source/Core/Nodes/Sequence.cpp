@@ -73,15 +73,15 @@ Sequence::~Sequence()
 	stopTracking();
 }
 
-ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix) noexcept
+ValueSetResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 {
-	const auto result = addMatrix(matrix, m_storage.m_matrices.size());
+	const auto result = pushMatrix(matrix, m_storage.m_matrices.size());
 	updateValues(-1);
 
 	return result;
 }
 
-ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix, size_t index) noexcept
+ValueSetResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcept
 {
 	const auto result = m_storage.addMatrix(matrix, index);
 	updateValues(-1);
@@ -154,5 +154,24 @@ void Sequence::stopTracking()
 	{
 		*m_tracker = MatrixTracker();
 	}
+}
+
+//===-- Helpers -----------------------------------------------------------===//
+Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence)
+{
+	auto parent = GraphManager::getParent(sequence, I3T_SEQ_IN_MUL);
+	while (parent != nullptr)
+	{
+		const auto parentSequence = parent->as<Sequence>();
+		const bool hasMatrixInput = parentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn();
+		if (!parentSequence->getMatrices().empty() || hasMatrixInput)
+		{
+			return parentSequence;
+		}
+
+		parent = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MUL);
+	}
+
+	return nullptr;
 }
 } // namespace Core

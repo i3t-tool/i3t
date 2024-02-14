@@ -30,7 +30,7 @@ TEST_F(ModelNodeTest, ShouldConsumeTransformMatrix)
 	auto transform = Builder::createTransform<ETransformType::Translation>();
 	transform->as<Node>()->setValue(generateVec3());
 
-	sequence->addMatrix(transform);
+	sequence->pushMatrix(transform);
 
 	auto* gameObjectVp = new Vp::GameObject();
 

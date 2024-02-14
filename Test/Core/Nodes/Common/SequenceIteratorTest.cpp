@@ -60,21 +60,182 @@ TestTree arrangeSequenceTree()
 	plug_expectOk(root, branch2, 0, 0);
 
 	// Add matrices to the sequences.
-	root->addMatrix(matrices[0]);
-	root->addMatrix(matrices[1]);
-	root->addMatrix(matrices[2]);
+	root->pushMatrix(matrices[0]);
+	root->pushMatrix(matrices[1]);
+	root->pushMatrix(matrices[2]);
 
-	branch1->addMatrix(matrices[3]);
-	branch1->addMatrix(matrices[4]);
+	branch1->pushMatrix(matrices[3]);
+	branch1->pushMatrix(matrices[4]);
 
-	branch2->addMatrix(matrices[5]);
-	branch2->addMatrix(matrices[6]);
+	branch2->pushMatrix(matrices[5]);
+	branch2->pushMatrix(matrices[6]);
 
 	std::vector<Ptr<Node>> expectedMatrices = {
 	    matrices[4], matrices[3], matrices[2], matrices[1], matrices[0],
 	};
 
 	return TestTree{root, branch1, branch2, expectedMatrices};
+}
+
+TEST(SequenceIteratorTest, BeginAndEnd)
+{
+	auto s = arrangeSequenceTree();
+
+	// Create sequence–root path from "branch1" sequence to root sequence.
+	SequenceTree tree(s.branch1Sequence);
+
+	// Get iterator which points to last matrix in branch1.
+	auto it = tree.begin();
+	EXPECT_TRUE(it != tree.end());
+	EXPECT_TRUE(*it == s.branch1Sequence->getMatrices().back());
+}
+
+/// X - translation on X axis
+/// Y - translation on Y axis
+/// Z - translation on Z axis
+///
+/// ```
+///                      /- matrix1 (Z)                                     /- matrix2 (Z)
+///                     /                                                  /
+/// | sequence 1 | - | sequence 2 | - | sequence 3 | - | sequence 4 | - | sequence 5 |
+/// | Y, X       |   | X          |   | X          |   |            |   | X          |
+/// ```
+struct TrickyTestTree
+{
+	Ptr<Sequence> sequence1;
+	Ptr<Sequence> sequence2;
+	Ptr<Sequence> sequence3;
+	Ptr<Sequence> sequence4;
+	Ptr<Sequence> sequence5;
+
+	Ptr<Node> matrix1;
+	Ptr<Node> matrix2;
+
+	glm::vec3 translationX = {1, 0, 0};
+	glm::vec3 translationY = {0, 1, 0};
+	glm::vec3 translationZ = {0, 0, 1};
+
+	TrickyTestTree()
+	{
+		sequence1 = GraphManager::createSequence();
+		sequence1->pushMatrix(createTranslation(translationY));
+		sequence1->pushMatrix(createTranslation(translationX));
+		sequence2 = GraphManager::createSequence();
+		sequence2->pushMatrix(createTranslation(translationX));
+		sequence3 = GraphManager::createSequence();
+		sequence3->pushMatrix(createTranslation(translationX));
+		sequence4 = GraphManager::createSequence();
+		sequence5 = GraphManager::createSequence();
+		sequence5->pushMatrix(createTranslation(translationX));
+
+		matrix1 = GraphManager::createNode<EOperatorType::MakeTranslation>();
+		matrix1->setValue(glm::translate(translationZ));
+		matrix2 = GraphManager::createNode<EOperatorType::MakeTranslation>();
+		matrix2->setValue(glm::translate(translationZ));
+
+		plug_expectOk(sequence1, sequence2, 0, 0);
+
+		plug_expectOk(sequence2, sequence3, 0, 0);
+		plug_expectOk(matrix1, sequence2, 0, I3T_SEQ_IN_MAT);
+
+		plug_expectOk(sequence3, sequence4, 0, 0);
+
+		plug_expectOk(sequence4, sequence5, 0, 0);
+
+		plug_expectOk(matrix2, sequence5, 0, I3T_SEQ_IN_MAT);
+	}
+
+private:
+	static Ptr<Transform> createTranslation(glm::vec3 translation)
+	{
+		auto transform = Builder::createTransform<ETransformType::Translation>();
+		transform->setDefaultValue("translate", translation);
+
+		return transform;
+	}
+};
+
+TEST(SequenceIteratorTest, Advance)
+{
+	TrickyTestTree s;
+
+	SequenceTree tree(s.sequence5);
+
+	auto it = tree.begin();
+	ASSERT_TRUE(it != tree.end());
+
+	Ptr<Node> matrix;
+
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence5.get());
+	EXPECT_EQ(matrix, s.matrix2);
+	++it;
+	ASSERT_TRUE(it != tree.end());
+
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence3.get());
+	EXPECT_EQ(matrix, s.sequence3->getMatrices().back());
+	++it;
+	ASSERT_TRUE(it != tree.end());
+
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence2.get());
+	EXPECT_EQ(matrix, s.matrix1);
+	++it;
+	ASSERT_TRUE(it != tree.end());
+
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_EQ(matrix, s.sequence1->getMatrices()[1]);
+	++it;
+	ASSERT_TRUE(it != tree.end());
+
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_EQ(matrix, s.sequence1->getMatrices()[0]);
+	++it;
+
+	// Iterator is invalid.
+	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_TRUE(it == tree.end());
+}
+
+TEST(SequenceIteratorTest, Withdraw)
+{
+	TrickyTestTree s;
+
+	SequenceTree tree(s.sequence5);
+
+	auto it = tree.end();
+	ASSERT_TRUE(it != tree.begin());
+	ASSERT_TRUE(it.getSequence() == s.sequence1.get());
+
+	--it;
+	auto matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_EQ(matrix, s.sequence1->getMatrices()[0]);
+
+	--it;
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_EQ(matrix, s.sequence1->getMatrices()[1]);
+
+	--it;
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence2.get());
+	EXPECT_EQ(matrix, s.matrix1);
+
+	--it;
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence3.get());
+	EXPECT_EQ(matrix, s.sequence3->getMatrices().back());
+
+	--it;
+	matrix = *it;
+	EXPECT_EQ(it.getSequence(), s.sequence5.get());
+	EXPECT_EQ(matrix, s.matrix2);
+
+	EXPECT_TRUE(it == tree.begin());
 }
 
 TEST(SequenceIteratorTest, MatrixIterator)
@@ -143,7 +304,7 @@ TEST(SequenceIteratorTest, MatrixIteratorOnTwoEmptySequences)
 	// Get iterator which points to last matrix in branch1.
 	auto it = tree.begin();
 
-	EXPECT_TRUE(it != tree.end());
+	EXPECT_TRUE(it == tree.end());
 }
 
 struct TestChain
@@ -167,11 +328,11 @@ TestChain arrangeTestChain()
 
 	auto scale = Builder::createTransform<ETransformType::Scale>();
 	scale->setValue(glm::scale(generateVec3()));
-	middleSequence->addMatrix(scale);
+	middleSequence->pushMatrix(scale);
 
 	auto translation = Builder::createTransform<ETransformType::Translation>();
 	translation->setValue(glm::translate(generateVec3()));
-	middleSequence->addMatrix(translation);
+	middleSequence->pushMatrix(translation);
 
 	auto rightOperator = Builder::createOperator<EOperatorType::MatrixToMatrix>();
 	rightOperator->setValue(generateMat4());
