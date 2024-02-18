@@ -140,9 +140,9 @@ void Sequence::updateValues(int inputIndex)
 	m_tracker->update();
 }
 
-MatrixTracker* Sequence::startTracking(UPtr<IModelProxy> modelProxy)
+MatrixTracker* Sequence::startTracking(TrackingDirection direction, UPtr<IModelProxy> modelProxy)
 {
-	*m_tracker = MatrixTracker(this, std::move(modelProxy));
+	*m_tracker = MatrixTracker(this, direction, std::move(modelProxy));
 
 	return m_tracker;
 }

@@ -238,6 +238,24 @@ TEST(SequenceIteratorTest, Withdraw)
 	EXPECT_TRUE(it == tree.begin());
 }
 
+TEST(SequenceIteratorTest, collect)
+{
+	TrickyTestTree s;
+	SequenceTree tree(s.sequence5);
+
+	std::vector<Ptr<Node>> expected = {
+	    s.matrix2,
+	    s.sequence3->getMatrices().back(),
+	    s.matrix1,
+	    s.sequence1->getMatrices()[1],
+	    s.sequence1->getMatrices()[0],
+	};
+
+	const auto result = tree.begin().collect();
+
+	EXPECT_EQ(expected, result);
+}
+
 TEST(SequenceIteratorTest, MatrixIterator)
 {
 	auto s = arrangeSequenceTree();

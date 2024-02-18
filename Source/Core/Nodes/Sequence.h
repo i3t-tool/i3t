@@ -40,6 +40,12 @@ namespace Builder
 Ptr<Sequence> createSequence(MatrixTracker* tracker);
 } // namespace Builder
 
+enum class TrackingDirection
+{
+	LeftToRight = -1,
+	RightToLeft = 1
+};
+
 /**
  * Sequence of matrices.
  *
@@ -126,7 +132,7 @@ public:
 
 	void updateValues(int inputIndex) override;
 
-	MatrixTracker* startTracking(UPtr<IModelProxy> modelProxy);
+	MatrixTracker* startTracking(TrackingDirection direction, UPtr<IModelProxy> modelProxy);
 	void stopTracking();
 
 private:
@@ -137,13 +143,6 @@ private:
 
 /// \returns nullptr if there is no nonempty sequence in the parent chain.
 Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence);
-
-FORCE_INLINE Ptr<Sequence> toSequence(Ptr<Node> node)
-{
-	if (node == nullptr)
-		return nullptr;
-	return node->as<Sequence>();
-}
 
 FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices)
 {

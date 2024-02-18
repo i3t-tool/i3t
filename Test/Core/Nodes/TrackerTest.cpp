@@ -97,7 +97,7 @@ protected:
 };
 
 /**
- * Classic tracking.
+ * Classic tracking
  *
  * ///////////     ///////////
  * | M1 | M2 | --- | M3 | M4 |
@@ -108,7 +108,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 	auto t = arrange();
 
 	// Act
-	auto tracker = t.s2->startTracking(std::make_unique<DummyModelProxy>());
+	auto tracker = t.s2->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
 
 	{
 		float trackingParam = 1.0f;
@@ -174,13 +174,84 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 	}
 }
 
+TEST_F(TrackerTest, TrackingLeftToRight)
+{
+	auto t = arrange();
+
+	// Act
+	auto tracker = t.s2->startTracking(TrackingDirection::LeftToRight, std::make_unique<DummyModelProxy>());
+
+	{
+		float trackingParam = 0.0f;
+		tracker->setParam(trackingParam);
+
+		glm::mat4 expected{1.0f};
+
+		EXPECT_EQ(tracker->fullMatricesCount(), 0);
+		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
+
+		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 0.0f);
+	}
+	{
+		float trackingParam = 0.30f;
+		tracker->setParam(trackingParam);
+
+		float interpParam = (abs(trackingParam) - 0.25f) * 4;
+		const auto expected =
+		    t.mat1->getData().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->getData().getMat4(), interpParam);
+
+		EXPECT_EQ(tracker->fullMatricesCount(), 1);
+		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+
+		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), interpParam);
+		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 0.0f);
+	}
+	{
+		float trackingParam = 0.85f;
+		tracker->setParam(trackingParam);
+
+		float interpParam = (abs(trackingParam) - 0.75f) * 4;
+		const auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
+		                      glm::interpolate(glm::mat4(1.0f), t.mat4->getData().getMat4(), interpParam);
+
+		EXPECT_EQ(tracker->fullMatricesCount(), 3);
+		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+
+		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), interpParam);
+	}
+	{
+		float trackingParam = 1.0f;
+		tracker->setParam(trackingParam);
+
+		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
+		                t.mat4->getData().getMat4();
+
+		EXPECT_EQ(tracker->fullMatricesCount(), 4);
+		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+
+		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 1.0f);
+	}
+}
+
 TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 {
 	auto sequence = GraphManager::createSequence();
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
 	// start full tracking
-	auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
+	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
 	tracker->setParam(1.0f);
 
 	// add new matrix
@@ -202,7 +273,7 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 		sequence->pushMatrix(mat);
 
 		// start full tracking
-		auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
+		auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
 		tracker->setParam(1.0f);
 
 		EXPECT_TRUE(GraphManager::isTrackingEnabled());
@@ -220,7 +291,7 @@ TEST_F(TrackerTest, EmptySequence)
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
 	// start full tracking
-	auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
+	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
 	tracker->setParam(1.0f);
 
 	sequence->popMatrix(0);

@@ -46,6 +46,11 @@ public:
 		///     Never null.
 		Sequence* getSequence() const;
 
+		/// \returns Non-owned pointer to the all matrices from start to the root,
+		///     note that Ptr<Node> may points to operator with matrix output,
+		///     not only to transformation.
+		std::vector<Ptr<Node>> collect();
+
 		/// Move iterator to root sequence.
 		MatrixIterator& operator++();
 
@@ -110,15 +115,22 @@ public:
 	virtual Ptr<Core::Model> getModel() = 0;
 };
 
+struct TrackingResult
+{
+	std::size_t fullMatricesCount;
+	ID interpolatedTransformID;
+	glm::mat4 interpolatedMatrix{1.0f};
+	std::map<ID, float> trackingProgress;
+};
+
+enum class TrackingDirection;
+
 class MatrixTracker
 {
 public:
 	MatrixTracker() = default;
 
-	/**
-	 * @param beginSequence
-	 */
-	explicit MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model);
+	MatrixTracker(Sequence* beginSequence, TrackingDirection direction, UPtr<IModelProxy> model);
 
 	void update();
 
@@ -130,14 +142,14 @@ public:
 		return m_model->getModel();
 	}
 
-	const glm::mat4& getInterpolatedMatrix()
+	const glm::mat4& getInterpolatedMatrix() const
 	{
-		return m_interpolatedMatrix;
+		return m_state.interpolatedMatrix;
 	}
 
 	unsigned fullMatricesCount() const
 	{
-		return m_fullMatricesCount;
+		return m_state.fullMatricesCount;
 	}
 
 	float getParam() const
@@ -149,45 +161,44 @@ public:
 
 	const std::map<Core::ID, float>& getTrackingProgress() const
 	{
-		return m_trackingProgress;
+		return m_state.trackingProgress;
 	}
 
 	float getTrackingProgressForNode(ID transformID) const
 	{
-		if (!m_trackingProgress.contains(transformID))
+		if (!m_state.trackingProgress.contains(transformID))
 		{
 			return 0.0f;
 		}
 
-		return m_trackingProgress.at(transformID);
+		return m_state.trackingProgress.at(transformID);
 	}
 
 	ID getInterpolatedTransformID() const
 	{
-		return m_interpolatedTransformID;
+		return m_state.interpolatedTransformID;
 	}
 
 private:
 	/// \pre m_beginSequence is set
 	void track();
 
+	void handleEdgeCases(float& interpParam, SequenceTree& st);
+
 	/// Public interface is in the GraphManager.
 	void stop();
 
-	void setTransform();
+	void setModelTransform();
 
-	unsigned m_fullMatricesCount = 0;
+	TrackingResult m_state;
 
-	glm::mat4 m_interpolatedMatrix;
 	float m_param = 0.0f;
 
 	UPtr<IModelProxy> m_model;
 
+	TrackingDirection m_direction;
+
 	/// On sequence destruction, tracker is destroyed too.
 	Sequence* m_beginSequence = nullptr;
-
-	/// \todo Redundant information, remove.
-	ID m_interpolatedTransformID = 0;
-	std::map<ID, float> m_trackingProgress;
 };
 } // namespace Core
