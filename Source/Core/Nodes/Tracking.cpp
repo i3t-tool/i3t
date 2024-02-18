@@ -85,6 +85,19 @@ Sequence* SequenceTree::MatrixIterator::getSequence() const
 	return m_currentSequence;
 }
 
+std::vector<Ptr<Node>> SequenceTree::MatrixIterator::collect()
+{
+	std::vector<Ptr<Node>> result;
+	auto it = *this;
+	while (it != m_tree->end())
+	{
+		result.push_back(*it);
+		++it;
+	}
+
+	return result;
+}
+
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
 {
 	advance();
@@ -277,8 +290,8 @@ void setActivePart(Ptr<Node> node, float value)
 	}
 }
 
-MatrixTracker::MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model)
-    : m_model(std::move(model)), m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
+MatrixTracker::MatrixTracker(Sequence* beginSequence, TrackingDirection direction, UPtr<IModelProxy> model)
+    : m_model(std::move(model)), m_direction(direction), m_beginSequence(beginSequence)
 {
 	update();
 }
@@ -330,87 +343,110 @@ void MatrixTracker::track()
 		return;
 	}
 
-	m_trackingProgress.clear();
+	m_state.trackingProgress.clear();
 
 	// Create iterator for traversing sequence branch.
-	auto st = SequenceTree(m_beginSequence->getPtr());
+	SequenceTree st(m_beginSequence->getPtr());
 
-	int matricesCount = 0; // to the root
+	std::vector<Ptr<Node>> matrices = st.begin().collect();
+
+	for (const auto& matrix : matrices)
 	{
-		auto it = st.begin();
-
-		// Get matrices count in total.
-		while (it != st.end())
-		{
-			m_trackingProgress[(*it)->getId()] = 0.0f;
-			setActivePart(*it, 0.0f);
-			++it;
-			++matricesCount;
-		}
+		m_state.trackingProgress[matrix->getId()] = 0.0f;
+		setActivePart(matrix, 0.0f);
 	}
 
-	if (matricesCount == 0)
+	if (matrices.empty())
 	{
 		// Empty sequence cannot be tracked, end tracking.
 		stop();
 		return;
 	}
 
-	// Iterator now points to the sequences root.
+	// apply matrices right to left
 
-	float matFactor = 1.0f / (float) matricesCount;
-	int matricesBefore = (int) (m_param * (float) matricesCount);
-	m_fullMatricesCount = matricesBefore;
+	if (m_direction == TrackingDirection::LeftToRight)
+	{
+		std::reverse(matrices.begin(), matrices.end());
+	}
+	else if (m_direction == TrackingDirection::RightToLeft)
+	{}
+
+	const float matFactor = 1.0f / (float) matrices.size();
+	const auto matricesBefore = (int) (m_param * (float) matrices.size());
+	m_state.fullMatricesCount = matricesBefore;
 
 	float interpParam = fmod(m_param, matFactor) / matFactor;
-	// Handle special cases
-	if (Math::eq(0.0f, m_param))
-	{
-		interpParam = 0.0f;
-		m_interpolatedTransformID = (*st.begin())->getId();
-	}
-	else if (Math::eq(1.0f, m_param))
-	{
-		interpParam = 1.0f;
-		m_interpolatedTransformID = (*(st.begin() + (matricesCount - 1)))->getId();
-	}
 
-	glm::mat4 result(1.0f);
+	handleEdgeCases(interpParam, st);
+
+	glm::mat4 matrix(1.0f);
 	glm::mat4 rhs;
 	glm::mat4 lhs(1.0f);
 
+	for (int i = 0; i < matricesBefore; ++i)
 	{
-		auto it = st.begin();
-		for (int i = 0; i < m_fullMatricesCount; ++i)
-		{
-			m_trackingProgress[(*it)->getId()] = 1.0f;
-			setActivePart(*it, 1.0f);
-			result = (*it)->getData().getMat4() * result;
-			++it;
-		}
-
-		if (!Math::eq(1.0f, m_param))
-		{
-			// Interpolate last matrix.
-			const auto transform = *it;
-			m_trackingProgress[transform->getId()] = interpParam;
-			setActivePart(transform, interpParam);
-			rhs = transform->getData().getMat4();
-
-			auto useQuat = false;
-			if (const auto reallyTransform = std::dynamic_pointer_cast<Transform>(transform))
-			{
-				useQuat = reallyTransform->properties()->isRotation;
-			}
-			result = Math::lerp(lhs, rhs, interpParam, useQuat) * result;
-
-			m_interpolatedTransformID = transform->getId();
-		}
+		const auto& transform = matrices[i];
+		m_state.trackingProgress[transform->getId()] = 1.0f;
+		setActivePart(transform, 1.0f);
+		matrix = matrix * transform->getData().getMat4();
 	}
 
-	m_interpolatedMatrix = result;
+	if (!Math::eq(0.0f, m_param) && !Math::eq(1.0f, m_param))
+	{
+		// interpolate matrix
+		const auto maybeTransform = matrices[matricesBefore];
+		m_state.trackingProgress[maybeTransform->getId()] = interpParam;
+		setActivePart(maybeTransform, interpParam);
+		rhs = maybeTransform->getData().getMat4();
 
-	setTransform();
+		auto useQuat = false;
+		if (auto transform = std::dynamic_pointer_cast<Transform>(maybeTransform))
+		{
+			useQuat = transform->properties()->isRotation;
+		}
+		matrix = matrix * Math::lerp(lhs, rhs, interpParam, useQuat);
+
+		m_state.interpolatedTransformID = maybeTransform->getId();
+	}
+
+	m_state.interpolatedMatrix = matrix;
+
+	setModelTransform();
+}
+
+void MatrixTracker::handleEdgeCases(float& interpParam, SequenceTree& st)
+{
+	if (m_direction == TrackingDirection::LeftToRight)
+	{
+		if (Math::eq(0.0f, m_param))
+		{
+			// empty
+			interpParam = 0.0f;
+			m_state.interpolatedTransformID = (*(--st.end()))->getId();
+		}
+		else if (Math::eq(1.0f, m_param))
+		{
+			// all matrices
+			interpParam = 1.0f;
+			m_state.interpolatedTransformID = (*st.begin())->getId();
+		}
+	}
+	else if (m_direction == TrackingDirection::RightToLeft)
+	{
+		if (Math::eq(0.0f, m_param))
+		{
+			// all matrices
+			interpParam = 0.0f;
+			m_state.interpolatedTransformID = (*st.begin())->getId();
+		}
+		else if (Math::eq(1.0f, m_param))
+		{
+			// no matrices
+			interpParam = 1.0f;
+			m_state.interpolatedTransformID = (*(--st.end()))->getId();
+		}
+	}
 }
 
 void MatrixTracker::stop()
@@ -419,9 +455,8 @@ void MatrixTracker::stop()
 	m_model = nullptr;
 }
 
-void MatrixTracker::setTransform()
+void MatrixTracker::setModelTransform()
 {
-	// m_model->getModel()->setValue(m_interpolatedMatrix);
-	m_model->update(m_interpolatedMatrix);
+	m_model->update(m_state.interpolatedMatrix);
 }
 } // namespace Core

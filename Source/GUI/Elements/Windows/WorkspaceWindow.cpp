@@ -181,15 +181,15 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 			Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
 			if (seq)
 			{
-				// m_trackingFirstTransformation =
-				// std::dynamic_pointer_cast<WorkspaceTransformation>(seq->getInnerWorkspaceNodes().back());
 				const auto model = getSequenceModel(seq);
 				if (model == nullptr)
 					continue;
 				LOG_INFO("TRACKING ON");
 				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-				tracking = seq->getNodebase()->as<Core::Sequence>()->startTracking(
-				    std::make_unique<WorkspaceModelProxy>(model));
+				const auto coreSeq = seq->getNodebase()->as<Core::Sequence>();
+				tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
+				                                  std::make_unique<WorkspaceModelProxy>(model));
+
 				break;
 			}
 		}
@@ -201,8 +201,9 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 			return;
 		LOG_INFO("TRACKING ON");
 		sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+		const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
 		tracking =
-		    sequence->getNodebase()->as<Core::Sequence>()->startTracking(std::make_unique<WorkspaceModelProxy>(model));
+		    coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::make_unique<WorkspaceModelProxy>(model));
 	}
 }
 
