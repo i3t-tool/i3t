@@ -145,7 +145,7 @@ bool WorkspaceTransformation::afterContent()
 
 	ImVec2 size = bottomright - topleft;
 	float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
-	if (trackingFromLeft)
+	if (!trackingFromLeft)
 	{
 		if (inactiveMark != 1) // Left tracking
 		{
@@ -179,7 +179,7 @@ bool WorkspaceTransformation::afterContent()
 	auto interpolatedTransform = std::dynamic_pointer_cast<WorkspaceTransformation>(maybeInterpolatedTransform.value());
 	if (interpolatedTransform.get() == this)
 	{
-		ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
+		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
 		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
 		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,

@@ -395,10 +395,10 @@ colors:
     z: 0.886274517
     w: 0.768627465
   ntrs_Nodes Transformation TrackingColor:
-    x: 0.300000012
-    y: 0.300000012
-    z: 0.100000001
-    w: 0.600000024
+    x: 0.160784319
+    y: 0.160784319
+    z: 0.160784319
+    w: 0.760784328
   star_Description Background:
     x: 0.0980392173
     y: 0.0980392173
