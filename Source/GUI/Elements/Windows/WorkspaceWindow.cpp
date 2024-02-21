@@ -120,7 +120,10 @@ void WorkspaceDiwne::trackingSmoothLeft()
 		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
 
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
-		tracking->setParam(tracking->getParam() + step);
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
 	}
 }
 
@@ -136,7 +139,10 @@ void WorkspaceDiwne::trackingSmoothRight()
 		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
 
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
-		tracking->setParam(tracking->getParam() - step);
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
 	}
 }
 void WorkspaceDiwne::trackingJaggedLeft()
@@ -144,7 +150,10 @@ void WorkspaceDiwne::trackingJaggedLeft()
 	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
 	{
 		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
-		tracking->setParam(tracking->getParam() + step);
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
 	}
 }
 
@@ -154,7 +163,10 @@ void WorkspaceDiwne::trackingJaggedRight()
 	{
 		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
 
-		tracking->setParam(tracking->getParam() - step);
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
 	}
 }
 
@@ -172,7 +184,7 @@ void WorkspaceDiwne::trackingSwitch()
 		trackingSwitchOn();
 }
 
-void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
+void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence, bool isRightToLeft)
 {
 	if (sequence == nullptr)
 	{
@@ -187,9 +199,17 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 				LOG_INFO("TRACKING ON");
 				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
 				const auto coreSeq = seq->getNodebase()->as<Core::Sequence>();
-				tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
-				                                  std::make_unique<WorkspaceModelProxy>(model));
-
+				if (isRightToLeft)
+				{
+					tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
+					                                  std::make_unique<WorkspaceModelProxy>(model));
+				}
+				else
+				{
+					tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight,
+					                                  std::make_unique<WorkspaceModelProxy>(model));
+				}
+				m_trackingFromLeft = !isRightToLeft;
 				break;
 			}
 		}
@@ -202,8 +222,17 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 		LOG_INFO("TRACKING ON");
 		sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
 		const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
-		tracking =
-		    coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::make_unique<WorkspaceModelProxy>(model));
+		if (isRightToLeft)
+		{
+			tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
+			                                  std::make_unique<WorkspaceModelProxy>(model));
+		}
+		else
+		{
+			tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight,
+			                                  std::make_unique<WorkspaceModelProxy>(model));
+		}
+		m_trackingFromLeft = !isRightToLeft;
 	}
 }
 

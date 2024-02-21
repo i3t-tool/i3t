@@ -145,26 +145,18 @@ bool WorkspaceTransformation::afterContent()
 
 	ImVec2 size = bottomright - topleft;
 	float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
+
 	if (!trackingFromLeft)
 	{
-		if (inactiveMark != 1) // Left tracking
-		{
-			bottomright.x -= (inactiveMark) *size.x;
-			diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-		}
-		else if (inactiveMark == 1)
-		{ // accounting for yellow mark placement
-			bottomright.x -= (inactiveMark) *size.x;
-		}
-	}
-	else if (inactiveMark != 0) // RIGHT TRACKING
-	{
-		topleft.x += (1 - inactiveMark) * size.x;
+		bottomright.x = topleft.x;
+		bottomright.x += (1 - inactiveMark) * size.x;
 		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
-	else if (inactiveMark == 0)
-	{
-		topleft.x += (1 - inactiveMark) * size.x;
+	else
+	{ // Left tracking, top left moving left
+		topleft.x = bottomright.x;
+		topleft.x -= (1 - inactiveMark) * size.x;
+		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 
 	auto maybeInterpolatedTransform =

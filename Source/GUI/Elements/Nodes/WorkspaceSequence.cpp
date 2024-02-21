@@ -160,14 +160,23 @@ void WorkspaceSequence::popupContentTracking()
 	}
 	else
 	{
-		if (ImGui::MenuItem("Start tracking", ""))
+		if (ImGui::MenuItem("Start tracking from right", ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{
 				workspaceDiwne.trackingSwitchOff();
 			}
 
-			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()), true);
+		}
+		if (ImGui::MenuItem("Start tracking from left", ""))
+		{
+			if (Core::GraphManager::isTrackingEnabled())
+			{
+				workspaceDiwne.trackingSwitchOff();
+			}
+
+			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()), false);
 		}
 	}
 }

@@ -227,7 +227,7 @@ public:
 	void trackingJaggedRight();
 	void trackingModeSwitch();
 	void trackingSwitch();
-	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr);
+	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr, bool isRightToLeft = true);
 	void trackingSwitchOff();
 	void toggleSelectedNodesVisibility();
 	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
