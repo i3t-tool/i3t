@@ -389,7 +389,15 @@ void MatrixTracker::track()
 		const auto& transform = matrices[i];
 		m_state.trackingProgress[transform->getId()] = 1.0f;
 		setActivePart(transform, 1.0f);
-		matrix = matrix * transform->getData().getMat4();
+
+		if (m_direction == TrackingDirection::LeftToRight)
+		{
+			matrix = matrix * transform->getData().getMat4();
+		}
+		else if (m_direction == TrackingDirection::RightToLeft)
+		{
+			matrix = transform->getData().getMat4() * matrix;
+		}
 	}
 
 	if (!Math::eq(0.0f, m_param) && !Math::eq(1.0f, m_param))
@@ -405,7 +413,15 @@ void MatrixTracker::track()
 		{
 			useQuat = transform->properties()->isRotation;
 		}
-		matrix = matrix * Math::lerp(lhs, rhs, interpParam, useQuat);
+
+		if (m_direction == TrackingDirection::LeftToRight)
+		{
+			matrix = matrix * Math::lerp(lhs, rhs, interpParam, useQuat);
+		}
+		else if (m_direction == TrackingDirection::RightToLeft)
+		{
+			matrix = Math::lerp(lhs, rhs, interpParam, useQuat) * matrix;
+		}
 
 		m_state.interpolatedTransformID = maybeTransform->getId();
 	}
