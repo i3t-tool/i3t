@@ -237,19 +237,40 @@ void Cycle::updateValue(float increment)
 				newValue = newValue < m_to ? m_from : m_to;
 			}
 
-			pulse(I3T_CYCLE_OUT_END);
+			pulse(I3T_CYCLE_OUT_END);   // reaches end
+			pulse(I3T_CYCLE_OUT_BEGIN); // and simultaneously reaches the begin
 
 			break;
 		case EMode::PingPong:
 			if (m_from <= m_to) // and out of the range <m_from, m_to> or <m_to, m_from>
 			{
-				newValue = newValue > m_to ? m_to : m_from;
-				pulse(I3T_CYCLE_OUT_END);
+				// newValue = newValue > m_to ? m_to : m_from;
+				// pulse(I3T_CYCLE_OUT_END);
+				if (newValue > m_to)
+				{
+					newValue = m_to;
+					pulse(I3T_CYCLE_OUT_END);
+				}
+				else
+				{
+					newValue = m_from;
+					pulse(I3T_CYCLE_OUT_BEGIN);
+				}
 			}
 			else
 			{
-				newValue = newValue > m_from ? m_from : m_to;
-				pulse(I3T_CYCLE_OUT_BEGIN);
+				// newValue = newValue > m_from ? m_from : m_to;
+				// pulse(I3T_CYCLE_OUT_BEGIN);
+				if (newValue > m_from)
+				{
+					newValue = m_from;
+					pulse(I3T_CYCLE_OUT_BEGIN);
+				}
+				else
+				{
+					newValue = m_to;
+					pulse(I3T_CYCLE_OUT_END);
+				}
 			}
 
 			m_directionMultiplier *= -1.0f;

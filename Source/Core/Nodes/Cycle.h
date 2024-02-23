@@ -17,6 +17,7 @@
 namespace Core
 {
 constexpr auto I3T_CYCLE_STEP_DURATION_SECONDS = 0.5f;
+constexpr auto I3T_CYCLE_STEP_DURATION_MINIMUM = 0.01f; // to avoid cycle STOP when 0.0f
 
 constexpr size_t I3T_CYCLE_IN_FROM = 0;
 constexpr size_t I3T_CYCLE_IN_TO = 1;
@@ -124,7 +125,7 @@ public:
 
 	void setStepDuration(float stepDuration)
 	{
-		m_stepDuration = std::clamp(stepDuration, 0.0f, FLT_MAX);
+		m_stepDuration = std::clamp(stepDuration, I3T_CYCLE_STEP_DURATION_MINIMUM, FLT_MAX);
 	}
 
 	float getStepDuration() const
