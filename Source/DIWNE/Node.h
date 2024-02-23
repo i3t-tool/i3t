@@ -99,7 +99,7 @@ public:
 		m_drawMode = drawMode;
 
 
-		if (!getRender())
+		if (!getRender()) // hide the node and its input wire in the tutorial scene
 			return false;
 
 		bool interaction_happen = drawDiwne(drawMode);
@@ -175,9 +175,14 @@ public:
 		m_render = render;
 	};
 
-	float m_drawAnyway; /*!< you have to draw the node anyway.
+	bool m_drawAnyway; /*!< you have to draw the node anyway. // (PF) was float!?!?
 	                         For example in the first frame after you created it
 	                         -> to obtain its real size */
+	// todo (PF) rename to something like m_forceToDraw, m_forceFirstTimeDraw, or m_forceToDrawFirstTime
+	// This variable is
+	// - set to true in the Node constructor only
+	// - dropped to false in Node::beforeBeginDiwne()
+	// - used to force drawing the node for the first time
 
 protected:
 	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
@@ -189,8 +194,8 @@ protected:
 
 	float m_centerDummySpace; ///< indent value to center the middle part
 	DrawModeNodePosition m_nodePosMode;
-	bool m_toDelete; ///< Set to true after node delete action
-	bool m_render = true;
+	bool m_toDelete;      ///< Set to true after node delete action
+	bool m_render = true; ///< used to hide nodes in tutorial scenes (action "toggleNodeWorkspaceVisibility")
 
 private:
 	void setNodeRectsPositionDiwne(ImVec2 const& position);

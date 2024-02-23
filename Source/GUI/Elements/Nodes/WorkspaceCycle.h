@@ -47,13 +47,21 @@ public:
 
 	int maxLengthOfData() override;
 
+	/**
+	 * \brief Radio button - used for cycle mode selection
+	 * \param label Button text
+	 * \param v_button Button value (button number) - cycle mode assigned to this button
+	 * \param v Pressed button value \a v_button - return value of the selected button
+	 * \return true if this button was pressed - as a side effect, replace the current mode in \a *v by \a v_button
+	 */
 	bool myRadioButton(const char* label, int* v, int v_button);
+
 	std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const override
 	{
 		if (m_levelOfDetail == WorkspaceLevelOfDetail::SetValues ||
 		    m_levelOfDetail == WorkspaceLevelOfDetail::LightCycle)
 			return {getOutputs()[0]}; // output value only
 		else
-			return {getOutputs()}; // value and all Pulse outputs
+			return {getOutputs()}; // Float value and all Pulse outputs
 	};
 };

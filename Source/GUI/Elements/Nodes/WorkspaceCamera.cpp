@@ -27,6 +27,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
                                                  /* true, \todo (PF) was not used */
                                                  true))
 {
+	// connect matrix P to matrix V internally
 	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
 
 	m_projection->setSelectable(false);
@@ -240,11 +241,16 @@ bool WorkspaceCamera::topContent()
 bool WorkspaceCamera::middleContent()
 {
 	bool inner_interaction_happen = false;
-	inner_interaction_happen |=
-	    m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
-	ImGui::SameLine();
-	inner_interaction_happen |=
-	    m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+
+	// if (m_levelOfDetail == WorkspaceLevelOfDetail::Full) // todo it is not so simple - input wires are missing in
+	// Label LOD
+	{
+		inner_interaction_happen |=
+		    m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+		ImGui::SameLine();
+		inner_interaction_happen |=
+		    m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+	}
 	return inner_interaction_happen;
 }
 

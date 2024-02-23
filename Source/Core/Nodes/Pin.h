@@ -99,6 +99,9 @@ public:
 		m_isDisabled = disabled;
 	}
 
+	/**
+	 * \brief False in Camera P and V matrices ONLY. Used to skip hidden values stored as pins.
+	 */
 	[[nodiscard]] bool isRendered() const
 	{
 		return m_isRendered;
@@ -125,7 +128,7 @@ private:
 	bool m_isDisabled = false; //< Pin is visible, but cannot be interactively connected to
 	                           //< (used for Camera mult output)
 
-	bool m_isRendered = true; //< Render this pin. Used in Camera P and V matrices.
+	bool m_isRendered = true; //< Render this pin. False in Camera P and V matrices ONLY.
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component

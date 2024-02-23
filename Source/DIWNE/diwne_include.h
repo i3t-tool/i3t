@@ -70,6 +70,11 @@ enum DrawMode
 	Interacting /*!< Usual mode - draw and allow interaction too */
 };
 
+/**
+ * \brief pin icon shape type
+ * used in WorkspaceCorePin::content(), file WorkspaceElementWitCoreData.cpp::379
+ * drawn by Diwne::DrawIcon, method Diwne::DrawIconXXXX, file Diwne.cpp
+ */
 enum IconType
 {
 	NoIcon,
@@ -83,16 +88,16 @@ enum IconType
 	GrabDownRight,
 	Cross,
 	Hyphen,
-	Stop,
-	Pause,
-	SkipBack,
-	SkipBack2,
-	SkipForward,
-	SkipForward2,
-	Rewind,
-	FastForward,
-	AtFrom,
-	AtTo,
+	Stop,         ///< ⏹
+	Pause,        ///< ⏸ two vertical bars
+	SkipBack,     ///< |< vertical bar followed by the left arrow
+	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
+	SkipForward,  ///< ">|" right arrow followed by the vertical bar
+	SkipForward2, ///< |> vertical bar followed by the right arrow
+	Rewind,       ///< ⏪
+	FastForward,  ///< ⏩
+	AtFrom,       // todo, now a synonym to the FastForward
+	AtTo,         // todo, now a synonym to the Rewind
 };
 
 enum DiwneAction

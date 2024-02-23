@@ -451,7 +451,7 @@ void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor in
 	}
 }
 
-// | I < | --- 1 1 1 4 1
+// | I < | --- 1 1 5   vertical bar followed by the arrow
 void Diwne::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                              ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
@@ -477,6 +477,7 @@ void Diwne::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerC
 	}
 }
 
+// | < I | --- 5 1 1    arrow followed by the vertical bar
 void Diwne::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                               ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
@@ -523,12 +524,11 @@ void Diwne::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerCol
 	}
 }
 
+// | > I | --- 5 1 1   right arrow followed by the vertical bar
 void Diwne::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
-
-	// float right1x = topLeft.x + 5.0f * columnWidth;               // triangle
 
 	ImVec2 middleRight1;
 	middleRight1.x = topLeft.x + 5.0f * columnWidth; // triangle
@@ -551,6 +551,7 @@ void Diwne::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor inn
 	}
 }
 
+// | I > | --- 1 1 5     vertical bar followed by the right arrow
 void Diwne::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
@@ -748,6 +749,17 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor
 	                  size, padding, filled, id);
 }
 
+void Diwne::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+
+	const ImVec2 icon_min = ImGui::GetCursorScreenPos();
+	const ImVec2 icon_max = icon_min + size;
+
+	idl->AddRectFilled(icon_min, icon_max, color, rounding, ImDrawFlags_RoundCornersAll);
+	ImGui::SetCursorScreenPos(icon_min);
+}
+
 bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
                        DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
                        ImVec4 padding, bool filled, std::string const id) const
@@ -763,10 +775,18 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor
 }
 
 void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
-                     ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled) const
+                     ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
+                     ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	const ImVec2 icon_min = ImGui::GetCursorScreenPos();
+
+	// (PF) move Icon slightly lower to match the position of the text
+	// todo make it more robust for larger icons?
+	float h = ImGui::GetTextLineHeight();
+	float dh = h > size.y ? (h - size.y) / 2.0f : 0.0f;
+	const ImVec2 icon_min = ImGui::GetCursorScreenPos() + ImVec2(0, dh);
+
+	// const ImVec2 icon_min = ImGui::GetCursorScreenPos();
 	const ImVec2 icon_max = icon_min + size;
 	const ImVec2 inner_icon_min = icon_min + ImVec2(padding.x, padding.w);
 	const ImVec2 inner_icon_max = icon_max - ImVec2(padding.z, padding.y);
@@ -786,7 +806,7 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 	case SkipBack2:
 	case SkipForward:
 	case SkipForward2:
-		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled, thickness, rounding);
 		break;
 	case TriangleLeft:
 		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);

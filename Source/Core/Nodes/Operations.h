@@ -427,6 +427,7 @@ inline const Operation g_sequence = {
 
 inline const Operation g_cameraProperties = {
     "Camera", "camera", {}, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
+// names of inner matrices (projection and view) are defined in the WorkspaceCamera constructor
 
 inline static const Operation g_modelProperties = {
     "Model",

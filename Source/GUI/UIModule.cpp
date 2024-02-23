@@ -267,6 +267,11 @@ void UIModule::loadFonts()
 	    // - this is a too long range instead of two characters
 	    0,
 	};
+	const ImWchar symbolRanges[] = {
+	    0x2300,
+	    0x23E9,
+	    0,
+	};
 	// https://symbl.cc/en/unicode/table/
 	// These icons should be in unicode, but are not in our roboto fonts...
 	// “User interface symbols” subblock of the “Miscellaneous Technical”

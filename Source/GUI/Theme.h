@@ -175,7 +175,20 @@ enum class EColor
 
 	AboutWindow_BackgroundLeft,
 	AboutWindow_BackgroundRight,
-	AboutWindow_Text
+	AboutWindow_Text,
+
+	Cycle_Button,
+	Cycle_ButtonHovered,
+	Cycle_ButtonActive,
+	Cycle_ButtonForeground, ////< large buttons icons and text on radiobutton
+	Cycle_RadioButton,
+	Cycle_RadioButtonActive,
+	Cycle_RadioButtonHovered,
+	Cycle_RadioButtonText,
+	Cycle_RadioButtonSelected,
+	Cycle_RadioButtonSelectedHovered,
+	Cycle_RadioButtonSelectedText,
+	Cycle_RadioButtonBackground,
 };
 
 enum class EFont
@@ -282,7 +295,10 @@ enum class ESize
 	StartWindow_ScrollbarSize,
 	StartWindow_YourSceneWinRounding,
 	StartWindow_DotSize,
-	StartWindow_DotSpacing
+	StartWindow_DotSpacing,
+
+	Cycle_ButtonRounding,
+	Cycle_RadioButtonRounding,
 };
 
 enum class ESizeVec2
@@ -324,7 +340,9 @@ enum class ESizeVec2
 	StartWindow_WinPadding,
 	StartWindow_LeftWinPadding,
 	StartWindow_RightWinOuterPadding,
-	StartWindow_RightWinInnerPadding
+	StartWindow_RightWinInnerPadding,
+
+	Cycle_ButtonSize,
 };
 
 constexpr inline EColor asColor(Core::EValueType type)

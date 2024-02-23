@@ -108,7 +108,7 @@ bool WorkspaceNodeWithCoreData::topContent()
 			{
 				setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
 			}
-			else
+			else if (!std::dynamic_pointer_cast<WorkspaceCamera>(shared_from_this())) // camera does not change state
 			{
 				setLevelOfDetail(WorkspaceLevelOfDetail::Label);
 			}
@@ -349,7 +349,7 @@ const char* WorkspaceNodeWithCoreData::getButtonSymbolFromLOD(const WorkspaceLev
 	if (detail == WorkspaceLevelOfDetail::Label)
 		return ">";
 	if (detail == WorkspaceLevelOfDetail::LightCycle)
-		return "lightcycle error";
+		return "."; // was a lightcycle error
 
 	return "missingLOD";
 }
@@ -406,11 +406,15 @@ bool WorkspaceCorePin::content()
 
 		const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
 
+		ImGuiContext& g = *GImGui;
+
+		// space between icon symbol and icon boundary
 		const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
 		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 		//   not visible anyway so we're just drawing stuff twice for no reason
 		// todo (PF) - I have temporally added the pin border drawing of not-connected pins
+		// connected pins have no border now
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
 		               createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
 		               ImVec4(padding, padding, padding, padding), isConnected());
@@ -557,8 +561,10 @@ WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diw
 bool WorkspaceCoreOutputPinWithData::content()
 {
 	bool interaction_happen = false;
-	if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full ||
-	    getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues) // for cycle box
+	// if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full ||
+	//     getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues || // for cycle box
+	//     getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::LightCycle)  // for cycle box
+	if (getNode().getLevelOfDetail() != WorkspaceLevelOfDetail::Label)
 	{
 		interaction_happen |= drawData();
 		ImGui::SameLine();
@@ -745,7 +751,7 @@ bool WorkspaceCoreOutputPinScreen::drawData()
 		// ImVec2(1,0));
 		ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture),
 		             I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize) * diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f),
-		             ImVec2(1, 0)); // vertiocal flip
+		             ImVec2(1, 0)); // vertical flip
 	}
 	return false;
 }
@@ -761,10 +767,33 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID cons
     : WorkspaceCorePin(diwne, id, pin, node), m_link(diwne, id, this)
 {}
 
+void mujDebug()
+{
+	static bool flag = false;
+
+	ImGui::Begin("Overlap");
+
+	if (ImGui::Checkbox("Use AlignTextToFramePadding() ", &flag))
+		ImGui::AlignTextToFramePadding();
+
+	auto style = ImGui::GetStyle();
+	ImGui::Text(fmt::format("Item   x: {}, y: {}", style.ItemSpacing.x, style.ItemSpacing.y).c_str());
+	// ImGui::Text(fmt::format("Indent x: {}, y: {}", std::to_string(style.IndentSpacing)).c_str());
+	ImGui::DebugDrawItemRect(ImColor(255, 127, 40, 127));
+	// ImGui::Checkbox(fmt::format("##{}smooth", getId()).c_str(), &smooth))
+
+	ImGui::End();
+}
+
+
 bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode /*=DIWNE::DrawMode::Interacting*/)
 {
 	m_connectionChanged = false;
+
 	const bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
+
+	// ImGui::DebugDrawItemRect(ImColor(255, 127, 100, 127));
+
 	if (isConnected())
 	{
 		// inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
@@ -825,8 +854,9 @@ bool WorkspaceCoreInputPin::content()
 {
 	float inner_interaction_happen = WorkspaceCorePin::content(); // icon
 
-	const std::string& label = m_pin.getLabel();                         // label
-	if (!(m_pin.ValueType == Core::EValueType::Pulse) && !label.empty()) // no labels for pulse and cycle
+	const std::string& label = m_pin.getLabel(); // label
+	if (!(m_pin.ValueType == Core::EValueType::Pulse) &&
+	    !label.empty()) // no labels for pulse type in PulseToPulse and Cycle
 	{
 		ImGui::SameLine();
 		ImGui::TextUnformatted(label.c_str());
@@ -1118,6 +1148,8 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 
 		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
 		{
+			// register the connected wires only.
+			// Connect them to the middle of the box left side (showing just the label)
 			ImRect nodeRect = getNodeRectDiwne();
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
@@ -1127,7 +1159,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 					pin->setConnectionPointDiwne(pinConnectionPoint);
 					if (pin->isConnected())
 					{
-						wd.m_linksToDraw.push_back(&pin->getLink());
+						wd.m_linksToDraw.push_back(&pin->getLink()); // register the wire
 					}
 				}
 			}
@@ -1138,13 +1170,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					inner_interaction_happen |= pin->drawDiwne();
-					/* is in pin->drawDiwne()
-					      if (pin->isconnected())
-					      {
-					        wd.m_linkstodraw.push_back(&pin->getlink());
-					      }
-					*/
+					inner_interaction_happen |= pin->drawDiwne(); // pin + register the wire
 				}
 			}
 		}
@@ -1171,17 +1197,22 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label ||   // Label draws the wires only
 		    m_levelOfDetail == WorkspaceLevelOfDetail::SetValues) // SetValues must add the invisible Pulse outputs
 		{
-			const ImRect nodeRect = getNodeRectDiwne();
+			// register the connected wires only.
+			// Connect them to the middle of the box right side (showing just the label)
 
+			const ImRect nodeRect = getNodeRectDiwne();
 			// todo (PF) pinConnectionPoint is wrong when output pulse pins are not drawn
 			const ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
 			{
 				if (pin->getCorePin().isRendered())
 					pin->setConnectionPointDiwne(pinConnectionPoint);
+				else
+					int i = 7; // NOOP
 			}
 		}
 		// else - include SetValues
+		// uses getOutputsToShow()) = subset of outputs, based of the level. Override function in the WorkspaceCycle
 		if (m_levelOfDetail != WorkspaceLevelOfDetail::Label) // SetValues must draw the value pin
 		{
 			const float prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
