@@ -29,7 +29,7 @@ private:
 	// variables of the workspace box
 	GLuint m_textureID = 0;            // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
 	ImVec2 m_textureSize = {100, 100}; // initial render texture size - should be
-	                                   // large enough or changed during zoo
+	                                   // large enough or changed during zoom
 
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 	Vp::DisplayOptions m_displayOptions;

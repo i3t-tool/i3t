@@ -479,6 +479,66 @@ colors:
     y: 0.90196079
     z: 0.90196079
     w: 1
+  ncyc_Button:
+    x: 0.470588237
+    y: 0.470588237
+    z: 0.470588237
+    w: 1
+  ncyc_ButtonHovered:
+    x: 0.549019635
+    y: 0.529411793
+    z: 0.529411793
+    w: 1
+  ncyc_ButtonActive:
+    x: 0.509803951
+    y: 0.509803951
+    z: 0.509803951
+    w: 1
+  ncyc_ButtonForeground:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  ncyc_RadioButton:
+    x: 0.129411772
+    y: 0.129411772
+    z: 0.129411772
+    w: 1
+  ncyc_RadioButtonActive:
+    x: 0.333333343
+    y: 0.333333343
+    z: 0.333333343
+    w: 1
+  ncyc_RadioButtonHovered:
+    x: 0.215686277
+    y: 0.215686277
+    z: 0.215686277
+    w: 1
+  ncyc_RadioButtonText:
+    x: 0.349019617
+    y: 0.349019617
+    z: 0.349019617
+    w: 1
+  ncyc_RadioButtonSelected:
+    x: 0.568627477
+    y: 0.776470602
+    z: 0.788235307
+    w: 0.858823538
+  ncyc_RadioButtonSelectedHovered:
+    x: 0.588235319
+    y: 0.784313738
+    z: 0.80392158
+    w: 0.90196079
+  ncyc_RadioButtonSelectedText:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  ncyc_RadioButtonBackground:
+    x: 0.129411772
+    y: 0.129411772
+    z: 0.129411772
+    w: 1
   glob_Tab Color:
     x: 0
     y: 0
@@ -486,10 +546,10 @@ colors:
     w: 0
 sizes:
   ngen_Nodes Float Margin: 5
-  ngen_Nodes Float Width: 45
   star_Dot Spacing: 7
-  ngen_Nodes Rounding: 7
+  ngen_Nodes Float Width: 45
   star_Dot Size: 10
+  ngen_Nodes Rounding: 7
   ngen_Nodes BorderWidth: 0
   ngen_Pin labels Indent: 12
   ngen_Header Label Indent: 2
@@ -535,6 +595,8 @@ sizes:
   star_Frame Rounding: 4
   star_Scrollbar Size: 14
   star_Your Scene Section Rounding: 6
+  ncyc_ButtonRounding: 3
+  ncyc_RadioButtonRounding: 5
 size vectors:
   ngen_Nodes Pivot Size:
     x: 0
@@ -605,3 +667,6 @@ size vectors:
   star_Right Window InnerPadding:
     x: 10
     y: 10
+  ncyc_ButtonSize:
+    x: 40
+    y: 40

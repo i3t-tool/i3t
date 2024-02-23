@@ -263,6 +263,13 @@ public:
 	 */
 	bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
 	                bool filled, std::string const id) const;
+	/**
+	 * \brief Just the shape of the button, no interaction
+	 * \param size
+	 * \param color
+	 * \param rounding
+	 */
+	void EmptyButton(ImVec2 size, ImColor color, float rounding);
 
 	/*!
 	 * Add ImGui Button with icon on it \see DrawIcon()
@@ -288,14 +295,15 @@ public:
 	 * \param fgShapeColor color of the foreground shape if filled == false
 	 * \param fgInnerColor color of foreground shape interior if filled == false
 	 * \param size of the icon in screen coordinates
-	 * \param padding of the fg shape (top, right, bottom, left)
+	 * \param padding of the fg shape (left, bottom, right, top)
 	 * \param filled means
 	 *  - true fill both shapes with their ShapeColor
 	 *  - false draw both shapes with a ShapeColor border and fill them with InnerColor
 	 * \return void
 	 */
 	void DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
-	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled) const;
+	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
+	              ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
 
 	/**
 	 * \brief Draw a circle icon

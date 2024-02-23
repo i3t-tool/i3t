@@ -24,8 +24,8 @@ namespace DIWNE
 /* ===== D i w n e  O b j e c t ===== */
 /* ================================== */
 /** \brief All objects in DIWNE are inherited from DiwneObject
- *  DiwneObject cover functionality common for all Objects in node editor - such
- * as selecting, dragging, hovering
+ *  DiwneObject covers the functionality common to all Objects in the node editor - such
+ *  as selecting, dragging, hovering,...
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {

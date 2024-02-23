@@ -220,6 +220,22 @@ void Theme::initClassicProperties()
 	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
 	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
 
+	// Cycle - todo - this is modern too
+	set(EColor::Cycle_Button, createColor(120, 120, 120, 255));
+	set(EColor::Cycle_ButtonHovered, createColor(125, 125, 125, 255));
+	set(EColor::Cycle_ButtonActive, createColor(130, 130, 130, 255));
+	set(EColor::Cycle_ButtonForeground, createColor(0, 0, 0, 255));
+
+	set(EColor::Cycle_RadioButton, createColor(33, 33, 33, 255));
+	set(EColor::Cycle_RadioButtonActive, createColor(158, 220, 213, 255));
+	set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 337, 255));
+	set(EColor::Cycle_RadioButtonText, createColor(89, 89, 89, 255));
+	set(EColor::Cycle_RadioButtonSelected, createColor(140, 190, 186, 255));
+	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(345, 195, 186, 255));
+	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
+	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
+
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
@@ -318,6 +334,9 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::StartWindow_DotSize] = 10.0f;
 	m_sizes[ESize::StartWindow_DotSpacing] = 7.0f;
 
+	m_sizes[ESize::Cycle_ButtonRounding] = 3.0f;
+	m_sizes[ESize::Cycle_RadioButtonRounding] = 5.0f;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -356,6 +375,8 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = ImVec2(30.f, 30.f);
 	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = ImVec2(10.f, 10.f);
+
+	m_sizesVec2[ESizeVec2::Cycle_ButtonSize] = ImVec2(40.0f, 40.0f);
 }
 
 void Theme::initModernProperties()
@@ -499,10 +520,40 @@ void Theme::initModernProperties()
 	set(EColor::StartWindow_DescriptionFont, createColor(65, 65, 66, 255));
 	set(EColor::StartWindow_YourSceneWinBackground, createColor(255, 255, 255, 255));
 
-
 	set(EColor::AboutWindow_BackgroundLeft, createColor(255, 255, 255, 255));
 	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
 	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
+
+	// Cycle
+
+	// set(EColor::Cycle_Button, createColor(120, 120, 120, 255));
+	// set(EColor::Cycle_ButtonHovered, createColor(135, 135, 135, 255));
+	// set(EColor::Cycle_ButtonActive, createColor(150, 150, 150, 255));
+	// set(EColor::Cycle_ButtonForeground, createColor(0, 0, 0, 255));
+
+	// set(EColor::Cycle_RadioButton, createColor(33, 33, 33, 255));
+	// set(EColor::Cycle_RadioButtonActive, createColor(158, 220, 213, 255));
+	// set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 337, 255));
+	// set(EColor::Cycle_RadioButtonText, createColor(89, 89, 89, 255));
+	// set(EColor::Cycle_RadioButtonSelected, createColor(160, 220, 200, 255));
+	// set(EColor::Cycle_RadioButtonSelectedHovered, createColor(180, 240, 220, 255));
+	// set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
+	// set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
+
+	set(EColor::Cycle_Button, createColor(120, 120, 120, 255));
+	set(EColor::Cycle_ButtonHovered, createColor(140, 135, 135, 255)); //
+	set(EColor::Cycle_ButtonActive, createColor(130, 130, 130, 255));  //
+	set(EColor::Cycle_ButtonForeground, createColor(0, 0, 0, 255));
+
+	set(EColor::Cycle_RadioButton, createColor(33, 33, 33, 255));
+	set(EColor::Cycle_RadioButtonHovered, createColor(55, 55, 55, 255));
+	set(EColor::Cycle_RadioButtonActive, createColor(85, 85, 85, 255));
+	set(EColor::Cycle_RadioButtonText, createColor(89, 89, 89, 255));
+	set(EColor::Cycle_RadioButtonSelected, createColor(145, 198, 201, 219));
+	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(150, 200, 205, 230));
+	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255)); //
+	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
+
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
@@ -598,6 +649,9 @@ void Theme::initModernProperties()
 	m_sizes[ESize::StartWindow_DotSize] = 10.0f;
 	m_sizes[ESize::StartWindow_DotSpacing] = 7.0f;
 
+	m_sizes[ESize::Cycle_ButtonRounding] = 3.0f;
+	m_sizes[ESize::Cycle_RadioButtonRounding] = 5.0f;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -635,6 +689,8 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = ImVec2(30.f, 30.f);
 	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = ImVec2(10.f, 10.f);
+
+	m_sizesVec2[ESizeVec2::Cycle_ButtonSize] = ImVec2(40.0f, 40.0f);
 }
 
 void Theme::initNames()
@@ -652,6 +708,7 @@ void Theme::initNames()
 	g_CategoryNames["nflo_"] = "Node Editor Floats";
 	g_CategoryNames["nscr_"] = "Node Editor ScreenNode";
 	g_CategoryNames["nlnk_"] = "Node Editor Link";
+	g_CategoryNames["ncyc_"] = "Node Editor Cycle";
 
 	// Global
 	g_ColorNames[EColor::Text] = "glob_Text";
@@ -804,6 +861,25 @@ void Theme::initNames()
 
 	g_ColorNames[EColor::Nodes_Screen_noInput_background] = "nscr_Nodes_Screen_noInput_background";
 	g_ColorNames[EColor::Nodes_Screen_noInput_text] = "nscr_Nodes_Screen_noInput_text";
+
+	// Cycle
+	// large button icons
+	g_ColorNames[EColor::Cycle_Button] = "ncyc_Button";
+	g_ColorNames[EColor::Cycle_ButtonHovered] = "ncyc_ButtonHovered";
+	g_ColorNames[EColor::Cycle_ButtonActive] = "ncyc_ButtonActive";
+	g_ColorNames[EColor::Cycle_ButtonForeground] = "ncyc_ButtonForeground";
+	g_SizeNames[ESize::Cycle_ButtonRounding] = "ncyc_ButtonRounding";
+	g_SizeVecNames[ESizeVec2::Cycle_ButtonSize] = "ncyc_ButtonSize";
+	// radiobuttons
+	g_ColorNames[EColor::Cycle_RadioButton] = "ncyc_RadioButton";
+	g_ColorNames[EColor::Cycle_RadioButtonActive] = "ncyc_RadioButtonActive";
+	g_ColorNames[EColor::Cycle_RadioButtonHovered] = "ncyc_RadioButtonHovered";
+	g_ColorNames[EColor::Cycle_RadioButtonText] = "ncyc_RadioButtonText";
+	g_ColorNames[EColor::Cycle_RadioButtonSelected] = "ncyc_RadioButtonSelected";
+	g_ColorNames[EColor::Cycle_RadioButtonSelectedHovered] = "ncyc_RadioButtonSelectedHovered";
+	g_ColorNames[EColor::Cycle_RadioButtonSelectedText] = "ncyc_RadioButtonSelectedText";
+	g_ColorNames[EColor::Cycle_RadioButtonBackground] = "ncyc_RadioButtonBackground";
+	g_SizeNames[ESize::Cycle_RadioButtonRounding] = "ncyc_RadioButtonRounding";
 
 	// Links
 	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
