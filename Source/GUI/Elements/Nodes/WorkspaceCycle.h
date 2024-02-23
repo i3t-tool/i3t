@@ -10,9 +10,6 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-//
-// Created by Sofie on 07.05.2021.
-//
 
 #pragma once
 #include "WorkspaceElementsWithCoreData.h"
