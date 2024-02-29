@@ -132,7 +132,7 @@ public:
 
 	void updateValues(int inputIndex) override;
 
-	MatrixTracker* startTracking(TrackingDirection direction, UPtr<IModelProxy> modelProxy);
+	MatrixTracker* startTracking(TrackingDirection direction, std::vector<UPtr<IModelProxy>> modelProxy);
 	void stopTracking();
 
 private:

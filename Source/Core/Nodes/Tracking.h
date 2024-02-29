@@ -100,7 +100,7 @@ public:
 
 	/**
 	 * \return Points to the root sequence and matrix is nullptr,
-	 *     so it is not possible to dereference it (as any other STL iterator).
+	 *     so it is not possible to decrement or dereference it (as any other STL iterator).
 	 */
 	MatrixIterator end();
 };
@@ -125,22 +125,19 @@ struct TrackingResult
 
 enum class TrackingDirection;
 
-class MatrixTracker
+class MatrixTracker final
 {
 public:
 	MatrixTracker() = default;
 
-	MatrixTracker(Sequence* beginSequence, TrackingDirection direction, UPtr<IModelProxy> model);
+	MatrixTracker(Sequence* beginSequence, TrackingDirection direction, std::vector<UPtr<IModelProxy>> model);
 
 	void update();
 
 	Ptr<Sequence> getSequence() const;
 	ID getSequenceID() const;
 
-	Ptr<Model> getModel() const
-	{
-		return m_model->getModel();
-	}
+	std::vector<Ptr<Model>> getModels() const;
 
 	const glm::mat4& getInterpolatedMatrix() const
 	{
@@ -183,7 +180,7 @@ private:
 	/// \pre m_beginSequence is set
 	void track();
 
-	void handleEdgeCases(float& interpParam, SequenceTree& st);
+	void handleEdgeCases(float& interpParam, const std::vector<Ptr<Node>>& matrices);
 
 	/// Public interface is in the GraphManager.
 	void stop();
@@ -194,7 +191,7 @@ private:
 
 	float m_param = 0.0f;
 
-	UPtr<IModelProxy> m_model;
+	std::vector<UPtr<IModelProxy>> m_models;
 
 	TrackingDirection m_direction;
 

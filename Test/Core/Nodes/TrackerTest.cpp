@@ -67,7 +67,7 @@ public:
 	{
 		m_model = GraphManager::createModel();
 	}
-	~DummyModelProxy() override = default;
+	~DummyModelProxy() override {}
 
 	void update(const glm::mat4& transform) override
 	{
@@ -107,8 +107,11 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 {
 	auto t = arrange();
 
+	std::vector<UPtr<IModelProxy>> proxy;
+	proxy.push_back(std::make_unique<DummyModelProxy>());
+
 	// Act
-	auto tracker = t.s2->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
+	auto tracker = t.s2->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
 
 	{
 		float trackingParam = 1.0f;
@@ -178,8 +181,11 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 {
 	auto t = arrange();
 
+	std::vector<UPtr<IModelProxy>> proxy;
+	proxy.push_back(std::make_unique<DummyModelProxy>());
+
 	// Act
-	auto tracker = t.s2->startTracking(TrackingDirection::LeftToRight, std::make_unique<DummyModelProxy>());
+	auto tracker = t.s2->startTracking(TrackingDirection::LeftToRight, std::move(proxy));
 
 	{
 		float trackingParam = 0.0f;
@@ -250,8 +256,11 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	auto sequence = GraphManager::createSequence();
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
+	std::vector<UPtr<IModelProxy>> proxy;
+	proxy.push_back(std::make_unique<DummyModelProxy>());
+
 	// start full tracking
-	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
+	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
 	tracker->setParam(1.0f);
 
 	// add new matrix
@@ -260,7 +269,7 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	sequence->pushMatrix(mat);
 
 	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getInterpolatedMatrix()));
-	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getModel()->getData().getMat4()));
+	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getModels().back()->getData().getMat4()));
 }
 
 TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
@@ -272,8 +281,11 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 		mat->setDefaultValue("translation", generateVec3());
 		sequence->pushMatrix(mat);
 
+		std::vector<UPtr<IModelProxy>> proxy;
+		proxy.push_back(std::make_unique<DummyModelProxy>());
+
 		// start full tracking
-		auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
+		auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
 		tracker->setParam(1.0f);
 
 		EXPECT_TRUE(GraphManager::isTrackingEnabled());
@@ -290,8 +302,11 @@ TEST_F(TrackerTest, EmptySequence)
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
+	std::vector<UPtr<IModelProxy>> proxy;
+	proxy.push_back(std::make_unique<DummyModelProxy>());
+
 	// start full tracking
-	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::make_unique<DummyModelProxy>());
+	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
 	tracker->setParam(1.0f);
 
 	sequence->popMatrix(0);

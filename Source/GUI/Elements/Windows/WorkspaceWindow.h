@@ -228,9 +228,13 @@ public:
 	void trackingModeSwitch();
 	void trackingSwitch();
 	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr, bool isRightToLeft = true);
+
+	/**
+	 * @pre @p sequence is not null.
+	 */
+	void trackingInit(Ptr<WorkspaceSequence> sequence, std::vector<Ptr<WorkspaceModel>> models, bool isRightToLeft);
 	void trackingSwitchOff();
 	void toggleSelectedNodesVisibility();
-	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
 	std::vector<Ptr<WorkspaceModel>> getSequenceModels(Ptr<WorkspaceSequence> seq);
 
 	void processTrackingMove();
