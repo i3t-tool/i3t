@@ -14,6 +14,8 @@
 
 #include "WorkspaceWindow.h"
 
+#include <ranges>
+
 #include "GUI/Elements/Nodes/Tools.h"
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
@@ -190,50 +192,50 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence, bool isRi
 	{
 		for (auto&& node : getSelectedNodesInnerIncluded())
 		{
-			Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
-			if (seq)
+			sequence = std::dynamic_pointer_cast<WorkspaceSequence>(node);
+			if (sequence)
 			{
-				const auto model = getSequenceModel(seq);
-				if (model == nullptr)
+				const auto models = getSequenceModels(sequence);
+				if (models.empty())
 					continue;
-				LOG_INFO("TRACKING ON");
-				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-				const auto coreSeq = seq->getNodebase()->as<Core::Sequence>();
-				if (isRightToLeft)
-				{
-					tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
-					                                  std::make_unique<WorkspaceModelProxy>(model));
-				}
-				else
-				{
-					tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight,
-					                                  std::make_unique<WorkspaceModelProxy>(model));
-				}
-				m_trackingFromLeft = !isRightToLeft;
+
+				trackingInit(sequence, models, isRightToLeft);
+
 				break;
 			}
 		}
 	}
 	else
 	{
-		const auto model = getSequenceModel(sequence);
-		if (model == nullptr)
+		const auto models = getSequenceModels(sequence);
+		if (models.empty())
 			return;
-		LOG_INFO("TRACKING ON");
-		sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-		const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
-		if (isRightToLeft)
-		{
-			tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft,
-			                                  std::make_unique<WorkspaceModelProxy>(model));
-		}
-		else
-		{
-			tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight,
-			                                  std::make_unique<WorkspaceModelProxy>(model));
-		}
-		m_trackingFromLeft = !isRightToLeft;
+
+		trackingInit(sequence, models, isRightToLeft);
 	}
+}
+
+void WorkspaceDiwne::trackingInit(Ptr<WorkspaceSequence> sequence, std::vector<Ptr<WorkspaceModel>> models,
+                                  bool isRightToLeft)
+{
+	LOG_INFO("TRACKING ON");
+
+	std::vector<UPtr<Core::IModelProxy>> proxy(models.size());
+	std::transform(models.begin(), models.end(), proxy.begin(), [](Ptr<WorkspaceModel> model) {
+		return std::make_unique<WorkspaceModelProxy>(model);
+	});
+
+	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
+	if (isRightToLeft)
+	{
+		tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::move(proxy));
+	}
+	else
+	{
+		tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight, std::move(proxy));
+	}
+	m_trackingFromLeft = !isRightToLeft;
 }
 
 void WorkspaceDiwne::trackingSwitchOff()
@@ -1233,73 +1235,20 @@ std::vector<Ptr<WorkspaceModel>> WorkspaceDiwne::getAllModels()
 	return models;
 }
 
-Ptr<WorkspaceModel> WorkspaceDiwne::getSequenceModel(Ptr<WorkspaceSequence> seq)
-{
-	std::vector<Ptr<WorkspaceModel>> models;
-	Ptr<WorkspaceModel> ret = nullptr;
-	for (auto const& node : m_workspaceCoreNodes)
-	{
-		Ptr<WorkspaceModel> model = std::dynamic_pointer_cast<WorkspaceModel>(node);
-		if (model && model->getInputs()[0]->isConnected())
-		{
-			models.push_back(std::dynamic_pointer_cast<WorkspaceModel>(node));
-		};
-	}
-
-	for (auto const& model : models)
-	{
-		WorkspaceCoreOutputPin* pin = model->getInputs()[0]->getLink().getStartPin();
-		WorkspaceSequence* tempSeq;
-		while (pin != nullptr)
-		{
-			tempSeq = dynamic_cast<WorkspaceSequence*>(&(pin->getNode()));
-			if (tempSeq == nullptr)
-				break;
-
-			if (tempSeq->getId() == seq->getId())
-			{
-				ret = model;
-				break;
-			}
-			pin = tempSeq->getInputs()[0]->getLink().getStartPin();
-		}
-	}
-	return ret;
-}
-
-// TODO: (DR) This method is no longer used, replaced with ViewportHighlightResolver
 std::vector<Ptr<WorkspaceModel>> WorkspaceDiwne::getSequenceModels(Ptr<WorkspaceSequence> seq)
 {
-	std::vector<Ptr<WorkspaceModel>> models;
-	for (auto const& node : m_workspaceCoreNodes)
-	{
-		Ptr<WorkspaceModel> model = std::dynamic_pointer_cast<WorkspaceModel>(node);
-		if (model && model->getInputs()[0]->isConnected())
-		{
-			models.push_back(std::dynamic_pointer_cast<WorkspaceModel>(node));
-		};
-	}
+	auto filtered = m_workspaceCoreNodes | std::views::filter([&seq](Ptr<WorkspaceNodeWithCoreData>& node) {
+		                const auto isModel = std::dynamic_pointer_cast<WorkspaceModel>(node);
+		                const auto isSequenceChild =
+		                    Core::GraphManager::getParent(node->getNodebase()) == seq->getNodebase();
 
-	std::vector<Ptr<WorkspaceModel>> retModels;
-	for (auto const& model : models)
-	{
-		WorkspaceCoreOutputPin* pin = model->getInputs()[0]->getLink().getStartPin();
-		WorkspaceSequence* tempSeq;
-		while (pin != nullptr)
-		{
-			tempSeq = dynamic_cast<WorkspaceSequence*>(&(pin->getNode()));
-			if (tempSeq == nullptr)
-				break;
+		                return isModel && isSequenceChild;
+	                }) |
+	                std::views::transform([](Ptr<WorkspaceNodeWithCoreData>& node) {
+		                return std::dynamic_pointer_cast<WorkspaceModel>(node);
+	                });
 
-			if (tempSeq->getId() == seq->getId())
-			{
-				retModels.push_back(model);
-				break;
-			}
-			pin = tempSeq->getInputs()[0]->getLink().getStartPin();
-		}
-	}
-	return retModels;
+	return {filtered.begin(), filtered.end()};
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllInputFreeSequence()
