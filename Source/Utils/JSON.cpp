@@ -14,6 +14,8 @@
 
 #include "rttr/type"
 
+#include "Utils/Format.h"
+
 namespace JSONRTTR
 {
 using namespace rapidjson;
@@ -80,7 +82,13 @@ bool write_atomic_types_to_json(const type& t, const variant& var, PrettyWriter<
 	}
 	else if (var.can_convert<std::string>())
 	{
-		writer.String(var.to_string());
+		auto value = var.to_string();
+		if (t == type::get<fs::path>())
+		{
+			value = Utils::toString(value);
+		}
+
+		writer.String(value);
 		return true;
 	}
 

@@ -18,6 +18,7 @@
 #include "Logger/Logger.h"
 #include "ModelResourceFiles.h"
 #include "State/StateManager.h"
+#include "Utils/Format.h"
 #include "Utils/Text.h"
 
 // Used for method overloading to indicate no alias was specified
@@ -810,7 +811,7 @@ Memento ResourceManager::saveScene(Scene* scene)
 		}
 
 		resource.AddMember("name", rapidjson::Value(importedAlias, a), a);
-		resource.AddMember("path", rapidjson::Value(path.string(), a), a);
+		resource.AddMember("path", rapidjson::Value(Utils::toString(path), a), a);
 		resource.AddMember("type", rapidjson::Value(EnumUtils::name(ResourceType::Model), a), a);
 
 		Mesh* mesh = std::static_pointer_cast<Mesh>(resourcePtr->data).get();

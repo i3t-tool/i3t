@@ -12,11 +12,10 @@
  */
 #include "SystemDialogs.h"
 
-#include <codecvt>
-
 #include "portable-file-dialogs.h"
 
 #include "Logger/Logger.h"
+#include "Utils/Text.h"
 
 bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
                                          const std::vector<std::string>& filter)
@@ -50,13 +49,7 @@ bool SystemDialogs::OpenFilesDialog(std::vector<fs::path>& result, const std::st
 	result.clear();
 	for (const auto& fileStr : files)
 	{
-#ifdef _WIN32
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		std::wstring wideFilename = converter.from_bytes(fileStr);
-		result.push_back(fs::path(wideFilename));
-#else
 		result.push_back(fs::path(fileStr));
-#endif
 	}
 
 	if (fs::current_path() != pwd)
