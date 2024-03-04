@@ -53,3 +53,14 @@ inline size_t hash_string(const std::string& a)
 {
 	return hash_string(a, "", "");
 }
+
+namespace Utils
+{
+#ifdef _WIN32
+// Convert a wide Unicode string to an UTF8 string
+std::string utf8Encode(const std::wstring& wstr);
+
+// Convert an UTF8 string to a wide Unicode String
+std::wstring utf8Decode(const std::string& str);
+#endif
+} // namespace Utils

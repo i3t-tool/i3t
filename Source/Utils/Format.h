@@ -22,6 +22,18 @@
 
 namespace Utils
 {
+inline std::string toString(const fs::path& path)
+{
+	auto result = path.string();
+
+	if (fs::path::preferred_separator == '\\')
+	{
+		std::replace(result.begin(), result.end(), '\\', '/');
+	}
+
+	return result;
+}
+
 inline std::string toString(float fl)
 {
 	std::string str;

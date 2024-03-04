@@ -48,6 +48,7 @@ if (MSVC)
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
 
     set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+    add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
 # Link C++17 filesystem library.

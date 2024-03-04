@@ -109,8 +109,6 @@ static void saveAs()
 			filename += I3T_SCENE_EXTENSION;
 		}
 
-		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-
 		App::getModule<StateManager>().saveScene(filename);
 	}
 }
