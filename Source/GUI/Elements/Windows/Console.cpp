@@ -140,7 +140,7 @@ void Console::execute()
 
 	m_oss << "\n> " << m_Command << "\n";
 
-	ConsoleCommand::dispatch(m_Command);
+	ConsoleCommand::dispatchImmediate(m_Command);
 
 	m_HistoryPos = -1;
 	for (int i = m_History.size() - 1; i >= 0; i--)
