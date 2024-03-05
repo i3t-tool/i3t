@@ -84,6 +84,14 @@ public:
 		App::get().enqueueCommand(new Command<Type, Args...>(m_args));
 	}
 
+	static void dispatchImmediate(Args... args)
+	{
+		std::tuple<Args...> m_args(args...);
+
+		Command<Type, Args...> cmd(m_args);
+		cmd.execute();
+	}
+
 protected:
 	/**
 	 * Copy a command and its arguments.
