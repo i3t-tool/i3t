@@ -56,6 +56,11 @@
       "type": "Model"
     },
     {
+      "name": "Arrow",
+      "path": "Data/Models/arrow.glb",
+      "type": "Model"
+    },
+    {
       "name": "Metal Box",
       "path": "Data/Models/box_metal.gltf",
       "type": "Model"
