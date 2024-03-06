@@ -107,7 +107,17 @@ public:
 	 */
 	void initWindow();
 
+	/**
+	 * Get the main GLFW window.
+	 */
 	GLFWwindow* getWindow();
+
+	/**
+	 * Get the active GLFW window.
+	 * This may return a different window than the getWindow() method due to ImGui potentially create new native windows
+	 * to handle ImGui windows being dragged out of the main window.
+	 */
+	static GLFWwindow* getCurrentWindow();
 
 	const std::string& getTitle();
 	void setTitle(const std::string& title);

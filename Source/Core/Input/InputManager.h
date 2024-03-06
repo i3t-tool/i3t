@@ -186,33 +186,12 @@ public:
 	 * \param	keyReleased	The key released.
 	 */
 	static void keyUp(int keyReleased);
-	//@}
-
-	/**
-	 * Get active GLFW viewport (window).
-	 * \return GLFW window.
-	 */
-	static GLFWwindow* getCurrentViewport();
 
 private:
-	/**
-	 * Locks cursor before camera drag or rotation.
-	 */
-	static void beginCameraControl();
-
-	/** Unlock the cursor after camera interaction. */
-	static void endCameraControl();
-
 	/**
 	 * Process action and axis events.
 	 */
 	static void processEvents(InputController& controller);
-
-	/**
-	 * Check ImGui mouse input for current window and set mouse cursor position
-	 * and mouse button map. Use this function after ImGui::Begin(...).
-	 */
-	static void processViewportEvents();
 
 private:
 	static InputController s_globalInputController;

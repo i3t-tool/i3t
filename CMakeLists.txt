@@ -131,6 +131,8 @@ set(I3T_IMGUI_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
 
 file(GLOB_RECURSE I3T_SOURCE
@@ -189,9 +191,6 @@ target_link_libraries(
 target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
 
-target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
-        IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
-
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
 
@@ -207,10 +206,6 @@ set_target_properties(
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
-
-# Tell ImGui which header file contains OpenGL functions signatures.
-target_compile_definitions(${PROJECT_NAME}
-        PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)

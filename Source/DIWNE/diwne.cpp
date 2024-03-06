@@ -95,7 +95,7 @@ void Diwne::begin()
 	ImGui::Checkbox("Show debug texts", &(m_diwneDebug_on));
 	DIWNE_DEBUG((*this), {
 		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
-		                                    ImDrawCornerFlags_None, 10);
+		                                    ImDrawFlags_RoundCornersNone, 10);
 		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x,
 		                        m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
 		                        m_workAreaScreen.Min.x, m_workAreaScreen.Min.y, m_workAreaScreen.Max.x,
@@ -362,7 +362,7 @@ void Diwne::translateWorkAreaDiwne(ImVec2 const& distance)
 }
 
 void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
-                               ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/) const
+                               ImDrawFlags rounding_corners /*=ImDrawFlags_RoundCornersAll*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
@@ -373,7 +373,7 @@ void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 
 }
 
 void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
-                         ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/, float thickness /*=1.0f*/) const
+                         ImDrawFlags rounding_corners /*=ImDrawFlags_RoundCornersAll*/, float thickness /*=1.0f*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	float zoom = diwne.getWorkAreaZoom();
@@ -388,7 +388,7 @@ void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
 
-	idl->AddBezierCurve(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
+	idl->AddBezierCubic(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
 	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_workAreaZoom, num_segments);
 }
 

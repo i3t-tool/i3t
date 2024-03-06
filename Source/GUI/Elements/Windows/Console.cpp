@@ -12,8 +12,6 @@
  */
 #include "Console.h"
 
-#include "imgui.h"
-
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"

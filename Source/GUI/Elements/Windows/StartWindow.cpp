@@ -14,12 +14,12 @@
 
 #include <filesystem>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include "Config.h"
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "WorkspaceWindow.h"
-#include "imgui_internal.h"
 
 #include "API.h"
 #include "GUI/Elements/MainMenuBar.h"
@@ -337,7 +337,7 @@ void StartWindow::renderRightPanel()
 				// ImGui::SameLine(ImGui::GetCursorPosX() + innerPadding.x);
 				ImGui::SameLine();
 				std::string descChildName = "Desc##" + header->m_filename;
-				ImVec2 descSize(ImGui::GetContentRegionAvailWidth(), thumbImageSize);
+				ImVec2 descSize(ImGui::GetContentRegionAvail().x, thumbImageSize);
 				descSize.x -= (startNewBtnWidth + 2 * innerPadding.x + outerPadding.x);
 				// ImGui::PushClipRect(ImGui::GetCursorScreenPos(), descBottomRight,
 				// true); ImGui::BeginGroup();
@@ -429,7 +429,7 @@ void StartWindow::renderRightPanel()
 				float thickness_draw = 1.0f;
 				float thickness_layout = 0.0f;
 				ImVec2 screenPos = ImGui::GetCursorScreenPos();
-				const ImRect bb(screenPos, ImVec2(screenPos.x + ImGui::GetContentRegionAvailWidth() - innerPadding.x,
+				const ImRect bb(screenPos, ImVec2(screenPos.x + ImGui::GetContentRegionAvail().x - innerPadding.x,
 				                                  screenPos.y + thickness_draw));
 				ImGui::ItemSize(ImVec2(0.0f, thickness_layout));
 				if (ImGui::ItemAdd(bb, 0))

@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "glm/vec2.hpp"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Core/Defs.h"

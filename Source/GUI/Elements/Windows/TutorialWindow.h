@@ -12,7 +12,9 @@
  */
 #pragma once
 
-#include "imgui.h"          // temporary
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+// temporary
 #include "imgui_markdown.h" // tmeporary
 
 #include <string>

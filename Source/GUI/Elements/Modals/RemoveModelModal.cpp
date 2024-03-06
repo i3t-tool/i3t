@@ -12,7 +12,8 @@
  */
 #include "RemoveModelModal.h"
 
-#include <imgui.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"

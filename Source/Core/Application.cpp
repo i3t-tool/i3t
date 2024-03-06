@@ -14,8 +14,12 @@
 
 #include <functional>
 
-#include "GUI/ImGui/imgui_impl_glfw.h"
-#include "GUI/ImGui/imgui_impl_opengl3.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_internal.h"
+
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
@@ -106,13 +110,13 @@ void Application::run()
 
 void Application::beginFrame()
 {
-	// Update input (before logic update and rendering)
-	InputManager::beginFrame();
-
 	// Start the Dear ImGui frame ----------------------
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+
+	// Update input (before logic update and rendering)
+	InputManager::beginFrame();
 
 	onBeginFrame();
 }
@@ -233,6 +237,23 @@ void Application::initWindow()
 GLFWwindow* Application::getWindow()
 {
 	return m_window->get();
+}
+
+GLFWwindow* Application::getCurrentWindow()
+{
+	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+	ImGuiContext* g = ImGui::GetCurrentContext(); // Get current/last moused viewport.
+
+	GLFWwindow* window = nullptr;
+	for (int n = 0; n < platformIO.Viewports.Size; n++)
+	{
+		if (platformIO.Viewports[n]->ID == g->MouseViewport->ID)
+		{
+			window = (GLFWwindow*) platformIO.Viewports[n]->PlatformHandle;
+		}
+	}
+
+	return window;
 }
 
 const std::string& Application::getTitle()

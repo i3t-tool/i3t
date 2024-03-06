@@ -209,7 +209,7 @@ bool WorkspaceSequence::beforeContent()
 
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeBgTransformation),
-	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_All);
+	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
 	return false;
 }
 
@@ -228,7 +228,7 @@ bool WorkspaceSequence::topContent()
 {
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeHeaderTranformation) * m_tint,
-	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_Top);
+	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersTop);
 
 	return WorkspaceNodeWithCoreData::topContent();
 }

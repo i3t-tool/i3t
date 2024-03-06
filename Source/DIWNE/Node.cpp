@@ -162,7 +162,7 @@ bool Node::afterEndDiwne()
 		if (m_selected)
 		{
 			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
-			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
+			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 			                   diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 		}
 	}
@@ -224,8 +224,8 @@ bool Node::topContentDiwne()
 
 #ifdef DIWNE_DEBUG
 	DIWNE_DEBUG((diwne), {
-		diwne.AddRectDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, ImColor(0, 0, 255, 100), 0, ImDrawCornerFlags_None,
-		                   2);
+		diwne.AddRectDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
+		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
 
@@ -247,8 +247,8 @@ bool Node::leftContentDiwne()
 
 #ifdef DIWNE_DEBUG
 	DIWNE_DEBUG((diwne), {
-		diwne.AddRectDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max, ImColor(0, 0, 255, 100), 0, ImDrawCornerFlags_None,
-		                   2);
+		diwne.AddRectDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
+		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
 
@@ -269,7 +269,7 @@ bool Node::middleContentDiwne()
 #ifdef DIWNE_DEBUG
 	DIWNE_DEBUG((diwne), {
 		diwne.AddRectDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
-		                   ImDrawCornerFlags_None, 2);
+		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
 
@@ -291,7 +291,7 @@ bool Node::rightContentDiwne()
 #ifdef DIWNE_DEBUG
 	DIWNE_DEBUG((diwne), {
 		diwne.AddRectDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
-		                   ImDrawCornerFlags_None, 2);
+		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
 
@@ -313,7 +313,7 @@ bool Node::bottomContentDiwne()
 #ifdef DIWNE_DEBUG
 	DIWNE_DEBUG((diwne), {
 		diwne.AddRectDiwne(m_bottomRectDiwne.Min, m_bottomRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
-		                   ImDrawCornerFlags_None, 2);
+		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
 
