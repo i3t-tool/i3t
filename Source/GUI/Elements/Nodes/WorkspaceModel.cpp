@@ -206,7 +206,7 @@ bool WorkspaceModel::topContent()
 	// TODO: (DR) This call might be unnecessary as the same call is made in WorkspaceNode, for color
 	// override perhaps? Similarly in WorkspaceScreen. (Note sure, noting so I don't forget)
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
 
 	return WorkspaceNodeWithCoreData::topContent();
 }

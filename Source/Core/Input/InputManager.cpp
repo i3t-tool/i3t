@@ -12,7 +12,8 @@
  */
 #include "InputManager.h"
 
-#include <imgui.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
 #include <imgui_internal.h>
 
 #include "Core/Application.h"
@@ -214,32 +215,6 @@ bool InputManager::isMouseDown()
 	return false;
 }
 
-// TODO: (DR) Unused, different mouse drag handling strategy was used, might be handy in the future
-void InputManager::beginCameraControl()
-{
-	// Disable system cursor. The cursor will be hidden and at the
-	// endCameraControl the cursor will be at the same position.
-	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-	m_ignoreImGuiEvents = true;
-
-	// Tell ImGui to don't capture mouse position. No widgets will be set to the
-	// hovered state.
-	auto& io = ImGui::GetIO();
-	g_mousedFlags = io.ConfigFlags; // Store current IO configuration flags.
-	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
-}
-
-void InputManager::endCameraControl()
-{
-	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-	m_ignoreImGuiEvents = false;
-
-	auto& io = ImGui::GetIO();
-	io.ConfigFlags = g_mousedFlags;
-}
-
 void InputManager::processEvents(InputController& controller)
 {
 	for (const auto& [action, state, callback] : controller.m_actions)
@@ -321,6 +296,28 @@ void InputManager::beginFrame()
 			setUnpressed(imGuiMouseKeys[i]);
 		}
 	}
+
+	// Update mouse wheel
+	if (abs(io.MouseWheel) < 0.0001)
+	{
+		InputManager::setUnpressed(Keys::mouseScrlDown);
+		InputManager::setUnpressed(Keys::mouseScrlUp);
+	}
+	else if (io.MouseWheel > 0.0)
+	{
+		InputManager::setPressed(Keys::mouseScrlUp);
+		InputManager::setUnpressed(Keys::mouseScrlDown);
+	}
+	else if (io.MouseWheel < 0.0)
+	{
+		InputManager::setPressed(Keys::mouseScrlDown);
+		InputManager::setUnpressed(Keys::mouseScrlUp);
+	}
+	if (io.MouseWheel != 0)
+	{
+		int x = 5;
+	}
+	InputManager::m_mouseWheelOffset = io.MouseWheel;
 }
 
 void InputManager::endFrame()
@@ -356,7 +353,6 @@ void InputManager::endFrame()
 		}
 	}
 
-	/// \todo MH mouse scroll release.
 	m_keyMap[Keys::Code::mouseScrlUp] = KeyState::UP;
 	m_keyMap[Keys::Code::mouseScrlDown] = KeyState::UP;
 	m_mouseWheelOffset = 0;
@@ -788,23 +784,6 @@ void InputManager::keyUp(int keyReleased)
 		break;
 
 	default:
-		LOG_ERROR("Unrecognized key pressed!");
+		LOG_ERROR("[INPUT] Unrecognized key {} pressed!", keyReleased);
 	}
-}
-
-GLFWwindow* InputManager::getCurrentViewport()
-{
-	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-	ImGuiContext* g = ImGui::GetCurrentContext(); // Get current/last moused viewport.
-
-	GLFWwindow* window = nullptr;
-	for (int n = 0; n < platformIO.Viewports.Size; n++)
-	{
-		if (platformIO.Viewports[n]->ID == g->MouseViewport->ID)
-		{
-			window = (GLFWwindow*) platformIO.Viewports[n]->PlatformHandle;
-		}
-	}
-
-	return window;
 }

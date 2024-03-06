@@ -17,11 +17,24 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
 void glfwErrorCallback(int error, const char* description)
 {
 	pgr::dieWithError(description);
+}
+
+void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		InputManager::keyDown(key);
+	}
+	if (action == GLFW_RELEASE)
+	{
+		InputManager::keyUp(key);
+	}
 }
 
 void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat)
@@ -48,6 +61,9 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 		exit(EXIT_FAILURE);
 	}
 
+	// Note that the key callback has to be set BEFORE initializing ImGui GLFW backend as the callbacks get overwritten.
+	// The ImGui backend upon init will notice this existing callback and call it itself.
+	glfwSetKeyCallback(m_mainWindow, glfwKeyCallback);
 	glfwSetWindowUserPointer(m_mainWindow, (void*) this);
 
 	setTitle(BASE_WINDOW_TITLE.c_str());

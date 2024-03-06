@@ -12,6 +12,7 @@
  */
 #include "WorkspaceElementsWithCoreData.h"
 
+#include "imgui_internal.h"        // for ImGui::ActivateItemByID()
 #include "misc/cpp/imgui_stdlib.h" /* for changable text */
 
 #include "State/StateManager.h"
@@ -87,7 +88,7 @@ bool WorkspaceNodeWithCoreData::topContent()
 
 	// adding a border
 	diwne.AddRectDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBorder),
-	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawCornerFlags_All,
+	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
 	                   I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
@@ -156,7 +157,7 @@ bool WorkspaceNodeWithCoreData::topContent()
 		auto id = ImGui::GetItemID();
 		if (m_isFirstDraw)
 		{
-			ImGui::ActivateItem(id);
+			ImGui::ActivateItemByID(id);
 			interaction_happen = true;
 			m_isFirstDraw = false;
 		}

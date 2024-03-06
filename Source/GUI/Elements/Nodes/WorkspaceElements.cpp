@@ -65,7 +65,7 @@ bool WorkspaceNode::beforeContent()
 {
 	/* whole node background */
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBg),
-	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_All);
+	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersAll);
 	return false;
 }
 
@@ -74,7 +74,7 @@ bool WorkspaceNode::topContent()
 	bool interaction_happen = false;
 
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
 	ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1));
 	ImGui::SameLine();
 	ImGui::TextUnformatted(m_topLabel.c_str());

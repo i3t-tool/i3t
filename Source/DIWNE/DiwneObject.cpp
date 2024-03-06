@@ -86,10 +86,9 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /* = DrawMode::Interacting */)
 #ifdef DIWNE_DEBUG
 		DIWNE_DEBUG((diwne), {
 			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 50), 0,
-			                   ImDrawCornerFlags_None, 3);
+			                   ImDrawFlags_RoundCornersNone, 3);
 		}); /* close of macro */
 #endif      // DIWNE_DEBUG
-
 		m_inner_interaction_happen |= afterEndDiwne();
 		m_inner_interaction_happen |= processInteractionsDiwne();
 		if (this == &diwne)
@@ -233,7 +232,7 @@ bool DiwneObject::processInteractionsDiwne()
 		if (m_isActive)
 		{
 			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
-			                   ImDrawCornerFlags_None, 5);
+			                   ImDrawFlags_RoundCornersNone, 5);
 		};
 	}); /* close of macro */
 #endif  // DIWNE_DEBUG
@@ -294,7 +293,7 @@ bool DiwneObject::processFocused()
 		diwne.setDiwneAction(getTouchActionType());
 	}
 	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->objectFocusBorderColor,
-	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
+	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	                   diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
 	return true;
 }
@@ -326,7 +325,7 @@ bool DiwneObject::processFocusedForInteraction()
 {
 	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
 	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
-	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
+	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
 	return true;
 }

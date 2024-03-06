@@ -232,16 +232,16 @@ public:
 	       * \param p_max const ImVec2& in diwne coords
 	       * \param col ImVec4
 	       * \param 0.0f float rounding
-	       * \param ImDrawCornerFlags_All ImDrawCornerFlags rounding_corners
+	       * \param ImDrawFlags_RoundCornersAll ImDrawFlags rounding_corners
 	       * \return void
 	       *
 	       */
 	void AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
-	                        ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All) const;
+	                        ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll) const;
 	/*! \brief Draw rectangle to window ImDrawlist \see AddRectFilledDiwne
 	 */
 	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
-	                  ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All, float thickness = 1.0f) const;
+	                  ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f) const;
 	/*! \brief Draw Bezier (not Bezier really) curve to window ImDrawList
 	 *
 	 * \param p1 const ImVec2& start point in diwne coords

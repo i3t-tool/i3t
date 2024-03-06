@@ -12,7 +12,8 @@
  */
 #pragma once
 
-#include <imgui.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
 
 #include "GUI/Elements/IWindow.h"
 

@@ -12,8 +12,6 @@
  */
 #include "ViewportWindow.h"
 
-#include "imgui.h"
-
 #include "API.h"
 #include "Core/Input/InputManager.h"
 

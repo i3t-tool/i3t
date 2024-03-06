@@ -17,6 +17,7 @@
 #include <optional>
 #include <string_view>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "GUI/Elements/Windows/WorkspaceWindow.h"

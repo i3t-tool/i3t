@@ -51,7 +51,7 @@ bool WorkspaceTransformation::beforeContent()
 	/* whole node background */
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeBgTransformation), I3T::getSize(ESize::Nodes_Rounding),
-	                         ImDrawCornerFlags_All);
+	                         ImDrawFlags_RoundCornersAll);
 	return false;
 }
 
@@ -62,7 +62,7 @@ bool WorkspaceTransformation::topContent()
 
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeHeaderTranformation), I3T::getSize(ESize::Nodes_Rounding),
-	                         ImDrawCornerFlags_Top);
+	                         ImDrawFlags_RoundCornersTop);
 
 	interaction_happen |= WorkspaceNodeWithCoreData::topContent();
 	ImGui::SameLine(0, 0);

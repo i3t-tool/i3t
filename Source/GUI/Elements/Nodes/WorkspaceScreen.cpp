@@ -61,7 +61,7 @@ void WorkspaceScreen::popupContent()
 bool WorkspaceScreen::topContent()
 {
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
 
 	return WorkspaceNodeWithCoreData::topContent();
 }
