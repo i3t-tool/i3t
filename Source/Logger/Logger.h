@@ -116,7 +116,7 @@ enum class LoggingOption
 class Logger
 {
 	/// Creates default logger, custom one can be created by Logger::initLogger.
-	Logger();
+	Logger() = default;
 	~Logger() = default;
 
 public:

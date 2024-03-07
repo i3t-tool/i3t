@@ -18,6 +18,7 @@
 #undef GetObject
 #endif
 
+#include "spdlog/cfg/env.h"
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
@@ -38,18 +39,6 @@ struct LoggingToggle final
 	static Keys::Code KEY_LoggingToggle_mouseMovement;
 	static Keys::Code KEY_Dummy_tutorialStep; // #TUTORIAL
 };
-
-Logger::Logger()
-{
-	std::vector<spdlog::sink_ptr> sinks;
-	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
-	sinks[0]->set_level(spdlog::level::info);
-	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
-
-	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
-	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
-	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
-}
 
 Logger& Logger::getInstance()
 {
@@ -74,13 +63,13 @@ void Logger::initLogger(int argc, char* argv[])
 {
 	loadStrings();
 
+	spdlog::set_level(spdlog::level::info);
 	spdlog::set_pattern(DEFAULT_LOG_PATTERN);
 
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
 	// sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
-	sinks[0]->set_level(spdlog::level::trace);
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	constexpr auto maxFileCount = 2;
@@ -89,24 +78,19 @@ void Logger::initLogger(int argc, char* argv[])
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::appLog.string(),
 	                                                                                    maxLogSize, maxFileCount));
-	appLogger->set_level(spdlog::level::trace);
-	appLogger->flush_on(spdlog::level::info);
+	spdlog::register_logger(appLogger);
 
 	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
 	interactionLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
 	    Configuration::userInteractionLog.string(), maxLogSize, maxFileCount));
-	interactionLogger->set_level(spdlog::level::trace);
+	spdlog::register_logger(interactionLogger);
 
 	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
 	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
 	    Configuration::mouseLog.string(), maxLogSize, maxFileCount));
-	mouseLogger->set_level(spdlog::level::trace);
+	spdlog::register_logger(mouseLogger);
 
-	std::ostringstream init_message;
-	init_message << " >> Logger strings version: " << getLogString("version") << " <<";
-
-	interactionLogger->trace(getLogString("logInit") + init_message.str());
-	mouseLogger->trace(getLogString("mouseLogInit") + init_message.str());
+	spdlog::cfg::load_env_levels();
 }
 
 void Logger::endLogger() const
@@ -180,7 +164,6 @@ bool Logger::shouldLogMouse()
 
 void Logger::loadStrings()
 {
-	std::cout << "[info]: Load strings from: " << Configuration::logEventsDefinition << std::endl;
 	rapidjson::Document doc;
 	if (!JSON::parse(Configuration::logEventsDefinition, doc))
 	{
