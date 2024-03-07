@@ -14,7 +14,6 @@
 
 #include <array>
 #include <filesystem>
-#include <iostream>
 
 #include "assimp/Importer.hpp"
 

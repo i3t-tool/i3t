@@ -35,18 +35,6 @@ static inline const std::string BASE_WINDOW_TITLE = "I3T - An Interactive Tool f
 class Application
 {
 protected:
-	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
-
-	bool m_shouldClose = false;
-	double m_lastFrameSeconds{0.0}; // PF changed to double
-
-	Window* m_window;
-
-	/// Array of commands which the application is going to process in its main loop.
-	std::vector<ICommand*> m_commands;
-
-	static Application* s_instance;
-
 	Application();
 
 private:
@@ -88,6 +76,13 @@ public:
 	void close();
 
 	/// Creates instance of module, registers it to the application, and calls its init() method.
+	///
+	/// \note Modules are destroyed in the reverse order of their creation!
+	///
+	/// \tparam T
+	/// \tparam Args
+	/// \param args
+	/// \return
 	template <typename T, typename... Args> static T* createModule(Args&&... args);
 
 	template <typename T> static T& getModule();
@@ -128,6 +123,22 @@ protected:
 	virtual void onEndFrame() {}
 	virtual void onUpdate(double delta) {}
 	virtual void onClose() {}
+
+private:
+	// std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
+	std::vector<std::unique_ptr<Module>> m_modules;
+
+	bool m_shouldClose = false;
+	double m_lastFrameSeconds{0.0}; // PF changed to double
+
+	Window* m_window;
+
+	/// Array of commands which the application is going to process in its main loop.
+	std::vector<ICommand*> m_commands;
+
+	static Application* s_instance;
+
+	std::unordered_map<std::size_t, std::size_t> m_modulesLookup;
 };
 
 template <typename T, typename... Args> inline T* Application::createModule(Args&&... args)
@@ -136,10 +147,15 @@ template <typename T, typename... Args> inline T* Application::createModule(Args
 
 	const auto hash = typeid(T).hash_code();
 	auto& self = Application::get();
-	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
-	self.m_modules[hash]->onInit();
+	self.m_modules.push_back(std::make_unique<T>(std::forward(args)...));
 
-	return (T*) self.m_modules[hash].get();
+	const auto idx = self.m_modules.size() - 1;
+	self.m_modulesLookup[hash] = idx;
+
+	auto* result = self.m_modules.back().get();
+	result->onInit();
+
+	return (T*) result;
 }
 
 template <typename T> T& Application::getModule()
@@ -147,10 +163,13 @@ template <typename T> T& Application::getModule()
 	const auto hash = typeid(T).hash_code();
 	const auto& self = Application::get();
 
-	I3T_ASSERT(self.m_modules.count(hash) != 0, "Module is not created!");
-	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr, "Invalid type.");
+	I3T_ASSERT(self.m_modulesLookup.count(hash) != 0, "Module is not created!: " + std::string(typeid(T).name()));
 
-	return *(T*) self.m_modules.at(hash).get();
+	const auto idx = self.m_modulesLookup.at(hash);
+	auto result = self.m_modules[idx].get();
+	I3T_ASSERT(dynamic_cast<T*>(result) != nullptr, "Invalid type.");
+
+	return *(T*) result;
 }
 
 typedef Application App;

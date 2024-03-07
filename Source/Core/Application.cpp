@@ -42,6 +42,10 @@ Application::~Application()
 		close();
 	}
 
+	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui::DestroyContext();
+
 	m_window->finalize();
 }
 
@@ -158,7 +162,7 @@ void Application::update()
 	double delta = current - m_lastFrameSeconds;
 	m_lastFrameSeconds = current;
 
-	for (auto& [_, m] : m_modules)
+	for (auto& m : m_modules)
 	{
 		m->onUpdate(delta);
 	}
@@ -168,10 +172,10 @@ void Application::update()
 
 void Application::display()
 {
-	for (auto& [_, m] : m_modules)
+	for (auto& m : m_modules)
 		m->onBeginFrame();
 
-	for (auto& [_, m] : m_modules)
+	for (auto& m : m_modules)
 		m->onEndFrame();
 }
 
@@ -179,7 +183,7 @@ void Application::close()
 {
 	m_shouldClose = true;
 
-	for (auto& [_, m] : m_modules)
+	for (auto& m : m_modules)
 	{
 		m->onClose();
 	}

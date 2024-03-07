@@ -1105,8 +1105,15 @@ bool Diwne::applyZoomScaling()
 	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
 	// ImGui::SetWindowFontScale(m_workAreaZoom);
 
-	m_zoomOriginalFontScale = applyZoomScalingToFont(ImGui::GetFont());
-	ImGui::PushFont(ImGui::GetFont());
+	/// \todo
+	auto* font = ImGui::GetFont();
+	if (!font)
+	{
+		return false;
+	}
+
+	m_zoomOriginalFontScale = applyZoomScalingToFont(font);
+	ImGui::PushFont(font);
 
 	//	static int d = 0;
 	//	int dMax = 120;
@@ -1141,6 +1148,11 @@ bool Diwne::restoreZoomScaling()
 
 float Diwne::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 {
+	if (!font)
+	{
+		return 1.0f;
+	}
+
 	ImFont* f = font;
 	if (largeFont != nullptr)
 	{
@@ -1149,6 +1161,7 @@ float Diwne::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 	float originalScale = f->Scale;
 	f->Scale = m_workAreaZoom;
 	ImGui::PushFont(f);
+
 	return originalScale;
 
 	// TODO: Test dynamic font switching based on zoom level

@@ -38,8 +38,6 @@ TEST(MathUtilsTest, QuatLerp)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		std::cout << "Angle[" << i << "] = " << angles[i] << std::endl;
-
 		auto result = Math::lerp(lhs, rhs, alphas[i], true); // true => use quaternion interpolation
 
 		auto expected = glm::eulerAngleX(glm::radians(angles[i])); // rotation part

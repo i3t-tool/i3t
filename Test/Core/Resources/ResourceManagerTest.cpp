@@ -21,13 +21,20 @@
 class ResourceManagerTest : public ::testing::Test
 {
 public:
-	ResourceManagerTest()
+	void SetUp() override
 	{
-		app.init();
+		app = new I3TApplication();
+		app->init();
+	}
+
+	void TearDown() override
+	{
+		app->close();
+		delete app;
 	}
 
 private:
-	I3TApplication app;
+	I3TApplication* app;
 };
 
 TEST_F(ResourceManagerTest, TextureTest)

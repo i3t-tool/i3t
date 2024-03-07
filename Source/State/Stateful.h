@@ -80,6 +80,7 @@ public:
 	{
 		rapidjson::Document doc;
 		doc.SetObject();
+
 		return doc;
 	}
 };
