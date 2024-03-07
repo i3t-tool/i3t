@@ -5,7 +5,7 @@ set -eo pipefail
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )"
 cd "$SCRIPT_DIR" && cd ..
 
-TEST="Binaries/Debug/I3TTest"
+TEST="${TEST:-Binaries/Debug/I3TTest}"
 
 if [ ! -f $TEST ]; then
   echo "Binary $TEST does not exists!"

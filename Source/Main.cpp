@@ -100,7 +100,6 @@ int main(int argc, char* argv[])
 
 	if (!Detail::isLightThemeSet().has_value())
 	{
-		std::cout << "Cannot get config value." << std::endl;
 		return 1;
 	}
 	std::cout << Detail::isLightThemeSet().value() << std::endl;

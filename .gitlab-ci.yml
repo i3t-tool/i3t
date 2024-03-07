@@ -80,7 +80,7 @@ test:
   rules:
     - !reference [.changes-rules, cpp]
   script:
-    - bash Scripts/RunTests.sh
+    - xvfb-run Binaries/Debug/I3TTest
   dependencies:
     - build-tests
 

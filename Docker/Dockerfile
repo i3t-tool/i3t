@@ -11,5 +11,6 @@ RUN apt update && apt install -y \
     libxrandr-dev \
     libxinerama-dev \
     libxcursor-dev \
-    libxi-dev && \
+    libxi-dev \
+    xvfb && \
     ln /usr/bin/g++-12 /usr/bin/g++
