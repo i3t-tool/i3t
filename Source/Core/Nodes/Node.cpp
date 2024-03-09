@@ -296,9 +296,9 @@ void Node::unplugInput(size_t index)
 {
 	I3T_ASSERT(m_inputs.size() > index, "The node's input pin that you want to unplug does not exist.");
 
-	LOG_DEBUG("Unplugging input {} of node {}.", index, getSignature());
-
 	auto& input = m_inputs[index];
+
+	LOG_DEBUG("Unplugging input {} of node {}.", index, getSignature());
 
 	if (!input.isPluggedIn())
 	{
@@ -326,7 +326,8 @@ void Node::unplugOutput(size_t index)
 
 	LOG_DEBUG("Unplugging output {} of node {}.", index, getSignature());
 
-	for (auto* input : m_outputs[index].getOutComponents())
+	const auto childInputs = m_outputs[index].getOutComponents();
+	for (auto* input : childInputs)
 	{
 		// Called through Node function to trigger callbacks.
 		input->Owner.unplugInput(input->Index);

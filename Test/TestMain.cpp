@@ -12,8 +12,11 @@
  */
 #include "gtest/gtest.h"
 
+#include "Logger/Logger.h"
+
 int main(int argc, char** argv)
 {
+	INIT_LOGGER(argc, argv);
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
