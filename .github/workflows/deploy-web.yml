@@ -28,7 +28,7 @@ jobs:
 
       - name: Generate C++ API documentation
         run: |
-          apt install -y doxygen unzip wget
+          sudo apt install -y doxygen unzip wget
           wget https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
           unzip doxybook2-linux-amd64-v1.5.0.zip
           cp bin/doxybook2 /usr/bin
