@@ -1,0 +1,400 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": false,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -59.26006317138672,
+                "orbitCameraRotationY": 21.88001251220703,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 23.93016815185547,
+                "iorbitCameraPivot": [
+                    0.179966077208519,
+                    -0.1724444329738617,
+                    0.3697827458381653
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 41,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1025.94287109375,
+                    154.0858917236328
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 37,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1026.142822265625,
+                    -11.314277648925782
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 45,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1027.3421630859376,
+                    71.48560333251953
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 19,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    763.7431030273438,
+                    -28.914306640625
+                ],
+                "type": "MatrixToVectors"
+            },
+            {
+                "id": 61,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1161.7437744140626,
+                    153.8856964111328
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 49,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1296.5433349609376,
+                    -48.91427993774414
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 52,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1148.5430908203126,
+                    -47.314231872558597
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 58,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "position": [
+                    1157.944091796875,
+                    44.48569869995117
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 67,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1303.34326171875,
+                    17.08570671081543
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 64,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    1309.9429931640626,
+                    82.88569641113281
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 10,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "position": [
+                    1439.9991455078126,
+                    154.399658203125
+                ],
+                "type": "Determinant"
+            }
+        ],
+        "sequences": [
+            {
+                "id": 13,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    281.4284362792969,
+                    229.7143096923828
+                ],
+                "transforms": []
+            },
+            {
+                "id": 1,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    158.3999786376953,
+                    35.40000534057617
+                ],
+                "transforms": [
+                    {
+                        "id": 7,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            178.1428680419922,
+                            66.28568267822266
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "angle": 0.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.2999999523162842,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": false
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 8,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    486.6002197265625,
+                    -16.399999618530275
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 70,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    496.5431213378906,
+                    125.48564910888672
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                19,
+                1,
+                41,
+                0
+            ],
+            [
+                19,
+                2,
+                41,
+                1
+            ],
+            [
+                19,
+                0,
+                37,
+                0
+            ],
+            [
+                19,
+                1,
+                37,
+                1
+            ],
+            [
+                19,
+                0,
+                45,
+                0
+            ],
+            [
+                19,
+                2,
+                45,
+                1
+            ],
+            [
+                1,
+                1,
+                19,
+                0
+            ],
+            [
+                19,
+                2,
+                61,
+                0
+            ],
+            [
+                52,
+                0,
+                49,
+                0
+            ],
+            [
+                19,
+                0,
+                52,
+                0
+            ],
+            [
+                19,
+                1,
+                58,
+                0
+            ],
+            [
+                58,
+                0,
+                67,
+                0
+            ],
+            [
+                61,
+                0,
+                64,
+                0
+            ],
+            [
+                1,
+                1,
+                10,
+                0
+            ],
+            [
+                1,
+                0,
+                8,
+                0
+            ],
+            [
+                1,
+                0,
+                70,
+                0
+            ],
+            [
+                1,
+                1,
+                13,
+                1
+            ]
+        ],
+        "zoom": 1.25,
+        "workArea": {
+            "Min": [
+                105.34286499023438,
+                -76.11431121826172
+            ],
+            "Max": [
+                1628.5428466796876,
+                459.88568115234377
+            ]
+        }
+    }
+}
