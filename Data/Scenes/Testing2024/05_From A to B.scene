@@ -1,9 +1,10 @@
 {
+    "readOnly": true,
     "resources": {
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": true,
+        "manipulator_enabled": false,
         "mainScene": {
             "lightFollowsCamera": true,
             "camera": {
