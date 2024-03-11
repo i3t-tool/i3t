@@ -28,11 +28,11 @@
                     0.0,
                     1.0
                 ],
-                "iorbitCameraRadius": 18.251243591308599,
+                "iorbitCameraRadius": 35.46453475952149,
                 "iorbitCameraPivot": [
-                    0.9245109558105468,
-                    -4.6572675704956059,
-                    1.0032027959823609
+                    2.5759239196777345,
+                    1.3171708583831788,
+                    -0.8443679213523865
                 ],
                 "fov": 90.0,
                 "zNear": 0.20000000298023225,
@@ -67,7 +67,7 @@
         ],
         "sequences": [
             {
-                "id": 39,
+                "id": 7,
                 "label": "B",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -79,41 +79,7 @@
                 "transforms": []
             },
             {
-                "id": 51,
-                "label": "B",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    669.155517578125,
-                    171.91110229492188
-                ],
-                "transforms": []
-            },
-            {
-                "id": 85,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1335.107666015625,
-                    180.4351043701172
-                ],
-                "transforms": []
-            },
-            {
-                "id": 91,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1011.822998046875,
-                    225.14935302734376
-                ],
-                "transforms": []
-            },
-            {
-                "id": 45,
+                "id": 31,
                 "label": "A",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -125,7 +91,7 @@
                 "transforms": []
             },
             {
-                "id": 23,
+                "id": 37,
                 "label": "B",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -136,7 +102,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 29,
+                        "id": 43,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -179,7 +145,7 @@
                         "locked": true
                     },
                     {
-                        "id": 30,
+                        "id": 44,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -226,7 +192,7 @@
                         "locked": true
                     },
                     {
-                        "id": 31,
+                        "id": 45,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -269,7 +235,7 @@
                         "locked": true
                     },
                     {
-                        "id": 32,
+                        "id": 46,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -318,7 +284,7 @@
                 ]
             },
             {
-                "id": 7,
+                "id": 47,
                 "label": "A",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -329,7 +295,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 13,
+                        "id": 53,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -372,7 +338,7 @@
                         "locked": true
                     },
                     {
-                        "id": 14,
+                        "id": 54,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -419,7 +385,7 @@
                         "locked": true
                     },
                     {
-                        "id": 15,
+                        "id": 55,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -462,7 +428,7 @@
                         "locked": true
                     },
                     {
-                        "id": 16,
+                        "id": 56,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -511,7 +477,7 @@
                 ]
             },
             {
-                "id": 17,
+                "id": 57,
                 "label": "B^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -523,7 +489,7 @@
                 "transforms": []
             },
             {
-                "id": 33,
+                "id": 63,
                 "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -535,7 +501,55 @@
                 "transforms": []
             },
             {
-                "id": 63,
+                "id": 19,
+                "label": "matice modelu",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1344.4410400390626,
+                    204.4351043701172
+                ],
+                "transforms": []
+            },
+            {
+                "id": 13,
+                "label": "B",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    669.155517578125,
+                    171.91110229492188
+                ],
+                "transforms": []
+            },
+            {
+                "id": 25,
+                "label": "BA^(-1)",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    910.4894409179688,
+                    354.4825134277344
+                ],
+                "transforms": []
+            },
+            {
+                "id": 75,
+                "label": "A",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1146.068359375,
+                    -74.28883361816406
+                ],
+                "transforms": []
+            },
+            {
+                "id": 69,
                 "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -545,18 +559,6 @@
                     5.911102294921875
                 ],
                 "transforms": []
-            },
-            {
-                "id": 57,
-                "label": "A",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1106.0665283203126,
-                    -79.6221923828125
-                ],
-                "transforms": []
             }
         ],
         "cycles": [],
@@ -564,7 +566,7 @@
         "screens": [],
         "models": [
             {
-                "id": 69,
+                "id": 81,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -585,7 +587,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 75,
+                "id": 83,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -606,13 +608,13 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 71,
+                "id": 85,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    -116.88607788085938,
-                    101.56189727783203
+                    -106.21940612792969,
+                    110.89524841308594
                 ],
                 "model": "Axes",
                 "visible": true,
@@ -627,16 +629,16 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 73,
+                "id": 87,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    35.37784194946289,
-                    -177.53338623046876
+                    40.711181640625,
+                    -189.5334014892578
                 ],
                 "model": "default_cube",
-                "visible": true,
+                "visible": false,
                 "showAxes": true,
                 "opaque": true,
                 "opacity": 0.5,
@@ -648,7 +650,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 77,
+                "id": 89,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -672,105 +674,99 @@
         "transforms": [],
         "edges": [
             [
-                23,
+                47,
                 1,
-                39,
+                1,
+                0
+            ],
+            [
+                37,
+                1,
+                4,
+                0
+            ],
+            [
+                37,
+                1,
+                7,
                 1
             ],
             [
-                39,
+                47,
                 1,
-                51,
+                31,
                 1
             ],
             [
+                4,
+                0,
                 57,
-                2,
-                85,
                 1
             ],
             [
+                1,
+                0,
                 63,
+                1
+            ],
+            [
+                31,
+                0,
+                83,
+                0
+            ],
+            [
+                7,
+                0,
+                85,
+                0
+            ],
+            [
+                31,
+                0,
+                87,
+                0
+            ],
+            [
+                75,
                 2,
-                91,
+                19,
                 1
             ],
             [
                 7,
                 1,
-                45,
+                13,
                 1
             ],
             [
-                7,
-                1,
-                1,
-                0
-            ],
-            [
-                23,
-                1,
-                4,
-                0
-            ],
-            [
-                4,
-                0,
-                17,
+                69,
+                2,
+                25,
                 1
             ],
             [
-                1,
-                0,
-                33,
-                1
-            ],
-            [
-                45,
+                69,
                 0,
                 75,
                 0
             ],
             [
-                39,
-                0,
-                71,
-                0
-            ],
-            [
-                45,
-                0,
-                73,
-                0
-            ],
-            [
-                51,
-                0,
-                63,
-                0
-            ],
-            [
-                33,
+                31,
                 1,
-                63,
+                75,
                 1
             ],
             [
-                57,
+                13,
                 0,
-                77,
+                69,
                 0
             ],
             [
                 63,
-                0,
-                57,
-                0
-            ],
-            [
-                45,
                 1,
-                57,
+                69,
                 1
             ]
         ],
@@ -782,7 +778,7 @@
             ],
             "Max": [
                 1767.393798828125,
-                527.6729736328125
+                599.6729736328125
             ]
         }
     }

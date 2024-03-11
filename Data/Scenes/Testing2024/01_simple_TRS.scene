@@ -3,7 +3,7 @@
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": true,
+        "manipulator_enabled": false,
         "mainScene": {
             "lightFollowsCamera": true,
             "camera": {
@@ -44,7 +44,7 @@
         "operators": [],
         "sequences": [
             {
-                "id": 1,
+                "id": 47,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -54,7 +54,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 7,
+                        "id": 53,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
@@ -101,12 +101,12 @@
                         "locked": true
                     },
                     {
-                        "id": 8,
+                        "id": 54,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            581.491943359375,
+                            577.491943359375,
                             57.7774658203125
                         ],
                         "type": "EulerX",
@@ -144,12 +144,12 @@
                         "locked": true
                     },
                     {
-                        "id": 9,
+                        "id": 55,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            757.491943359375,
+                            749.491943359375,
                             57.7774658203125
                         ],
                         "type": "Scale",
@@ -198,7 +198,7 @@
         "screens": [],
         "models": [
             {
-                "id": 50,
+                "id": 56,
                 "label": "word frame w",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -220,7 +220,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 10,
+                "id": 58,
                 "label": "object frame o",
                 "render": true,
                 "numberOfDecimals": 1,
@@ -242,7 +242,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 12,
+                "id": 60,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -266,9 +266,9 @@
         "transforms": [],
         "edges": [
             [
-                1,
+                47,
                 0,
-                12,
+                60,
                 0
             ]
         ],
@@ -280,7 +280,7 @@
             ],
             "Max": [
                 2097.491943359375,
-                309.7774658203125
+                284.7774658203125
             ]
         }
     }

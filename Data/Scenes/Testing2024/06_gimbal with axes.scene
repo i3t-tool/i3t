@@ -3,26 +3,26 @@
         "imported": [
             {
                 "name": "gimbal_inner_x",
-                "path": "..\\Default_scenes\\04_gimbalLock\\scene_data\\gimbal_inner_x\\gimbal_inner_x.glb",
+                "path": "../Default_scenes/04_gimbalLock/scene_data/gimbal_inner_x/gimbal_inner_x.glb",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "gimbal_middle_z",
-                "path": "..\\Default_scenes\\04_gimbalLock\\scene_data\\gimbal_middle_z\\gimbal_middle_z.glb",
+                "path": "../Default_scenes/04_gimbalLock/scene_data/gimbal_middle_z/gimbal_middle_z.glb",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "gimbal_outer_y",
-                "path": "..\\Default_scenes\\04_gimbalLock\\scene_data\\gimbal_outer_y\\gimbal_outer_y.glb",
+                "path": "../Default_scenes/04_gimbalLock/scene_data/gimbal_outer_y/gimbal_outer_y.glb",
                 "type": "Model",
                 "normalize": false
             }
         ]
     },
     "viewport": {
-        "manipulator_enabled": true,
+        "manipulator_enabled": false,
         "mainScene": {
             "lightFollowsCamera": true,
             "camera": {
@@ -224,7 +224,7 @@
                 ]
             },
             {
-                "id": 23,
+                "id": 16,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -234,7 +234,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 29,
+                        "id": 22,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "SetValues",
@@ -279,7 +279,7 @@
                 ]
             },
             {
-                "id": 16,
+                "id": 23,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -289,7 +289,7 @@
                 ],
                 "transforms": [
                     {
-                        "id": 22,
+                        "id": 29,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "SetValues",
@@ -394,7 +394,7 @@
         "screens": [],
         "models": [
             {
-                "id": 39,
+                "id": 37,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -415,7 +415,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 41,
+                "id": 39,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -436,7 +436,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 43,
+                "id": 41,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -457,7 +457,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 47,
+                "id": 43,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -499,7 +499,7 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 37,
+                "id": 47,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -529,7 +529,25 @@
                 0
             ],
             [
+                16,
+                0,
+                23,
+                0
+            ],
+            [
+                23,
+                0,
                 30,
+                0
+            ],
+            [
+                30,
+                0,
+                37,
+                0
+            ],
+            [
+                23,
                 0,
                 39,
                 0
@@ -541,27 +559,9 @@
                 0
             ],
             [
-                23,
+                16,
                 0,
                 43,
-                0
-            ],
-            [
-                23,
-                0,
-                16,
-                0
-            ],
-            [
-                16,
-                0,
-                30,
-                0
-            ],
-            [
-                23,
-                0,
-                47,
                 0
             ],
             [
@@ -573,7 +573,7 @@
             [
                 30,
                 0,
-                37,
+                47,
                 0
             ]
         ],
@@ -585,7 +585,7 @@
             ],
             "Max": [
                 1767.0322265625,
-                556.0
+                528.0
             ]
         }
     }
