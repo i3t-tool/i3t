@@ -1,0 +1,328 @@
+{
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -91.73999786376952,
+                "orbitCameraRotationY": 1.0000019073486329,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 12.0,
+                "iorbitCameraPivot": [
+                    0.5411601662635803,
+                    0.7895801067352295,
+                    0.05072152614593506
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 18,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    175.0,
+                    173.0
+                ],
+                "type": "FloatSinCos"
+            },
+            {
+                "id": 22,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "position": [
+                    65.0,
+                    174.0
+                ],
+                "type": "FloatToFloat",
+                "value": 0.5235983729362488
+            }
+        ],
+        "sequences": [
+            {
+                "id": 1,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    361.0,
+                    167.0
+                ],
+                "transforms": [
+                    {
+                        "id": 7,
+                        "render": true,
+                        "numberOfDecimals": 3,
+                        "LOD": "Full",
+                        "position": [
+                            381.0,
+                            198.0
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "label": "cilova matice",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    353.0,
+                    358.0
+                ],
+                "transforms": [
+                    {
+                        "id": 14,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "position": [
+                            373.0,
+                            389.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                1.899999976158142,
+                                1.2999999523162842,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                1.899999976158142,
+                                1.2999999523162842,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 15,
+                        "render": true,
+                        "numberOfDecimals": 3,
+                        "LOD": "SetValues",
+                        "position": [
+                            516.0,
+                            389.0
+                        ],
+                        "type": "EulerZ",
+                        "defaultValues": {
+                            "angle": 0.5235983729362488
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.8660256266593933,
+                                0.49999964237213137,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -0.49999964237213137,
+                                0.8660256266593933,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 16,
+                "label": "cil",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    828.0,
+                    357.0
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 28,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    695.0,
+                    164.0
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 25,
+                "label": "world",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    269.0,
+                    2.0
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "tintStrength": 0.6899999976158142
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                22,
+                0,
+                18,
+                0
+            ],
+            [
+                8,
+                0,
+                16,
+                0
+            ],
+            [
+                1,
+                0,
+                28,
+                0
+            ]
+        ],
+        "zoom": 1.0,
+        "workArea": {
+            "Min": [
+                0.0,
+                0.0
+            ],
+            "Max": [
+                1904.0,
+                629.0
+            ]
+        }
+    }
+}
