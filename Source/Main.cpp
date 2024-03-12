@@ -92,17 +92,10 @@
  * argv	An array of command-line argument strings. \return	Exit-code for the
  * process - 0 for success, else an error code.
  */
-#include "GUI/Theme.h"
 
 int main(int argc, char* argv[])
 {
 	std::setlocale(LC_ALL, ".UTF8");
-
-	if (!Detail::isLightThemeSet().has_value())
-	{
-		return 1;
-	}
-	std::cout << Detail::isLightThemeSet().value() << std::endl;
 
 	std::cout << (Config::COPYRIGHT_TEXT);
 

@@ -510,5 +510,5 @@ private:
 
 namespace Detail
 {
-Result<bool, Error> isLightThemeSet();
+bool isLightThemeSet();
 }

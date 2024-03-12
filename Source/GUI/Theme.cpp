@@ -1134,7 +1134,7 @@ void Theme::returnFloatColorToDefault()
 	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgHovered];
 }
 
-Result<bool, Error> Detail::isLightThemeSet()
+bool Detail::isLightThemeSet()
 {
 #ifdef WIN32
 	// based on
@@ -1150,14 +1150,15 @@ Result<bool, Error> Detail::isLightThemeSet()
 
 	if (res != ERROR_SUCCESS)
 	{
-		return Err("error_code: " + std::to_string(res));
+		LOG_ERROR("error_code: " + std::to_string(res));
+		return false;
 	}
 
 	// convert bytes written to our buffer to an int, assuming little-endian
 	auto i = int(buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0]);
 
 	return i == 1;
-#else
-	return true;
 #endif
+
+	return false;
 }

@@ -208,9 +208,7 @@ void UIModule::setDefaultTheme()
 	const auto maybeLightTheme = getThemeByName(I3T_DEFAULT_THEME_LIGHT_NAME);
 	const auto maybeDarkTheme = getThemeByName(I3T_DEFAULT_THEME_DARK_NAME);
 
-	const auto themeQueryResult = Detail::isLightThemeSet();
-
-	if (!maybeLightTheme.has_value() || !maybeDarkTheme.has_value() || !themeQueryResult)
+	if (!maybeLightTheme.has_value() || !maybeDarkTheme.has_value())
 	{
 		LOG_ERROR("Failed to set default theme: {} or {} not found", I3T_DEFAULT_THEME_LIGHT_NAME,
 		          I3T_DEFAULT_THEME_DARK_NAME);
@@ -219,9 +217,7 @@ void UIModule::setDefaultTheme()
 	}
 	else
 	{
-		const bool hasLightTheme = themeQueryResult.value();
-
-		hasLightTheme ? setTheme(*maybeLightTheme.value()) : setTheme(*maybeDarkTheme.value());
+		Detail::isLightThemeSet() ? setTheme(*maybeLightTheme.value()) : setTheme(*maybeDarkTheme.value());
 	}
 
 	getUserData().customThemeName = "";
