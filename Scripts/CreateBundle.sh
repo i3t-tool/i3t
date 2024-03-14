@@ -99,11 +99,13 @@ function create_bundle() {
     archive_name="I3T$ARCHIVE_NAME_POSTFIX.zip"
 
     cp Data/imgui_default.ini Data/imgui.ini
-    binaries=$(find "$binaries_directory" -type f -name "*.so" -o -name "*.dll" -o -name "I3T" -o -name "I3T.exe")
+    binaries=$(find "$binaries_directory" -name "*.so" -o -name "*.dll" -o -name "I3T" -o -name "I3T.exe")
     for binary in $binaries; do
-        cp -f "$binary" "$(basename $binary)"
-        zip_cmd "$archive_name" "$(basename $binary)"
-        rm -f "$(basename $binary)"
+        local binary_name=$(basename $binary)
+
+        cp -f "$binary" "$binary_name"
+        zip_cmd "$archive_name" "$binary_name"
+        rm -f "$binary_name"
     done
 
     if [ ! $? = 0 ]; then

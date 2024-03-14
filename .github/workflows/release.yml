@@ -39,8 +39,8 @@ jobs:
         shell: bash
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --target I3T
-          bash Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
+          cmake --build build --config Release --target I3T -j
+          Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
 
       - name: Publish
         uses: softprops/action-gh-release@v1
