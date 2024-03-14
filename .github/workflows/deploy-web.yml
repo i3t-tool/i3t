@@ -14,9 +14,6 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Docs
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -31,8 +28,8 @@ jobs:
           sudo apt install -y doxygen unzip wget
           wget https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
           unzip doxybook2-linux-amd64-v1.5.0.zip
-          cp bin/doxybook2 /usr/bin
-          bash Scripts/CreateCppDocs.sh
+          sudo cp bin/doxybook2 /usr/bin
+          # bash ./Scripts/CreateCppDocs.sh
 
       - name: Build website
         run: npm run docs:build
