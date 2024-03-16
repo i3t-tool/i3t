@@ -168,30 +168,35 @@ TEST(SequenceIteratorTest, Advance)
 
 	matrix = *it;
 	EXPECT_EQ(it.getSequence(), s.sequence5.get());
+	EXPECT_TRUE(it.transformInfo().isExternal);
 	EXPECT_EQ(matrix, s.matrix2);
 	++it;
 	ASSERT_TRUE(it != tree.end());
 
 	matrix = *it;
 	EXPECT_EQ(it.getSequence(), s.sequence3.get());
+	EXPECT_FALSE(it.transformInfo().isExternal);
 	EXPECT_EQ(matrix, s.sequence3->getMatrices().back());
 	++it;
 	ASSERT_TRUE(it != tree.end());
 
 	matrix = *it;
 	EXPECT_EQ(it.getSequence(), s.sequence2.get());
+	EXPECT_TRUE(it.transformInfo().isExternal);
 	EXPECT_EQ(matrix, s.matrix1);
 	++it;
 	ASSERT_TRUE(it != tree.end());
 
 	matrix = *it;
 	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_FALSE(it.transformInfo().isExternal);
 	EXPECT_EQ(matrix, s.sequence1->getMatrices()[1]);
 	++it;
 	ASSERT_TRUE(it != tree.end());
 
 	matrix = *it;
 	EXPECT_EQ(it.getSequence(), s.sequence1.get());
+	EXPECT_FALSE(it.transformInfo().isExternal);
 	EXPECT_EQ(matrix, s.sequence1->getMatrices()[0]);
 	++it;
 

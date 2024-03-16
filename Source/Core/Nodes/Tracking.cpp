@@ -52,12 +52,13 @@ SequenceTree::MatrixIterator SequenceTree::end()
 
 SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 {
-	m_currentSequence = sequence;
+	m_info.sequence = sequence;
 
-	auto inputOperator = GraphManager::getParent(m_currentSequence->getPtr(), I3T_SEQ_IN_MAT);
+	auto inputOperator = GraphManager::getParent(m_info.sequence->getPtr(), I3T_SEQ_IN_MAT);
 	if (inputOperator != nullptr)
 	{
-		// there is matrix output plugged into this sequence
+		// there is matrix output plugged into this sequence)
+		m_info.isExternal = true;
 		m_currentMatrix = inputOperator;
 	}
 	else
@@ -69,20 +70,20 @@ SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 
 SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, Ptr<Node> node)
 {
-	m_currentSequence = sequence;
+	m_info.sequence = sequence;
 	m_currentMatrix = node;
 }
 
 SequenceTree::MatrixIterator::MatrixIterator(const SequenceTree::MatrixIterator& mt)
 {
 	m_tree = mt.m_tree;
-	m_currentSequence = mt.m_currentSequence;
+	m_info.sequence = mt.m_info.sequence;
 	m_currentMatrix = mt.m_currentMatrix;
 }
 
 Sequence* SequenceTree::MatrixIterator::getSequence() const
 {
-	return m_currentSequence;
+	return m_info.sequence;
 }
 
 std::vector<Ptr<Node>> SequenceTree::MatrixIterator::collect()
@@ -96,6 +97,21 @@ std::vector<Ptr<Node>> SequenceTree::MatrixIterator::collect()
 	}
 
 	return result;
+}
+
+std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> SequenceTree::MatrixIterator::collectWithInfo()
+{
+	std::vector<Ptr<Node>> matrices;
+	std::vector<TransformInfo> info;
+	auto it = *this;
+	while (it != m_tree->end())
+	{
+		matrices.push_back(*it);
+		info.push_back(m_info);
+		++it;
+	}
+
+	return {matrices, info};
 }
 
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
@@ -145,7 +161,7 @@ Ptr<Node> SequenceTree::MatrixIterator::operator*() const
 
 bool SequenceTree::MatrixIterator::operator==(const SequenceTree::MatrixIterator& rhs) const
 {
-	return m_currentMatrix == rhs.m_currentMatrix && m_currentSequence == rhs.m_currentSequence;
+	return m_currentMatrix == rhs.m_currentMatrix && m_info.sequence == rhs.m_info.sequence;
 }
 
 bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator& rhs) const
@@ -156,17 +172,17 @@ bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator
 void SequenceTree::MatrixIterator::advance()
 {
 	bool hasNext = true;
-	const auto parentNonEmptySequence = getNonemptyParentSequence(m_currentSequence->getPtr()->as<Sequence>());
+	const auto parentNonEmptySequence = getNonemptyParentSequence(m_info.sequence->getPtr()->as<Sequence>());
 
-	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn() && !parentNonEmptySequence)
+	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn() && !parentNonEmptySequence)
 	{
 		hasNext = false;
 	}
 
-	const auto& matrices = m_currentSequence->getMatrices();
+	const auto& matrices = m_info.sequence->getMatrices();
 	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
 	auto index = std::distance(matrices.begin(), it);
-	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
 		// The sequence has matrix input plugged in. We are at the end of the sequence.
 		index = 0;
@@ -183,6 +199,7 @@ void SequenceTree::MatrixIterator::advance()
 		return;
 	}
 
+	m_info.isExternal = false;
 	if (index == 0)
 	{
 		const auto matrixPluggedIntoParent = GraphManager::getParent(parentNonEmptySequence, I3T_SEQ_IN_MAT);
@@ -190,13 +207,14 @@ void SequenceTree::MatrixIterator::advance()
 		// We are at the beginning of the sequence. Go to the next sequence.
 		if (matrixPluggedIntoParent)
 		{
+			m_info.isExternal = true;
 			m_currentMatrix = matrixPluggedIntoParent;
 		}
 		else
 		{
 			m_currentMatrix = parentNonEmptySequence->getMatrices().back();
 		}
-		m_currentSequence = parentNonEmptySequence.get();
+		m_info.sequence = parentNonEmptySequence.get();
 	}
 	else
 	{
@@ -227,13 +245,13 @@ void SequenceTree::MatrixIterator::withdraw()
 {
 	bool hasPrevMatrix = true;
 	auto prevNonEmptySequence = getNonemptyChildSequence(m_tree->m_beginSequence->getPtr()->as<Sequence>(),
-	                                                     m_currentSequence->getPtr()->as<Sequence>());
+	                                                     m_info.sequence->getPtr()->as<Sequence>());
 
 	// Find index of current matrix in current sequence.
-	const auto& matrices = m_currentSequence->getMatrices();
+	const auto& matrices = m_info.sequence->getMatrices();
 	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
 	auto index = std::distance(matrices.begin(), it);
-	if (m_currentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
 		// The sequence has matrix input plugged in. We are at the beginning of the sequence.
 		index = matrices.size() - 1;
@@ -249,19 +267,21 @@ void SequenceTree::MatrixIterator::withdraw()
 		return;
 	}
 
+	m_info.isExternal = false;
 	if (index == matrices.size() - 1)
 	{
 		const auto matrixPluggedIntoChild = GraphManager::getParent(prevNonEmptySequence, I3T_SEQ_IN_MAT);
 
 		if (matrixPluggedIntoChild)
 		{
+			m_info.isExternal = true;
 			m_currentMatrix = matrixPluggedIntoChild;
 		}
 		else
 		{
 			m_currentMatrix = prevNonEmptySequence->getMatrices().front();
 		}
-		m_currentSequence = prevNonEmptySequence.get();
+		m_info.sequence = prevNonEmptySequence.get();
 	}
 	else if (m_currentMatrix == nullptr)
 	{
@@ -355,12 +375,16 @@ void MatrixTracker::track()
 		return;
 	}
 
-	m_state.trackingProgress.clear();
+	m_state.reset();
 
 	// Create iterator for traversing sequence branch.
 	SequenceTree st(m_beginSequence->getPtr());
 
-	std::vector<Ptr<Node>> matrices = st.begin().collect();
+	auto [matrices, info] = st.begin().collectWithInfo();
+	for (size_t i = 0; i < matrices.size(); ++i)
+	{
+		m_state.transformInfo[matrices[i]->getId()] = info[i];
+	}
 
 	for (const auto& matrix : matrices)
 	{
@@ -390,7 +414,7 @@ void MatrixTracker::track()
 
 	float interpParam = fmod(m_param, matFactor) / matFactor;
 
-	handleEdgeCases(interpParam, matrices);
+	handleEdgeCases(interpParam, matrices, info);
 
 	glm::mat4 matrix(1.0f);
 
@@ -444,16 +468,19 @@ void MatrixTracker::track()
 	setModelTransform();
 }
 
-void MatrixTracker::handleEdgeCases(float& interpParam, const std::vector<Ptr<Node>>& matrices)
+void MatrixTracker::handleEdgeCases(float& interpParam, const std::vector<Ptr<Node>>& matrices,
+                                    const std::vector<TransformInfo>& info)
 {
 	if (Math::eq(0.0f, m_param))
 	{
 		interpParam = 0.0f;
+
 		m_state.interpolatedTransformID = matrices.front()->getId();
 	}
 	else if (Math::eq(1.0f, m_param))
 	{
 		interpParam = 1.0f;
+
 		m_state.interpolatedTransformID = matrices.back()->getId();
 	}
 }

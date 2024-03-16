@@ -24,6 +24,15 @@ namespace Core
 class Sequence;
 class Transform;
 
+/// Cannot outlive the sequence.
+struct TransformInfo
+{
+	bool isExternal = false;
+
+	/// Sequence which contains the transform.
+	Sequence* sequence = nullptr;
+};
+
 class SequenceTree
 {
 	Sequence* m_beginSequence;
@@ -46,10 +55,17 @@ public:
 		///     Never null.
 		Sequence* getSequence() const;
 
+		const TransformInfo& transformInfo() const
+		{
+			return m_info;
+		}
+
 		/// \returns Non-owned pointer to the all matrices from start to the root,
 		///     note that Ptr<Node> may points to operator with matrix output,
 		///     not only to transformation.
 		std::vector<Ptr<Node>> collect();
+
+		std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> collectWithInfo();
 
 		/// Move iterator to root sequence.
 		MatrixIterator& operator++();
@@ -86,7 +102,8 @@ public:
 		void invalidate();
 
 		SequenceTree* m_tree;
-		Sequence* m_currentSequence;
+		/// Current matrix info.
+		TransformInfo m_info;
 		Ptr<Node> m_currentMatrix;
 	};
 
@@ -117,10 +134,17 @@ public:
 
 struct TrackingResult
 {
-	std::size_t fullMatricesCount;
-	ID interpolatedTransformID;
+	std::size_t fullMatricesCount = 0;
+	ID interpolatedTransformID = 0;
 	glm::mat4 interpolatedMatrix{1.0f};
 	std::map<ID, float> trackingProgress;
+	std::map<ID, TransformInfo> transformInfo;
+
+	void reset()
+	{
+		trackingProgress.clear();
+		transformInfo.clear();
+	}
 };
 
 enum class TrackingDirection;
@@ -176,11 +200,17 @@ public:
 		return m_state.interpolatedTransformID;
 	}
 
+	const TrackingResult& result() const
+	{
+		return m_state;
+	}
+
 private:
 	/// \pre m_beginSequence is set
 	void track();
 
-	void handleEdgeCases(float& interpParam, const std::vector<Ptr<Node>>& matrices);
+	void handleEdgeCases(float& interpParam, const std::vector<Ptr<Node>>& matrices,
+	                     const std::vector<TransformInfo>& info);
 
 	/// Public interface is in the GraphManager.
 	void stop();
