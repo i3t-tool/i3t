@@ -88,14 +88,14 @@ enum IconType
 	GrabDownRight,
 	Cross,
 	Hyphen,
-	Stop,         ///< ⏹
-	Pause,        ///< ⏸ two vertical bars
+	Stop,         ///< Black Square For Stop (U+23F9)
+	Pause,        ///< Double Vertical Bar (U+23F8)
 	SkipBack,     ///< |< vertical bar followed by the left arrow
 	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
 	SkipForward,  ///< ">|" right arrow followed by the vertical bar
 	SkipForward2, ///< |> vertical bar followed by the right arrow
-	Rewind,       ///< ⏪
-	FastForward,  ///< ⏩
+	Rewind,       ///< Black Left-Pointing Double Triangle (U+23EA)
+	FastForward,  ///< Black Right-Pointing Double Triangle (U+23E9)
 	AtFrom,       // todo, now a synonym to the FastForward
 	AtTo,         // todo, now a synonym to the Rewind
 };

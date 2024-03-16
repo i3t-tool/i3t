@@ -30,6 +30,7 @@ export default defineConfig({
   // # Your title {#your-custom-id}
   // ```
   markdown: { attrs: { disable: true } },
+  ignoreDeadLinks: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -59,7 +60,6 @@ export default defineConfig({
           { text: 'How to add new node', link: '/developer-guide/how-to-add-new-node' },
         ]
       },
-        /*
       {
         text: 'C++ API Reference',
         link: '/cpp-api-reference/',
@@ -70,7 +70,6 @@ export default defineConfig({
           ...autogenerate('Namespaces', 'namespaces'),
         ]
       }
-         */
     ],
 
     socialLinks: [
