@@ -13,6 +13,7 @@
 #include "StateManager.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Config.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"
@@ -28,7 +29,7 @@ void StateManager::onInit()
 	fs::create_directory(USER_DATA_DIR);
 
 	// Create UserData/Global.json if it doesn't exist.
-	if (!fs::exists(USER_DATA_FILE))
+	if (!fs::exists(Configuration::root / USER_DATA_FILE))
 	{
 		saveUserData();
 	}
@@ -423,7 +424,7 @@ void StateManager::saveUserData()
 {
 	auto& data = getUserData();
 
-	auto result = JSON::serializeToFile(data, USER_DATA_FILE);
+	auto result = JSON::serializeToFile(data, Configuration::root / USER_DATA_FILE);
 	if (!result)
 	{
 		LOG_ERROR("Failed to create initial UserData/Global.json: {}", result.error());
@@ -435,7 +436,7 @@ void StateManager::loadUserData()
 	auto& data = getUserData();
 
 	// Load UserData/Global.json.
-	auto result = JSON::deserializeFile(fs::path(USER_DATA_FILE), data);
+	auto result = JSON::deserializeFile(Configuration::root / USER_DATA_FILE, data);
 	if (!result)
 	{
 		LOG_ERROR("Failed to load UserData/Global.json: {}", result.error());

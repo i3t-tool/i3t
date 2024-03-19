@@ -12,24 +12,43 @@
  */
 #include "SystemDialogs.h"
 
+#include <functional>
+
 #include "portable-file-dialogs.h"
 
+#include "Config.h"
 #include "Logger/Logger.h"
 #include "Utils/Text.h"
+
+template <typename T> T currentPathGuard(std::function<T(void)> fn)
+{
+	const auto pwd = fs::current_path();
+
+	auto result = fn();
+
+	if (fs::current_path() != pwd)
+	{
+		LOG_WARN("Current path changed by file dialog from {} to {}. Restoring.", pwd.string(),
+		         fs::current_path().string());
+		fs::current_path(Configuration::root);
+	}
+
+	return result;
+}
 
 bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
                                          const std::vector<std::string>& filter)
 {
 	std::vector<fs::path> results;
-	if (OpenFilesDialog(results, title, root, filter, true))
-	{
-		result = results.at(0);
-		return true;
-	}
-	else
+
+	if (!OpenFilesDialog(results, title, root, filter, true))
 	{
 		return false;
 	}
+
+	result = results.at(0);
+
+	return true;
 }
 
 bool SystemDialogs::OpenFilesDialog(std::vector<fs::path>& result, const std::string& title, fs::path root,
@@ -37,9 +56,11 @@ bool SystemDialogs::OpenFilesDialog(std::vector<fs::path>& result, const std::st
 {
 	const auto pwd = fs::current_path();
 
-	auto files = pfd::open_file(title, root.make_preferred().string(), filter,
-	                            (singleSelect ? pfd::opt::none : pfd::opt::multiselect))
-	                 .result();
+	auto files = currentPathGuard<std::vector<std::string>>([&] {
+		return pfd::open_file(title, root.make_preferred().string(), filter,
+		                      (singleSelect ? pfd::opt::none : pfd::opt::multiselect))
+		    .result();
+	});
 
 	if (files.empty())
 	{
@@ -52,22 +73,15 @@ bool SystemDialogs::OpenFilesDialog(std::vector<fs::path>& result, const std::st
 		result.push_back(fs::path(fileStr));
 	}
 
-	if (fs::current_path() != pwd)
-	{
-		LOG_WARN("Current path changed by file dialog from {} to {}. Restoring.", pwd.string(),
-		         fs::current_path().string());
-		fs::current_path(pwd);
-	}
-
 	return true;
 }
 
 bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
                                          const std::vector<std::string>& filter)
 {
-	const auto pwd = fs::current_path();
-
-	auto destination = pfd::save_file(title, root.make_preferred().string(), filter).result();
+	auto destination = currentPathGuard<std::string>([&] {
+		return pfd::save_file(title, root.make_preferred().string(), filter).result();
+	});
 
 	if (destination.empty())
 	{
@@ -75,13 +89,6 @@ bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const st
 	}
 
 	result = destination;
-
-	if (fs::current_path() != pwd)
-	{
-		fs::current_path(pwd);
-		LOG_WARN("Current path changed by file dialog from {} to {}. Restoring.", pwd.string(),
-		         fs::current_path().string());
-	}
 
 	return true;
 }
