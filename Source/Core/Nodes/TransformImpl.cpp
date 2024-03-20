@@ -138,7 +138,7 @@ bool TransformImpl<ETransformType::Scale>::isValid() const
 	return result;
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
+SetValueResult TransformImpl<ETransformType::Scale>::setValue(float val)
 {
 	// notifySequence();
 	// return Node::setValue(glm::vec3(val));
@@ -146,11 +146,11 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
 	return setValue(glm::vec3(val));
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& vec)
+SetValueResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& vec)
 {
 	if (hasSynergies() && !Math::areElementsSame(vec)) // todo epsilonEQ would be probably better
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Given vector does not have all three values equal."};
 	}
 	else
@@ -160,19 +160,19 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 	}
 
 	notifySequence();
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
+SetValueResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
 {
 	return setValue(glm::vec3(vec));
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_ScaleMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 	/// if (isLocked()) // can change the diagonal only - done by canSetValue()
@@ -203,7 +203,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 void TransformImpl<ETransformType::Scale>::setDefaultUniformScale(float val)
 {
@@ -269,35 +269,35 @@ bool TransformImpl<ETransformType::EulerX>::isValid() const
 	return result;
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
+SetValueResult TransformImpl<ETransformType::EulerX>::setValue(float val)
 {
 	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec3& val)
+SetValueResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec3& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec4& val)
+SetValueResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec4& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_RotateXMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
-	auto mat = getData().getMat4();
+	auto mat = data().getMat4();
 	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies
 
 	if (hasSynergies())
@@ -307,7 +307,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		///	2) should not fail for unlocked transforms
 		// if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
-		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//	return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		//												"Value must be within [-1.0, 1.0] interval."};
 		// }
 
@@ -364,7 +364,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
 void TransformImpl<ETransformType::EulerX>::initDefaults()
@@ -409,35 +409,35 @@ bool TransformImpl<ETransformType::EulerY>::isValid() const
 	return result;
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
+SetValueResult TransformImpl<ETransformType::EulerY>::setValue(float val)
 {
 	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec3& val)
+SetValueResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec3& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& val)
+SetValueResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
 {
 	// if (!validateValue(g_RotateYMask, coords, val))
 	if (!canSetValue(g_RotateYMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
-	auto mat = getData().getMat4();
+	auto mat = data().getMat4();
 	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies
 
 	if (hasSynergies())
@@ -445,7 +445,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		// PF Commented out - se the comment at EulerX
 		// if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
-		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//	return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		//												"Value must be within [-1.0, 1.0] interval."};
 		// }
 
@@ -501,7 +501,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 	setInternalValue(mat);
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
 void TransformImpl<ETransformType::EulerY>::initDefaults()
@@ -545,38 +545,38 @@ bool TransformImpl<ETransformType::EulerZ>::isValid() const
 
 	return result;
 }
-ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
+SetValueResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 {
 	setDefaultValue("angle", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec3& val)
+SetValueResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec3& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& val)
+SetValueResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& val)
 {
-	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
 {
 	// if (!validateValue(g_RotateZMask, coords, val))
 	if (!canSetValue(g_RotateZMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
 	// PF: remembering the halfspace sign for each box to avoid jumps during
 	// interaction with rotation matrix
 
-	auto mat = getData().getMat4();
+	auto mat = data().getMat4();
 	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies, works
 	                               // in all 4x4 coordinates
 
@@ -585,7 +585,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		// PF Commented out - se the comment at EulerX
 		// if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
-		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//	return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		//												"Value must be within [-1.0, 1.0] interval."};
 		// }
 
@@ -640,7 +640,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 	setInternalValue(mat);
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
 void TransformImpl<ETransformType::EulerZ>::initDefaults()
@@ -675,12 +675,12 @@ bool TransformImpl<ETransformType::Translation>::isValid() const
 	return result;
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
+SetValueResult TransformImpl<ETransformType::Translation>::setValue(float val)
 {
 	return setValue(glm::vec3(val)); // sets the defaults
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
+SetValueResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
 
 	setInternalValue(glm::translate(vec));
@@ -690,19 +690,19 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::v
 	setDefaultValueNoUpdate("translation", vec); // update Defaults ONLY
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec4& vec)
+SetValueResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec4& vec)
 {
 	return setValue(glm::vec3(vec));
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_TranslateMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 	setInternalValue(val, coords);
@@ -719,7 +719,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 	notifySequence();
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
 void TransformImpl<ETransformType::Translation>::initDefaults()
@@ -777,9 +777,9 @@ void TransformImpl<ETransformType::AxisAngle>::resetMatrixFromDefaults()
 	notifySequence();
 }
 
-ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat4& mat)
+SetValueResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat4& mat)
 {
-	ValueSetResult result;
+	SetValueResult result;
 
 	// Axis angle cannot set the value individually for each coordinate in the matrix as the 3x3 rotation matrix has to
 	// be evaluated at once, piecewise evaluation would fail as the matrix would be invalid at times (not orthonormal,
@@ -792,7 +792,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 		{
 			if (!canSetValue(g_AxisAngleMask, glm::ivec2(c, r), mat[c][r]))
 			{
-				return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+				return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 				                      "Cannot set value at given coordinates."};
 			}
 		}
@@ -823,25 +823,25 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 		setInternalValue(oldValue);
 		setDefaultValueNoUpdate("angle", oldAngle);
 		setDefaultValueNoUpdate("axis", oldAxis);
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "AxisAngle synergy not valid!"};
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation, "AxisAngle synergy not valid!"};
 	}
 
 	notifySequence();
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
+SetValueResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
 {
 	setDefaultValue("angle", rads);
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
-ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec3& axis)
+SetValueResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec3& axis)
 {
 	setDefaultValue("axis", axis);
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
 // #define PF_DEBUG
@@ -960,7 +960,7 @@ const glm::quat& TransformImpl<ETransformType::Quat>::getNormalizedQuat() const
 	return m_normalized;
 };
 
-ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
+SetValueResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 {
 	////m_initialQuat = q;
 	m_normalized = glm::normalize(q);
@@ -972,17 +972,17 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 
 	setInternalValue(glm::toMat4(m_normalized)); // matrix
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
-// ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
+// SetValueResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
 //{
 //	// glm::quat q(vec);
 //	// return setValue(glm::quat(q));
 //	return setValue(glm::quat(vec)); // todo - is wrong - replace with (w,x,y,z)
 // }
 
-ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& mat)
+SetValueResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& mat)
 {
 	return setValue(glm::quat_cast(mat));
 }
@@ -1115,11 +1115,11 @@ void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 	notifySequence();
 }
 
-ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_OrthoMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
@@ -1234,7 +1234,7 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 	}
 	///--------------------------to
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+	return SetValueResult{SetValueResult::Status::Ok};
 }
 
 //===-- Perspective -------------------------------------------------------===//
@@ -1291,11 +1291,11 @@ void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 	notifySequence();
 }
 
-ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_PerspectiveMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
@@ -1365,7 +1365,7 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 		setDefaultValueNoUpdate("far", newFar);
 	}
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
 //===-- Frustum
@@ -1466,11 +1466,11 @@ void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 	notifySequence();
 }
 
-ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
+SetValueResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_FrustumMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
 		                      "Cannot set value on given coordinates."};
 	}
 
@@ -1579,7 +1579,7 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 		setDefaultValueNoUpdate("far", newFar);
 	}
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
 //===-- Look At -----------------------------------------------------------===//
@@ -1667,13 +1667,13 @@ void TransformImpl<ETransformType::LookAt>::resetMatrixFromDefaults()
 }
 
 // Same as in Transform, no synergies or matrix to defaults
-// ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val,
+// SetValueResult TransformImpl<ETransformType::LookAt>::setValue(float val,
 // glm::ivec2 coords)
 //{
 //	if (isLocked()) { return
-// ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid
+// SetValueResult{SetValueResult::Status::Err_ConstraintViolation, "Invalid
 // position!"}; } 	setInternalValue(val, coords); 	notifySequence();
 //
-//	return ValueSetResult{};
+//	return SetValueResult{};
 //}
 } // namespace Core

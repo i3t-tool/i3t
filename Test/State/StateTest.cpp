@@ -172,7 +172,7 @@ TEST(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 		const auto scaleNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transform>();
 
 		EXPECT_TRUE(scaleNode->hasSavedValue());
-		EXPECT_TRUE(Math::eq(scaleNode->getData().getMat4(), glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));
+		EXPECT_TRUE(Math::eq(scaleNode->data().getMat4(), glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));
 		EXPECT_TRUE(!scaleNode->hasSynergies());
 		EXPECT_TRUE(Math::eq(scaleNode->getSavedValue(), glm::scale(randomVec3)));
 	}

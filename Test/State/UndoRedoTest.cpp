@@ -57,15 +57,15 @@ TEST(UndoRedoTest, Basic)
 	addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
 
 	connectNodes(nodes[0], nodes[1], 0, 0);
-	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), newValue);
+	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
 
 	App::getModule<StateManager>().undo();
-	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), 0.0f);
+	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), 0.0f);
 	EXPECT_FALSE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
 
 	App::getModule<StateManager>().redo();
-	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), newValue);
+	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
 
 	//
@@ -89,7 +89,7 @@ TEST(UndoRedoTest, Basic)
 	}
 
 	EXPECT_TRUE(nodes.size() == 2);
-	EXPECT_TRUE(nodes[1]->getNodebase()->getData().getFloat() == newValue);
+	EXPECT_TRUE(nodes[1]->getNodebase()->data().getFloat() == newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
 
 	addNodeToNodeEditor<WorkspaceOperator<EOperatorType::MatrixToMatrix>>();
@@ -99,5 +99,5 @@ TEST(UndoRedoTest, Basic)
 
 	App::getModule<StateManager>().undo();
 	App::getModule<StateManager>().redo();
-	EXPECT_TRUE(Math::eq(mat, nodes[2]->getNodebase()->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(mat, nodes[2]->getNodebase()->data().getMat4()));
 }

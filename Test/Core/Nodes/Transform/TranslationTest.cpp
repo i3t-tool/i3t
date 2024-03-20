@@ -27,7 +27,7 @@ TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 	// Invalid coordinates.
 	auto result = translationNode->setValue(generateFloat(), {0, 3});
 
-	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+	EXPECT_EQ(SetValueResult::Status::Err_ConstraintViolation, result.status);
 	EXPECT_TRUE(translationNode->isValid());
 }
 
@@ -41,7 +41,7 @@ TEST(TranslationTest, ValidValues_Ok)
 	setValue_expectOk(translationNode, -4.0f, {3, 2});
 
 	auto translMat = glm::translate(glm::vec3(-2.0f, -3.0f, -4.0f));
-	auto data = translationNode->getData().getMat4();
+	auto data = translationNode->data().getMat4();
 
 	EXPECT_EQ(translMat, data);
 	EXPECT_TRUE(translationNode->isValid());
@@ -67,7 +67,7 @@ TEST(TranslationTest, GettersAndSetterShouldBeOk)
 
 	translation->setDefaultValue("translation", vec);
 
-	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
+	EXPECT_EQ(glm::translate(vec), translation->data().getMat4());
 }
 
 TEST(TranslationTest, SetValueInMatrixUpdatesDefaultValue)
@@ -107,5 +107,5 @@ TEST(TranslationTest, SetDefaultValueUpdatesMatrix)
 
 	translation->setDefaultValue("translation", vec);
 
-	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
+	EXPECT_EQ(glm::translate(vec), translation->data().getMat4());
 }

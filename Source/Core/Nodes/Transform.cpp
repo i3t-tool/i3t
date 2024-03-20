@@ -101,6 +101,17 @@ Data& Transform::getDefaultValueMut(const std::string& name)
 	return it->data;
 }
 
+void Transform::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
+{
+	if (getDefaultValueMut(name).index() != val.index())
+	{
+		LOG_ERROR("Error in setDefaultValueWithSynergies - undefined value type.");
+		return;
+	}
+
+	getDefaultValueMut(name) = val;
+}
+
 TransformOperation::ValueMap Transform::getDefaultTypes() const
 {
 	return getTransformDefaults(getOperation()->keyWord);
@@ -144,7 +155,7 @@ void Transform::unlock()
 
 void Transform::saveValue()
 {
-	m_savedData = getData(0);
+	m_savedData = data(0);
 	m_savedValues = m_defaultValues;
 
 	m_hasSavedData = true;
@@ -180,9 +191,9 @@ void Transform::setSavedValue(const glm::mat4& values)
 }
 
 // PF todo - check for synergies????
-ValueSetResult Transform::setValue(const glm::mat4& mat)
+SetValueResult Transform::setValue(const glm::mat4& mat)
 {
-	ValueSetResult result;
+	SetValueResult result;
 
 	for (int c = 0; c < 4; ++c)
 	{
@@ -198,7 +209,7 @@ ValueSetResult Transform::setValue(const glm::mat4& mat)
 				// MSVC was unable to compile this expression without using Node::
 				result = setValue(val, coords);
 
-				if (result.status != ValueSetResult::Status::Ok)
+				if (result.status != SetValueResult::Status::Ok)
 				{
 					notifySequence();
 
@@ -209,21 +220,21 @@ ValueSetResult Transform::setValue(const glm::mat4& mat)
 	}
 	notifySequence();
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
-ValueSetResult Transform::setValue(float val, glm::ivec2 coords) // PF
+SetValueResult Transform::setValue(float val, glm::ivec2 coords) // PF
 {
 	// Default implementation, potentially overriden by subclasses
 	if (isLocked())
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 
 	setInternalValue(val, coords);
 	notifySequence();
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
 void Transform::notifySequence()

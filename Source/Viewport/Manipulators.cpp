@@ -196,9 +196,9 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			{
 				if (Math::eq(projectionParams[i], 0))
 					continue;
-				Core::ValueSetResult result = node->setDefaultValue(
+				Core::SetValueResult result = node->setDefaultValue(
 				    paramNames[i], node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
-				if (result.status != Core::ValueSetResult::Status::Ok)
+				if (result.status != Core::SetValueResult::Status::Ok)
 				{
 					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
 					         n(type), n(result.status), result.message);
@@ -235,7 +235,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			{
 				if (Math::eq(projectionParams[i], 0))
 					continue;
-				Core::ValueSetResult result;
+				Core::SetValueResult result;
 				// left and right
 				if (i == 0 || i == 1)
 				{
@@ -258,7 +258,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 					result = node->setDefaultValue(paramNames[i], node->getDefaultValue(paramNames[i]).getFloat() +
 					                                                  projectionParams[i]);
 				}
-				if (result.status != Core::ValueSetResult::Status::Ok)
+				if (result.status != Core::SetValueResult::Status::Ok)
 				{
 					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
 					         n(type), n(result.status), result.message);
@@ -309,8 +309,8 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			}
 
 			// Set the new matrix value, defaults should be updated within setValue by the respective implementation
-			Core::ValueSetResult result = node->setValue(resultMatrix);
-			if (result.status != Core::ValueSetResult::Status::Ok)
+			Core::SetValueResult result = node->setValue(resultMatrix);
+			if (result.status != Core::SetValueResult::Status::Ok)
 			{
 				LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
 				         n(type), n(result.status), result.message);
@@ -365,7 +365,7 @@ bool Manipulators::drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::m
 
 			const auto result = node->setDefaultValue(pointNames[i], glm::vec3(resultMatrix[3]));
 			;
-			if (result.status != Core::ValueSetResult::Status::Ok)
+			if (result.status != Core::SetValueResult::Status::Ok)
 			{
 				LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
 				         n(manipulator->m_type), n(result.status), result.message);
@@ -408,7 +408,7 @@ Manipulators::ManipulatorType Manipulators::determineManipulatorType(std::shared
 
 void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shared_ptr<Core::Node> node)
 {
-	manipulator.m_editedMatrix = glm::mat4(node->getData().getMat4());
+	manipulator.m_editedMatrix = glm::mat4(node->data().getMat4());
 	manipulator.m_referenceSpace = glm::mat4(1);
 
 	// Get reference space if applicable
@@ -427,7 +427,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 				auto matrices = camera->getView()->getMatrices();
 				for (const auto& mat : matrices)
 				{
-					viewMatrix *= mat->getData().getMat4();
+					viewMatrix *= mat->data().getMat4();
 				}
 				manipulator.m_auxillaryMatrix = viewMatrix;
 			}
@@ -456,7 +456,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 	while (it != st.end())
 	{
 		auto n = *it;
-		result = n->getData().getMat4() * result;
+		result = n->data().getMat4() * result;
 		++it;
 	}
 	manipulator.m_referenceSpace = result;

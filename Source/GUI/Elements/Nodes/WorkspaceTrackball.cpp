@@ -186,7 +186,7 @@
 ////
 ////	}else{
 ////		//Matrix (in output)
-////		const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
+////		const glm::mat4& coreData = m_nodebase->data(index).getMat4();
 ////		const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 ////		int const idOfNode = this->m_id.Get();
 ////
@@ -315,7 +315,7 @@
 //	}else{
 //	    /* \todo JH draw it from some existing source? */
 //		//Matrix (in output)
-//		const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
+//		const glm::mat4& coreData = m_nodebase->data(index).getMat4();
 //		const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 //
 //		bool valueChanged = false;

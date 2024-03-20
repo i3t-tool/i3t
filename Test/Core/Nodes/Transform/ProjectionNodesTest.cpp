@@ -31,7 +31,7 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 	ortho->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::ortho(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
-	auto resultMat = ortho->getData().getMat4();
+	auto resultMat = ortho->data().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
 }
@@ -39,7 +39,7 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 TEST(OrthoProjTest, Problem_Set22_changes00)
 {
 	auto ortho = Builder::createTransform<ETransformType::Ortho>();
-	auto mat = ortho->getData().getMat4();
+	auto mat = ortho->data().getMat4();
 	ortho->initDefaults();
 
 	auto left = ortho->getDefaultValue("left").getFloat();
@@ -50,7 +50,7 @@ TEST(OrthoProjTest, Problem_Set22_changes00)
 	auto far = ortho->getDefaultValue("far").getFloat();
 
 	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
-	auto resultMat = ortho->getData().getMat4();
+	auto resultMat = ortho->data().getMat4();
 	EXPECT_EQ(expectedMat, resultMat);
 
 	auto mat00 = mat[0][0];
@@ -72,7 +72,7 @@ TEST(PerspectiveProjTest, ShouldBeOk)
 	perspective->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
-	auto resultMat = perspective->getData().getMat4();
+	auto resultMat = perspective->data().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
 }
@@ -99,7 +99,7 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	perspective->setDefaultValue("far", farZ);
 	EXPECT_EQ(farZ, perspective->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ), perspective->getData().getMat4());
+	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ), perspective->data().getMat4());
 }
 
 //--- Frustum -----------------------------------------------------------------
@@ -114,7 +114,7 @@ TEST(FrustumTest, ShouldBeOk)
 	frustum->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::frustum(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
-	auto resultMat = frustum->getData().getMat4();
+	auto resultMat = frustum->data().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
 }
@@ -150,7 +150,7 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 	frustum->setDefaultValue("far", far);
 	EXPECT_EQ(far, frustum->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far), frustum->getData().getMat4());
+	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far), frustum->data().getMat4());
 }
 
 TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
@@ -194,5 +194,5 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
 
 	// mixture of default values
 	// EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
-	// frustum->getData().getMat4());
+	// frustum->data().getMat4());
 }

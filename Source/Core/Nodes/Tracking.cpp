@@ -426,11 +426,11 @@ void MatrixTracker::track()
 
 		if (m_direction == TrackingDirection::LeftToRight)
 		{
-			matrix = matrix * transform->getData().getMat4();
+			matrix = matrix * transform->data().getMat4();
 		}
 		else if (m_direction == TrackingDirection::RightToLeft)
 		{
-			matrix = transform->getData().getMat4() * matrix;
+			matrix = transform->data().getMat4() * matrix;
 		}
 	}
 
@@ -443,7 +443,7 @@ void MatrixTracker::track()
 		const auto maybeTransform = matrices[matricesBefore];
 		m_state.trackingProgress[maybeTransform->getId()] = interpParam;
 		setActivePart(maybeTransform, interpParam);
-		rhs = maybeTransform->getData().getMat4();
+		rhs = maybeTransform->data().getMat4();
 
 		auto useQuat = false;
 		if (auto transform = std::dynamic_pointer_cast<Transform>(maybeTransform))

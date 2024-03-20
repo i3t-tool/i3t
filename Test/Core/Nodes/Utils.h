@@ -25,18 +25,18 @@ template <typename Node, typename T> inline void setValue_expectOk(const Node& n
 	// setValue handles the synergies
 	auto result = node->setValue(std::forward<T>(value));
 	// auto result = setValue(std::forward<T>(value));
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 }
 
 template <typename T> inline void setValue_expectOk(Ptr<Node> node, T&& value, glm::ivec2 coords)
 {
 	auto result = node->setValue(std::forward<T>(value), coords);
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 }
 template <typename T> inline void setValue_expectWrong(Ptr<Node> node, T&& value, glm::ivec2 coords)
 {
 	auto result = node->setValue(std::forward<T>(value), coords);
-	EXPECT_NE(ValueSetResult::Status::Ok, result.status);
+	EXPECT_NE(SetValueResult::Status::Ok, result.status);
 }
 
 template <typename T1, typename T2> inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex = 0, int rightIndex = 0)

@@ -92,15 +92,15 @@ inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 
 	{
 		auto result = mat1->setValue(generateMat4());
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 	}
 	{
 		auto result = mat2->setValue(generateMat4());
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 	}
 	{
 		auto result = mat3->setValue(generateMat4());
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 	}
 
 	// Insert matrices into the seq.

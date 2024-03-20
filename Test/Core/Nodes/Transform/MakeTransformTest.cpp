@@ -32,7 +32,7 @@ TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 	setValue_expectOk(vec3, initialTranslation);
 
 	auto expectedNodeValue = glm::translate(initialTranslation);
-	EXPECT_EQ(expectedNodeValue, makeTranslation->getData().getMat4());
+	EXPECT_EQ(expectedNodeValue, makeTranslation->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
@@ -53,9 +53,9 @@ TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 	auto expectedRotXMat = glm::rotate(rotRads, glm::vec3(1.0f, 0.0f, 0.0f));
 	auto expectedRotYMat = glm::rotate(rotRads, glm::vec3(0.0f, 1.0f, 0.0f));
 	auto expectedRotZMat = glm::rotate(rotRads, glm::vec3(0.0f, 0.0f, 1.0f));
-	EXPECT_EQ(expectedRotXMat, makeRotX->getData().getMat4());
-	EXPECT_EQ(expectedRotYMat, makeRotY->getData().getMat4());
-	EXPECT_EQ(expectedRotZMat, makeRotZ->getData().getMat4());
+	EXPECT_EQ(expectedRotXMat, makeRotX->data().getMat4());
+	EXPECT_EQ(expectedRotYMat, makeRotY->data().getMat4());
+	EXPECT_EQ(expectedRotZMat, makeRotZ->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
@@ -74,7 +74,7 @@ TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 	setValue_expectOk(axisNode, axis);
 
 	auto expectedNodeValue = glm::rotate(rotRads, axis);
-	EXPECT_EQ(expectedNodeValue, makeAxisRotNode->getData().getMat4());
+	EXPECT_EQ(expectedNodeValue, makeAxisRotNode->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakeOrthoShouldBeValid)
@@ -85,7 +85,7 @@ TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 
 	auto expectedOrtho = glm::ortho(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]);
 
-	EXPECT_EQ(expectedOrtho, makeOrthoNode->getData().getMat4());
+	EXPECT_EQ(expectedOrtho, makeOrthoNode->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
@@ -96,7 +96,7 @@ TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 
 	auto expectedMat = glm::perspective(inputValues[0], inputValues[1], inputValues[2], inputValues[3]);
 
-	EXPECT_EQ(expectedMat, makePerspectiveNode->getData().getMat4());
+	EXPECT_EQ(expectedMat, makePerspectiveNode->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakeFrustumShouldBeValid)
@@ -107,7 +107,7 @@ TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 
 	auto expectedOrtho = glm::frustum(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]);
 
-	EXPECT_EQ(expectedOrtho, makeFrustumNode->getData().getMat4());
+	EXPECT_EQ(expectedOrtho, makeFrustumNode->data().getMat4());
 }
 
 TEST(MakeTransformTest, MakeLookAtShouldBeValid)
@@ -130,5 +130,5 @@ TEST(MakeTransformTest, MakeLookAtShouldBeValid)
 
 	auto expectedMat = glm::lookAt(values[0], values[1], values[2]);
 
-	EXPECT_EQ(expectedMat, makeLookAtNode->getData().getMat4());
+	EXPECT_EQ(expectedMat, makeLookAtNode->data().getMat4());
 }

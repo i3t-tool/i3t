@@ -29,14 +29,13 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	cameraNode->getProj()->pushMatrix(perspectiveProj);
 	cameraNode->getView()->pushMatrix(lookAt);
 
-	EXPECT_TRUE(
-	    Math::eq(cameraNode->getProj()->getData(I3T_SEQ_OUT_MAT).getMat4(), perspectiveProj->getData().getMat4()));
-	EXPECT_TRUE(Math::eq(cameraNode->getView()->getData(I3T_SEQ_OUT_MAT).getMat4(), lookAt->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(cameraNode->getProj()->data(I3T_SEQ_OUT_MAT).getMat4(), perspectiveProj->data().getMat4()));
+	EXPECT_TRUE(Math::eq(cameraNode->getView()->data(I3T_SEQ_OUT_MAT).getMat4(), lookAt->data().getMat4()));
 
 	plug_expectOk(cameraNode, screenNode, 0, 0);
 
-	auto expectedPV = perspectiveProj->getData().getMat4() * lookAt->getData().getMat4();
-	EXPECT_EQ(expectedPV, cameraNode->getData(1).getMat4());
+	auto expectedPV = perspectiveProj->data().getMat4() * lookAt->data().getMat4();
+	EXPECT_EQ(expectedPV, cameraNode->data(1).getMat4());
 }
 
 TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)

@@ -230,17 +230,6 @@ float WorkspaceNodeWithCoreData::updateDataItemsWidth()
 	return m_dataItemsWidth;
 }
 
-Core::DataMap const* WorkspaceNodeWithCoreData::setDataMap(Core::DataMap const* mapToSet)
-{
-	// m_nodebase->setDataMap(mapToSet);
-	return getDataMap();
-}
-
-Core::DataMap const* WorkspaceNodeWithCoreData::getDataMap()
-{
-	return m_nodebase->getDataMap();
-}
-
 WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail)
 {
 	m_levelOfDetail = levelOfDetail;
@@ -746,7 +735,7 @@ bool WorkspaceCoreOutputPinScreen::drawData()
 	if (getCorePin().isPluggedIn())
 	{
 		glm::mat4 camera =
-		    Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4(); /* JH why magic 2? */
+		    Core::GraphManager::getParent(getNode().getNodebase())->data(2).getMat4(); /* JH why magic 2? */
 
 		// ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f),
 		// ImVec2(1,0));
@@ -1685,7 +1674,7 @@ bool drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisi
                   FloatPopupMode& floatPopupMode, const glm::vec4& data,
                   std::array<Core::EValueState, 4> const& dataState, bool& valueChanged, glm::vec4& valueOfChange)
 {
-	//    const glm::vec4& coreData = m_nodebase->getData(index).getVec4();
+	//    const glm::vec4& coreData = m_nodebase->data(index).getVec4();
 	//    const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 
 	bool actualValueChanged = false;

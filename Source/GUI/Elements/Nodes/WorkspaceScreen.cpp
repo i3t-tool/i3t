@@ -87,7 +87,7 @@ bool WorkspaceScreen::middleContent()
 	if (getNodebase()->getInput(0).isPluggedIn())
 	{
 		// Get projection and view matrix from screen input
-		std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->getData().getScreen();
+		std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->data().getScreen();
 
 		Vp::Viewport* viewport = I3T::getViewport();
 		m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;

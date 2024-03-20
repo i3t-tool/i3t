@@ -34,7 +34,7 @@ TEST_F(ScreenTest, _)
 	camera->getView()->pushMatrix(t1);
 
 	// Check if camera contains t1.
-	EXPECT_TRUE(Math::eq(t1->getData().getMat4(), camera->getData(2).getMat4()));
+	EXPECT_TRUE(Math::eq(t1->data().getMat4(), camera->data(2).getMat4()));
 
 	// Unplugged screen has no parent node.
 	EXPECT_EQ(nullptr, GraphManager::getParent(screen));
@@ -45,5 +45,5 @@ TEST_F(ScreenTest, _)
 	EXPECT_EQ(camera, parent->as<Camera>());
 
 	// Get camera transform from screen node.
-	EXPECT_TRUE(Math::eq(camera->getData(2).getMat4(), GraphManager::getParent(screen)->getData(2).getMat4()));
+	EXPECT_TRUE(Math::eq(camera->data(2).getMat4(), GraphManager::getParent(screen)->data(2).getMat4()));
 }

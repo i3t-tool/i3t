@@ -36,7 +36,7 @@ TEST_F(CycleTestFixture, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 			GraphManager::update(sPerFrame);
 		}
 
-		float delta = cycle->getTo() - cycle->getData().getFloat();
+		float delta = cycle->getTo() - cycle->data().getFloat();
 		EXPECT_TRUE(Math::eq(delta, cycle->getTo()));
 	}
 	{
@@ -46,9 +46,9 @@ TEST_F(CycleTestFixture, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 		float currentValue = 0.0f;
 		for (int i = 0; i < expectedUpdates; ++i)
 		{
-			lastValue = cycle->getData().getFloat();
+			lastValue = cycle->data().getFloat();
 			GraphManager::update(sPerFrame);
-			currentValue = cycle->getData().getFloat();
+			currentValue = cycle->data().getFloat();
 
 			if (i + 1 != expectedUpdates)
 				EXPECT_TRUE(lastValue < currentValue);
@@ -73,12 +73,12 @@ TEST_F(CycleTestFixture, TriggerStepNextOnParentPlay)
 	}
 	cycle2->pause();
 
-	float previous = cycle2->getData().getFloat();
+	float previous = cycle2->data().getFloat();
 	cycle1->play();
 
 	// cycle6 value increases by step on parent play.
 	float expected = previous + cycle2->getManualStep();
-	float current = cycle2->getData().getFloat();
+	float current = cycle2->data().getFloat();
 	EXPECT_TRUE(Math::eq(expected, current));
 }
 
@@ -125,8 +125,8 @@ TEST_F(CycleTestFixture, TriggerOnPlay)
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 
-	float cycle5Val = cycle5->getData().getFloat();
-	float cycle6Val = cycle6->getData().getFloat();
+	float cycle5Val = cycle5->data().getFloat();
+	float cycle6Val = cycle6->data().getFloat();
 
 	cycle1->play();
 	// cycle2 plays on parent play.
@@ -139,19 +139,19 @@ TEST_F(CycleTestFixture, TriggerOnPlay)
 	EXPECT_FALSE(cycle4->isRunning());
 
 	// \todo MH
-	// EXPECT_TRUE(Math::eq(cycle4->getFrom(), cycle4->getData().getFloat()));
+	// EXPECT_TRUE(Math::eq(cycle4->getFrom(), cycle4->data().getFloat()));
 
 	{
 		// cycle5 value decreases by step on parent play.
 		float expected = cycle5Val - cycle5->getManualStep();
-		float current = cycle5->getData().getFloat();
+		float current = cycle5->data().getFloat();
 		// \todo MH
 		// EXPECT_TRUE(Math::eq(expected, current));
 	}
 	{
 		// cycle6 value increases by step on parent play.
 		float expected = cycle6Val + cycle6->getManualStep();
-		float current = cycle6->getData().getFloat();
+		float current = cycle6->data().getFloat();
 		EXPECT_TRUE(Math::eq(expected, current));
 	}
 }

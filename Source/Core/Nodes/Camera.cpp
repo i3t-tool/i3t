@@ -47,8 +47,8 @@ void Camera::createComponents()
 
 void Camera::updateValues(int inputIndex)
 {
-	const auto& projMat = m_proj->getData(I3T_OUTPUT1).getMat4();
-	const auto& viewMat = m_view->getData(I3T_OUTPUT1).getMat4();
+	const auto& projMat = m_proj->data(I3T_OUTPUT1).getMat4();
+	const auto& viewMat = m_view->data(I3T_OUTPUT1).getMat4();
 
 	setInternalValue(std::make_pair(projMat, viewMat), I3T_CAMERA_OUT_SCREEN);
 	setInternalValue(projMat * viewMat, I3T_CAMERA_OUT_MATRIX);

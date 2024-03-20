@@ -52,7 +52,7 @@ void Cycle::play()
 
 	if (m_mode == EMode::Once)
 	{
-		float currentValue = getData().getFloat();
+		float currentValue = data().getFloat();
 
 		// rewind to start (to m_from) before the loop start after stop at m_to
 		if ((m_from <= m_to && currentValue >= m_to) || (m_from > m_to && currentValue <= m_to))
@@ -198,7 +198,7 @@ void Cycle::updateValues(const int inputIndex)
 
 void Cycle::updateValue(float increment)
 {
-	const float currentValue = getData().getFloat();
+	const float currentValue = data().getFloat();
 	float newValue = currentValue + ((m_from <= m_to) ? 1.0f : -1.0f) * m_directionMultiplier * increment;
 
 	// if out of bounds, clamp values to the range <m_from, m_to> or <m_to,

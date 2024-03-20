@@ -397,7 +397,7 @@ int WorkspaceSequence::maxLengthOfData()
 {
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
-		return maxLengthOfData4x4(m_nodebase->getData(0).getMat4() /*\todo JM HM better selection (index) of data*/,
+		return maxLengthOfData4x4(m_nodebase->data(0).getMat4() /*\todo JM HM better selection (index) of data*/,
 		                          m_numberOfVisibleDecimal);
 	}
 	return 0;
