@@ -193,7 +193,14 @@ public:
 	 * two vectors). Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
-	const Data& data(size_t index = 0)
+	const Data& data(size_t index = 0) const
+	{
+		I3T_ASSERT(index < m_internalData.size(), "Desired data storage does not exist!");
+
+		return m_internalData[index];
+	}
+
+	Data& dataMut(size_t index)
 	{
 		return getInternalData(index);
 	}

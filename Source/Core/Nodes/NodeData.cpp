@@ -14,7 +14,7 @@
 
 namespace Core
 {
-Data::Data(EValueType valueType) : opValueType(valueType)
+Data::Data(EValueType valueType) : valueType(valueType)
 {
 	switch (valueType)
 	{

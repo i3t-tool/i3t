@@ -87,7 +87,7 @@ public:
 		{
 			for (auto& [key, valueStore] : nodebase->getDefaultValues())
 			{
-				switch (valueStore.opValueType)
+				switch (valueStore.valueType)
 				{
 				case Core::EValueType::Vec3:
 				{
@@ -360,7 +360,7 @@ template <> inline bool WorkspaceTransformation_s<Core::ETransformType::Scale>::
 	{
 		for (auto& [key, valueStore] : nodebase->getDefaultValues())
 		{
-			switch (valueStore.opValueType)
+			switch (valueStore.valueType)
 			{
 			case Core::EValueType::Vec3:
 			{

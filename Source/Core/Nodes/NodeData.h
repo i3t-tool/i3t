@@ -89,15 +89,15 @@ enum class EValueState
 class Data
 {
 public:
-	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
+	EValueType valueType; ///< wire type, such as Float or 4x4 Matrix
 
 	using Storage =
 	    std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3, glm::vec4, glm::quat, float, void*>;
 
 public:
-	/** Default constructor constructs a signal of type OpValueType::MATRIX and
+	/** Default constructor constructs a signal of type valueType::MATRIX and
 	 * with an undefined value (a unit matrix) */
-	Data() : opValueType(EValueType::Matrix)
+	Data() : valueType(EValueType::Matrix)
 	{
 		m_value = glm::mat4(1.0f);
 	}
@@ -106,40 +106,42 @@ public:
 	 * \brief Explicit constructors from given data values
 	 */
 	///@{
-	explicit Data(const bool val) : opValueType(EValueType::Pulse)
+	explicit Data(const bool val) : valueType(EValueType::Pulse)
 	{
 		m_value = val;
 	}
 
-	explicit Data(float val) : opValueType(EValueType::Float)
+	explicit Data(float val) : valueType(EValueType::Float)
 	{
 		m_value = val;
 	}
 
-	explicit Data(const glm::vec3& val) : opValueType(EValueType::Vec3)
+	explicit Data(const glm::vec3& val) : valueType(EValueType::Vec3)
 	{
 		m_value = val;
 	}
 
-	explicit Data(const glm::vec4& val) : opValueType(EValueType::Vec4)
+	explicit Data(const glm::vec4& val) : valueType(EValueType::Vec4)
 	{
 		m_value = val;
 	}
 
-	explicit Data(const glm::mat4& val) : opValueType(EValueType::Matrix)
+	explicit Data(const glm::mat4& val) : valueType(EValueType::Matrix)
 	{
 		m_value = val;
 	}
 
-	explicit Data(const glm::quat val) : opValueType(EValueType::Quat)
+	explicit Data(const glm::quat val) : valueType(EValueType::Quat)
 	{
 		m_value = val;
 	}
-	explicit Data(const std::pair<glm::mat4, glm::mat4> val) : opValueType(EValueType::Screen)
+	explicit Data(const std::pair<glm::mat4, glm::mat4> val) : valueType(EValueType::Screen)
 	{
 		m_value = val;
 	}
 	///@}
+
+	explicit Data(Storage val, EValueType valueType) : valueType(valueType), m_value(std::move(val)) {}
 
 	/** Constructor of given signal type with an undefined value (identity) */
 	explicit Data(EValueType valueType);
@@ -205,8 +207,43 @@ public:
 		return m_value.index();
 	}
 
+	bool hasSavedValue() const
+	{
+		return m_savedValue.has_value();
+	}
+
+	void saveValue()
+	{
+		m_savedValue = m_value;
+	}
+
+	std::optional<Storage> getSavedValue() const
+	{
+		return m_savedValue;
+	}
+
+	template <typename T> void setSavedValue(T&& val)
+	{
+		m_savedValue = val;
+	}
+
+	/// Reset the value to the last saved value.
+	void reloadValue()
+	{
+		if (hasSavedValue())
+		{
+			m_value = *m_savedValue;
+		}
+	}
+
+	Storage data()
+	{
+		return m_value;
+	}
+
 private:
 	Storage m_value;
+	std::optional<Storage> m_savedValue;
 };
 
 template <typename T> std::optional<std::remove_reference_t<T>> Data::getValue() const

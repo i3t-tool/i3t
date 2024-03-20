@@ -124,7 +124,12 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 
 	if (props->isConstructor)
 	{
-		addData(op, "value", coreNode->data());
+		auto data = coreNode->data(0);
+		addData(op, "value", data);
+		if (data.hasSavedValue())
+		{
+			addData(op, "savedValue", Core::Data(data.getSavedValue().value(), data.valueType));
+		}
 	}
 
 	// Workaround for #311
@@ -266,9 +271,10 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 	JSON::addMatrix(transform, "value", coreNode->data().getMat4(), m_memento.GetAllocator());
 
-	if (coreNode->hasSavedValue())
+	auto maybeSavedValue = coreNode->data(0).getSavedValue();
+	if (maybeSavedValue)
 	{
-		JSON::addMatrix(transform, "savedValue", coreNode->getSavedValue(), m_memento.GetAllocator());
+		addData(transform, "savedValue", Core::Data(*maybeSavedValue, Core::EValueType::Matrix));
 
 		/*
 		for (const auto& [key, value] : coreNode->getDefaultValues())
@@ -296,7 +302,7 @@ void SerializationVisitor::addData(rapidjson::Value& target, const char* key, co
 
 	auto& alloc = m_memento.GetAllocator();
 
-	switch (data.opValueType)
+	switch (data.valueType)
 	{
 	case EValueType::Float:
 		target.AddMember(rapidjson::Value(key, alloc).Move(), rapidjson::Value(data.getFloat()), alloc);

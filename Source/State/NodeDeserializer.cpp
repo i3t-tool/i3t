@@ -279,45 +279,19 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 	assignCommon(value, node);
 
-	if (value.HasMember("value"))
+	if (value.HasMember("value") && coreNode->getOperation()->isConstructor)
 	{
-		using namespace Core;
-
-		const auto maybeData = JSON::getData(value["value"], coreNode->getOperation()->inputTypes[0]);
-		if (maybeData.has_value())
+		const auto valueType = coreNode->getOperation()->inputTypes[0];
+		if (auto maybeData = JSON::getData(value["value"], valueType))
 		{
 			const auto& data = *maybeData;
-			switch (data.opValueType)
+			coreNode->dataMut(0) = data;
+		}
+		if (value.HasMember("savedValue"))
+		{
+			if (auto maybeData = JSON::getData(value["savedValue"], valueType))
 			{
-			case Core::EValueType::Float:
-			{
-				coreNode->setValue(data.getFloat());
-				break;
-			}
-			case Core::EValueType::Vec3:
-			{
-				coreNode->setValue(data.getVec3());
-				break;
-			}
-			case Core::EValueType::Vec4:
-			{
-				coreNode->setValue(data.getVec4());
-				break;
-			}
-			case Core::EValueType::Matrix:
-			{
-				coreNode->setValue(data.getMat4());
-				break;
-			}
-			case Core::EValueType::Quat:
-			{
-				coreNode->setValue(data.getQuat());
-			}
-			case Core::EValueType::Pulse:
-			case Core::EValueType::MatrixMul:
-			case Core::EValueType::Screen:
-			case Core::EValueType::Ptr:
-				break;
+				coreNode->dataMut(0).setSavedValue((*maybeData).data());
 			}
 		}
 	}
@@ -361,7 +335,7 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 
 	if (value.HasMember("savedValue"))
 	{
-		coreNode->setSavedValue(JSON::getMat(value["savedValue"]));
+		coreNode->dataMut(0).setSavedValue(JSON::getMat(value["savedValue"]));
 	}
 	coreNode->setValue(JSON::getMat(value["value"]));
 

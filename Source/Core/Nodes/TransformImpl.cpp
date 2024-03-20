@@ -990,8 +990,8 @@ SetValueResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& ma
 void TransformImpl<ETransformType::Quat>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
 {
 	constexpr float HYSTERESIS_ONE = 1.2f;
-	assert(hasSynergies());                      // called from setValues after this check
-	assert(val.opValueType == EValueType::Quat); // \todo future - add float for w,x,y,z
+	assert(hasSynergies());                    // called from setValues after this check
+	assert(val.valueType == EValueType::Quat); // \todo future - add float for w,x,y,z
 
 	// std::cout << "Pretizena virtualni funkce pro Quat" << std::endl;
 
@@ -1079,7 +1079,7 @@ void TransformImpl<ETransformType::Ortho>::initDefaults()
 void TransformImpl<ETransformType::Ortho>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
 {
 	assert(hasSynergies()); // called from setValues after this check
-	assert(val.opValueType == EValueType::Float);
+	assert(val.valueType == EValueType::Float);
 
 	// std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
 
@@ -1416,7 +1416,7 @@ void TransformImpl<ETransformType::Frustum>::initDefaults()
 void TransformImpl<ETransformType::Frustum>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
 {
 	assert(hasSynergies()); // called from setValues after this check
-	assert(val.opValueType == EValueType::Float);
+	assert(val.valueType == EValueType::Float);
 
 	// std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
 
