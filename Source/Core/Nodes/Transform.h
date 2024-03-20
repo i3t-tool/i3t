@@ -259,29 +259,13 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
-	bool hasSavedValue() const
-	{
-		return m_hasSavedData;
-	}
+	bool hasSavedValue() const;
 
 	/** Save current values of the transformation for future reloading. */
 	void saveValue();
 
 	/** Restore saved values if they exist. */
 	void reloadValue();
-
-	const glm::mat4& getSavedValue() const;
-
-	const DefaultValues& getSavedDefaults() const
-	{
-		return m_savedValues;
-	}
-
-	/**
-	 * \brief Save the value, read from YAML
-	 * \param values matrix from YAML
-	 */
-	void setSavedValue(const glm::mat4& values);
 
 	//===----------------------------------------------------------------------===//
 
@@ -358,12 +342,6 @@ private:
 	friend void setActivePart(Ptr<Node> node, float value);
 
 	float m_activePart = 0.0;
-
-	bool m_hasSavedData = false;
-
-	/// \todo Rename to m_savedMatrix
-	Data m_savedData;
-	DefaultValues m_savedValues;
 };
 
 struct HalfspaceSign

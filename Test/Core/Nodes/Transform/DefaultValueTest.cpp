@@ -28,8 +28,8 @@ TEST(DefaultValueTest, Example)
 	{
 		// There are only four types of default values - float, vec3, vec4, and
 		// quaternion.
-		switch (valueStore.opValueType)
-		// or switch (valueStore.opValueType)
+		switch (valueStore.valueType)
+		// or switch (valueStore.valueType)
 		{
 		case EValueType::Float:
 		{

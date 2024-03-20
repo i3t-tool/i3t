@@ -64,8 +64,8 @@ struct Operation
 	PinGroup inputTypes;
 	PinGroup outputTypes;
 	std::string defaultTagText = NO_TAG;
-	PinNames defaultInputNames = DEFAULT_NAMES;  // if the names differ from the names of the OpValueType
-	PinNames defaultOutputNames = DEFAULT_NAMES; // if the names differ from the names of the OpValueType
+	PinNames defaultInputNames = DEFAULT_NAMES;  // if the names differ from the names of the valueType
+	PinNames defaultOutputNames = DEFAULT_NAMES; // if the names differ from the names of the valueType
 
 	/**
 	 * \brief Constructor is an operator that can generate value (such as float, vec3, vec4, mat4, pulse,...).

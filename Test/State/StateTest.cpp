@@ -174,6 +174,8 @@ TEST(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 		EXPECT_TRUE(scaleNode->hasSavedValue());
 		EXPECT_TRUE(Math::eq(scaleNode->data().getMat4(), glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));
 		EXPECT_TRUE(!scaleNode->hasSynergies());
-		EXPECT_TRUE(Math::eq(scaleNode->getSavedValue(), glm::scale(randomVec3)));
+		auto maybeSavedValue = scaleNode->data(0).getSavedValue();
+		ASSERT_TRUE(maybeSavedValue.has_value());
+		EXPECT_TRUE(Math::eq(std::get<glm::mat4>(*maybeSavedValue), glm::scale(randomVec3)));
 	}
 }

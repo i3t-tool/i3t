@@ -22,7 +22,7 @@ std::vector<std::string> concat(const std::map<std::string, Core::Data>& map, co
 	for (const auto& [key, val] : map)
 	{
 		std::string strVal = "undefined";
-		switch (val.opValueType)
+		switch (val.valueType)
 		{
 		case EValueType::Float:
 			strVal = toString(val.getFloat());

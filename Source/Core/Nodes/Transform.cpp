@@ -50,7 +50,6 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 Transform::Transform(const TransformOperation& transformType) : Node(&(transformType.operation))
 {
 	m_internalData.push_back(Data(EValueType::Matrix));
-	m_savedData = Data(EValueType::Matrix);
 }
 
 void Transform::createDefaults()
@@ -61,7 +60,6 @@ void Transform::createDefaults()
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
 		m_defaultValues.push_back({key, Data(valueType)});
-		m_savedValues.push_back({key, Data(valueType)});
 	}
 }
 
@@ -153,44 +151,42 @@ void Transform::unlock()
 	m_isLocked = false;
 }
 
+bool Transform::hasSavedValue() const
+{
+	auto result = data(0).hasSavedValue();
+	for (auto& [_, data] : m_defaultValues)
+	{
+		result = result || data.hasSavedValue();
+	}
+
+	return result;
+}
+
 void Transform::saveValue()
 {
-	m_savedData = data(0);
-	m_savedValues = m_defaultValues;
-
-	m_hasSavedData = true;
+	dataMut(0).saveValue();
+	for (auto& [_, data] : m_defaultValues)
+	{
+		data.saveValue();
+	}
 }
 
 void Transform::reloadValue()
 {
-	if (!m_hasSavedData)
-	{
-		return;
-	}
+	dataMut(0).reloadValue();
 
-	setInternalValue(m_savedData.getMat4(), 0);
 	if (!m_defaultValues.empty())
 	{
-		m_defaultValues = m_savedValues;
+		for (auto& [_, data] : m_defaultValues)
+		{
+			data.reloadValue();
+		}
 		resetMatrixFromDefaults();
 	}
 
 	notifySequence();
 }
 
-const glm::mat4& Transform::getSavedValue() const
-{
-	return m_savedData.getMat4();
-}
-
-void Transform::setSavedValue(const glm::mat4& values)
-{
-	m_savedData.setValue(values);
-
-	m_hasSavedData = true; // PF: was missing in comparison to saveValue()
-}
-
-// PF todo - check for synergies????
 SetValueResult Transform::setValue(const glm::mat4& mat)
 {
 	SetValueResult result;

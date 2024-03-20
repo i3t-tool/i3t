@@ -285,9 +285,31 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 	}
 }
 
+static void drawMenuStoreValues(Ptr<Core::Node> node)
+{
+	if (ImGui::BeginMenu("Value"))
+	{
+		if (ImGui::MenuItem("Store"))
+		{
+			node->dataMut(0).saveValue();
+		}
+		if (ImGui::MenuItem("Restore", nullptr, false, node->data(0).hasSavedValue()))
+		{
+			node->dataMut(0).reloadValue();
+		}
+
+		ImGui::EndMenu();
+	}
+}
+
 void WorkspaceNodeWithCoreData::popupContent()
 {
 	drawMenuSetEditable();
+
+	if (m_nodebase->getOperation()->isConstructor)
+	{
+		drawMenuStoreValues(getNodebase());
+	}
 
 	ImGui::Separator();
 
