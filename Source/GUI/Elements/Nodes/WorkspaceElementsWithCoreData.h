@@ -32,7 +32,7 @@ typedef std::vector<Ptr<WorkspaceCorePin>>::const_iterator workspacePinIter;
 typedef std::vector<Ptr<WorkspaceLink>>::const_iterator workspaceLinkIter;
 
 typedef std::function<float()> getter_function_pointer;
-typedef std::function<Core::ValueSetResult(float)> setter_function_pointer;
+typedef std::function<Core::SetValueResult(float)> setter_function_pointer;
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 {
@@ -81,9 +81,6 @@ public:
 
 	WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
 	WorkspaceLevelOfDetail getLevelOfDetail();
-
-	Core::DataMap const* setDataMap(const Core::DataMap* mapToSet);
-	Core::DataMap const* getDataMap();
 
 	bool drawDataLabel();
 	void drawMenuSetEditable();

@@ -150,43 +150,7 @@ protected:
 	 * \param name changed data field
 	 * \param val newValue as Core::Data(newValue)!!! (as we cannot have virtual template functions)
 	 */
-	virtual void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
-	{
-		// getDefaultValueMut(name).setValue(val); // defaults
-		// std::cout << "Nepretizena virtualni funkce" << std::endl;
-
-		switch (val.opValueType)
-		{
-		case EValueType::Float:
-			getDefaultValueMut(name).setValue(val.getFloat());
-			break;
-		case EValueType::Vec3:
-			getDefaultValueMut(name).setValue(val.getVec3());
-			break;
-		case EValueType::Quat:
-			getDefaultValueMut(name).setValue(val.getQuat());
-			break;
-		case EValueType::Vec4:
-			getDefaultValueMut(name).setValue(val.getVec4());
-			break;
-		case EValueType::Matrix:
-			getDefaultValueMut(name).setValue(val.getMat4());
-			break;
-		case EValueType::MatrixMul:
-			getDefaultValueMut(name).setValue(val.getMat4());
-			break;
-		case EValueType::Screen:
-			getDefaultValueMut(name).setValue(val.getScreen());
-			break;
-		case EValueType::Ptr:
-			getDefaultValueMut(name).setValue(val.getPointer());
-			break;
-		case EValueType::Pulse:
-		default:
-			std::cout << "Error in setDefaultValueWithSynergies - undefined value type." << std::endl;
-			break;
-		}
-	}
+	virtual void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val);
 
 public:
 	// template <typename T> void setDefaultValueWithSynergies(const std::string& name, T&& val);
@@ -200,19 +164,18 @@ public:
 	 * \param name Name of the parameter (such as Center)
 	 * \param val New value
 	 */
-	template <typename T> ValueSetResult setDefaultValue(const std::string& name, T&& val)
+	template <typename T> SetValueResult setDefaultValue(const std::string& name, T&& val)
 	{
 		const auto* props = properties();
 		if (!props->hasDefaultValue(name))
 		{
-			return ValueSetResult(ValueSetResult::Status::Err_LogicError,
+			return SetValueResult(SetValueResult::Status::Err_LogicError,
 			                      "default value with this name does not exist");
 		}
 
 		if (hasSynergies())
 		{
-			// setDefaultValueWithSynergiesT(name, val); // impossible, we cannot create a template virtual function
-			setDefaultValueWithSynergies(name, Core::Data(val)); // as rvalue reference
+			setDefaultValueWithSynergies(name, Core::Data(val));
 		}
 		else
 		{
@@ -220,7 +183,7 @@ public:
 		}
 		resetMatrixFromDefaults(); // defaults to matrix
 
-		return ValueSetResult();
+		return SetValueResult();
 	}
 
 	template <typename T> void setDefaultValueNoUpdate(const std::string& name, T&& val)
@@ -243,8 +206,8 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
-	// ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	// virtual ValueSetResult onSetValue(float val, glm::ivec2 coords) {}
+	// SetValueResult setValue(float val, glm::ivec2 coords) override;
+	// virtual SetValueResult onSetValue(float val, glm::ivec2 coords) {}
 
 	/**
 	 * \brief Checks the validity of the stored Transform matrix (used by GUI to
@@ -333,8 +296,8 @@ public:
 	//	enableSynergies(); // if (m_hasMenuSynergies) only
 	// }
 
-	ValueSetResult setValue(const glm::mat4& mat) override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override; // PF
+	SetValueResult setValue(const glm::mat4& mat) override;
+	SetValueResult setValue(float val, glm::ivec2 coords) override; // PF
 
 	void notifySequence();
 

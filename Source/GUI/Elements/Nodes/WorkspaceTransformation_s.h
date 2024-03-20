@@ -44,10 +44,10 @@ public:
 	int maxLengthOfData()
 	{
 		//    if (Core::ETransformType::Quat == T)
-		//        return maxLengthOfDataQuaternion( m_nodebase->getData().getQuat(),
+		//        return maxLengthOfDataQuaternion( m_nodebase->data().getQuat(),
 		//        m_numberOfVisibleDecimal);
 		//    else
-		return maxLengthOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
+		return maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
 	}
 
 	void drawMenuLevelOfDetail()

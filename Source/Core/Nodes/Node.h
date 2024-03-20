@@ -33,7 +33,7 @@ namespace Core
 class Node;
 class Pin;
 
-struct ValueSetResult
+struct SetValueResult
 {
 	enum class Status
 	{
@@ -45,8 +45,8 @@ struct ValueSetResult
 	Status status = Status::Ok;
 	std::string message;
 
-	ValueSetResult() = default;
-	ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
+	SetValueResult() = default;
+	SetValueResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
 };
 
 inline constexpr size_t I3T_INPUT0 = 0;
@@ -79,13 +79,6 @@ protected:
 	 * \param operation Node properties.
 	 */
 	Node(const Operation* operation) : m_operation(operation) {}
-
-	/**
-	 * Delete node.
-	 *
-	 * \pre All inputs and outputs must be unplugged (calls Node::finalize
-	 * function)!
-	 */
 	virtual ~Node();
 
 public:
@@ -113,6 +106,7 @@ public:
 	/**
 	 * Prepares node for its destruction, after that the destructor can be called.
 	 */
+	/// \todo MH: Remove, use destructor directly.
 	void finalize();
 
 	/**
@@ -199,15 +193,9 @@ public:
 	 * two vectors). Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
-	const Data& getData(size_t index = 0)
-	{
-		return getInternalData(index);
-	}
-
-	/// \todo MH Replace getData with this function.
 	const Data& data(size_t index = 0)
 	{
-		return getData(index);
+		return getInternalData(index);
 	}
 
 public:
@@ -216,24 +204,25 @@ public:
 	/// \returns nullptr if owner is not set.
 	Ptr<Node> getOwner() const;
 
-	/// \todo Does it needs to be public?
+private:
 	void setOwner(Node* owner)
 	{
 		m_owner = owner;
 	}
 
+public:
 	/// Get the topmost owner of this node.
 	Ptr<Node> getRootOwner();
 
 	void notifyOwner();
 
 public:
-	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
+	[[nodiscard]] virtual SetValueResult setValue(void* ptr)
 	{
 		m_internalData[0].setValue(ptr);
 		spreadSignal();
 
-		return ValueSetResult{};
+		return SetValueResult{};
 	}
 
 	/**
@@ -243,23 +232,23 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val)
+	[[nodiscard]] virtual SetValueResult setValue(float val)
 	{
 		return setValueEx(val);
 	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
+	[[nodiscard]] virtual SetValueResult setValue(const glm::vec3& vec)
 	{
 		return setValueEx(vec);
 	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
+	[[nodiscard]] virtual SetValueResult setValue(const glm::vec4& vec)
 	{
 		return setValueEx(vec);
 	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)
+	[[nodiscard]] virtual SetValueResult setValue(const glm::quat& q)
 	{
 		return setValueEx(q);
 	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
+	[[nodiscard]] virtual SetValueResult setValue(const glm::mat4& mat)
 	{
 		return setValueEx(mat);
 	}
@@ -269,11 +258,11 @@ public:
 	 * \param coords in the column major order: coords.x is the column index and
 	 * coords.y is the row index. \return
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
+	[[nodiscard]] virtual SetValueResult setValue(float val, glm::ivec2 coords)
 	{
 		setInternalValue(val, coords);
-		return ValueSetResult{};
-		// return ValueSetResult{ValueSetResult::Status::Err_LogicError,
+		return SetValueResult{};
+		// return SetValueResult{SetValueResult::Status::Err_LogicError,
 		// "Unsupported operation on non transform object."};
 	}
 
@@ -281,22 +270,22 @@ public:
 	 * Smart set function, used with constrained transformation for value
 	 * checking. \param mat \param map array of 16 chars.
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const DataMap& map)
+	[[nodiscard]] virtual SetValueResult setValue(const glm::mat4& mat, const DataMap& map)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
+		return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
-	template <typename T> [[nodiscard]] ValueSetResult setValue(const T& value, unsigned index)
+	template <typename T> [[nodiscard]] SetValueResult setValue(const T& value, unsigned index)
 	{
 		return setValueEx(value, index);
 	}
 
 private:
 	/// Sets value of pin at \p index position.
-	template <typename T> ValueSetResult setValueEx(T&& val, unsigned index = 0)
+	template <typename T> SetValueResult setValueEx(T&& val, unsigned index = 0)
 	{
 		setInternalValue(val, index);
-		return ValueSetResult{};
+		return SetValueResult{};
 	}
 
 protected:
@@ -330,13 +319,6 @@ protected:
 	 * @return
 	 */
 	bool shouldPulse(size_t inputIndex, size_t updatedInputIndex);
-
-public:
-	/// \todo MH will be removed.
-	static const DataMap* getDataMap();
-
-	/// \todo MH will be removed.
-	static const DataMap& getDataMapRef();
 
 public:
 	//===-- Values updating functions. ----------------------------------------===//
@@ -399,7 +381,7 @@ public:
 		return fmt::format("{} #{}", m_operation->keyWord, m_id);
 	}
 
-protected:
+private:
 	// TODO: (DR) Callbacks cannot be unregistered! That could cause issues when lifetime of listener ends before the
 	//   dispatcher.
 	//   Callbacks are very primitively implemented using std::function, std::function instances cannot be compared and
@@ -411,6 +393,7 @@ protected:
 	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_plugCallbacks;
 	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_unplugCallbacks;
 
+protected:
 	void triggerUpdateCallback(Node* node);
 	void triggerDeleteCallback(Node* node);
 	void triggerPlugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
@@ -456,13 +439,11 @@ public:
 	virtual void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 protected:
-	virtual ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
+	ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
 
 private:
 	void unplugAll();
 	void unplugInput(size_t index);
-
-private:
 	void unplugOutput(size_t index);
 
 protected:
@@ -488,8 +469,5 @@ protected:
 
 	/// Nested nodes.
 	std::vector<Node*> m_children;
-
-	/// Used by Camera
-	ENodePlugResult (*m_isPlugCorrectFn)(const Pin& input, const Pin& output) = nullptr;
 };
 } // namespace Core

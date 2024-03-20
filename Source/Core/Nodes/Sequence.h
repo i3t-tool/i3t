@@ -71,11 +71,11 @@ class Sequence : public Node
 	public:
 		Storage(Sequence& sequence) : m_sequence(sequence) {}
 
-		ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept
+		SetValueResult addMatrix(Ptr<Transform> matrix) noexcept
 		{
 			return addMatrix(matrix, 0);
 		};
-		ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+		SetValueResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 		Ptr<Transform> popMatrix(const int index);
 		void swap(int from, int to);
 
@@ -94,7 +94,7 @@ public:
 	 * @param matrix
 	 * @return
 	 */
-	ValueSetResult pushMatrix(Ptr<Transform> matrix) noexcept;
+	SetValueResult pushMatrix(Ptr<Transform> matrix) noexcept;
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -102,7 +102,7 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	ValueSetResult pushMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+	SetValueResult pushMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 
 	const Matrices& getMatrices() const
 	{
@@ -148,7 +148,7 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices
 {
 	glm::mat4 result(1.0f);
 	for (const auto& mat : matrices)
-		result *= mat->getData().getMat4();
+		result *= mat->data().getMat4();
 	return result;
 }
 } // namespace Core

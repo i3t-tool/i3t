@@ -100,17 +100,17 @@ TEST(EulerXTest, MatrixToDefaultsUpdateWithSynergies)
 	rotXNode->setValue(c, {1, 1});
 
 	// set values od cos - precise
-	val = rotXNode->getData().getMat4()[1][1];
+	val = rotXNode->data().getMat4()[1][1];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotXNode->getData().getMat4()[2][2];
+	val = rotXNode->data().getMat4()[2][2];
 	EXPECT_TRUE(Math::eq(c, val));
 
 	// computed values of sin - not very precise
-	val = rotXNode->getData().getMat4()[2][1];
+	val = rotXNode->data().getMat4()[2][1];
 	EXPECT_TRUE(Math::eq(-s, val, Math::FACTOR_ROUGHLY_SIMILAR));
 
-	val = rotXNode->getData().getMat4()[1][2];
+	val = rotXNode->data().getMat4()[1][2];
 	EXPECT_TRUE(Math::eq(s, val, Math::FACTOR_ROUGHLY_SIMILAR));
 
 	// The rotation
@@ -118,7 +118,7 @@ TEST(EulerXTest, MatrixToDefaultsUpdateWithSynergies)
 	EXPECT_TRUE(Math::eq(r, angle, Math::FACTOR_ROUGHLY_SIMILAR));
 
 	auto expectedMatrix = glm::eulerAngleX(angle);
-	EXPECT_TRUE(Math::eq(expectedMatrix, rotXNode->getData().getMat4(), Math::FACTOR_ROUGHLY_SIMILAR));
+	EXPECT_TRUE(Math::eq(expectedMatrix, rotXNode->data().getMat4(), Math::FACTOR_ROUGHLY_SIMILAR));
 }
 
 TEST(EulerXTest, MatrixToDefaultsUpdateWithoutSynergies)
@@ -133,16 +133,16 @@ TEST(EulerXTest, MatrixToDefaultsUpdateWithoutSynergies)
 	rotXNode->disableSynergies();
 	// The matrix content:
 	rotXNode->setValue(c, {1, 1});
-	val = rotXNode->getData().getMat4()[1][1];
+	val = rotXNode->data().getMat4()[1][1];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotXNode->getData().getMat4()[2][2];
+	val = rotXNode->data().getMat4()[2][2];
 	EXPECT_TRUE(Math::eq(1.0f, val));
 
-	val = rotXNode->getData().getMat4()[2][1];
+	val = rotXNode->data().getMat4()[2][1];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
-	val = rotXNode->getData().getMat4()[1][2];
+	val = rotXNode->data().getMat4()[1][2];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
 	// The rotation schould be unchanged
@@ -161,19 +161,19 @@ TEST(EulerYTest, MatrixToDefaultsUpdateWithSynergies)
 	// with synergies, initial quadrant is the first one (X+,Y+)
 	// The matrix content:
 	rotYNode->setValue(c, {0, 0});
-	val = rotYNode->getData().getMat4()[0][0];
+	val = rotYNode->data().getMat4()[0][0];
 	EXPECT_TRUE(Math::eq(c, val));
 	// ASSERT_EQ(c, val);
 
-	val = rotYNode->getData().getMat4()[2][2];
+	val = rotYNode->data().getMat4()[2][2];
 	EXPECT_TRUE(Math::eq(c, val));
 	// ASSERT_EQ(c, val);
 
-	val = rotYNode->getData().getMat4()[2][0];
+	val = rotYNode->data().getMat4()[2][0];
 	EXPECT_TRUE(Math::eq(s, val));
 	// ASSERT_EQ(s, val);
 
-	val = rotYNode->getData().getMat4()[0][2];
+	val = rotYNode->data().getMat4()[0][2];
 	EXPECT_TRUE(Math::eq(-s, val));
 	// ASSERT_EQ(-s, val);
 
@@ -195,16 +195,16 @@ TEST(EulerYTest, MatrixToDefaultsUpdateWithoutSynergies)
 	rotYNode->disableSynergies();
 	// The matrix content:
 	rotYNode->setValue(c, {0, 0});
-	val = rotYNode->getData().getMat4()[0][0];
+	val = rotYNode->data().getMat4()[0][0];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotYNode->getData().getMat4()[2][2];
+	val = rotYNode->data().getMat4()[2][2];
 	EXPECT_TRUE(Math::eq(1.0f, val));
 
-	val = rotYNode->getData().getMat4()[2][0];
+	val = rotYNode->data().getMat4()[2][0];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
-	val = rotYNode->getData().getMat4()[0][2];
+	val = rotYNode->data().getMat4()[0][2];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
 	// The rotation should be unchanged
@@ -223,16 +223,16 @@ TEST(EulerZTest, MatrixToDefaultsUpdateWithSynergies)
 	// with synergies, initial quadrant is the first one (X+,Y+)
 	// The matrix content:
 	rotZNode->setValue(c, {0, 0});
-	val = rotZNode->getData().getMat4()[0][0];
+	val = rotZNode->data().getMat4()[0][0];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotZNode->getData().getMat4()[1][1];
+	val = rotZNode->data().getMat4()[1][1];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotZNode->getData().getMat4()[1][0];
+	val = rotZNode->data().getMat4()[1][0];
 	EXPECT_TRUE(Math::eq(-s, val));
 
-	val = rotZNode->getData().getMat4()[0][1];
+	val = rotZNode->data().getMat4()[0][1];
 	EXPECT_TRUE(Math::eq(s, val));
 
 	// The rotation should be updated to the angle (from the cosine(angle) value)
@@ -252,16 +252,16 @@ TEST(EulerZTest, MatrixToDefaultsUpdateWithoutSynergies)
 	rotZNode->disableSynergies();
 	// The matrix content:
 	rotZNode->setValue(c, {0, 0});
-	val = rotZNode->getData().getMat4()[0][0];
+	val = rotZNode->data().getMat4()[0][0];
 	EXPECT_TRUE(Math::eq(c, val));
 
-	val = rotZNode->getData().getMat4()[1][1];
+	val = rotZNode->data().getMat4()[1][1];
 	EXPECT_TRUE(Math::eq(1.0f, val));
 
-	val = rotZNode->getData().getMat4()[0][1];
+	val = rotZNode->data().getMat4()[0][1];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
-	val = rotZNode->getData().getMat4()[1][0];
+	val = rotZNode->data().getMat4()[1][0];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
 	// The rotation should be unchanged
@@ -281,7 +281,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 
 		setValue_expectOk(rotXNode, glm::cos(rads), {1, 1});
 
-		auto mat = rotXNode->getData().getMat4();
+		auto mat = rotXNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
@@ -293,7 +293,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 
 		setValue_expectOk(rotXNode, glm::sin(rads), {1, 2});
 
-		auto mat = rotXNode->getData().getMat4();
+		auto mat = rotXNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
@@ -305,7 +305,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 
 		setValue_expectOk(rotXNode, -glm::sin(rads), {2, 1});
 
-		auto mat = rotXNode->getData().getMat4();
+		auto mat = rotXNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
@@ -317,7 +317,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 
 		setValue_expectOk(rotXNode, glm::cos(rads), {2, 2});
 
-		auto mat = rotXNode->getData().getMat4();
+		auto mat = rotXNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
@@ -359,10 +359,10 @@ TEST(EulerXTest,
 
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
-	// std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
-	// std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1] << ", value should be " << 0.0f << std::endl;
-	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));
-	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][1],
+	// std::cerr << "Matrix[1,2] = " << rot->data().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
+	// std::cerr << "Matrix[2,1] = " << rot->data().getMat4()[2][1] << ", value should be " << 0.0f << std::endl;
+	EXPECT_TRUE(Math::eq(rot->data().getMat4()[1][2], wrongVal));
+	EXPECT_TRUE(Math::eq(rot->data().getMat4()[1][1],
 	                     1.0f)); // was identity, no synergies => should be unchanged
 
 	// std::cerr << "--------------------- START WRONG TEST -------------------" << std::endl;
@@ -374,12 +374,12 @@ TEST(EulerXTest,
 	rot->enableSynergies();
 	setValue_expectOk(rot, wrongVal, {1, 2}); // synergies will use this as sin(angle)
 
-	// std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
-	// std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1] << ", value should be " << -wrongVal <<
+	// std::cerr << "Matrix[1,2] = " << rot->data().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
+	// std::cerr << "Matrix[2,1] = " << rot->data().getMat4()[2][1] << ", value should be " << -wrongVal <<
 	// std::endl;
 
-	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));  //  sin
-	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[2][1], -wrongVal)); // -sin
+	EXPECT_TRUE(Math::eq(rot->data().getMat4()[1][2], wrongVal));  //  sin
+	EXPECT_TRUE(Math::eq(rot->data().getMat4()[2][1], -wrongVal)); // -sin
 	EXPECT_TRUE(rot->isValid());
 }
 
@@ -420,10 +420,10 @@ TEST(EulerXTest, SetMatrixShouldBeValid)
 
 	setValue_expectOk(eulerX, mat);
 
-	EXPECT_TRUE(Math::eq(mat, eulerX->getData().getMat4(), 100 * Math::FACTOR_ROUGHLY_SIMILAR))
+	EXPECT_TRUE(Math::eq(mat, eulerX->data().getMat4(), 100 * Math::FACTOR_ROUGHLY_SIMILAR))
 	    << Utils::toString(mat) << std::endl
 	    << "!=\n"
-	    << Utils::toString(eulerX->getData().getMat4()) << std::endl;
+	    << Utils::toString(eulerX->data().getMat4()) << std::endl;
 	; // get what you set
 	auto storedRad = eulerX->getDefaultValue("angle").getFloat();
 	EXPECT_FALSE(Math::eq(initialRad, storedRad, Math::FACTOR_ROUGHLY_SIMILAR)); // setValue updated the Default
@@ -431,7 +431,7 @@ TEST(EulerXTest, SetMatrixShouldBeValid)
 
 	eulerX->resetMatrixFromDefaults();
 	const auto expectedMat = glm::eulerAngleX(initialRad);
-	const auto currentMat = eulerX->getData().getMat4();
+	const auto currentMat = eulerX->data().getMat4();
 	EXPECT_FALSE(Math::eq(expectedMat, currentMat, 10 * Math::FACTOR_ROUGHLY_SIMILAR)); //
 }
 
@@ -449,7 +449,7 @@ TEST(EulerYTest, OneValueSet)
 
 		setValue_expectOk(rotYNode, val, {0, 0});
 
-		auto mat = rotYNode->getData().getMat4();
+		auto mat = rotYNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -459,7 +459,7 @@ TEST(EulerYTest, OneValueSet)
 
 		setValue_expectOk(rotYNode, glm::sin(rads), {2, 0});
 
-		auto mat = rotYNode->getData().getMat4();
+		auto mat = rotYNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -469,7 +469,7 @@ TEST(EulerYTest, OneValueSet)
 
 		setValue_expectOk(rotYNode, -glm::sin(rads), {0, 2});
 
-		auto mat = rotYNode->getData().getMat4();
+		auto mat = rotYNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -479,7 +479,7 @@ TEST(EulerYTest, OneValueSet)
 
 		setValue_expectOk(rotYNode, glm::cos(rads), {2, 2});
 
-		auto mat = rotYNode->getData().getMat4();
+		auto mat = rotYNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -499,9 +499,9 @@ TEST(EulerYTest, SetMatrixShouldBeValid)
 	setValue_expectOk(eulerY, mat);
 	// auto setResult = eulerY->setValue(mat);
 
-	// EXPECT_EQ(mat, eulerY->getData().getMat4());
-	// EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
-	EXPECT_TRUE(Math::eq(mat, eulerY->getData().getMat4())); // get what you set
+	// EXPECT_EQ(mat, eulerY->data().getMat4());
+	// EXPECT_EQ(SetValueResult::Status::Ok, setResult.status);
+	EXPECT_TRUE(Math::eq(mat, eulerY->data().getMat4())); // get what you set
 	auto storedRad = eulerY->getDefaultValue("angle").getFloat();
 
 	EXPECT_FALSE(Math::eq(initialRad, storedRad)); // setValue updated the Default
@@ -509,7 +509,7 @@ TEST(EulerYTest, SetMatrixShouldBeValid)
 
 	eulerY->resetMatrixFromDefaults();
 	auto expectedMat = glm::eulerAngleZ(initialRad);
-	auto currentMat = eulerY->getData().getMat4();
+	auto currentMat = eulerY->data().getMat4();
 	EXPECT_FALSE(Math::eq(expectedMat, currentMat)); //
 }
 
@@ -525,7 +525,7 @@ TEST(EulerZTest, OneValueSet)
 
 		setValue_expectOk(rotZNode, glm::cos(rads), {0, 0});
 
-		auto mat = rotZNode->getData().getMat4();
+		auto mat = rotZNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -535,7 +535,7 @@ TEST(EulerZTest, OneValueSet)
 
 		setValue_expectOk(rotZNode, glm::sin(rads), {0, 1});
 
-		auto mat = rotZNode->getData().getMat4();
+		auto mat = rotZNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -545,7 +545,7 @@ TEST(EulerZTest, OneValueSet)
 
 		setValue_expectOk(rotZNode, -glm::sin(rads), {1, 0});
 
-		auto mat = rotZNode->getData().getMat4();
+		auto mat = rotZNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -555,7 +555,7 @@ TEST(EulerZTest, OneValueSet)
 
 		setValue_expectOk(rotZNode, glm::cos(rads), {1, 1});
 
-		auto mat = rotZNode->getData().getMat4();
+		auto mat = rotZNode->data().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
@@ -571,8 +571,8 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
 	auto mat = glm::eulerAngleZ(newRad);
 
 	setValue_expectOk(eulerZ, mat);
-	// EXPECT_EQ(mat, eulerZ->getData().getMat4());
-	EXPECT_TRUE(Math::eq(mat, eulerZ->getData().getMat4())); // get what you set
+	// EXPECT_EQ(mat, eulerZ->data().getMat4());
+	EXPECT_TRUE(Math::eq(mat, eulerZ->data().getMat4())); // get what you set
 	auto storedRad = eulerZ->getDefaultValue("angle").getFloat();
 
 	EXPECT_FALSE(Math::eq(initialRad, storedRad)); // setValue updated the Default
@@ -580,7 +580,7 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
 
 	eulerZ->resetMatrixFromDefaults();
 	auto expectedMat = glm::eulerAngleZ(initialRad);
-	auto currentMat = eulerZ->getData().getMat4();
+	auto currentMat = eulerZ->data().getMat4();
 	EXPECT_FALSE(Math::eq(expectedMat, currentMat)); //
 }
 
@@ -605,7 +605,7 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 	for (int i = 0; i < 3; ++i)
 	{
 		setValue_expectOk(rots[i], angle);
-		EXPECT_EQ(expectedMatrices[i], rots[i]->getData().getMat4());
+		EXPECT_EQ(expectedMatrices[i], rots[i]->data().getMat4());
 	}
 }
 
@@ -629,7 +629,7 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 		setValue_expectOk(axisAngle, axis);
 		EXPECT_EQ(axis, axisAngle->getDefaultValue("axis").getVec3());
 	}
-	EXPECT_EQ(expectedMat, axisAngle->getData().getMat4());
+	EXPECT_EQ(expectedMat, axisAngle->data().getMat4());
 }
 
 //===-- Quaternion rotation test ------------------------------------------===//
@@ -654,7 +654,7 @@ TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 
 	// matrix is OK
 	const glm::quat quat0 = rot->getDefaultValue("quat").getQuat();
-	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat0)));
+	EXPECT_EQ(rot->data().getMat4(), glm::toMat4(glm::normalize(quat0)));
 }
 
 TEST(QuatRotTest, getNormalized_returns_normalized)
@@ -755,7 +755,7 @@ TEST(QuatRotTest, DataGetters_withoutHysteresis)
 	rot->setDefaultValue("quat", unitQuat); // bound to 1.2 and then normalized in setDefaultValueWithSynergies()
 
 	auto& mat1 = rot->getInternalData().getMat4();
-	auto& mat2 = rot->getData().getMat4();
+	auto& mat2 = rot->data().getMat4();
 	auto& mat3 = rot->data().getMat4();
 
 	EXPECT_PRED_FORMAT2(AssertEqualMatrices, mat1, mat2);
@@ -821,7 +821,7 @@ TEST(QuatRotTest, HandlingSynergies_setValue_expectOk_WithSynergies) // internal
 
 	// the matrix is set correctly based on the normalized quaternion
 	// may be not valid - changed by hysteresis
-	EXPECT_EQ(rot->getData().getMat4(),
+	EXPECT_EQ(rot->data().getMat4(),
 	          glm::toMat4(glm::normalize(nonUnitQuat))); // same matrix as from normalized
 }
 
@@ -848,18 +848,18 @@ TEST(QuatRotTest, HandlingSynergies_setValue_expectOk_NoSynergies)
 	EXPECT_NE(rot->getQuat(), rot->getNormalizedQuat()); // default quat is left non-normalized
 
 	// invalid due to hysteresis replacement in setDefaultValueWithSynergies()
-	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	//                     glm::toMat4(glm::normalize(nonUnitQuat))); // same matrix as from normalized
 
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	                    glm::toMat4(glm::normalize(rot->getQuat()))); // same matrix as from normalized(quat)
 
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	                    glm::toMat4(rot->getNormalizedQuat())); // same matrix as from normalized
 
 
 	// the matrix is set correctly based on the normalized quaternion
-	EXPECT_EQ(rot->getData().getMat4(),
+	EXPECT_EQ(rot->data().getMat4(),
 	          glm::toMat4(glm::normalize(nonUnitQuat))); // same matrix as from normalized
 }
 
@@ -894,14 +894,14 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue_WithSynergiesAndHysteresis)
 	EXPECT_EQ(rot->getQuat(), rot->getNormalizedQuat()); // normalized default = m_normalized
 
 	// invalid due to hysteresis replacement in setDefaultValueWithSynergies()
-	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	//                     glm::toMat4(glm::normalize(nonUnitQuat))); // same matrix as from normalized
 
 	EXPECT_PRED_FORMAT2(
-	    AssertEqualMatrices, rot->getData().getMat4(),
+	    AssertEqualMatrices, rot->data().getMat4(),
 	    glm::toMat4(glm::normalize(rot->getQuat()))); // same matrix as from quat, that is also normalized
 
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	                    glm::toMat4(rot->getNormalizedQuat())); // same matrix as from normalized
 }
 
@@ -929,13 +929,13 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue_NoSynergies)
 	EXPECT_NE(rot->getQuat(), rot->getNormalizedQuat()); // default is left non-normalized
 
 	// invalid due to hysteresis replacement in setDefaultValueWithSynergies()
-	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	// EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	//                     glm::toMat4(glm::normalize(nonUnitQuat))); // same matrix as from normalized
 
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	                    glm::toMat4(glm::normalize(rot->getQuat()))); // same matrix as from normalized(quat)
 
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->getData().getMat4(),
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, rot->data().getMat4(),
 	                    glm::toMat4(rot->getNormalizedQuat())); // same matrix as from normalized
 }
 

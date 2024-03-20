@@ -33,9 +33,9 @@ inline std::tuple<std::array<float, Size>, std::array<Ptr<Node>, Size>> generate
 	{
 		inputValues[i] = generateFloat();
 		inputNodes[i] = Builder::createOperator<EOperatorType::FloatToFloat>();
-		auto valueSetResult = inputNodes[i]->setValue(inputValues[i]);
+		auto SetValueResult = inputNodes[i]->setValue(inputValues[i]);
 		auto plugResult = GraphManager::plug(inputNodes[i], node, 0, i);
-		EXPECT_EQ(ValueSetResult::Status::Ok, valueSetResult.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, SetValueResult.status);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	return std::make_tuple(inputValues, inputNodes);

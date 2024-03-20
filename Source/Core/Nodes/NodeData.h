@@ -139,8 +139,6 @@ public:
 	{
 		m_value = val;
 	}
-	explicit Data(const void* val) : opValueType(EValueType::Ptr) {}
-	// todo check this - the pointer is not stored !!!
 	///@}
 
 	/** Constructor of given signal type with an undefined value (identity) */
@@ -169,10 +167,6 @@ public:
 	{
 		return std::get<glm::vec3>(m_value);
 	}
-	[[nodiscard]] glm::vec3& getVec3Ref()
-	{
-		return std::get<glm::vec3>(m_value);
-	}
 
 	[[nodiscard]] const glm::vec4& getVec4() const
 	{
@@ -189,13 +183,9 @@ public:
 		return std::get<float>(m_value);
 	}
 
-	[[nodiscard]] void* getPointer() const
-	{
-		return std::get<void*>(m_value);
-	}
-
 	//
 
+	/// \todo MH Refactor
 	template <typename T> std::optional<std::remove_reference_t<T>> getValue() const;
 
 	//

@@ -46,7 +46,7 @@ template <typename T> static std::optional<T> getValue(Ptr<GuiNode> guiNode, int
 		return std::nullopt;
 	}
 
-	const auto maybeValue = node->getData(index).getValue<T>();
+	const auto maybeValue = node->data(index).getValue<T>();
 	if (!maybeValue.has_value())
 	{
 		g_printRef("no such type of value");
@@ -65,14 +65,14 @@ template <typename T> static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 		g_printRef("cannot set value for this node");
 		return false;
 	}
-	if (node->getData().index() != variant_index<Core::Data::Storage, T>())
+	if (node->data().index() != variant_index<Core::Data::Storage, T>())
 	{
 		g_printRef("invalid value type for this node");
 		return false;
 	}
 
 	const auto result = node->setValue(value);
-	if (result.status != Core::ValueSetResult::Status::Ok)
+	if (result.status != Core::SetValueResult::Status::Ok)
 	{
 		g_printRef(result.message);
 		return false;
@@ -99,7 +99,7 @@ template <typename T> static bool setDefaultValue(Ptr<GuiTransform> guiNode, con
 {
 	const auto node = guiNode->getNodebase()->as<Core::Transform>();
 	const auto result = node->setDefaultValue(name, value);
-	if (result.status != Core::ValueSetResult::Status::Ok)
+	if (result.status != Core::SetValueResult::Status::Ok)
 	{
 		g_printRef(result.message);
 
@@ -212,7 +212,7 @@ void ScriptingModule::onInit()
 	    														 {
 		                                 const auto glmCoords = glm::vec2(coords.x, coords.y);
 		                                 const auto result = self->getNodebase()->setValue(value, glmCoords);
-		                                 if (result.status != Core::ValueSetResult::Status::Ok)
+		                                 if (result.status != Core::SetValueResult::Status::Ok)
 		                                 {
 			                                 print(result.message);
 		                                 }

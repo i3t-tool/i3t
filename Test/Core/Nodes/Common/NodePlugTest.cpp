@@ -31,7 +31,7 @@ TEST(PlugTest, DotProductOfTwoVec3NodesShouldBeCorrect)
 	setValue_expectOk(vec1, glm::vec3(1.0f, 2.0f, 1.0f));
 	setValue_expectOk(vec2, glm::vec3(2.0f, 1.0f, 2.0f));
 
-	EXPECT_EQ(6.0f, dotNode->getData().getFloat());
+	EXPECT_EQ(6.0f, dotNode->data().getFloat());
 }
 
 TEST(PlugTest, DifferentPinTypes_NodeShouldNotBeConnected)
@@ -84,7 +84,7 @@ TEST(PlugTest, UnplugMeFromPluggedNode)
 
 	setValue_expectOk(vec1, glm::vec3(2.1f, 0.5f, 0.0f));
 
-	EXPECT_FALSE(vec2->getData().getVec3().x == 0.0f);
+	EXPECT_FALSE(vec2->data().getVec3().x == 0.0f);
 
 	GraphManager::unplugAll(vec1);
 

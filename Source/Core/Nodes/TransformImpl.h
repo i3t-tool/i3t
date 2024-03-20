@@ -141,11 +141,11 @@ public:
 		return true;
 	}
 
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override
 	{
 		setInternalValue(val, coords);
 		notifySequence();
-		return ValueSetResult{};
+		return SetValueResult{};
 	}
 
 	/**
@@ -173,10 +173,10 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float val) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] SetValueResult setValue(float val) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
 	[[nodiscard]] void setDefaultUniformScale(float val);
 
 	void resetMatrixFromDefaults() override;
@@ -202,10 +202,10 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] SetValueResult setValue(float rad) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
 
@@ -233,10 +233,10 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] SetValueResult setValue(float rad) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
 
@@ -264,10 +264,10 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] SetValueResult setValue(float rad) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
 
@@ -283,10 +283,10 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float val) override; // useful for init only, Translation has no synergies
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] SetValueResult setValue(float val) override; // useful for init only, Translation has no synergies
+	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
 };
@@ -301,9 +301,9 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	ValueSetResult setValue(const glm::mat4& mat) override;
-	ValueSetResult setValue(float rads) override;
-	ValueSetResult setValue(const glm::vec3& axis) override;
+	SetValueResult setValue(const glm::mat4& mat) override;
+	SetValueResult setValue(float rads) override;
+	SetValueResult setValue(const glm::vec3& axis) override;
 
 	void resetMatrixFromDefaults() override;
 };
@@ -345,9 +345,9 @@ public:
 	const glm::quat& getQuat() const;
 	const glm::quat& getNormalizedQuat() const;
 
-	ValueSetResult setValue(const glm::quat& q) override;
-	// ValueSetResult setValue(const glm::vec4& vec) override; // probably not used, test order correctness
-	ValueSetResult setValue(const glm::mat4& mat) override;
+	SetValueResult setValue(const glm::quat& q) override;
+	// SetValueResult setValue(const glm::vec4& vec) override; // probably not used, test order correctness
+	SetValueResult setValue(const glm::mat4& mat) override;
 
 	/**
 	 * \brief set new quat \a val, and normalize the default "quat" if synergies enabled!
@@ -372,7 +372,7 @@ public:
 
 	bool isValid() const override;
 	void initDefaults() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	/**
 	 * \brief Make the frustum axis-symmetric (left = -right, top = -bottom)
@@ -391,7 +391,7 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	SetValueResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
 };
@@ -416,7 +416,7 @@ public:
 	void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val) override;
 	void resetMatrixFromDefaults() override;
 
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	SetValueResult setValue(float val, glm::ivec2 coords) override;
 };
 
 
@@ -432,7 +432,7 @@ public:
 	void initDefaults() override;
 
 	void resetMatrixFromDefaults() override;
-	// ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF same
+	// SetValueResult setValue(float val, glm::ivec2 coords) override; //PF same
 	// as in Transform
 };
 } // namespace Core

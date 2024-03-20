@@ -29,7 +29,7 @@ TEST(LookAtTest, ShouldBeOk)
 
 	auto expectedMat =
 	    glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
-	auto resultMat = lookAt->getData().getMat4();
+	auto resultMat = lookAt->data().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
 }
@@ -50,7 +50,7 @@ TEST(LookAtTest, GettersAndSettersShouldBeOk)
 	lookAt->setDefaultValue("up", up);
 	EXPECT_EQ(up, lookAt->getDefaultValue("up").getVec3());
 
-	EXPECT_EQ(glm::lookAt(eye, center, up), lookAt->getData().getMat4());
+	EXPECT_EQ(glm::lookAt(eye, center, up), lookAt->data().getMat4());
 }
 
 
@@ -65,7 +65,7 @@ TEST(LookAtTest, SetValue_and_Lock_Unlock)
 	auto up = lookAt->getDefaultValue("up").getVec3();
 
 	auto mat = lookAt->getInternalData().getMat4();
-	auto mat2 = lookAt->getData().getMat4();
+	auto mat2 = lookAt->data().getMat4();
 
 	EXPECT_EQ(mat, mat2);
 
@@ -85,7 +85,7 @@ TEST(LookAtTest, SetValue_and_Lock_Unlock)
 	lookAt->unlock();
 	setValue_expectOk(lookAt, val, {1, 1});
 
-	auto wrongValue = lookAt->getData().getMat4()[1][1];
+	auto wrongValue = lookAt->data().getMat4()[1][1];
 	EXPECT_NE(wrongValue, 1.0f);
 	EXPECT_EQ(wrongValue, val);
 

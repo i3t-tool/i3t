@@ -302,7 +302,7 @@ bool WorkspaceTransformation::drawDataFull()
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)));
 
 	interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-	                                 m_nodebase->getData().getMat4(),
+	                                 m_nodebase->data().getMat4(),
 	                                 {m_nodebase->as<Core::Transform>()->getValueState({0, 0}),
 	                                  m_nodebase->as<Core::Transform>()->getValueState({1, 0}),
 	                                  m_nodebase->as<Core::Transform>()->getValueState({2, 0}),
@@ -335,7 +335,7 @@ bool WorkspaceTransformation::drawDataFull()
 
 int WorkspaceTransformation::maxLengthOfData()
 {
-	return maxLengthOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
+	return maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
 }
 
 bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(

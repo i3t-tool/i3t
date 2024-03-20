@@ -29,10 +29,10 @@ TEST_F(SequenceTest, SequenceCanContainMatrices)
 	glm::mat4 expectedMat(1.0f);
 	for (auto& mat : seq->getMatrices())
 	{
-		expectedMat *= mat->getData().getMat4();
+		expectedMat *= mat->data().getMat4();
 	}
 
-	const auto& currentMat = seq->getData().getMat4();
+	const auto& currentMat = seq->data().getMat4();
 	EXPECT_EQ(expectedMat, currentMat);
 }
 
@@ -56,7 +56,7 @@ TEST_F(SequenceTest, MatricesCanBeMoved)
 
 	{
 		auto expectedSequenceValue = getMatProduct(seq->getMatrices());
-		EXPECT_EQ(expectedSequenceValue, seq->getData().getMat4());
+		EXPECT_EQ(expectedSequenceValue, seq->data().getMat4());
 	}
 
 	// Add them back.
@@ -65,7 +65,7 @@ TEST_F(SequenceTest, MatricesCanBeMoved)
 	EXPECT_TRUE(mat1->isInSequence() && mat2->isInSequence());
 	{
 		auto expectedSequenceValue = getMatProduct(seq->getMatrices());
-		EXPECT_EQ(expectedSequenceValue, seq->getData().getMat4());
+		EXPECT_EQ(expectedSequenceValue, seq->data().getMat4());
 	}
 }
 
@@ -87,13 +87,13 @@ TEST_F(SequenceTest, UpdateIsCalledOnMatrixValueChange)
 	auto seq = arrangeSequence();
 
 	auto& matrices = seq->getMatrices();
-	auto firstTwoMatricesProduct = matrices[0]->getData().getMat4() * matrices[1]->getData().getMat4();
+	auto firstTwoMatricesProduct = matrices[0]->data().getMat4() * matrices[1]->data().getMat4();
 	auto mat3NewValue = glm::translate(generateVec3());
 
 	auto& mat = seq->getMatRef(seq->getMatrices().size() - 1);
 	setValue_expectOk(mat, mat3NewValue);
 
-	EXPECT_EQ(seq->getData().getMat4(), firstTwoMatricesProduct * mat3NewValue);
+	EXPECT_EQ(seq->data().getMat4(), firstTwoMatricesProduct * mat3NewValue);
 }
 
 TEST_F(SequenceTest, InternalValueCanBeReadByOperator)
@@ -114,7 +114,7 @@ TEST_F(SequenceTest, InternalValueCanBeReadByOperator)
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 
-	EXPECT_EQ(seq->getData().getMat4(), matMulMatNode->getData().getMat4());
+	EXPECT_EQ(seq->data().getMat4(), matMulMatNode->data().getMat4());
 }
 
 TEST_F(SequenceTest, InternalValueCanBeSetFromOutside)
@@ -126,7 +126,7 @@ TEST_F(SequenceTest, InternalValueCanBeSetFromOutside)
 
 	plug_expectOk(matNode, seq, I3T_OUTPUT0, I3T_SEQ_IN_MAT);
 
-	EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
+	EXPECT_EQ(matNode->data().getMat4(), seq->data().getMat4());
 }
 
 TEST_F(SequenceTest, SequenceCantBeSelfPlugged)
@@ -174,16 +174,16 @@ TEST_F(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueIn
 	plug_expectOk(seq2, seq1, I3T_SEQ_OUT_MAT, I3T_SEQ_IN_MAT);
 
 	// Matrix storages should be same.
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
+	EXPECT_EQ(seq1->data(I3T_SEQ_MAT).getMat4(), seq2->data(I3T_SEQ_MAT).getMat4());
 
 	// seq1 model matrix and seq2 stored matrices product should be same.
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MOD).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
+	EXPECT_EQ(seq1->data(I3T_SEQ_MOD).getMat4(), seq2->data(I3T_SEQ_MAT).getMat4());
 
 	plug_expectOk(seq2, mat, I3T_SEQ_OUT_MAT, I3T_INPUT0);
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), mat->getData(I3T_DATA0).getMat4());
+	EXPECT_EQ(seq1->data(I3T_SEQ_MAT).getMat4(), mat->data(I3T_DATA0).getMat4());
 
 	// seq2 model matrix should be same as seq1 * seq2
-	EXPECT_EQ(seq2->getData(2).getMat4(), seq1->getData(1).getMat4() * seq2->getData(1).getMat4());
+	EXPECT_EQ(seq2->data(2).getMat4(), seq1->data(1).getMat4() * seq2->data(1).getMat4());
 }
 
 TEST_F(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput)
@@ -196,7 +196,7 @@ TEST_F(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInp
 	auto plugResult = GraphManager::plug(seq1, seq2, 1, 1);
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 
-	EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
+	EXPECT_EQ(seq1->data(1).getMat4(), seq2->data(1).getMat4());
 }
 
 TEST_F(SequenceTest, ThreeSequencesComposeMatrices)
@@ -207,18 +207,18 @@ TEST_F(SequenceTest, ThreeSequencesComposeMatrices)
 
 	{
 		auto expectedMat = getMatProduct(seq1->getMatrices());
-		EXPECT_EQ(expectedMat, seq1->getData().getMat4());
+		EXPECT_EQ(expectedMat, seq1->data().getMat4());
 	}
 	{
 		plug_expectOk(seq1, seq2, 0, 0);
 		auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices());
-		EXPECT_EQ(expectedMat, seq2->getData().getMat4());
+		EXPECT_EQ(expectedMat, seq2->data().getMat4());
 	}
 	{
 		plug_expectOk(seq2, seq3, 0, 0);
 		auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) *
 		                   getMatProduct(seq3->getMatrices());
-		EXPECT_EQ(expectedMat, seq3->getData().getMat4());
+		EXPECT_EQ(expectedMat, seq3->data().getMat4());
 	}
 }
 
@@ -226,7 +226,7 @@ TEST_F(SequenceTest, MultipleNotifyKeepsSameValue)
 {
 	auto seq = GraphManager::createSequence();
 	auto transform = GraphManager::createTransform<ETransformType::Free>();
-	const auto initialValue = transform->getData().getMat4();
+	const auto initialValue = transform->data().getMat4();
 
 	auto newValue = generateMat4();
 	transform->setValue(newValue);
@@ -240,7 +240,7 @@ TEST_F(SequenceTest, MultipleNotifyKeepsSameValue)
 		transform->notifySequence();
 	}
 
-	EXPECT_TRUE(Math::eq(seq->getData().getMat4(), newValue));
+	EXPECT_TRUE(Math::eq(seq->data().getMat4(), newValue));
 }
 
 TEST_F(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
@@ -251,20 +251,20 @@ TEST_F(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 
 	sequence->pushMatrix(transform);
 
-	auto initial = sequence->getData().getMat4();
+	auto initial = sequence->data().getMat4();
 
 	transform->setDefaultValue("translation", generateVec3());
 
-	const auto beforeReset = sequence->getData().getMat4();
-	const auto stored = sequence->getData().getMat4();
+	const auto beforeReset = sequence->data().getMat4();
+	const auto stored = sequence->data().getMat4();
 	EXPECT_FALSE(Math::eq(initial, beforeReset));
 
 	transform->saveValue();
 	transform->resetMatrixFromDefaults();
 
-	const auto afterReset = sequence->getData().getMat4();
+	const auto afterReset = sequence->data().getMat4();
 	transform->reloadValue();
-	const auto afterRestore = sequence->getData().getMat4();
+	const auto afterRestore = sequence->data().getMat4();
 	EXPECT_TRUE(Math::eq(afterReset, afterRestore));
 	EXPECT_TRUE(Math::eq(stored, afterRestore));
 }
@@ -298,6 +298,6 @@ TEST_F(SequenceTest, WhenPluggingSequenceWithMatrixInputToSequenceWithMatrixInsi
 	plug_expectOk(mat, seq2, 0, 1);
 	mat->setValue(2.0f, {3, 0});
 
-	const auto expected = transform->getData().getMat4() * mat->getData().getMat4();
-	EXPECT_TRUE(Math::eq(seq2->getData().getMat4(), expected));
+	const auto expected = transform->data().getMat4() * mat->data().getMat4();
+	EXPECT_TRUE(Math::eq(seq2->data().getMat4(), expected));
 }

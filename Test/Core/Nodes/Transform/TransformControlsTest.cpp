@@ -24,7 +24,7 @@ TEST(TransformControlsTest, _)
 	auto translation = GraphManager::createTransform<ETransformType::Translation>();
 
 	translation->setDefaultValue("translation", generateVec3());
-	auto expectedValues = translation->getData().getMat4();
+	auto expectedValues = translation->data().getMat4();
 
 	translation->saveValue();
 
@@ -33,5 +33,5 @@ TEST(TransformControlsTest, _)
 
 	translation->reloadValue();
 
-	EXPECT_TRUE(Math::eq(expectedValues, translation->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(expectedValues, translation->data().getMat4()));
 }

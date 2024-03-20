@@ -76,7 +76,7 @@ TEST(ScaleTest, ResetToInitialValues)
 
 	setValue_expectOk(scaleNode->as<Transform>(), mat);
 	{
-		const glm::mat4 data = scaleNode->getData().getMat4();
+		const glm::mat4 data = scaleNode->data().getMat4();
 
 		EXPECT_TRUE(Math::eq(data, mat));
 		EXPECT_FALSE(scaleNode->isValid());
@@ -93,7 +93,7 @@ TEST(ScaleTest, ResetToInitialValues)
 		// EXPECT_TRUE(scaleNode->hasSynergies());
 
 		const auto expected = glm::scale(glm::vec3(1.0f)); // identity
-		const auto actual = scaleNode->getData().getMat4();
+		const auto actual = scaleNode->data().getMat4();
 
 		EXPECT_TRUE(Math::eq(expected, actual));
 		EXPECT_TRUE(scaleNode->isLocked());
@@ -131,7 +131,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Mat4_AsTransformation_Ok)
 
 	setValue_expectOk(scale, glm::scale(scaleValue));
 
-	EXPECT_TRUE(Math::eq(glm::scale(scaleValue), scale->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(glm::scale(scaleValue), scale->data().getMat4()));
 	EXPECT_TRUE(scale->isValid());
 }
 
@@ -152,11 +152,11 @@ TEST(ScaleTest, UniformScale_SetInvalidValue_Mat4_AsTransformation_ShouldNotBePe
 	//------------------------------------------
 	auto result = scale->setValue(glm::scale(scaleValue)); // init by a non-uniform matrix -> uniform
 
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 	EXPECT_TRUE(scale->isValid()); // is uniform
 
 	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleValue.z)),
-	                     scale->getData().getMat4())); // last of non-uniform vec3
+	                     scale->data().getMat4())); // last of non-uniform vec3
 }
 
 // ----	float ----
@@ -171,8 +171,8 @@ TEST(ScaleTest, UniformScale_SetValidValue_Float_asScale_Ok)
 	auto val = generateFloat();
 	// setValue_expectOk(scale, val);
 	auto result = scale->setValue(val);
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(val, val, val)), scale->getData().getMat4()));
+	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
+	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(val, val, val)), scale->data().getMat4()));
 	EXPECT_TRUE(scale->isValid());
 }
 
@@ -192,7 +192,7 @@ TEST(ScaleTest, UniformScale_SetValidValue__Vec3_Uniform_Ok)
 	/// Transformation, not for TransformImpl
 	auto result = scale->setValue(scaleVec3);
 
-	EXPECT_TRUE(Math::eq(glm::scale(scaleVec3), scale->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(glm::scale(scaleVec3), scale->data().getMat4()));
 	EXPECT_TRUE(scale->isValid());
 }
 
@@ -204,7 +204,7 @@ TEST(ScaleTest, UniformScale_SetInvalidValue__Vec3_Non_uniform_fail)
 	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scale->enableSynergies(); // should be implicit
-	const auto before = scale->getData().getMat4();
+	const auto before = scale->data().getMat4();
 
 	// Set new uniform scale as vec3
 	// TEST: setting a non-uniform vec3 scale to uniform-scale matrix must fail
@@ -213,16 +213,16 @@ TEST(ScaleTest, UniformScale_SetInvalidValue__Vec3_Non_uniform_fail)
 	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	const auto result = scale->setValue(scaleVec3); // the test
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+	EXPECT_EQ(SetValueResult::Status::Err_ConstraintViolation, result.status);
 
-	const auto after = scale->getData().getMat4();
+	const auto after = scale->data().getMat4();
 
 	// And the matrix must remain unchanged (identity matrix remains)
 	EXPECT_TRUE(scale->isValid());                        // matrix not changed - validity must remain true
 	EXPECT_TRUE(Math::eq(before, after));                 // the matrix did not change
 	EXPECT_FALSE(Math::eq(glm::scale(scaleVec3), after)); // non-uniform scale matrix was NOT set
 	EXPECT_FALSE(                                         // we do not use just scale.x as the uniform scale value
-	    Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
+	    Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->data().getMat4()));
 }
 
 // non-uniform scale switched to uniform scale (via enable synergies) invalidates the scale box
@@ -252,12 +252,12 @@ TEST(ScaleTest, UniformScaleMatrixValueAndSynergies)
 	{
 		// Invalid coordinates.
 		const auto result = scaleNode->setValue(scaleValue, {3, 1});
-		EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+		EXPECT_EQ(SetValueResult::Status::Err_ConstraintViolation, result.status);
 	}
 	{
 		// Valid coordinates.
 		setValue_expectOk(scaleNode, scaleValue, {1, 1}); // write the whole diagonal
-		const auto data = scaleNode->getData().getMat4();
+		const auto data = scaleNode->data().getMat4();
 
 		EXPECT_EQ(data, scaleMat);
 		EXPECT_TRUE(scaleNode->isValid());
@@ -276,7 +276,7 @@ TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
 		scaleNode->enableSynergies(); // should be
 
 		auto result = scaleNode->setValue(scaleValue, {coord, coord});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 		auto v = scaleNode->getDefaultValue("scale").getVec3();
 		EXPECT_EQ(v.x, scaleValue);
 		EXPECT_EQ(v.y, scaleValue);
@@ -289,7 +289,7 @@ TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
 		scaleValue = generateFloat();
 
 		auto result = scaleNode->setValue(scaleValue, {coord, coord});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 		auto v = scaleNode->getDefaultValue("scale").getVec3();
 		for (int i = 0; i < 3; i++)
 		{
@@ -320,7 +320,7 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
 
 		scale->setDefaultValue("scale", vec); // default and the matrix
 
-		EXPECT_EQ(glm::scale(glm::vec3{vec.x, vec.x, vec.x}), scale->getData().getMat4());
+		EXPECT_EQ(glm::scale(glm::vec3{vec.x, vec.x, vec.x}), scale->data().getMat4());
 	}
 	// non-uniform scale.
 	{
@@ -328,7 +328,7 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
 
 		scale->setDefaultValue("scale", vec);
 
-		EXPECT_EQ(glm::scale(vec), scale->getData().getMat4());
+		EXPECT_EQ(glm::scale(vec), scale->data().getMat4());
 	}
 }
 
@@ -350,7 +350,7 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 		          scaleVector); // different vector is different
 		EXPECT_EQ(scaleNode->getDefaultValue("scale").getVec3(),
 		          glm::vec3(scaleValue)); // uniform
-		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)), scaleNode->getData().getMat4());
+		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)), scaleNode->data().getMat4());
 	}
 	// vector sets matrix based on .x only
 	{
@@ -362,13 +362,13 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 
 		EXPECT_EQ(v.x, scaleVector.x);          // uniform scale based on .x
 		EXPECT_EQ(v, glm::vec3(scaleVector.x)); // uniform scale based on .x
-		EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleVector.x)), scaleNode->getData().getMat4()));
+		EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleVector.x)), scaleNode->data().getMat4()));
 	}
 	// vector sets matrix - correct
 	{
 		scaleNode->disableSynergies();
 		scaleNode->setDefaultValue("scale", scaleVector); // vector
 		// EXPECT_EQ(scaleNode->getDefaultValue("scale"), scaleVector);
-		EXPECT_EQ(glm::scale(scaleVector), scaleNode->getData().getMat4());
+		EXPECT_EQ(glm::scale(scaleVector), scaleNode->data().getMat4());
 	}
 }

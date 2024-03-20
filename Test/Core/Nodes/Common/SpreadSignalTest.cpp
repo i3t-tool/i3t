@@ -45,5 +45,5 @@ TEST(SpreadSignalTest, ValuesShouldBeSpreadThroughConnectedNodes)
 	setValue_expectOk(vec2Node, vec2);
 
 	float expectedValue = glm::dot(vec1, vec2);
-	EXPECT_EQ(expectedValue, floatNode->getData().getFloat());
+	EXPECT_EQ(expectedValue, floatNode->data().getFloat());
 }

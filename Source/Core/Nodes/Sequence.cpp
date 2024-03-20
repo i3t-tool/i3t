@@ -27,7 +27,7 @@ Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 }
 
 //===-- Storage -----------------------------------------------------------===//
-ValueSetResult Sequence::Storage::addMatrix(Ptr<Transform> matrix, size_t index) noexcept
+SetValueResult Sequence::Storage::addMatrix(Ptr<Transform> matrix, size_t index) noexcept
 {
 	// insert transform to matrix array
 	index = index >= m_matrices.size() ? m_matrices.size() : index;
@@ -36,7 +36,7 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transform> matrix, size_t index)
 	// mark transform as used in a sequence
 	matrix->as<Transform>()->setSequence(&m_sequence, index);
 
-	return ValueSetResult{};
+	return SetValueResult{};
 }
 
 Ptr<Transform> Sequence::Storage::popMatrix(const int index)
@@ -73,7 +73,7 @@ Sequence::~Sequence()
 	stopTracking();
 }
 
-ValueSetResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
+SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 {
 	const auto result = pushMatrix(matrix, m_storage.m_matrices.size());
 	updateValues(-1);
@@ -81,7 +81,7 @@ ValueSetResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 	return result;
 }
 
-ValueSetResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcept
+SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcept
 {
 	const auto result = m_storage.addMatrix(matrix, index);
 	updateValues(-1);

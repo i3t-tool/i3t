@@ -117,8 +117,8 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		float trackingParam = 1.0f;
 		tracker->setParam(trackingParam);
 
-		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
-		                t.mat4->getData().getMat4();
+		auto expected =
+		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -134,8 +134,8 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		tracker->setParam(trackingParam);
 
 		float interpParam = (abs(trackingParam) - 0.75f) * 4;
-		auto expected = glm::interpolate(glm::mat4(1.0f), t.mat1->getData().getMat4(), interpParam) *
-		                t.mat2->getData().getMat4() * t.mat3->getData().getMat4() * t.mat4->getData().getMat4();
+		auto expected = glm::interpolate(glm::mat4(1.0f), t.mat1->data().getMat4(), interpParam) *
+		                t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -151,7 +151,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 
 		float interpParam = (abs(trackingParam) - 0.25f) * 4;
 		auto expected =
-		    glm::interpolate(glm::mat4(1.0f), t.mat3->getData().getMat4(), interpParam) * t.mat4->getData().getMat4();
+		    glm::interpolate(glm::mat4(1.0f), t.mat3->data().getMat4(), interpParam) * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -208,7 +208,7 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 
 		float interpParam = (abs(trackingParam) - 0.25f) * 4;
 		const auto expected =
-		    t.mat1->getData().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->getData().getMat4(), interpParam);
+		    t.mat1->data().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->data().getMat4(), interpParam);
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -223,8 +223,8 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		tracker->setParam(trackingParam);
 
 		float interpParam = (abs(trackingParam) - 0.75f) * 4;
-		const auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
-		                      glm::interpolate(glm::mat4(1.0f), t.mat4->getData().getMat4(), interpParam);
+		const auto expected = t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() *
+		                      glm::interpolate(glm::mat4(1.0f), t.mat4->data().getMat4(), interpParam);
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -238,8 +238,8 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		float trackingParam = 1.0f;
 		tracker->setParam(trackingParam);
 
-		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
-		                t.mat4->getData().getMat4();
+		auto expected =
+		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
@@ -268,8 +268,8 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	mat->setDefaultValue("translation", generateVec3());
 	sequence->pushMatrix(mat);
 
-	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getInterpolatedMatrix()));
-	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getModels().back()->getData().getMat4()));
+	EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
+	EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getModels().back()->data().getMat4()));
 }
 
 TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
@@ -290,7 +290,7 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 
 		EXPECT_TRUE(GraphManager::isTrackingEnabled());
 
-		EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
 	}
 
 	EXPECT_FALSE(GraphManager::isTrackingEnabled());

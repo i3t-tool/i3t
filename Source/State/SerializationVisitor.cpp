@@ -124,7 +124,7 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 
 	if (props->isConstructor)
 	{
-		addData(op, "value", coreNode->getData());
+		addData(op, "value", coreNode->data());
 	}
 
 	// Workaround for #311
@@ -264,7 +264,7 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 	//
 
-	JSON::addMatrix(transform, "value", coreNode->getData().getMat4(), m_memento.GetAllocator());
+	JSON::addMatrix(transform, "value", coreNode->data().getMat4(), m_memento.GetAllocator());
 
 	if (coreNode->hasSavedValue())
 	{

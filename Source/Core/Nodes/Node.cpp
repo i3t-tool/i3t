@@ -334,22 +334,6 @@ void Node::unplugOutput(size_t index)
 	}
 }
 
-const DataMap* Node::getDataMap()
-{
-	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-	static DataMap map(mapData);
-
-	return &map;
-}
-
-const DataMap& Node::getDataMapRef()
-{
-	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-	static DataMap map(mapData);
-
-	return map;
-}
-
 void Node::updateValues(int inputIndex)
 {
 	triggerUpdateCallback(this);
