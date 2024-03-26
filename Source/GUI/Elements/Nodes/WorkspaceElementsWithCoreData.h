@@ -223,6 +223,9 @@ public:
 	};
 	void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
 
+	/**
+	 * \pre Needs to be plugged
+	 */
 	void unplug(bool logEvent = true);
 	bool plug(WorkspaceCoreOutputPin* ou, bool logEvent = true);
 	bool connectionChanged() const;
