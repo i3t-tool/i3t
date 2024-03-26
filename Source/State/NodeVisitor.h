@@ -18,6 +18,7 @@
 class WorkspaceCamera;
 class WorkspaceCycle;
 class WorkspaceNodeWithCoreData;
+class WorkspaceNodeWithCoreDataWithPins;
 class WorkspaceSequence;
 class WorkspaceTransformation;
 class WorkspaceScreen;
@@ -26,7 +27,7 @@ class WorkspaceModel;
 using GuiNode = WorkspaceNodeWithCoreData;
 using GuiCamera = WorkspaceCamera;
 using GuiCycle = WorkspaceCycle;
-using GuiOperator = WorkspaceNodeWithCoreData; /* JH WorkspaceOperator can be here? */
+using GuiOperator = WorkspaceNodeWithCoreDataWithPins;
 using GuiTransform = WorkspaceTransformation;
 using GuiSequence = WorkspaceSequence;
 using GuiScreen = WorkspaceScreen;

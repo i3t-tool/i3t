@@ -63,7 +63,7 @@ public:
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		visitor.visit(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()));
+		visitor.visit(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 

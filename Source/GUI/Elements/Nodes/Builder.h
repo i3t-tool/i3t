@@ -34,7 +34,7 @@ public:
 		doFor<0, maxCount>();
 	}
 
-	std::optional<Ptr<WorkspaceNodeWithCoreData>> operator()(const char* type)
+	std::optional<Ptr<WorkspaceNodeWithCoreDataWithPins>> operator()(const char* type)
 	{
 		I3T_ASSERT(m_createFns.count(type) == 1, "Cannot find factory function for given operator");
 		return m_createFns.at(type)(ImVec2(0.0f, 0.0f));
@@ -52,7 +52,7 @@ private:
 		}
 	}
 
-	std::map<std::string_view, std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>> m_createFns;
+	std::map<std::string_view, std::function<Ptr<WorkspaceNodeWithCoreDataWithPins>(ImVec2 const)>> m_createFns;
 };
 
 //
