@@ -74,13 +74,6 @@ SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, Ptr<Node> node)
 	m_currentMatrix = node;
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(const SequenceTree::MatrixIterator& mt)
-{
-	m_tree = mt.m_tree;
-	m_info.sequence = mt.m_info.sequence;
-	m_currentMatrix = mt.m_currentMatrix;
-}
-
 Sequence* SequenceTree::MatrixIterator::getSequence() const
 {
 	return m_info.sequence;
@@ -107,7 +100,7 @@ std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> SequenceTree::Matr
 	while (it != m_tree->end())
 	{
 		matrices.push_back(*it);
-		info.push_back(m_info);
+		info.push_back(it.m_info);
 		++it;
 	}
 
