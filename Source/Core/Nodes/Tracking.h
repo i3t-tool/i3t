@@ -49,8 +49,6 @@ public:
 		explicit MatrixIterator(Sequence* sequence);
 		MatrixIterator(Sequence* sequence, Ptr<Node> node);
 
-		MatrixIterator(const MatrixIterator& mt);
-
 		/// \returns Non-owned pointer to the current sequence.
 		///     Never null.
 		Sequence* getSequence() const;

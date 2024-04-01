@@ -330,6 +330,46 @@ TEST(SequenceIteratorTest, MatrixIteratorOnTwoEmptySequences)
 	EXPECT_TRUE(it == tree.end());
 }
 
+TEST(SequenceIteratorTest, GetNonemptyParentSequence)
+{
+	auto s1 = GraphManager::createSequence();
+	auto s2 = GraphManager::createSequence();
+	auto s3 = GraphManager::createSequence();
+
+	plug_expectOk(s1, s2, I3T_SEQ_OUT_MAT, I3T_SEQ_IN_MAT);
+	plug_expectOk(s2, s3, I3T_SEQ_OUT_MUL, I3T_SEQ_IN_MUL);
+
+	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+
+	s2->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+
+	s3->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+
+	auto s1Parent = getNonemptyParentSequence(s1);
+	auto s2Parent = getNonemptyParentSequence(s2);
+	auto s3Parent = getNonemptyParentSequence(s3);
+	EXPECT_EQ(s1Parent, nullptr);
+	EXPECT_EQ(s2Parent, nullptr);
+	EXPECT_EQ(s3Parent, s2);
+
+	SequenceTree tree(s3);
+	auto [matrices, info] = tree.begin().collectWithInfo();
+	EXPECT_EQ(matrices.size(), 2);
+	EXPECT_EQ(info.size(), 2);
+
+	EXPECT_EQ(info[0].isExternal, false);
+	EXPECT_EQ(info[1].isExternal, true);
+	EXPECT_NE(info[1].sequence, s1.get());
+	EXPECT_NE(info[1].sequence, s3.get());
+	EXPECT_EQ(info[1].sequence, s2.get());
+
+	s3->startTracking(TrackingDirection::RightToLeft, std::vector<UPtr<IModelProxy>>());
+}
+
 TEST(SequenceIteratorTest, MatrixInputPlugged)
 {
 	const auto sequence = GraphManager::createSequence();
