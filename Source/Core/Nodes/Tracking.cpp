@@ -376,7 +376,8 @@ void MatrixTracker::track()
 	auto [matrices, info] = st.begin().collectWithInfo();
 	for (size_t i = 0; i < matrices.size(); ++i)
 	{
-		m_state.transformInfo[matrices[i]->getId()] = info[i];
+		auto& matrix = matrices[i];
+		m_state.transformInfo[matrix->getId()] = info[i];
 	}
 
 	for (const auto& matrix : matrices)
@@ -397,6 +398,7 @@ void MatrixTracker::track()
 	if (m_direction == TrackingDirection::LeftToRight)
 	{
 		std::reverse(matrices.begin(), matrices.end());
+		std::reverse(info.begin(), info.end());
 	}
 	else if (m_direction == TrackingDirection::RightToLeft)
 	{}
@@ -433,7 +435,9 @@ void MatrixTracker::track()
 		glm::mat4 rhs;
 		glm::mat4 lhs(1.0f);
 
-		const auto maybeTransform = matrices[matricesBefore];
+		const auto interpIdx = matricesBefore;
+
+		const auto maybeTransform = matrices[interpIdx];
 		m_state.trackingProgress[maybeTransform->getId()] = interpParam;
 		setActivePart(maybeTransform, interpParam);
 		rhs = maybeTransform->data().getMat4();
@@ -453,7 +457,8 @@ void MatrixTracker::track()
 			matrix = Math::lerp(lhs, rhs, interpParam, useQuat) * matrix;
 		}
 
-		m_state.interpolatedTransformID = maybeTransform->getId();
+		m_state.interpolatedTransformID =
+		    info[interpIdx].isExternal ? info[interpIdx].sequence->as<Sequence>()->getId() : maybeTransform->getId();
 	}
 
 	m_state.interpolatedMatrix = matrix;
