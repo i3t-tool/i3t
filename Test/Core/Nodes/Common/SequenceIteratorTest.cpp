@@ -339,13 +339,19 @@ TEST(SequenceIteratorTest, GetNonemptyParentSequence)
 	plug_expectOk(s1, s2, I3T_SEQ_OUT_MAT, I3T_SEQ_IN_MAT);
 	plug_expectOk(s2, s3, I3T_SEQ_OUT_MUL, I3T_SEQ_IN_MUL);
 
+	auto t1 = Builder::createTransform<ETransformType::Translation>();
+	t1->setDefaultValue("translate", glm::vec3(1, 1, 1));
+	s1->pushMatrix(t1);
+	/*
 	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
-	s1->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	 */
 
 	s2->pushMatrix(Builder::createTransform<ETransformType::Translation>());
+	// Never true.
+	// EXPECT_EQ(s2->getInternalData().getMat4(), glm::translate(glm::vec3(1, 1, 1)));
 
 	s3->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
@@ -362,12 +368,19 @@ TEST(SequenceIteratorTest, GetNonemptyParentSequence)
 	EXPECT_EQ(info.size(), 2);
 
 	EXPECT_EQ(info[0].isExternal, false);
-	EXPECT_EQ(info[1].isExternal, true);
-	EXPECT_NE(info[1].sequence, s1.get());
-	EXPECT_NE(info[1].sequence, s3.get());
-	EXPECT_EQ(info[1].sequence, s2.get());
+	EXPECT_EQ(info[0].sequence, s3.get());
 
-	s3->startTracking(TrackingDirection::RightToLeft, std::vector<UPtr<IModelProxy>>());
+	EXPECT_EQ(info[1].isExternal, true);
+	// EXPECT_NE(info[1].sequence, s1.get());
+	// EXPECT_NE(info[1].sequence, s3.get());
+	EXPECT_EQ(info[1].sequence, s2.get());
+	EXPECT_EQ(info[1].sequence->getId(), s2->getId());
+
+	auto* t = s3->startTracking(TrackingDirection::LeftToRight, std::vector<UPtr<IModelProxy>>());
+	t->setParam(0.2f);
+	EXPECT_NE(t->result().interpolatedTransformID, s1->getId());
+	EXPECT_EQ(t->result().interpolatedTransformID, s2->getId());
+	EXPECT_NE(t->result().interpolatedTransformID, s3->getId());
 }
 
 TEST(SequenceIteratorTest, MatrixInputPlugged)
