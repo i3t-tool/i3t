@@ -146,9 +146,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	}
 
 	// PREPARE PARSING MACHINE
-	std::vector<TStep> steps; // we will be filling this vector and then creating
-	                          // a tutorial with it
-	steps.emplace_back();     // add the first step
+	std::vector<TutorialStep> steps; // we will be filling this vector and then creating
+	                                 // a tutorial with it
+	steps.emplace_back();            // add the first step
 	int currentStep = 0;
 	// int currentBlockIndent = -1;  // deprecated
 	blockType_t currentBlock = NOT_BLOCK;
@@ -474,48 +474,48 @@ void TutorialLoader::skipSpaces(std::istringstream& stream, unsigned int maxCoun
 	}
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createExplanation(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createExplanation(TutorialStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Explanation>(string));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createHeadline(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createHeadline(TutorialStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Headline>(string));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createTask(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createTask(TutorialStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Task>(string));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createHint(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createHint(TutorialStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Hint>(string));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createChoice(TStep& step, const std::string& question,
+std::shared_ptr<TutorialElement>& TutorialLoader::createChoice(TutorialStep& step, const std::string& question,
                                                                const std::vector<std::string>& choices,
                                                                int correctChoice)
 {
 	return step.m_content.emplace_back(std::make_shared<ChoiceTask>(question, choices, correctChoice));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createMultichoice(TStep& step, const std::string& question,
+std::shared_ptr<TutorialElement>& TutorialLoader::createMultichoice(TutorialStep& step, const std::string& question,
                                                                     std::vector<std::string>& choices,
                                                                     const std::vector<int>& correctChoices)
 {
 	return step.m_content.emplace_back(std::make_shared<MultiChoiceTask>(question, choices, correctChoices));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const std::string& question,
+std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TutorialStep& step, const std::string& question,
                                                               const std::unordered_set<std::string>& correctAnswers)
 {
 	// todo
 	return step.m_content.emplace_back(std::make_shared<InputTask>(question, correctAnswers));
 }
 
-void TutorialLoader::addScript(TStep& step, const std::string& script)
+void TutorialLoader::addScript(TutorialStep& step, const std::string& script)
 {
 	step.m_scriptToRunWhenShown += script;
 }

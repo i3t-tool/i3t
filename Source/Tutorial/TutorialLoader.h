@@ -96,18 +96,18 @@ private:
 	 * @return a reference to the shared_ptr of the newly created explanation
 	 * element
 	 */
-	static std::shared_ptr<TutorialElement>& createExplanation(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>& createHeadline(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>& createTask(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>& createHint(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>& createChoice(TStep& step, const std::string& question,
+	static std::shared_ptr<TutorialElement>& createExplanation(TutorialStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createHeadline(TutorialStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createTask(TutorialStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createHint(TutorialStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createChoice(TutorialStep& step, const std::string& question,
 	                                                      const std::vector<std::string>& choices, int correctChoice);
-	static std::shared_ptr<TutorialElement>& createMultichoice(TStep& step, const std::string& question,
+	static std::shared_ptr<TutorialElement>& createMultichoice(TutorialStep& step, const std::string& question,
 	                                                           std::vector<std::string>& choices,
 	                                                           const std::vector<int>& correctChoices);
-	static std::shared_ptr<TutorialElement>& createInput(TStep& step, const std::string& question,
+	static std::shared_ptr<TutorialElement>& createInput(TutorialStep& step, const std::string& question,
 	                                                     const std::unordered_set<std::string>& correctAnswers);
-	static void addScript(TStep& step, const std::string& script);
+	static void addScript(TutorialStep& step, const std::string& script);
 	// todo possibly make this a templated function
 	// todo maybe accept strings as rvalue references and move it
 

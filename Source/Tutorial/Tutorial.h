@@ -90,6 +90,7 @@ struct Hint : TutorialElement
 	}
 };
 
+/// \todo Not implemented!
 struct ChoiceTask : TutorialElement
 {
 	ChoiceTask(std::string question, std::vector<std::string> choices, int correctChoice)
@@ -103,6 +104,7 @@ struct ChoiceTask : TutorialElement
 	}
 };
 
+/// \todo Not implemented!
 struct MultiChoiceTask : TutorialElement
 {
 	MultiChoiceTask(std::string question, std::vector<std::string> choices, std::vector<int> correctChoices)
@@ -117,6 +119,7 @@ struct MultiChoiceTask : TutorialElement
 	}
 };
 
+/// \todo Not implemented!
 struct InputTask : TutorialElement
 {
 	InputTask(std::string question, std::unordered_set<std::string> correctAnswers)
@@ -129,11 +132,10 @@ struct InputTask : TutorialElement
 	}
 };
 
-struct TStep
+struct TutorialStep
 {
-	TStep() = default;
+	TutorialStep() = default;
 
-	// std::string m_title; // deprecated
 	std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
 	std::string m_scriptToRunWhenShown;
 
@@ -167,7 +169,7 @@ struct TutorialHeader
  */
 struct Tutorial
 {
-	Tutorial(std::shared_ptr<TutorialHeader> header, std::vector<TStep> steps,
+	Tutorial(std::shared_ptr<TutorialHeader> header, std::vector<TutorialStep> steps,
 	         std::unordered_map<std::string, std::shared_ptr<GUIImage>> filenameToImageMap)
 	    : m_header(std::move(header)), m_steps(std::move(steps)), m_filenameToImage(std::move(filenameToImageMap))
 	{}
@@ -175,7 +177,7 @@ struct Tutorial
 	// general
 	std::shared_ptr<TutorialHeader> m_header;
 	// step content
-	std::vector<TStep> m_steps;
+	std::vector<TutorialStep> m_steps;
 	// support structures
 	std::unordered_map<std::string, std::shared_ptr<GUIImage>>
 	    m_filenameToImage; // filename to GUIImage (including GLuint id)
