@@ -25,3 +25,19 @@ Resource::Resource(std::string alias, size_t hashId, std::string path, ResourceT
 {
 	// Empty
 }
+
+bool Resource::changeLocation(fs::path newDir, bool deleteOriginals)
+{
+	if (!resourceFiles)
+	{
+		LOG_WARN("[RESOURCE] Cannot change location of a Resource without an associated ResourceFiles instance!")
+		return false;
+	}
+
+	if (resourceFiles->changeLocation(newDir, deleteOriginals))
+	{
+		this->path = resourceFiles->m_path.string();
+		return true;
+	}
+	return false;
+}

@@ -83,10 +83,10 @@ private:
 	// Comparator for ResourceFiles sets
 	struct ResFilesCmp
 	{
-		bool operator()(Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) const;
+		bool operator()(Ptr<Resource> lhs, Ptr<Resource> rhs) const;
 	};
 	/// List of lists of files of newly added resources whose files should be moved to data dir on next save
-	std::set<Ptr<ResourceFiles>, ResFilesCmp> m_filesToAddOnSave;
+	std::set<Ptr<Resource>, ResFilesCmp> m_resourcesToAddOnSave;
 
 public:
 	// NOTE: That these flags are NOT atomic
@@ -247,7 +247,11 @@ public:
 	bool removeImportedModel(const std::string& alias);
 
 	Memento saveScene(State::Scene* scene) override;
+	/// Ensure that model files required by the scene are in the right place
+	void updateModelFiles(State::Scene* scene);
+	/// Ensure there are no unused model files in the scene_data directory of the passed scene.
 	bool cleanUpModelFiles(State::Scene* scene);
+
 	void loadScene(const Memento& memento, State::Scene* scene) override;
 	void clearScene() override;
 

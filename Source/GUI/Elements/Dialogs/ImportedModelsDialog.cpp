@@ -59,108 +59,94 @@ void ImportedModelsDialog::render()
 			m_selectedModelAlias = "";
 		}
 
-		static ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable;
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
+		ImGui::BeginChild("ModelList", ImVec2(150, 0), ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX,
+		                  ImGuiWindowFlags_HorizontalScrollbar);
 
-		if (ImGui::BeginTable("ImportedModelsTable", 2, flags))
+		if (resourceAliases.size() > 0)
 		{
-			ImGui::TableNextRow();
-			for (int column = 0; column < 2; column++)
+			int index = 0;
+			for (auto& alias : resourceAliases)
 			{
-				ImGui::TableSetColumnIndex(column);
-				if (column == 0)
+				if (ImGui::Selectable(alias.c_str(), m_selectedModelIndex == index))
 				{
-					ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
-					ImGui::BeginChild("ModelList", ImVec2(0, -1), true, ImGuiWindowFlags_HorizontalScrollbar);
-
-					if (resourceAliases.size() > 0)
-					{
-						int index = 0;
-						for (auto& alias : resourceAliases)
-						{
-							if (ImGui::Selectable(alias.c_str(), m_selectedModelIndex == index))
-							{
-								modelIndexChanged = true;
-								newModelIndex = index;
-							}
-							index++;
-						}
-					}
-					else
-					{
-						ImGui::BeginDisabled(true);
-						ImGui::Selectable("No models imported");
-						ImGui::EndDisabled();
-					}
-
-					ImGui::EndChild();
-					ImGui::PopStyleColor();
+					modelIndexChanged = true;
+					newModelIndex = index;
 				}
-				else
+				index++;
+			}
+		}
+		else
+		{
+			ImGui::BeginDisabled(true);
+			ImGui::Selectable("No models imported");
+			ImGui::EndDisabled();
+		}
+
+		ImGui::EndChild();
+		ImGui::PopStyleColor();
+
+		ImGui::SameLine();
+
+		ImGui::BeginChild("ModelRightPane", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
+
+		if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0)))
+		{
+			importModel(m_normalizeImportedModels);
+		}
+		ImGui::SetItemDefaultFocus();
+
+		if (ImGui::Button("Remove", ImVec2(-FLT_MIN, 0)))
+		{
+			if (m_selectedModelIndex >= 0)
+			{
+				maybeRemoveModel(resourceAliases.at(m_selectedModelIndex));
+			}
+			else
+			{
+				LOG_INFO("No model selected!");
+			}
+		}
+		ImGui::Checkbox("Normalize model size", &m_normalizeImportedModels);
+
+		ImGui::Separator();
+
+		ImGui::Text("Model details:");
+		if (!m_selectedModelAlias.empty())
+		{
+			if (ImGui::BeginTabBar("##Tabs",
+			                       ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_TabListPopupButton))
+			{
+				Core::Mesh* mesh = RMI.meshByAlias(m_selectedModelAlias);
+				if (mesh)
 				{
-					ImGui::BeginChild("ModelRightPane", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
-
-					if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0)))
+					int counter = 0;
+					for (auto& meshPart : mesh->m_meshParts)
 					{
-						importModel(m_normalizeImportedModels);
-					}
-					ImGui::SetItemDefaultFocus();
-
-					if (ImGui::Button("Remove", ImVec2(-FLT_MIN, 0)))
-					{
-						if (m_selectedModelIndex >= 0)
+						std::string meshPartName =
+						    meshPart.name.empty() ? "Mesh " + std::to_string(counter) : meshPart.name;
+						if (ImGui::BeginTabItem(meshPartName.c_str()))
 						{
-							maybeRemoveModel(resourceAliases.at(m_selectedModelIndex));
-						}
-						else
-						{
-							LOG_INFO("No model selected!");
-						}
-					}
-					ImGui::Checkbox("Normalize model size", &m_normalizeImportedModels);
+							ImGui::Text("Material:");
+							ImGui::ColorEdit3("Diffuse", glm::value_ptr(meshPart.material.diffuse));
+							ImGui::ColorEdit3("Specular", glm::value_ptr(meshPart.material.specular));
+							ImGui::ColorEdit3("Ambient", glm::value_ptr(meshPart.material.ambient));
+							ImGui::DragFloat("Shininess", &meshPart.material.shininess, 0.3f, 1.0f, 1000.0f, "%.1f",
+							                 ImGuiSliderFlags_Logarithmic);
 
-					ImGui::Separator();
-
-					ImGui::Text("Model details:");
-					if (!m_selectedModelAlias.empty())
-					{
-						if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_FittingPolicyScroll |
-						                                     ImGuiTabBarFlags_TabListPopupButton))
-						{
-							Core::Mesh* mesh = RMI.meshByAlias(m_selectedModelAlias);
-							if (mesh)
-							{
-								int counter = 0;
-								for (auto& meshPart : mesh->m_meshParts)
-								{
-									std::string meshPartName =
-									    meshPart.name.empty() ? "Mesh " + std::to_string(counter) : meshPart.name;
-									if (ImGui::BeginTabItem(meshPartName.c_str()))
-									{
-										ImGui::Text("Material:");
-										ImGui::ColorEdit3("Diffuse", glm::value_ptr(meshPart.material.diffuse));
-										ImGui::ColorEdit3("Specular", glm::value_ptr(meshPart.material.specular));
-										ImGui::ColorEdit3("Ambient", glm::value_ptr(meshPart.material.ambient));
-										ImGui::DragFloat("Shininess", &meshPart.material.shininess, 0.3f, 1.0f, 1000.0f,
-										                 "%.1f", ImGuiSliderFlags_Logarithmic);
-
-										ImGui::EndTabItem();
-									}
-									counter++;
-								}
-							}
+							ImGui::EndTabItem();
 						}
-						ImGui::EndTabBar();
+						counter++;
 					}
-					else
-					{
-						ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(IM_COL32(200, 200, 200, 255)),
-						                   "No model selected");
-					}
-					ImGui::EndChild();
 				}
 			}
-			ImGui::EndTable();
+			ImGui::EndTabBar();
 		}
+		else
+		{
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(IM_COL32(200, 200, 200, 255)), "No model selected");
+		}
+		ImGui::EndChild();
 	}
 	ImGui::End();
 

@@ -49,7 +49,4 @@ public:
 	}
 };
 
-/// Returns true if target scene is an I3T scene and is read-only.
-bool isReadOnly(const fs::path& scene);
-
 } // namespace State

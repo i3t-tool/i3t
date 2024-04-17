@@ -409,9 +409,9 @@ void ScriptingModule::onInit()
 	});
 
 	m_Lua.set_function("eval_from_file", [this](const std::string& path) {
-		if (!FilesystemUtils::doesFileExist(path))
+		if (!fs::exists(fs::path(path)))
 		{
-			print("file does not exists");
+			print("file does not exist");
 			return false;
 		}
 		return true;

@@ -46,8 +46,8 @@ public:
 	std::vector<std::string> alternativeAliases; ///< Any additional aliases that got registered after the first one
 	                                             ///< which is not included in this list
 
-	Ptr<ResourceFiles>
-	    resourceFiles; ///< The resource CAN have an assigned ResourceFiles instance tracking any associated files
+	/// The resource CAN have an assigned ResourceFiles instance tracking any associated files
+	Ptr<ResourceFiles> resourceFiles;
 
 private:
 	size_t hashId;              ///< Resource hash, unique identifier
@@ -55,6 +55,16 @@ private:
 
 public:
 	Resource(std::string alias, std::string path, ResourceType type);
+
+	/**
+	 * Change the location of associated ResourceFiles instance.
+	 * This method is a delegate to the ResourceFiles::changeLocation() method that updates this Resource's m_path upon
+	 * success. Should only be called when this resource actually does have a ResourceFiles instance assigned.
+	 * @param newDir New file structure root.
+	 * @param deleteOriginals Delete the original files.
+	 * @return True on success, false otherwise
+	 */
+	bool changeLocation(fs::path newDir, bool deleteOriginals);
 
 private:
 	Resource(std::string alias, size_t hashId, std::string path, ResourceType type, std::shared_ptr<void> data);

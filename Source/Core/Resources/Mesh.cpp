@@ -149,7 +149,7 @@ void Mesh::renderMeshPart(const MeshPart& meshPart) const
 			glDrawArrays(GL_TRIANGLES, meshPart.startIndex, meshPart.nIndices);
 			break;
 		default:
-			throw std::invalid_argument("Mesh: Invalid mesh primitive type!");
+			throw std::invalid_argument("[MESH] Invalid mesh primitive type!");
 		}
 		break;
 	case ELEMENTS:
@@ -164,11 +164,11 @@ void Mesh::renderMeshPart(const MeshPart& meshPart) const
 			                         (void*) (meshPart.startIndex * sizeof(unsigned int)), meshPart.baseVertex);
 			break;
 		default:
-			throw std::invalid_argument("Mesh: Invalid mesh primitive type!");
+			throw std::invalid_argument("[MESH] Invalid mesh primitive type!");
 		}
 		break;
 	default:
-		throw std::invalid_argument("Mesh: Invalid mesh draw type!");
+		throw std::invalid_argument("[MESH] Invalid mesh draw type!");
 	}
 }
 
@@ -217,13 +217,13 @@ Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 
 	if (!scn)
 	{
-		LOG_ERROR("Mesh: Failed to load the scene '{}': {}", path, importer.GetErrorString());
+		LOG_ERROR("[MESH] Failed to load the file '{}': {}", path, importer.GetErrorString());
 		return nullptr;
 	}
 
 	if (scn->mNumMeshes < 1)
 	{
-		LOG_ERROR("Mesh: No meshes found in the scene '{}'", path);
+		LOG_ERROR("[MESH] No meshes found in the file '{}'", path);
 		return nullptr;
 	}
 
@@ -244,7 +244,7 @@ Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
 	{
-		LOG_INFO("Mesh: No triangles found in the scene '{}'", path);
+		LOG_INFO("[MESH] No triangles found in the file '{}'", path);
 		return nullptr;
 	}
 
@@ -588,7 +588,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 		aiReturn texFound = material->GetTexture(type, 0, &texPathString);
 		if (texFound != AI_SUCCESS)
 		{
-			LOG_ERROR("Mesh: Failed to fetch a texture of type '{}'!", aiTextureTypeToString(type));
+			LOG_ERROR("[MESH] Failed to fetch a texture of type '{}'!", aiTextureTypeToString(type));
 			return 0;
 		}
 
@@ -624,14 +624,14 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 				if (!minimalLoad)
 				{
 					// Texture is compressed (As per assimp docs, mWidth contains the length)
-					LOG_INFO("Mesh: Loading an embedded texture of type '{}'", aiTextureTypeToString(type));
+					LOG_INFO("[MESH] Loading an embedded texture of type '{}'", aiTextureTypeToString(type));
 					texId = loadEmbeddedTexture((unsigned char*) &*aiTex->pcData, aiTex->mWidth);
 				}
 			}
 			else
 			{
 				LOG_ERROR(
-				    "Mesh: Failed to load an embedded texture of type '{}': Uncompressed embedded textures are not "
+				    "[MESH] Failed to load an embedded texture of type '{}': Uncompressed embedded textures are not "
 				    "currently supported.",
 				    aiTextureTypeToString(type));
 			}
@@ -670,7 +670,7 @@ GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mip
 	else
 	{
 		const char* error = stbi_failure_reason();
-		LOG_ERROR("Mesh: Failed to load an embedded texture: {}", error);
+		LOG_ERROR("[MESH] Failed to load an embedded texture: {}", error);
 	}
 	stbi_image_free(imageData);
 

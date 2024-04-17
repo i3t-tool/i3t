@@ -88,6 +88,8 @@ public:
 		return m_currentScene.get();
 	}
 
+	static bool isValidScenePath(const fs::path path);
+
 	// Global save/load ________________________________________________________________________________________________
 
 	bool saveGlobal();
@@ -129,6 +131,12 @@ private:
 
 	Ptr<State::Scene> m_currentScene;
 
+	/**
+	 * Set the passed scene as the current scene.
+	 * @param newScene The new current scene.
+	 * @param newScenePath If a non-empty path is passed, it is set as the path of the new current scene.
+	 * @return True if the current scene actually changed, false if the passed scene was already the current scene.
+	 */
 	bool setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath = "");
 
 	std::optional<Memento> createSceneMemento(Scene* scene);
