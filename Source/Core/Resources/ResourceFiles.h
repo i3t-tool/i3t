@@ -38,6 +38,13 @@ public:
 	virtual ~ResourceFiles() = default;
 
 	void addFile(fs::path filePath);
+
+	/**
+	 * Change the location of the managed files.
+	 * @param newDir New file structure root.
+	 * @param deleteOriginals Delete the original files.
+	 * @return True on success, false otherwise
+	 */
 	bool changeLocation(fs::path newDir, bool deleteOriginals);
 	bool deleteFiles();
 

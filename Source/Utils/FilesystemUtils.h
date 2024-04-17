@@ -14,38 +14,10 @@
 
 #include <filesystem>
 
-#include <sys/stat.h>
-
 namespace fs = std::filesystem;
 
 namespace FilesystemUtils
 {
-
-inline bool doesFileExists(const char* filename)
-{
-	struct stat buffer;
-	return (stat(filename, &buffer) == 0);
-}
-
-/**
- *
- * @param path Absolute
- * @return
- */
-inline bool doesFileExist(const std::string& path)
-{
-	return doesFileExists(path.c_str());
-}
-
-/**
- *
- * @param path Absolute
- * @return
- */
-inline bool doesFileExists(fs::path& path)
-{
-	return doesFileExists(path.string().c_str());
-}
 
 inline void reportFilesystemException(const fs::filesystem_error& e)
 {
@@ -172,8 +144,9 @@ inline bool isSubpath(const fs::path path, const fs::path base)
 
 /**
  * Compare two paths with exception handling.
- * Note that both paths MUST exist for this method to return true.
- * Use the weaklyEquivalent() method if any of the paths doesn't exist.
+ * Calls the fs::equivalent method directly which checks if two paths are pointing to the same EXISTING file.
+ * Thus both paths MUST exist for this method to not throw an exception.
+ * Use the weaklyEquivalent() method if any of the paths don't exist.
  */
 inline bool equivalent(const fs::path& path1, const fs::path& path2)
 {
@@ -208,6 +181,7 @@ inline fs::path normalizePath(const fs::path& originalPath)
 
 /**
  * Compare two paths with exception handling.
+ * Uses mostly string comparison trickery.
  * The paths do NOT have to exist.
  */
 inline bool weaklyEquivalent(const fs::path& path1, const fs::path& path2)
@@ -215,6 +189,7 @@ inline bool weaklyEquivalent(const fs::path& path1, const fs::path& path2)
 	// TODO: (DR) Write some tests
 	try
 	{
+		// Normalize paths and compare their canonical versions
 		fs::path path1N = normalizePath(path1);
 		fs::path path2N = normalizePath(path2);
 		return path1N == path2N;
@@ -223,6 +198,22 @@ inline bool weaklyEquivalent(const fs::path& path1, const fs::path& path2)
 	{
 		reportFilesystemException(e);
 		return false;
+	}
+}
+
+/**
+ * Compares two paths either using equivalent() or weaklyEquivalent().
+ * The weak equivalence is used when either of the two paths don't exist.
+ */
+inline bool anyEquivalent(const fs::path& path1, const fs::path& path2)
+{
+	if (fs::exists(path1) && fs::exists(path2))
+	{
+		return FilesystemUtils::equivalent(path1, path2);
+	}
+	else
+	{
+		return weaklyEquivalent(path1, path2);
 	}
 }
 

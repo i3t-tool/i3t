@@ -39,9 +39,9 @@ ResourceManager& ResourceManager::instance()
 	return App::getModule<ResourceManager>();
 }
 
-bool ResourceManager::ResFilesCmp::operator()(Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) const
+bool ResourceManager::ResFilesCmp::operator()(Ptr<Resource> lhs, Ptr<Resource> rhs) const
 {
-	return *lhs < *rhs;
+	return *(lhs->resourceFiles) < *(rhs->resourceFiles);
 }
 
 bool ResourceManager::resourceExists(size_t id)
@@ -736,8 +736,7 @@ bool ResourceManager::importModel(const fs::path& path, bool normalize)
 		modelResource->resourceFiles = modelFiles;
 
 		m_importedResources.push_back(modelAlias);
-
-		m_filesToAddOnSave.insert(modelFiles);
+		m_resourcesToAddOnSave.insert(modelResource);
 
 		LOG_INFO("[IMPORT] Imported  model '{}' from '{}'.", modelAlias, modelFiles->m_path.string());
 	}
@@ -762,7 +761,7 @@ bool ResourceManager::removeImportedModel(const std::string& alias)
 
 	Ptr<Resource> modelResource = resIt->second.lock();
 	Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(modelResource->path, alias);
-	m_filesToAddOnSave.erase(modelFiles);
+	m_resourcesToAddOnSave.erase(modelResource);
 
 	// Model files will be "garbage collected" later during scene save
 
@@ -777,7 +776,7 @@ Memento ResourceManager::saveScene(Scene* scene)
 	// TODO: (DR) I haven't really thought too much how imported models should be handled during undo/redo operations,
 	//   right now a load triggered by an undo/redo (a load with a NULL Scene pointer passed) is simply ignored.
 
-	StateManager& stateManager = App::getModule<StateManager>();
+	updateModelFiles(scene); // Scene file management
 
 	// Add ResourceManager entry to the scene JSON file
 	rapidjson::Document state;
@@ -821,7 +820,11 @@ Memento ResourceManager::saveScene(Scene* scene)
 	}
 	state.AddMember("resources", resources, a);
 
-	// Scene file management
+	return state;
+}
+
+void ResourceManager::updateModelFiles(State::Scene* scene)
+{
 	if (scene)
 	{
 		// Check if the scene location has changed compared to the last save
@@ -831,11 +834,12 @@ Memento ResourceManager::saveScene(Scene* scene)
 			// However disregard any resources that were to be removed and those to be yet added
 			for (const auto& importedModel : m_importedResources)
 			{
-				Ptr<ResourceFiles> resourceFiles = resourceByAlias(importedModel)->resourceFiles;
-				if (m_filesToAddOnSave.contains(resourceFiles))
+				Ptr<Resource> resource = resourceByAlias(importedModel);
+				Ptr<ResourceFiles> resourceFiles = resource->resourceFiles;
+				if (m_resourcesToAddOnSave.contains(resource))
 					continue;
 
-				resourceFiles->changeLocation(scene->m_dataPath / resourceFiles->m_name, false);
+				resource->changeLocation(scene->m_dataPath / resourceFiles->m_name, false);
 			}
 		}
 
@@ -844,11 +848,12 @@ Memento ResourceManager::saveScene(Scene* scene)
 		// - The models will still be loaded from the tmp directory but since they're already loaded their files are no
 		//    longer needed
 		bool error = false;
-		for (const auto& newModelFiles : m_filesToAddOnSave)
+		for (const auto& newResource : m_resourcesToAddOnSave)
 		{
-			error |= !newModelFiles->changeLocation(scene->m_dataPath / newModelFiles->m_name, true);
+			Ptr<ResourceFiles> newModelFiles = newResource->resourceFiles;
+			error |= !newResource->changeLocation(scene->m_dataPath / newModelFiles->m_name, true);
 		}
-		m_filesToAddOnSave.clear();
+		m_resourcesToAddOnSave.clear();
 
 		if (error)
 		{
@@ -858,8 +863,6 @@ Memento ResourceManager::saveScene(Scene* scene)
 		// Remove any unused models
 		cleanUpModelFiles(scene);
 	}
-
-	return state;
 }
 
 bool ResourceManager::cleanUpModelFiles(Scene* scene)
@@ -883,8 +886,8 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 			if (entry.path().extension() != I3T_SCENE_EXTENSION)
 				continue;
 
-			// Ignore the current scene file
-			if (FilesystemUtils::equivalent(entry.path(), scenePath))
+			// Ignore the current scene file (The scenePath file can potentially not exist yet!)
+			if (FilesystemUtils::anyEquivalent(entry.path(), scenePath))
 				continue;
 
 			// Parse the scene file
@@ -1030,7 +1033,7 @@ void ResourceManager::clearScene()
 		}
 	}
 
-	m_filesToAddOnSave.clear();
+	m_resourcesToAddOnSave.clear();
 }
 
 Memento ResourceManager::saveGlobal()

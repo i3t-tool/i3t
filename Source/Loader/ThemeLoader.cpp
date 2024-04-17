@@ -127,7 +127,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
-	if (!FilesystemUtils::doesFileExists(path.string().c_str()))
+	if (!fs::exists(path))
 	{
 		return Err("File does not exist");
 	}

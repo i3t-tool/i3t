@@ -185,6 +185,21 @@ const Memento& StateManager::getCurrentState() const
 	return m_mementos[m_currentStateIdx];
 }
 
+bool StateManager::isValidScenePath(const fs::path path)
+{
+	if (fs::is_directory(path))
+	{
+		LOG_ERROR("Invalid scene save location! Path cannot be a directory: {}.", path.string());
+		return false;
+	}
+	if (path.extension().string() != I3T_SCENE_EXTENSION)
+	{
+		LOG_ERROR("Invalid scene save location! Scene files need to end with {}.", I3T_SCENE_EXTENSION);
+		return false;
+	}
+	return true;
+}
+
 std::optional<Memento> StateManager::createSceneMemento(Scene* scene)
 {
 	Memento state;
@@ -233,18 +248,22 @@ bool StateManager::saveScene()
 
 bool StateManager::saveScene(const fs::path& target)
 {
-	if (isReadOnly(target))
+	if (!isValidScenePath(target))
 	{
-		LOG_ERROR("No save performed, target scene {} is read-only!", target.string());
 		return false;
 	}
 
+	setCurrentScene(std::make_shared<Scene>(this, false), target);
+
 	LOG_INFO("");
-	LOG_INFO("Saving scene to '{}'.", target.string());
+	if (m_currentScene->m_readOnly)
+	{
+		LOG_ERROR("[SCENE SAVE] No save performed, target scene {} is read-only!", target.string());
+		return false;
+	}
+	LOG_INFO("[SCENE SAVE] Saving scene to '{}'.", target.string());
 
 	createTmpDirectory();
-
-	setCurrentScene(std::make_shared<Scene>(this, false), target);
 
 	// Create scene .json file
 	const auto result = JSON::save(target, *createSceneMemento(m_currentScene.get()));
@@ -264,18 +283,18 @@ bool StateManager::saveScene(const fs::path& target)
 bool StateManager::loadScene(const fs::path& path)
 {
 	LOG_INFO("");
-	LOG_INFO("Loading scene from '{}'.", path.string());
+	LOG_INFO("[SCENE LOAD] Loading scene from '{}'.", path.string());
 
 	if (!fs::exists(path))
 	{
-		LOG_ERROR("Scene file at '{}' does not exist!", path.string());
+		LOG_ERROR("[SCENE LOAD] Scene file at '{}' does not exist!", path.string());
 		return false;
 	}
 
 	rapidjson::Document doc;
 	if (!JSON::parse(path, doc, I3T_SCENE_SCHEMA))
 	{
-		LOG_ERROR("Failed to parse the scene file!");
+		LOG_ERROR("[SCENE LOAD] Failed to parse the scene file!");
 		return false;
 	}
 
@@ -309,11 +328,6 @@ bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
 	if (m_currentScene && m_currentScene->m_path == newScenePath)
 	{
 		m_currentScene->m_sceneLocationChanged = false;
-		return true;
-	}
-	if (fs::is_directory(newScenePath))
-	{
-		LOG_ERROR("Scene path cannot be a directory!");
 		return false;
 	}
 
@@ -325,6 +339,12 @@ bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
 			newScene->m_sceneLocationChanged = true;
 			newScene->m_prevPath = m_currentScene->m_path;
 			newScene->m_prevDataPath = m_currentScene->m_dataPath;
+		}
+		else
+		{
+			newScene->m_sceneLocationChanged = false;
+			newScene->m_prevPath.clear();
+			newScene->m_prevDataPath.clear();
 		}
 		newScene->m_path = newScenePath;
 		newScene->m_dataPath = newScenePath.parent_path() / m_sceneDataFolderName;
@@ -365,7 +385,7 @@ bool StateManager::saveGlobal()
 	}
 
 	LOG_INFO("");
-	LOG_INFO("Saving global data to '{}'.", absolutePath);
+	LOG_INFO("[STATE MANAGER] Saving global data to '{}'.", absolutePath);
 
 	// Create global data .json file
 	const auto result = JSON::save(target, *createGlobalMemento());
@@ -389,18 +409,18 @@ bool StateManager::loadGlobal()
 	}
 
 	LOG_INFO("");
-	LOG_INFO("Loading global data from '{}'.", absolutePath);
+	LOG_INFO("[STATE MANAGER] Loading global data from '{}'.", absolutePath);
 
 	if (!fs::exists(target))
 	{
-		LOG_WARN("Global data file at '{}' does not exist!", target.string());
+		LOG_WARN("[STATE MANAGER] Global data file at '{}' does not exist!", target.string());
 		return false;
 	}
 
 	rapidjson::Document doc;
 	if (!JSON::parse(target, doc, I3T_SCENE_SCHEMA))
 	{
-		LOG_WARN("Failed to parse global data file!");
+		LOG_WARN("[STATE MANAGER] Failed to parse global data file!");
 		return false;
 	}
 
@@ -427,7 +447,7 @@ void StateManager::saveUserData()
 	auto result = JSON::serializeToFile(data, Configuration::root / USER_DATA_FILE);
 	if (!result)
 	{
-		LOG_ERROR("Failed to create initial UserData/Global.json: {}", result.error());
+		LOG_ERROR("[STATE MANAGER] Failed to create initial UserData/Global.json: {}", result.error());
 	}
 }
 
@@ -439,7 +459,7 @@ void StateManager::loadUserData()
 	auto result = JSON::deserializeFile(Configuration::root / USER_DATA_FILE, data);
 	if (!result)
 	{
-		LOG_ERROR("Failed to load UserData/Global.json: {}", result.error());
+		LOG_ERROR("[STATE MANAGER] Failed to load UserData/Global.json: {}", result.error());
 	}
 
 	// TODO: (DR) There should be a limit of how many recent files there can be
@@ -449,7 +469,7 @@ void StateManager::loadUserData()
 		auto path = fs::path(*it);
 		if (!fs::exists(path))
 		{
-			LOG_INFO("Pruning non-existing recent file: {}", path.string())
+			LOG_INFO("[STATE MANAGER] Pruning non-existing recent file: {}", path.string())
 			it = data.recentFiles.erase(it);
 		}
 		else

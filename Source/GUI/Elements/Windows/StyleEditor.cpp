@@ -135,7 +135,7 @@ void StyleEditor::renderSaveRevertField()
 		{
 			m_infoMessage = "Theme name contains invalid characters.";
 		}
-		else if (FilesystemUtils::doesFileExist(path))
+		else if (fs::exists(fs::path(path)))
 		{
 			m_infoMessage = "Theme with this name already exists.";
 		}

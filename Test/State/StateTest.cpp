@@ -32,8 +32,8 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	I3TApplication app;
 	app.init();
 
-	const auto scenePath = "Test/State/TestScene.json";
-	const auto emptyScenePath = "Test/State/EmptyScene.json";
+	const auto scenePath = "Test/State/TestScene"s + I3T_SCENE_EXTENSION;
+	const auto emptyScenePath = "Test/State/EmptyScene"s + I3T_SCENE_EXTENSION;
 
 	std::vector<Ptr<WorkspaceNodeWithCoreDataWithPins>> nodes;
 
@@ -44,7 +44,7 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	ASSERT_TRUE(workspace != nullptr);
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene("Test/State/EmptyScene.json");
+	App::getModule<StateManager>().saveScene(emptyScenePath);
 
 	{
 		ASSERT_TRUE(getNodes(workspace).empty());
