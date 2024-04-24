@@ -377,10 +377,20 @@ TEST(SequenceIteratorTest, GetNonemptyParentSequence)
 	EXPECT_EQ(info[1].sequence->getId(), s2->getId());
 
 	auto* t = s3->startTracking(TrackingDirection::LeftToRight, std::vector<UPtr<IModelProxy>>());
+	const auto t3ID = s3->getMatrices().back()->getId();
 	t->setParam(0.2f);
 	EXPECT_NE(t->result().interpolatedTransformID, s1->getId());
 	EXPECT_EQ(t->result().interpolatedTransformID, s2->getId());
 	EXPECT_NE(t->result().interpolatedTransformID, s3->getId());
+	EXPECT_FLOAT_EQ(t->result().trackingProgress.at(s2->getId()), 2 * 0.2f);
+	EXPECT_FLOAT_EQ(t->result().trackingProgress.at(t3ID), 0.0f);
+
+	t->setParam(0.8f);
+	EXPECT_NE(t->result().interpolatedTransformID, s1->getId());
+	EXPECT_NE(t->result().interpolatedTransformID, s2->getId());
+	EXPECT_EQ(t->result().interpolatedTransformID, t3ID);
+	EXPECT_FLOAT_EQ(t->result().trackingProgress.at(s2->getId()), 1.0f);
+	EXPECT_FLOAT_EQ(t->result().trackingProgress.at(t3ID), 1.0f - 2 * 0.2f);
 }
 
 TEST(SequenceIteratorTest, MatrixInputPlugged)

@@ -16,6 +16,11 @@
 
 namespace Core
 {
+ID TransformInfo::getTrackingID() const
+{
+	return !isExternal ? currentNode->getId() : sequence->getId();
+}
+
 SequenceTree::SequenceTree(Ptr<Node> sequence)
 {
 	if (sequence == nullptr)
@@ -59,19 +64,19 @@ SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 	{
 		// there is matrix output plugged into this sequence)
 		m_info.isExternal = true;
-		m_currentMatrix = inputOperator;
+		m_info.currentNode = inputOperator;
 	}
 	else
 	{
 		// normal case
-		m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
+		m_info.currentNode = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
 	}
 }
 
 SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, Ptr<Node> node)
 {
 	m_info.sequence = sequence;
-	m_currentMatrix = node;
+	m_info.currentNode = node;
 }
 
 Sequence* SequenceTree::MatrixIterator::getSequence() const
@@ -147,14 +152,14 @@ SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
 
 Ptr<Node> SequenceTree::MatrixIterator::operator*() const
 {
-	I3T_ASSERT(m_currentMatrix != nullptr, "Iterator is at the end!");
+	I3T_ASSERT(m_info.currentNode != nullptr, "Iterator is at the end!");
 
-	return m_currentMatrix;
+	return m_info.currentNode;
 }
 
 bool SequenceTree::MatrixIterator::operator==(const SequenceTree::MatrixIterator& rhs) const
 {
-	return m_currentMatrix == rhs.m_currentMatrix && m_info.sequence == rhs.m_info.sequence;
+	return m_info.currentNode == rhs.m_info.currentNode && m_info.sequence == rhs.m_info.sequence;
 }
 
 bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator& rhs) const
@@ -173,7 +178,7 @@ void SequenceTree::MatrixIterator::advance()
 	}
 
 	const auto& matrices = m_info.sequence->getMatrices();
-	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	const auto it = std::find(matrices.begin(), matrices.end(), m_info.currentNode);
 	auto index = std::distance(matrices.begin(), it);
 	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
@@ -201,17 +206,17 @@ void SequenceTree::MatrixIterator::advance()
 		if (matrixPluggedIntoParent)
 		{
 			m_info.isExternal = true;
-			m_currentMatrix = matrixPluggedIntoParent;
+			m_info.currentNode = matrixPluggedIntoParent;
 		}
 		else
 		{
-			m_currentMatrix = parentNonEmptySequence->getMatrices().back();
+			m_info.currentNode = parentNonEmptySequence->getMatrices().back();
 		}
 		m_info.sequence = parentNonEmptySequence.get();
 	}
 	else
 	{
-		m_currentMatrix = matrices[--index];
+		m_info.currentNode = matrices[--index];
 	}
 }
 
@@ -242,7 +247,7 @@ void SequenceTree::MatrixIterator::withdraw()
 
 	// Find index of current matrix in current sequence.
 	const auto& matrices = m_info.sequence->getMatrices();
-	const auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	const auto it = std::find(matrices.begin(), matrices.end(), m_info.currentNode);
 	auto index = std::distance(matrices.begin(), it);
 	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
@@ -268,40 +273,31 @@ void SequenceTree::MatrixIterator::withdraw()
 		if (matrixPluggedIntoChild)
 		{
 			m_info.isExternal = true;
-			m_currentMatrix = matrixPluggedIntoChild;
+			m_info.currentNode = matrixPluggedIntoChild;
 		}
 		else
 		{
-			m_currentMatrix = prevNonEmptySequence->getMatrices().front();
+			m_info.currentNode = prevNonEmptySequence->getMatrices().front();
 		}
 		m_info.sequence = prevNonEmptySequence.get();
 	}
-	else if (m_currentMatrix == nullptr)
+	else if (m_info.currentNode == nullptr)
 	{
 		// iterator is at the end
-		m_currentMatrix = matrices.front();
+		m_info.currentNode = matrices.front();
 	}
 	else
 	{
-		m_currentMatrix = matrices[++index];
+		m_info.currentNode = matrices[++index];
 	}
 }
 
 void SequenceTree::MatrixIterator::invalidate()
 {
-	m_currentMatrix = nullptr;
+	m_info.currentNode = nullptr;
 }
 
 //------------------------------------------------------------------------------------------------//
-
-void setActivePart(Ptr<Node> node, float value)
-{
-	const auto maybeTransform = std::dynamic_pointer_cast<Transform>(node);
-	if (maybeTransform)
-	{
-		maybeTransform->m_activePart = value;
-	}
-}
 
 MatrixTracker::MatrixTracker(Sequence* beginSequence, TrackingDirection direction,
                              std::vector<UPtr<IModelProxy>> models)
@@ -376,14 +372,9 @@ void MatrixTracker::track()
 	auto [matrices, info] = st.begin().collectWithInfo();
 	for (size_t i = 0; i < matrices.size(); ++i)
 	{
-		auto& matrix = matrices[i];
-		m_state.transformInfo[matrix->getId()] = info[i];
-	}
-
-	for (const auto& matrix : matrices)
-	{
-		m_state.trackingProgress[matrix->getId()] = 0.0f;
-		setActivePart(matrix, 0.0f);
+		const auto nodeID = info[i].getTrackingID();
+		m_state.transformInfo[nodeID] = info[i];
+		m_state.trackingProgress[nodeID] = 0.0f;
 	}
 
 	if (matrices.empty())
@@ -416,8 +407,7 @@ void MatrixTracker::track()
 	for (int i = 0; i < matricesBefore; ++i)
 	{
 		const auto& transform = matrices[i];
-		m_state.trackingProgress[transform->getId()] = 1.0f;
-		setActivePart(transform, 1.0f);
+		m_state.trackingProgress[info[i].getTrackingID()] = 1.0f;
 
 		if (m_direction == TrackingDirection::LeftToRight)
 		{
@@ -436,10 +426,9 @@ void MatrixTracker::track()
 		glm::mat4 lhs(1.0f);
 
 		const auto interpIdx = matricesBefore;
-
 		const auto maybeTransform = matrices[interpIdx];
-		m_state.trackingProgress[maybeTransform->getId()] = interpParam;
-		setActivePart(maybeTransform, interpParam);
+		m_state.interpolatedTransformID = info[interpIdx].getTrackingID();
+		m_state.trackingProgress[m_state.interpolatedTransformID] = interpParam;
 		rhs = maybeTransform->data().getMat4();
 
 		auto useQuat = false;
@@ -456,9 +445,6 @@ void MatrixTracker::track()
 		{
 			matrix = Math::lerp(lhs, rhs, interpParam, useQuat) * matrix;
 		}
-
-		m_state.interpolatedTransformID =
-		    info[interpIdx].isExternal ? info[interpIdx].sequence->as<Sequence>()->getId() : maybeTransform->getId();
 	}
 
 	m_state.interpolatedMatrix = matrix;
@@ -473,13 +459,13 @@ void MatrixTracker::handleEdgeCases(float& interpParam, const std::vector<Ptr<No
 	{
 		interpParam = 0.0f;
 
-		m_state.interpolatedTransformID = matrices.front()->getId();
+		m_state.interpolatedTransformID = info.front().getTrackingID();
 	}
 	else if (Math::eq(1.0f, m_param))
 	{
 		interpParam = 1.0f;
 
-		m_state.interpolatedTransformID = matrices.back()->getId();
+		m_state.interpolatedTransformID = info.back().getTrackingID();
 	}
 }
 
