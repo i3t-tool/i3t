@@ -124,10 +124,11 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 1.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
 	}
 	{
 		float trackingParam = 0.85f;
@@ -140,10 +141,11 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		EXPECT_EQ(tracker->fullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), interpParam);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 1.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), interpParam);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
 	}
 	{
 		float trackingParam = 0.30f;
@@ -156,10 +158,11 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		EXPECT_EQ(tracker->fullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), interpParam);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 1.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), interpParam);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
 	}
 	{
 		float trackingParam = 0.0f;
@@ -170,10 +173,11 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		EXPECT_EQ(tracker->fullMatricesCount(), 0);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 0.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
 	}
 }
 
@@ -197,10 +201,11 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 0.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
 	}
 	{
 		float trackingParam = 0.30f;
@@ -213,10 +218,11 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		EXPECT_EQ(tracker->fullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), interpParam);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 0.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 0.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), interpParam);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
 	}
 	{
 		float trackingParam = 0.85f;
@@ -229,10 +235,11 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		EXPECT_EQ(tracker->fullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), interpParam);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), interpParam);
 	}
 	{
 		float trackingParam = 1.0f;
@@ -244,10 +251,11 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		EXPECT_EQ(tracker->fullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat3->getActivePart(), 1.0f);
-		EXPECT_FLOAT_EQ(t.mat4->getActivePart(), 1.0f);
+		const auto& progress = tracker->result().trackingProgress;
+		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
 	}
 }
 

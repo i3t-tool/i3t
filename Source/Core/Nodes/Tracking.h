@@ -31,6 +31,13 @@ struct TransformInfo
 
 	/// Sequence which contains the transform.
 	Sequence* sequence = nullptr;
+
+	/// Node with matrix output.
+	Ptr<Node> currentNode = nullptr;
+
+	/// \returns !isExternal ? currentNode->getId() : sequence->getId();
+	///    If isExternal, then sequence is the sequence with currentNode as input.
+	ID getTrackingID() const;
 };
 
 class SequenceTree
@@ -102,7 +109,6 @@ public:
 		SequenceTree* m_tree;
 		/// Current matrix info.
 		TransformInfo m_info;
-		Ptr<Node> m_currentMatrix;
 	};
 
 public:
@@ -181,16 +187,6 @@ public:
 	const std::map<Core::ID, float>& getTrackingProgress() const
 	{
 		return m_state.trackingProgress;
-	}
-
-	float getTrackingProgressForNode(ID transformID) const
-	{
-		if (!m_state.trackingProgress.contains(transformID))
-		{
-			return 0.0f;
-		}
-
-		return m_state.trackingProgress.at(transformID);
 	}
 
 	ID getInterpolatedTransformID() const

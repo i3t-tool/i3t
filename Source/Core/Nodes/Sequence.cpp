@@ -92,7 +92,6 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcep
 [[nodiscard]] Ptr<Transform> Sequence::popMatrix(const int index)
 {
 	const auto result = m_storage.popMatrix(index);
-	result->m_activePart = 0.0f;
 	updateValues(-1);
 
 	return result;

@@ -302,11 +302,6 @@ public:
 		m_currentIndex = index;
 	}
 
-	float getActivePart() const
-	{
-		return m_activePart;
-	}
-
 protected:
 	DefaultValues m_defaultValues;
 
@@ -338,10 +333,6 @@ protected:
 
 private:
 	friend class MatrixTracker;
-
-	friend void setActivePart(Ptr<Node> node, float value);
-
-	float m_activePart = 0.0;
 };
 
 struct HalfspaceSign

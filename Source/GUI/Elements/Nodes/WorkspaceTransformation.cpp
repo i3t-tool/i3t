@@ -143,8 +143,10 @@ bool WorkspaceTransformation::afterContent()
 	ImVec2 bottomright = m_middleRectDiwne.Max;
 	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
 
+	Core::TrackingResult t = workspaceDiwne.tracking->result();
+
 	ImVec2 size = bottomright - topleft;
-	float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
+	float inactiveMark = t.trackingProgress[this->getId()];
 
 	if (!trackingFromLeft)
 	{
@@ -160,7 +162,7 @@ bool WorkspaceTransformation::afterContent()
 	}
 
 	auto maybeInterpolatedTransform =
-	    findNodeById(workspaceDiwne.getAllNodesInnerIncluded(), workspaceDiwne.tracking->getInterpolatedTransformID());
+	    findNodeById(workspaceDiwne.getAllNodesInnerIncluded(), t.interpolatedTransformID);
 
 	if (!maybeInterpolatedTransform)
 	{

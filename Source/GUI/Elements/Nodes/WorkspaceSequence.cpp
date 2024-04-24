@@ -215,12 +215,63 @@ bool WorkspaceSequence::beforeContent()
 
 bool WorkspaceSequence::afterContent()
 {
-	//    for (WorkspaceCoreInputPin & inputPin : getInputs())
-	//    {
-	//        if
-	//        (inputPin.m_connectionChanged){dynamic_cast<WorkspaceDiwne&>(diwne).m_reconnectCameraToSequence
-	//        = true;}
-	//    }
+	if (!Core::GraphManager::isTrackingEnabled())
+	{
+		return false;
+	}
+
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
+
+	ImVec2 topleft = m_middleRectDiwne.Min;
+	ImVec2 bottomright = m_middleRectDiwne.Max;
+	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
+
+	Core::TrackingResult t = workspaceDiwne.tracking->result();
+
+	ImVec2 size = bottomright - topleft;
+	float inactiveMark = t.trackingProgress[this->getId()];
+
+	if (!trackingFromLeft && (inactiveMark != 0 || this->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected()))
+	{
+		bottomright.x = topleft.x;
+		bottomright.x += (1 - inactiveMark) * size.x;
+		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+	}
+	else if (inactiveMark != 0 || this->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
+	{ // Left tracking, top left moving left
+		topleft.x = bottomright.x;
+		topleft.x -= (1 - inactiveMark) * size.x;
+		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+	}
+	else
+	{
+		return false;
+	}
+
+	auto maybeInterpolatedSequence = findNodeById(workspaceDiwne.getAllNodes(), t.interpolatedTransformID);
+
+	if (!maybeInterpolatedSequence)
+	{
+		maybeInterpolatedSequence =
+		    findNodeById(workspaceDiwne.getAllNodes(), t.transformInfo[t.interpolatedTransformID].sequence->getId());
+	}
+
+	if (!maybeInterpolatedSequence)
+	{
+		Core::GraphManager::stopTracking();
+		return false;
+	}
+
+	auto interpolatedSequence = std::dynamic_pointer_cast<WorkspaceSequence>(maybeInterpolatedSequence.value());
+	if (interpolatedSequence.get() == this)
+	{
+		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
+		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
+
+		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
+		                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
+	}
+
 	return false;
 }
 
