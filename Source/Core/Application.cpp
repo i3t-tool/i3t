@@ -93,12 +93,7 @@ void Application::run()
 	{
 		glfwPollEvents();
 
-		// Process commands.
-		for (auto& command : m_commands)
-		{
-			command->execute();
-		}
-		m_commands.clear();
+		CommandDispatcher::get().execute();
 
 		beginFrame();
 
