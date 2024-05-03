@@ -15,8 +15,9 @@
 
 #include <functional>
 
+#include "Commands/Dispatcher.h"
+#include "Commands/ICommand.h"
 #include "Core/Application.h"
-#include "ICommand.h"
 
 /**
  * Base class for all commands.
@@ -81,7 +82,7 @@ public:
 	{
 		std::tuple<Args...> m_args(args...);
 
-		App::get().enqueueCommand(new Command<Type, Args...>(m_args));
+		CommandDispatcher::get().enqueueCommand(new Command<Type, Args...>(m_args));
 	}
 
 	static void dispatchImmediate(Args... args)
