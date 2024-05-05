@@ -147,7 +147,7 @@ void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
 	}
 	else
 	{
-		LOG_FATAL("Tutorial " + header->m_filename + " not loaded.");
+		LOG_FATAL("Tutorial {} not loaded.", header->m_filename.string());
 	}
 }
 

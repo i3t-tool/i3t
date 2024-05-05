@@ -1,0 +1,14 @@
+---
+title: Test
+language: cs
+---
+
+headline: Krok 1
+
+scriptFile: step1.lua
+
+--
+
+headline: Krok 2
+
+script: print("Hello from step 2")

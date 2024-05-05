@@ -12,12 +12,15 @@
  */
 #include "TutorialLoader.h"
 
-#include "Logger/Logger.h"
-#include "Tutorial/Tutorial.h"
-#include "stb_image.h"
-#include "yaml-cpp/yaml.h"
 #include <filesystem>
 #include <fstream>
+
+#include "stb_image.h"
+#include "yaml-cpp/yaml.h"
+
+#include "Logger/Logger.h"
+#include "Tutorial/Tutorial.h"
+#include "Utils/FilesystemUtils.h"
 
 std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& path)
 {
@@ -96,7 +99,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	}
 
 	// we create our tutorial header object on heap, we are using shared ptr, so
-	// that when there arent any references, we can eg properly free the loaded
+	// that when there aren't any references, we can eg properly free the loaded
 	// image and destroy it
 	return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(scene),
 	                                        std::move(thumbnail));
@@ -108,7 +111,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	std::ifstream tutorialStream(header->m_filename);
 	if (!tutorialStream.good())
 	{
-		LOG_FATAL("Tutorial file '" + header->m_filename + "' was not found");
+		LOG_FATAL("Tutorial file '{}' was not found", header->m_filename.string());
 		return nullptr; // return nothing
 	}
 	// FOR TUT CREATION DEBUG
@@ -133,13 +136,14 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		{
 			if (tutorialStream.eof())
 			{
-				LOG_FATAL("Tutorial file '" + header->m_filename +
+				LOG_FATAL("Tutorial file '{}'"
 				          "' missing 2 '---' YAML marks at the beginning of file or "
-				          "no further content behind them");
+				          "no further content behind them",
+				          header->m_filename.string());
 			}
 			else
 			{
-				LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
+				LOG_FATAL("Tutorial file '{}' I/O error", header->m_filename.string());
 			}
 			return nullptr;
 		}
@@ -151,7 +155,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	steps.emplace_back();            // add the first step
 	int currentStep = 0;
 	// int currentBlockIndent = -1;  // deprecated
-	blockType_t currentBlock = NOT_BLOCK;
+	auto currentBlock = EBlockType::NOT_BLOCK;
 	std::string line;
 	// temporaries for accumulating multiple line content:
 	std::string textStore;
@@ -162,11 +166,13 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	// -------------------------------------------------------
 
 	// [FUNCS] DETERMINING ELEMENT TYPES
-	auto isBlockType = [](const std::string& string) {
+	auto getBlockType = [](const std::string& string) {
+		using enum EBlockType;
+
 		// is keyword
-		static const std::unordered_map<std::string, blockType_t> stringToBlockType = {
-		    {"task:", TASK},   {"hint:", HINT},     {"choice:", CHOICE},    {"multichoice:", MULTICHOICE},
-		    {"input:", INPUT}, {"script:", SCRIPT}, {"headline:", HEADLINE}};
+		static const std::unordered_map<std::string, EBlockType> stringToBlockType = {
+		    {"task:", TASK},   {"hint:", HINT},     {"choice:", CHOICE},     {"multichoice:", MULTICHOICE},
+		    {"input:", INPUT}, {"script:", SCRIPT}, {"headline:", HEADLINE}, {"scriptFile:", SCRIPT_FILE}};
 		if (const auto it{stringToBlockType.find(string)}; it != std::end(stringToBlockType))
 		{
 			return it->second;
@@ -174,11 +180,14 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		// is anything else
 		return NOT_BLOCK;
 	};
-	auto isSingleLineType = [](const std::string& string) {
+	auto getSingleLineType = [](const std::string& string) {
+		using enum ESingleLineType;
+
 		// is keyword
-		static const std::unordered_map<std::string, singleLineType_t> stringToSingleLineType = {
-		    {"task:", TASK_SINGLE},    {"hint:", HINT_SINGLE},     {"x:", CORRECT_ANSWER},        {"o:", WRONG_ANSWER},
-		    {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE}, {"headline:", HEADLINE_SINGLE}};
+		static const std::unordered_map<std::string, ESingleLineType> stringToSingleLineType = {
+		    {"task:", TASK_SINGLE},         {"hint:", HINT_SINGLE},      {"x:", CORRECT_ANSWER},
+		    {"o:", WRONG_ANSWER},           {"answers:", ANSWER_LIST},   {"script:", SCRIPT_SINGLE},
+		    {"headline:", HEADLINE_SINGLE}, {"scriptFile:", SCRIPT_FILE}};
 		if (const auto it{stringToSingleLineType.find(string)}; it != std::end(stringToSingleLineType))
 		{
 			return it->second;
@@ -198,6 +207,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 
 	// [FUNC] FILLING THE STEP CLASS WITH COMPLETED BLOCK ELEMENTS
 	auto endCurrentBlock = [&]() -> void {
+		using enum EBlockType;
+
 		switch (currentBlock)
 		{
 		case EXPLANATION:
@@ -212,6 +223,21 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		case SCRIPT:
 			addScript(steps[currentStep], textStore);
 			break;
+		case SCRIPT_FILE:
+		{
+			const auto scriptPath = getDirectory(header->m_filename) + textStore;
+			auto readFileResult = FilesystemUtils::readFile(scriptPath);
+			if (readFileResult)
+			{
+				auto scriptSource = readFileResult.value();
+				addScript(steps[currentStep], scriptSource);
+			}
+			else
+			{
+				LOG_FATAL("Cannot load script file '{}': {}", textStore, readFileResult.error());
+			}
+			break;
+		}
 		case HEADLINE:
 			createHeadline(steps[currentStep], textStore);
 			break;
@@ -219,16 +245,16 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			// LOG_DEBUG("Ending block when NOT_BLOCK");
 			break;
 		default:
-			LOG_INFO("Creation of tutorial block element " + std::to_string(currentBlock) + " not implemented yet");
+			LOG_INFO("Creation of tutorial block element {} not implemented yet", magic_enum::enum_name(currentBlock));
 		}
 
 		currentBlock = NOT_BLOCK;
 	};
 
 	// [FUNC] INITIATING BLOCK ELEMENTS
-	auto beginBlock = [&](blockType_t blockType) -> void {
+	auto beginBlock = [&](EBlockType blockType) -> void {
 		// drop current block if any (safety check)
-		if (currentBlock)
+		if (currentBlock != EBlockType::NOT_BLOCK)
 		{
 			endCurrentBlock();
 		}
@@ -243,7 +269,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	};
 
 	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
-	auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void {
+	auto handleSingleLine = [&](ESingleLineType type, const std::string& content) -> void {
+		using enum ESingleLineType;
 		// check also for current state, and show error when calling singlelines
 		// which do not match nektere pripady ponechavaji state, jine ho musi
 		// resetovat!
@@ -261,16 +288,34 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			endCurrentBlock();
 			createHint(steps[currentStep], content);
 			break;
-		case SCRIPT_SIGNLE:
+		case SCRIPT_SINGLE:
 			endCurrentBlock();
 			addScript(steps[currentStep], content);
 			break;
+		case SCRIPT_FILE:
+		{
+			endCurrentBlock();
+
+			const auto scriptPath = getDirectory(header->m_filename) + content;
+			auto readFileResult = FilesystemUtils::readFile(scriptPath);
+			if (readFileResult)
+			{
+				auto scriptSource = readFileResult.value();
+				addScript(steps[currentStep], scriptSource);
+			}
+			else
+			{
+				LOG_FATAL("Cannot load script file '{}': {}", content, readFileResult.error());
+			}
+
+			break;
+		}
 		case HEADLINE_SINGLE:
 			endCurrentBlock();
 			createHeadline(steps[currentStep], content);
 			break;
 		default:
-			LOG_INFO("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
+			LOG_INFO("Creation of single-line tutorial element {} not implemented yet", magic_enum::enum_name(type));
 		}
 	};
 	// -------------------------------------------------------
@@ -311,15 +356,15 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			continue; // comments do not end blocks
 		}
 		// recognize type of line / command
-		blockType_t blockType = isBlockType(firstWord);
-		singleLineType_t singleLineType = isSingleLineType(firstWord);
+		EBlockType blockType = getBlockType(firstWord);
+		ESingleLineType singleLineType = getSingleLineType(firstWord);
 		// skip possible spaces between keyword and content if any
 		skipSpaces(lineStream);
 		// get any possible remaining text
 		std::string restOfLine;
 		std::getline(lineStream, restOfLine);
 		// handle single-lines
-		if (singleLineType)
+		if (singleLineType != ESingleLineType::NOT_SINGLE_LINE)
 		{
 			// actually used as single-line
 			if (!restOfLine.empty())
@@ -329,14 +374,14 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 				continue;
 			}
 			// actually used as block but the type does not allow blocks
-			else if (!blockType)
+			else if (blockType == EBlockType::NOT_BLOCK)
 			{
 				LOG_FATAL("NOT A BLOCK COMMAND: " + line);
 				// todo show errors to creator
 			}
 		}
 		// handle block starts
-		if (blockType)
+		if (blockType != EBlockType::NOT_BLOCK)
 		{
 			// actually used as block start
 			if (restOfLine.empty())
@@ -355,15 +400,15 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		else
 		{
 			// no current block -> start explanation
-			if (!currentBlock)
+			if (currentBlock == EBlockType::NOT_BLOCK)
 			{
-				beginBlock(EXPLANATION);
+				beginBlock(EBlockType::EXPLANATION);
 			}
 			// reset stream to start
 			lineStream.clear();
 			lineStream.seekg(0);
 			// block indentation - skip 2 spaces if not simple explanation
-			if (currentBlock != EXPLANATION)
+			if (currentBlock != EBlockType::EXPLANATION)
 			{
 				if (indent >= 2)
 				{
@@ -385,7 +430,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	// bug fix todo - if there is a non-empty line just before EOF then it wont
 	// get added (there has to be eg an empty line after it) FINISH UNFINISHED
 	// BLOCKS
-	if (currentBlock != NOT_BLOCK)
+	if (currentBlock != EBlockType::NOT_BLOCK)
 	{
 		endCurrentBlock();
 	}
@@ -393,7 +438,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	// CHECK if parsing ended because of error
 	if (!tutorialStream.eof())
 	{
-		LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
+		LOG_FATAL("Tutorial file '{}' I/O error", header->m_filename.string());
 	}
 
 	// CREATE THE TUTORIAL
@@ -445,10 +490,9 @@ std::shared_ptr<GUIImage> TutorialLoader::loadImage(const std::string& path)
 	}
 }
 
-std::string TutorialLoader::getDirectory(std::string& path)
+std::string TutorialLoader::getDirectory(const std::filesystem::path& path)
 {
-	std::filesystem::path p(path);
-	return p.parent_path().string() + "/";
+	return path.parent_path().string() + "/";
 }
 
 void TutorialLoader::skipSpaces(std::istringstream& stream)

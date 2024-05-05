@@ -336,7 +336,7 @@ void StartWindow::renderRightPanel()
 				// ImGui::NextColumn();
 				// ImGui::SameLine(ImGui::GetCursorPosX() + innerPadding.x);
 				ImGui::SameLine();
-				std::string descChildName = "Desc##" + header->m_filename;
+				std::string descChildName = "Desc##" + header->m_filename.string();
 				ImVec2 descSize(ImGui::GetContentRegionAvail().x, thumbImageSize);
 				descSize.x -= (startNewBtnWidth + 2 * innerPadding.x + outerPadding.x);
 				// ImGui::PushClipRect(ImGui::GetCursorScreenPos(), descBottomRight,
@@ -399,7 +399,7 @@ void StartWindow::renderRightPanel()
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
-					std::string buttonName = "Start##" + header->m_filename;
+					std::string buttonName = "Start##" + header->m_filename.string();
 					if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
 					{
 						// TUTORIAL LOADING !!!
@@ -554,38 +554,3 @@ void StartWindow::loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tuto
 	m_windowManager->openModal<BeforeNewTutModal>();
 	LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 }
-
-void StartWindow::showTutorialPopup()
-{
-	if (!App::getModule<StateManager>().isDirty())
-	{
-		popupActive = false;
-		return;
-	}
-	ImGui::OpenPopup("Delete current scene?");
-	LOG_INFO("POPUP INITIATED");
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		ImGui::Text("All those beautiful nodes will be deleted.\nThis operation cannot be undone!");
-		ImGui::Separator();
-
-		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{
-			App::getModule<StateManager>().newScene();
-			popupActive = false;
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(120, 0)))
-		{
-			popupActive = false;
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-}
-
-void StartWindow::renderTutorials() {}

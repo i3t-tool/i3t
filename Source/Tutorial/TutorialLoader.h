@@ -25,7 +25,7 @@ public:
 	 * @return ptr to image if successful, nullptr otherwise
 	 */
 	static std::shared_ptr<GUIImage> loadImage(const std::string& path);
-	static std::string getDirectory(std::string& path);
+	static std::string getDirectory(const std::filesystem::path& path);
 
 private:
 	TutorialLoader() = default;
@@ -36,7 +36,7 @@ private:
 	//   STATE_CHOICE, STATE_MULTICHOICE, STATE_INPUT
 	// };
 
-	enum blockType_t
+	enum class EBlockType
 	{
 		NOT_BLOCK = 0,
 		EXPLANATION,
@@ -46,10 +46,11 @@ private:
 		MULTICHOICE,
 		INPUT,
 		SCRIPT,
+		SCRIPT_FILE,
 		HEADLINE
 	};
 
-	enum singleLineType_t
+	enum class ESingleLineType
 	{
 		NOT_SINGLE_LINE = 0,
 		TASK_SINGLE,
@@ -57,17 +58,10 @@ private:
 		CORRECT_ANSWER,
 		WRONG_ANSWER,
 		ANSWER_LIST,
-		SCRIPT_SIGNLE,
+		SCRIPT_SINGLE,
+		SCRIPT_FILE,
 		HEADLINE_SINGLE
 	};
-
-	/**
-	  "bool load(char* filename)\n"
-	    "bool append(char* filename)\n"
-	    "bool save(char* filename)\n"
-	    "bool savesel(char* filename)\n"
-	    "bool run(char* filename)\n"
-	**/
 
 	// enum keyword_t
 	//{
