@@ -154,9 +154,8 @@ struct TutorialHeader
 	    : m_filename(std::move(filename)), m_title(std::move(title)), m_description(std::move(description)),
 	      m_scene(std::move(scene)), m_thumbnailImage(std::move(thumbnail))
 	{}
-	~TutorialHeader() = default;
 
-	std::string m_filename;
+	fs::path m_filename;
 	std::string m_title;
 	std::string m_description;
 	std::string m_scene;

@@ -55,7 +55,10 @@ private:
 	std::shared_ptr<GUIImage> m_logoImage;
 	std::shared_ptr<GUIImage> m_cvutImage;
 	std::shared_ptr<GUIImage> m_i3tImage;
+
+	/// Metadata of all discovered tutorials.
 	std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
+
 	Ptr<Tutorial> m_currentTutorial;
 	void renderTutorials();
 	void showTutorialPopup();

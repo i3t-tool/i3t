@@ -14,6 +14,9 @@
 
 #include <filesystem>
 
+#include "Core/Result.h"
+#include "Logger/Logger.h"
+
 namespace fs = std::filesystem;
 
 namespace FilesystemUtils
@@ -216,5 +219,7 @@ inline bool anyEquivalent(const fs::path& path1, const fs::path& path2)
 		return weaklyEquivalent(path1, path2);
 	}
 }
+
+Result<std::string, Error> readFile(const fs::path& path);
 
 } // namespace FilesystemUtils
