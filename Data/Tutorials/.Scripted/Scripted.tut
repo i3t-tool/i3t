@@ -5,6 +5,8 @@ language: cs
 
 headline: Krok 1
 
+Vytvoř Scale transformaci.
+
 scriptFile: step1.lua
 
 --

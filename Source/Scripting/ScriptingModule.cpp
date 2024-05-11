@@ -20,6 +20,7 @@
 #include "Core/Nodes/NodeData.h"
 #include "Core/Nodes/Operations.h"
 #include "GUI/Elements/Nodes/Builder.h"
+#include "Scripting/Environment.h"
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
 
@@ -178,12 +179,18 @@ void ScriptingModule::onInit()
 
 	//
 
-	m_Lua.new_usertype<GuiNode>(sol::no_constructor);
+	m_Lua.new_usertype<GuiNode>(
+		"Node",
+		"type", [](Ptr<GuiNode> self) {
+			return self->getNodebase()->getOperation()->keyWord;
+		},
+		"get_position", &GuiNode::getNodePositionDiwne,
+		"set_position", &GuiNode::setNodePositionDiwne
+	);
 
 	m_Lua.new_usertype<GuiOperator>(
 	    "Operator",
-	    "get_position", &GuiOperator::getNodePositionDiwne,
-	    "set_position", &GuiOperator::setNodePositionDiwne,
+		sol::base_classes, sol::bases<GuiNode>(),
 	    "get_float", &getValue<float>,
 		"get_vec3", &getValue<glm::vec3>,
 		"get_vec4", &getValue<glm::vec4>,
@@ -263,8 +270,7 @@ void ScriptingModule::onInit()
 
 	m_Lua.new_usertype<GuiTransform>(
 	    "Transform",
-	    "get_position", &GuiTransform::getNodePositionDiwne,
-	    "set_position", &GuiTransform::setNodePositionDiwne,
+		sol::base_classes, sol::bases<GuiNode>(),
 	    "get_value", [](Ptr<GuiTransform> self) {
 		    return getValue<glm::mat4>(self);
 	    },
@@ -340,8 +346,7 @@ void ScriptingModule::onInit()
 
 	m_Lua.new_usertype<GuiSequence>(
 	    "Sequence",
-	    "get_position", &GuiSequence::getNodePositionDiwne,
-	    "set_position", &GuiSequence::setNodePositionDiwne,
+	    sol::base_classes, sol::bases<GuiNode>(),
 	    "push", [this](GuiSequence& self, Ptr<GuiTransform> transform) {
 		    self.moveNodeToSequence(transform);
 	    },
@@ -371,6 +376,10 @@ void ScriptingModule::onInit()
 	    });
 
 	//
+
+	m_Lua.set_function("get_all_nodes", []() -> std::vector<Ptr<GuiNode>> {
+	  	return getNodeEditor().m_workspaceCoreNodes;
+	});
 
 	m_Lua.set_function("get_node", [this](Core::ID id) -> Ptr<GuiNode> {
 		const auto result = getNodeEditor().getNode<GuiNode>(id);
@@ -490,6 +499,31 @@ void ScriptingModule::onInit()
 		/// \todo
 	});
 	// clang-format on
+
+	//-- Timers --------------------------------------------------------------------------------------------------------
+
+	m_Lua.set_function("set_timer", [this](uint64_t intervalMs, sol::function callback) {
+		return m_chronos.setTimer(intervalMs, callback);
+	});
+
+	m_Lua.set_function("clear_timer", [this](Ptr<Timer> timer) {
+		m_chronos.clearTimer(timer);
+	});
+
+	//------------------------------------------------------------------------------------------------------------------
+
+	Registry::registerAll(m_Lua);
+}
+
+void ScriptingModule::onUpdate(double deltaSeconds)
+{
+	m_chronos.update(deltaSeconds);
+}
+
+void ScriptingModule::onClose()
+{
+	// Destroy timers before the workspace, because of weird DINWE nodes ownership issues.
+	m_chronos = {};
 }
 
 bool ScriptingModule::runScript(const char* luaSource)

@@ -62,6 +62,11 @@ public:
 	 */
 	void setStep(int step_number);
 
+	Ptr<Tutorial> getTutorial()
+	{
+		return m_tutorial;
+	}
+
 	/**
 	 * \brief Renders the tutorial window using ImGui.
 	 */
@@ -69,16 +74,13 @@ public:
 
 private:
 	static std::shared_ptr<Tutorial> m_tutorial; // todo temporarily static because of img callback
-	// static std::string m_current_dir;
 	int m_currentStep;
 	float m_progressBarAnimationPosition;
 	ImGui::MarkdownConfig m_mdConfig; // todo temporary
-	// std::string getAbsolutePathByTutorial(std::string filename);
+
 	void renderTutorialHeader();
 	void renderTutorialContent();
 	void renderTutorialControls();
-	// overrides todo jsou private ale parent classa je ma public, ocividne je to
-	// dulezitejsi
 	void renderExplanation(Explanation* explanation) override;
 	void renderHeadline(Headline* headline) override;
 	void renderChoiceTask(ChoiceTask* choice) override;
