@@ -14,13 +14,16 @@
 
 #include <vector>
 
+#define SOL_ALL_SAFETIES_ON 1
+#include "sol/sol.hpp"
+
 #include "Core/Defs.h"
 
 class Timer
 {
 public:
 	Timer() = default;
-	Timer(uint64_t intervalMs, std::function<void(void)> callback)
+	Timer(uint64_t intervalMs, sol::protected_function callback)
 	    : m_intervalMs(intervalMs), m_callback(std::move(callback))
 	{}
 
@@ -40,7 +43,7 @@ public:
 private:
 	uint64_t m_intervalMs = 0;
 	uint64_t m_lastTickMs = 0;
-	std::function<void(void)> m_callback;
+	sol::protected_function m_callback;
 };
 
 class Chronos
@@ -54,7 +57,7 @@ public:
 		}
 	}
 
-	Ptr<Timer> setTimer(uint64_t intervalMs, std::function<void(void)> callback)
+	Ptr<Timer> setTimer(uint64_t intervalMs, sol::protected_function callback)
 	{
 		auto timer = std::make_shared<Timer>(intervalMs, std::move(callback));
 		m_timers.emplace_back(timer);
