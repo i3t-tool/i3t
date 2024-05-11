@@ -51,6 +51,8 @@
 // todo
 #endif // unix
 
+#include "Scripting/Environment.h"
+
 // TUTORIAL GUI PROPERTIES DEFINITIONS
 //---
 
@@ -177,7 +179,7 @@ void TutorialWindow::setStep(int step_number)
 		// run script
 		if (!m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown.empty())
 		{
-			ConsoleCommand::dispatch(m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown);
+			ConsoleCommand::dispatchImmediate(m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown);
 		}
 	}
 }

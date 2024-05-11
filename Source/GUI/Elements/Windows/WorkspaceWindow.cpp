@@ -1724,7 +1724,6 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 
 WorkspaceWindow::~WorkspaceWindow()
 {
-	g_workspaceDiwne->m_workspaceCoreNodes.clear();
 	delete g_workspaceDiwne;
 }
 

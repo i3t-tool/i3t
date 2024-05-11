@@ -22,6 +22,6 @@ public:
 	virtual void onInit() {}
 	virtual void onBeginFrame() {}
 	virtual void onEndFrame() {}
-	virtual void onUpdate(double delta) {}
+	virtual void onUpdate(double deltaSeconds) {}
 	virtual void onClose() {}
 };

@@ -18,10 +18,13 @@
 #include "sol/sol.hpp"
 
 #include "Core/Module.h"
+#include "Scripting/Timer.h"
 
 class ScriptingModule : public Module
 {
 	void onInit() override;
+	void onUpdate(double deltaSeconds) override;
+	void onClose() override;
 
 public:
 	bool runScript(const char* luaSource);
@@ -37,6 +40,8 @@ private:
 	 */
 	void print(const std::string& str);
 
+	/// Has to be destructed last!
 	sol::state m_Lua;
+	Chronos m_chronos;
 	std::ostringstream m_oss;
 };
