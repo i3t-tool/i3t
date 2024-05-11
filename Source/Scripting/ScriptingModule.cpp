@@ -502,7 +502,9 @@ void ScriptingModule::onInit()
 
 	//-- Timers --------------------------------------------------------------------------------------------------------
 
-	m_Lua.set_function("set_timer", [this](uint64_t intervalMs, sol::function callback) {
+	m_Lua.set_function("set_timer", [this](uint64_t intervalMs, sol::protected_function callback) {
+		callback.set_error_handler(m_Lua["print"]);
+
 		return m_chronos.setTimer(intervalMs, callback);
 	});
 
