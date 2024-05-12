@@ -184,6 +184,14 @@ void TutorialWindow::setStep(int step_number)
 	}
 }
 
+void TutorialWindow::reloadTutorial()
+{
+	if (hasTutorial())
+	{
+		setTutorial(m_tutorial->m_header);
+	}
+}
+
 //---
 
 void TutorialWindow::render()

@@ -293,6 +293,15 @@ void MainMenuBar::showTutorialMenu()
 	{
 		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 
+		if (ImGui::MenuItem("Reload", nullptr))
+		{
+			auto tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
+			if (tutorialWindow->hasTutorial())
+			{
+				tutorialWindow->reloadTutorial();
+			}
+		}
+
 		ImGui::EndMenu();
 	}
 }
