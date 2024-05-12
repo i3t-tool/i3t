@@ -62,6 +62,8 @@ public:
 	 */
 	void setStep(int step_number);
 
+	void reloadTutorial();
+
 	Ptr<Tutorial> getTutorial()
 	{
 		return m_tutorial;
