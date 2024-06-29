@@ -1,0 +1,183 @@
+---
+title: 1. I3T Introduction
+description: In this tutorial you can learn the basics of working with I3T
+thumbnail: thumbnail.png
+language: en
+---
+
+headline: Welcome to I3T!
+
+*I3T* is a program used to teach *transformations in 3D space*.
+
+![Interactive Tool for Teaching Transformations](I3Tpreview.png)
+
+In this tutorial you will learn the *structure of the program* and how to perform *basic tasks*.
+
+First you have to learn how the tutorials are structured!
+
+--
+headline: Tasks and Tips
+*Tutorials are interactive*. They contain *tasks*, which you should complete as you encounter them.
+
+*Tasks* look like this:
+task: Taskity task task McTask
+
+*It's important to try to finish each task you encounter!* 
+
+*Tips* tell you how to continue *if you're unsure how to complete the task.*
+
+hint: Some extremely useful information here <---
+
+--
+headline: Images
+
+*Images* are used to show you visual clues regarding the tutorial tasks.
+
+Each of the *images* can also show you its content as text, if you hover over it with your cursor.
+
+![This is a bunny](bunny.png)
+
+
+--
+headline: User interface
+
+*The primary user interface* of the program is divided into two windows:
+
+![View and Workspace](i3tscreens.png)
+
+*Scene View* shows us the 3D scene from a free camera.
+
+*Workspace* is used to assemble *graph nodes* (also *boxes*) that modify the 3D scene.
+
+*You can customize the window layout* as you wish (but it's recommended to leave it as is).
+
+--
+headline: Scene View
+
+*Scene View* shows the 3D scene (similarly to Blender or Unity).
+
+![Scene View](viewport.png)
+
+Controls are similar to Blender:
+    * *rotating* = Right mouse button  ![right mouse button](mouseRight.png)
+    * *panning* = Holding middle mouse button  ![middle mouse button](mouseMiddle.png)
+    * *zoom* = mousewheel up and down  ![mousewheel](mouseMiddle.png)
+
+The controls also work the same for *Workspace*!
+
+--
+headline: Workspace
+*Workspace* is where you assemble the scene. You can add in blocks and connect them together.
+
+Clicking the *right mouse button*  ![right mouse button](mouseRight.png)  on the *Workspace* window shows the *"Workspace menu"*.
+
+![Context/Workspace menu](menu.png)
+
+The workspace menu is used to add blocks to the scene *blocks*. 
+
+You can also use the *right mouse button* to interact with already created nodes.
+
+--
+headline: Graph nodes
+*Nodes* are the most basic components of the program. They represent *matrices, 3D models or other functions* (eg. cycles).
+
+task:
+  Add three blocks into the workspace:
+    * model
+    * sequence
+    * transformation -> scale
+hint: ![right mouse button](mouseRight.png)  in the Workspace window opens the Add menu.
+Workspace should look like this after adding the *blocks* (the blocks can be moved by grabbing their top bar):
+![Cube model, sequence and scaling transformation matrix](addStuff.png)
+
+--
+headline: Node types
+
+*Let's look at the node types:*
+    * *Model* = cube 3D model
+    * *Sequence* = "holder" for one or more matrices, that is used to connect the *transform* with the *model*
+    * *Scale* = scaling transformation *matrix*
+
+![The blocks look like this](addStuff.png)
+
+To *scale* the model, we need to connect the blocks together correctly.
+
+--
+headline: How do we do that?
+
+*Blocks* work similarly to programming functions, they contain a *input* and a *output*. We connect them using colored *wires*.
+
+![Sequence block](blocks.png)
+
+The icon determines the input/output *data type*. The data type limits which *blocks* "fit together" (can be connected).
+
+For example:
+    * *4x4 Matrix* = ![matrix symbol](matrixsym.png)
+    * *3D vector* = ![3D vector symbol](vec3.png)
+    * *Matrix multiplication* = ![matrix multiplication symbol](mult.png)
+
+--
+headline: Model
+
+*The "Model" block* represents a 3D object, a *cube* by default.
+
+![model block](model.png)
+
+Models have a single *input* (a wire slot), shown by the green X symbol ![matrix multiplication symbol](mult.png).
+
+The symbol represents *matrix multiplication*, which means that all *verticies of the model* get multiplied by the *transformation matrix* connected on input.
+
+--
+
+headline: Sequence
+
+The *Sequence block* acts as a case for one or more *matrices*.
+
+![Sequence](seq.png)
+
+The sequence block contains multiple *inputs* and *outputs*, the most important for this exercise being the first *output* ![Maticové násobení](mult.png).
+
+As we can see, the input for the model and the output of the sequence are the same, so we can *connect* them by *dragging* a wire from the output/input.
+
+task: Connect the *sequence* and the *model*!
+
+--
+
+headline: Scaling matrix
+
+The matrix blocks are used to *transform the model* (translating, rotating or scaling).
+
+They are represented by a 4x4 matrix:
+
+![scaling matrix](scale.png)
+
+Matrices don't have any *inputs* or *outputs*. Instead, they need to be *inserted into a sequence block*.
+
+We can insert the matrix into a sequence by *dragging it into the sequence* by its top bar.
+
+task: Insert the *scale matrix* into the *sequence*!
+
+--
+headline: Changing values
+
+task: Try changing the matrix values by *dragging the left mouse button* (horizontally).
+
+![Clicking and dragging the matrix value to the right increases the value and scales the model](hintPosun.png)
+
+The values can also be changed by *double-clicking* and rewriting the value.
+
+Scaling is *uniform*, which means the green values *change together*. The individual green values represent the scaling along the *X*, *Y* and *Z* axes.
+
+--
+headline: Yippeeee!
+Now that you know the basics, you are ready to start working with *transformations*!
+
+![Done!](checkbox.png)
+
+What we learned:
+  * working with the *workspace* and *scene view*
+  * *mouse controls* ![left mouse button](mouseLeft.png) ![middle mouse button](mouseMiddle.png) ![right mouse button](mouseRight.png)
+  * basics of working with *nodes/blocks*
+
+You can return to the menu by clicking the *Finish* button. ![Down!](down.png)
+

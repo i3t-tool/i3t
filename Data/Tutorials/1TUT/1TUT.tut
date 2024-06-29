@@ -112,7 +112,7 @@ Ikona vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdo
 Například:
     * *Matice* = ![Symbol pro matici](matrixsym.png)
     * *Trojrozměrný vektor* = ![3D vektor](vec3.png)
-    * *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
+    * *Maticové násobení* = ![Symbol pro maticové násobení](mult.png)
 
 --
 headline: Model
