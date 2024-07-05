@@ -81,6 +81,8 @@ public:
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
 
+	void clear() override;
+
 	void popupContent() override;
 
 	bool beforeBegin() override;
@@ -113,7 +115,7 @@ public:
 
 	/**
 	 * \brief All WorkspaceNodes
-	 * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
+	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
 	 **/
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
 
