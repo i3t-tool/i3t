@@ -127,7 +127,7 @@ struct SettingsDiwne
 /* ===== D i w n e ===== */
 /* ===================== */
 
-/*! \brief Object of node editor
+/*! \brief The node editor object
  *  In ancestor of this object you will probably store your nodes (links, pins)
  *  It store inter-object interactions
  *  Every DiwneObject has reference to this object
@@ -138,11 +138,15 @@ public:
 #ifdef DIWNE_DEBUG
 	bool m_diwneDebug_on = false;
 #endif // DIWNE_DEBUG
-	/*! Default constructor */
+	/** Default constructor */
 	Diwne(DIWNE::SettingsDiwne* settingsDiwne);
 
 	/** Default destructor */
-	virtual ~Diwne() = default;
+	virtual ~Diwne();
+
+	/** Clear all nodes from the node editor */
+	virtual void clear();
+
 	DIWNE::DiwneAction getHoldActionType() const final
 	{
 		return DiwneAction::HoldWorkarea;
@@ -158,27 +162,27 @@ public:
 
 	bool m_takeSnap;
 
-	virtual bool initializeDiwne();
-	virtual bool allowDrawing();
-	virtual bool beforeBeginDiwne();
-	virtual void begin();
-	virtual bool afterContentDiwne();
-	virtual void end();
-	virtual bool afterEndDiwne();
-	virtual bool processInteractionsDiwne();
-	virtual bool finalizeDiwne();
+	virtual bool initializeDiwne() override;
+	virtual bool allowDrawing() override;
+	virtual bool beforeBeginDiwne() override;
+	virtual void begin() override;
+	virtual bool afterContentDiwne() override;
+	virtual void end() override;
+	virtual bool afterEndDiwne() override;
+	virtual bool processInteractionsDiwne() override;
+	virtual bool finalizeDiwne() override;
 
 	bool blockRaisePopup(); /*!< sometimes we do not want to raise popup - here specify
 	                           it ( now it is when selecting action run ) */
 
-	virtual ImRect getRectDiwne() const
+	virtual ImRect getRectDiwne() const override
 	{
 		return getWorkAreaDiwne();
 	};
 
-	virtual bool processDrag();
+	virtual bool processDrag() override;
 
-	virtual bool processInteractions();
+	virtual bool processInteractions() override;
 
 	void updateWorkAreaRectangles(); /*! \brief Update position and size of work
 	                                    area on screen and on diwne */

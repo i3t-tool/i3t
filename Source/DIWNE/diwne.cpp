@@ -31,6 +31,17 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
 	setSelectable(false);
 }
 
+Diwne::~Diwne()
+{
+	clear();
+}
+
+void Diwne::clear()
+{
+	diwne.setLastActiveNode<DIWNE::Node>(nullptr);
+	diwne.setLastActivePin<DIWNE::Pin>(nullptr);
+}
+
 DiwneAction Diwne::getDiwneActionActive() const
 {
 	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;

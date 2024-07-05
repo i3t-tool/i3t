@@ -49,6 +49,12 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
 
 WorkspaceDiwne::~WorkspaceDiwne()
 {
+	clear();
+}
+
+void WorkspaceDiwne::clear()
+{
+	Diwne::clear();
 	m_workspaceCoreNodes.clear();
 }
 
@@ -993,7 +999,7 @@ void WorkspaceDiwne::popupContent()
 
 		if (ImGui::MenuItem("All nodes"))
 		{
-			m_workspaceCoreNodes.clear();
+			clear();
 		}
 
 		if (ImGui::MenuItem("All links"))
@@ -1872,7 +1878,7 @@ void WorkspaceWindow::clearScene()
 	{
 		node->deleteActionDiwne();
 	}
-	getNodeEditor().m_workspaceCoreNodes.clear();
+	getNodeEditor().clear();
 }
 
 Memento WorkspaceWindow::saveGlobal()

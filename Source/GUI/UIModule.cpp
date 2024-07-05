@@ -107,8 +107,7 @@ void UIModule::onClose()
 {
 	/// \todo MH - This may not be sufficient.
 	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
-	workspace->getNodeEditor().m_workspaceCoreNodes.clear();
-
+	workspace->getNodeEditor().clear(); // We need to clear nodes here rather than later with destructors
 	m_windowManager.clear();
 }
 
