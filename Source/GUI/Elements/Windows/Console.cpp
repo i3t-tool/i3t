@@ -26,7 +26,7 @@ static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 	return console->textEditCallback(data);
 }
 
-Console::Console(bool show) : IWindow(show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
+Console::Console(bool show) : IWindow("Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
 {
 	m_oss << "I3T console\n";
 }
@@ -36,8 +36,15 @@ void Console::render()
 	const auto& style = ImGui::GetStyle();
 	m_InputHeight = ImGui::GetFontSize() + 2 * style.FramePadding.y + style.ItemSpacing.y;
 
-	drawOutput();
-	drawInput();
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::Begin(getName(), getShowPtr());
+	{
+		this->updateWindowInfo();
+		drawOutput();
+		drawInput();
+	}
+	ImGui::PopStyleColor();
+	ImGui::End();
 }
 
 int Console::textEditCallback(ImGuiInputTextCallbackData* data)

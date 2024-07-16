@@ -29,9 +29,11 @@ namespace UI
 {
 constexpr float DRAG_FLOAT_WIDTH = 100.0f;
 
+StyleEditor::StyleEditor() : IWindow("Style Editor") {}
+
 void StyleEditor::render()
 {
-	ImGui::Begin(getID(), getShowPtr(), g_dialogFlags);
+	ImGui::Begin(getName(), getShowPtr(), g_dialogFlags);
 
 	this->updateWindowInfo();
 

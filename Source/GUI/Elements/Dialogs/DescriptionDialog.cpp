@@ -17,14 +17,17 @@
 
 #include "Commands/ApplicationCommands.h"
 
-DescriptionDialog::DescriptionDialog()
+DescriptionDialog::DescriptionDialog() : IWindow("Description")
 {
 	m_isEditState = false;
 }
 
 void DescriptionDialog::render()
 {
-	ImGui::Begin(setName("Description").c_str());
+	bool windowOpen = true;
+
+	ImGui::Begin(getName(), getShowPtr());
+	this->updateWindowInfo();
 
 	if (m_isEditState)
 	{
@@ -62,5 +65,9 @@ void DescriptionDialog::render()
 		}
 	}
 
+	if (!isVisible())
+	{
+		HideWindowCommand::dispatch(ID);
+	}
 	ImGui::End();
 }

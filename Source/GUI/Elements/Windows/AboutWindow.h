@@ -22,6 +22,9 @@ class AboutWindow : public IWindow
 {
 public:
 	I3T_WINDOW(AboutWindow)
+
+	AboutWindow();
+
 	std::shared_ptr<TextureRegion> dcgiReg;
 
 	void render() override;

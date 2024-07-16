@@ -15,6 +15,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include <imgui_internal.h>
+#include <unordered_set>
 
 #include "Core/Application.h"
 #include "Core/Window.h"
@@ -36,7 +37,8 @@ ImGuiConfigFlags g_mousedFlags;
 
 InputController InputManager::s_globalInputController;
 std::vector<InputController*> InputManager::m_inputControllers;
-InputController* InputManager::s_activeInput = nullptr;
+
+WPtr<InputController> InputManager::s_activeInput;
 
 std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
@@ -67,8 +69,8 @@ void InputManager::triggerAction(const char* action, EKeyState state)
 {
 	s_globalInputController.triggerAction(action, state);
 
-	if (s_activeInput)
-		s_activeInput->triggerAction(action, state);
+	if (!s_activeInput.expired())
+		s_activeInput.lock()->triggerAction(action, state);
 }
 
 void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
@@ -137,16 +139,17 @@ bool InputManager::areModifiersActive(Modifiers mods)
 	return active;
 }
 
-void InputManager::setActiveInput(InputController* input)
+void InputManager::setActiveInput(const WPtr<InputController>& input)
 {
-	I3T_ASSERT(input != nullptr, "Input parameter is null");
 	s_activeInput = input;
 }
 
-bool InputManager::isInputActive(InputController* input)
+bool InputManager::isInputActive(const WPtr<InputController>& input)
 {
-	I3T_ASSERT(input != nullptr, "Input parameter is null");
-	return s_activeInput == input;
+	//	I3T_ASSERT(input != nullptr, "Input parameter is null");
+	if (s_activeInput.expired() || input.expired())
+		return false;
+	return s_activeInput.lock() == input.lock();
 }
 
 bool InputManager::isActionTriggered(const char* name, EKeyState state)
@@ -337,8 +340,8 @@ void InputManager::endFrame()
 
 	// Process events (Note: Dispatches callbacks)
 	processEvents(s_globalInputController);
-	if (s_activeInput)
-		processEvents(*s_activeInput);
+	if (!s_activeInput.expired())
+		processEvents(*s_activeInput.lock());
 
 	// Process keys
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)

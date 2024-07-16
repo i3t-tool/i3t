@@ -22,6 +22,8 @@
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
+SetupDialog::SetupDialog() : IWindow("Preferences") {}
+
 void SetupDialog::render()
 {
 	static int cameraMode;
@@ -31,8 +33,9 @@ void SetupDialog::render()
 	// style.FramePadding.y = 4;
 	bool windowOpen = true;
 	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(setName("Preferences").c_str(), &windowOpen);
+	ImGui::Begin(getName(), getShowPtr());
 	{
+		this->updateWindowInfo();
 		Vp::Viewport* viewport = I3T::getViewport();
 		Vp::ViewportSettings& stg = viewport->getSettings();
 
@@ -114,7 +117,7 @@ void SetupDialog::render()
 		//		}
 	}
 	ImGui::PopStyleColor();
-	if (!windowOpen)
+	if (!isVisible())
 	{
 		HideWindowCommand::dispatch(ID);
 	}

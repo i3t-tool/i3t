@@ -21,19 +21,19 @@
 #include "GUI/Theme.h"
 #include "Logger/Logger.h"
 
-LogWindow::LogWindow()
+LogWindow::LogWindow() : IWindow("Log View")
 {
 #ifdef I3T_DEBUG
-	Input.bindAction("MyTestAction", EKeyState::Pressed, [] {
+	m_input->bindAction("MyTestAction", EKeyState::Pressed, [] {
 		LOG_INFO("MyTestAction triggered!");
 	});
 
-	Input.bindAxis("MyTestAxis", [](float val) {
+	m_input->bindAxis("MyTestAxis", [](float val) {
 		LOG_INFO("MyTestAxis triggered: {}!", val);
 	});
 
 	////
-	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
+	m_input->bindAction("createAndPlugConstructor", EKeyState::Released, [] {
 		const auto isActionTriggered = InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
 		LOG_INFO("InputManager::isActionTriggered("
 		         "\"createAndPlugConstructor\") = {}",
@@ -41,19 +41,19 @@ LogWindow::LogWindow()
 	});
 	////
 
-	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
+	m_input->bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
 		LOG_INFO("bind: (mouse click + left ctrl) pressed");
 	});
 
-	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
+	m_input->bindAction("scrollUp", EKeyState::Pressed, []() {
 		LOG_INFO("scrollUp");
 	});
 
-	Input.bindAction("scrollDown", EKeyState::Pressed, []() {
+	m_input->bindAction("scrollDown", EKeyState::Pressed, []() {
 		LOG_INFO("scrollDown");
 	});
 
-	Input.bindAxis("scroll", [](float val) {
+	m_input->bindAxis("scroll", [](float val) {
 		LOG_INFO("scroll: {}", val);
 	});
 #endif
@@ -62,9 +62,8 @@ LogWindow::LogWindow()
 void LogWindow::render()
 {
 	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(setName("Log View").c_str(), getShowPtr());
+	ImGui::Begin(getName(), getShowPtr());
 	ImGui::PopStyleColor();
-
 	this->updateWindowInfo();
 
 	ImGui::Text("Log output");

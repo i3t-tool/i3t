@@ -27,6 +27,7 @@ public:
 	I3T_WINDOW(DescriptionDialog)
 
 	DescriptionDialog();
+
 	virtual void render() override;
 
 private:

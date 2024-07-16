@@ -28,6 +28,7 @@ class TutorialWindow : public IWindow, private ITutorialRenderer
 {
 public:
 	I3T_WINDOW(TutorialWindow)
+
 	TutorialWindow(bool show);
 
 	bool hasTutorial() const;

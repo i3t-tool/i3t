@@ -21,5 +21,7 @@ class SetupDialog : public IWindow
 public:
 	I3T_WINDOW(SetupDialog)
 
+	SetupDialog();
+
 	virtual void render() override;
 };

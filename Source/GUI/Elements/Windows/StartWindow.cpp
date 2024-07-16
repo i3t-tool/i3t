@@ -29,7 +29,7 @@
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
 
-StartWindow::StartWindow(bool show) : IWindow(show)
+StartWindow::StartWindow(bool show) : IWindow("Welcome", show)
 {
 	// load images
 	try
@@ -497,7 +497,7 @@ void StartWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::StartWindow_DefaultButton));
 
 
-	ImGui::Begin(setName("").c_str(), getShowPtr(),
+	ImGui::Begin(getName(), getShowPtr(),
 	             ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse |
 	                 ImGuiWindowFlags_NoSavedSettings); // | ImGuiWindowFlags_NoMove
 	{

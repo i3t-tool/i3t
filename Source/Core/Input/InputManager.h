@@ -124,13 +124,13 @@ public:
 	/**
 	 * Set active input controller (for focused window).
 	 */
-	static void setActiveInput(InputController* input);
+	static void setActiveInput(const WPtr<InputController>& input);
 
 	/**
 	 * Check if the specified input controller is active.
 	 * Window input controller will be active when the window is focused.
 	 */
-	static bool isInputActive(InputController* input);
+	static bool isInputActive(const WPtr<InputController>& input);
 
 public:
 	/**
@@ -195,5 +195,5 @@ private:
 
 private:
 	static InputController s_globalInputController;
-	static InputController* s_activeInput;
+	static WPtr<InputController> s_activeInput;
 };
