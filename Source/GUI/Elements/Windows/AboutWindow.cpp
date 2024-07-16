@@ -23,6 +23,8 @@
 
 static const char* I3T_WEBSITE = "https://i3t-tool.org/";
 
+AboutWindow::AboutWindow() : IWindow("About") {}
+
 void AboutWindow::render()
 {
 	// Set initial window size
@@ -36,8 +38,7 @@ void AboutWindow::render()
 	}
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, I3T::getUI()->getTheme().get(EColor::AboutWindow_BackgroundLeft));
-
-	ImGui::Begin(setName("").c_str(), getShowPtr(),
+	ImGui::Begin(getName(), getShowPtr(),
 	             ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
 	                 ImGuiWindowFlags_AlwaysUseWindowPadding);
 	{

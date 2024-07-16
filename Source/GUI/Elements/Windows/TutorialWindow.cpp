@@ -71,7 +71,7 @@ const int MIN_WIN_HEIGHT = 600;
 //---
 
 // INIT
-TutorialWindow::TutorialWindow(bool show) : IWindow(show)
+TutorialWindow::TutorialWindow(bool show) : IWindow("Tutorial", show)
 {
 	emptyTutorial();
 	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
@@ -216,23 +216,22 @@ void TutorialWindow::render()
 	                      I3T::getUI()->getTheme().get(EColor::TutorialScrollbarHovered));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, I3T::getUI()->getTheme().get(EColor::TutorialScrollbarActive));
 	//  BEGIN WINDOW
-	std::string window_name;
 	if (m_tutorial != nullptr)
 	{
 		// window_name = "Tutorial - " + m_tutorial->m_header->m_title +
 		// "###Tutorial window";
-		window_name = setName("Tutorial");
+		setTitle(std::string("Tutorial - ") + m_tutorial->m_header->m_title);
 	}
 	else
 	{
 		// window_name = "Tutorial - empty###Tutorial window";
-		window_name = setName("Tutorial");
+		setTitle("Tutorial");
 	}
 
 	// START THE WINDOW
 
 	ImGui::SetNextWindowSize(ImVec2(500, 650), ImGuiCond_FirstUseEver);
-	ImGui::Begin(window_name.c_str(), getShowPtr());
+	ImGui::Begin(getName(), getShowPtr());
 
 	this->updateWindowInfo();
 

@@ -28,6 +28,7 @@ public:
 	I3T_WINDOW(ImportedModelsDialog)
 
 	ImportedModelsDialog();
+
 	void render() override;
 
 	static void importModel(bool normalize);

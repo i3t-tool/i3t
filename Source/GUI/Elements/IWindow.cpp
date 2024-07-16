@@ -19,21 +19,32 @@
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 
-const char* IWindow::getName() const
+const char* IWindow::getName()
 {
-	return imGuiName.c_str();
+	if (m_nameNeedsUpdate)
+	{
+		m_name = std::string(fmt::format("{}###{}", m_title.c_str(), getID()));
+	}
+	m_nameNeedsUpdate = false;
+	return m_name.c_str();
 };
 
-const std::string& IWindow::setName(const char* name)
+const void IWindow::setTitle(std::string title)
 {
-	imGuiName = fmt::format("{}###{}", name, getID());
+	m_title = title;
+	m_nameNeedsUpdate = true;
+}
 
-	return imGuiName;
+const std::string& IWindow::getTitle() const
+{
+	return m_title;
 }
 
 void IWindow::updateWindowInfo()
 {
 	ImGuiIO io = ImGui::GetIO();
+
+	m_windowInfoUpdated = true;
 
 	// This returns slightly different results than GetWindowContentRegionMin, better to rely on ImGui to calculate this
 	// rather than trying to guess menu bars etc with GetFrameHeight()
@@ -61,17 +72,20 @@ void IWindow::updateWindowInfo()
 	}
 	else
 	{
-		LOG_WARN("IWindow '{}' does not have a window manager assigned! (in updateWindowInfo())", imGuiName);
+		LOG_WARN("IWindow '{}' does not have a window manager assigned! (in updateWindowInfo())", getName());
 	}
 
 	if (I3T::app().m_debugWindowManager)
 	{
 		ImGui::GetForegroundDrawList()->AddRectFilled(GUI::glmToIm(m_windowMin), GUI::glmToIm(m_windowMax),
-		                                              ImColor(0.f, 0.f, 0.f, 0.35f));
+		                                              ImColor(0.f, 0.f, 0.f, 0.1f));
+		if (this->m_windowManager->m_focusedWindow.get() == this)
+		{
+			ImGui::GetForegroundDrawList()->AddRect(GUI::glmToIm(m_windowMin), GUI::glmToIm(m_windowMax),
+			                                        ImColor(232, 197, 21, 255), 0.0f, 0, 3.0f);
+		}
 		ImGui::GetForegroundDrawList()->AddRect(GUI::glmToIm(m_windowMin), GUI::glmToIm(m_windowMax),
 		                                        ImColor(1.f, 0.f, 0.f, 1.f));
-		// ImGui::GetForegroundDrawList()->AddRect(windowMin, ImVec2(windowMin.x + windowWidth, windowMin.y +
-		// windowHeight), ImColor(0.f, 1.f, 0.f, 0.7f));
 
 		glm::vec2 padding = glm::vec2(4.0f);
 		ImColor color = ImColor(0.27f, 0.96f, 0.09f, 1.f);
@@ -86,6 +100,7 @@ void IWindow::updateWindowInfo()
 		auto mousePos = fmt::format("Rel mousePos: {}, {}", pos.x, pos.y);
 
 		auto windowManager = fmt::format("WindowManager: {}", fmt::ptr(m_windowManager));
+		auto autoFocus = fmt::format("Auto focus: {}", m_autoFocus);
 
 		ImGui::GetForegroundDrawList()->AddText(GUI::glmToIm(m_windowMin + padding + glm::vec2(0, size.y * 0)), color,
 		                                        windowPos.c_str());
@@ -99,15 +114,18 @@ void IWindow::updateWindowInfo()
 		                                        mousePos.c_str());
 		ImGui::GetForegroundDrawList()->AddText(GUI::glmToIm(m_windowMin + padding + glm::vec2(0, size.y * 5)), color,
 		                                        windowManager.c_str());
+		ImGui::GetForegroundDrawList()->AddText(GUI::glmToIm(m_windowMin + padding + glm::vec2(0, size.y * 6)), color,
+		                                        autoFocus.c_str());
 	}
+}
+IWindow::IWindow(std::string title, bool show) : m_show(show)
+{
+	setTitle(title.c_str());
 };
 
 //
 
-ModalWindow::ModalWindow(const std::string& title)
-{
-	setName(title.c_str());
-}
+ModalWindow::ModalWindow(const std::string& title) : IWindow(title) {}
 
 void ModalWindow::render()
 {

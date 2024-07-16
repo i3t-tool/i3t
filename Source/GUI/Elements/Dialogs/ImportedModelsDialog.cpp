@@ -28,7 +28,7 @@
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
-ImportedModelsDialog::ImportedModelsDialog() {}
+ImportedModelsDialog::ImportedModelsDialog() : IWindow("Manage Models") {}
 
 void ImportedModelsDialog::render()
 {
@@ -40,8 +40,9 @@ void ImportedModelsDialog::render()
 	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 30, ImGui::GetFontSize() * 24);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-	ImGui::Begin(setName("Manage Models").c_str(), &m_show, g_dialogFlags);
+	ImGui::Begin(getName(), getShowPtr(), g_dialogFlags);
 	{
+		this->updateWindowInfo();
 		std::vector<std::string> resourceAliases = RMI.getImportedResourceAliases();
 
 		// Update the selected model
@@ -153,7 +154,7 @@ void ImportedModelsDialog::render()
 	if (modelIndexChanged)
 		m_selectedModelIndex = newModelIndex;
 
-	if (!m_show)
+	if (!isVisible())
 	{
 		HideWindowCommand::dispatch(ID);
 	}

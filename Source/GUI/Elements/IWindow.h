@@ -18,6 +18,7 @@
 #include "spdlog/fmt/fmt.h"
 
 #include "Core/Input/InputController.h"
+#include <Core/Types.h>
 
 #define I3T_WINDOW(WindowType)                                                                                         \
 public:                                                                                                                \
@@ -37,10 +38,30 @@ class WindowManager;
  */
 class IWindow : public std::enable_shared_from_this<IWindow>
 {
+public:
 	friend class WindowManager;
 
+	std::string m_title; ///< Visible window title
+
+	WindowManager* m_windowManager{nullptr}; ///< Weak reference to a WindowManager set when this window is added to it
+
+	// Window info (updated by updateWindowInfo())
+	bool m_autoFocus{false};         ///< When true the window will get focus immediately upon hovering over it
+	bool m_windowInfoUpdated{false}; ///< A flag indicating the updateWindowInfo() method was called
+	glm::vec2 m_windowPos;           ///< Top-left corner of the window in screen coordinates
+	glm::ivec2 m_windowSize;         ///< Window width and height dimensions
+
+	glm::vec2 m_windowMin; ///< Top left corner of the window, same as m_windowPos (separate variable for clarity)
+	glm::vec2 m_windowMax; ///< Bottom right corner of the window
+
+protected:
+	bool m_show{false};
+	std::string m_name;           ///< Full ImGui window identifier
+	bool m_nameNeedsUpdate{true}; ///< Workaround to avoid setting the name in the constructor (cannot call getID there)
+	Ptr<InputController> m_input{std::make_shared<InputController>()};
+
 public:
-	explicit IWindow(bool show = false) : m_show(show) {}
+	explicit IWindow(std::string title, bool show = false);
 
 	/**
 	 * \pre Window cannot be destroyed at runtime. It may cause crash.
@@ -69,23 +90,17 @@ public:
 		return &m_show;
 	}
 
-	/**
-	 * @return ImGui window name.
-	 */
-	const char* getName() const;
-	const std::string& setName(const char* name);
+	const char* getName(); ///< @return ImGui window name.
+
+	const void setTitle(std::string title);
+	const std::string& getTitle() const;
 
 	/**
 	 * Returns window input controller.
 	 */
-	InputController& getInput()
+	WPtr<InputController> getInput()
 	{
-		return Input;
-	}
-
-	InputController* getInputPtr()
-	{
-		return &Input;
+		return m_input;
 	}
 
 protected:
@@ -96,21 +111,6 @@ protected:
 	 * position and dimensions may receive invalid information.
 	 */
 	void updateWindowInfo();
-
-public:
-	// Window info (updated by updateWindowInfo())
-	glm::vec2 m_windowPos;   ///< Top-left corner of the window in screen coordinates
-	glm::ivec2 m_windowSize; ///< Window width and height dimensions
-
-	glm::vec2 m_windowMin; ///< Top left corner of the window, same as m_windowPos (separate variable for clarity)
-	glm::vec2 m_windowMax; ///< Bottom right corner of the window
-
-protected:
-	bool m_show;
-	std::string imGuiName;
-	InputController Input;
-
-	WindowManager* m_windowManager = nullptr; ///< Weak reference to a WindowManager set when this window is added to it
 };
 
 

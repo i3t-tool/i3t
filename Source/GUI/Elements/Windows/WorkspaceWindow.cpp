@@ -1651,69 +1651,70 @@ void WorkspaceDiwne::setWorkAreaZoom(float val)
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */
 /* ========================================== */
-WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(App::get())
+WorkspaceWindow::WorkspaceWindow(bool show) : IWindow("Workspace", show), m_wholeApplication(App::get())
 {
+	m_autoFocus = true;
 	initDiwneFromTheme();
 	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
 	// Input actions for workspace window.
-	Input.bindAction("selectAll", EKeyState::Pressed, [&]() {
+	m_input->bindAction("selectAll", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->selectAll();
 	});
-	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() {
+	m_input->bindAction("invertSelection", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->invertSelection();
 	});
-	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() {
+	m_input->bindAction("zoomToAll", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->zoomToAll();
 	});
-	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() {
+	m_input->bindAction("zoomToSelected", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->zoomToSelected();
 	});
-	Input.bindAction("delete", EKeyState::Pressed, [&]() {
+	m_input->bindAction("delete", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->deleteCallback();
 	});
-	Input.bindAction("copy", EKeyState::Pressed, [&]() {
+	m_input->bindAction("copy", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->copySelectedNodes();
 	});
-	Input.bindAction("paste", EKeyState::Pressed, [&]() {
+	m_input->bindAction("paste", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->pasteSelectedNodes();
 	});
-	Input.bindAction("cut", EKeyState::Pressed, [&]() {
+	m_input->bindAction("cut", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->cutSelectedNodes();
 	});
-	Input.bindAction("duplicate", EKeyState::Pressed, [&]() {
+	m_input->bindAction("duplicate", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->duplicateClickedNode();
 	});
-	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
+	m_input->bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->duplicateSelectedNodes();
 	});
-	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSwitchOff();
 	});
-	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSmoothLeft();
 	});
-	Input.bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSmoothRight();
 	});
-	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingJaggedLeft();
 	});
-	Input.bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingJaggedRight();
 	});
-	Input.bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingModeSwitch();
 	});
-	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingSwitch", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSwitch();
 	});
-	Input.bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSwitchOn();
 	});
-	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() {
+	m_input->bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSwitchOff();
 	});
-	Input.bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() {
+	m_input->bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->toggleSelectedNodesVisibility();
 	});
 
@@ -1761,7 +1762,7 @@ void WorkspaceWindow::render()
 {
 	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
-	if (ImGui::Begin(setName("Workspace").c_str(), getShowPtr(),
+	if (ImGui::Begin(getName(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
 	                     ImGuiWindowFlags_NoScrollWithMouse))
 	{

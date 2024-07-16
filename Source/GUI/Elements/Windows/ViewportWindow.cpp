@@ -28,14 +28,15 @@ using namespace UI;
 
 using CameraMode = Vp::AggregateCamera::CameraMode;
 
-ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show)
+ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow("Scene View", show)
 {
+	m_autoFocus = true;
 	m_viewport = viewport;
 	// TODO: (DR) Not sure if binding callbacks to an axis really makes sense
 	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport
 	//  window and its difficult to unbind stuff
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
-	// Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
+	// m_input->bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
 	m_renderOptions.wboit = true;
 	m_renderOptions.wboitFunc = 0;
@@ -46,56 +47,56 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 
 	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
-	Input.bindAction("viewpoint-right", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-right", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 		}
 	});
 	InputManager::setInputAction("viewpoint-left", Keys::n3, {Keys::ctrll});
-	Input.bindAction("viewpoint-left", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-left", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 		}
 	});
 	InputManager::setInputAction("viewpoint-top", Keys::n7);
-	Input.bindAction("viewpoint-top", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-top", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 		}
 	});
 	InputManager::setInputAction("viewpoint-bottom", Keys::n7, {Keys::ctrll});
-	Input.bindAction("viewpoint-bottom", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-bottom", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 		}
 	});
 	InputManager::setInputAction("viewpoint-front", Keys::n1);
-	Input.bindAction("viewpoint-front", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-front", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 		}
 	});
 	InputManager::setInputAction("viewpoint-back", Keys::n1, {Keys::ctrll});
-	Input.bindAction("viewpoint-back", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-back", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 		}
 	});
 	InputManager::setInputAction("viewpoint-center-scene", Keys::home);
-	Input.bindAction("viewpoint-center-scene", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-center-scene", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->centerOnScene(*m_viewport->getMainScene().lock().get());
 		}
 	});
 	InputManager::setInputAction("viewpoint-center-selection", Keys::n0);
-	Input.bindAction("viewpoint-center-selection", EKeyState::Pressed, [&]() {
+	m_input->bindAction("viewpoint-center-selection", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
 			camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
@@ -108,9 +109,9 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	//	InputManager::setInputAxis("move", 1.0f, Keys::o);
 	//	InputManager::setInputAxis("move", -1.0f, Keys::p);
 	//
-	//	Input.bindAction("fire", EKeyState::Pressed, []() { LOG_INFO("Action fired."); });
-	//	Input.bindAction("fire", EKeyState::Released, []() { LOG_INFO("Action released."); });
-	//	Input.bindAxis("move", [](float val) { LOG_INFO("move: {}", val); });
+	//	m_input->bindAction("fire", EKeyState::Pressed, []() { LOG_INFO("Action fired."); });
+	//	m_input->bindAction("fire", EKeyState::Released, []() { LOG_INFO("Action released."); });
+	//	m_input->bindAxis("move", [](float val) { LOG_INFO("move: {}", val); });
 	/// todoend
 }
 
@@ -128,8 +129,7 @@ void ViewportWindow::render()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	auto name = setName("Scene View");
-	ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
+	ImGui::Begin(getName(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar();
 
@@ -161,7 +161,7 @@ void ViewportWindow::render()
 
 	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
 	//  the InputManager's active input rather than asking the WindowManager
-	if (InputManager::isInputActive(getInputPtr()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
+	if (InputManager::isInputActive(getInput()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
 		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);

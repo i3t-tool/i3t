@@ -39,7 +39,7 @@ void UIModule::onInit()
 {
 	// Switch active InputController when window focus changes
 	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
-		InputManager::setActiveInput(&(window->getInput()));
+		InputManager::setActiveInput(window ? window->getInput() : WPtr<InputController>());
 	});
 
 	Theme::initNames();

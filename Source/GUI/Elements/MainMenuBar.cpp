@@ -30,6 +30,7 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "Logger/Logger.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
 
@@ -330,9 +331,36 @@ void MainMenuBar::showHelpMenu()
 
 #ifdef I3T_DEBUG
 		ImGui::Separator();
+		if (ImGui::BeginMenu("Debug"))
+		{
+			if (ImGui::BeginMenu("Log level"))
+			{
+				Logger& logger = Logger::getInstance();
+				spdlog::level::level_enum logLevel = logger.getAppLogger()->level();
+				spdlog::level::level_enum* newLogLevel = nullptr;
 
-		ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
-		ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+				if (ImGui::MenuItem("Trace", nullptr, logLevel == spdlog::level::trace))
+					logger.getAppLogger()->set_level(spdlog::level::trace);
+				if (ImGui::MenuItem("Debug", nullptr, logLevel == spdlog::level::debug))
+					logger.getAppLogger()->set_level(spdlog::level::debug);
+				if (ImGui::MenuItem("Info", nullptr, logLevel == spdlog::level::info))
+					logger.getAppLogger()->set_level(spdlog::level::info);
+				if (ImGui::MenuItem("Warn", nullptr, logLevel == spdlog::level::warn))
+					logger.getAppLogger()->set_level(spdlog::level::warn);
+				if (ImGui::MenuItem("Error", nullptr, logLevel == spdlog::level::err))
+					logger.getAppLogger()->set_level(spdlog::level::err);
+				if (ImGui::MenuItem("Critical", nullptr, logLevel == spdlog::level::critical))
+					logger.getAppLogger()->set_level(spdlog::level::critical);
+				if (ImGui::MenuItem("Off", nullptr, logLevel == spdlog::level::off))
+					logger.getAppLogger()->set_level(spdlog::level::off);
+
+				ImGui::EndMenu();
+			}
+			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
+			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+			ImGui::EndMenu();
+		}
+
 #endif
 
 		ImGui::EndMenu();

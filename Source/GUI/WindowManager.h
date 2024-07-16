@@ -29,6 +29,8 @@ static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlag
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
     static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 
+class ImGuiWindow;
+
 /**
  * Application window manager.
  * Handles window lifetime, visibility, focus and drawing. As well as some utility methods.
@@ -61,14 +63,14 @@ public:
 	WindowManager() = default;
 
 	/**
-	 * Handles automatic window focus change.
-	 */
-	void updateFocus();
-
-	/**
 	 * Draw all managed windows
 	 */
 	void draw();
+
+	/**
+	 * Handles automatic window focus change.
+	 */
+	void updateFocus();
 
 	/**
 	 * Returns the last window that started being constructed (eg. the last window that called
@@ -112,7 +114,9 @@ public:
 
 		if (!hasWindow(T::ID))
 		{
-			m_windows.insert(std::pair(std::string(T::ID), std::make_unique<T>()));
+			UPtr<T> window = std::make_unique<T>();
+			window->m_windowManager = this;
+			m_windows.insert(std::pair(std::string(T::ID), std::move(window)));
 			m_windows[T::ID]->show();
 		}
 	}
@@ -129,8 +133,7 @@ public:
 
 	void showWindow(IWindow* window, bool show);
 	void showWindow(Ptr<IWindow> window, bool show);
-	void focusWindow(IWindow* window);
-	void focusWindow(Ptr<IWindow> window);
+	void focusWindow(Ptr<IWindow> window, bool updateImGuiFocus = true);
 
 	template <typename T> bool isFocused()
 	{
@@ -164,12 +167,16 @@ public:
 
 private:
 	void updateWindowFocus();
+	bool windowDebugTable(const char* label);
+	void windowDebugTableEntry(IWindow& window, unsigned idx);
+	const char* windowDebugName(ImGuiWindow* window);
 
 	/**
 	 * Not thread safe (using strtok).
 	 */
 	std::string makeIDNice(const char* ID);
 
+	Ptr<IWindow> findImGuiWindow(ImGuiWindow* window);
 	Ptr<IWindow> findAnyWindow(std::string ID);
 
 	inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& windows)
