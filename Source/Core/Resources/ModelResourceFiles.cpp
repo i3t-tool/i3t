@@ -33,6 +33,8 @@ bool Core::ModelResourceFiles::fetchFiles()
 	// Remove the model loaded initially
 	LOG_INFO("[IMPORT] Removing original temporarily loaded model");
 	RMI.removeResource(importedMesh);
+
+	return true;
 }
 
 bool Core::ModelResourceFiles::fetchFiles(void* data)

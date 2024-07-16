@@ -469,13 +469,14 @@ bool parse(const fs::path& inputPath, rapidjson::Document& doc)
 
 	rapidjson::IStreamWrapper inputStreamWrapper(file);
 
-	const auto hasError = doc.ParseStream(inputStreamWrapper).HasParseError();
+	bool hasError = doc.ParseStream(inputStreamWrapper).HasParseError();
 	if (hasError)
 	{
 		LOG_ERROR("Cannot parse json file '{}'!", inputPath.string());
+		LOG_ERROR("Parse error: {} (Offset {})", rapidjson::GetParseError_En(doc.GetParseError()),
+		          doc.GetErrorOffset());
 		return false;
 	}
-
 	return true;
 }
 
@@ -486,7 +487,13 @@ bool parse(const fs::path& inputPath, rapidjson::Document& doc, const fs::path& 
 	                                          schemaSrc.string(), strerror(errno), fs::current_path().string()));
 
 	rapidjson::IStreamWrapper schemaInputStreamWrapper(schemaFile);
-	auto hasError = doc.ParseStream(schemaInputStreamWrapper).HasParseError();
+	doc.ParseStream(schemaInputStreamWrapper);
+	bool hasError = doc.HasParseError();
+	if (hasError)
+	{
+		LOG_WARN("Cannot parse schema file!");
+		LOG_WARN("Parse error: {} (Offset {})", rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
+	}
 	I3T_ASSERT(!hasError, "Cannot parse schema file!");
 
 	rapidjson::SchemaDocument schema(doc);

@@ -4,7 +4,7 @@
   "title": "Config",
   "type": "object",
   "properties": {
-    "resources": {
+    "defaultResources": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/resource"
@@ -24,6 +24,9 @@
         },
         "type": {
           "type": "string"
+        },
+		"normalized": {
+          "type": "boolean"
         }
       }
     }

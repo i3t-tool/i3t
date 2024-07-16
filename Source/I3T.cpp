@@ -47,12 +47,12 @@ void I3TApplication::onInit()
 
 	auto* stateManager = createModule<StateManager>();
 
-	// Former initI3T member function
-	const auto conf = loadConfig("Config.json");
+	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();
+	JSON::parse(Configuration::configFile, *configDoc, "Data/Schemas/Config.schema.json");
 
 	ResourceManager* resourceManager = createModule<Core::ResourceManager>();
 	App::getModule<StateManager>().addOriginator(resourceManager);
-	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
+	App::getModule<ResourceManager>().loadDefaultResources(*configDoc);
 
 	Vp::Viewport* viewport = createModule<Vp::Viewport>();
 	App::getModule<StateManager>().addOriginator(viewport);

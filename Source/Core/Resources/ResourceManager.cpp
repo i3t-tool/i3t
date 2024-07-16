@@ -460,28 +460,27 @@ Ptr<Resource> ResourceManager::resourceByAlias(const std::string& alias)
 }
 
 
-void ResourceManager::createDefaultResources(const std::vector<Resource>& defaultResources)
+void ResourceManager::loadDefaultResources(rapidjson::Document& doc)
 {
-	for (const auto& resource : defaultResources)
+	LOG_INFO("[RESOURCE MANAGER] Loading default resources");
+
+	std::vector<ModelSaveEntry> modelEntries = deserializeModels(doc["defaultResources"]);
+
+	for (const auto& modelEntry : modelEntries)
 	{
-		switch (resource.resourceType)
+		switch (modelEntry.type)
 		{
-		case ResourceType::Shader:
-			// TODO: (DR) Cannot load shader from a single path, need multiple or some path convention
-			break;
-		case ResourceType::Texture:
-			if (texture(resource.alias, resource.path))
-			{
-				registerDefault(resource.alias);
-			}
-			break;
 		case ResourceType::Model:
-			m_forceModelNormalize = true;
-			if (mesh(resource.alias, resource.path))
+			if (modelEntry.normalize)
+				m_forceModelNormalize = true;
+			if (mesh(modelEntry.name, modelEntry.path))
 			{
-				registerDefault(resource.alias);
+				registerDefault(modelEntry.name);
 			}
 			m_forceModelNormalize = false;
+			break;
+		default:
+			// Only model resources can be loaded currently
 			break;
 		}
 	}
@@ -785,39 +784,7 @@ Memento ResourceManager::saveScene(Scene* scene)
 
 	rapidjson::Value resources(rapidjson::kObjectType);
 	resources.AddMember("imported", rapidjson::Value(rapidjson::kArrayType), a);
-	for (const auto& importedAlias : m_importedResources)
-	{
-		// We're assuming all Resources are models right now, as only models can be imported as of now
-		rapidjson::Value resource(rapidjson::kObjectType);
-
-		Ptr<Resource> resourcePtr = m_aliasMap.at(importedAlias).lock();
-		fs::path path = fs::path(resourcePtr->path);
-
-		if (scene)
-		{
-			if (FilesystemUtils::isSubpath(path, scene->m_stateManager->getTmpDirectory()))
-			{
-				// The path is from inside the tmp directory (newly imported model)
-				fs::path pathRelToTmp = path.lexically_relative(scene->m_stateManager->getTmpDirectory());
-				path = scene->m_dataPath / pathRelToTmp;
-			}
-			path = path.lexically_relative(scene->m_path.parent_path());
-		}
-		if (path.empty())
-		{
-			LOG_ERROR("Failed to resolve path for resource '{}'! Resource path: '{}'", importedAlias,
-			          resourcePtr->path);
-		}
-
-		resource.AddMember("name", rapidjson::Value(importedAlias, a), a);
-		resource.AddMember("path", rapidjson::Value(Utils::toString(path), a), a);
-		resource.AddMember("type", rapidjson::Value(EnumUtils::name(ResourceType::Model), a), a);
-
-		Mesh* mesh = std::static_pointer_cast<Mesh>(resourcePtr->data).get();
-		resource.AddMember("normalize", rapidjson::Value().SetBool(mesh->m_normalized), a);
-
-		resources["imported"].PushBack(std::move(resource), a);
-	}
+	serializeModels(m_importedResources, scene, resources["imported"], a);
 	state.AddMember("resources", resources, a);
 
 	return state;
@@ -903,12 +870,9 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 					// Silent fail
 					continue;
 				}
-				if (auto resources = readResources(doc["resources"]["imported"]))
+				for (const auto& modelEntry : deserializeModels(doc["resources"]["imported"]))
 				{
-					for (const auto& resource : *resources)
-					{
-						usedModels.insert(resource.alias);
-					}
+					usedModels.insert(modelEntry.name);
 				}
 			}
 		}
@@ -957,55 +921,38 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 			return;
 		}
 
-		for (const auto& resource : memento["resources"]["imported"].GetArray())
+		std::vector<ModelSaveEntry> modelEntries = deserializeModels(memento["resources"]["imported"]);
+		for (const auto& modelEntry : modelEntries)
 		{
-			const auto resourceName = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
-			const auto resourcePath = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
-			const auto resourceType = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
-
-			// Model specific
-			bool normalize = false;
-			if (resource.HasMember("normalize"))
-			{
-				normalize = resource["normalize"].GetBool();
-			}
-
-			const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(resourceType);
-			if (!maybeType.has_value())
-			{
-				LOG_ERROR("Resource {} has unknown type!", resource["name"].GetString());
-				continue;
-			}
-
 			// The resource path should be relative to the .scene file's parent folder
-			fs::path path = scene->m_path.parent_path() / fs::path(resourcePath);
+			fs::path path = scene->m_path.parent_path() / fs::path(modelEntry.path);
 
 			// Load model resource
-			if (normalize)
+			if (modelEntry.normalize)
 				RMI.m_forceModelNormalize = true;
-			Mesh* newMesh = mesh(resourceName, path.string());
-			if (normalize)
+			Mesh* newMesh = mesh(modelEntry.name, path.string());
+			if (modelEntry.normalize)
 				RMI.m_forceModelNormalize = false;
 
 			if (newMesh)
 			{
 				// Fetch files for the mesh for future use
-				Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(path.string(), resourceName);
+				Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(path.string(), modelEntry.name);
 				if (!modelFiles->fetchFiles(newMesh))
 				{
-					LOG_ERROR("[IMPORT] Failed to fetch files for imported model '{}'!", resourceName);
+					LOG_ERROR("[IMPORT] Failed to fetch files for imported model '{}'!", modelEntry.name);
 				}
 				else
 				{
-					Ptr<Resource> modelResource = resourceByAlias(resourceName);
+					Ptr<Resource> modelResource = resourceByAlias(modelEntry.name);
 					modelResource->resourceFiles = modelFiles;
 				}
 				counter++;
-				m_importedResources.push_back(resourceName);
+				m_importedResources.push_back(modelEntry.name);
 			}
 			else
 			{
-				LOG_ERROR("[IMPORT] Failed to load imported model '{}'!", resourceName);
+				LOG_ERROR("[IMPORT] Failed to load imported model '{}'!", modelEntry.name);
 				failCounter++;
 			}
 		}
@@ -1043,26 +990,70 @@ Memento ResourceManager::saveGlobal()
 void ResourceManager::loadGlobal(const Memento& memento) {}
 void ResourceManager::clearGlobal() {}
 
-std::optional<std::vector<Resource>> ResourceManager::readResources(const rapidjson::Value& resources)
+void ResourceManager::serializeModels(std::vector<std::string> modelAliases, Scene* scene, rapidjson::Value& targetArr,
+                                      rapidjson::Document::AllocatorType& a)
 {
-	std::vector<Resource> result;
-
-	for (const auto& resource : resources.GetArray())
+	for (const auto& importedAlias : modelAliases)
 	{
-		const auto name = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
-		const auto path = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
-		const auto type = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
+		// We're assuming all Resources are models right now, as only models can be imported as of now
+		rapidjson::Value resource(rapidjson::kObjectType);
 
-		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(type);
+		Ptr<Resource> resourcePtr = m_aliasMap.at(importedAlias).lock();
+		fs::path path = fs::path(resourcePtr->path);
+
+		if (scene)
+		{
+			if (FilesystemUtils::isSubpath(path, scene->m_stateManager->getTmpDirectory()))
+			{
+				// The path is from inside the tmp directory (newly imported model)
+				fs::path pathRelToTmp = path.lexically_relative(scene->m_stateManager->getTmpDirectory());
+				path = scene->m_dataPath / pathRelToTmp;
+			}
+			path = path.lexically_relative(scene->m_path.parent_path());
+		}
+		if (path.empty())
+		{
+			LOG_ERROR("Failed to resolve path for resource '{}'! Resource path: '{}'", importedAlias,
+			          resourcePtr->path);
+		}
+
+		resource.AddMember("name", rapidjson::Value(importedAlias, a), a);
+		resource.AddMember("path", rapidjson::Value(Utils::toString(path), a), a);
+		resource.AddMember("type", rapidjson::Value(EnumUtils::name(ResourceType::Model), a), a);
+
+		Mesh* mesh = std::static_pointer_cast<Mesh>(resourcePtr->data).get();
+		resource.AddMember("normalize", rapidjson::Value().SetBool(mesh->m_normalized), a);
+
+		targetArr.PushBack(std::move(resource), a);
+	}
+}
+
+std::vector<ResourceManager::ModelSaveEntry> ResourceManager::deserializeModels(const rapidjson::Value& modelsEntry)
+{
+	std::vector<ModelSaveEntry> outList;
+	for (const auto& resource : modelsEntry.GetArray())
+	{
+		const auto resourceName = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
+		const auto resourcePath = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
+		const auto resourceType = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
+
+		// Model specific
+		bool normalize = false;
+		if (resource.HasMember("normalize"))
+		{
+			normalize = resource["normalize"].GetBool();
+		}
+
+		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(resourceType);
 		if (!maybeType.has_value())
 		{
 			LOG_ERROR("Resource {} has unknown type!", resource["name"].GetString());
 			continue;
 		}
 
-		result.emplace_back(name, path, maybeType.value());
+		outList.emplace_back(resourceName, resourcePath, *maybeType, normalize);
 	}
-
-	return result;
+	return outList;
 }
+
 } // namespace Core
