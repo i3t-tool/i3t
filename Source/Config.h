@@ -23,20 +23,18 @@
 #include "Core/Resources/Resource.h"
 #include "Utils/FilesystemUtils.h"
 
+// TODO: (DR) This stuff should probably be moved to StateManager, especially the root and sceneRoot
 struct Configuration
 {
-	std::vector<Core::Resource> Resources;
-
 	static inline const fs::path root = fs::current_path();
-	static inline const fs::path sceneRoot = root / "Data/Scenes";
+	static inline const fs::path sceneRoot = root / "Data" / "Scenes";
 
-	static inline const fs::path logEventsDefinition = root / "Data/LogEventsDefinition.json";
-	static inline const fs::path appLog = root / "Logs/App.log";
-	static inline const fs::path userInteractionLog = root / "Logs/UserInteraction.log";
-	static inline const fs::path mouseLog = root / "Logs/Mouse.log";
+	static inline const fs::path configFile = root / "Data" / "Config.json";
+	static inline const fs::path logEventsDefinition = root / "Data" / "LogEventsDefinition.json";
+	static inline const fs::path appLog = root / "Logs" / "App.log";
+	static inline const fs::path userInteractionLog = root / "Logs" / "UserInteraction.log";
+	static inline const fs::path mouseLog = root / "Logs" / "Mouse.log";
 };
-
-Ptr<Configuration> loadConfig(const fs::path& filename);
 
 // TODO: (DR) Pretty sure this is all obsolete at this point and some parts of it should be moved somewhere else
 /**

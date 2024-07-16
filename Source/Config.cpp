@@ -17,21 +17,6 @@
 #include "Core/Resources/ResourceManager.h"
 #include "Utils/JSON.h"
 
-Ptr<Configuration> loadConfig(const fs::path& filename)
-{
-	auto conf = std::make_shared<Configuration>();
-
-	rapidjson::Document doc;
-	JSON::parse(filename, doc, "Data/Schemas/Config.schema.json");
-
-	if (auto resources = Core::ResourceManager::readResources(doc["resources"]))
-	{
-		conf->Resources = *resources;
-	}
-
-	return conf;
-}
-
 // statics
 
 std::string Config::VERSION = "v006";

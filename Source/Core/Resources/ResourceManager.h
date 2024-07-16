@@ -101,22 +101,6 @@ public:
 	bool resourceExists(size_t id);
 	bool resourceExists(std::string& alias);
 
-	/**
-	 * Loads provided resources and marks them as default.
-	 */
-	void createDefaultResources(const std::vector<Resource>& defaultResources);
-
-	/**
-	 * Register an alias as a "default" resource.
-	 * The aliased resource must exist.
-	 */
-	void registerDefault(const std::string& alias);
-
-	/**
-	 * Returns default resources of type.
-	 */
-	std::vector<Resource> getDefaultResources(ResourceType type);
-
 	std::vector<std::string> getImportedResourceAliases();
 
 	/**
@@ -240,11 +224,27 @@ public:
 	           const float* colors, const unsigned int nColors);
 
 	//////////////////////////////////////////////////////
-	// SCENE LOAD/SAVE
+	// MODEL LOAD/SAVE
 	//////////////////////////////////////////////////////
+
+	struct ModelSaveEntry
+	{
+		std::string name;
+		std::string path;
+		Core::ResourceType type;
+		bool normalize;
+	};
 
 	bool importModel(const fs::path& path, bool normalize);
 	bool removeImportedModel(const std::string& alias);
+
+	std::vector<ModelSaveEntry> deserializeModels(const rapidjson::Value& modelsEntry);
+	void serializeModels(std::vector<std::string> modelAliases, Scene* scene, rapidjson::Value& targetArr,
+	                     rapidjson::Document::AllocatorType& a);
+
+	//////////////////////////////////////////////////////
+	// SCENE LOAD/SAVE
+	//////////////////////////////////////////////////////
 
 	Memento saveScene(State::Scene* scene) override;
 	/// Ensure that model files required by the scene are in the right place
@@ -259,7 +259,26 @@ public:
 	void loadGlobal(const Memento& memento) override;
 	void clearGlobal() override;
 
-	static std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources);
+	//////////////////////////////////////////////////////
+	// DEFAULT RESOURCES
+	//////////////////////////////////////////////////////
+
+	/**
+	 * Loads resources from the a json document and marks them as default.
+	 * The json document must contain an "defaultResources" entry.
+	 */
+	void loadDefaultResources(rapidjson::Document& doc);
+
+	/**
+	 * Register an alias as a "default" resource.
+	 * The aliased resource must exist.
+	 */
+	void registerDefault(const std::string& alias);
+
+	/**
+	 * Returns default resources of type.
+	 */
+	std::vector<Resource> getDefaultResources(ResourceType type);
 
 private:
 	/**

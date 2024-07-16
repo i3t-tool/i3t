@@ -1,5 +1,5 @@
 {
-  "resources": [
+  "defaultResources": [
     {
       "name": "Bunny",
       "path": "Data/Models/Bunny.gltf",
