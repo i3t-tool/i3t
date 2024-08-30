@@ -17,13 +17,14 @@
 #include "I3T.h"
 
 // #include "Common.h"
+#include "I3TUtil.h"
+
 
 using namespace Core;
 
 TEST(NodeToolsTest, CopyNodes)
 {
-	I3TApplication app;
-	app.init();
+	auto app = initI3T();
 
 	const auto f1 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
 	const auto f2 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();

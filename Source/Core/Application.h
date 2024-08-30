@@ -50,7 +50,7 @@ public:
 	 * Performs initialization of the application.
 	 * @see onInit()
 	 */
-	void init();
+	bool init();
 
 	/**
 	 * Enter main loop.

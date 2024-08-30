@@ -13,17 +13,17 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/Operations.h"
+#include "Core/Nodes/Utils.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
-#include "Core/Nodes/Utils.h"
 #include "Generator.h"
 #include "I3T.h"
+#include "I3TUtil.h"
 
 /// Needs to be read carefully!
 TEST(UndoRedoTest, Basic)
 {
-	I3TApplication app;
-	app.init();
+	auto app = initI3T();
 
 	const auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
