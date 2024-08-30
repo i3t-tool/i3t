@@ -95,8 +95,6 @@
 
 int main(int argc, char* argv[])
 {
-	std::setlocale(LC_ALL, ".UTF8");
-
 	std::cout << (Config::COPYRIGHT_TEXT);
 
 	// init the logging library
@@ -109,7 +107,11 @@ int main(int argc, char* argv[])
 		I3TApplication app;
 
 		// Initialize all modules.
-		app.init();
+		if (!app.init())
+		{
+			LOG_FATAL("Failed to initialize I3T!");
+			exit(EXIT_FAILURE);
+		}
 
 		app.run();
 	}

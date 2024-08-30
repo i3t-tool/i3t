@@ -18,9 +18,10 @@
 #include "assimp/Importer.hpp"
 
 #include "Config.h"
+#include "Core/Resources/ResourceManager.h"
 #include "I3T.h"
 
-#include "Core/Resources/ResourceManager.h"
+#include "I3TUtil.h"
 
 using namespace std::string_literals;
 
@@ -50,8 +51,7 @@ TEST(GLTFResourcesTest, DISABLED_DefaultModelAreImported)
 {
 	using namespace Core;
 
-	I3TApplication app;
-	app.init();
+	auto app = initI3T();
 
 	const auto& defaultModels = ResourceManager::instance().getDefaultResources(ResourceType::Model);
 

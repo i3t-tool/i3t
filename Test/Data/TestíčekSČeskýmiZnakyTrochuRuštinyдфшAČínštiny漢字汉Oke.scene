@@ -1,0 +1,136 @@
+{
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -100.14999389648438,
+                "orbitCameraRotationY": 20.139982223510747,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 1.357841730117798,
+                "iorbitCameraPivot": [
+                    -0.11228122562170029,
+                    0.49221670627594,
+                    -0.008205779828131199
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 7,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    361.5714111328125,
+                    267.0001220703125
+                ],
+                "type": "FloatToFloat",
+                "value": 0.0
+            },
+            {
+                "id": 4,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    177.2856903076172,
+                    217.00003051757813
+                ],
+                "type": "FloatToFloat",
+                "value": 0.0
+            },
+            {
+                "id": 1,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    5.5714192390441898,
+                    289.1427307128906
+                ],
+                "type": "FloatToFloat",
+                "value": 0.0
+            }
+        ],
+        "sequences": [],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 10,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    166.42860412597657,
+                    405.7142333984375
+                ],
+                "model": "Bunny",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                4,
+                0,
+                7,
+                0
+            ],
+            [
+                1,
+                0,
+                4,
+                0
+            ]
+        ],
+        "zoom": 0.875,
+        "workArea": {
+            "Min": [
+                -137.57144165039063,
+                -182.85714721679688
+            ],
+            "Max": [
+                939.0,
+                862.8570556640625
+            ]
+        }
+    }
+}

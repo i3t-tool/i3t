@@ -1,7 +1,7 @@
 /**
- * \file
+ * \file LocaleTest
  * \brief
- * \author Martin Herich
+ * \author Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2024 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -10,28 +10,21 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-
-/*
-#include <filesystem>
-
 #include "gtest/gtest.h"
 
-#include "Utils/Text.h"
+#include "I3T.h"
 
-namespace fs = std::filesystem;
+#include "I3TUtil.h"
 
-TEST(PathUTF8, Example)
+/**
+ * Ensures that printf-like standard C functions format using the '.' (dot) decimal separator.
+ */
+TEST(LocaleTest, StandardLocaleIsUsed)
 {
-    fs::path path = "D:\\Stahování";
-    fs::directory_iterator it(path.generic_string());
+	auto app = initI3T();
 
-    int i = 0;
-    for (const auto& entry : it)
-    {
-        std::cout << entry.path() << std::endl;
-
-        if (i++ > 10)
-            break;
-    }
+	char buffer[100];
+	int count = snprintf(buffer, 100, "%.2f", 3.6);
+	ASSERT_TRUE(count == 4);
+	ASSERT_TRUE(!strcmp(buffer, "3.60"));
 }
-*/

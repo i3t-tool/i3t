@@ -54,15 +54,22 @@ Application& Application::get()
 	return *s_instance;
 }
 
-void Application::init()
+bool Application::init()
 {
+	// Using en_US UTF8 locale, could also use the default C locale with utf8.
+	// Not explicitly setting a locale uses the OS default which can introduce inconsistencies with ImGui etc.
+	// Think it will be best to assume the default C/en_US locale and "." as a decimal separator.
+	// On that note, ImGui has an option to override the platform decimal separator io.PlatformLocaleDecimalPoint
+	//  but that does not override the components using printf-like format (which most do).
+	std::setlocale(LC_ALL, "en_US.UTF8");
+	LOG_INFO("Using locale: {}", std::string(setlocale(LC_ALL, NULL)));
+
 	initWindow();
 
 	// Setup Dear ImGui context after OpenGL context.
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void) io;
 
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
@@ -77,8 +84,11 @@ void Application::init()
 	onInit();
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(m_window->get(), true);
-	ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
+	if (!ImGui_ImplGlfw_InitForOpenGL(m_window->get(), true))
+		return false;
+	if (!ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion))
+		return false;
+	return true;
 }
 
 void Application::run()

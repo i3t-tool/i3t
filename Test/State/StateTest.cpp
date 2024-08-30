@@ -14,10 +14,10 @@
 
 #include "API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "I3T.h"
 #include "State/StateManager.h"
 
 #include "Generator.h"
+#include "I3TUtil.h"
 
 using namespace Core;
 
@@ -26,14 +26,28 @@ const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
 	return workspaceWindow->getNodeEditor().getAllNodes();
 }
 
-/// \todo This test may require the OpenGL context!
-TEST(StateTest, SceneCanBeSavedAndLoaded)
+class StateTest : public ::testing::Test
 {
-	I3TApplication app;
-	app.init();
+private:
+	std::unique_ptr<I3TApplication> app;
 
-	const auto scenePath = "Test/State/TestScene"s + I3T_SCENE_EXTENSION;
-	const auto emptyScenePath = "Test/State/EmptyScene"s + I3T_SCENE_EXTENSION;
+public:
+	void SetUp() override
+	{
+		app = initI3T();
+	}
+
+	void TearDown() override
+	{
+		app->close();
+	}
+};
+
+/// \todo This test may require the OpenGL context!
+TEST_F(StateTest, SceneCanBeSavedAndLoaded)
+{
+	const auto scenePath = "Test/Data/TestScene"s + I3T_SCENE_EXTENSION;
+	const auto emptyScenePath = "Test/Data/EmptyScene"s + I3T_SCENE_EXTENSION;
 
 	std::vector<Ptr<WorkspaceNodeWithCoreDataWithPins>> nodes;
 
@@ -101,20 +115,75 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	}
 }
 
-/// \todo Run this test within ImGui frame scope.
-TEST(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
+TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 {
-	I3TApplication app;
-	app.init();
+	const auto sceneName = "TestíčekSČeskýmiZnakyTrochuRuštinyдфшAČínštiny漢字汉Oke"s + I3T_SCENE_EXTENSION;
+	const auto scenePath = fs::path("Test") / "Data" / sceneName;
+	const auto newSceneName = "JinýTestPlnýHáčkůAČárekдфшAČínštiny漢字汉Oke"s + I3T_SCENE_EXTENSION;
+	const auto newScenePath = fs::path("Test") / "Data" / newSceneName;
 
-	const auto scenePath = "Test/State/TestScene.json";
+	// Requires the application to be initialized!
+	auto* ui = I3T::getUI();
+	ASSERT_TRUE(ui != nullptr);
+	const auto workspace = ui->getWindowManager().getWindowPtr<WorkspaceWindow>();
+	ASSERT_TRUE(workspace != nullptr);
+
+	auto& stateManager = App::getModule<StateManager>();
+
+	// Load the scene
+	bool result = stateManager.loadScene(scenePath);
+	{
+		ASSERT_TRUE(result);
+
+		ASSERT_TRUE(stateManager.getCurrentScene() != nullptr);
+		ASSERT_TRUE(stateManager.getCurrentScene()->m_path.filename() == sceneName);
+
+		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
+
+		const std::vector<Ptr<WorkspaceNodeWithCoreData>>& nodes = workspace->getNodeEditor().getAllNodes();
+		ASSERT_TRUE(nodes.size() == 4);
+		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
+	}
+
+	// Delete the possibly existing new scene file.
+	if (fs::exists(newScenePath))
+		FilesystemUtils::deleteFileOrDir(newScenePath);
+
+	// Ensure the new scene file does not exist
+	ASSERT_TRUE(!fs::exists(newScenePath));
+
+	// Save the scene to a different path
+	result = stateManager.saveScene(newScenePath);
+	{
+		ASSERT_TRUE(result);
+
+		ASSERT_TRUE(stateManager.getCurrentScene() != nullptr);
+		ASSERT_TRUE(stateManager.getCurrentScene()->m_path.filename() == newSceneName);
+
+		const std::vector<Ptr<WorkspaceNodeWithCoreData>>& nodes = workspace->getNodeEditor().getAllNodes();
+		ASSERT_TRUE(nodes.size() == 4);
+		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
+
+		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
+	}
+
+	// Ensure the new scene file was created
+	ASSERT_TRUE(fs::exists(newScenePath));
+}
+
+/// \todo Run this test within ImGui frame scope.
+TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
+{
+	const auto scenePath = "Test/Data/TestScene.json";
 
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene("Test/State/EmptyScene.json");
+	App::getModule<StateManager>().saveScene("Test/Data/EmptyScene.json");
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes;
 
