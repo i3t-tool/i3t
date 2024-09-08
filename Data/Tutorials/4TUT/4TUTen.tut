@@ -1,0 +1,231 @@
+---
+title: 4. Cameras and projections
+description: Learn how to work with cameras and projections
+thumbnail: thumb4.png
+language: en
+scene: 4TUT/camera.scene
+---
+headline: Camera, action!
+
+Welcome to the *camera-focused* tutorial. This time you will learn something about using the *camera block*
+(and also some things about *view* and *projection* matrices as a bonus).
+
+![Scene objects](showcase.png)
+
+*Two objects* were also loaded into the scene, we will capture these objects using the camera.
+
+--
+headline: Camera block
+
+task: Add a camera to the scene
+
+![Camera block in the workspace](camera_block.png)
+
+*The camera* is a unique block - it contains two *sequences*:
+- *projection* - a holder for a *projection* matrix
+- *view* - a holder for a *lookAt* matrix
+
+It has three *outputs*:
+- ![Screen pin symbol](screensym.png) - output for a *screen* object
+- ![Matrix pin symbol](matrixsym.png) - output for *copying* the resulting matrix
+- ![Matrix multiplication pin symbol](mult.png) - output for *multiplying* a block by the matrices in the camera
+
+The most used one being the *first* and the *last* output. By connecting a *screen* we can peep what the camera actually sees.
+
+--
+headline: Screen
+
+To connect a *screen* and see what the camera sees, we need to *add a screen* into the *workspace* first.
+
+task: Add a "screen" block into the workspace
+
+task: Connect the screen and the camera
+
+The *screen* scale can be adjusted via the *red corner* of the screen.
+
+![Connected screen being resized](resize_screen.png)
+
+--
+headline: Other outputs
+
+The second *camera* output works similarly to the second *sequence* output - it *copies the matrix values* of the original sequence into an output block.
+
+![Passing the matrix value to a sequence](sequence_duplicate.png)
+
+The third *camera* output is automatically connected to all *model* blocks (or sequences leading into the objects).
+
+This demonstrates that the camera "sees" these objects and that they are being *transformed* from the *perspective* of the camera.
+
+![Automatic connections symbolising](camera_connections.png)
+
+*The green wire* in practice means that each of these models is multiplied by a *projection* and *view* matrix - just like in *OpenGL*.
+
+![The resulting PVM matrix, which is used on all objects that the camera captures](PVMmatrix.png)
+
+--
+headline: View
+
+*View matrix* tells us the *location, rotation and scale* of the camera in 3D space. We use a specialised *lookAt* matrix for this.
+
+task: Add a lookAt matrix to the workspace (transformation/lookAt)
+
+*LookAt* matrix is composed of three 3D vectors:
+- *eye vector* - the XYZ coordinates of the camera
+- *center vector* - the XYZ coordinates of the focus point
+- *up vector* - the up vector (shows the direction where "up" is)
+
+![LookAt matrix example](look_at.png)
+
+*Problem:* the lookAt matrix doesn't look like the image above, and it's *locked* :(.
+
+--
+headline: Level Of Detail
+
+If we want to make our job easier while *working with matrices* we can use *Level Of Detail*:
+- *Full* = full detail, we see *all values*
+- *Label* = only the *name*, the rest is hidden
+- *Set values* = *reduced set of important values* 
+
+You can set the *level of detail* of the block using the *context menu*, of by pressing the *upper left button* of the block
+
+task: Set the level of detail of the matrix to "Set values"
+
+![The level of detail context menu](level_of_detail.png)
+
+In this case, we will preferably use the *Set values* level to make our job easier.
+
+--
+headline: Setting up the lookAt matrix
+
+task: Add the lookAt matrix to the "view" sequence of the camera
+
+![Correctly inserted matrix](look_at_in_cam.png)
+
+We can see that the camera *moved* from the scene center.
+
+![Scene after adding the matrix](moved_camera.png)
+
+We will do more stuff with *lookAt* later, for now we also need a *projection matrix*.
+
+--
+headline: Projection matrix
+
+*Projection* is a way to visualise *3D* objects in *2D*.
+
+*The projection matrix* determines the size of the camera *frustum* (area that the camera sees), which then in turn influences how the objects look.
+
+There are two basic types of *projections*:
+- *parallel projection* - a flat view of the objects
+- *perspective projection* - "realistic" view
+
+![Two camera views with parallel and perspective projections](projections.png)
+source:[NeHe:lesson 21]
+
+--
+headline: Parallel projection
+
+*Parallel projection* shows us a *"flat"*  view of the scene, and has a prism-shaped *frustum*.
+
+task: Add a parallel projection matrix to the scene (transformation/projection/ortho)
+
+*Parallel projection doesn't scale* the objects using the camera depth, it only layers the objects.  
+
+![Parallel projection visualisation](ortographic_projection.png)
+
+*Parallel projection* is important for *3D modelling*, where we often need a *profile* of the model.
+
+--
+headline: Parallel projection parameters
+
+task: Set the level of detail of the projection matrix to "Set value"
+
+![Parallel projection parameters](ortho_proj_matrix.png)
+
+The values determine the *frustum dimensions*:
+- *left/right/top/bottom* - borders of the frustum
+- *near/far* - near and far wall of the frustum
+
+The *left/right* and *bottom/top* values are *interlinked* by default, but we can unlock them if needed using *"disable synergies"*.
+
+--
+headline: Parallel projection view
+
+task: Add the projection matrix into the camera "projection" sequence
+
+![Snapshot of the workspace](screen.png)
+
+Now we can see something in the *screen*. You can see a duck and a cube!
+
+task: Try modifying the projection parameters. Can you make it so that the duck isn't visible?
+hint:
+Modify the "far" value
+
+Now that you tried to modify the *frustum*, let's continue with *perspective projection*.
+
+--
+headline: Perspective projection
+
+*Perspective projection* is used to visualise the scene in a more natural way - the *objects are deformed by distance and position* in the scene.
+
+task: Add a perspective projection matrix to the workspace
+
+![Perspective projection visualisation](perspective_projection.png)
+
+*Frustum* of the perspective projection is shaped like a truncated pyramid.
+
+--
+headline: Perspective projection parameters
+
+task: Set the perspective projection matrix to the "Set value" level of detail
+
+![Perspective projection parameters](perspective_proj_matrix.png)
+
+The matrix has these *values*:
+- *fovy* - angle of the frustum along the *y-axis*
+- *aspect* - *aspect ratio* of the frustum
+- *near* - the near cutoff point 
+- *far* - the far cutoff point
+
+The *perspective projection matrix* is always *symmetrical*.
+
+For an *asymmetrical perspective projection* we need to use the *"frustum"* specialised matrix instead.
+
+--
+
+headline: Perspective projection view
+
+task: Exchange the parallel projection matrix for the perspective projection matrix
+
+![Correctly exchanged matrices](perspective_screen.png)
+
+*We can see that we can't see* the duck, even though it's still in the camera frustum. It's simply blocked by the cube!
+
+--
+headline: lookAt that duck!
+
+task: Update the lookAt matrix so that the camera is aimed at the duck
+hint:
+The coordinates of the duck are visible in her transformation matrix.
+
+This locks in the camera view to *always have the duck in the center*.
+
+task: Move the camera so that the duck is visible
+
+![Peeking at the duck](duck_peek_screen.png)
+
+*Here they are!* You can modify the *projection* and *lookAt* further if you want to.
+
+--
+headline: Cut!
+
+![Donezo!](checkbox.png)
+
+What we learned:
+- working with a *camera*
+- *projection* types
+- the *lookAt* matrix
+
+Click on Finish ![Down](down.png) to return to the start menu.
+
+
+

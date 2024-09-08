@@ -64,11 +64,13 @@ StartWindow::StartWindow(bool show) : IWindow("Welcome", show)
 	{
 		LOG_ERROR(e.what())
 	}
-	reloadTutorials();
+	language_is_english = false;
+	reloadTutorials(language_is_english);
 }
 
-void StartWindow::reloadTutorials()
+void StartWindow::reloadTutorials(bool english)
 {
+	m_tutorial_headers.clear();
 	// preload all tutorials located in TUTORIALS_FOLDER recursively
 	std::string path = Config::TUTORIALS_FOLDER;
 	if (path[0] == '/')
@@ -83,7 +85,10 @@ void StartWindow::reloadTutorials()
 		for (auto const& entry : std::filesystem::recursive_directory_iterator(
 		         path, std::filesystem::directory_options::skip_permission_denied))
 		{
-			if (entry.path().extension() == ".tut")
+			std::string filename = entry.path().stem().string();
+
+			if (entry.path().extension() == ".tut" && ((english && filename.substr(filename.size() - 2) == "en") ||
+			                                           (!english && filename.substr(filename.size() - 2) != "en")))
 			{
 				std::string pathString = entry.path().string();
 				LOG_INFO(pathString);
@@ -175,6 +180,28 @@ void StartWindow::renderLeftPanel() const
 			ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - m_cvutImage->m_height);
 			ImGui::Image((ImTextureID) m_cvutImage->m_texID, ImVec2(m_cvutImage->m_width, m_cvutImage->m_height));
 		}
+		ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - m_cvutImage->m_height);
+		ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - m_cvutImage->m_height);
+
+		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
+		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
+
+		bool language = I3T::getWindowPtr<StartWindow>()->language_is_english;
+		if (ImGui::Button("cz/en", ImVec2(m_cvutImage->m_height, m_cvutImage->m_height)))
+		{
+			I3T::getWindowPtr<StartWindow>()->language_is_english = !language;
+			I3T::getWindowPtr<StartWindow>()->reloadTutorials(!language);
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+		}
+
+		ImGui::PopStyleColor(4);
+		ImGui::PopFont();
 
 		ImGui::EndChild();
 	}

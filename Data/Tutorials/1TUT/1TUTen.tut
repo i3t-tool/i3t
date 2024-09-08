@@ -59,9 +59,9 @@ headline: Scene View
 ![Scene View](viewport.png)
 
 Controls are similar to Blender:
-    * *rotating* = Right mouse button  ![right mouse button](mouseRight.png)
-    * *panning* = Holding middle mouse button  ![middle mouse button](mouseMiddle.png)
-    * *zoom* = mousewheel up and down  ![mousewheel](mouseMiddle.png)
+- *rotating* = Right mouse button  ![right mouse button](mouseRight.png)
+- *panning* = Holding middle mouse button  ![middle mouse button](mouseMiddle.png)
+- *zoom* = mousewheel up and down  ![mousewheel](mouseMiddle.png)
 
 The controls also work the same for *Workspace*!
 
@@ -83,9 +83,9 @@ headline: Graph nodes
 
 task:
   Add three blocks into the workspace:
-    * model
-    * sequence
-    * transformation -> scale
+- model
+- sequence
+- transformation -> scale
 hint: ![right mouse button](mouseRight.png)  in the Workspace window opens the Add menu.
 Workspace should look like this after adding the *blocks* (the blocks can be moved by grabbing their top bar):
 ![Cube model, sequence and scaling transformation matrix](addStuff.png)
@@ -94,9 +94,9 @@ Workspace should look like this after adding the *blocks* (the blocks can be mov
 headline: Node types
 
 *Let's look at the node types:*
-    * *Model* = cube 3D model
-    * *Sequence* = "holder" for one or more matrices, that is used to connect the *transform* with the *model*
-    * *Scale* = scaling transformation *matrix*
+- *Model* = cube 3D model
+- *Sequence* = "holder" for one or more matrices, that is used to connect the *transform* with the *model*
+- *Scale* = scaling transformation *matrix*
 
 ![The blocks look like this](addStuff.png)
 
@@ -105,16 +105,16 @@ To *scale* the model, we need to connect the blocks together correctly.
 --
 headline: How do we do that?
 
-*Blocks* work similarly to programming functions, they contain a *input* and a *output*. We connect them using colored *wires*.
+*Blocks* work similarly to programming functions, they contain an *input* and an *output*. We connect them using colored *wires*.
 
 ![Sequence block](blocks.png)
 
 The icon determines the input/output *data type*. The data type limits which *blocks* "fit together" (can be connected).
 
 For example:
-    * *4x4 Matrix* = ![matrix symbol](matrixsym.png)
-    * *3D vector* = ![3D vector symbol](vec3.png)
-    * *Matrix multiplication* = ![matrix multiplication symbol](mult.png)
+- *4x4 Matrix* = ![matrix symbol](matrixsym.png)
+- *3D vector* = ![3D vector symbol](vec3.png)
+- *Matrix multiplication* = ![matrix multiplication symbol](mult.png)
 
 --
 headline: Model
@@ -125,7 +125,7 @@ headline: Model
 
 Models have a single *input* (a wire slot), shown by the green X symbol ![matrix multiplication symbol](mult.png).
 
-The symbol represents *matrix multiplication*, which means that all *verticies of the model* get multiplied by the *transformation matrix* connected on input.
+The symbol represents *matrix multiplication*, which means that all *vertices of the model* get multiplied by the *transformation matrix* connected on input.
 
 --
 
@@ -135,7 +135,7 @@ The *Sequence block* acts as a case for one or more *matrices*.
 
 ![Sequence](seq.png)
 
-The sequence block contains multiple *inputs* and *outputs*, the most important for this exercise being the first *output* ![Maticové násobení](mult.png).
+The sequence block contains multiple *inputs* and *outputs*, the most important for this exercise being the first *output* ![Matrix multiplication](mult.png).
 
 As we can see, the input for the model and the output of the sequence are the same, so we can *connect* them by *dragging* a wire from the output/input.
 
@@ -175,9 +175,9 @@ Now that you know the basics, you are ready to start working with *transformatio
 ![Done!](checkbox.png)
 
 What we learned:
-  * working with the *workspace* and *scene view*
-  * *mouse controls* ![left mouse button](mouseLeft.png) ![middle mouse button](mouseMiddle.png) ![right mouse button](mouseRight.png)
-  * basics of working with *nodes/blocks*
+- working with the *workspace* and *scene view*
+- *mouse controls* ![left mouse button](mouseLeft.png) ![middle mouse button](mouseMiddle.png) ![right mouse button](mouseRight.png)
+- basics of working with *nodes/blocks*
 
 You can return to the menu by clicking the *Finish* button. ![Down!](down.png)
 

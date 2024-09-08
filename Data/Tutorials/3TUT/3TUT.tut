@@ -20,16 +20,16 @@ headline: Co už jsme se naučili?
 ![První lekce](lekce1.png)
 
 V první lekci jsi se naučil/a:
-    * *Workspace* = prostředí pro tvorbu scény
-    * *Scene View* = náhled na naší výslednou scénu
-    * *Základy práce s I3T* = tvorba krabiček a jejich spojení
+- *Workspace* = prostředí pro tvorbu scény
+- *Scene View* = náhled na naší výslednou scénu
+- *Základy práce s I3T* = tvorba krabiček a jejich spojení
 
 ![Druhá lekce](lekce2.png)
 
 V druhé lekci zase:
-    * základy práce s *transformacemi*
-    * špetku *matematiky*
-    * opakování základní práce s *bloky*
+- základy práce s *transformacemi*
+- špetku *matematiky*
+- opakování základní práce s *bloky*
 
 --
 headline: Jdeme na sněhuláka!
@@ -143,9 +143,9 @@ headline: A je to!
 ![WOOOOOOOOOOO!](checkbox.png)
 
 Co jsme se naučili:
-  * práce se *sekvencemi*
-  * *matice*
-  * složené *transformace*
-  * složitější práce v I3T
+- práce se *sekvencemi*
+- *matice*
+- složené *transformace*
+- složitější práce v I3T
 
 Klikni na Finish pro návrat do úvodního okna ![dole :)](down.png).

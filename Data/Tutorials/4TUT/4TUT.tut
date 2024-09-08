@@ -11,7 +11,7 @@ Vítej v *kamerovém* tutoriálu. Tentokrát si ukážeme, jak pracovat s *kamer
 
 Taky se dozvíš něco o maticích *view* a *projection*.
 
-![Kamera s objekty](showcase.png)
+![Objekty ve scéně](showcase.png)
 
 Do scény se ti načetly *dva objekty*, které budeme kamerou zachycovat!
 
@@ -23,13 +23,13 @@ task: Přidej do scény kameru
 ![Blok kamery](camera_block.png)
 
 *Kamera* je unikátní - má v sobě dvě *sekvence*:
-    * *projection* - pouzdro pro matici *projekce*
-    * *view* - pouzdro pro pohledovou matici *lookAt*
+- *projection* - pouzdro pro matici *projekce*
+- *view* - pouzdro pro pohledovou matici *lookAt*
 
 Má tři *výstupy*:
-    * ![Symbol obrazovky](screensym.png) - výstup pro *obrazovku* (screen)
-    * ![Symbol matice 4x4](matrixsym.png) - výstup pro *zkopírování* výsledné matice
-    * ![Symbol maticového násobení](mult.png) - výstup pro *násobení* kamerovými maticemi
+- ![Symbol obrazovky](screensym.png) - výstup pro *obrazovku* (screen)
+- ![Symbol matice 4x4](matrixsym.png) - výstup pro *zkopírování* výsledné matice
+- ![Symbol maticového násobení](mult.png) - výstup pro *násobení* kamerovými maticemi
 
 My budeme využívat hlavně *první* výstup. Napojením krabičky *screen* totiž uvidíme to, co vidí *kamera*.
 
@@ -69,9 +69,9 @@ headline: View
 task: Přidej si do workspace lookAt matici (transformation/lookAt)
 
 Matice *lookAt* se vytváří ze tří trojrozměrných vektorů:
-    * *eye vector* - souřadnice kamery
-    * *center vector* - souřadnice středu pohledu
-    * *up vector* - vektor orientace kamery (kde je nahoru)
+- *eye vector* - souřadnice kamery
+- *center vector* - souřadnice středu pohledu
+- *up vector* - vektor orientace kamery (kde je nahoru)
 
 ![Look at matice](look_at.png)
 
@@ -81,9 +81,9 @@ Matice *lookAt* se vytváří ze tří trojrozměrných vektorů:
 headline: Level Of Detail
 
 Pokud si chceme *zjednodušit manipulaci* s maticemi, můžeme využít *Level Of Detail*:
-    * *Full* = plný detail, vidíme *všechny hodnoty*
-    * *Label* = pouze *jméno*, zbytek je schovaný
-    * *Set values* = *hodnoty, ze kterých matice vzniká*
+- *Full* = plný detail, vidíme *všechny hodnoty*
+- *Label* = pouze *jméno*, zbytek je schovaný
+- *Set values* = *hodnoty, ze kterých matice vzniká*
 
 *Úroveň detailu* bloku nastavíme přes *kontextové menu*, nebo rychleji pomocí *tlačítka na liště* bloku
 
@@ -114,8 +114,8 @@ headline: Projekční matice
 *Projekční matice* ovlivňuje, jak vypadá *frustum* kamery (*frustum* je objem, který kamera "vidí").
 
 Existují dva základní typy *projekcí*:
-    * *rovnoběžná (paralelní) projekce* - "plochý" (kolmý) pohled
-    * *perspektivní projekce* - "realistický" pohled
+- *rovnoběžná (paralelní) projekce* - "plochý" (kolmý) pohled
+- *perspektivní projekce* - "realistický" pohled
 
 ![Kamera s perspektivní projekční maticí](projections.png)
 zdroj:[NeHe:lesson 21]
@@ -141,8 +141,8 @@ task: Nastav si u projekce úroveň detailu "Set value"
 ![Parametry rovnoběžné projekce](ortho_proj_matrix.png)
 
 Hodnoty nastavují *hranice frustu* matice:
-    * *left/right/top/bottom* - levá/pravá/vrchni/spodní hranice frusta
-    * *near/far* - kde frustum začíná a kde končí
+- *left/right/top/bottom* - levá/pravá/vrchni/spodní hranice frusta
+- *near/far* - kde frustum začíná a kde končí
 
 Hodnoty *left/right* a *bottom/top* jsou původně *propojené*, ale můžeme si je pomocí *"disable synergies"* odemknout.
 
@@ -172,7 +172,6 @@ task: Přidej do workspace matici perspektivní projekce
 
 *Frustum* perspektivní projekce vychází z *jednoho bodu* (kamery nebo oka) a má tvar *komolého jehlanu*.
 
-*Perspektivní projekci* používáme častěji než *rovnoběžnou projekci*.
 
 --
 headline: Parametry perspektivní projekce
@@ -182,10 +181,10 @@ task: Nastav si perspektivní projekci na úroveň detailu "Set value"
 ![Parametry perspektivní projekce](perspective_proj_matrix.png)
 
 Matice má tyto *parametry*:
-    * *fovy* - úhel frusta *na výšku*
-    * *aspect* - *poměr* stran frusta
-    * *near* - kde frustum *začíná*
-    * *far* - kde frustum *končí*
+- *fovy* - úhel frusta *na výšku*
+- *aspect* - *poměr* stran frusta
+- *near* - kde frustum *začíná*
+- *far* - kde frustum *končí*
 
 Matice *perspektivní projekce* se stěnami frusta manipuluje *symetricky*.
 
@@ -222,9 +221,9 @@ headline: Klapka!
 ![Splněno!](checkbox.png)
 
 Co jsme si ukázali:
-  * jak pracovat s *kamerou*
-  * druhy *projekce*
-  * matici *lookAt*
+- jak pracovat s *kamerou*
+- druhy *projekce*
+- matici *lookAt*
 
 Klikni na *Finish* ![Dole](down.png) pro návrat do úvodního okna.
 

@@ -1,0 +1,85 @@
+---
+title: Exercise - Detective
+description: Solve a murder mystery while learning how cameras work!
+thumbnail: detective_thumb.png
+language: en
+scene: EXC2/exc2.scene
+---
+headline: Murder
+
+Get in the role of a *detective*, and capture a series of photos that will lead to the capture of a suspect.
+
+Use the *screen block* to capture these scenes as they are shown in the following pictures
+
+task: First capture the side of the building, that will tell us the address of the crime scene
+
+![Wall of the crime scene house](wall.png)
+
+Don't forget, you can *modify the capture distance* of the camera!
+
+--
+headline: Aerial view
+
+Time to *fly*!
+
+task: Try to capture the scene from a birds-eye-view, that way we can see the surrounding area
+
+![Desired aerial view](house.png)
+
+--
+headline: The suspect
+
+We just received the exact coordinates of the *suspect* in 3D space!
+
+task: Target the suspect with your camera at (0, 3, -6) and try to find him in the house window
+
+![Peeking through the window](window_peek.png)
+
+--
+headline: X-Ray
+
+The camera is also able to *see through walls* (if we set it up correctly).
+
+task: Without moving your camera try to filter out the front wall (clipping) to better see the crime scene
+
+![Using camera viewport to see through walls](clipping_peek.png)
+
+--
+headline: Crime scene details
+
+We also need some *evidence*. Photograph the crime scene, that way we can convict the suspect!
+
+task: Capture a shot of the crime scene from inside the cabin
+
+![Crime scene detail](detail.png)
+--
+headline: Zoom
+
+task: Use the zoom feature, to zoom in on the suspects face
+
+![Murderer duck's face](detail_zoom.png)
+--
+headline: Aspect ratio
+
+We also need a *wide angle shot* of the entire interior. We will use our wide angle lens for that.
+
+task: Use a single photo to show the entire scene
+
+![Wide angle shot of the scene](wide_shot.png)
+--
+headline: JAIL
+
+Good work *detective*, we got him!
+
+![jail.](jail.png)
+
+You really know what you're doing with that camera!
+
+
+
+
+
+
+
+
+

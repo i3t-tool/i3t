@@ -36,9 +36,9 @@ headline: Scene View
 ![Scene View](viewport.png)
 
 Ovládání - podobné jako Blender:
-    * *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
-    * *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
-    * *přiblížení a oddálení* = Kolečko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+- *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
+- *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+- *přiblížení a oddálení* = Kolečko myši  ![prostřední tlačítko myši](mouseMiddle.png)
 
 Přiblížení, oddálení a posouvání má *Workspace* stejné jako *Scene View*.
 
@@ -57,9 +57,9 @@ headline: Stavební bloky
 *Bloky* jsou základní jednotkou I3T, mohou reprezentovat *matice, modely, nebo funkce* (například cykly).
 
 *Příklady bloků:*
-    * *Model* = model krychle
-    * *Sequence* (seq) = "pouzdro" na matice transformací, pomocí kterého propojujeme *matice* a *model*
-    * *Scale* = *matice* operace škálování
+- *Model* = model krychle
+- *Sequence* (seq) = "pouzdro" na matice transformací, pomocí kterého propojujeme *matice* a *model*
+- *Scale* = *matice* operace škálování
 
 ![Bloky vypadají takhle](addStuff.png)
 
@@ -75,9 +75,9 @@ headline: Jak propojit bloky?
 Ikona vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdou propojit, a které ne.
 
 Například:
-    * *Matice* = ![Symbol pro matici](matrixsym.png)
-    * *Trojrozměrný vektor* = ![3D vektor](vec3.png)
-    * *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
+- *Matice* = ![Symbol pro matici](matrixsym.png)
+- *Trojrozměrný vektor* = ![3D vektor](vec3.png)
+- *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
 --
 headline: Jak pracovat se sekvencí?
 

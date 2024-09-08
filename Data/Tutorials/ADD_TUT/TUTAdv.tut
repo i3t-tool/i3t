@@ -18,11 +18,11 @@ headline: Hlavní lišta
 ![Hlavní lišta programu](lista.png)
 
 Na hlavní liště máme *čtyri* záložky:
-    * *File* = ukládání a načítání scén
-    * *Edit* = undo a redo
-    * *Windows* = správce oken programu
-    * *Tutorials* = přístup k oknům tutoriálu
-    * *Help* = dokumentace a seznam autorů
+- *File* = ukládání a načítání scén
+- *Edit* = undo a redo
+- *Windows* = správce oken programu
+- *Tutorials* = přístup k oknům tutoriálu
+- *Help* = dokumentace a seznam autorů
 
 Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se ti v náhledu *bude ukazovat* a co *ne*.
 
@@ -31,31 +31,31 @@ Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se 
 headline: Workspace - Klávesové zkratky
 
 *I3T* obsahuje většinu známých zkratek:
-    * copy/paste/cut
-        * *Ctrl+C/Ctrl+V/Ctrl+X*
-    * undo/redo
-        * *Ctrl+Y/Ctrl+R*/Ctrl+Z
-    * duplikace bloku
-        * *Ctrl+LClick*
-    * duplikace všech vybraných bloků
-        * *Ctrl+D*
-    * uložení scény
-        * *Ctrl+S*
-    * několikanásobná selekce
-        * *Shift+LClick*
-    * selekce všech bloků dotýkajících se obdélníku
-        * *Tažení LClick doleva*
-    * selekce všech bloků obsažených v obdélníku
-        * *Tažení LClick doprava*
-    * delete
-        * *Delete*
+- copy/paste/cut
+    - *Ctrl+C/Ctrl+V/Ctrl+X*
+- undo/redo
+    - *Ctrl+Y/Ctrl+R*/Ctrl+Z
+- duplikace bloku
+    - *Ctrl+LClick*
+- duplikace všech vybraných bloků
+    - *Ctrl+D*
+- uložení scény
+    - *Ctrl+S*
+- několikanásobná selekce
+    - *Shift+LClick*
+- selekce všech bloků dotýkajících se obdélníku
+    - *Tažení LClick doleva*
+- selekce všech bloků obsažených v obdélníku
+    - *Tažení LClick doprava*
+- delete
+    - *Delete*
 --
 headline: Level Of Detail
 
 Pokud nám bloky *zabírají moc místa* ve scéně, nebo chceme *zjednodušit proces transformace*, můžeme využít *Level Of Detail*:
-    * *Full* = plný detail, vidíme *všechno*
-    * *Label* = pouze *jméno*, zbytek je schovaný
-    * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic.
+- *Full* = plný detail, vidíme *všechno*
+- *Label* = pouze *jméno*, zbytek je schovaný
+- *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic.
 
 *Úroveň detailu* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*, nebo rychleji pomocí *tlačítka na liště* bloku
 

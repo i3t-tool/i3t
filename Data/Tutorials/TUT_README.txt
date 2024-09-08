@@ -63,14 +63,20 @@ All keywords:
 Other functions:
     - *foo* - used to make text bold
     - lists - used to create itemised lists
-        * item1
-        * item2
-        * item3
+        - item1
+        - item2
+        - item3
         ...
 IMAGES___________________________________________________________
 Adding images: ![description](image.png)
     - descriptions appear in tooltips if an image is hovered over
     - !!!images need to be in the tutorial directory to be loaded!!!
+
+
+MISC_____________________________________________________________
+Loading the english/czech version should be done according to a determining string in filename (currently - "en" as last two characters)
+English versions should be loaded in the same way as the czech versions and reloaded on language change
+Tutorials are always ordered in alphabetical order according to the filename
 
 
 That is everything you need to create a tutorial in I3T, good luck!

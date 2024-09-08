@@ -1,0 +1,153 @@
+---
+title: 3. Composing transformations
+description: Build a snowman and learn how to compose transformations
+thumbnail: snehulakThumb.png
+language: en
+---
+headline: Welcome to the third tutorial!
+
+This tutorial will show you how to build a *snowman*!
+
+You will also learn how to *compose multiple transformations*.
+
+The finished snowman will look like this (excluding the hat and carrot):
+
+![Finished scene](snehulak.png)
+
+--
+headline: What did we learn already?
+
+![Lesson n1](lekce1.png)
+
+The first lesson taught you about:
+- *Workspace* = area where we build the scene
+- *Scene View* = 3D view of the scene
+- *I3T Basics* = working with nodes, connecting them
+
+![Lesson n2](lekce2.png)
+
+The second lesson taught you about:
+- *transformation* basics
+- *math* behind the transformations
+- additional node interaction possibilities
+
+--
+headline: Do You Want to Build a Snowman?
+
+*The snowman* will definitely need legs, we have to add them.
+
+task: Add a new *model* node and a *sequence*, rename the sequence to "legs" and connect it to the model
+
+hint:
+You can rename by ![Right mouse button](mouseRight.png)  on the block top bar and select "Rename".
+
+![Renamed sequence block](nohySeq.png)
+
+--
+headline: Adding transformations!
+
+task: Add a *scale matrix* and *translation matrix* into the "legs" sequence
+
+Add the transformations *in this order*:
+
+![Correct transformation sequence](poradi.png)
+
+In I3T we always add transformations in the *Translation, Rotation, Scaling* order (*TRS* in short).
+
+*Why this particular order?*
+
+--
+headline: "TRuSt me it works!"
+
+Transformations in a sequence are always applied *RIGHT TO LEFT* (reverse the actual order):
+
+![The correct order of matrix transformations visualised](matrixOrderAlt.png)
+
+Thanks to *TRS* we assure that *translation* is always applied *last*.
+
+--
+headline: Same transformations, different order
+
+Let's look at a different order, *SRT*:
+
+![Reverse of the correct order, the model position changes with each transformation](wrongOrderAlt.png)
+
+The result is *different* from the TRS version, even though the transformations were the *same*.
+
+*Recommendation:* Use only *TRS*. This assures that the model positions stays *constant* during your work with the object!
+
+--
+headline: Lets try it out
+
+task: Change the "legs" scale to two
+task: Move the model along the Y axis so that it "sits on the ground"
+
+![Resulting scene](nohy.png)
+
+*Reminder:* You can zoom and move in the *Workspace* in the same way you do in *Scene View*.
+
+--
+headline: Adding a body
+
+task: Add a new cube *model* and a *sequence*, rename it to "body" and add a *translation matrix* into it
+task: Change the *translation matrix* values so that the *body* sits on the *legs*
+hint:
+    Matrix values should look like this
+    ![Translation matrix values of 0, 5, 0](translate.png)
+
+![Correctly assembled snowman body](stredModel.png)
+
+--
+
+headline: Adding a head!
+
+task: Put a head on the snowman's shoulders by *copying the "legs" sequence* and renaming them to "head"
+hint: You can copy selected blocks using Ctrl+C and Ctrl+V or Ctrl+LClick
+task: Make the head *twice as small as the body* and place it on the "body".
+
+![Our beautiful snowman, correctly built](snehulak.png)
+
+--
+headline: Master manipulator
+
+*We can also chain sequences together* with other sequences. That way if you change a single sequence, it influences all following sequences in the chain!
+
+It's quite simple:
+
+![Connecting a single sequence to multiple sequences](multseq.png)
+
+--
+headline: Try it yourself!
+
+task: Add a new *sequence* and rename it to "snowman"
+task: Connect it to all other *sequences* (head, body, legs)
+task: Add three matrices into it, *Translation, Rotation along X, and Scale* and try manipulating the snowman as a single object
+
+![Fully connected Workspace](propojeni.png)
+
+--
+headline: Tracking
+
+If you need help visualising the transformation process, you can use *tracking*. Tracking is in the context menu of each *sequence*.
+
+![Tracking in the sequence context menu](tracking.png)
+
+*Tracking* adds a temporary copy of the model, which simulates the process of transformation step by step. 
+
+You can *advance* and *rewind* tracking using the arrow keys (left and right).
+
+task: Try tracking on any sequence connected to a model (also try to change the transformation order).
+
+--
+
+headline: We did it!
+
+![WOOOOOOOOOOO!](checkbox.png)
+
+What we learned today:
+- working with *sequences*
+- *matrices*
+- composing *transformations*
+- advanced I3T work
+
+Click on Finish ![Down](down.png) to return to the start menu.

@@ -1,0 +1,72 @@
+---
+title: Exercise - Table
+description: Try to assemble a table in I3T!
+thumbnail: table_thumb.png
+language: en
+scene: EXC1/exc1.scene
+---
+headline: First exercise
+
+Welcome to the *first exercise*!
+
+Exercises are similar to previous *tutorials*, the main difference being that exercises are made up of *tasks* only.
+
+In this one you will try to assemble a simple table using *I3T*.
+
+![A table with a tea kettle](table.png)
+
+*P.S.* You can use the *ghost* of the table to compare your results to the intended solution
+
+--
+headline: Table top
+
+task: Add a table-top, and modify it so that it fits the ghost table legs
+
+![Table-top fitted correctly](table_board.png)
+
+task: Rename the model block to "Top"
+
+--
+headline: Table leg
+
+task: Add a new block to the scene, and modify it so that it looks like a table leg
+
+![Table-top with a leg](leg.png)
+
+--
+headline: Attaching the leg
+
+task: Move the leg to connect it to the table-top
+
+![Attached leg](leg_positioned.png)
+
+--
+headline: Remaining legs
+
+task: Add all 3 remaining legs to the table
+
+![Table with all legs added](legs.png)
+
+--
+headline: Unified table
+
+task: Move the entire table to fit the ghost using a single translation matrix 
+
+![Translated table](table_translated.png)
+
+--
+headline: Tea kettle
+
+task: Place a tea kettle on the table. Make sure to include it in the object, so that you can move the whole table if you want
+
+![Table with a correctly fitted kettle](table_teapot.png)
+
+--
+headline: Finito!
+
+*The table* is complete. What a beauty! The topology of *Workspace* nodes should look like this:
+
+![Workspace topology of the completed table](scene.png)
+
+You can see that the ability to *branch sequences* was very useful to us. Branching is an excellent way to modify multiple objects using the *same transformations*.
+
