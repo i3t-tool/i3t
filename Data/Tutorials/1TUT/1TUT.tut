@@ -14,6 +14,7 @@ headline: Vítej v I3T!
 V tomto tutoriálu se naučíš, jak je program *strukturovaný* a jak se v něm *pracuje*.
 
 První si ale ukážeme, jak se v *tutoriálech orientovat*.
+
 --
 headline: Úkoly a Tipy
 
@@ -59,9 +60,9 @@ headline: Scene View
 ![Scene View](viewport.png)
 
 Ovládání - podobné jako Blender:
-    * *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
-    * *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
-    * *přiblížení a oddálení* = Kolečko myši  ![Kolečko myši](mouseMiddle.png)
+- *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
+- *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+- *přiblížení a oddálení* = Kolečko myši  ![Kolečko myši](mouseMiddle.png)
 
 Přiblížení, oddálení a posouvání má *Workspace* stejné jako *Scene View*.
 
@@ -81,9 +82,9 @@ headline: Stavební bloky
 
 task:
   Přidej do workspace tři bloky:
-    * model
-    * sequence
-    * transformation -> scale
+- model
+- sequence
+- transformation -> scale
 hint: ![pravé tlačítko myši](mouseRight.png)  na ploše Workspace otevře Add menu.
 Workspace by po přidání *bloků* měl vypadat asi takhle (s bloky jde hýbat uchopením za vrchní lištu):
 ![Model krychle, sekvence a matice transformace velikosti](addStuff.png)
@@ -92,9 +93,9 @@ Workspace by po přidání *bloků* měl vypadat asi takhle (s bloky jde hýbat 
 headline: Druhy bloků
 
 *Podívejme se na přidané bloky:*
-    * *Model* = model krychle
-    * *Sequence* = "pouzdro" na jednu nebo více matic, pomocí kterého propojujeme *matice* a *model*
-    * *Scale* = *matice* transformace škálování
+- *Model* = model krychle
+- *Sequence* = "pouzdro" na jednu nebo více matic, pomocí kterého propojujeme *matice* a *model*
+- *Scale* = *matice* transformace škálování
 
 ![Měly by vypadat takto](addStuff.png)
 
@@ -110,9 +111,9 @@ headline: Jak propojit bloky?
 Ikona vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdou propojit, a které ne.
 
 Například:
-    * *Matice* = ![Symbol pro matici](matrixsym.png)
-    * *Trojrozměrný vektor* = ![3D vektor](vec3.png)
-    * *Maticové násobení* = ![Symbol pro maticové násobení](mult.png)
+- *Matice* = ![Symbol pro matici](matrixsym.png)
+- *Trojrozměrný vektor* = ![3D vektor](vec3.png)
+- *Maticové násobení* = ![Symbol pro maticové násobení](mult.png)
 
 --
 headline: Model
@@ -173,9 +174,9 @@ Už znáš základy práce s I3T a můžeš začít s *transformacemi*!
 ![Splněno!](checkbox.png)
 
 Co jsme se naučili:
-  * práci s *workspace* a *scene view*
-  * *ovládání myší* ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png)
-  * základy práce s *bloky*
+- práci s *workspace* a *scene view*
+- *ovládání myší* ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png)
+- základy práce s *bloky*
 
 Tlačítkem *Finish* se vrátíš do úvodního okna. ![Dole!](down.png)
 

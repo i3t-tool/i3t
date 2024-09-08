@@ -9,17 +9,17 @@ headline: Vítej ve druhém tutoriálu!
 Podíváme se jak fungují *transformace*!
 
 Ukážeme si:
-    * *Rotaci* = otočení objektu
-    * *Škálování* = změna velikosti objektu
-    * *Translaci* = změna pozice objektu
+- *Rotaci* = otočení objektu
+- *Škálování* = změna velikosti objektu
+- *Translaci* = změna pozice objektu
 
 ![Vizuální demonstrace transformací pokud jsi ztracený](transformations.png)
 
 S operací *škálování* jsme pracovali v předchozí lekci, tentokrát se ale podíváme na to, jak fungují *transformace* obecně.
 
 --
-
 headline: Co to je transformace?
+
 Když nějaký objekt *transformujeme*, upravíme pozici *každého jeho bodu*.
 
 *Transformace* v 3D reprezentujeme maticí *4x4*.
@@ -46,11 +46,11 @@ Ta nám umožní na model použít všechny *transformace*, které potřebujeme.
 headline: Perspektivní projekce s homogenními souřadnicemi
 
 Postup je jednoduchý:
-    * Přidej novou souřadnici *W = 1*
+- Přidej novou souřadnici *W = 1*
 ![Přidání souřadnice W](convertToHomogeneous.png)
-    * *Vynásob nové souřadnice maticí* transformace
+- *Vynásob nové souřadnice maticí* transformace
 ![Násobení maticí transformace](transforming.png)
-    * *Převeď zpět* z homogenních souřadnic - souřadnicí *W* vyděl zbytek souřadnic
+- *Převeď zpět* z homogenních souřadnic - souřadnicí *W* vyděl zbytek souřadnic
 ![Konverze z homogenních do standardních souřadnic](conversion.png)
 
 Výsledné souřadnice jsou *nové souřadnice* transformovaného bodu!
@@ -176,9 +176,9 @@ Translací *posouváme* objekt v prostoru.
 ![Matice translace](translation.png)
 
 *Pro náš případ by se kačka posunula*:
-    * O tři po ose X (o tři "doprava")
-    * O dva po ose Y (o dva "nahoru")
-    * O čtyři do záporu v ose Z (o čtyři "od nás")
+- O tři po ose X (o tři "doprava")
+- O dva po ose Y (o dva "nahoru")
+- O čtyři do záporu v ose Z (o čtyři "od nás")
 
 --
 headline: Práce s translací
@@ -199,8 +199,8 @@ Super! Už víš co dělá jaká transformace!
 ![Splněno!](checkbox.png)
 
 Co jsme se dozvěděli:
-  * základy práce s *transformacemi*
-  * ždibec *matematiky*
-  * opakování základů *práce s bloky*
+- základy práce s *transformacemi*
+- ždibec *matematiky*
+- opakování základů *práce s bloky*
 
 Klikni na Finish ![Dole](down.png) pro návrat do úvodního okna.

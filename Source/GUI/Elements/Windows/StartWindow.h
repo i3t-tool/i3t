@@ -26,12 +26,13 @@ public:
 	I3T_WINDOW(StartWindow)
 	StartWindow(bool show);
 	bool popupActive = false;
+	bool language_is_english = false;
 
 	/**
 	 * \brief searches through the tutorial directory and adds all found tutorial
 	 * files to the window
 	 */
-	void reloadTutorials();
+	void reloadTutorials(bool english);
 
 	void renderLeftPanel() const;
 	void renderRightPanel();

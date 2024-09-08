@@ -1,0 +1,90 @@
+---
+title: 5. Advanced I3T functions
+description: Speed up your I3T work with these shortcuts and functions
+thumbnail: thumbnail.png
+language: en
+---
+headline: Welcome to the advanced controls tutorial!
+
+This tutorial will be filled with *shortcuts and tips* to work faster and easier when using I3T.
+
+![Advanced manipulation results](nahled.png)
+
+It acts as a kind of *manual*, so you can quit and return whenever you want, the order of the screens isn't important.
+
+--
+headline: Top bar
+
+![Top bar of the program](lista.png)
+
+We can see four main *sections* :
+- *File* = managing scenes, saving, loading
+- *Edit* = undo and redo
+- *Windows* = window manager of the program
+- *Tutorials* = tutorial window access
+- *Help* = documentation and credits
+
+Scene view has its own *separate bar*, which is used to manage display and render options.
+
+![SceneView menu](sceneView.png)
+--
+headline: Workspace - Shortcuts
+
+*I3T* contains many basic shortcuts:
+- copy/paste/cut
+    - *Ctrl+C/Ctrl+V/Ctrl+X*
+- undo/redo
+    - *Ctrl+Y/Ctrl+R*/Ctrl+Z
+- block duplication with click
+    - *Ctrl+LClick*
+- duplicate all selected blocks
+    - *Ctrl+D*
+- saving 
+    - *Ctrl+S*
+- selecting multiple entities
+    - *Shift+LClick*
+- dragging selection all touching
+    - *dragging LClick left*
+- dragging selection all included
+    - *dragging LClick right*
+- delete
+    - *Delete*
+--
+headline: Level Of Detail
+
+If you're *running out of space*, of need to quickly modify matrix values without needing to intuit which values are which, you can use *Levels Of Detail*:
+- *Full* = full detail, we see *all values*
+- *Label* = only the *name*, the rest is hidden
+- *Set values* = *reduced set of important values* (only for matrices)
+
+You can set the *level of detail* of the block using the *context menu*, of by pressing the *upper left button* of the block
+
+![Level of detail context menu](levelOfDetail.png)
+
+--
+headline: Operators
+
+The *Add menu* has a section called *operators*.
+
+![Operator section in the Add menu](operators.png)
+
+It contains blocks that help with conversions and *math operations* for example: *matrix inversion*,  *determinant* calculation, matrix *decompositions* etc.
+
+--
+headline: Tracking
+
+If you need help visualising the transformation process, you can use *tracking*. Tracking is in the context menu of each *sequence*.
+
+![Tracking in the sequence context menu](tracking.png)
+
+*Tracking* adds a temporary copy of the model, which simulates the process of transformation step by step.
+
+You can *advance* and *rewind* tracking using the arrow keys (left and right).
+
+If you need a more *jagged visualisation*, you can turn off the *smooth tracking* option, which gives us a more jumpy visualisation.
+
+*Tracking* will show all transformations *connected to the tracked sequence from the left*, any following sequences will not be accounted.
+
+
+
+

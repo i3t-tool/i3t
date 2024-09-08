@@ -1,0 +1,208 @@
+---
+title: 2. Working with transformations
+description: Learn about transformations, and transform objects using I3T!
+thumbnail: transform_thumb.png
+language: en
+---
+headline: Welcome to the second tutorial!
+
+This one is focused on *transformations*.
+
+We'll see:
+- *Rotation* = rotating an object
+- *Scaling* = changing the size of an object
+- *Translation* = changing the position of an object
+
+![Example of Rotation, Scaling, Translation in order](transformations.png)
+
+We already used *scaling* in a previous tutorial. Here you will learn about how these transformations work.
+
+--
+headline:What is a transformation?
+
+When we *transform* a 3D model (object), we modify the position of *each of its vertices*.
+
+*Transformations* in 3D are represented by a *4x4 matrix*.
+The effect of the transformation is a result of the *matrix values*.
+
+![Blank matrix that doesn't transform the object](matrix.png)
+
+Each of the vertices is transformed by *multiplying the coordinates* by the transformation matrix.
+
+*Problem:* The matrix is *4x4*, the coordinates are *3x1*. How do we multiply them?
+
+--
+headline: Solution: Homogeneous coordinates
+
+In order to multiply 3D coordinates by the transformation matrix, we have to convert them to *homogeneous coordinates*.
+
+![Homogeneous coordinates](vec4.png)
+
+*Homogeneous coordinates* have an additional value: *W*
+
+Using these coordinates not only allows us to use 4x4 matrices, but also allows us to do *perspective transformation* (explored in the 4th tutorial).
+
+--
+headline: Transformation using homogeneous coordinates 
+
+It's quite simple:
+* Add a new coordinate to a vertex *W = 1*
+![Adding a new coordinate](convertToHomogeneous.png)
+- *Multiply the coordinates* by the transformation
+![Multiplication](transforming.png)
+- *Convert them back* from homogeneous - divide X,Y,Z coordinates by *W*
+![Using division to convert from homogeneous coordinates](conversion.png)
+
+The resulting coordinates give us the new position of the transformed object!
+
+Note: *W value* is modified only by *projection*!
+
+--
+headline: Transformation in action
+
+task: Add a *sequence* and a *model* and connect the blocks together
+hint:
+Blocks are added from the workspace menu ( ![Right mouse button](mouseRight.png)  in Workspace).
+We connect them by dragging
+
+![Connected Sequence and Model blocks](sekvencemodel.png)
+
+*Problem: *What if I want a *rubber ducky* instead of an ugly cube?
+
+--
+headline: Solution: Block context menu
+
+Every block has its own *context menu*, that can be accessed by right-clicking ![Right mouse button](mouseRight.png)  on the *top bar* of the block.
+
+![Context menu of the model](context_menu.png)
+
+You can use the context menu in many ways, for example *renaming*, or *changing the model*.
+
+--
+
+headline: Scaling
+
+task: Change the cube to a "duck" (you can name him *Eduardo*)
+task: Add a *scale matrix* to the workplace 
+hint: Scale matrix is in the workspace menu ( ![Right mouse button](mouseRight.png)  in Workspace) under transformation/scale.
+
+Scaling *changes the size* of the object.
+
+*Scaling matrix* has its values on the diagonal of the matrix:
+
+![Example of a 2x scale matrix](scale.png)
+
+This matrix makes the model *twice as large uniformly*.
+
+--
+
+headline: Object scaling
+
+task: Insert the scaling matrix into the sequence and set its values to *two*
+hint: You can insert the matrix by dragging it by its top bar into the sequence
+
+We can see that the Eduardo becomes twice as large in *Scene View*.
+
+![Big Eduardo](bigger_model.png)
+
+But what if you wanted to "stretch" the model in *one direction only*?
+
+--
+headline: Uneven scaling
+
+If we want to change the scale of each axis *independently*, we need to *disable the synergies* of the matrix.
+
+We can do that via the context menu of the *matrix* under *"disable synergies"*.
+
+![Unlocking the matrix](disable_syn.png)
+
+*You can change the individual values now. Try it on Eduardo and continue.*
+
+--
+headline: Rotation
+
+task: Add a *rotation matrix* in the *Y* direction
+
+Rotation is used to rotate objects around *different axes*.
+
+The important values in each rotation matrix are different based on the *axis*, that we want to rotate around *(X, Y, or Z)*:
+
+![All rotation matrices](rotations.png)
+
+We use *sine* and *cosine* of the rotation angle as the values for the matrix, which is why these values are bounded by *<-1, 1>*.
+
+--
+headline: Changing the matrix in the sequence
+
+task:  Take out the *scaling matrix* from the sequence and replace it with the *rotation matrix*
+
+hint: ![Right mouse button](mouseRight.png)  in Workspace, transformation/rotation/eulerAngleY
+
+![Correctly inserted rotation matrix](swapTransform.png)
+
+Since the matrix values can often be *decimals*, we may want to set them in a more precise way.
+
+--
+
+headline: Choose Value
+As you already know, values in a matrix are modified by *dragging your mouse* or *double-clicking*.
+
+Another way to modify the values is the *Choose value* menu, which is accessed by *right-clicking on an unlocked matrix value* (not grayed out).
+
+![Choose value menu](anglePopup.png)
+
+You can use it to choose a *precise number* from a list of most frequently used numbers.
+
+--
+headline: Working with rotation
+
+task: Rotate the model using the Choose Value menu
+
+hint: ![Right mouse button](mouseRight.png)  on any of the unlocked values
+
+![Rotated Eduardo](rotated_cube.png)
+
+The ducky is now rotated around the *Y axis*.
+
+By applying *multiple rotations* we can rotate the model around any axis. *Composing multiple transformations* will be discussed in the next tutorial.
+
+--
+headline: Translation
+
+task: Remove the *rotation matrix* from the sequence and replace it with a new *translation matrix*
+
+The translation matrix is used to *move the object* in 3D space.
+
+*The values that determine the translation* are the first three values in the last column:
+
+![Translation matrix with highlighted values](translation.png)
+
+*According to the example matrix, Eduardo would move*:
+- by 3 along the X axis (three to the right)
+- by 2 along the Y axis (two up)
+- by -4 along the Z axis (four away from us)
+
+--
+headline: Working with translation
+
+I don't know about you, but I'm getting sick of Eduardo.
+
+task: Update the values in the *translation matrix*, so that duck is no longer *Scene View* (as seen in the picture)
+
+![An empty scene with no duck](translated_cube.png)
+
+*Hint:* if you want to *reset* the matrix values, you can do so through the context menu *(Value/Reset)*
+
+![Reset value menu](reset_value.png)
+--
+headline: Eduardo deserved it!
+Nice! Now you know what each of the matrices does!
+
+![Done!](checkbox.png)
+
+What we learned:
+- basics of working with *transformations*
+- a bit of *maths*
+- repeating basics of *working with blocks*
+
+Click on Finish ![Down](down.png) to return to the start menu.

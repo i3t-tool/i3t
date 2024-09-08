@@ -486,7 +486,7 @@ void TutorialWindow::renderInputTask(InputTask* input) {}
 void TutorialWindow::renderTask(Task* task)
 {
 	// Calculate font size multiplier relative to default imgui fontsize (10) minus space between paragraphs
-	float fontMult = (ImGui::GetFontSize() - SIMPLE_SPACE / 4) / 10;
+	float fontMult = (ImGui::GetFontSize() - 1) / 10;
 	// Rounding to 1 decimal for consistency
 	fontMult = static_cast<float>(static_cast<int>(fontMult * 10.)) / 10.;
 

@@ -1,0 +1,162 @@
+---
+title: I3T basics without any theory
+description: A separate tutorial focused solely on I3T
+thumbnail: logoi3t.png
+language: en
+---
+
+headline: Welcome to I3T!
+
+*I3T* is a program used to teach *transformations in 3D space*.
+
+![Interactive Tool for Teaching Transformations](I3Tpreview.png)
+
+In this tutorial you will learn the *structure of the program* and how to perform *basic tasks*.
+
+First you have to learn how the tutorials are structured!
+
+--
+headline: User interface
+
+*The primary user interface* of the program is divided into two windows:
+
+![View and Workspace](i3tscreens.png)
+
+*Scene View* shows us the 3D scene from a free camera.
+
+*Workspace* is used to assemble *graph nodes* (also *boxes*) that modify the 3D scene.
+
+*You can customize the window layout* as you wish (but it's recommended to leave it as is).
+
+--
+headline: Scene View
+
+*Scene View* shows the 3D scene (similarly to Blender or Unity).
+
+![Scene View](viewport.png)
+
+Controls are similar to Blender:
+- *rotating* = Right mouse button  ![right mouse button](mouseRight.png)
+- *panning* = Holding middle mouse button  ![middle mouse button](mouseMiddle.png)
+- *zoom* = mousewheel up and down  ![mousewheel](mouseMiddle.png)
+
+The controls also work the same for *Workspace*!
+
+
+--
+headline: Workspace
+*Workspace* is where you assemble the scene. You can add in blocks and connect them together.
+
+Clicking the *right mouse button*  ![right mouse button](mouseRight.png)  on the *Workspace* window shows the *"Workspace menu"*.
+
+![Context/Workspace menu](menu.png)
+
+The workspace menu is used to add blocks to the scene *blocks*.
+
+You can also use the *right mouse button* to interact with already created nodes.
+
+
+--
+headline: Graph nodes
+*Nodes* are the most basic components of the program. They represent *matrices, 3D models or other functions* (eg. cycles).
+
+Here are some *node examples*:
+- *model* = 3D model present in the scene view
+- *sequence* = a "holder" for transformation matrices, used to apply matrices to models
+- *scale* = transformation matrix used for scaling the model
+![Cube model, sequence and scaling transformation matrix](addStuff.png)
+
+--
+headline: How do we connect blocks?
+
+*Blocks* work similarly to programming functions, they contain an *input* and an *output*. We connect them using colored *wires*.
+
+![Sequence block](blocks.png)
+
+The icon determines the input/output *data type*. The data type limits which *blocks* "fit together" (can be connected).
+
+For example:
+- *4x4 Matrix* = ![matrix symbol](matrixsym.png)
+- *3D vector* = ![3D vector symbol](vec3.png)
+- *Matrix multiplication* = ![matrix multiplication symbol](mult.png)
+
+--
+headline: How to use sequences?
+
+*Sequence* is different from other blocks - we have to *put* the transformation *matrices inside* instead of connecting them. You can do that by *dragging* the matrix *into the sequence*.
+
+![Dragging the matrix into the sequence](sequence_drag.png)
+
+We can also add *multiple* transformations to a single *sequence*, which will be applied *RIGHT TO LEFT* (similarly to matrix multiplication rules).
+
+--
+headline: Changing values
+
+The values inside the matrix cells can be modified by horizontally *dragging the mouse* or by *double-click editing* them.
+
+![Clicking and dragging the matrix value to the right increases the value and scales the model](hintPosun.png)
+
+The values can also be changed by *double-clicking* and rewriting the value.
+
+--
+headline: Solution: Block context menu
+
+Every block has its own *context menu*, that can be accessed by right-clicking ![Right mouse button](mouseRight.png)  on the *top bar* of the block.
+
+![Context menu of the model](context_menu.png)
+
+You can use the context menu in many ways, for example *renaming*, or *changing the model*.
+
+--
+
+headline: Creating block hierarchies
+
+*The outputs* of any block can be assigned to *multiple inputs*. This is useful for example when applying a *single transformation* tu *multiple objects*.
+
+You can create a new outgoing wire by dragging the output using your mouse:
+
+![Connecting a sequence to multiple targets](multseq.png)
+
+--
+
+headline: Tracking
+
+If you need help visualising the transformation process, you can use *tracking*. Tracking is in the context menu of each *sequence*.
+
+![Tracking in the sequence context menu](tracking.png)
+
+*Tracking* adds a temporary copy of the model, which simulates the process of transformation step by step.
+
+You can *advance* and *rewind* tracking using the arrow keys (left and right).
+
+If you need a more *jagged visualisation*, you can turn off the *smooth tracking* option, which gives us a more jumpy visualisation.
+
+*Tracking* will show all transformations *connected to the tracked sequence from the left*, any following sequences will not be accounted.
+
+--
+
+headline: Camera
+
+*The camera block* simulates an independent camera in the scene.
+
+*The first sequence* in the camera block acts as a holder for a *projection matrix*.
+
+*The second sequence* acts as a holder for a *view/lookAt matrix*.
+
+You need *both a projection and a view* matrix to correctly work with the camera object.
+
+![Camera block with filled matrices](camera.png)
+
+Note: it is recommended to set the *projection* and *lookAt* matrix to a *"Set values"* level-of-detail.
+
+--
+headline: Camera and Screen
+
+To see what the camera sees, you need to add a *screen* block, which connects to the *first* camera *output*, and *shows the perspective* of the camera.
+
+![Example camera use](camera_screen.png)
+
+*The camera* connects itself automatically to all *models and sequences* - this shows us that the objects are being transformed in the view of the camera by both of the camera matrices.
+
+
+
