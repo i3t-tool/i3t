@@ -94,4 +94,8 @@ Vp::Viewport* getViewport()
 {
 	return &App::get().getModule<Vp::Viewport>();
 }
+Core::ResourceManager& getResourceManager()
+{
+	return App::get().getModule<Core::ResourceManager>();
+}
 } // namespace I3T

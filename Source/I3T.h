@@ -33,6 +33,10 @@ namespace Vp
 {
 class Viewport;
 }
+namespace Core
+{
+class ResourceManager;
+}
 class UIModule;
 
 // Static util methods
@@ -41,4 +45,5 @@ namespace I3T
 I3TApplication& app();
 UIModule* getUI();
 Vp::Viewport* getViewport();
+Core::ResourceManager& getResourceManager();
 } // namespace I3T

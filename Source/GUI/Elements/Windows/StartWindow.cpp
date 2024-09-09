@@ -19,6 +19,7 @@
 #include "imgui_internal.h"
 
 #include "Config.h"
+#include "Core/Resources/ResourceManager.h"
 #include "WorkspaceWindow.h"
 
 #include "API.h"
@@ -190,7 +191,11 @@ void StartWindow::renderLeftPanel() const
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 
 		bool language = I3T::getWindowPtr<StartWindow>()->language_is_english;
-		if (ImGui::Button("cz/en", ImVec2(m_cvutImage->m_height, m_cvutImage->m_height)))
+		GLuint flagCz = I3T::getResourceManager().texture("Data/Textures/flags/cz.png");
+		GLuint flagEn = I3T::getResourceManager().texture("Data/Textures/flags/gb.png");
+		GLuint flag = language ? flagEn : flagCz;
+		if (ImGui::ImageButton("##LangButton", (void*) (intptr_t) flag, ImVec2(48, 36), ImVec2(0., 0.), ImVec2(1., 1.),
+		                       ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
 		{
 			I3T::getWindowPtr<StartWindow>()->language_is_english = !language;
 			I3T::getWindowPtr<StartWindow>()->reloadTutorials(!language);
