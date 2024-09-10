@@ -30,6 +30,7 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/IconFonts/Icons.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
@@ -202,18 +203,18 @@ void MainMenuBar::showFileMenu()
 {
 	if (ImGui::BeginMenu("File"))
 	{
-		if (ImGui::MenuItem("New"))
+		if (ImGui::MenuItem(ICON_I3T_NEW_FILE " New"))
 		{
 			InputManager::triggerAction("new", EKeyState::Pressed);
 		}
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Open", "Ctrl+O"))
+		if (ImGui::MenuItem(ICON_I3T_OPEN_FILE " Open", "Ctrl+O"))
 		{
 			InputManager::triggerAction("open", EKeyState::Pressed);
 		}
 
-		if (ImGui::BeginMenu("Recent"))
+		if (ImGui::BeginMenu(ICON_I3T_CLOCK " Recent"))
 		{
 			showRecentFiles();
 
@@ -221,26 +222,27 @@ void MainMenuBar::showFileMenu()
 		}
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Save", "Ctrl+S", false, !App::getModule<StateManager>().getCurrentScene()->m_readOnly))
+		if (ImGui::MenuItem(ICON_I3T_SAVE " Save", "Ctrl+S", false,
+		                    !App::getModule<StateManager>().getCurrentScene()->m_readOnly))
 		{
 			save();
 		}
 
-		if (ImGui::MenuItem("Save As"))
+		if (ImGui::MenuItem(ICON_I3T_SAVE " Save As"))
 		{
 			saveAs();
 		}
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Manage Models"))
+		if (ImGui::MenuItem(ICON_I3T_MODELS " Manage Models"))
 		{
 			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
 		}
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Exit"))
+		if (ImGui::MenuItem(ICON_I3T_EXIT " Exit"))
 		{
 			BeforeCloseCommand::dispatch();
 		}
@@ -275,13 +277,16 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
-		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
-		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
-		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_HOME " Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_TUTORIAL " Tutorial window", nullptr,
+		                I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_SCENE " Scene view window", nullptr,
+		                I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_WORKSPACE " Workspace window", nullptr,
+		                I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 #ifdef I3T_DEBUG
-		ImGui::MenuItem("Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
-		ImGui::MenuItem("Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_CONSOLE " Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_LOG " Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 #endif
 
 		ImGui::EndMenu();
@@ -290,11 +295,11 @@ void MainMenuBar::showWindowsMenu()
 
 void MainMenuBar::showTutorialMenu()
 {
-	if (ImGui::BeginMenu("Tutorials"))
+	if (ImGui::BeginMenu(ICON_I3T_TUTORIAL " Tutorials"))
 	{
-		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_I3T_HOME " Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 
-		if (ImGui::MenuItem("Reload", nullptr))
+		if (ImGui::MenuItem(ICON_I3T_REFRESH " Reload", nullptr))
 		{
 			auto tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
 			if (tutorialWindow->hasTutorial())
@@ -309,7 +314,7 @@ void MainMenuBar::showTutorialMenu()
 
 void MainMenuBar::showHelpMenu()
 {
-	if (ImGui::BeginMenu("Help"))
+	if (ImGui::BeginMenu(ICON_I3T_HELP " Help"))
 	{
 #ifdef I3T_DEBUG
 		if (ImGui::MenuItem("Description"))
@@ -331,7 +336,7 @@ void MainMenuBar::showHelpMenu()
 
 #ifdef I3T_DEBUG
 		ImGui::Separator();
-		if (ImGui::BeginMenu("Debug"))
+		if (ImGui::BeginMenu(ICON_I3T_DEBUG " Debug"))
 		{
 			if (ImGui::BeginMenu("Log level"))
 			{

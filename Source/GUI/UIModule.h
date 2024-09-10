@@ -69,6 +69,8 @@ public:
 		return m_fonts;
 	}
 	void loadFonts();
+	ImFont* loadFont(const char* filename, float size_pixels, float fontScale, const ImFontConfig* font_cfg_template,
+	                 const ImWchar* glyph_ranges, bool mergeIcons);
 
 	WindowManager& getWindowManager()
 	{

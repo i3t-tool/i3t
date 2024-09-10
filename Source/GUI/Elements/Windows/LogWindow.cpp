@@ -11,6 +11,7 @@
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #include "LogWindow.h"
+#include "GUI/IconFonts/Icons.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -21,7 +22,7 @@
 #include "GUI/Theme.h"
 #include "Logger/Logger.h"
 
-LogWindow::LogWindow() : IWindow("Log View")
+LogWindow::LogWindow() : IWindow(ICON_I3T_LOG " Log View")
 {
 #ifdef I3T_DEBUG
 	m_input->bindAction("MyTestAction", EKeyState::Pressed, [] {

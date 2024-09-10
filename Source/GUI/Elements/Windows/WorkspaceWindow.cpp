@@ -17,6 +17,7 @@
 #include <ranges>
 
 #include "GUI/Elements/Nodes/Tools.h"
+#include "GUI/IconFonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 #include "State/NodeDeserializer.h"
@@ -1651,7 +1652,8 @@ void WorkspaceDiwne::setWorkAreaZoom(float val)
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */
 /* ========================================== */
-WorkspaceWindow::WorkspaceWindow(bool show) : IWindow("Workspace", show), m_wholeApplication(App::get())
+WorkspaceWindow::WorkspaceWindow(bool show)
+    : IWindow(ICON_I3T_WORKSPACE " Workspace", show), m_wholeApplication(App::get())
 {
 	m_autoFocus = true;
 	initDiwneFromTheme();

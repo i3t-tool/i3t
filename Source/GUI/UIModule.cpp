@@ -28,6 +28,8 @@
 #include "Loader/ThemeLoader.h"
 #include "Utils/HSLColor.h"
 
+#include "GUI/IconFonts/Icons.h"
+
 using namespace UI;
 
 UIModule::~UIModule()
@@ -328,30 +330,55 @@ void UIModule::loadFonts()
 	// (PF) reduced font ranges above -> font atlas 1024x2048
 
 	m_fonts = {
-	    {"Roboto12",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 12.0f * fontScale, &lqConfig, ranges)}, //
-	    {"Roboto14",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 14.0f * fontScale, &hqConfig, ranges)}, //
-	    {"Roboto16",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
-	    {"Roboto17.5",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 17.5f * fontScale, &lqConfig, ranges)}, //
-	    {"RobotoBold12",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 12.0f * fontScale, &lqConfig, ranges)}, //
-	    {"RobotoBold16",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
-	    {"RobotoBold20",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Bold.ttf", 20.0f * fontScale, &mqConfig, ranges)}, //
-	    {"RobotoItalic16",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Italic.ttf", 16.0f * fontScale, &lqConfig, ranges)}, //
-	    {"UbuntuBold18",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 18.0f * fontScale, &lqConfig, ranges)}, //
-	    {"UbuntuBold24",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 24.0f * fontScale, &lqConfig, ranges)}, //
-	    {"UbuntuBold33.5",
-	     io.Fonts->AddFontFromFileTTF("Data/Fonts/Ubuntu-Bold.ttf", 33.5f * fontScale, &ubuntuBoldCfg, ranges)}, //
+	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},         //
+	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},          //
+	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},         //
+	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)},       //
+	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},        //
+	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},        //
+	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},        //
+	    {"RobotoItalic16", loadFont("Data/Fonts/Roboto-Italic.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},    //
+	    {"UbuntuBold18", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 18.0f, fontScale, &lqConfig, ranges, false)},        //
+	    {"UbuntuBold24", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 24.0f, fontScale, &lqConfig, ranges, false)},        //
+	    {"UbuntuBold33.5", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 33.5f, fontScale, &ubuntuBoldCfg, ranges, false)}, //
 	};
+
 	io.Fonts->Build();
+}
+
+void loadFontAwesomeIcons(float size_pixels, float fontScale)
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Merge in icon fonts
+	ImFontConfig icons_config;
+	icons_config.MergeMode = true;
+	icons_config.PixelSnapH = true;
+
+	float baseFontSize = size_pixels * fontScale;
+	float iconFontSize = baseFontSize;
+
+	icons_config.GlyphMinAdvanceX = iconFontSize;
+	//	icons_config.GlyphMaxAdvanceX = iconFontSize;
+	icons_config.GlyphOffset = ImVec2(0, 0);
+
+	static const ImWchar icons_ranges_fa[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+	//	static const ImWchar icons_ranges_fa[] = {0xf074, 0xf07C, 0xf2c7, 0xf2cb, 0}; // Example of custom ranges
+	io.Fonts->AddFontFromFileTTF("Data/Fonts/fa-6-solid-900.ttf", iconFontSize, &icons_config, icons_ranges_fa);
+}
+
+ImFont* UIModule::loadFont(const char* filename, float size_pixels, float fontScale,
+                           const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges, bool mergeIcons)
+{
+	ImFont* font =
+	    ImGui::GetIO().Fonts->AddFontFromFileTTF(filename, size_pixels * fontScale, font_cfg_template, glyph_ranges);
+
+	if (!mergeIcons)
+		return font;
+
+	loadFontAwesomeIcons(size_pixels, fontScale);
+
+	return font;
 }
 
 void UIModule::buildDockspace()

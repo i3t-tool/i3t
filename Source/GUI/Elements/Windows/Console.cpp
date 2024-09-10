@@ -17,6 +17,7 @@
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Toolkit.h"
 #include "Scripting/ScriptingModule.h"
+#include <GUI/IconFonts/Icons.h>
 
 using namespace UI;
 
@@ -26,7 +27,8 @@ static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 	return console->textEditCallback(data);
 }
 
-Console::Console(bool show) : IWindow("Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
+Console::Console(bool show)
+    : IWindow(ICON_I3T_CONSOLE " Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
 {
 	m_oss << "I3T console\n";
 }

@@ -27,7 +27,7 @@
     },
 	{
       "name": "Plane",
-      "path": "Data/Models/Plane.gltf",
+      "path": "Data/Models/plane.gltf",
       "type": "Model"
     },
     {

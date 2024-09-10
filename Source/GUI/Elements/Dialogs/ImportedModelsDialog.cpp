@@ -23,12 +23,13 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/RemoveModelModal.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/IconFonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "State/StateManager.h"
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
-ImportedModelsDialog::ImportedModelsDialog() : IWindow("Manage Models") {}
+ImportedModelsDialog::ImportedModelsDialog() : IWindow(ICON_I3T_MODELS " Manage Models") {}
 
 void ImportedModelsDialog::render()
 {

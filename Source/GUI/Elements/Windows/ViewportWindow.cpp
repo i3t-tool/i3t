@@ -24,11 +24,13 @@
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/shader/GridShader.h"
 
+#include "GUI/IconFonts/Icons.h"
+
 using namespace UI;
 
 using CameraMode = Vp::AggregateCamera::CameraMode;
 
-ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow("Scene View", show)
+ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(ICON_I3T_SCENE " Scene View", show)
 {
 	m_autoFocus = true;
 	m_viewport = viewport;

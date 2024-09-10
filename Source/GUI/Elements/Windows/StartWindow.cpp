@@ -25,12 +25,13 @@
 #include "API.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
+#include "GUI/IconFonts/Icons.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
 
-StartWindow::StartWindow(bool show) : IWindow("Welcome", show)
+StartWindow::StartWindow(bool show) : IWindow(ICON_I3T_HOME " Welcome", show)
 {
 	// load images
 	try
@@ -139,7 +140,8 @@ void StartWindow::renderLeftPanel() const
 		// ImGui::Dummy(ImVec2(0, titleVerticalOffset));
 		// LOGO
 		ImGui::Dummy(ImVec2(0, titleVerticalOffset / 2));
-		ImGui::Image((ImTextureID) m_i3tImage->m_texID, ImVec2(m_i3tImage->m_width / 2, m_i3tImage->m_height / 2));
+		ImGui::Image((ImTextureID) (intptr_t) m_i3tImage->m_texID,
+		             ImVec2(m_i3tImage->m_width / 2, m_i3tImage->m_height / 2));
 
 		// TITLE
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle));
@@ -179,7 +181,8 @@ void StartWindow::renderLeftPanel() const
 		if (m_cvutImage)
 		{
 			ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - m_cvutImage->m_height);
-			ImGui::Image((ImTextureID) m_cvutImage->m_texID, ImVec2(m_cvutImage->m_width, m_cvutImage->m_height));
+			ImGui::Image((ImTextureID) (intptr_t) m_cvutImage->m_texID,
+			             ImVec2(m_cvutImage->m_width, m_cvutImage->m_height));
 		}
 		ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - m_cvutImage->m_height);
 		ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - m_cvutImage->m_height);
@@ -252,7 +255,7 @@ void StartWindow::renderRightPanel()
 				// folderImage->m_width)/2,ImGui::GetCursorPosY() + (thumbImageSize -
 				// folderImage->m_height)/2); ImGui::Dummy(ImVec2(thumbImageSize,
 				// thumbImageSize)); ImGui::SetCursorPos(offset);
-				ImGui::Image((ImTextureID) m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+				ImGui::Image((ImTextureID) (intptr_t) m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 			}
 			else
 			{}
@@ -350,14 +353,15 @@ void StartWindow::renderRightPanel()
 				auto img = header->m_thumbnailImage;
 				if (img)
 				{
-					ImGui::Image((ImTextureID) img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+					ImGui::Image((ImTextureID) (intptr_t) img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 				}
 				else
 				{
 					// todo load dummy at introwindow init
 					if (m_dummyImage)
 					{
-						ImGui::Image((ImTextureID) m_dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+						ImGui::Image((ImTextureID) (intptr_t) m_dummyImage->m_texID,
+						             ImVec2(thumbImageSize, thumbImageSize));
 					}
 					else
 					{
