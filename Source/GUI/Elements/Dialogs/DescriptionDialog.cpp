@@ -16,6 +16,7 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "GUI/WindowManager.h"
 
 DescriptionDialog::DescriptionDialog() : IWindow("Description")
 {
@@ -26,7 +27,7 @@ void DescriptionDialog::render()
 {
 	bool windowOpen = true;
 
-	ImGui::Begin(getName(), getShowPtr());
+	ImGui::Begin(getName(), getShowPtr(), g_dialogFlags);
 	this->updateWindowInfo();
 
 	if (m_isEditState)

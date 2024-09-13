@@ -102,7 +102,22 @@ If the user already knows what they are doing, they can try **exercises** (the l
 # Technical manual
 
 ## GUI
-tbd
+### Themes
+The colors and other size properties of the GUI is determined by the current application *Theme*. There are multiple themes to choose from and can be switched and edited at runtime via the *Style Editor* window. 
+
+One default theme is always loaded called the 'Classic' style. This object is initialized in code in the `Theme::createDefaultClassic()` method.
+Other themes are loaded from `.yml` files in the `Data/Themes` directory.
+
+A `Theme` (`GUI/Theme/Theme.h`) object contains key-value pairs of style properties (colors (ImVec4) and sizes (floats, ImVec2)). These style properties overwrite the standard Dear ImGui style properties and specify the visual theme of the application. The style properties are also queried from various parts od the GUI codebase and used locally to style specific components or used outside of Dear ImGui. 
+
+Each additional theme loaded from the `.yml` files using `GUI/Theme/ThemeLoader.h` is derived from the 'Classic' theme and initially contains the properties set by the `Theme::initClassicProperties()` method. These properties are then partially or fully overwritten by the style properties present in the styles `.yml` file.
+
+#### Adding a Theme style property
+To add a style property, the following must be done in `Theme.h/.cpp`:
+ - Create a style property key in one of the enums depending on the type (EColor, ESize, ESizeVec2).
+ - Set a default value for the 'Classic' theme in `initClassicProperties()`.
+ - Add a human-readable key name in the `Theme::initNames()` method.
+ - (optional) Do something with the style variable value at Theme init in the `Theme::apply()` method. Usually this would be overwriting an existing ImGui style variable with it.
 
 ## DIWNE
 See the [DIWNE documentation](developer-guide/diwne).

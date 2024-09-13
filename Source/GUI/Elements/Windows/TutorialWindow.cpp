@@ -32,6 +32,7 @@
 #include "imgui_markdown.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "GUI/Toolkit.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
@@ -201,13 +202,13 @@ void TutorialWindow::render()
 		        // styles
 
 	// PUSH STYLE
+	GUI::dockTabStylePush();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, I3T::getUI()->getTheme().get(ESizeVec2::TutorialWindow_Padding));
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getUI()->getTheme().get(ESize::TutorialWindow_FrameRounding));
 	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, I3T::getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarSize));
 	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding,
 	                    I3T::getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarRounding));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, I3T::getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, I3T::getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, I3T::getUI()->getTheme().get(EColor::TutorialScrollbarBg));
@@ -232,8 +233,8 @@ void TutorialWindow::render()
 
 	ImGui::SetNextWindowSize(ImVec2(500, 650), ImGuiCond_FirstUseEver);
 	ImGui::Begin(getName(), getShowPtr());
-
 	this->updateWindowInfo();
+	GUI::dockTabStylePop();
 
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialText));
 
@@ -245,7 +246,6 @@ void TutorialWindow::render()
 	// POP STYLE
 	ImGui::PopStyleVar(5);
 	ImGui::PopStyleColor(7);
-	ImGui::PopStyleColor();
 	// END WINDOW
 	ImGui::End();
 }

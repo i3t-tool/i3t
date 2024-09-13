@@ -46,6 +46,7 @@ private:
 
 	ImDrawListSplitter m_channelSplitter;
 
+	bool showViewportButtons();
 	bool showViewportMenu();
 };
 } // namespace UI

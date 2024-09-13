@@ -17,7 +17,7 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "GUI/Theme.h"
+#include "GUI/Theme/Theme.h"
 #include "Utils/FilesystemUtils.h"
 
 template <typename T> std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
@@ -40,6 +40,14 @@ void dumpVec2(YAML::Emitter& out, const float* vec)
 	out << YAML::EndMap;
 }
 
+void dumpVec2Seq(YAML::Emitter& out, const float* vec)
+{
+	out << YAML::Flow << YAML::BeginSeq;
+	out << vec[0];
+	out << vec[1];
+	out << YAML::EndSeq << YAML::Block;
+}
+
 void dumpVec4(YAML::Emitter& out, const float* vec)
 {
 	out << YAML::BeginMap;
@@ -50,12 +58,29 @@ void dumpVec4(YAML::Emitter& out, const float* vec)
 	out << YAML::EndMap;
 }
 
+void dumpVec4SeqRound(YAML::Emitter& out, const float* vec, int precision)
+{
+	out << YAML::Flow << YAML::BeginSeq;
+	out << fmt::format("{:.{}f}", vec[0], precision);
+	out << fmt::format("{:.{}f}", vec[1], precision);
+	out << fmt::format("{:.{}f}", vec[2], precision);
+	out << fmt::format("{:.{}f}", vec[3], precision);
+	out << YAML::EndSeq << YAML::Block;
+}
+
 ImVec2 parseVec2(YAML::Node& node)
 {
 	ImVec2 vec;
 	vec.x = node["x"].as<float>();
 	vec.y = node["y"].as<float>();
+	return vec;
+}
 
+ImVec2 parseVec2Seq(YAML::Node& node)
+{
+	ImVec2 vec;
+	vec.x = node[0].as<float>();
+	vec.y = node[1].as<float>();
 	return vec;
 }
 
@@ -66,8 +91,22 @@ ImVec4 parseVec4(YAML::Node& node)
 	vec.y = node["y"].as<float>();
 	vec.z = node["z"].as<float>();
 	vec.w = node["w"].as<float>();
-
 	return vec;
+}
+
+ImVec4 parseVec4Seq(YAML::Node& node)
+{
+	ImVec4 vec;
+	vec.x = node[0].as<float>();
+	vec.y = node[1].as<float>();
+	vec.z = node[2].as<float>();
+	vec.w = node[3].as<float>();
+	return vec;
+}
+
+template <typename T> bool compareThemeEntry(const T& a, const T& b)
+{
+	return a.first < b.first;
 }
 
 void saveTheme(const fs::path& path, Theme& theme)
@@ -77,25 +116,42 @@ void saveTheme(const fs::path& path, Theme& theme)
 		return;
 	}
 
+	// Sort the style keys alphabetically first
+	std::vector<std::pair<EColor, ImVec4>> colors;
+	for (const auto& [key, val] : theme.getColorsRef())
+		colors.emplace_back(key, val);
+	std::vector<std::pair<ESize, float>> sizes1;
+	for (const auto& [key, val] : theme.getSizesRef())
+		sizes1.emplace_back(key, val);
+	std::vector<std::pair<ESizeVec2, ImVec2>> sizes2;
+	for (const auto& [key, val] : theme.getSizesVecRef())
+		sizes2.emplace_back(key, val);
+
+	std::sort(colors.begin(), colors.end(), compareThemeEntry<std::pair<EColor, ImVec4>>);
+	std::sort(sizes1.begin(), sizes1.end(), compareThemeEntry<std::pair<ESize, float>>);
+	std::sort(sizes2.begin(), sizes2.end(), compareThemeEntry<std::pair<ESizeVec2, ImVec2>>);
+
+	// Generate yml file
+
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 
 	out << YAML::Key << "colors";
 	out << YAML::Value << YAML::BeginMap;
-	for (const auto& [key, val] : theme.getColorsRef())
+	for (const auto& [key, val] : colors)
 	{
 		if (auto str = enumToStr(Theme::getColorNames(), key))
 		{
 			out << YAML::Key << str;
 			out << YAML::Value;
-			dumpVec4(out, (const float*) &val);
+			dumpVec4SeqRound(out, (const float*) &val, 3);
 		}
 	}
 	out << YAML::EndMap;
 
 	out << YAML::Key << "sizes";
 	out << YAML::Value << YAML::BeginMap;
-	for (const auto& [key, val] : theme.getSizesRef())
+	for (const auto& [key, val] : sizes1)
 	{
 		if (auto* str = enumToStr(Theme::getSizeNames(), key))
 		{
@@ -107,13 +163,13 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 	out << YAML::Key << "size vectors";
 	out << YAML::Value << YAML::BeginMap;
-	for (const auto& [key, val] : theme.getSizesVecRef())
+	for (const auto& [key, val] : sizes2)
 	{
 		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
 		{
 			out << YAML::Key << str;
 			out << YAML::Value;
-			dumpVec2(out, (const float*) &val);
+			dumpVec2Seq(out, (const float*) &val);
 		}
 	}
 	out << YAML::EndMap;
@@ -157,7 +213,7 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 
 			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
 			{
-				colors[*en] = parseVec4(node);
+				colors[*en] = parseVec4Seq(node);
 			}
 			else
 				LOG_ERROR("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
@@ -183,7 +239,7 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 
 			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
 			{
-				sizesVec[*en] = parseVec2(node);
+				sizesVec[*en] = parseVec2Seq(node);
 			}
 		}
 	}

@@ -24,8 +24,9 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Theme/ThemeLoader.h"
+#include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
-#include "Loader/ThemeLoader.h"
 #include "Utils/HSLColor.h"
 
 #include "GUI/IconFonts/Icons.h"
@@ -119,9 +120,6 @@ void UIModule::loadThemes()
 	const std::string themesDir = "Data/Themes";
 
 	m_allThemes.push_back(Theme::createDefaultClassic());
-
-	// Not needed now.
-	// m_allThemes.push_back(Theme::createDefaultModern());
 
 	// Load all themes at Data/Themes directory.
 	const auto entries = fs::directory_iterator(themesDir);
@@ -363,8 +361,7 @@ void loadFontAwesomeIcons(float size_pixels, float fontScale)
 	icons_config.GlyphOffset = ImVec2(0, 0);
 
 	static const ImWchar icons_ranges_fa[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-	//	static const ImWchar icons_ranges_fa[] = {0xf074, 0xf07C, 0xf2c7, 0xf2cb, 0}; // Example of custom ranges
-	io.Fonts->AddFontFromFileTTF("Data/Fonts/fa-6-solid-900.ttf", iconFontSize, &icons_config, icons_ranges_fa);
+	io.Fonts->AddFontFromFileTTF("Data/Fonts/fa-6-solid-900-i3t.ttf", iconFontSize, &icons_config, icons_ranges_fa);
 }
 
 ImFont* UIModule::loadFont(const char* filename, float size_pixels, float fontScale,
@@ -400,6 +397,7 @@ void UIModule::buildDockspace()
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
 		                ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
@@ -423,7 +421,7 @@ void UIModule::buildDockspace()
 	ImGui::PopStyleVar();
 
 	if (opt_fullscreen)
-		ImGui::PopStyleVar(2);
+		ImGui::PopStyleVar(3);
 
 	// DockSpace
 	ImGuiIO& io = ImGui::GetIO();
@@ -431,10 +429,10 @@ void UIModule::buildDockspace()
 	{
 		// Active tab color is set to a special color for docked windows. It does not affect regular tabs.
 		// This style should be pushed for the dockspace here as well as every docked window Begin()
-		ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+		GUI::dockTabStylePush();
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-		ImGui::PopStyleColor();
+		GUI::dockTabStylePop();
 	}
 	else
 	{
