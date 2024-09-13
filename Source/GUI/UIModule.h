@@ -20,7 +20,7 @@
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "GUI/Elements/IWindow.h"
-#include "GUI/Theme.h"
+#include "GUI/Theme/Theme.h"
 #include "GUI/WindowManager.h"
 #include "State/Stateful.h"
 

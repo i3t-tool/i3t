@@ -130,73 +130,167 @@ void ViewportWindow::render()
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(getName(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-
-	// Get info about current window's dimensions
-	this->updateWindowInfo();
-
-	int windowWidth = m_windowSize.x;
-	int windowHeight = m_windowSize.y;
-	ImVec2 windowMin = GUI::glmToIm(m_windowMin);
-	ImVec2 windowMax = GUI::glmToIm(m_windowMax);
-
-	bool menuInteraction = false;
-	if (ImGui::BeginMenuBar())
+	GUI::dockTabStylePush();
+	if (ImGui::Begin(getName(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar))
 	{
-		menuInteraction |= showViewportMenu();
-		ImGui::EndMenuBar();
-	}
+		GUI::dockTabStylePop();
+		ImGui::PopStyleVar();
+		// Get info about current window's dimensions
+		this->updateWindowInfo();
 
-	m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
-	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
-	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
-	// interacting with them, hence we draw them beforehand using a channel splitter
-	bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
-	if (m_viewport->getSettings().scene().manipulator_enabled)
-	{
-		manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
-	}
-	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+		int windowWidth = m_windowSize.x;
+		int windowHeight = m_windowSize.y;
+		ImVec2 windowMin = GUI::glmToIm(m_windowMin);
+		ImVec2 windowMax = GUI::glmToIm(m_windowMax);
 
-	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
-	//  the InputManager's active input rather than asking the WindowManager
-	if (InputManager::isInputActive(getInput()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
-	{
-		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
-		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
-		m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
-	}
+		bool menuInteraction = false;
+		if (ImGui::BeginMenuBar())
+		{
+			menuInteraction |= showViewportMenu();
+			ImGui::EndMenuBar();
+		}
 
-	m_renderOptions.lightingModel = m_viewport->getSettings().global().lighting_lightingModel;
-	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
-	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
+		// Some UI elements need to get drawn last to overlay them over the viewport, however we want to know if the
+		// user has interacted with them before drawing the viewport, hence we draw them beforehand using a channel
+		// splitter.
+		m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
 
-	if (framebuffer)
-	{
-		GLuint texture = framebuffer->getColorTexture();
-		// the uv coordinates flips the picture, since it was upside down at first
-		ImGui::GetWindowDrawList()->AddImage((void*) (intptr_t) texture, windowMin, windowMax, ImVec2(0, 1),
-		                                     ImVec2(1, 0));
+		// UI overlay channel
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
+
+		menuInteraction |= showViewportButtons();
+
+		// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
+		// interacting with them, hence we draw them beforehand using a channel splitter
+		bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
+		if (m_viewport->getSettings().scene().manipulator_enabled)
+		{
+			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
+		}
+
+		// Viewport channel
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+
+		// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but
+		// through
+		//  the InputManager's active input rather than asking the WindowManager
+		if (InputManager::isInputActive(getInput()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
+		{
+			glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
+			m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
+			m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
+		}
+
+		m_renderOptions.lightingModel = m_viewport->getSettings().global().lighting_lightingModel;
+		m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
+		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
+
+		if (framebuffer)
+		{
+			GLuint texture = framebuffer->getColorTexture();
+			// the uv coordinates flips the picture, since it was upside down at first
+			ImGui::GetWindowDrawList()->AddImage((void*) (intptr_t) texture, windowMin, windowMax, ImVec2(0, 1),
+			                                     ImVec2(1, 0));
+		}
+		else
+		{
+			ImGui::Text("Failed to draw viewport!");
+		}
+
+		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
 	else
 	{
-		ImGui::Text("Failed to draw viewport!");
+		GUI::dockTabStylePop();
+		ImGui::PopStyleVar(2);
+	}
+	ImGui::End();
+}
+
+bool ViewportWindow::showViewportButtons()
+{
+	bool interacted = false;
+
+	Vp::ViewportSettings& stg = m_viewport->getSettings();
+
+	float popupTitleDividerSize = 0.3f * ImGui::GetTextLineHeight();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+
+	glm::vec2 topLeftButtonsOffset = 0.4f * glm::vec2(ImGui::GetFontSize(), ImGui::GetFontSize());
+	ImVec2 topLeftButtonsOrigin = GUI::glmToIm(this->m_windowMin + topLeftButtonsOffset);
+
+	ImGui::SetCursorScreenPos(topLeftButtonsOrigin);
+
+	// Object visibility options
+	const char* displayPopupId = "popup_display";
+	if (ImGui::Button(ICON_FA_EYE "###DisplayButton"))
+	{
+		interacted = true;
+		ImGui::OpenPopup(displayPopupId);
+	}
+	else
+	{
+		if (ImGui::IsItemHovered())
+		{
+			interacted = true;
+			GUI::Tooltip("Object visibility toggle", "");
+		}
 	}
 
-	m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+	if (ImGui::BeginPopup(displayPopupId))
+	{
+		interacted = true;
+		ImGui::TextDisabled("Object visibility");
+		ImGui::Dummy({0.0f, popupTitleDividerSize});
 
-	ImGui::End();
+		ImGui::MenuItem(ICON_I3T_MODEL " Objects", nullptr, &m_displayOptions.showDefault);
+		ImGui::MenuItem(ICON_I3T_MANIPULATOR " Axes", nullptr, &m_displayOptions.showAxes);
+		ImGui::MenuItem(ICON_I3T_GRID " Grid", nullptr, &m_displayOptions.showGrid);
+		ImGui::MenuItem(ICON_I3T_CAMERA " Cameras", nullptr, &m_displayOptions.showCamera);
+		ImGui::MenuItem(ICON_I3T_FRUSTUM " Frustums", nullptr, &m_displayOptions.showFrustum);
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::SameLine();
+
+	if (GUI::ToggleButton(ICON_I3T_EARTH "###WorldLightingButton", stg.scene().mainScene.lightFollowsCamera, true))
+	{
+		interacted = true;
+	}
+	else
+	{
+		if (ImGui::IsItemHovered())
+		{
+			interacted = true;
+			GUI::Tooltip("Toggle world lighting", "");
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (GUI::ToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", stg.scene().manipulator_enabled))
+	{
+		interacted = true;
+	}
+	else
+	{
+		if (ImGui::IsItemHovered())
+		{
+			interacted = true;
+			GUI::Tooltip("Toggle manipulators", "");
+		}
+	}
+
+	ImGui::PopItemFlag();
+	ImGui::PopStyleVar();
+	return interacted;
 }
 
 bool ViewportWindow::showViewportMenu()
 {
-	// TODO: (DR) Sometimes closing of nested menus causes a debug assertion fail, its a fixed bug as per:
-	//  https://github.com/ocornut/imgui/issues/4640
-	//  Can only be fixed by updating imgui
-
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 
 	Vp::ViewportSettings& stg = m_viewport->getSettings();
@@ -390,15 +484,15 @@ bool ViewportWindow::showViewportMenu()
 		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
 		ImGui::Checkbox("Show grid", &m_displayOptions.showGrid);
 		ImGui::SameLine();
-		GUI::ToggleButton("XZ", m_displayOptions.showGridLines, gridButtonSize);
+		GUI::ToggleButton("XZ", m_displayOptions.showGridLines, false, gridButtonSize);
 		ImGui::SameLine();
 		ImGui::Dummy(ImVec2(4.0f, 0.0f));
 		ImGui::SameLine();
-		GUI::ToggleButton("X", m_displayOptions.showGridXAxis, gridButtonSize);
+		GUI::ToggleButton("X", m_displayOptions.showGridXAxis, false, gridButtonSize);
 		ImGui::SameLine();
-		GUI::ToggleButton("Y", m_displayOptions.showGridYAxis, gridButtonSize);
+		GUI::ToggleButton("Y", m_displayOptions.showGridYAxis, false, gridButtonSize);
 		ImGui::SameLine();
-		GUI::ToggleButton("Z", m_displayOptions.showGridZAxis, gridButtonSize);
+		GUI::ToggleButton("Z", m_displayOptions.showGridZAxis, false, gridButtonSize);
 
 		ImGui::Separator();
 

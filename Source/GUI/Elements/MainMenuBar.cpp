@@ -264,7 +264,9 @@ void MainMenuBar::showEditMenu()
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem("Preferences"))
+		if (ImGui::MenuItem(ICON_I3T_STYLE " Style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
+		{}
+		if (ImGui::MenuItem(ICON_I3T_SETTINGS " Preferences"))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
 		}
@@ -327,12 +329,9 @@ void MainMenuBar::showHelpMenu()
 		ImGui::Separator();
 
 #ifdef I3T_DEBUG
-		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
+		if (ImGui::MenuItem("Show ImGui demo window", nullptr, &m_showDemoWindow))
 		{}
 #endif
-
-		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
-		{}
 
 #ifdef I3T_DEBUG
 		ImGui::Separator();

@@ -53,7 +53,7 @@ bool Button(const char* id, bool disabled = false);
 bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
                void* user_data);
 
-void ToggleButton(const char* label, bool& toggled, ImVec2 size = ImVec2(0.0f, 0.0f));
+bool ToggleButton(const char* label, bool& toggled, bool invert = false, ImVec2 size = ImVec2(0.0f, 0.0f));
 
 bool ButtonWithCorners(const char* label, ImDrawFlags corners, const ImVec2& size = ImVec2(0, 0));
 
@@ -102,5 +102,33 @@ void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size,
 
 void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
                  float thickness = 1.0f);
+
+inline void Tooltip(const char* header, const char* description)
+{
+	ImGui::BeginTooltip();
+	ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+	ImGui::TextUnformatted(header);
+
+	if (strlen(description) != 0)
+	{
+		ImGui::Dummy({0.0f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_Text, {0.7f, 0.7f, 0.7f, 1.0f});
+		ImGui::TextUnformatted(description);
+		ImGui::PopStyleColor();
+	}
+
+	ImGui::PopTextWrapPos();
+	ImGui::EndTooltip();
+}
+
+/**
+ * Sets style for the tab of a dockable window.
+ * This method should be called after the ImGui::Begin call of a dockable window.
+ * Style needs to be popped afterwards with dockTabStylePop()
+ * Note that this style affects regular ImGui tabs,
+ * the style needs to be popped before using those in the dockable window.
+ */
+void dockTabStylePush();
+void dockTabStylePop();
 
 } // namespace GUI

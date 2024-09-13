@@ -83,25 +83,29 @@ bool Button(const char* id, bool disabled)
 	return result;
 }
 
-void ToggleButton(const char* label, bool& toggled, ImVec2 size)
+bool ToggleButton(const char* label, bool& toggled, bool invert, ImVec2 size)
 {
+	bool pressed = false;
 	int colorsPushed = 0;
-	if (toggled)
+	bool state = invert ? !toggled : toggled;
+	if (state)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ActiveColor));
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::SelectionColor));
 		colorsPushed++;
 	}
 	else
 	{
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::TutorialButtonBg));
-		colorsPushed++;
+		colorsPushed = colorsPushed + 2;
 	}
 	if (ImGui::Button(label, size))
 	{
+		pressed = true;
 		toggled = !toggled;
 	}
 	ImGui::PopStyleColor(colorsPushed);
-	colorsPushed = 0;
+	return pressed;
 }
 
 bool ButtonWithCorners(const char* label, ImDrawFlags corners, const ImVec2& size_arg)
@@ -227,6 +231,20 @@ void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDra
 	}
 
 	drawList->AddPolyline(&points[0], points.size(), color, ImDrawFlags_Closed, thickness);
+}
+
+void dockTabStylePush()
+{
+	ImGui::PushStyleColor(ImGuiCol_TabHovered, I3T::getUI()->getTheme().get(EColor::DockTabHovered));
+	ImGui::PushStyleColor(ImGuiCol_Tab, I3T::getUI()->getTheme().get(EColor::DockTab));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleColor(ImGuiCol_TabUnfocused, I3T::getUI()->getTheme().get(EColor::DockTabUnfocused));
+	ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, I3T::getUI()->getTheme().get(EColor::DockTabUnfocusedActive));
+}
+
+void dockTabStylePop()
+{
+	ImGui::PopStyleColor(5);
 }
 
 } // namespace GUI

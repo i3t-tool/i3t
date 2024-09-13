@@ -18,6 +18,7 @@
 
 #include "GUI/Elements/Nodes/Tools.h"
 #include "GUI/IconFonts/Icons.h"
+#include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 #include "State/NodeDeserializer.h"
@@ -1762,12 +1763,15 @@ WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
 
 void WorkspaceWindow::render()
 {
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
+	GUI::dockTabStylePush();
 	/* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
 	                     ImGuiWindowFlags_NoScrollWithMouse))
 	{
+		GUI::dockTabStylePop();
+		ImGui::PopStyleVar();
 		this->updateWindowInfo();
 
 		if (ImGui::BeginMenuBar())
@@ -1784,8 +1788,12 @@ void WorkspaceWindow::render()
 		}
 		g_workspaceDiwne->drawDiwne(drawMode);
 	}
+	else
+	{
+		GUI::dockTabStylePop();
+		ImGui::PopStyleVar();
+	}
 	ImGui::End();
-	ImGui::PopStyleColor();
 }
 
 void WorkspaceWindow::showEditMenu()

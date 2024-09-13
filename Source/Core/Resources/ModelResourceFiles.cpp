@@ -134,4 +134,5 @@ bool Core::ModelResourceFiles::fetchFiles(void* data)
 		LOG_DEBUG("[IMPORT] {}: {}", std::to_string(i), entry.string());
 		i++;
 	}
+	return true;
 }

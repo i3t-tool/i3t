@@ -38,14 +38,18 @@ void Console::render()
 	const auto& style = ImGui::GetStyle();
 	m_InputHeight = ImGui::GetFontSize() + 2 * style.FramePadding.y + style.ItemSpacing.y;
 
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(getName(), getShowPtr());
+	GUI::dockTabStylePush();
+	if (ImGui::Begin(getName(), getShowPtr()))
 	{
+		GUI::dockTabStylePop();
 		this->updateWindowInfo();
 		drawOutput();
 		drawInput();
 	}
-	ImGui::PopStyleColor();
+	else
+	{
+		GUI::dockTabStylePop();
+	}
 	ImGui::End();
 }
 

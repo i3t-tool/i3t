@@ -12,6 +12,7 @@
  */
 #include "LogWindow.h"
 #include "GUI/IconFonts/Icons.h"
+#include "GUI/Toolkit.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -19,7 +20,7 @@
 #include "API.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
-#include "GUI/Theme.h"
+#include "GUI/Theme/Theme.h"
 #include "Logger/Logger.h"
 
 LogWindow::LogWindow() : IWindow(ICON_I3T_LOG " Log View")
@@ -62,9 +63,9 @@ LogWindow::LogWindow() : IWindow(ICON_I3T_LOG " Log View")
 
 void LogWindow::render()
 {
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
+	GUI::dockTabStylePush();
 	ImGui::Begin(getName(), getShowPtr());
-	ImGui::PopStyleColor();
+	GUI::dockTabStylePop();
 	this->updateWindowInfo();
 
 	ImGui::Text("Log output");

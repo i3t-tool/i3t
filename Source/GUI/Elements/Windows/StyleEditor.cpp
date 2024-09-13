@@ -18,18 +18,18 @@
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 
+#include "GUI/IconFonts/Icons.h"
+#include "GUI/Theme/ThemeLoader.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
-#include "Loader/ThemeLoader.h"
 #include "UserData.h"
-#include "Utils/FilesystemUtils.h"
 #include "Utils/Other.h"
 
 namespace UI
 {
 constexpr float DRAG_FLOAT_WIDTH = 100.0f;
 
-StyleEditor::StyleEditor() : IWindow("Style Editor") {}
+StyleEditor::StyleEditor() : IWindow(ICON_I3T_STYLE " Style Editor") {}
 
 void StyleEditor::render()
 {
@@ -191,10 +191,6 @@ void StyleEditor::revertChangesOnCurrentTheme()
 	{
 		I3T::emplaceTheme(Theme::createDefaultClassic());
 	}
-	else if (curr.getName() == "modern")
-	{
-		I3T::emplaceTheme(Theme::createDefaultModern());
-	}
 	else
 	{
 		auto path = std::string("Data/Themes/") + curr.getName() + ".yml";
@@ -227,7 +223,7 @@ void showColors()
 		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
 
 		const auto label = fmt::format("{}##{}", str + I3T_PROPERTY_NAME_OFFSET, (unsigned) key);
-		if (ImGui::ColorEdit4(label.c_str(), (float*) (&color)))
+		if (ImGui::ColorEdit4(label.c_str(), (float*) (&color), ImGuiColorEditFlags_AlphaPreviewHalf))
 		{
 			curr.apply();
 		}

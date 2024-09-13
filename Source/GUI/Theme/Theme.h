@@ -37,21 +37,39 @@ inline const std::set<std::string> I3T_DEFAULT_THEMES = {
 
 enum class EColor
 {
-	// Global colors.
+	// Main I3T colors
+	PrimaryColor,   /// Color of tabs, separators, titles ...
+	ActiveColor,    /// Focused primary color
+	SelectionColor, /// Active selection color
+
+	// ImGui standard colors
 	Text,
-	Border,
+	TextDisabled,
 	WindowBackground,
 	PopupBackground,
+	Border,
+	FrameBg,
+	FrameBgHovered,
+	FrameBgActive,
 	MenuBarBackground,
-	PrimaryColor, /// Color of tabs, separators, titles ...
-	ActiveColor,
-	TabColor, // TODO: (DR) Unused
+	Button,
+	ButtonHovered,
+	ButtonActive,
+	Tab,
+	TabHovered,
+	TabActive,
+
+	// Extra dock tab options
+	DockTab,
+	DockTabActive,
+	DockTabUnfocused,
+	DockTabUnfocusedActive,
+	DockTabHovered,
+
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
 	SceneViewBackground,
-
-	DockTabActive,
 
 	Synergies_FloatBg,
 	Synergies_FloatBgActive,
@@ -401,7 +419,6 @@ public:
 	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
 	static Theme createDefaultClassic();
-	static Theme createDefaultModern();
 
 	void initFonts();
 
@@ -410,11 +427,6 @@ private:
 	 * Style based on Folta/Zadina style.
 	 */
 	void initClassicProperties();
-
-	/**
-	 * Style based on Pilka design.
-	 */
-	void initModernProperties();
 
 public:
 	/**

@@ -18,11 +18,13 @@
 #include "API.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "GUI/Theme.h"
+#include "GUI/IconFonts/Icons.h"
+#include "GUI/Theme/Theme.h"
+#include "GUI/Toolkit.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
-SetupDialog::SetupDialog() : IWindow("Preferences") {}
+SetupDialog::SetupDialog() : IWindow(ICON_I3T_SETTINGS " Preferences") {}
 
 void SetupDialog::render()
 {
@@ -32,10 +34,12 @@ void SetupDialog::render()
 	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
 	// style.FramePadding.y = 4;
 	bool windowOpen = true;
-	ImGui::PushStyleColor(ImGuiCol_TabActive, I3T::getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(getName(), getShowPtr());
+	GUI::dockTabStylePush();
+	if (ImGui::Begin(getName(), getShowPtr()))
 	{
 		this->updateWindowInfo();
+		GUI::dockTabStylePop();
+
 		Vp::Viewport* viewport = I3T::getViewport();
 		Vp::ViewportSettings& stg = viewport->getSettings();
 
@@ -116,7 +120,10 @@ void SetupDialog::render()
 		//			ImGui::Checkbox("console", &check);
 		//		}
 	}
-	ImGui::PopStyleColor();
+	else
+	{
+		GUI::dockTabStylePop();
+	}
 	if (!isVisible())
 	{
 		HideWindowCommand::dispatch(ID);

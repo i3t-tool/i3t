@@ -18,7 +18,7 @@
 #include "I3T.h"
 
 #include "Core/Application.h"
-#include "GUI/Theme.h"
+#include "GUI/Theme/Theme.h"
 #include "GUI/UIModule.h"
 
 // TODO: (DR) Maybe merge this with the I3TApplication (I3T.h) file?

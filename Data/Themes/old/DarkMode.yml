@@ -1,0 +1,692 @@
+colors:
+  glob_Text:
+    x: 0.949019611
+    y: 0.949019611
+    z: 0.949019611
+    w: 1
+  glob_Window Background:
+    x: 0.135479093
+    y: 0.135479093
+    z: 0.135479093
+    w: 1
+  glob_Popup Background:
+    x: 0.101960786
+    y: 0.101960786
+    z: 0.101960786
+    w: 0.862745106
+  glob_Menu Bar Background:
+    x: 0.135479093
+    y: 0.135479093
+    z: 0.135479093
+    w: 1
+  glob_Border:
+    x: 0.199101806
+    y: 0.199101806
+    z: 0.199101806
+    w: 1
+  glob_Primary Color (tabs, tiles, ...):
+    x: 0.268000007
+    y: 0.268000007
+    z: 0.276000023
+    w: 1
+  glob_Active Color:
+    x: 0.298000008
+    y: 0.298000008
+    z: 0.306000024
+    w: 1
+  glob_Selection Color:
+    x: 0.201919198
+    y: 0.395685673
+    z: 0.626556039
+    w: 1
+  glob_Tab SceneView Background:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  glob_Dock Tab Color:
+    x: 0.252669036
+    y: 0.252669036
+    z: 0.252669036
+    w: 1
+  glob_Dock Selected Tab Color:
+    x: 0.0996441245
+    y: 0.0996441245
+    z: 0.0996441245
+    w: 1
+  npop_Connection is possible (text):
+    x: 0.118354835
+    y: 0.786676645
+    z: 0.118354835
+    w: 1
+  glob_Dock Unfocused Tab Color:
+    x: 0.250980407
+    y: 0.250980407
+    z: 0.250980407
+    w: 1
+  npop_Connection is not possible (text):
+    x: 0.880239546
+    y: 0.214789003
+    z: 0.214789003
+    w: 1
+  glob_Dock Unfocused Selected Tab Color:
+    x: 0.196078435
+    y: 0.196078435
+    z: 0.196078435
+    w: 1
+  npop_Create node popup:
+    x: 0.125490203
+    y: 0.176470593
+    z: 0.125490203
+    w: 0.70588237
+  glob_Dock Hovered Tab Color:
+    x: 0.234999999
+    y: 0.497999996
+    z: 0.811999977
+    w: 1
+  glob_Selected node border:
+    x: 1
+    y: 0.913725495
+    z: 0
+    w: 0.509803951
+  tuts_Background:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  tuts_Text:
+    x: 0.90196079
+    y: 0.90196079
+    z: 0.90196079
+    w: 1
+  tuts_Bar Background:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 1
+  tuts_Scrollbar Background:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  tuts_Scrollbar Active:
+    x: 0.254901975
+    y: 0.254901975
+    z: 0.254901975
+    w: 1
+  tuts_Scrollbar Grab:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 1
+  tuts_Scrollbar Hovered:
+    x: 0.235294119
+    y: 0.235294119
+    z: 0.235294119
+    w: 1
+  tuts_Title Text:
+    x: 0.0615147986
+    y: 0.435669512
+    z: 0.784313738
+    w: 1
+  tuts_Highlight Text:
+    x: 0.941176474
+    y: 0.941176474
+    z: 0.941176474
+    w: 1
+  tuts_Button Text:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  tuts_Button Background:
+    x: 0.0549019612
+    y: 0.384313732
+    z: 0.686274529
+    w: 1
+  tuts_Button Active:
+    x: 0.0745098069
+    y: 0.517647088
+    z: 0.90196079
+    w: 1
+  tuts_Button Hovered:
+    x: 0.0745098069
+    y: 0.454901963
+    z: 0.788235307
+    w: 1
+  tuts_Task Background:
+    x: 0.392156869
+    y: 0.392156869
+    z: 0.392156869
+    w: 0.196078435
+  glob_Selection rectangle full:
+    x: 0
+    y: 0.419910192
+    z: 0.150237262
+    w: 0.392156869
+  glob_Selection rectangle touch:
+    x: 0.0124690849
+    y: 0.640718579
+    z: 0.378320754
+    w: 0.392156869
+  npin_Pulse Pin:
+    x: 0.656789899
+    y: 0.0751900598
+    z: 0.799446762
+    w: 1
+  npin_Float Pin:
+    x: 0.0392156877
+    y: 0.701960802
+    z: 0.0274509806
+    w: 1
+  npin_Matrix Pin:
+    x: 0.709803939
+    y: 0.00784313772
+    z: 0.0235294122
+    w: 1
+  npin_Quaternion Pin:
+    x: 0.712580919
+    y: 0.723374844
+    z: 0.0730378851
+    w: 1
+  npin_Vector 3 Pin:
+    x: 0.227450982
+    y: 0.329411775
+    z: 0.733333349
+    w: 1
+  npin_Vector 4 Pin:
+    x: 0.436376214
+    y: 0.324484855
+    z: 0
+    w: 1
+  npin_Screen Pin:
+    x: 0
+    y: 0.502825022
+    z: 1
+    w: 1
+  npin_MatrixMul Pin:
+    x: 0.266666681
+    y: 0.788235307
+    z: 0.611764729
+    w: 1
+  npin_Inner Color Pulse:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color Float:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color Matrix:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color Quat:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color Vec3:
+    x: 0.0975103974
+    y: 0.0975103974
+    z: 0.0975103974
+    w: 1
+  npin_Inner Color Vec4:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color Screen:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  npin_Inner Color MatrixMul:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  ngen_Item Selected Border:
+    x: 0.756736517
+    y: 0.756736517
+    z: 0.756736517
+    w: 1
+  ngen_General Node Background:
+    x: 0.19535929
+    y: 0.19535929
+    z: 0.19535929
+    w: 1
+  ngen_General Node Header:
+    x: 0.0196078438
+    y: 0.34117648
+    z: 0.0117647061
+    w: 1
+  ngen_General Node Font (text):
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  nops_Operator Background:
+    x: 0.196078435
+    y: 0.196078435
+    z: 0.196078435
+    w: 1
+  nops_Operator Header:
+    x: 0.00392156886
+    y: 0.400000006
+    z: 0.490196079
+    w: 1
+  nops_Operator Float Background:
+    x: 0.301960796
+    y: 0.333333343
+    z: 0.41568628
+    w: 1
+  nops_Operator Active Float Background:
+    x: 0.380392164
+    y: 0.411764711
+    z: 0.494117647
+    w: 1
+  nops_Operator Hovered Float Background:
+    x: 0.34117648
+    y: 0.372549027
+    z: 0.454901963
+    w: 1
+  ntrs_Transform Background:
+    x: 0.196078435
+    y: 0.196078435
+    z: 0.196078435
+    w: 1
+  ntrs_Transform Header:
+    x: 0.525490224
+    y: 0.137254909
+    z: 0.0901960805
+    w: 1
+  ngen_Node Border:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.278431386
+  ngen_LOD Button Text:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  ngen_LOD Button Color:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.100000001
+  ngen_LOD Button Active Color:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.0500000007
+  ngen_LOD Button Hover Color:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.200000003
+  ntrs_Transform Float Background:
+    x: 0.356862754
+    y: 0.329411775
+    z: 0.262745112
+    w: 1
+  ntrs_Transform Float Active:
+    x: 0.435294122
+    y: 0.407843143
+    z: 0.34117648
+    w: 1
+  ntrs_Transform Float Hovered:
+    x: 0.396078438
+    y: 0.368627459
+    z: 0.301960796
+    w: 1
+  nlnk_selected_colorShift:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 0
+  nflo_Synergies FloatBg:
+    x: 0
+    y: 0.27040112
+    z: 0
+    w: 1
+  nflo_Synergies FloatBgHovered:
+    x: 0.0565612987
+    y: 0.53592813
+    z: 0.0565612987
+    w: 1
+  nflo_Synergies FloatBgActive:
+    x: 0
+    y: 0.702627957
+    z: 0
+    w: 1
+  nscr_Nodes Screen resizeBtn bgShape:
+    x: 1
+    y: 1
+    z: 1
+    w: 0.600000024
+  nscr_Nodes Screen resizeBtn bgInner:
+    x: 0.400000006
+    y: 0.200000003
+    z: 0.200000003
+    w: 0.600000024
+  nscr_Nodes Screen resizeBtn fgShape:
+    x: 0.400000006
+    y: 0.400000006
+    z: 0.600000024
+    w: 0.600000024
+  nscr_Nodes Screen resizeBtn fgInner:
+    x: 0.400000006
+    y: 0.400000006
+    z: 0.600000024
+    w: 0.600000024
+  nscr_Nodes_Screen_noInput_background:
+    x: 0
+    y: 0
+    z: 0
+    w: 0.649999976
+  nscr_Nodes_Screen_noInput_text:
+    x: 1
+    y: 1
+    z: 1
+    w: 0.649999976
+  ntrs_Nodes Transformation ValidIcon bgShape:
+    x: 1
+    y: 0
+    z: 0
+    w: 1
+  ntrs_Nodes Transformation ValidIcon bgInner:
+    x: 1
+    y: 0
+    z: 0
+    w: 1
+  ntrs_Nodes Transformation ValidIcon fgShape:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  ntrs_Nodes Transformation ValidIcon fgInner:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  ntrs_Nodes Transformation ValidIcon padding:
+    x: 0.874509811
+    y: 0.768627465
+    z: 0.886274517
+    w: 0.768627465
+  ntrs_Nodes Transformation TrackingColor:
+    x: 0.160784319
+    y: 0.160784319
+    z: 0.160784319
+    w: 0.760784328
+  star_Description Background:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  star_Window Background:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  star_Scrollbar Background:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  star_Scrollbar Grab:
+    x: 0.196078435
+    y: 0.196078435
+    z: 0.196078435
+    w: 1
+  star_Scrollbar Grab Hovered:
+    x: 0.235294119
+    y: 0.235294119
+    z: 0.235294119
+    w: 1
+  star_Scrollbar Grab Active:
+    x: 0.274509817
+    y: 0.274509817
+    z: 0.274509817
+    w: 1
+  star_Separator:
+    x: 0.792156875
+    y: 0.792156875
+    z: 0.792156875
+    w: 1
+  star_Default Button:
+    x: 0.0549019612
+    y: 0.384313732
+    z: 0.686274529
+    w: 1
+  star_New Scene Button:
+    x: 0.0313725509
+    y: 0.733333349
+    z: 0.90196079
+    w: 1
+  star_New Scene Button Font:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  star_Title Font Color:
+    x: 0.0549019612
+    y: 0.384313732
+    z: 0.686274529
+    w: 1
+  star_Description Font Color:
+    x: 0.698669732
+    y: 0.698669732
+    z: 0.709803939
+    w: 1
+  star_Your Scene Section Background:
+    x: 0.0980392173
+    y: 0.0980392173
+    z: 0.0980392173
+    w: 1
+  abut_AboutWindow BackgroundLeft:
+    x: 0.117647059
+    y: 0.117647059
+    z: 0.117647059
+    w: 1
+  abut_AboutWindow BackgroundRight:
+    x: 0.137254909
+    y: 0.137254909
+    z: 0.137254909
+    w: 1
+  abut_AboutWindow Text:
+    x: 0.90196079
+    y: 0.90196079
+    z: 0.90196079
+    w: 1
+  ncyc_Button:
+    x: 0.470588237
+    y: 0.470588237
+    z: 0.470588237
+    w: 1
+  ncyc_ButtonHovered:
+    x: 0.549019635
+    y: 0.529411793
+    z: 0.529411793
+    w: 1
+  ncyc_ButtonActive:
+    x: 0.509803951
+    y: 0.509803951
+    z: 0.509803951
+    w: 1
+  ncyc_ButtonForeground:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  ncyc_RadioButton:
+    x: 0.129411772
+    y: 0.129411772
+    z: 0.129411772
+    w: 1
+  ncyc_RadioButtonActive:
+    x: 0.333333343
+    y: 0.333333343
+    z: 0.333333343
+    w: 1
+  ncyc_RadioButtonHovered:
+    x: 0.215686277
+    y: 0.215686277
+    z: 0.215686277
+    w: 1
+  ncyc_RadioButtonText:
+    x: 0.349019617
+    y: 0.349019617
+    z: 0.349019617
+    w: 1
+  ncyc_RadioButtonSelected:
+    x: 0.568627477
+    y: 0.776470602
+    z: 0.788235307
+    w: 0.858823538
+  ncyc_RadioButtonSelectedHovered:
+    x: 0.588235319
+    y: 0.784313738
+    z: 0.80392158
+    w: 0.90196079
+  ncyc_RadioButtonSelectedText:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  ncyc_RadioButtonBackground:
+    x: 0.129411772
+    y: 0.129411772
+    z: 0.129411772
+    w: 1
+sizes:
+  ngen_Nodes Float Margin: 5
+  star_Dot Spacing: 7
+  ngen_Nodes Float Width: 45
+  star_Dot Size: 10
+  ngen_Nodes Rounding: 7
+  ngen_Nodes BorderWidth: 0
+  ngen_Pin labels Indent: 12
+  ngen_Header Label Indent: 2
+  ngen_Trackball Button Height: 20
+  ngen_Trackball Sensitivity: 5
+  ngen_Float Inner Padding: 1
+  ngen_Drag Speed fo Float: 0.0149999997
+  ngen_CTRL Multiplicator: 0.100000001
+  ngen_SHIFT Multiplicator: 10
+  ngen_ALT Multiplicator: 0.00999999978
+  ngen_Nodes Inputs Alignment: 0
+  ngen_Nodes Middle Alignment: 0
+  ngen_Nodes Outputs Alignment: 0
+  ngen_Nodes Left Side spacing: 3
+  ngen_Nodes Right Side spacing: 3
+  glob_Selected node border thickness: 2.5
+  ngen_Nodes Default Visible Precision: 1
+  ngen_Nodes Default Visible Precision For Quaternions: 4
+  ngen_Nodes Default Inactive Part Marker: 0
+  ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
+  ngen_Link minimal x distance between controlpoint and start/end of link: 50
+  ngen_Link Thickness: 5
+  ngen_Link Additional thickness when selected: 2
+  ngen_Pins IconPadding: 2
+  ngen_Links Selected Alpha: 0.800000012
+  ngen_Float_inactive_alphaMultiplicator: 0.5
+  ngen_Nodes Operators Rounding: 5
+  ngen_Nodes Sequence Rounding: 5
+  ngen_Nodes LOD Button Rounding: 5
+  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Border Thickness: 2
+  ngen_Nodes Transformation TrackingMarkSize: 5
+  star_Window Width: 850
+  star_Window Height: 500
+  star_Window Rounding: 6
+  star_Title Vertical Offset: 130
+  star_Left Bar Width: 330
+  star_Load Button Width: 120
+  star_Start New Button Width: 120
+  star_Button Height: 30
+  star_I3T Image Size: 80
+  star_Start Button Width: 120
+  star_Frame Rounding: 4
+  star_Scrollbar Size: 14
+  star_Your Scene Section Rounding: 6
+  ncyc_ButtonRounding: 3
+  ncyc_RadioButtonRounding: 5
+size vectors:
+  ngen_Nodes Pivot Size:
+    x: 0
+    y: 0
+  glob_Windows Frame Padding:
+    x: 5
+    y: 5
+  ngen_Nodes Items Spacing:
+    x: 4
+    y: 4
+  ngen_Nodes Float Padding:
+    x: 0
+    y: 1
+  ngen_Nodes Pin Spacing:
+    x: 0
+    y: 0
+  ngen_Nodes Pivot Alignment:
+    x: 0
+    y: 0.5
+  ngen_Nodes Inputs Size:
+    x: 0
+    y: 0
+  ngen_Nodes Middle Size:
+    x: 0
+    y: 0
+  ngen_Nodes Output Size:
+    x: 0
+    y: 0
+  ngen_Nodes LOD Button Size:
+    x: 27
+    y: 27
+  ngen_Nodes Icon Size:
+    x: 12
+    y: 12
+  ngen_Nodes Float Cycle Button Size:
+    x: 32
+    y: 32
+  ngen_Nodes Screen Texture Size:
+    x: 130
+    y: 130
+  ngen_Builder Item Spacing:
+    x: 0
+    y: 0
+  ngen_Nodes Screen ResizeButtonSize:
+    x: 20
+    y: 20
+  ngen_Nodes Sequence DummySpaceSize:
+    x: 100
+    y: 1
+  ngen_NewNode PositionShift:
+    x: 10
+    y: 0
+  star_Window Size:
+    x: 1020
+    y: 600
+  star_Logo Offset:
+    x: 5
+    y: -20
+  star_Window Padding:
+    x: 0
+    y: 0
+  star_Left Window Padding:
+    x: 30
+    y: 30
+  star_Right Window OuterPadding:
+    x: 10
+    y: 10
+  star_Right Window InnerPadding:
+    x: 10
+    y: 10
+  ncyc_ButtonSize:
+    x: 40
+    y: 40
