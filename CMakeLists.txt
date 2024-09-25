@@ -102,6 +102,8 @@ set(ASSIMP_BUILD_PLY_IMPORTER ON)
 set(ASSIMP_BUILD_ASSIMP_TOOLS CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW should not build docs.")
+
 #  Project dependencies which should be compiled.
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
