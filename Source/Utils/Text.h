@@ -22,12 +22,14 @@ inline bool ends_with(std::string const& value, std::string const& ending)
 	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-template <typename T> inline void hash_combine(std::size_t& seed, const T& v)
+template <typename T>
+inline void hash_combine(std::size_t& seed, const T& v)
 {
 	seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
-template <typename It> inline std::size_t hash_range(It first, It last)
+template <typename It>
+inline std::size_t hash_range(It first, It last)
 {
 	std::size_t seed = 0;
 	for (; first != last; ++first)

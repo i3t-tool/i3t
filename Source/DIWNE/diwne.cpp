@@ -103,7 +103,6 @@ void Diwne::begin()
 	ImGui::BeginGroup();
 
 #ifdef DIWNE_DEBUG
-	ImGui::Checkbox("Show debug texts", &(m_diwneDebug_on));
 	DIWNE_DEBUG((*this), {
 		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
 		                                    ImDrawFlags_RoundCornersNone, 10);

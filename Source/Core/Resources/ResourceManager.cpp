@@ -682,7 +682,6 @@ bool ResourceManager::importModel(const fs::path& path, bool normalize)
 {
 	StateManager& stateManager = App::getModule<StateManager>();
 
-	LOG_INFO("");
 	LOG_INFO("[IMPORT] Importing model from path '{}'...", path.string());
 	std::string modelAlias = path.stem().string();
 	if (resourceExists(modelAlias))
@@ -908,9 +907,7 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 	{
 		int counter = 0;
 		int failCounter = 0;
-		LOG_INFO("");
 		LOG_INFO("[RESOURCE MANAGER] Loading imported resources ...");
-		LOG_INFO("");
 
 		clearScene();
 
@@ -957,12 +954,10 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 			}
 		}
 
-		LOG_INFO("");
 		LOG_INFO("[RESOURCE MANAGER] Loaded {} imported resources.{}", std::to_string(counter),
 		         (failCounter > 0 ? std::string(" Failed to load ") + std::to_string(failCounter) + " resource" +
 		                                (failCounter == 1 ? "" : "s") + "."
 		                          : ""));
-		LOG_INFO("");
 	}
 }
 

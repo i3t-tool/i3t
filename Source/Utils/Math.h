@@ -245,7 +245,8 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float eps
 	return true;
 }
 
-template <typename T> bool isNormalized(const T& val)
+template <typename T>
+bool isNormalized(const T& val)
 {
 	// return eq(glm::length2(val), 1.0f, FACTOR_FOR_MATRICES);
 	return eqToOne(glm::length2(val));

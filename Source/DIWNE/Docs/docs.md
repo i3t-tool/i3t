@@ -61,7 +61,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	Your main object (node-editor) will inherit from this class and then override the content() function with all the content you want to display. When you want to render the node-editor, call the drawDiwne() function on this object. 
 
-	PIt provides shared functions and information and workspace information:
+	It provides shared functions and information and workspace information:
 	- mp_settingsDiwne : stores setting information (colors, margins, sizes, etc.)
 	- m_diwneAction, m_diwneAction_previousFrame : current and previous user actions
 	- mp_lastActivePin, mp_lastActiveNode : last active objects that the user recently used

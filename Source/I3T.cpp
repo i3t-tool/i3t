@@ -12,7 +12,6 @@
  */
 #include "I3T.h"
 
-#include "API.h"
 #include "Config.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
@@ -84,12 +83,10 @@ I3TApplication& app()
 {
 	return static_cast<I3TApplication&>(App::get());
 }
-
 UIModule* getUI()
 {
 	return &App::get().getModule<UIModule>();
 }
-
 Vp::Viewport* getViewport()
 {
 	return &App::get().getModule<Vp::Viewport>();
@@ -97,5 +94,31 @@ Vp::Viewport* getViewport()
 Core::ResourceManager& getResourceManager()
 {
 	return App::get().getModule<Core::ResourceManager>();
+}
+std::vector<Theme>& getThemes()
+{
+	return getUI()->getThemes();
+}
+Theme& getTheme()
+{
+	return getUI()->getTheme();
+}
+ImFont* getFont(EFont font)
+{
+	return getTheme().get(font);
+}
+
+const ImVec4& getColor(EColor color)
+{
+	return getTheme().get(color);
+}
+
+float getSize(ESize size)
+{
+	return getTheme().get(size);
+}
+const ImVec2& getSize(ESizeVec2 size)
+{
+	return getTheme().get(size);
 }
 } // namespace I3T

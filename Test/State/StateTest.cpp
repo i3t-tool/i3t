@@ -12,14 +12,12 @@
  */
 #include "gtest/gtest.h"
 
-#include "API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "I3T.h"
 #include "State/StateManager.h"
 
 #include "Generator.h"
 #include "I3TUtil.h"
-
-using namespace Core;
 
 const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
 {
@@ -49,7 +47,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 	const auto scenePath = "Test/Data/TestScene"s + I3T_SCENE_EXTENSION;
 	const auto emptyScenePath = "Test/Data/EmptyScene"s + I3T_SCENE_EXTENSION;
 
-	std::vector<Ptr<WorkspaceNodeWithCoreDataWithPins>> nodes;
+	std::vector<Ptr<Workspace::CoreNodeWithPins>> nodes;
 
 	// Requires the application to be initialized!
 	auto* ui = I3T::getUI();
@@ -69,15 +67,18 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		// StateManager contains the initial state only.
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
+		nodes.push_back(
+		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
+		nodes.push_back(
+		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
+		nodes.push_back(
+		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
@@ -141,7 +142,7 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
-		const std::vector<Ptr<WorkspaceNodeWithCoreData>>& nodes = workspace->getNodeEditor().getAllNodes();
+		const std::vector<Ptr<Workspace::CoreNode>>& nodes = workspace->getNodeEditor().getAllNodes();
 		ASSERT_TRUE(nodes.size() == 4);
 		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
 	}
@@ -161,7 +162,7 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 		ASSERT_TRUE(stateManager.getCurrentScene() != nullptr);
 		ASSERT_TRUE(stateManager.getCurrentScene()->m_path.filename() == newSceneName);
 
-		const std::vector<Ptr<WorkspaceNodeWithCoreData>>& nodes = workspace->getNodeEditor().getAllNodes();
+		const std::vector<Ptr<Workspace::CoreNode>>& nodes = workspace->getNodeEditor().getAllNodes();
 		ASSERT_TRUE(nodes.size() == 4);
 		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
 
@@ -176,8 +177,9 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 /// \todo Run this test within ImGui frame scope.
 TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 {
-	const auto scenePath = "Test/Data/TestScene.json";
+	using namespace Workspace;
 
+	const auto scenePath = "Test/Data/TestScene.json";
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
@@ -185,11 +187,11 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 	// create empty scene
 	App::getModule<StateManager>().saveScene("Test/Data/EmptyScene.json");
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes;
+	std::vector<Ptr<CoreNode>> nodes;
 
-	nodes.push_back(addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Scale>>());
-	nodes.push_back(addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Free>>());
-	nodes.push_back(addNodeToNodeEditor<WorkspaceSequence>());
+	nodes.push_back(addNodeToNodeEditor<Transformation<ETransformType::Scale>>());
+	nodes.push_back(addNodeToNodeEditor<Transformation<ETransformType::Free>>());
+	nodes.push_back(addNodeToNodeEditor<Workspace::Sequence>());
 
 	const auto randomVec3 = generateVec3();
 
@@ -204,7 +206,7 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 		scaleNode->setDefaultValue("scale", glm::vec3(1.0f, 1.0f, 1.0f));
 		App::getModule<StateManager>().takeSnapshot();
 
-		std::static_pointer_cast<WorkspaceSequence>(nodes[2])->moveNodeToSequence(nodes[1]);
+		std::static_pointer_cast<Workspace::Sequence>(nodes[2])->moveNodeToSequence(nodes[1]);
 
 		/// \todo Sequence now contains a transform but the workspace also contains
 		/// it. \todo When to take a snapshot?

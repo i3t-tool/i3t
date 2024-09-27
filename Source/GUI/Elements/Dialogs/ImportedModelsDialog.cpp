@@ -22,9 +22,10 @@
 #include "Core/Defs.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/RemoveModelModal.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/WindowManager.h"
+#include "GUI/Workspace/Nodes/Model.h"
+#include "GUI/Workspace/WorkspaceDiwne.h"
 #include "State/StateManager.h"
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -181,7 +182,6 @@ void ImportedModelsDialog::importModel(bool normalize)
 		//   the context of physical model files?
 		stateManager.takeSnapshot();
 	}
-	LOG_INFO("");
 	LOG_INFO("[IMPORT] Imported {} resources.{}", std::to_string(counter),
 	         (failCounter > 0 ? std::string(" Failed to import ") + std::to_string(failCounter) + " resource" +
 	                                (failCounter == 1 ? "" : "s") + "."
@@ -198,7 +198,7 @@ bool ImportedModelsDialog::importContentDialog(std::vector<fs::path>& result, co
 
 void ImportedModelsDialog::maybeRemoveModel(const std::string& alias)
 {
-	std::vector<Ptr<WorkspaceModel>> models = g_workspaceDiwne->getAllModels();
+	std::vector<Ptr<Workspace::Model>> models = Workspace::g_diwne->getAllModels();
 	int usedCount = 0;
 	for (const auto& model : models)
 	{

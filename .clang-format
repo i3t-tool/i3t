@@ -25,3 +25,4 @@ BraceWrapping:
   SplitEmptyFunction: false
   SplitEmptyRecord: false
 
+AlwaysBreakTemplateDeclarations: Yes

@@ -12,19 +12,17 @@
  */
 #include "ViewportWindow.h"
 
-#include "API.h"
+#include "Config.h"
 #include "Core/Input/InputManager.h"
-
-#include "../Nodes/WorkspaceElementsWithCoreData.h"
-
+#include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "I3T.h"
+
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/shader/GridShader.h"
-
-#include "GUI/IconFonts/Icons.h"
 
 using namespace UI;
 
@@ -442,8 +440,7 @@ bool ViewportWindow::showViewportMenu()
 	}
 
 	// TODO: (DR) To follow the "unified api methodology", the UI here should only update the viewport settings and not
-	// actually perform the changes.
-	//  Although this is more "efficient" in a way. But cumbersome I suppose.
+	//  actually perform the changes. Although this is more "efficient" in a way. But cumbersome I suppose.
 	if (ImGui::BeginMenu("View"))
 	{
 		userInteractedWithMenus = true;

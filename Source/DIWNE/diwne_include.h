@@ -1,6 +1,3 @@
-#ifndef DIWNE_INCLUDE_H
-#define DIWNE_INCLUDE_H
-
 /**
  * \file
  * \brief
@@ -41,24 +38,22 @@
  * 1) is position and size of node editor window on screen
  * 2) is position of node editor surface in window
  */
+#pragma once
 
 #include "spdlog/fmt/fmt.h"
 #include <limits>
-//------------------------------------------------------------------------------
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include <imgui_internal.h>
-// TODO - REDEFINE DIWNE
-/*
 #define DIWNE_DEBUG(node_editor, debugCode)                                                                            \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (node_editor.m_diwneDebug_on)                                                                               \
-        {                                                                                                              \
-            debugCode                                                                                                  \
-        }                                                                                                              \
-    } while (0) // do-while only for code-technical reason
-*/
+	do                                                                                                                 \
+	{                                                                                                                  \
+		if (node_editor.m_diwneDebug)                                                                                  \
+		{                                                                                                              \
+			debugCode                                                                                                  \
+		}                                                                                                              \
+	} while (0) // do-while only for code-technical reason
 namespace DIWNE
 {
 typedef unsigned int ID;
@@ -143,5 +138,3 @@ class Diwne;
 
 #include "Node.h"
 #include "Pin.h"
-
-#endif // DIWNE_INCLUDE_H

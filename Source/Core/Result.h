@@ -33,28 +33,34 @@ private:
 	std::string m_message;
 };
 
-template <typename V, typename E> using Result = std::expected<V, E>;
+template <typename V, typename E>
+using Result = std::expected<V, E>;
 
-template <typename V, typename E> bool operator&&(const Result<V, E>& lhs, bool rhs)
+template <typename V, typename E>
+bool operator&&(const Result<V, E>& lhs, bool rhs)
 {
 	return lhs.has_value() && rhs;
 }
 
-template <typename V, typename E> bool operator&&(bool lhs, const Result<V, E>& rhs)
+template <typename V, typename E>
+bool operator&&(bool lhs, const Result<V, E>& rhs)
 {
 	return lhs && rhs.has_value();
 }
 
 #define Err(x) std::unexpected(x);
 
-template <> struct fmt::formatter<Error>
+template <>
+struct fmt::formatter<Error>
 {
-	template <typename ParseContext> constexpr auto parse(ParseContext& ctx)
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx)
 	{
 		return ctx.begin();
 	}
 
-	template <typename FormatContext> auto format(const Error& error, FormatContext& ctx)
+	template <typename FormatContext>
+	auto format(const Error& error, FormatContext& ctx)
 	{
 		return fmt::format_to(ctx.out(), "{}", error.str());
 	};

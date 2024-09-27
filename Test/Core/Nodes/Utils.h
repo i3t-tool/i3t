@@ -20,7 +20,8 @@
 
 using namespace Core;
 
-template <typename Node, typename T> inline void setValue_expectOk(const Node& node, T&& value)
+template <typename Node, typename T>
+inline void setValue_expectOk(const Node& node, T&& value)
 {
 	// setValue handles the synergies
 	auto result = node->setValue(std::forward<T>(value));
@@ -28,18 +29,21 @@ template <typename Node, typename T> inline void setValue_expectOk(const Node& n
 	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 }
 
-template <typename T> inline void setValue_expectOk(Ptr<Node> node, T&& value, glm::ivec2 coords)
+template <typename T>
+inline void setValue_expectOk(Ptr<Node> node, T&& value, glm::ivec2 coords)
 {
 	auto result = node->setValue(std::forward<T>(value), coords);
 	EXPECT_EQ(SetValueResult::Status::Ok, result.status);
 }
-template <typename T> inline void setValue_expectWrong(Ptr<Node> node, T&& value, glm::ivec2 coords)
+template <typename T>
+inline void setValue_expectWrong(Ptr<Node> node, T&& value, glm::ivec2 coords)
 {
 	auto result = node->setValue(std::forward<T>(value), coords);
 	EXPECT_NE(SetValueResult::Status::Ok, result.status);
 }
 
-template <typename T1, typename T2> inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex = 0, int rightIndex = 0)
+template <typename T1, typename T2>
+inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex = 0, int rightIndex = 0)
 {
 	auto plugResult = GraphManager::plug(std::forward<T1>(lhs), std::forward<T2>(rhs), leftIndex, rightIndex);
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);

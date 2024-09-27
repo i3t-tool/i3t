@@ -141,7 +141,8 @@ public:
 		return shared_from_this();
 	}
 
-	template <typename T> Ptr<T> as()
+	template <typename T>
+	Ptr<T> as()
 	{
 		static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node class.");
 		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()), "Cannot cast to Ptr<T>.");
@@ -282,14 +283,16 @@ public:
 		return SetValueResult{SetValueResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
-	template <typename T> [[nodiscard]] SetValueResult setValue(const T& value, unsigned index)
+	template <typename T>
+	[[nodiscard]] SetValueResult setValue(const T& value, unsigned index)
 	{
 		return setValueEx(value, index);
 	}
 
 private:
 	/// Sets value of pin at \p index position.
-	template <typename T> SetValueResult setValueEx(T&& val, unsigned index = 0)
+	template <typename T>
+	SetValueResult setValueEx(T&& val, unsigned index = 0)
 	{
 		setInternalValue(val, index);
 		return SetValueResult{};
@@ -303,7 +306,8 @@ protected:
 	 * \param value Value to set.
 	 * \param index Index of the DataStore (if the node stores more than one value)
 	 */
-	template <typename T> void setInternalValue(const T& value, size_t index = 0)
+	template <typename T>
+	void setInternalValue(const T& value, size_t index = 0)
 	{
 		getInternalData(index).setValue(value);
 		spreadSignal(index);

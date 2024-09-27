@@ -30,7 +30,7 @@ TEST(UndoRedoTest, Basic)
 	const auto& nodes = workspace->getNodeEditor().getAllNodes();
 	ASSERT_TRUE(nodes.empty());
 
-	addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
+	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 	const float newValue = 10.0f;
 	setValue_expectOk(nodes[0]->getNodebase(), newValue);
 	App::getModule<StateManager>().takeSnapshot();
@@ -54,7 +54,7 @@ TEST(UndoRedoTest, Basic)
 	App::getModule<StateManager>().takeSnapshot();
 	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
-	addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
+	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 
 	connectNodes(nodes[0], nodes[1], 0, 0);
 	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), newValue);
@@ -92,7 +92,7 @@ TEST(UndoRedoTest, Basic)
 	EXPECT_TRUE(nodes[1]->getNodebase()->data().getFloat() == newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
 
-	addNodeToNodeEditor<WorkspaceOperator<EOperatorType::MatrixToMatrix>>();
+	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::MatrixToMatrix>>();
 	const auto mat = generateMat4();
 	setValue_expectOk(nodes[2]->getNodebase(), mat);
 	App::getModule<StateManager>().takeSnapshot();

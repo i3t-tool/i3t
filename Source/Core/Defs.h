@@ -69,24 +69,28 @@ namespace fs = std::filesystem;
  * \param val Enum value
  * \return String name of the enum value
  */
-template <typename T> auto n(T val)
+template <typename T>
+auto n(T val)
 {
 	return std::string(magic_enum::enum_name(val));
 }
 
 namespace EnumUtils
 {
-template <typename T> auto name(T val)
+template <typename T>
+auto name(T val)
 {
 	return n(val);
 }
 
-template <typename T> std::optional<T> value(const std::string& str)
+template <typename T>
+std::optional<T> value(const std::string& str)
 {
 	return magic_enum::enum_cast<T>(str);
 }
 
-template <typename T> std::optional<T> value(std::string_view str)
+template <typename T>
+std::optional<T> value(std::string_view str)
 {
 	return magic_enum::enum_cast<T>(str);
 }

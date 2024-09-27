@@ -83,9 +83,11 @@ public:
 	/// \tparam Args
 	/// \param args
 	/// \return
-	template <typename T, typename... Args> static T* createModule(Args&&... args);
+	template <typename T, typename... Args>
+	static T* createModule(Args&&... args);
 
-	template <typename T> static T& getModule();
+	template <typename T>
+	static T& getModule();
 
 	/**
 	 * Issue command.
@@ -141,7 +143,8 @@ private:
 	std::unordered_map<std::size_t, std::size_t> m_modulesLookup;
 };
 
-template <typename T, typename... Args> inline T* Application::createModule(Args&&... args)
+template <typename T, typename... Args>
+inline T* Application::createModule(Args&&... args)
 {
 	static_assert(std::is_base_of_v<Module, T>, "Class T must be derived from the Module class");
 
@@ -158,7 +161,8 @@ template <typename T, typename... Args> inline T* Application::createModule(Args
 	return (T*) result;
 }
 
-template <typename T> T& Application::getModule()
+template <typename T>
+T& Application::getModule()
 {
 	const auto hash = typeid(T).hash_code();
 	const auto& self = Application::get();
