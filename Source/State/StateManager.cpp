@@ -255,7 +255,6 @@ bool StateManager::saveScene(const fs::path& target)
 
 	setCurrentScene(std::make_shared<Scene>(this, false), target);
 
-	LOG_INFO("");
 	if (m_currentScene->m_readOnly)
 	{
 		LOG_ERROR("[SCENE SAVE] No save performed, target scene {} is read-only!", target.string());
@@ -384,7 +383,6 @@ bool StateManager::saveGlobal()
 		absolutePath = target.string() + " (Failed to resolve absolute path)";
 	}
 
-	LOG_INFO("");
 	LOG_INFO("[STATE MANAGER] Saving global data to '{}'.", absolutePath);
 
 	// Create global data .json file
@@ -408,7 +406,6 @@ bool StateManager::loadGlobal()
 		absolutePath = target.string() + " (Failed to resolve absolute path)";
 	}
 
-	LOG_INFO("");
 	LOG_INFO("[STATE MANAGER] Loading global data from '{}'.", absolutePath);
 
 	if (!fs::exists(target))

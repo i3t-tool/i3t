@@ -10,12 +10,15 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#ifndef DIWNE_H
-#define DIWNE_H
+#pragma once
 
 #include <functional>
 
 #include "diwne_include.h"
+
+// DIWNE Refactoring todos:
+// TODO: (DR) Seperate Icon drawing into its own class
+// TODO: (DR) Refactor and revise the whole bypass/input/action trigger system thats going on here
 
 /* ImDrawList functions works in screen coordinates */
 namespace DIWNE
@@ -136,7 +139,7 @@ class Diwne : public DiwneObject
 {
 public:
 #ifdef DIWNE_DEBUG
-	bool m_diwneDebug_on = false;
+	bool m_diwneDebug = false;
 #endif // DIWNE_DEBUG
 	/** Default constructor */
 	Diwne(DIWNE::SettingsDiwne* settingsDiwne);
@@ -386,27 +389,31 @@ public:
 		return m_helperLink;
 	};
 
-	template <typename T> std::shared_ptr<T> getLastActivePin()
+	template <typename T>
+	std::shared_ptr<T> getLastActivePin()
 	{
 		static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
 		return std::dynamic_pointer_cast<T>(mp_lastActivePin);
 	}
 
-	template <typename T> void setLastActivePin(std::shared_ptr<T> pin)
+	template <typename T>
+	void setLastActivePin(std::shared_ptr<T> pin)
 	{
 		static_assert(std::is_same<T, std::nullptr_t>::value || std::is_base_of_v<DIWNE::Pin, T>,
 		              "Pin must be derived from DIWNE::Pin class.");
 		mp_lastActivePin = pin;
 	}
 
-	template <typename T> std::shared_ptr<T> getLastActiveNode()
+	template <typename T>
+	std::shared_ptr<T> getLastActiveNode()
 	{
 		static_assert(std::is_base_of_v<DIWNE::Node, T> /* || std::is_same<T, std::nullptr_t>::value*/,
 		              "Node must be derived from DIWNE::Node class.");
 		return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
 	}
 
-	template <typename T> void setLastActiveNode(std::shared_ptr<T> node)
+	template <typename T>
+	void setLastActiveNode(std::shared_ptr<T> node)
 	{
 		static_assert(
 		    // std::is_same<T, std::nullptr_t>::value ||
@@ -549,5 +556,3 @@ protected:
 };
 
 } /* namespace DIWNE */
-
-#endif // DIWNE_H

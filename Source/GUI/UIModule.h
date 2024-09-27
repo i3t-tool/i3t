@@ -77,12 +77,14 @@ public:
 		return m_windowManager;
 	}
 
-	template <typename T> void openModal()
+	template <typename T>
+	void openModal()
 	{
 		m_windowManager.openModal<T>();
 	}
 
-	template <typename TStrategy> void openConfirmModal()
+	template <typename TStrategy>
+	void openConfirmModal()
 	{
 		m_windowManager.openConfirmModal<TStrategy>();
 	}

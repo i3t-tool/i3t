@@ -15,23 +15,26 @@
 #include "Core/Defs.h"
 
 /// GUI nodes.
-class WorkspaceCamera;
-class WorkspaceCycle;
-class WorkspaceNodeWithCoreData;
-class WorkspaceNodeWithCoreDataWithPins;
-class WorkspaceSequence;
-class WorkspaceTransformation;
-class WorkspaceScreen;
-class WorkspaceModel;
+namespace Workspace
+{
+class Camera;
+class Cycle;
+class CoreNode;
+class CoreNodeWithPins;
+class Sequence;
+class TransformationBase;
+class Screen;
+class Model;
+} // namespace Workspace
 
-using GuiNode = WorkspaceNodeWithCoreData;
-using GuiCamera = WorkspaceCamera;
-using GuiCycle = WorkspaceCycle;
-using GuiOperator = WorkspaceNodeWithCoreDataWithPins;
-using GuiTransform = WorkspaceTransformation;
-using GuiSequence = WorkspaceSequence;
-using GuiScreen = WorkspaceScreen;
-using GuiModel = WorkspaceModel;
+using GuiNode = Workspace::CoreNode;
+using GuiCamera = Workspace::Camera;
+using GuiCycle = Workspace::Cycle;
+using GuiOperator = Workspace::CoreNodeWithPins;
+using GuiTransform = Workspace::TransformationBase;
+using GuiSequence = Workspace::Sequence;
+using GuiScreen = Workspace::Screen;
+using GuiModel = Workspace::Model;
 
 class NodeVisitor
 {

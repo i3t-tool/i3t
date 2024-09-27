@@ -10,8 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#ifndef NODE_H
-#define NODE_H
+#pragma once
 
 #include "diwne_include.h"
 
@@ -124,7 +123,7 @@ public:
 	bool rightContentDiwne();
 	bool bottomContentDiwne();
 
-	virtual ImRect getRectDiwne() const
+	virtual ImRect getRectDiwne() const override
 	{
 		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
 	};
@@ -187,12 +186,13 @@ public:
 protected:
 	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
-	/* Border rects of node - are computed every frame based on node content and
-	 * m_nodePositionDiwne */
-	ImRect m_topRectDiwne, m_leftRectDiwne, m_middleRectDiwne, m_rightRectDiwne,
-	    m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
-
+	/** \brief Rectangle of parts of node in diwne,
+	 * are computed every frame based on node content and m_nodePositionDiwne.
+	 * Note that these rects are using "world" node editor coordinates, not scaled and translated screen ones.
+	 */
+	ImRect m_topRectDiwne, m_leftRectDiwne, m_middleRectDiwne, m_rightRectDiwne, m_bottomRectDiwne;
 	float m_centerDummySpace; ///< indent value to center the middle part
+
 	DrawModeNodePosition m_nodePosMode;
 	bool m_toDelete;      ///< Set to true after node delete action
 	bool m_render = true; ///< used to hide nodes in tutorial scenes (action "toggleNodeWorkspaceVisibility")
@@ -203,5 +203,3 @@ private:
 };
 
 } /* namespace DIWNE */
-
-#endif // NODE_H

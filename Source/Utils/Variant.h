@@ -14,7 +14,8 @@
 
 #include <variant>
 
-template <typename VariantType, typename T, std::size_t index = 0> inline constexpr size_t variant_index()
+template <typename VariantType, typename T, std::size_t index = 0>
+inline constexpr size_t variant_index()
 {
 	static_assert(std::variant_size_v<VariantType> > index, "Type not found in variant!");
 	if constexpr (index == std::variant_size_v<VariantType>)

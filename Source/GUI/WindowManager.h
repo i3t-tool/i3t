@@ -108,7 +108,8 @@ public:
 	 *
 	 * \tparam T window to create. T must be derived from IWindow class.
 	 */
-	template <typename T> void showUniqueWindow()
+	template <typename T>
+	void showUniqueWindow()
 	{
 		checkWindowType<T>();
 
@@ -126,7 +127,8 @@ public:
 	 * @tparam T
 	 * @return
 	 */
-	template <typename T> Ptr<T> getWindowPtr()
+	template <typename T>
+	Ptr<T> getWindowPtr()
 	{
 		return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows));
 	}
@@ -135,7 +137,8 @@ public:
 	void showWindow(Ptr<IWindow> window, bool show);
 	void focusWindow(Ptr<IWindow> window, bool updateImGuiFocus = true);
 
-	template <typename T> bool isFocused()
+	template <typename T>
+	bool isFocused()
 	{
 		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
 
@@ -156,10 +159,12 @@ public:
 	 */
 	static glm::vec2 getMousePositionForWindow(const IWindow* window);
 
-	template <typename T> void openModal();
+	template <typename T>
+	void openModal();
 	void openModal(UPtr<IWindow> modalInstance);
 
-	template <typename TStrategy> void openConfirmModal()
+	template <typename TStrategy>
+	void openConfirmModal()
 	{
 		UPtr<IWindow> modal = std::make_unique<ConfirmModal>(std::make_unique<TStrategy>());
 		openModal(std::move(modal));
@@ -192,7 +197,8 @@ private:
 		return nullptr;
 	}
 
-	template <typename T> inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& windows)
+	template <typename T>
+	inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& windows)
 	{
 		checkWindowType<T>();
 
@@ -204,7 +210,8 @@ private:
 		return result;
 	}
 
-	template <typename T> constexpr inline void checkWindowType()
+	template <typename T>
+	constexpr inline void checkWindowType()
 	{
 		static_assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
 	}
@@ -212,7 +219,8 @@ private:
 	std::vector<UPtr<IWindow>> m_modalStack;
 };
 
-template <typename T> void WindowManager::openModal()
+template <typename T>
+void WindowManager::openModal()
 {
 	auto modal = std::make_unique<T>();
 	modal->show();

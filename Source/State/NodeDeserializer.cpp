@@ -15,8 +15,9 @@
 #include <algorithm>
 
 #include "Core/Nodes/Transform.h"
-#include "GUI/Elements/Nodes/Builder.h"
-#include "GUI/Elements/Nodes/Tools.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/Builder.h"
+#include "GUI/Workspace/Tools.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -24,14 +25,14 @@
 #undef GetObject
 #endif
 
-static OperatorBuilder g_OperatorBuilder;
-static TransformBuilder g_TransformBuilder;
+static Workspace::OperatorBuilder g_OperatorBuilder;
+static Workspace::TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
 std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 {
-	std::map<Core::ID, Ptr<WorkspaceNodeWithCoreData>> createdNodes;
+	std::map<Core::ID, Ptr<Workspace::CoreNode>> createdNodes;
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
@@ -58,7 +59,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
-		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+		const auto cycle = Workspace::addNodeToNodeEditorNoSave<Workspace::Cycle>();
 		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
 		createdNodes[value["id"].GetInt()] = cycle;
 		NodeDeserializer::assignCommon(value, cycle);
@@ -119,7 +120,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
-		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
+		const auto camera = Workspace::addNodeToNodeEditorNoSave<Workspace::Camera>();
 		NodeDeserializer::assignCommon(value, camera);
 		createdNodes[value["id"].GetInt()] = camera;
 
@@ -136,7 +137,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
-		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
+		const auto screen = Workspace::addNodeToNodeEditorNoSave<Workspace::Screen>();
 		NodeDeserializer::assignCommon(value, screen);
 		createdNodes[value["id"].GetInt()] = screen;
 
@@ -151,7 +152,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
-		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
+		const auto model = Workspace::addNodeToNodeEditorNoSave<Workspace::Model>();
 		NodeDeserializer::assignCommon(value, model);
 		createdNodes[value["id"].GetInt()] = model;
 
@@ -239,7 +240,7 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	}
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> result;
+	std::vector<Ptr<Workspace::CoreNode>> result;
 	std::transform(createdNodes.begin(), createdNodes.end(), std::back_inserter(result), [](auto& pair) {
 		return pair.second;
 	});
@@ -256,7 +257,7 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 	// Workaround for #311
 	if (type == n(Core::EOperatorType::AngleAxisToQuat))
 	{
-		auto result = addNodeToNodeEditorNoSave<WorkspaceAngleAxisToQuat>();
+		auto result = Workspace::addNodeToNodeEditorNoSave<Workspace::AngleAxisToQuatOperator>();
 		if (value.HasMember("halfAngle"))
 		{
 			const auto halfAngle = value["halfAngle"].GetBool();
@@ -300,7 +301,7 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 {
-	auto sequence = addNodeToNodeEditorNoSave<WorkspaceSequence>();
+	auto sequence = Workspace::addNodeToNodeEditorNoSave<Workspace::Sequence>();
 
 	assignCommon(value, sequence);
 	assignSequence(value, sequence);
@@ -327,7 +328,7 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 
 	value["synergies"].GetBool() ? coreNode->enableSynergies() : coreNode->disableSynergies();
 
-	const auto maybeLOD = EnumUtils::value<WorkspaceLevelOfDetail>(std::string(value["LOD"].GetString()));
+	const auto maybeLOD = EnumUtils::value<Workspace::LevelOfDetail>(std::string(value["LOD"].GetString()));
 	if (maybeLOD.has_value())
 	{
 		node->setLevelOfDetail(maybeLOD.value());
@@ -415,7 +416,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 	{
 		const std::string LODName = value["LOD"].GetString();
 		node->setLevelOfDetail(
-		    EnumUtils::value<WorkspaceLevelOfDetail>(LODName).value_or(WorkspaceLevelOfDetail::Full));
+		    EnumUtils::value<Workspace::LevelOfDetail>(LODName).value_or(Workspace::LevelOfDetail::Full));
 	}
 
 	const auto position = JSON::getVec2(value["position"].GetArray());
@@ -424,7 +425,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 
 void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)
 {
-	std::vector<Ptr<WorkspaceTransformation>> transforms;
+	std::vector<Ptr<Workspace::TransformationBase>> transforms;
 	for (const auto& transform : value["transforms"].GetArray())
 	{
 		auto maybeTransform = createTransform(transform);

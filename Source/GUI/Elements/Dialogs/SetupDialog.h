@@ -14,8 +14,6 @@
 
 #include "GUI/Elements/IWindow.h"
 
-// TODO: (DR) Remove, not used anymore
-
 class SetupDialog : public IWindow
 {
 public:

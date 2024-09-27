@@ -20,7 +20,8 @@
 #include "Logger/Logger.h"
 #include "Utils/Text.h"
 
-template <typename T> T currentPathGuard(std::function<T(void)> fn)
+template <typename T>
+T currentPathGuard(std::function<T(void)> fn)
 {
 	const auto pwd = fs::current_path();
 

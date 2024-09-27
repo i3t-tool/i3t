@@ -12,14 +12,14 @@
  */
 #include "SerializationVisitor.h"
 
-#include "GUI/Elements/Nodes/WorkspaceCamera.h"
-#include "GUI/Elements/Nodes/WorkspaceCycle.h"
-#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
-#include "GUI/Elements/Nodes/WorkspaceModel.h"
-#include "GUI/Elements/Nodes/WorkspaceOperator.h"
-#include "GUI/Elements/Nodes/WorkspaceScreen.h"
-#include "GUI/Elements/Nodes/WorkspaceSequence.h"
-#include "GUI/Elements/Nodes/WorkspaceTransformation.h"
+#include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "GUI/Workspace/Nodes/Camera.h"
+#include "GUI/Workspace/Nodes/Cycle.h"
+#include "GUI/Workspace/Nodes/Model.h"
+#include "GUI/Workspace/Nodes/Operator.h"
+#include "GUI/Workspace/Nodes/Screen.h"
+#include "GUI/Workspace/Nodes/Sequence.h"
+#include "GUI/Workspace/Nodes/TransformationBase.h"
 #include "Logger/Logger.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -133,7 +133,7 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 	}
 
 	// Workaround for #311
-	if (auto quatAngleAxis = std::dynamic_pointer_cast<WorkspaceAngleAxisToQuat>(node))
+	if (auto quatAngleAxis = std::dynamic_pointer_cast<Workspace::AngleAxisToQuatOperator>(node))
 	{
 		op.AddMember("halfAngle", quatAngleAxis->m_halfAngle, alloc);
 	}
@@ -234,7 +234,8 @@ void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiS
 
 	for (const auto& transform : node->getInnerWorkspaceNodes())
 	{
-		dumpTransform(sequence["transforms"].GetArray(), std::static_pointer_cast<WorkspaceTransformation>(transform));
+		dumpTransform(sequence["transforms"].GetArray(),
+		              std::static_pointer_cast<Workspace::TransformationBase>(transform));
 	}
 
 	sequences.PushBack(sequence, alloc);

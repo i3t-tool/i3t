@@ -8,11 +8,9 @@ workflow:
 image: cvutdcgi/i3t-ci
 
 stages:
-  - pre-lint  # linting without building
-  - build
   - lint
+  - build
   - test
-  - release
 
 # How to write paths: https://stackoverflow.com/a/55391444
 .changes-rules:
@@ -30,7 +28,7 @@ stages:
 
 # Linting phase
 check-format:
-  stage: pre-lint
+  stage: lint
   rules:
     - !reference [.changes-rules, cpp]
   script:
@@ -83,9 +81,3 @@ test:
     - xvfb-run Binaries/Debug/I3TTest
   dependencies:
     - build-tests
-
-###
-
-pass:
-  script:
-    - echo "Pipeline passed"

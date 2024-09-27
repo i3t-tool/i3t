@@ -30,7 +30,8 @@
  * \tparam Type command derived class (CloseCommand for example)-
  * \tparam Args command argument for callback call.
  */
-template <typename Type, typename... Args> class Command : public ICommand
+template <typename Type, typename... Args>
+class Command : public ICommand
 {
 public:
 	typedef std::function<void(Args&...)> Callback;

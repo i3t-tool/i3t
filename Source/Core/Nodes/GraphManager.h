@@ -50,12 +50,14 @@ public:
 	static void init();
 	static void destroy();
 
-	template <EOperatorType T> static Ptr<Node> createNode()
+	template <EOperatorType T>
+	static Ptr<Node> createNode()
 	{
 		return Builder::createOperator<T>();
 	}
 
-	template <ETransformType T> static Ptr<Transform> createTransform()
+	template <ETransformType T>
+	static Ptr<Transform> createTransform()
 	{
 		return Builder::createTransform<T>();
 	}

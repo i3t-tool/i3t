@@ -112,12 +112,14 @@ initDefaults(), resetMatrixFromDefaults use default|
 namespace Core
 {
 
-template <ETransformType T> class TransformImpl : public Transform
+template <ETransformType T>
+class TransformImpl : public Transform
 {};
 
 namespace Builder
 {
-template <ETransformType T> Ptr<Transform> createTransform()
+template <ETransformType T>
+Ptr<Transform> createTransform()
 {
 	// const auto defaultValues = getTransformDefaults(T);  //\todo PF - not
 	// used????
@@ -131,7 +133,8 @@ template <ETransformType T> Ptr<Transform> createTransform()
 }
 } // namespace Builder
 
-template <> class TransformImpl<ETransformType::Free> : public Transform
+template <>
+class TransformImpl<ETransformType::Free> : public Transform
 {
 public:
 	TransformImpl() : Transform(getTransformOperation(ETransformType::Free)) {}
@@ -161,7 +164,8 @@ public:
 	};
 };
 
-template <> class TransformImpl<ETransformType::Scale> : public Transform
+template <>
+class TransformImpl<ETransformType::Scale> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Scale))
@@ -190,7 +194,8 @@ public:
  *   0      0       0       1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerX> : public Transform
+template <>
+class TransformImpl<ETransformType::EulerX> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerX))
@@ -221,7 +226,8 @@ private:
  *    0      0     0      1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerY> : public Transform
+template <>
+class TransformImpl<ETransformType::EulerY> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerY))
@@ -252,7 +258,8 @@ private:
  *     0        0      0    1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerZ> : public Transform
+template <>
+class TransformImpl<ETransformType::EulerZ> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerZ))
@@ -275,7 +282,8 @@ private:
 	HalfspaceSign halfspaceSign;
 };
 
-template <> class TransformImpl<ETransformType::Translation> : public Transform
+template <>
+class TransformImpl<ETransformType::Translation> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Translation)) {}
@@ -293,7 +301,8 @@ public:
 
 //===-- Other transformations ---------------------------------------------===//
 
-template <> class TransformImpl<ETransformType::AxisAngle> : public Transform
+template <>
+class TransformImpl<ETransformType::AxisAngle> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::AxisAngle)) {}
@@ -318,7 +327,8 @@ public:
  * of the default quaternion (and matrix determinant, which should be 1 all the
  * times).
  */
-template <> class TransformImpl<ETransformType::Quat> : public Transform
+template <>
+class TransformImpl<ETransformType::Quat> : public Transform
 {
 	// glm::quat m_initialQuat;  // stored as the defaultValue "quat"
 	glm::quat m_normalized;
@@ -361,7 +371,8 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Ortho> : public Transform
+template <>
+class TransformImpl<ETransformType::Ortho> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Ortho))
@@ -383,7 +394,8 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Perspective> : public Transform
+template <>
+class TransformImpl<ETransformType::Perspective> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Perspective)) {}
@@ -396,7 +408,8 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Frustum> : public Transform
+template <>
+class TransformImpl<ETransformType::Frustum> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Frustum))
@@ -423,7 +436,8 @@ public:
 /**
  * Same as perspective projection node, but all values are locked.
  */
-template <> class TransformImpl<ETransformType::LookAt> : public Transform
+template <>
+class TransformImpl<ETransformType::LookAt> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::LookAt)) {}

@@ -13,6 +13,8 @@
 #pragma once
 
 #include "Core/Application.h"
+#include "GUI/Theme/Theme.h"
+#include "GUI/UIModule.h"
 
 class I3TApplication : public Application
 {
@@ -42,8 +44,46 @@ class UIModule;
 // Static util methods
 namespace I3T
 {
+// Global app accessor
 I3TApplication& app();
+
+// Modules
 UIModule* getUI();
 Vp::Viewport* getViewport();
 Core::ResourceManager& getResourceManager();
+
+// Theme
+std::vector<Theme>& getThemes();
+Theme& getTheme();
+ImFont* getFont(EFont font);
+const ImVec4& getColor(EColor color);
+float getSize(ESize size);
+const ImVec2& getSize(ESizeVec2 size);
+
+/**
+ * Change properties of the given theme.
+ * @param theme
+ */
+template <typename Theme_>
+inline void emplaceTheme(Theme_&& theme)
+{
+	auto& allThemes = I3T::getThemes();
+	auto it = std::find_if(allThemes.begin(), allThemes.end(), [](Theme& theme) {
+		return theme.getName() == I3T::getTheme().getName();
+	});
+	*it = theme;
+	I3T::getUI()->setTheme(*it);
+}
+
+// Window
+/**
+ * Get pointer to dockable (unique) window.
+ * \tparam T window type
+ * \return shared pointer to window of type T.
+ */
+template <typename T>
+Ptr<T> getWindowPtr()
+{
+	return getUI()->getWindowManager().getWindowPtr<T>();
+}
 } // namespace I3T

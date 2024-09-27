@@ -27,6 +27,8 @@
 #include "GUI/Theme/ThemeLoader.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "State/StateManager.h"
+#include "UserData.h"
 #include "Utils/HSLColor.h"
 
 #include "GUI/IconFonts/Icons.h"

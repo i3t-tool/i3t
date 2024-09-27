@@ -20,7 +20,8 @@
 #include "GUI/Theme/Theme.h"
 #include "Utils/FilesystemUtils.h"
 
-template <typename T> std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
+template <typename T>
+std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
 	for (const auto& [key, val] : map)
 	{
@@ -104,7 +105,8 @@ ImVec4 parseVec4Seq(YAML::Node& node)
 	return vec;
 }
 
-template <typename T> bool compareThemeEntry(const T& a, const T& b)
+template <typename T>
+bool compareThemeEntry(const T& a, const T& b)
 {
 	return a.first < b.first;
 }

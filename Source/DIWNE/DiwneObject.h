@@ -186,13 +186,13 @@ public:                               /* \todo some attributes should be private
 	virtual bool allowProcessUnselect();
 	virtual bool allowProcessRaisePopup();
 
-	virtual bool processObjectFocused();
-	virtual bool processObjectFocusedForInteraction();
-	virtual bool processObjectHold();
-	virtual bool processObjectUnhold();
-	virtual bool processObjectDrag();
-	virtual bool processObjectSelect();
-	virtual bool processObjectUnselect();
+	bool processFocusedDiwne();
+	bool processFocusedForInteractionDiwne();
+	bool processHoldDiwne();
+	bool processUnholdDiwne();
+	bool processDragDiwne();
+	bool processSelectDiwne();
+	bool processUnselectDiwne();
 
 	inline DIWNE::ID const getIdDiwne() const
 	{

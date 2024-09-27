@@ -141,7 +141,8 @@ public:
 	void endLogger() const;
 	void update();
 
-	template <typename... Args> void log(const LoggingOption& logType, const std::string& message, Args&&... args);
+	template <typename... Args>
+	void log(const LoggingOption& logType, const std::string& message, Args&&... args);
 
 	void addToLogBuffer(const LoggingOption& logType, const std::string& message, const std::vector<std::string>& args);
 
@@ -195,7 +196,8 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------//
 
-template <typename... Args> void Logger::log(const LoggingOption& logType, const std::string& message, Args&&... args)
+template <typename... Args>
+void Logger::log(const LoggingOption& logType, const std::string& message, Args&&... args)
 {
 	std::vector<std::string> logData = {args...};
 	addToLogBuffer(logType, message, logData);

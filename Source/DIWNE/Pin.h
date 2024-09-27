@@ -10,8 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#ifndef PIN_H
-#define PIN_H
+#pragma once
 
 #include "diwne_include.h"
 
@@ -96,5 +95,3 @@ protected:
 };
 
 } /* namespace DIWNE */
-
-#endif // PIN_H

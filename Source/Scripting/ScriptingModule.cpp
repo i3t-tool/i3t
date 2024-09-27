@@ -19,17 +19,18 @@
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 #include "Core/Nodes/Operations.h"
-#include "GUI/Elements/Nodes/Builder.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/Builder.h"
 #include "Scripting/Environment.h"
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
 
-static OperatorBuilder g_OperatorBuilder;
-static TransformBuilder g_TransformBuilder;
+static Workspace::OperatorBuilder g_OperatorBuilder;
+static Workspace::TransformBuilder g_TransformBuilder;
 
 std::function<void(const std::string& str)> g_printRef;
 
-static WorkspaceDiwne& getNodeEditor()
+static Workspace::WorkspaceDiwne& getNodeEditor()
 {
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	return workspace->getNodeEditor();
@@ -37,7 +38,8 @@ static WorkspaceDiwne& getNodeEditor()
 
 //----------------------------------------------------------------------------//
 
-template <typename T> static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
+template <typename T>
+static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
 {
 	const auto node = guiNode->getNodebase();
 
@@ -57,7 +59,8 @@ template <typename T> static std::optional<T> getValue(Ptr<GuiNode> guiNode, int
 	return maybeValue;
 }
 
-template <typename T> static bool setValue(Ptr<GuiNode> guiNode, const T& value)
+template <typename T>
+static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 {
 	const auto node = guiNode->getNodebase();
 
@@ -84,7 +87,8 @@ template <typename T> static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 
 //----------------------------------------------------------------------------//
 
-template <typename T> static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
+template <typename T>
+static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
 {
 	const auto transform = guiNode->getNodebase()->as<Core::Transform>();
 	const auto maybeValue = transform->getDefaultValue(name).getValue<T>();
@@ -96,7 +100,8 @@ template <typename T> static std::optional<T> getDefaultValue(Ptr<GuiTransform> 
 	return maybeValue;
 }
 
-template <typename T> static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
+template <typename T>
+static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
 {
 	const auto node = guiNode->getNodebase()->as<Core::Transform>();
 	const auto result = node->setDefaultValue(name, value);
@@ -202,7 +207,7 @@ void ScriptingModule::onInit()
 		    return connectNodesNoSave(self, other, from, to);
 	    },
 	    "unplug_input", [&](Ptr<GuiOperator> self, int inputIndex) {
-		    if (auto node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(self))
+		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 		    {
 			    if (node->getInputs().size() <= inputIndex)
 			    {
@@ -217,7 +222,7 @@ void ScriptingModule::onInit()
 		    }
 	    },
 	    "unplug_output", [&](Ptr<GuiOperator> self, int outputIndex) {
-		    if (auto node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(self))
+		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 		    {
 			    if (node->getOutputs().size() <= outputIndex)
 			    {
@@ -226,14 +231,14 @@ void ScriptingModule::onInit()
 			    }
 
 			    const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
-			    std::vector<std::pair<Ptr<WorkspaceNodeWithCoreDataWithPins>, int>> toUnplug;
+			    std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
 			    for (const auto& outputPin : self->getNodebase()->getOutputPins())
 			    {
 				    for (const auto inputPin : outputPin.getOutComponents())
 				    {
-					    if (auto maybeNode = findNodeById(nodes, inputPin->Owner.getId()))
+					    if (auto maybeNode = Workspace::Tools::findNodeById(nodes, inputPin->Owner.getId()))
 					    {
-						    auto nodeWithPin = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(*maybeNode);
+						    auto nodeWithPin = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(*maybeNode);
 						    toUnplug.push_back({nodeWithPin, inputPin->Index});
 					    }
 				    }
@@ -368,7 +373,7 @@ void ScriptingModule::onInit()
 		    return transform;
 	    },
 	    sol::meta_function::construct, [this]() -> Ptr<GuiSequence> {
-		    auto sequence = addNodeToNodeEditor<GuiSequence>();
+		    auto sequence = Workspace::addNodeToNodeEditor<GuiSequence>();
 
 		    print(fmt::format("ID: {}", sequence->getNodebase()->getId()));
 

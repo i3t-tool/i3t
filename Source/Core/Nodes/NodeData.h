@@ -188,11 +188,13 @@ public:
 	//
 
 	/// \todo MH Refactor
-	template <typename T> std::optional<std::remove_reference_t<T>> getValue() const;
+	template <typename T>
+	std::optional<std::remove_reference_t<T>> getValue() const;
 
 	//
 
-	template <typename T> void setValue(T&& val)
+	template <typename T>
+	void setValue(T&& val)
 	{
 		m_value = val;
 	}
@@ -222,7 +224,8 @@ public:
 		return m_savedValue;
 	}
 
-	template <typename T> void setSavedValue(T&& val)
+	template <typename T>
+	void setSavedValue(T&& val)
 	{
 		m_savedValue = val;
 	}
@@ -246,7 +249,8 @@ private:
 	std::optional<Storage> m_savedValue;
 };
 
-template <typename T> std::optional<std::remove_reference_t<T>> Data::getValue() const
+template <typename T>
+std::optional<std::remove_reference_t<T>> Data::getValue() const
 {
 	if (index() != variant_index<Storage, std::remove_reference_t<T>>())
 	{

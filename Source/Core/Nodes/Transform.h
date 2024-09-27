@@ -164,7 +164,8 @@ public:
 	 * \param name Name of the parameter (such as Center)
 	 * \param val New value
 	 */
-	template <typename T> SetValueResult setDefaultValue(const std::string& name, T&& val)
+	template <typename T>
+	SetValueResult setDefaultValue(const std::string& name, T&& val)
 	{
 		const auto* props = properties();
 		if (!props->hasDefaultValue(name))
@@ -186,7 +187,8 @@ public:
 		return SetValueResult();
 	}
 
-	template <typename T> void setDefaultValueNoUpdate(const std::string& name, T&& val)
+	template <typename T>
+	void setDefaultValueNoUpdate(const std::string& name, T&& val)
 	{
 		getDefaultValueMut(name).setValue(val);
 	}

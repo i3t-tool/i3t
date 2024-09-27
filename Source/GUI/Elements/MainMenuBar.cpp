@@ -15,8 +15,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
-#include "API.h"
 #include "Commands/ApplicationCommands.h"
+#include "Core/Input/InputManager.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
@@ -31,6 +31,7 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/IconFonts/Icons.h"
+#include "I3T.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
@@ -360,6 +361,9 @@ void MainMenuBar::showHelpMenu()
 
 				ImGui::EndMenu();
 			}
+#ifdef DIWNE_DEBUG
+			ImGui::MenuItem("Debug node editor", nullptr, &(Workspace::g_diwne->m_diwneDebug));
+#endif
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 			ImGui::EndMenu();

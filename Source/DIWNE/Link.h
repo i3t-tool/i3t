@@ -10,8 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#ifndef DIWNE_LINK_H
-#define DIWNE_LINK_H
+#pragma once
 
 #include <algorithm>
 
@@ -49,7 +48,7 @@ public:
 	void updateControlPoints();
 	void updateSquareDistanceMouseFromLink();
 
-	virtual ImRect getRectDiwne() const
+	virtual ImRect getRectDiwne() const override
 	{
 		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
 		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
@@ -100,5 +99,3 @@ private:
 };
 
 } /* namespace DIWNE */
-
-#endif // DIWNE_LINK_H

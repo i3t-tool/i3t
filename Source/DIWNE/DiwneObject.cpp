@@ -192,8 +192,8 @@ bool DiwneObject::processInteractionsDiwne()
 	{
 		if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
 		{
-			interaction_happen |= processObjectFocused();
-			interaction_happen |= processObjectFocusedForInteraction();
+			interaction_happen |= processFocusedDiwne();
+			interaction_happen |= processFocusedForInteractionDiwne();
 
 			if (m_focused) /* diwne.m_objectFocused is checked in
 			                  allowFocusedForInteraction() too */
@@ -208,16 +208,16 @@ bool DiwneObject::processInteractionsDiwne()
 				interaction_happen |= processRaisePopupDiwne();
 				if (m_selectable)
 				{
-					interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
+					interaction_happen |= m_selected ? processUnselectDiwne() : processSelectDiwne();
 				}
-				interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
+				interaction_happen |= m_isHeld ? processUnholdDiwne() : processHoldDiwne();
 				if (m_isHeld)
 				{
 					interaction_happen |= m_isHeld; /* holding (not only change in hold
 					                                   state) is interaction */
 					diwne.setDiwneAction(getHoldActionType());
 				}
-				interaction_happen |= processObjectDrag();
+				interaction_happen |= processDragDiwne();
 				interaction_happen |= processInteractions();
 			}
 		}
@@ -307,7 +307,7 @@ bool DiwneObject::allowProcessFocused()
 	               diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
-bool DiwneObject::processObjectFocused()
+bool DiwneObject::processFocusedDiwne()
 {
 	if (bypassFocusAction() && allowProcessFocused())
 	{
@@ -333,7 +333,7 @@ bool DiwneObject::allowProcessFocusedForInteraction()
 {
 	return allowProcessFocused();
 }
-bool DiwneObject::processObjectFocusedForInteraction()
+bool DiwneObject::processFocusedForInteractionDiwne()
 {
 	/* between frames mouse can go out of focus scope */
 	if ((bypassFocusForInteractionAction() || m_isHeld) && allowProcessFocusedForInteraction())
@@ -356,7 +356,7 @@ bool DiwneObject::allowProcessHold()
 {
 	return m_focusedForInteraction;
 }
-bool DiwneObject::processObjectHold()
+bool DiwneObject::processHoldDiwne()
 {
 	if (bypassHoldAction() && allowProcessHold())
 	{
@@ -374,7 +374,7 @@ bool DiwneObject::allowProcessUnhold()
 {
 	return true;
 }
-bool DiwneObject::processObjectUnhold()
+bool DiwneObject::processUnholdDiwne()
 {
 	if (bypassUnholdAction() && allowProcessUnhold())
 	{
@@ -397,7 +397,7 @@ bool DiwneObject::allowProcessDrag()
 {
 	return m_isHeld;
 }
-bool DiwneObject::processObjectDrag()
+bool DiwneObject::processDragDiwne()
 {
 	if (bypassDragAction() && allowProcessDrag())
 	{
@@ -416,7 +416,7 @@ bool DiwneObject::allowProcessSelect()
 {
 	return m_isHeld && !m_isDragged;
 }
-bool DiwneObject::processObjectSelect()
+bool DiwneObject::processSelectDiwne()
 {
 	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
 	{
@@ -433,7 +433,7 @@ bool DiwneObject::allowProcessUnselect()
 {
 	return m_isHeld && !m_isDragged;
 }
-bool DiwneObject::processObjectUnselect()
+bool DiwneObject::processUnselectDiwne()
 {
 	if (bypassUnselectAction() && allowProcessUnselect())
 	{

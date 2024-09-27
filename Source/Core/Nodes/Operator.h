@@ -20,7 +20,8 @@
 
 namespace Core
 {
-template <EOperatorType T> class Operator;
+template <EOperatorType T>
+class Operator;
 
 namespace Builder
 {
@@ -30,7 +31,8 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <EOperatorType T> Ptr<Node> createOperator()
+template <EOperatorType T>
+Ptr<Node> createOperator()
 {
 	auto ret = std::make_shared<::Core::Operator<T>>();
 	ret->init();
@@ -45,7 +47,8 @@ template <EOperatorType T> Ptr<Node> createOperator()
  *
  * \tparam T Type of node to be created.
  */
-template <EOperatorType T> class Operator : public Node
+template <EOperatorType T>
+class Operator : public Node
 {
 public:
 	/**
@@ -75,17 +78,21 @@ public:
 //===-- Member template function definitions.
 //------------------------------===//
 
-template <EOperatorType T> Operator<T>::Operator() : Node(&operations[static_cast<unsigned>(T)]) {}
+template <EOperatorType T>
+Operator<T>::Operator() : Node(&operations[static_cast<unsigned>(T)])
+{}
 
 //===-----------------------------------------------------------------------===//
 
-template <EOperatorType T> void Operator<T>::updateValues(int inputIndex)
+template <EOperatorType T>
+void Operator<T>::updateValues(int inputIndex)
 {
 	I3T_ABORT("This function should be specialized!");
 }
 
 // inversion
-template <> FORCE_INLINE void Operator<EOperatorType::Inversion>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Inversion>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -98,7 +105,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Inversion>::updateValues(i
 }
 
 // transpose
-template <> FORCE_INLINE void Operator<EOperatorType::Transpose>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Transpose>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -111,7 +119,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Transpose>::updateValues(i
 }
 
 // determinant
-template <> FORCE_INLINE void Operator<EOperatorType::Determinant>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Determinant>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -124,7 +133,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Determinant>::updateValues
 }
 
 // mat * mat
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixMulMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -147,7 +157,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulMatrix>::updateVa
 }
 
 // MatrixAddMatrix - todo probably a never used operation
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -168,7 +179,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateVa
 }
 
 // MatrixMulVector
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixMulVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -185,7 +197,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulVector>::updateVa
 }
 
 // VectorMulMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::VectorMulMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorMulMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -204,7 +217,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorMulMatrix>::updateVa
 }
 
 // MatrixMulFloat - todo probably a never used operation
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -231,7 +245,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateVal
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::VectorDotVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorDotVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -246,7 +261,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorDotVector>::updateVa
 }
 
 // VectorAddVector
-template <> FORCE_INLINE void Operator<EOperatorType::VectorAddVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorAddVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -267,7 +283,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorAddVector>::updateVa
 }
 
 // VectorSubVector
-template <> FORCE_INLINE void Operator<EOperatorType::VectorSubVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorSubVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -288,7 +305,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorSubVector>::updateVa
 }
 
 // VectorMulFloat
-template <> FORCE_INLINE void Operator<EOperatorType::VectorMulFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -305,7 +323,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorMulFloat>::updateVal
 }
 
 // VectorPerspectiveDivision
-template <> FORCE_INLINE void Operator<EOperatorType::VectorPerspectiveDivision>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorPerspectiveDivision>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -319,7 +338,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorPerspectiveDivision>
 }
 
 // NormalizeVector
-template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::NormalizeVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -332,7 +352,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector>::updateVa
 }
 
 // MixVector
-template <> FORCE_INLINE void Operator<EOperatorType::MixVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MixVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -354,7 +375,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixVector>::updateValues(i
 }
 
 // Vector3CrossVector3
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3CrossVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3CrossVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -374,7 +396,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3CrossVector3>::upda
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3DotVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3DotVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -390,7 +413,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3DotVector3>::update
 }
 
 // Vector3AddVector3
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3AddVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3AddVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -411,7 +435,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3AddVector3>::update
 }
 
 // Vector3SubVector3
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3SubVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3SubVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -432,7 +457,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3SubVector3>::update
 }
 
 // Vector3MulFloat
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3MulFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3MulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -449,7 +475,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3MulFloat>::updateVa
 }
 
 // NormalizeVector3
-template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::NormalizeVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -462,7 +489,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector3>::updateV
 }
 
 // Vector3Length
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -477,7 +505,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValu
 // ShowVector3
 // Create the matrix rotating vector (1,0,0) to the input vector direction.
 // Should be used with the VectorX model to show the input vector.
-template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -510,7 +539,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues
 }
 
 // MixVector3
-template <> FORCE_INLINE void Operator<EOperatorType::MixVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MixVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -532,7 +562,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixVector3>::updateValues(
 }
 
 // ConjQuat
-template <> FORCE_INLINE void Operator<EOperatorType::ConjQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::ConjQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -545,7 +576,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::ConjQuat>::updateValues(in
 }
 
 // FloatVecToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatVecToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatVecToQuat>::updateValues(int inputIndex)
 {
 	// PF (1,0,0,0) if (nothing connected) w=1; else w=0;
 
@@ -566,7 +598,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatVecToQuat>::updateVal
 }
 
 // AngleAxisToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::AngleAxisToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::AngleAxisToQuat>::updateValues(int inputIndex)
 {
 	/*
 \todo
@@ -610,7 +643,8 @@ else {
 }
 
 // VecVecToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::VecVecToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VecVecToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -624,7 +658,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VecVecToQuat>::updateValue
 }
 
 // QuatToFloatVec
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloatVec>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToFloatVec>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -641,7 +676,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloatVec>::updateVal
 }
 
 // QuatToAngleAxis
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToAngleAxis>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToAngleAxis>::updateValues(int inputIndex)
 {
 	// angle
 	if (m_inputs[0].isPluggedIn())
@@ -662,7 +698,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToAngleAxis>::updateVa
 }
 
 // QuatToEuler
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToEuler>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToEuler>::updateValues(int inputIndex)
 {
 	// angle
 	if (m_inputs[0].isPluggedIn())
@@ -685,7 +722,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToEuler>::updateValues
 }
 
 // EulerToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -700,7 +738,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues
 }
 
 // QuatInverse
-template <> FORCE_INLINE void Operator<EOperatorType::QuatInverse>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatInverse>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -713,7 +752,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatInverse>::updateValues
 }
 
 // QuatSlerp
-template <> FORCE_INLINE void Operator<EOperatorType::QuatSlerp>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatSlerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -777,7 +817,8 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 }
 
 // QuatLongWaySlerp
-template <> FORCE_INLINE void Operator<EOperatorType::QuatLongWaySlerp>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatLongWaySlerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -794,7 +835,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatLongWaySlerp>::updateV
 }
 
 // QuatLerp
-template <> FORCE_INLINE void Operator<EOperatorType::QuatLerp>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatLerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -817,7 +859,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatLerp>::updateValues(in
 }
 
 // FloatMulQuat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatMulQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatMulQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -838,7 +881,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatMulQuat>::updateValue
 }
 
 // QuatMulQuat
-template <> FORCE_INLINE void Operator<EOperatorType::QuatMulQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatMulQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -859,7 +903,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatMulQuat>::updateValues
 }
 
 // QuatVecConjQuat = qvq*
-template <> FORCE_INLINE void Operator<EOperatorType::QuatVecConjQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatVecConjQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -877,7 +922,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatVecConjQuat>::updateVa
 }
 
 // QuatLength
-template <> FORCE_INLINE void Operator<EOperatorType::QuatLength>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatLength>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -890,7 +936,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatLength>::updateValues(
 }
 
 // ClampFloat
-template <> FORCE_INLINE void Operator<EOperatorType::ClampFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::ClampFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -916,7 +963,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::ClampFloat>::updateValues(
 }
 
 // FloatMulFloat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatMulFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -937,7 +985,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatMulFloat>::updateValu
 }
 
 // FloatDivFloat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatDivFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatDivFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -957,7 +1006,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatDivFloat>::updateValu
 	}
 }
 // FloatAddFloat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatAddFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatAddFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -978,7 +1028,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatAddFloat>::updateValu
 }
 
 // FloatPowFloat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatPowFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatPowFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -999,7 +1050,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatPowFloat>::updateValu
 }
 
 // MixFloat
-template <> FORCE_INLINE void Operator<EOperatorType::MixFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MixFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -1021,7 +1073,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixFloat>::updateValues(in
 }
 
 // FloatSinCos
-template <> FORCE_INLINE void Operator<EOperatorType::FloatSinCos>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatSinCos>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1036,7 +1089,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatSinCos>::updateValues
 }
 
 // ASinACos
-template <> FORCE_INLINE void Operator<EOperatorType::ASinACos>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::ASinACos>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1051,7 +1105,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::ASinACos>::updateValues(in
 }
 
 // Signum
-template <> FORCE_INLINE void Operator<EOperatorType::Signum>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Signum>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1065,7 +1120,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Signum>::updateValues(int 
 }
 
 // MatrixToVectors
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixToVectors>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixToVectors>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1084,7 +1140,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToVectors>::updateVa
 }
 
 // Vectors3ToMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4(1.0f); // Identity is probably more useful for graphics
 
@@ -1101,7 +1158,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateV
 }
 
 // VectorsToMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4(1.0f); // Identity is probably more useful for graphics
 
@@ -1118,7 +1176,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateVa
 }
 
 // MatrixToFloats
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4(0.0f);
 
@@ -1137,7 +1196,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateVal
 }
 
 // FloatsToMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::FloatsToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatsToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4(0.0f);
 
@@ -1154,7 +1214,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatsToMatrix>::updateVal
 }
 
 // MatrixToTR
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixToTR>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixToTR>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1171,7 +1232,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToTR>::updateValues(
 }
 
 // TRToMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::TRToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::TRToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4(1.0f);
 
@@ -1191,7 +1253,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::TRToMatrix>::updateValues(
 }
 
 // MatrixToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1204,7 +1267,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToQuat>::updateValue
 }
 
 // QuatToMatrix
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1217,7 +1281,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToMatrix>::updateValue
 }
 
 // VectorToFloats
-template <> FORCE_INLINE void Operator<EOperatorType::VectorToFloats>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1236,7 +1301,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorToFloats>::updateVal
 }
 
 // FloatsToVector
-template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatsToVector>::updateValues(int inputIndex)
 {
 	glm::vec4 tmp = glm::vec4();
 
@@ -1253,7 +1319,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector>::updateVal
 }
 
 // VectorTVector3ToFloatsoFloats
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToFloats>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3ToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1270,7 +1337,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToFloats>::updateVa
 }
 
 // FloatsToVector3
-template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatsToVector3>::updateValues(int inputIndex)
 {
 	glm::vec3 tmp = glm::vec3();
 
@@ -1285,7 +1353,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector3>::updateVa
 }
 
 // VectorToVector3
-template <> FORCE_INLINE void Operator<EOperatorType::VectorToVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::VectorToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1298,7 +1367,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VectorToVector3>::updateVa
 }
 
 // Vector3ToVector
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3ToVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -1317,7 +1387,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector>::updateVa
 }
 
 // QuatToFloats
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1336,7 +1407,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValue
 }
 
 // FloatsToQuat
-template <> FORCE_INLINE void Operator<EOperatorType::FloatsToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatsToQuat>::updateValues(int inputIndex)
 {
 	glm::quat tmp = glm::quat(); // (0,0,0,0) is the default value after construction
 
@@ -1357,7 +1429,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatsToQuat>::updateValue
 }
 
 // NormalizeQuat
-template <> FORCE_INLINE void Operator<EOperatorType::NormalizeQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::NormalizeQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1369,7 +1442,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::NormalizeQuat>::updateValu
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::FloatToFloat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::FloatToFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1377,7 +1451,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::FloatToFloat>::updateValue
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector3>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector3ToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1385,7 +1460,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector3>::updateV
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::Vector4ToVector4>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Vector4ToVector4>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1393,7 +1469,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Vector4ToVector4>::updateV
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::QuatToQuat>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::QuatToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1401,7 +1478,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToQuat>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MatrixToMatrix>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MatrixToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1409,7 +1487,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixToMatrix>::updateVal
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeTranslation>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeTranslation>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1417,7 +1496,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeTranslation>::updateVa
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerX>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeEulerX>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1425,7 +1505,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerX>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerY>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeEulerY>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1433,7 +1514,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerY>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerZ>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeEulerZ>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1441,7 +1523,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerZ>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeScale>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeScale>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1449,7 +1532,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeScale>::updateValues(i
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeAxisAngle>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeAxisAngle>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1457,7 +1541,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeAxisAngle>::updateValu
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeOrtho>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeOrtho>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1467,7 +1552,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeOrtho>::updateValues(i
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakePerspective>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakePerspective>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1476,7 +1562,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakePerspective>::updateVa
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeFrustum>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeFrustum>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1486,7 +1573,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeFrustum>::updateValues
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::MakeLookAt>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::MakeLookAt>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1495,7 +1583,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeLookAt>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1503,7 +1592,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void Operator<EOperatorType::PulseToPulse>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void Operator<EOperatorType::PulseToPulse>::updateValues(int inputIndex)
 {
 	if (m_outputs[0].isPluggedIn())
 	{
