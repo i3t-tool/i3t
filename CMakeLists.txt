@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15) # 3.13 for target_link_options and add_compile_definitions
-                                     # 3.15 to fix a "overriding /W3 with /W4" bug
+# 3.15 to fix a "overriding /W3 with /W4" bug
 
 # Set project name.
 project(I3T VERSION 2.1.0)
@@ -49,19 +49,19 @@ if (MSVC)
 
     set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
     add_definitions(-DUNICODE -D_UNICODE)
-endif()
+endif ()
 
 # Link C++17 filesystem library.
 if (UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
-endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+endif ()
 
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/")
-else()
+else ()
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/${CMAKE_BUILD_TYPE}/")
-endif()
+endif ()
 
 # ---------- Setup output directories and compiler params. -----
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -128,21 +128,21 @@ add_subdirectory(Dependencies/rttr)
 # ======== Source groups ======================================
 # Add ImGui source files.
 set(I3T_IMGUI_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
 
 file(GLOB_RECURSE I3T_SOURCE
-    "Source/*.h"
-    "Source/*.hpp"
-    "Source/*.cpp"
-    "Dependencies/pgr-framework/src/*"
-    "Dependencies/pgr-framework/include/*"
+        "Source/*.h"
+        "Source/*.hpp"
+        "Source/*.cpp"
+        "Dependencies/pgr-framework/src/*"
+        "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 

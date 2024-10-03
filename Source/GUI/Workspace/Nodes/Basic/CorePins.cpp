@@ -50,7 +50,7 @@ std::map<Core::EValueType, EColor> Workspace::PinColorForeground = {
     {Core::EValueType::Quat, EColor::InnerQuatPin},           {Core::EValueType::Screen, EColor::InnerScreenPin},
     {Core::EValueType::Vec3, EColor::InnerVec3Pin},           {Core::EValueType::Vec4, EColor::InnerVec4Pin}};
 
-CorePin::CorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+CorePin::CorePin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
     : DIWNE::Pin(diwne, id), m_pin(pin), m_node(node), m_iconRectDiwne(ImRect(0, 0, 0, 0))
 {}
 
@@ -224,7 +224,12 @@ bool CorePin::processConnectionPrepared()
 	return true;
 }
 
-CoreOutPin::CoreOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+bool CorePin::processFocused()
+{
+	return DiwneObject::processFocused();
+}
+
+CoreOutPin::CoreOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
     : CorePin(diwne, id, pin, node)
 {}
 
@@ -247,7 +252,7 @@ bool CoreOutPin::content()
 	return inner_interaction_happen;
 }
 
-DataOutPin::DataOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+DataOutPin::DataOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
     : CoreOutPin(diwne, id, pin, node)
 {}
 
@@ -428,7 +433,7 @@ int DataOutPinPulse::maxLengthOfData()
 	return 0;
 } /* no data with length here*/
 
-DataOutPinScreen::DataOutPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+DataOutPinScreen::DataOutPinScreen(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
     : DataOutPin(diwne, id, pin, node)
 {}
 
@@ -454,15 +459,18 @@ int DataOutPinScreen::maxLengthOfData()
 
 /* >>>> WorkspaceCoreInputPin <<<< */
 
-CoreInPin::CoreInPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+CoreInPin::CoreInPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
     : CorePin(diwne, id, pin, node), m_link(diwne, id, this)
 {}
 
 bool CoreInPin::drawDiwne(DIWNE::DrawMode drawMode /*=DIWNE::DrawMode::Interacting*/)
 {
+	DIWNE::DrawMode drawModeTEST = m_interactive ? drawMode : DIWNE::DrawMode::JustDraw;
+
 	m_connectionChanged = false;
 
-	const bool inner_interaction_happen = CorePin::drawDiwne(m_drawMode);
+//	const bool inner_interaction_happen = CorePin::drawDiwne(m_drawMode);
+	const bool inner_interaction_happen = CorePin::drawDiwne(drawModeTEST);
 
 	// ImGui::DebugDrawItemRect(ImColor(255, 127, 100, 127));
 

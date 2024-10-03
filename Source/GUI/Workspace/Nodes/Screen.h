@@ -38,7 +38,7 @@ private:
 	Vp::RenderOptions m_renderOptions;
 
 public:
-	Screen(DIWNE::Diwne& diwne);
+	Screen(DIWNE::NodeEditor& diwne);
 	~Screen();
 
 	//===-- Double dispatch

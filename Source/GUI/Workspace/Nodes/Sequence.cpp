@@ -18,7 +18,7 @@
 
 using namespace Workspace;
 
-Sequence::Sequence(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*= Core::GraphManager::createSequence()*/,
+Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase /*= Core::GraphManager::createSequence()*/,
                    /* bool drawPins, - (PF) was not used, remove */ /*=true*/
                    bool isCameraSequence /*=false*/)
     : CoreNodeWithPins(diwne, nodebase, false),
@@ -286,6 +286,8 @@ bool Sequence::topContent()
 
 bool Sequence::middleContent()
 {
+	DIWNE::FrameContext& context = diwne.getFrameContext();
+
 	bool inner_interaction_happen = false;
 	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
 	Ptr<TransformationBase> dragedNode;

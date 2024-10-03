@@ -12,7 +12,7 @@
  */
 #pragma once
 
-#include "diwne_include.h"
+#include "DiwneObject.h"
 
 namespace DIWNE
 {
@@ -20,7 +20,7 @@ class Pin : public DiwneObject
 {
 public:
 	/** Default constructor */
-	Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwnePin");
+	Pin(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwnePin");
 	/** Default destructor */
 	virtual ~Pin(){};
 

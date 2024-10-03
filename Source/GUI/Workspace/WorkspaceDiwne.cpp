@@ -36,7 +36,7 @@ WorkspaceDiwne* Workspace::g_diwne = nullptr;
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
-    : Diwne(settingsDiwne), m_workspaceDiwneAction(WorkspaceDiwneAction::None),
+    : NodeEditor(settingsDiwne), m_workspaceDiwneAction(WorkspaceDiwneAction::None),
       m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_updateDataItemsWidth(false),
       m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
@@ -49,7 +49,7 @@ WorkspaceDiwne::~WorkspaceDiwne()
 
 void WorkspaceDiwne::clear()
 {
-	Diwne::clear();
+	NodeEditor::clear();
 	m_workspaceCoreNodes.clear();
 }
 
@@ -1062,8 +1062,7 @@ bool WorkspaceDiwne::beforeBegin()
 
 bool WorkspaceDiwne::beforeContent()
 {
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((*this), {
+	DIWNE_DEBUG_EXTRA_2((*this), {
 		if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::None)
 			ImGui::Text("WorkspaceWindowAction::None");
 		if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::CreateAndPlugTypeConstructor)
@@ -1071,7 +1070,6 @@ bool WorkspaceDiwne::beforeContent()
 
 		ImGui::TextUnformatted(fmt::format("WorkspaceNodes: {}", m_workspaceCoreNodes.size()).c_str());
 	});
-#endif // DIWNE_DEBUG
 	return false;
 }
 
@@ -1111,6 +1109,18 @@ bool WorkspaceDiwne::content()
 		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 	}
 
+	// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
+	//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not desirable.
+
+
+	// NOTE: Nodes are "constructed" front to back, eg. the first UI code to run is from the TOP node, however the nodes
+	//  are then later drawn by ImGui back to front because we reorder the ImGui draw commands using a channel splitter.
+	// This is desirable as when ImGui elements overlap, the first element to receive input is the FIRST one that's
+	//  submitted to ImGui, as it is able to "grab" the input first, the later elements which are drawn on top of it
+	//  are not the ones to receive input even though they're "FIRST" in the sense they're on top and drawn last.
+	// This is rather counterintuitive and a direct result of the immediate mode methodology. There is a way around
+	//  this in ImGui in the form of ImGui::SetNextItemAllowOverlap() but it is a tricky multi-frame workaround.
+
 	int number_of_nodes = m_workspaceCoreNodes.size();
 	int node_count = number_of_nodes - 1; /* -1 for space for top node drawn above links */
 	if (number_of_nodes > 0)
@@ -1138,6 +1148,10 @@ bool WorkspaceDiwne::content()
 				interaction_happen |= (*it)->drawNodeDiwne<CoreNode>(DIWNE::DrawModeNodePosition::OnItsPosition,
 				                                                     DIWNE::DrawMode::Interacting);
 			}
+
+			// TODO: This seems like a bit of a "hacky" solution here, we just don't draw the rest of nodes after a
+			//  sequence that just lost or gained a subnode? Investigate, the node list can simply just be copied
+			//  beforehand or the insertion/deletion deferred after rendering, no?
 			if (prev_size != m_workspaceCoreNodes.size())
 				break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is
 				          affected and iterator is invalidated (at least with MVSC) */
@@ -1620,13 +1634,13 @@ ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize()
 bool WorkspaceDiwne::processZoom()
 {
 	m_updateDataItemsWidth = true;
-	return Diwne::processZoom();
+	return NodeEditor::processZoom();
 }
 
 void WorkspaceDiwne::setWorkAreaZoom(float val)
 {
 	float old = m_workAreaZoom;
-	Diwne::setWorkAreaZoom(val);
+	NodeEditor::setWorkAreaZoom(val);
 	if (old != val)
 	{
 		m_updateDataItemsWidth = true;

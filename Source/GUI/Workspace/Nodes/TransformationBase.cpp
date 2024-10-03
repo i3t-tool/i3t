@@ -19,7 +19,7 @@
 
 using namespace Workspace;
 
-TransformationBase::TransformationBase(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
+TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
     : CoreNode(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
 {
 	updateDataItemsWidth();
@@ -32,6 +32,7 @@ bool TransformationBase::allowDrawing()
 
 void TransformationBase::updateSizes()
 {
+	// TODO: Is m_topOversizeSpace unused?
 	/* right align - have to be computed before DIWNE::Node::updateSizes(),
 	 * because after that are sizes updated */
 	/* space is between left-middle and middle-right, spacing is scaled in begin of frame */

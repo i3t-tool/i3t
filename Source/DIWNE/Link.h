@@ -14,23 +14,24 @@
 
 #include <algorithm>
 
-#include "diwne_include.h"
+#include "DiwneObject.h"
 
 namespace DIWNE
 {
 class Link : public DiwneObject
 {
 public:
-	Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneLink");
+	Link(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneLink");
 
 	/** Default destructor */
 	virtual ~Link(){};
 
-	virtual bool initialize();
-	virtual bool initializeDiwne();
-	virtual void begin(){}; /*!< link is not ImGui element - it is just picture of line */
-	virtual void end(){};
-	virtual bool content();
+	bool initialize() override;
+	bool initializeDiwne() override;
+	void begin() override{}; /*!< link is not ImGui element - it is just picture of line */
+	void end() override{};
+	bool content() override;
+
 	DIWNE::DiwneAction getHoldActionType() const final
 	{
 		return DiwneAction::HoldLink;
@@ -83,7 +84,7 @@ public:
 	                            endPoint) check - so could return true while Link
 	                            is not visible */
 
-	virtual bool bypassFocusAction();
+	virtual bool isHovered();
 	virtual bool bypassFocusForInteractionAction();
 
 	virtual bool processFocusedForInteraction();

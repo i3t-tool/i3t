@@ -28,7 +28,7 @@ protected:
 	CoreInPin* const m_endPin;
 
 public:
-	CoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, CoreInPin* endPin);
+	CoreLink(DIWNE::NodeEditor& diwne, DIWNE::ID id, CoreInPin* endPin);
 
 	CoreOutPin* getStartPin() const
 	{

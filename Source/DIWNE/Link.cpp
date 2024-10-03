@@ -10,14 +10,14 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#include "diwne_include.h"
+#include "Link.h"
+
+#include "NodeEditor.h"
 
 namespace DIWNE
 {
-Link::Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwneLink"*/)
-    : DiwneObject(diwne, id, labelDiwne), m_startDiwne(ImVec2(0, 0)) /* only initialize value - see initializeDiwne() */
-      ,
-      m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
+Link::Link(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwneLink"*/)
+    : DiwneObject(diwne, id, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
 {}
 
 void Link::updateSquareDistanceMouseFromLink()
@@ -60,14 +60,14 @@ bool Link::initializeDiwne()
 	return interaction_happen;
 }
 
-bool Link::bypassFocusAction()
+bool Link::isHovered()
 {
 	return m_squaredDistanceMouseFromLink <
 	       (diwne.mp_settingsDiwne->linkThicknessDiwne * diwne.mp_settingsDiwne->linkThicknessDiwne);
 }
 bool Link::bypassFocusForInteractionAction()
 {
-	return bypassFocusAction();
+	return isHovered();
 }
 
 bool Link::processFocused()
@@ -101,6 +101,11 @@ bool Link::content()
 	}
 	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                          diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
+	DIWNE_DEBUG(diwne, {
+		diwne.AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+		diwne.AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+		diwne.AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+	});
 	return false;
 }
 

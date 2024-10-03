@@ -21,7 +21,7 @@ template <Core::ETransformType T>
 class Transformation : public TransformationBase
 {
 public:
-	Transformation(DIWNE::Diwne& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
+	Transformation(DIWNE::NodeEditor& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
 	{
 		if (Core::ETransformType::Quat == T)
 		{

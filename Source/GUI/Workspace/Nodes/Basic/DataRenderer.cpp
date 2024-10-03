@@ -20,7 +20,7 @@
 
 using namespace Workspace;
 
-bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfVisibleDecimals,
+bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int const numberOfVisibleDecimals,
                                                FloatPopupMode& floatPopupMode, std::string const label, float& value,
                                                Core::EValueState const& valueState, bool& valueChanged)
 {
@@ -337,7 +337,7 @@ void DataRenderer::popupFloatContent(FloatPopupMode& popupMode, float& selectedV
 }
 
 /* nodebase->getValueState({colum, row}) /* EValueState */
-bool DataRenderer::drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
+bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
                                float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data,
                                std::array<std::array<Core::EValueState, 4> const, 4> const& dataState,
                                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange)
@@ -445,7 +445,7 @@ int DataRenderer::maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleD
 	return maximal;
 }
 
-bool DataRenderer::drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
+bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
                                 float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data,
                                 std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
                                 glm::vec4& valueOfChange)
@@ -499,7 +499,7 @@ int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisible
 	return maximal;
 }
 
-bool DataRenderer::drawDataVec3(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
+bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
                                 FloatPopupMode& floatPopupMode, const glm::vec3& data,
                                 std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
                                 glm::vec3& valueOfChange)
@@ -548,7 +548,7 @@ int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisible
 	return maximal;
 }
 
-bool DataRenderer::drawDataFloat(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
+bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
                                  FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState,
                                  bool& valueChanged, float& valueOfChange)
 {
@@ -577,7 +577,7 @@ int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDec
 	return Tools::numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
 }
 
-bool DataRenderer::drawDataQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
+bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
                                       float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data,
                                       std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
                                       glm::quat& valueOfChange)

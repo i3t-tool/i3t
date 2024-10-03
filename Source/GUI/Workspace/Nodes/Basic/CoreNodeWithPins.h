@@ -51,7 +51,7 @@ public:
 		return getOutputs();
 	};
 
-	CoreNodeWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
+	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
 	bool leftContent() override;
 	bool rightContent() override;

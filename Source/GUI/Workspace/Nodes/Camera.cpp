@@ -22,7 +22,7 @@
 
 using namespace Workspace;
 
-Camera::Camera(DIWNE::Diwne& diwne)
+Camera::Camera(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCamera(), false),
       m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(),
                                               /* true, \todo (PF) was not used */
@@ -70,7 +70,8 @@ Camera::Camera(DIWNE::Diwne& diwne)
 	// Hide multiplication output to discourage interaction
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 
-	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
+	// TODO: Use some flag to make it not interactive
+	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
 
 	m_viewportCamera = I3T::getViewport()->createCamera(getId());
 	auto cameraPtr = m_viewportCamera.lock();

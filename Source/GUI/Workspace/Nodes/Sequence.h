@@ -32,7 +32,7 @@ protected:
 	std::vector<Ptr<CoreNode>> m_workspaceInnerTransformations;
 
 public:
-	Sequence(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
+	Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
 	         /* bool drawPins = true, \todo (PF) was not used - remove */
 	         bool isCameraSequence = false);
 

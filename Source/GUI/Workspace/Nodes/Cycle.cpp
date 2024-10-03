@@ -16,7 +16,7 @@
 
 using namespace Workspace;
 
-Cycle::Cycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
+Cycle::Cycle(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
              bool showDataOnPins /*=true*/)
     : CoreNodeWithPins(diwne, nodebase, showDataOnPins)
 {

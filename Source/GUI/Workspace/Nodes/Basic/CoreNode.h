@@ -36,7 +36,7 @@ protected:
 	Ptr<Core::Node> const m_nodebase;
 
 public:
-	CoreNode(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
+	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
 
 	Ptr<Core::Node> const getNodebase() const;

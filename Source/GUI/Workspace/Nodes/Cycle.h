@@ -28,7 +28,7 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	Cycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createCycle(),
+	Cycle(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createCycle(),
 	      bool showDataOnPins = true);
 	bool isCycle();
 

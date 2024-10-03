@@ -361,9 +361,6 @@ void MainMenuBar::showHelpMenu()
 
 				ImGui::EndMenu();
 			}
-#ifdef DIWNE_DEBUG
-			ImGui::MenuItem("Debug node editor", nullptr, &(Workspace::g_diwne->m_diwneDebug));
-#endif
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 			ImGui::EndMenu();

@@ -12,14 +12,12 @@
  */
 #pragma once
 
-#include "diwne_include.h"
+#include "DiwneObject.h"
+
+#include "NodeEditor.h"
 
 namespace DIWNE
 {
-class Pin;
-
-/**
- */
 
 /*! \brief Used when one node is inside of another -> the inner node is drawn
  * OnCursorPosition when outer node is drawn
@@ -46,7 +44,7 @@ class Node : public DiwneObject
 {
 public:
 	/** Default constructor */
-	Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneNode");
+	Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneNode");
 	/** Default destructor */
 	virtual ~Node();
 

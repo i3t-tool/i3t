@@ -33,6 +33,15 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	m_autoFocus = true;
 	initDiwneFromTheme();
 	g_diwne = new WorkspaceDiwne(&settingsDiwne);
+
+	// TODO: These actions should be handled by the WorkspaceNodeEditor instance
+	//  in its processInteractions() method so it can react to input blocking properly
+	//  Eg. what if we press Ctrl+A in an ImGui text field? We're interacting with a
+	//  text field which should be flagged in the FrameContext object passed along to
+	//  processInteractions. Binding actions to the window ignores this outright.
+	//  Also we should react to actions on a per frame basis using if(trigger) syntax
+	//  rather than using bindings as its a more suitable approach in immediate mode UI
+
 	// Input actions for workspace window.
 	m_input->bindAction("selectAll", EKeyState::Pressed, [&]() {
 		g_diwne->selectAll();
@@ -151,6 +160,17 @@ void WorkspaceWindow::render()
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
+#if DIWNE_DEBUG_ENABLED
+			if (ImGui::BeginMenu("Debug"))
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+				ImGui::MenuItem("Enable", nullptr, &(Workspace::g_diwne->m_diwneDebug));
+				ImGui::MenuItem("Extras 1", nullptr, &(Workspace::g_diwne->m_diwneDebugExtra1));
+				ImGui::MenuItem("Extras 2", nullptr, &(Workspace::g_diwne->m_diwneDebugExtra2));
+				ImGui::PopItemFlag();
+				ImGui::EndMenu();
+			}
+#endif
 			ImGui::EndMenuBar();
 		}
 

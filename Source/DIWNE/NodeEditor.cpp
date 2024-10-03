@@ -10,8 +10,13 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
+#include "NodeEditor.h"
+
 #include "Logger/Logger.h"
-#include "diwne_include.h"
+
+#include "Link.h"
+#include "Node.h"
+#include "Pin.h"
 
 namespace DIWNE
 {
@@ -20,39 +25,40 @@ namespace DIWNE
 /* ===== D i w n e ===== */
 /* ===================== */
 
-Diwne::Diwne(SettingsDiwne* settingsDiwne)
+NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
     : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
       m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max),
-      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), mp_lastActivePin(nullptr), m_helperLink(diwne, 0),
-      m_diwneAction(None), m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false),
-      m_nodesSelectionChanged(false), m_selectionRectangeDiwne(ImRect(0, 0, 0, 0)),
-      m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false), m_tooltipDrawn(false), m_takeSnap(false)
+      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), mp_lastActivePin(nullptr),
+      m_helperLink(std::make_unique<Link>(diwne, 0)), m_diwneAction(DiwneAction::None),
+      m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false), m_nodesSelectionChanged(false),
+      m_selectionRectangeDiwne(ImRect(0, 0, 0, 0)), m_popupPosition(settingsDiwne->initPopupPosition),
+      m_popupDrawn(false), m_tooltipDrawn(false), m_takeSnap(false)
 {
 	setSelectable(false);
 }
 
-Diwne::~Diwne()
+NodeEditor::~NodeEditor()
 {
 	clear();
 }
 
-void Diwne::clear()
+void NodeEditor::draw(DrawMode drawMode)
+{
+	DiwneObject::draw(drawMode);
+}
+
+void NodeEditor::clear()
 {
 	diwne.setLastActiveNode<DIWNE::Node>(nullptr);
 	diwne.setLastActivePin<DIWNE::Pin>(nullptr);
 }
 
-DiwneAction Diwne::getDiwneActionActive() const
-{
-	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
-}
-
-bool Diwne::allowDrawing()
+bool NodeEditor::allowDrawing()
 {
 	return m_drawing;
 }
 
-bool Diwne::initializeDiwne()
+bool NodeEditor::initializeDiwne()
 {
 	m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0, 0), false,
 	                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -89,21 +95,22 @@ void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
 }
 
-bool Diwne::beforeBeginDiwne() // todo redesign to https://en.wikipedia.org/wiki/Call_super
+bool NodeEditor::beforeBeginDiwne() // todo redesign to https://en.wikipedia.org/wiki/Call_super
 {
 	updateWorkAreaRectangles();
 	m_nodesSelectionChanged = false;
 	return beforeBegin();
 }
 
-void Diwne::begin()
+void NodeEditor::begin()
 {
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
 	ImGui::PushID(mp_settingsDiwne->editorlabel.c_str());
 	ImGui::BeginGroup();
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((*this), {
+	applyZoomScaling();
+
+	DIWNE_DEBUG_EXTRA_2((*this), {
 		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
 		                                    ImDrawFlags_RoundCornersNone, 10);
 		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x,
@@ -172,33 +179,30 @@ void Diwne::begin()
 			ImGui::Text("PrevDiwneAction: Unknown");
 		}
 	}); /* close of macro */
-#endif  // DIWNE_DEBUG
 }
 
-bool Diwne::afterContentDiwne()
+bool NodeEditor::afterContentDiwne()
 {
 	bool interaction_happen = false;
 	if (m_diwneAction == DiwneAction::NewLink)
 	{
-		interaction_happen |= m_helperLink.drawDiwne(JustDraw);
+		interaction_happen |= m_helperLink->drawDiwne(JustDraw);
 	}
 	interaction_happen |= afterContent();
 	return interaction_happen;
 }
 
-void Diwne::end()
+void NodeEditor::end()
 {
+	diwne.restoreZoomScaling();
+
+	// TODO: Thid doesnt work anymore in newer ImGui versions, a dummy needs to be added
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
 	ImGui::EndGroup();
 	ImGui::PopID();
 }
 
-bool Diwne::afterEndDiwne()
-{
-	return DiwneObject::afterEndDiwne();
-}
-
-bool Diwne::allowProcessFocused()
+bool NodeEditor::allowProcessFocused()
 {
 	return m_isActive /* object is active from previous frame */
 	       ||
@@ -208,12 +212,12 @@ bool Diwne::allowProcessFocused()
 	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
-bool Diwne::processInteractions()
+bool NodeEditor::processInteractions()
 {
 	return processDiwneSelectionRectangle();
 }
 
-bool Diwne::processInteractionsDiwne()
+bool NodeEditor::processInteractionsDiwne()
 {
 	bool interaction_happen = false;
 
@@ -228,7 +232,7 @@ bool Diwne::processInteractionsDiwne()
 	return interaction_happen;
 }
 
-bool Diwne::finalizeDiwne()
+bool NodeEditor::finalizeDiwne()
 {
 	bool interaction_happen = finalize();
 	m_diwneAction_previousFrame = m_diwneAction;
@@ -236,32 +240,42 @@ bool Diwne::finalizeDiwne()
 	return interaction_happen;
 }
 
-bool Diwne::blockRaisePopup()
+bool NodeEditor::blockRaisePopup()
 {
 	return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch ||
 	       m_diwneAction_previousFrame == DiwneAction::SelectionRectFull ||
 	       m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
 
+DiwneAction NodeEditor::getDiwneActionActive() const
+{
+	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
+}
+
+DIWNE::Link& NodeEditor::getHelperLink()
+{
+	return *m_helperLink;
+}
+
 /* be careful for same mouse button in this functions */
-bool Diwne::allowProcessSelectionRectangle()
+bool NodeEditor::allowProcessSelectionRectangle()
 {
 	return m_focusedForInteraction;
 }
-bool Diwne::bypassSelectionRectangleAction()
+bool NodeEditor::bypassSelectionRectangleAction()
 {
 	return bypassIsMouseDragging1();
 } /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition()
+ImVec2 NodeEditor::bypassDiwneGetSelectionRectangleStartPosition()
 {
 	return screen2diwne(bypassMouseClickedPos1());
 } /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize()
+ImVec2 NodeEditor::bypassDiwneGetSelectionRectangleSize()
 {
 	return bypassGetMouseDragDelta1() / getWorkAreaZoom();
 } /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
 
-bool Diwne::processDiwneSelectionRectangle()
+bool NodeEditor::processDiwneSelectionRectangle()
 {
 	if (bypassSelectionRectangleAction() && allowProcessSelectionRectangle())
 	{
@@ -302,13 +316,13 @@ bool Diwne::processDiwneSelectionRectangle()
 	return false;
 }
 
-bool Diwne::processDrag()
+bool NodeEditor::processDrag()
 {
 	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
 	return true;
 }
 
-bool Diwne::processZoom()
+bool NodeEditor::processZoom()
 {
 	ImVec2 mousePosDiwne = screen2diwne(bypassGetMousePos());
 	setWorkAreaZoom(m_workAreaZoom + bypassGetZoomDelta());
@@ -316,7 +330,7 @@ bool Diwne::processZoom()
 	return true;
 }
 
-bool Diwne::processDiwneZoom()
+bool NodeEditor::processDiwneZoom()
 {
 	if (bypassZoomAction() && allowProcessZoom())
 	{
@@ -325,7 +339,7 @@ bool Diwne::processDiwneZoom()
 	return false;
 }
 
-void Diwne::updateWorkAreaRectangles()
+void NodeEditor::updateWorkAreaRectangles()
 {
 	ImVec2 windowPos = ImGui::GetWindowPos(); /* \todo JH return negative number while sub-window
 	                                             can not move outside from aplication window */
@@ -337,62 +351,69 @@ void Diwne::updateWorkAreaRectangles()
 	m_workAreaDiwne.Max = m_workAreaDiwne.Min + windowSize / m_workAreaZoom;
 }
 
-ImVec2 Diwne::transformFromImGuiToDiwne(const ImVec2& point) const
+ImVec2 NodeEditor::transformFromImGuiToDiwne(const ImVec2& point) const
 {
 	return workArea2screen(screen2workArea(point) / m_workAreaZoom); /* basically just zoom */
 }
 
-ImVec2 Diwne::transformFromDiwneToImGui(const ImVec2& point) const
+ImVec2 NodeEditor::transformFromDiwneToImGui(const ImVec2& point) const
 {
 	return workArea2screen(screen2workArea(point) * m_workAreaZoom); /* basically just zoom */
 }
 
-ImVec4 Diwne::transformFromImGuiToDiwne(const ImVec4& rect) const
+ImVec4 NodeEditor::transformFromImGuiToDiwne(const ImVec4& rect) const
 {
 	ImVec2 const topleft = transformFromImGuiToDiwne(ImVec2(rect.x, rect.y));
 	ImVec2 const bottomright = transformFromImGuiToDiwne(ImVec2(rect.z, rect.w));
 	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
 }
 
-ImVec4 Diwne::transformFromDiwneToImGui(const ImVec4& rect) const
+ImVec4 NodeEditor::transformFromDiwneToImGui(const ImVec4& rect) const
 {
 	ImVec2 const topleft = transformFromDiwneToImGui(ImVec2(rect.x, rect.y));
 	ImVec2 const bottomright = transformFromDiwneToImGui(ImVec2(rect.z, rect.w));
 	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
 }
 
-void Diwne::translateWorkAreaDiwneZoomed(ImVec2 const& distance)
+void NodeEditor::translateWorkAreaDiwneZoomed(ImVec2 const& distance)
 {
 	translateWorkAreaDiwne(ImVec2(distance.x / m_workAreaZoom, distance.y / m_workAreaZoom));
 }
 
-void Diwne::translateWorkAreaDiwne(ImVec2 const& distance)
+void NodeEditor::translateWorkAreaDiwne(ImVec2 const& distance)
 {
 	m_workAreaDiwne.Translate(distance);
 }
 
-void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
-                               ImDrawFlags rounding_corners /*=ImDrawFlags_RoundCornersAll*/) const
+void NodeEditor::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                                    ImDrawFlags rounding_corners, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
 	float zoom = diwne.getWorkAreaZoom();
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding * zoom,
-	                   rounding_corners);
+	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	                   rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners);
 }
 
-void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
-                         ImDrawFlags rounding_corners /*=ImDrawFlags_RoundCornersAll*/, float thickness /*=1.0f*/) const
+void NodeEditor::AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness, bool ignoreZoom) const
+{
+	float zoom = diwne.getWorkAreaZoom();
+	ImGui::GetWindowDrawList()->AddLine(diwne2screen(p1), diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
+	                                    thickness * (ignoreZoom ? 1.0f : zoom));
+}
+
+void NodeEditor::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                              ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	float zoom = diwne.getWorkAreaZoom();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding * zoom,
-	             rounding_corners, thickness * zoom);
+	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	             rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : zoom));
 }
 
-void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-                                float thickness, int num_segments /*=0*/) const
+void NodeEditor::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
+                                     float thickness, int num_segments /*=0*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
@@ -402,8 +423,8 @@ void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2
 	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_workAreaZoom, num_segments);
 }
 
-void Diwne::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                           bool filled, float thickness /*=1*/) const
+void NodeEditor::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                ImVec2 bottomRight, bool filled, float thickness /*=1*/) const
 {
 	ImVec2 center = ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
 	float radius = std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
@@ -415,9 +436,9 @@ void Diwne::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerCol
 	}
 }
 
-void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                              ImVec2 bottomRight, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/,
-                              float rounding /*= 0*/) const
+void NodeEditor::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                   ImVec2 bottomRight, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/,
+                                   float rounding /*= 0*/) const
 {
 	idl->AddRectFilled(topLeft, bottomRight, shapeColor, rounding);
 	if (!filled)
@@ -425,8 +446,8 @@ void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor inner
 		idl->AddRectFilled(topLeft + thickness, bottomRight - thickness, innerColor, rounding);
 	}
 }
-void Diwne::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                          bool filled, ImVec2 thickness, float rounding) const
+void NodeEditor::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                               ImVec2 bottomRight, bool filled, ImVec2 thickness, float rounding) const
 {
 	const float width = bottomRight.x - topLeft.x;
 	// const float columnWidth = width / 3.0f;
@@ -448,8 +469,8 @@ void Diwne::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColo
 	}
 }
 
-void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
 	                       bottomRight, shapeColor);
@@ -462,8 +483,8 @@ void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor in
 }
 
 // | I < | --- 1 1 5   vertical bar followed by the arrow
-void Diwne::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                             ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 	ImVec2 bottomRight1;
@@ -488,8 +509,8 @@ void Diwne::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerC
 }
 
 // | < I | --- 5 1 1    arrow followed by the vertical bar
-void Diwne::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                              ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -510,8 +531,8 @@ void Diwne::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor inner
 		                   innerColor);
 	}
 }
-void Diwne::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                           bool filled, float thickness) const
+void NodeEditor::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                ImVec2 bottomRight, bool filled, float thickness) const
 {
 	const ImVec2 middleLeft = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2.0f);
 
@@ -535,8 +556,8 @@ void Diwne::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerCol
 }
 
 // | > I | --- 5 1 1   right arrow followed by the vertical bar
-void Diwne::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                     ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -562,8 +583,8 @@ void Diwne::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor inn
 }
 
 // | I > | --- 1 1 5     vertical bar followed by the right arrow
-void Diwne::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -589,8 +610,8 @@ void Diwne::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor in
 		                       middleRight2 + ImVec2(-2.0f * thickness, 0.0f), innerColor);
 	}
 }
-void Diwne::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness) const
+void NodeEditor::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                     ImVec2 bottomRight, bool filled, float thickness) const
 {
 	const ImVec2 bottomLeft = ImVec2(topLeft.x, bottomRight.y);
 
@@ -612,8 +633,8 @@ void Diwne::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor inn
 	}
 }
 
-void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	idl->AddTriangleFilled(topLeft, ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
 	                       ImVec2(topLeft.x, bottomRight.y), shapeColor);
@@ -625,8 +646,8 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor i
 	}
 }
 
-void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                           ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
 	ImVec2 p2 = bottomRight - ImVec2(0.5f, 0.5f);
@@ -640,8 +661,8 @@ void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImCol
 	}
 }
 
-void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                          ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = topLeft + ImVec2(0.5f, 0.5f);
 	ImVec2 p2 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
@@ -655,8 +676,8 @@ void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColo
 	}
 }
 
-void Diwne::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	topLeft = topLeft + ImVec2(0.5f, 0.5f);
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
@@ -677,8 +698,8 @@ void Diwne::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor in
 	}
 }
 
-void Diwne::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void NodeEditor::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	topLeft = topLeft + ImVec2(0.5f, 0.5f);
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
@@ -699,8 +720,9 @@ void Diwne::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor i
 	}
 }
 
-void Diwne::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                          bool filled, float shapeThickness /*=4*/, float innerThickness /*=2*/) const
+void NodeEditor::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                               ImVec2 bottomRight, bool filled, float shapeThickness /*=4*/,
+                               float innerThickness /*=2*/) const
 {
 	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
@@ -739,8 +761,8 @@ void Diwne::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColo
 	//	}
 }
 
-void Diwne::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                           bool filled, float thickness) const
+void NodeEditor::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                ImVec2 bottomRight, bool filled, float thickness) const
 {
 	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
@@ -752,14 +774,14 @@ void Diwne::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerCol
 	idl->AddLine(start, end, shapeColor, thickness * m_workAreaZoom);
 }
 
-bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size,
-                       ImVec4 padding, bool filled, std::string const id) const
+bool NodeEditor::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size,
+                            ImVec4 padding, bool filled, std::string const id) const
 {
 	return IconButton(bgIconType, bgShapeColor, bgInnerColor, DIWNE::IconType::NoIcon, IM_COL32_BLACK, IM_COL32_BLACK,
 	                  size, padding, filled, id);
 }
 
-void Diwne::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
+void NodeEditor::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 
@@ -770,9 +792,9 @@ void Diwne::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
 	ImGui::SetCursorScreenPos(icon_min);
 }
 
-bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
-                       DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                       ImVec4 padding, bool filled, std::string const id) const
+bool NodeEditor::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+                            DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
+                            ImVec4 padding, bool filled, std::string const id) const
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
 
@@ -784,9 +806,9 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor
 	return result;
 }
 
-void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
-                     ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
-                     ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
+void NodeEditor::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+                          DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
+                          ImVec4 padding, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 
@@ -914,184 +936,184 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 	ImGui::Dummy(size);
 }
 
-ImVec2 Diwne::screen2workArea(const ImVec2& point) const
+ImVec2 NodeEditor::screen2workArea(const ImVec2& point) const
 {
 	return point - m_workAreaScreen.Min;
 }
 
-ImVec2 Diwne::workArea2screen(const ImVec2& point) const
+ImVec2 NodeEditor::workArea2screen(const ImVec2& point) const
 {
 	return point + m_workAreaScreen.Min;
 }
 
-ImVec2 Diwne::diwne2workArea(const ImVec2& point) const
+ImVec2 NodeEditor::diwne2workArea(const ImVec2& point) const
 {
 	return diwne2workArea_noZoom(point) * m_workAreaZoom;
 }
 
-ImVec2 Diwne::workArea2diwne(const ImVec2& point) const
+ImVec2 NodeEditor::workArea2diwne(const ImVec2& point) const
 {
 	return workArea2diwne_noZoom(point / m_workAreaZoom);
 }
 
-ImVec2 Diwne::screen2diwne(const ImVec2& point) const
+ImVec2 NodeEditor::screen2diwne(const ImVec2& point) const
 {
 	return workArea2diwne(screen2workArea(point));
 }
 
-ImVec2 Diwne::diwne2screen(const ImVec2& point) const
+ImVec2 NodeEditor::diwne2screen(const ImVec2& point) const
 {
 	return workArea2screen(diwne2workArea(point));
 }
 
-ImVec2 Diwne::diwne2workArea_noZoom(const ImVec2& point) const
+ImVec2 NodeEditor::diwne2workArea_noZoom(const ImVec2& point) const
 {
 	return point - m_workAreaDiwne.Min;
 }
 
-ImVec2 Diwne::workArea2diwne_noZoom(const ImVec2& point) const
+ImVec2 NodeEditor::workArea2diwne_noZoom(const ImVec2& point) const
 {
 	return point + m_workAreaDiwne.Min;
 }
 
-ImVec2 Diwne::screen2diwne_noZoom(const ImVec2& point) const
+ImVec2 NodeEditor::screen2diwne_noZoom(const ImVec2& point) const
 {
 	return workArea2diwne_noZoom(screen2workArea(point));
 }
 
-ImVec2 Diwne::diwne2screen_noZoom(const ImVec2& point) const
+ImVec2 NodeEditor::diwne2screen_noZoom(const ImVec2& point) const
 {
 	return workArea2screen(diwne2workArea_noZoom(point));
 }
 
-bool Diwne::bypassIsItemClicked0()
+bool NodeEditor::bypassIsItemClicked0()
 {
 	return ImGui::IsItemClicked(0);
 }
-bool Diwne::bypassIsItemClicked1()
+bool NodeEditor::bypassIsItemClicked1()
 {
 	return ImGui::IsItemClicked(1);
 }
-bool Diwne::bypassIsItemClicked2()
+bool NodeEditor::bypassIsItemClicked2()
 {
 	return ImGui::IsItemClicked(2);
 }
-bool Diwne::bypassIsMouseDown0()
+bool NodeEditor::bypassIsMouseDown0()
 {
 	return ImGui::IsMouseDown(0);
 }
-bool Diwne::bypassIsMouseDown1()
+bool NodeEditor::bypassIsMouseDown1()
 {
 	return ImGui::IsMouseDown(1);
 }
-bool Diwne::bypassIsMouseDown2()
+bool NodeEditor::bypassIsMouseDown2()
 {
 	return ImGui::IsMouseDown(2);
 }
-bool Diwne::bypassIsMouseClicked0()
+bool NodeEditor::bypassIsMouseClicked0()
 {
 	return ImGui::IsMouseClicked(0);
 }
-bool Diwne::bypassIsMouseClicked1()
+bool NodeEditor::bypassIsMouseClicked1()
 {
 	return ImGui::IsMouseClicked(1);
 }
-bool Diwne::bypassIsMouseClicked2()
+bool NodeEditor::bypassIsMouseClicked2()
 {
 	return ImGui::IsMouseClicked(2);
 }
-bool Diwne::bypassIsMouseReleased0()
+bool NodeEditor::bypassIsMouseReleased0()
 {
 	return ImGui::IsMouseReleased(0);
 }
-bool Diwne::bypassIsMouseReleased1()
+bool NodeEditor::bypassIsMouseReleased1()
 {
 	return ImGui::IsMouseReleased(1);
 }
-bool Diwne::bypassIsMouseReleased2()
+bool NodeEditor::bypassIsMouseReleased2()
 {
 	return ImGui::IsMouseReleased(2);
 }
-ImVec2 Diwne::bypassMouseClickedPos0()
+ImVec2 NodeEditor::bypassMouseClickedPos0()
 {
 	return ImGui::GetIO().MouseClickedPos[0];
 }
-ImVec2 Diwne::bypassMouseClickedPos1()
+ImVec2 NodeEditor::bypassMouseClickedPos1()
 {
 	return ImGui::GetIO().MouseClickedPos[1];
 }
-ImVec2 Diwne::bypassMouseClickedPos2()
+ImVec2 NodeEditor::bypassMouseClickedPos2()
 {
 	return ImGui::GetIO().MouseClickedPos[2];
 }
-bool Diwne::bypassIsItemActive()
+bool NodeEditor::bypassIsItemActive()
 {
 	return ImGui::IsItemActive();
 }
-bool Diwne::bypassIsMouseDragging0()
+bool NodeEditor::bypassIsMouseDragging0()
 {
 	return ImGui::IsMouseDragging(0);
 }
-bool Diwne::bypassIsMouseDragging1()
+bool NodeEditor::bypassIsMouseDragging1()
 {
 	return ImGui::IsMouseDragging(1);
 }
-bool Diwne::bypassIsMouseDragging2()
+bool NodeEditor::bypassIsMouseDragging2()
 {
 	return ImGui::IsMouseDragging(2);
 }
-ImVec2 Diwne::bypassGetMouseDragDelta0()
+ImVec2 NodeEditor::bypassGetMouseDragDelta0()
 {
 	return ImGui::GetMouseDragDelta(0);
 }
-ImVec2 Diwne::bypassGetMouseDragDelta1()
+ImVec2 NodeEditor::bypassGetMouseDragDelta1()
 {
 	return ImGui::GetMouseDragDelta(1);
 }
-ImVec2 Diwne::bypassGetMouseDragDelta2()
+ImVec2 NodeEditor::bypassGetMouseDragDelta2()
 {
 	return ImGui::GetMouseDragDelta(2);
 }
-ImVec2 Diwne::bypassGetMouseDelta()
+ImVec2 NodeEditor::bypassGetMouseDelta()
 {
 	return ImGui::GetIO().MouseDelta;
 }
-ImVec2 Diwne::bypassGetMousePos()
+ImVec2 NodeEditor::bypassGetMousePos()
 {
 	return ImGui::GetIO().MousePos;
 }
-float Diwne::bypassGetMouseWheel()
+float NodeEditor::bypassGetMouseWheel()
 {
 	return ImGui::GetIO().MouseWheel;
 }
-float Diwne::bypassGetZoomDelta()
+float NodeEditor::bypassGetZoomDelta()
 {
 	return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity;
 }
 
-bool Diwne::allowProcessZoom()
+bool NodeEditor::allowProcessZoom()
 {
 	return true;
 }
-bool Diwne::bypassZoomAction()
+bool NodeEditor::bypassZoomAction()
 {
 	return diwne.bypassGetZoomDelta() != 0;
 }
-bool Diwne::bypassDiwneSetPopupPositionAction()
+bool NodeEditor::bypassDiwneSetPopupPositionAction()
 {
 	return bypassIsMouseClicked1();
 }
-ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction()
+ImVec2 NodeEditor::bypassDiwneGetPopupNewPositionAction()
 {
 	return bypassGetMousePos();
 }
 
-ImRect Diwne::getSelectionRectangleDiwne()
+ImRect NodeEditor::getSelectionRectangleDiwne()
 {
 	return m_selectionRectangeDiwne;
 }
 
-void Diwne::setWorkAreaZoom(float val /*=1*/)
+void NodeEditor::setWorkAreaZoom(float val /*=1*/)
 {
 	double old = m_workAreaZoom;
 	if (val < mp_settingsDiwne->minWorkAreaZoom)
@@ -1106,7 +1128,7 @@ void Diwne::setWorkAreaZoom(float val /*=1*/)
 		m_workAreaZoom = val;
 }
 
-bool Diwne::applyZoomScaling()
+bool NodeEditor::applyZoomScaling()
 {
 	if (m_zoomScalingApplied)
 		return true;
@@ -1141,7 +1163,7 @@ bool Diwne::applyZoomScaling()
 	return false;
 }
 
-bool Diwne::restoreZoomScaling()
+bool NodeEditor::restoreZoomScaling()
 {
 	if (!m_zoomScalingApplied)
 		return false;
@@ -1156,7 +1178,7 @@ bool Diwne::restoreZoomScaling()
 	return true;
 }
 
-float Diwne::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
+float NodeEditor::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 {
 	if (!font)
 	{
@@ -1190,13 +1212,13 @@ float Diwne::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 	// password_font->IndexLookup.empty()); 	PushFont(password_font);
 }
 
-void Diwne::restoreZoomScalingToFont(ImFont* font, float originalScale)
+void NodeEditor::restoreZoomScalingToFont(ImFont* font, float originalScale)
 {
 	font->Scale = originalScale;
 	ImGui::PopFont();
 }
 
-bool Diwne::ensureZoomScaling(bool active)
+bool NodeEditor::ensureZoomScaling(bool active)
 {
 	bool activeBefore = m_zoomScalingApplied;
 	if (activeBefore != active)
@@ -1211,6 +1233,15 @@ bool Diwne::ensureZoomScaling(bool active)
 		}
 	}
 	return activeBefore;
+}
+
+FrameContext& NodeEditor::getFrameContext() const
+{
+	return *m_frameContext;
+}
+void NodeEditor::resetFrameContext(DrawMode drawMode)
+{
+	m_frameContext = std::make_unique<FrameContext>(drawMode);
 }
 
 } /* namespace DIWNE */

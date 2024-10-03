@@ -21,7 +21,7 @@ class TransformationBase : public CoreNode
 public:
 	WPtr<Sequence> m_parentSequence{};
 
-	TransformationBase(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
+	TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//

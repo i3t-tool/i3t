@@ -41,7 +41,7 @@ public:
 
 	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
 
-	Camera(DIWNE::Diwne& diwne);
+	Camera(DIWNE::NodeEditor& diwne);
 	~Camera();
 
 	//===-- Double dispatch

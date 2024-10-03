@@ -20,7 +20,7 @@
 
 using namespace Workspace;
 
-Screen::Screen(DIWNE::Diwne& diwne)
+Screen::Screen(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::Builder::createOperator<Core::EOperatorType::Screen>())
 {
 	init();

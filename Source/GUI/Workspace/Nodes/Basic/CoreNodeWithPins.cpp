@@ -16,7 +16,7 @@
 
 using namespace Workspace;
 
-CoreNodeWithPins::CoreNodeWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins /*=true*/)
+CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins /*=true*/)
     : CoreNode(diwne, nodebase), m_showDataOnPins(showDataOnPins), m_minRightAlignOfRightPins(0)
 {
 	const auto& inputPins = m_nodebase->getInputPins();

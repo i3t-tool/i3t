@@ -23,7 +23,7 @@
 
 using namespace Workspace;
 
-Model::Model(DIWNE::Diwne& diwne) : CoreNodeWithPins(diwne, Core::Builder::createModelNode())
+Model::Model(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createModelNode())
 {
 	init();
 	// setDataItemsWidth();

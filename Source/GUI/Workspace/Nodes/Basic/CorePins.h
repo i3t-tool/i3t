@@ -56,7 +56,7 @@ public:
 	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
 
 
-	CorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CorePin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
 
 	//    bool allowInteraction() const override;
 	//    bool allowProcessFocused() const override;
@@ -78,6 +78,8 @@ public:
 	bool isConnected() const;
 	void popupContent() override;
 
+	bool processFocused() override;
+
 	/* DIWNE function */
 	bool content() override;
 	bool processDrag() override;
@@ -98,7 +100,7 @@ protected:
 
 
 public:
-	CoreInPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CoreInPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
 
 	/**
 	 * \brief Draw pin icon + label and register the connected wire
@@ -142,7 +144,7 @@ class CoreOutPin : public CorePin
 {
 protected:
 public:
-	CoreOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CoreOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
 
 	void updateConnectionPointDiwne() override
 	{
@@ -155,7 +157,7 @@ public:
 class DataOutPin : public CoreOutPin
 {
 public:
-	DataOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	DataOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
 
 	bool content() override; ///< draw data, label, and pin
 
@@ -166,7 +168,7 @@ public:
 class DataOutPinMatrix : public DataOutPin
 {
 public:
-	DataOutPinMatrix(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinMatrix(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){};
 
 	bool drawData() override;
@@ -176,7 +178,7 @@ public:
 class DataOutPinVector4 : public DataOutPin
 {
 public:
-	DataOutPinVector4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinVector4(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){};
 
 	bool drawData() override;
@@ -186,7 +188,7 @@ public:
 class DataOutPinVector3 : public DataOutPin
 {
 public:
-	DataOutPinVector3(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinVector3(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){};
 
 	bool drawData() override;
@@ -196,7 +198,7 @@ public:
 class DataOutPinFloat : public DataOutPin
 {
 public:
-	DataOutPinFloat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinFloat(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){};
 
 	bool drawData() override;
@@ -206,7 +208,7 @@ public:
 class DataOutPinQuat : public DataOutPin
 {
 public:
-	DataOutPinQuat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinQuat(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){};
 
 	bool drawData() override;
@@ -217,7 +219,7 @@ class DataOutPinPulse : public DataOutPin
 {
 public:
 	// std::string m_buttonText;
-	DataOutPinPulse(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	DataOutPinPulse(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : DataOutPin(diwne, id, pin, node){
 	          // m_buttonText = m_pin.getLabel();
 	      };
@@ -232,7 +234,7 @@ private:
 	GLuint renderTexture;
 
 public:
-	DataOutPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	DataOutPinScreen(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -243,14 +245,14 @@ public:
 class CoreOutPinMatrixMultiply : public CoreOutPin
 {
 public:
-	CoreOutPinMatrixMultiply(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	CoreOutPinMatrixMultiply(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : CoreOutPin(diwne, id, pin, node){};
 };
 
 class CoreInPinMatrixMultiply : public CoreInPin
 {
 public:
-	CoreInPinMatrixMultiply(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
+	CoreInPinMatrixMultiply(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
 	    : CoreInPin(diwne, id, pin, node){};
 };
 } // namespace Workspace

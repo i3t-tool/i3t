@@ -10,12 +10,14 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#include "diwne_include.h"
+#include "Pin.h"
+
+#include "NodeEditor.h"
 
 namespace DIWNE
 {
 
-Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwnePin"*/)
+Pin::Pin(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwnePin"*/)
     : DiwneObject(diwne, id, labelDiwne), m_pinRectDiwne(ImRect(0, 0, 0, 0)), m_connectionPointDiwne(ImVec2(0, 0))
 {
 	setSelectable(false);

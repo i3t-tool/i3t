@@ -44,7 +44,7 @@ public:
 		return m_viewportModel;
 	}
 
-	Model(DIWNE::Diwne& diwne);
+	Model(DIWNE::NodeEditor& diwne);
 	~Model();
 
 	// Double dispatch

@@ -21,7 +21,7 @@ template <Core::EOperatorType T>
 class Operator : public CoreNodeWithPins
 {
 public:
-	Operator(DIWNE::Diwne& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
+	Operator(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
 	{
 		// To avoid rounding-confusion, the operators with quaternion output should have more decimal places to
 		// distinguish small changes near zero or near one
@@ -72,6 +72,7 @@ public:
 
 	virtual bool beforeContent() override
 	{
+		// TODO: Refactor, remove method and merge into content / begin
 		/* whole node background */
 		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgOperator),
 		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawFlags_RoundCornersAll);
@@ -113,7 +114,7 @@ class AngleAxisToQuatOperator : public Operator<Core::EOperatorType::AngleAxisTo
 {
 public:
 	bool m_halfAngle; ///< true == pin index 1, false == pin index 0 (full angle)
-	AngleAxisToQuatOperator(DIWNE::Diwne& diwne)
+	AngleAxisToQuatOperator(DIWNE::NodeEditor& diwne)
 	    : Operator<Core::EOperatorType::AngleAxisToQuat>(diwne),
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
 	{}

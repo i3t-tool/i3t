@@ -19,7 +19,7 @@ std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDet
                                                                      {LevelOfDetail::Label, "Label"},
                                                                      {LevelOfDetail::LightCycle, "Light cycle"}};
 
-Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
+Node::Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
     : DIWNE::Node(diwne, id), m_topLabel(topLabel), m_middleLabel(middleLabel), m_removeFromWorkspaceWindow(false)
 {}
 

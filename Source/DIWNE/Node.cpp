@@ -13,12 +13,12 @@
 #include "Node.h"
 
 #include "Logger/Logger.h"
-#include "diwne_include.h"
+
+#include "NodeEditor.h"
 
 namespace DIWNE
 {
-
-Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwneNode"*/)
+Node::Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne)
     : DiwneObject(diwne, id, labelDiwne), m_topRectDiwne(ImRect(0, 0, 0, 0)), m_leftRectDiwne(ImRect(0, 0, 0, 0)),
       m_middleRectDiwne(ImRect(0, 0, 0, 0)), m_rightRectDiwne(ImRect(0, 0, 0, 0)),
       m_bottomRectDiwne(ImRect(0, 0, 0, 0)), m_centerDummySpace(0), m_drawAnyway(true), m_nodePosMode(OnItsPosition),
@@ -88,8 +88,7 @@ void Node::begin()
 
 void Node::end()
 {
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		ImRect nodeRectDiwne = getNodeRectDiwne();
 		ImGui::Text(fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", nodeRectDiwne.Min.x,
 		                        nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
@@ -99,7 +98,6 @@ void Node::end()
 		                        diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y)
 		                .c_str());
 	});                /* close of macro */
-#endif                 // DIWNE_DEBUG
 	ImGui::EndGroup(); /* End of node */
 	ImGui::PopID();
 }
@@ -158,7 +156,6 @@ bool Node::afterEndDiwne()
 			            : diwne.m_allowUnselectingNodes                                 ? false
 			                                                                            : m_selected);
 		}
-
 		if (m_selected)
 		{
 			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
@@ -222,12 +219,10 @@ bool Node::topContentDiwne()
 	m_topRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
 	m_topRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		diwne.AddRectDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
 		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
-#endif  // DIWNE_DEBUG
 
 	return inner_interaction_happen;
 }
@@ -245,12 +240,10 @@ bool Node::leftContentDiwne()
 	m_leftRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
 	m_leftRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		diwne.AddRectDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
 		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
-#endif  // DIWNE_DEBUG
 
 	return inner_interaction_happen;
 }
@@ -266,12 +259,10 @@ bool Node::middleContentDiwne()
 	m_middleRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
 	m_middleRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		diwne.AddRectDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
 		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
-#endif  // DIWNE_DEBUG
 
 	return inner_interaction_happen;
 }
@@ -288,12 +279,10 @@ bool Node::rightContentDiwne()
 	m_rightRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
 	m_rightRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		diwne.AddRectDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
 		                   ImDrawFlags_RoundCornersNone, 2);
 	}); /* close of macro */
-#endif  // DIWNE_DEBUG
 
 	return inner_interaction_happen;
 }
@@ -310,12 +299,10 @@ bool Node::bottomContentDiwne()
 	m_bottomRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
 	m_bottomRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-#ifdef DIWNE_DEBUG
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_EXTRA_2((diwne), {
 		diwne.AddRectDiwne(m_bottomRectDiwne.Min, m_bottomRectDiwne.Max, ImColor(0, 0, 255, 100), 0,
 		                   ImDrawFlags_RoundCornersNone, 2);
-	}); /* close of macro */
-#endif  // DIWNE_DEBUG
+	});
 
 	return inner_interaction_happen;
 }

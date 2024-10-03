@@ -62,7 +62,7 @@ protected:
 	std::string m_middleLabel;
 
 public:
-	Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel = "Header",
+	Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const topLabel = "Header",
 	     std::string const middleLabel = "Content");
 	~Node();
 

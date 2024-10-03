@@ -16,7 +16,7 @@
 
 using namespace Workspace;
 
-CoreLink::CoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, CoreInPin* endPin)
+CoreLink::CoreLink(DIWNE::NodeEditor& diwne, DIWNE::ID id, CoreInPin* endPin)
     : DIWNE::Link(diwne, id), m_endPin(endPin), m_startPin(nullptr)
 {}
 

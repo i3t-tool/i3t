@@ -54,7 +54,7 @@ enum WorkspaceDiwneAction
 
 extern WorkspaceDiwne* g_diwne;
 
-class WorkspaceDiwne : public DIWNE::Diwne
+class WorkspaceDiwne : public DIWNE::NodeEditor
 {
 	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node);
 
@@ -86,6 +86,9 @@ public:
 
 	void setWorkAreaZoom(float val = 1) override;
 
+	// TODO: This secondary set of unrelated DiwneActions seems really odd, we're redoing what we already have because
+	//  we can't add more keys to the diwne action enum in the subclass
+	//  The diwne action "system" probably needs to be reworked alltogether
 	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
 	{
@@ -268,7 +271,7 @@ public:
 	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
 	bool m_updateDataItemsWidth; ///< Indicates a change in zoom level this frame
-	bool m_reconnectCameraToSequence;
+	bool m_reconnectCameraToSequence; // TODO: Unused probably
 
 	bool m_trackingFromLeft;
 };
