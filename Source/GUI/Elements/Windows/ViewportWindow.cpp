@@ -200,7 +200,7 @@ void ViewportWindow::render()
 	else
 	{
 		GUI::dockTabStylePop();
-		ImGui::PopStyleVar(2);
+		ImGui::PopStyleVar();
 	}
 	ImGui::End();
 }
