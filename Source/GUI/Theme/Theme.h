@@ -23,17 +23,13 @@
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 #include "Core/Result.h"
+#include "GUI/ThemeVariable.h"
 
 constexpr int I3T_PROPERTY_NAME_OFFSET = 5;
 
 constexpr auto I3T_CLASSIC_THEME_NAME = "Classic";
 constexpr auto I3T_DEFAULT_THEME_LIGHT_NAME = "LightMode";
 constexpr auto I3T_DEFAULT_THEME_DARK_NAME = "DarkMode";
-inline const std::set<std::string> I3T_DEFAULT_THEMES = {
-    I3T_CLASSIC_THEME_NAME,
-    I3T_DEFAULT_THEME_LIGHT_NAME,
-    I3T_DEFAULT_THEME_DARK_NAME,
-};
 
 enum class EColor
 {
@@ -364,11 +360,6 @@ enum class ESizeVec2
 	Cycle_ButtonSize,
 };
 
-constexpr inline EColor asColor(Core::EValueType type)
-{
-	return EColor(type);
-}
-
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
@@ -480,37 +471,25 @@ public:
 		m_colors.insert(std::pair(color, value));
 	}
 
-	[[nodiscard]] const Colors& getColors() const
-	{
-		return m_colors;
-	}
 	Colors& getColorsRef()
 	{
 		return m_colors;
-	}
-	void setColors(const Colors& colors)
-	{
-		m_colors = colors;
 	}
 
 	Sizes& getSizesRef()
 	{
 		return m_sizes;
 	}
+
 	SizesVec& getSizesVecRef()
 	{
 		return m_sizesVec2;
 	}
 
-	// JH unused -> maybe for "InputItems" only - drag float etc... but probably
-	// not needed
-	//	void operatorColorTheme();
-	//	void transformationColorTheme();
-	void returnFloatColorToDefault();
-
-	// JH unused
-	//	ImVec4 getHeader();
-	//	ImVec4 getBg();
+	static const std::vector<ThemeGroup>& getVariables()
+	{
+		return s_variables;
+	}
 
 private:
 	template <typename E, typename T>
@@ -519,6 +498,10 @@ private:
 		for (const auto [key, val] : source)
 			target[key] = val;
 	}
+
+	static ThemeGroup& group(const char* name);
+
+	static inline std::vector<ThemeGroup> s_variables;
 };
 
 namespace Detail

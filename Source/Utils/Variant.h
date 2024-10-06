@@ -31,3 +31,16 @@ inline constexpr size_t variant_index()
 		return variant_index<VariantType, T, index + 1>();
 	}
 }
+
+namespace Detail
+{
+template <class... Ts>
+struct Overloaded : Ts...
+{
+	using Ts::operator()...;
+};
+
+// explicit deduction guide (not needed as of C++20)
+template <class... Ts>
+Overloaded(Ts...) -> Overloaded<Ts...>;
+} // namespace Detail

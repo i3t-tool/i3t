@@ -218,7 +218,9 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 				colors[*en] = parseVec4Seq(node);
 			}
 			else
-				LOG_ERROR("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
+			{
+				LOG_WARN("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
+			}
 		}
 	}
 	if (yaml["sizes"])
@@ -229,6 +231,10 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 			if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
 			{
 				sizes[*en] = it->second.as<float>();
+			}
+			else
+			{
+				LOG_WARN("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
 			}
 		}
 	}
@@ -242,6 +248,10 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
 			{
 				sizesVec[*en] = parseVec2Seq(node);
+			}
+			else
+			{
+				LOG_WARN("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
 			}
 		}
 	}
