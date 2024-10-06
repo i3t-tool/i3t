@@ -20,13 +20,17 @@
 
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Theme/ThemeLoader.h"
+#include "GUI/ThemeVariable.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "UserData.h"
 #include "Utils/Other.h"
+#include "Utils/Variant.h"
 
 namespace UI
 {
+static void renderVariables();
+
 constexpr float DRAG_FLOAT_WIDTH = 100.0f;
 
 StyleEditor::StyleEditor() : IWindow(ICON_I3T_STYLE " Style Editor") {}
@@ -78,12 +82,87 @@ void StyleEditor::render()
 
 	renderSaveRevertField();
 
-	showColors();
-	ImGui::Separator();
-
-	showDimensions();
+	renderVariables();
 
 	ImGui::End();
+}
+
+void renderVariables()
+{
+	auto& curr = I3T::getTheme();
+
+	for (const auto& group : Theme::getVariables())
+	{
+		ImGui::TextUnformatted(group.name);
+		ImGui::Separator();
+
+		for (const auto& var : group.variables)
+		{
+			float valueMin = 0.0f, valueMax = 0.0f;
+			if (var.range.has_value())
+			{
+				valueMin = var.range.value().x;
+				valueMax = var.range.value().y;
+			}
+
+			std::visit(Detail::Overloaded{
+			               [&](const EColor& color) {
+				               auto& val = curr.getColorsRef()[color];
+				               ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
+				               if (ImGui::ColorEdit4(var.name, (float*) (&val)))
+				               {
+					               curr.apply();
+				               }
+			               },
+			               [&](const ESize& size) {
+				               auto& val = curr.getSizesRef()[size];
+
+				               ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
+
+				               if (var.forceInt)
+				               {
+					               int intVal = (int) val;
+					               if (ImGui::DragInt(var.name, &intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
+					               {
+						               val = (float) intVal;
+						               curr.apply();
+					               }
+				               }
+				               else
+				               {
+					               if (ImGui::DragFloat(var.name, &val, 1.0f, valueMin, valueMax, "%.0f"))
+					               {
+						               curr.apply();
+					               }
+				               }
+			               },
+			               [&](const ESizeVec2& sizeVec) {
+				               auto& val = curr.getSizesVecRef()[sizeVec];
+
+				               ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
+
+				               if (var.forceInt)
+				               {
+					               int intVal[2] = {(int) val[0], (int) val[1]};
+					               if (ImGui::DragInt2(var.name, intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
+					               {
+						               val[0] = (float) intVal[0];
+						               val[1] = (float) intVal[1];
+						               curr.apply();
+					               }
+				               }
+				               else
+				               {
+					               if (ImGui::DragFloat2(var.name, &val[0], 1.0f, valueMin, valueMax, "%.0f"))
+					               {
+						               curr.apply();
+					               }
+				               }
+			               },
+			           },
+			           var.key);
+		}
+	}
 }
 
 void StyleEditor::renderSaveRevertField()
@@ -197,80 +276,6 @@ void StyleEditor::revertChangesOnCurrentTheme()
 		if (auto theme = loadTheme(path))
 		{
 			I3T::emplaceTheme(*theme);
-		}
-	}
-}
-
-void showColors()
-{
-	auto& curr = I3T::getTheme();
-
-	GUI::Text("Colors", EFont::Header);
-	ImGui::Separator();
-
-	std::string lastCat;
-
-	for (auto& [key, str] : Theme::getColorNames())
-	{
-		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
-		if (currCat != lastCat)
-		{
-			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
-			lastCat = currCat;
-		}
-
-		auto& color = curr.getColorsRef()[key];
-		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
-
-		const auto label = fmt::format("{}##{}", str + I3T_PROPERTY_NAME_OFFSET, (unsigned) key);
-		if (ImGui::ColorEdit4(label.c_str(), (float*) (&color), ImGuiColorEditFlags_AlphaPreviewHalf))
-		{
-			curr.apply();
-		}
-	}
-}
-
-void showDimensions()
-{
-	auto& curr = I3T::getTheme();
-
-	GUI::Text("Dimensions", EFont::Header);
-	ImGui::Separator();
-
-	std::string lastCat;
-
-	for (auto& [key, str] : Theme::getSizeNames())
-	{
-		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
-		if (currCat != lastCat)
-		{
-			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
-			lastCat = currCat;
-		}
-
-		auto& val = curr.getSizesRef()[key];
-		ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, FLT_MAX, "%.0f"))
-		{
-			curr.apply();
-		}
-	}
-	ImGui::Separator();
-
-	for (auto& [key, str] : Theme::getSizeVecNames())
-	{
-		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
-		if (currCat != lastCat)
-		{
-			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
-			lastCat = currCat;
-		}
-
-		auto& val = curr.getSizesVecRef()[key];
-		ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, FLT_MAX, "%.0f"))
-		{
-			curr.apply();
 		}
 	}
 }

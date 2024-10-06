@@ -123,6 +123,11 @@ set(BUILD_DOCUMENTATION OFF CACHE BOOL "Build documentation.")
 set(BUILD_INSTALLER OFF CACHE BOOL "Build installer.")
 set(BUILD_PACKAGE OFF CACHE BOOL "Build package.")
 add_subdirectory(Dependencies/rttr)
+
+add_compile_definitions(
+        MAGIC_ENUM_RANGE_MIN=0
+        MAGIC_ENUM_RANGE_MAX=256
+)
 # =============================================================
 
 # ======== Source groups ======================================
