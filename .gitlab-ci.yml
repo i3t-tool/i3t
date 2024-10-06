@@ -11,6 +11,7 @@ stages:
   - lint
   - build
   - test
+  - pass
 
 # How to write paths: https://stackoverflow.com/a/55391444
 .changes-rules:
@@ -81,3 +82,11 @@ test:
     - xvfb-run Binaries/Debug/I3TTest
   dependencies:
     - build-tests
+
+###
+
+# Do not remove this job!
+pass:
+  stage: pass
+  script:
+    - echo "Pipeline passed"
