@@ -77,17 +77,18 @@ public:
 		return DiwneAction::TouchNode;
 	};
 
-	void updateSizes() override;
+//	void updateSizes() override;
 	void deleteActionDiwne();
 	virtual void deleteAction(){};
 
 	bool allowDrawing() override;
-	bool beforeBeginDiwne() override;
-	void begin() override;
-	bool content() override;
-	void end() override;
-	bool afterEndDiwne() override;
+//	bool beforeBeginDiwne() override;
+	void begin(FrameContext& context) override;
+	void content(FrameContext& context) override;
+	void end(FrameContext& context) override;
+//	bool afterEndDiwne() override;
 
+	/*
 	template <typename T>
 	bool drawNodeDiwne(DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
 	                   DrawMode drawMode = DrawMode::Interacting)
@@ -99,13 +100,13 @@ public:
 		if (!getRender()) // hide the node and its input wire in the tutorial scene
 			return false;
 
-		bool interaction_happen = drawDiwne(drawMode);
+		drawDiwne(drawMode);
 
 		if (interaction_happen && !m_toDelete)
 		{
 			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
 			if (diwne.getDiwneActionActive() == DiwneAction::None ||
-			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent /* no specific action */
+			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent // no specific action
 			)
 			{
 				diwne.setDiwneAction(DiwneAction::InteractingContent);
@@ -114,6 +115,7 @@ public:
 
 		return interaction_happen;
 	}
+	*/
 
 	bool topContentDiwne();
 	bool leftContentDiwne();
@@ -128,10 +130,10 @@ public:
 
 	bool setSelected(const bool selected) override;
 
-	bool processSelect() override;
-	bool processUnselect() override;
-
-	bool processDrag() override;
+//	bool processSelect() override;
+//	bool processUnselect() override;
+//
+//	bool processDrag() override;
 
 	virtual bool topContent();
 	virtual bool leftContent();

@@ -232,3 +232,5 @@ set_target_properties(assimp PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}")
 
 # =============================================================
+
+add_subdirectory(Source/DIWNE) # DIWNE standalone example project

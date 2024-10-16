@@ -63,30 +63,30 @@ bool Node::allowDrawing()
 	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne());
 }
 
-bool Node::beforeBeginDiwne()
-{
-	switch (m_nodePosMode)
-	{
-	case DrawModeNodePosition::OnItsPosition:
-		ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
-		break;
-	case DrawModeNodePosition::OnCursorPosition:
-		setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
-		break;
-	}
-	if (m_drawAnyway)
-		m_drawAnyway = false;
+//bool Node::beforeBeginDiwne()
+//{
+//	switch (m_nodePosMode)
+//	{
+//	case DrawModeNodePosition::OnItsPosition:
+//		ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+//		break;
+//	case DrawModeNodePosition::OnCursorPosition:
+//		setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+//		break;
+//	}
+//	if (m_drawAnyway)
+//		m_drawAnyway = false;
+//
+//	return beforeBegin();
+//}
 
-	return beforeBegin();
-}
-
-void Node::begin()
+void Node::begin(FrameContext& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup(); /* Begin of node */
 }
 
-void Node::end()
+void Node::end(FrameContext& context)
 {
 	DIWNE_DEBUG_EXTRA_2((diwne), {
 		ImRect nodeRectDiwne = getNodeRectDiwne();
@@ -102,7 +102,7 @@ void Node::end()
 	ImGui::PopID();
 }
 
-bool Node::content()
+void Node::content(FrameContext& context)
 {
 	bool interaction_happen = false;
 	interaction_happen |= topContentDiwne();
@@ -134,42 +134,43 @@ bool Node::content()
 	ImGui::PopID();
 
 	interaction_happen |= bottomContentDiwne();
-	return interaction_happen;
+//	return interaction_happen;
+	// TODO: Rework
 }
 
-bool Node::afterEndDiwne()
-{
-	if (m_selectable)
-	{
-		bool prev_selected = m_selected;
-		if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull ||
-		    diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
-		{
-			setSelected(diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true
-			            : diwne.m_allowUnselectingNodes                                 ? false
-			                                                                            : m_selected);
-		}
-		else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch ||
-		         diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch)
-		{
-			setSelected(diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true
-			            : diwne.m_allowUnselectingNodes                                 ? false
-			                                                                            : m_selected);
-		}
-		if (m_selected)
-		{
-			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
-			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-			                   diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
-		}
-	}
-
-	/* always block interactions with other nodes */
-	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-	ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne() * diwne.getWorkAreaZoom());
-
-	return DiwneObject::afterEndDiwne();
-}
+//bool Node::afterEndDiwne()
+//{
+//	if (m_selectable)
+//	{
+//		bool prev_selected = m_selected;
+//		if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull ||
+//		    diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
+//		{
+//			setSelected(diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true
+//			            : diwne.m_allowUnselectingNodes                                 ? false
+//			                                                                            : m_selected);
+//		}
+//		else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch ||
+//		         diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch)
+//		{
+//			setSelected(diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true
+//			            : diwne.m_allowUnselectingNodes                                 ? false
+//			                                                                            : m_selected);
+//		}
+//		if (m_selected)
+//		{
+//			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
+//			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+//			                   diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+//		}
+//	}
+//
+//	/* always block interactions with other nodes */
+//	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+//	ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne() * diwne.getWorkAreaZoom());
+//
+//	return DiwneObject::afterEndDiwne();
+//}
 
 bool Node::setSelected(const bool selected)
 {
@@ -177,33 +178,34 @@ bool Node::setSelected(const bool selected)
 	DiwneObject::setSelected(selected);
 	if (prevSelected != m_selected)
 	{
-		if (m_selected)
-			processSelect();
-		else
-			processUnselect();
+		// TODO: Uncomment
+//		if (m_selected)
+//			processSelect();
+//		else
+//			processUnselect();
 		diwne.m_takeSnap = true;
 	}
 	return m_selected;
 }
 
 // TODO: (DR) process/processUnselect seem to always return true, what is the purpose of the return value?
-bool Node::processSelect()
-{
-	diwne.setNodesSelectionChanged(true);
-	return true;
-}
+//bool Node::processSelect()
+//{
+//	diwne.setNodesSelectionChanged(true);
+//	return true;
+//}
+//
+//bool Node::processUnselect()
+//{
+//	diwne.setNodesSelectionChanged(true);
+//	return true;
+//}
 
-bool Node::processUnselect()
-{
-	diwne.setNodesSelectionChanged(true);
-	return true;
-}
-
-bool Node::processDrag()
-{
-	translateNodePositionDiwne(diwne.bypassGetMouseDelta() / diwne.getWorkAreaZoom());
-	return true;
-}
+//bool Node::processDrag()
+//{
+//	translateNodePositionDiwne(diwne.bypassGetMouseDelta() / diwne.getWorkAreaZoom());
+//	return true;
+//}
 
 bool Node::topContentDiwne()
 {
@@ -307,38 +309,38 @@ bool Node::bottomContentDiwne()
 	return inner_interaction_happen;
 }
 
-void Node::updateSizes()
-{
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	/* \todo can use ImGui::ItemMax/Min */
-	setNodeRectsPositionDiwne(m_nodePositionDiwne);
-	/* ItemSpacing is already scaled, node rects are using unscaled coordinates, thus the divison */
-	ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom();
-
-	float rightWidth = m_rightRectDiwne.GetWidth();
-	/* space is between left-middle and middle-right */
-	float centerWidth = m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + rightWidth + (spacing.x * 2);
-	float maxWidth = std::max(m_topRectDiwne.GetWidth(), std::max(centerWidth, m_bottomRectDiwne.GetWidth()));
-
-	float bottomYOfCentre = m_bottomRectDiwne.Min.y - spacing.y;
-
-	m_topRectDiwne.Max.x = m_topRectDiwne.Min.x + maxWidth; /* top.Max.x is most right point now */
-
-	m_leftRectDiwne.Max.y = bottomYOfCentre;
-
-	m_centerDummySpace = maxWidth - centerWidth; /* how much shift middle or right content for
-	                                                right-alignation */
-	/* \todo span graphic of middle background to fill middle of node or left it
-	  just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
-	  + spacing.x; m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth -
-	  spacing.x;*/ /* space between middle-right */
-	m_middleRectDiwne.Max.y = bottomYOfCentre;
-
-	m_rightRectDiwne.Max.y = bottomYOfCentre;
-
-	m_bottomRectDiwne.Max.x = m_topRectDiwne.Max.x;
-}
+//void Node::updateSizes()
+//{
+//	ImGuiStyle& style = ImGui::GetStyle();
+//
+//	/* \todo can use ImGui::ItemMax/Min */
+//	setNodeRectsPositionDiwne(m_nodePositionDiwne);
+//	/* ItemSpacing is already scaled, node rects are using unscaled coordinates, thus the divison */
+//	ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom();
+//
+//	float rightWidth = m_rightRectDiwne.GetWidth();
+//	/* space is between left-middle and middle-right */
+//	float centerWidth = m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + rightWidth + (spacing.x * 2);
+//	float maxWidth = std::max(m_topRectDiwne.GetWidth(), std::max(centerWidth, m_bottomRectDiwne.GetWidth()));
+//
+//	float bottomYOfCentre = m_bottomRectDiwne.Min.y - spacing.y;
+//
+//	m_topRectDiwne.Max.x = m_topRectDiwne.Min.x + maxWidth; /* top.Max.x is most right point now */
+//
+//	m_leftRectDiwne.Max.y = bottomYOfCentre;
+//
+//	m_centerDummySpace = maxWidth - centerWidth; /* how much shift middle or right content for
+//	                                                right-alignation */
+//	/* \todo span graphic of middle background to fill middle of node or left it
+//	  just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
+//	  + spacing.x; m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth -
+//	  spacing.x;*/ /* space between middle-right */
+//	m_middleRectDiwne.Max.y = bottomYOfCentre;
+//
+//	m_rightRectDiwne.Max.y = bottomYOfCentre;
+//
+//	m_bottomRectDiwne.Max.x = m_topRectDiwne.Max.x;
+//}
 
 void Node::setNodeRectsPositionDiwne(ImVec2 const& position)
 {

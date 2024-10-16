@@ -20,19 +20,11 @@
 
 namespace DIWNE
 {
-
-/* ===================== */
-/* ===== D i w n e ===== */
-/* ===================== */
-
 NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
     : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
       m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max),
-      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), mp_lastActivePin(nullptr),
-      m_helperLink(std::make_unique<Link>(diwne, 0)), m_diwneAction(DiwneAction::None),
-      m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false), m_nodesSelectionChanged(false),
-      m_selectionRectangeDiwne(ImRect(0, 0, 0, 0)), m_popupPosition(settingsDiwne->initPopupPosition),
-      m_popupDrawn(false), m_tooltipDrawn(false), m_takeSnap(false)
+      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), m_helperLink(std::make_unique<Link>(diwne, 0)),
+      m_popupPosition(settingsDiwne->initPopupPosition)
 {
 	setSelectable(false);
 }
@@ -47,63 +39,25 @@ void NodeEditor::draw(DrawMode drawMode)
 	DiwneObject::draw(drawMode);
 }
 
-void NodeEditor::clear()
-{
-	diwne.setLastActiveNode<DIWNE::Node>(nullptr);
-	diwne.setLastActivePin<DIWNE::Pin>(nullptr);
-}
-
 bool NodeEditor::allowDrawing()
 {
 	return m_drawing;
 }
 
-bool NodeEditor::initializeDiwne()
+void NodeEditor::initializeDiwne(FrameContext& context)
 {
 	m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0, 0), false,
 	                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	m_diwneAction = DiwneAction::None;
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
-	return initialize();
+	DiwneObject::initializeDiwne(context);
 }
 
-void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
-{
-	style.WindowPadding = style.WindowPadding * scale_factor;
-	style.WindowRounding = style.WindowRounding * scale_factor;
-	style.WindowMinSize = style.WindowMinSize * scale_factor;
-	style.ChildRounding = style.ChildRounding * scale_factor;
-	style.PopupRounding = style.PopupRounding * scale_factor;
-	style.FramePadding = style.FramePadding * scale_factor;
-	style.FrameRounding = style.FrameRounding * scale_factor;
-	style.ItemSpacing = style.ItemSpacing * scale_factor;
-	style.ItemInnerSpacing = style.ItemInnerSpacing * scale_factor;
-	style.CellPadding = style.CellPadding * scale_factor;
-	style.TouchExtraPadding = style.TouchExtraPadding * scale_factor;
-	style.IndentSpacing = style.IndentSpacing * scale_factor;
-	style.ColumnsMinSpacing = style.ColumnsMinSpacing * scale_factor;
-	style.ScrollbarSize = style.ScrollbarSize * scale_factor;
-	style.ScrollbarRounding = style.ScrollbarRounding * scale_factor;
-	style.GrabMinSize = style.GrabMinSize * scale_factor;
-	style.GrabRounding = style.GrabRounding * scale_factor;
-	style.LogSliderDeadzone = style.LogSliderDeadzone * scale_factor;
-	style.TabRounding = style.TabRounding * scale_factor;
-	style.TabMinWidthForCloseButton =
-	    (style.TabMinWidthForCloseButton != FLT_MAX) ? style.TabMinWidthForCloseButton * scale_factor : FLT_MAX;
-	style.DisplayWindowPadding = style.DisplayWindowPadding * scale_factor;
-	style.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding * scale_factor;
-	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
-}
-
-bool NodeEditor::beforeBeginDiwne() // todo redesign to https://en.wikipedia.org/wiki/Call_super
+void NodeEditor::begin(FrameContext& context)
 {
 	updateWorkAreaRectangles();
 	m_nodesSelectionChanged = false;
-	return beforeBegin();
-}
 
-void NodeEditor::begin()
-{
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
 	ImGui::PushID(mp_settingsDiwne->editorlabel.c_str());
 	ImGui::BeginGroup();
@@ -181,25 +135,59 @@ void NodeEditor::begin()
 	}); /* close of macro */
 }
 
-bool NodeEditor::afterContentDiwne()
+void NodeEditor::content(FrameContext& context) {}
+
+void NodeEditor::end(FrameContext& context)
 {
 	bool interaction_happen = false;
 	if (m_diwneAction == DiwneAction::NewLink)
 	{
-		interaction_happen |= m_helperLink->drawDiwne(JustDraw);
+		FrameContext localContext = context;
+		localContext.drawMode = DrawMode::JustDraw;
+		m_helperLink->drawDiwne(localContext);
+		context |= localContext;
 	}
-	interaction_happen |= afterContent();
-	return interaction_happen;
-}
 
-void NodeEditor::end()
-{
 	diwne.restoreZoomScaling();
 
 	// TODO: Thid doesnt work anymore in newer ImGui versions, a dummy needs to be added
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
 	ImGui::EndGroup();
 	ImGui::PopID();
+}
+
+void NodeEditor::clear()
+{
+	diwne.setLastActiveNode<DIWNE::Node>(nullptr);
+	diwne.setLastActivePin<DIWNE::Pin>(nullptr);
+}
+
+void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
+{
+	style.WindowPadding = style.WindowPadding * scale_factor;
+	style.WindowRounding = style.WindowRounding * scale_factor;
+	style.WindowMinSize = style.WindowMinSize * scale_factor;
+	style.ChildRounding = style.ChildRounding * scale_factor;
+	style.PopupRounding = style.PopupRounding * scale_factor;
+	style.FramePadding = style.FramePadding * scale_factor;
+	style.FrameRounding = style.FrameRounding * scale_factor;
+	style.ItemSpacing = style.ItemSpacing * scale_factor;
+	style.ItemInnerSpacing = style.ItemInnerSpacing * scale_factor;
+	style.CellPadding = style.CellPadding * scale_factor;
+	style.TouchExtraPadding = style.TouchExtraPadding * scale_factor;
+	style.IndentSpacing = style.IndentSpacing * scale_factor;
+	style.ColumnsMinSpacing = style.ColumnsMinSpacing * scale_factor;
+	style.ScrollbarSize = style.ScrollbarSize * scale_factor;
+	style.ScrollbarRounding = style.ScrollbarRounding * scale_factor;
+	style.GrabMinSize = style.GrabMinSize * scale_factor;
+	style.GrabRounding = style.GrabRounding * scale_factor;
+	style.LogSliderDeadzone = style.LogSliderDeadzone * scale_factor;
+	style.TabRounding = style.TabRounding * scale_factor;
+	style.TabMinWidthForCloseButton =
+	    (style.TabMinWidthForCloseButton != FLT_MAX) ? style.TabMinWidthForCloseButton * scale_factor : FLT_MAX;
+	style.DisplayWindowPadding = style.DisplayWindowPadding * scale_factor;
+	style.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding * scale_factor;
+	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
 }
 
 bool NodeEditor::allowProcessFocused()
@@ -212,32 +200,31 @@ bool NodeEditor::allowProcessFocused()
 	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
-bool NodeEditor::processInteractions()
+// bool NodeEditor::processInteractions()
+//{
+//	return processDiwneSelectionRectangle();
+// }
+//
+// bool NodeEditor::processInteractionsDiwne()
+//{
+//	bool interaction_happen = false;
+//
+//	interaction_happen |= DiwneObject::processInteractionsDiwne();
+//
+//	// for example inner interaction (focus on node) is no problem with this actions
+//	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction())
+//	{
+//		interaction_happen |= processDiwneZoom();
+//	}
+//
+//	return interaction_happen;
+// }
+
+void NodeEditor::finalizeDiwne(FrameContext& context)
 {
-	return processDiwneSelectionRectangle();
-}
-
-bool NodeEditor::processInteractionsDiwne()
-{
-	bool interaction_happen = false;
-
-	interaction_happen |= DiwneObject::processInteractionsDiwne();
-
-	// for example inner interaction (focus on node) is no problem with this actions
-	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction())
-	{
-		interaction_happen |= processDiwneZoom();
-	}
-
-	return interaction_happen;
-}
-
-bool NodeEditor::finalizeDiwne()
-{
-	bool interaction_happen = finalize();
+	DiwneObject::finalizeDiwne(context);
 	m_diwneAction_previousFrame = m_diwneAction;
 	ImGui::EndChild();
-	return interaction_happen;
 }
 
 bool NodeEditor::blockRaisePopup()
@@ -316,11 +303,11 @@ bool NodeEditor::processDiwneSelectionRectangle()
 	return false;
 }
 
-bool NodeEditor::processDrag()
-{
-	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
-	return true;
-}
+// bool NodeEditor::processDrag()
+//{
+//	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
+//	return true;
+// }
 
 bool NodeEditor::processZoom()
 {
@@ -1233,15 +1220,6 @@ bool NodeEditor::ensureZoomScaling(bool active)
 		}
 	}
 	return activeBefore;
-}
-
-FrameContext& NodeEditor::getFrameContext() const
-{
-	return *m_frameContext;
-}
-void NodeEditor::resetFrameContext(DrawMode drawMode)
-{
-	m_frameContext = std::make_unique<FrameContext>(drawMode);
 }
 
 } /* namespace DIWNE */

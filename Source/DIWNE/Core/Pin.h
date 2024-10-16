@@ -48,17 +48,17 @@ public:
 		return DiwneAction::TouchPin;
 	};
 
-	void begin() override;
-	void end() override;
-	void updateSizes() override;
-	bool processInteractionsAlways() override;
+	void begin(FrameContext& context) override;
+	void end(FrameContext& context) override;
+//	void updateSizes() override; //TODO: Uncomment
+//	bool processInteractionsAlways(FrameContext& context) override; //TODO: Uncomment
 
 	virtual const ImVec2& getLinkConnectionPointDiwne()
 	{
 		return m_connectionPointDiwne;
 	};
 
-	bool processDrag() override;
+//	bool processDrag() override;
 
 	/*! \brief Wrapper is run when new link is created and goal pin is hovered but
 	 * action not released yet

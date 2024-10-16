@@ -41,23 +41,20 @@ bool Link::isLinkOnWorkArea()
 	return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
 }
 
-bool Link::initialize()
+void Link::initialize(FrameContext& context)
 {
 	diwne.mp_settingsDiwne->linkColor.w =
 	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
 	diwne.mp_settingsDiwne->linkColorSelected.w = m_focusedForInteraction
 	                                                  ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
 	                                                  : diwne.mp_settingsDiwne->linkAlphaSelected;
-
-	return false;
 }
-bool Link::initializeDiwne()
+void Link::initializeDiwne(FrameContext& context)
 {
-	bool interaction_happen = initialize();
+	initialize(context);
 	updateEndpoints();
 	updateControlPoints();
 	updateSquareDistanceMouseFromLink();
-	return interaction_happen;
 }
 
 bool Link::isHovered()
@@ -69,28 +66,28 @@ bool Link::bypassFocusForInteractionAction()
 {
 	return isHovered();
 }
+//
+//bool Link::processFocused()
+//{
+//	if (bypassTouchAction())
+//	{
+//		diwne.setDiwneAction(getTouchActionType());
+//	}
+//	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+//	                          diwne.mp_settingsDiwne->objectFocusBorderColor,
+//	                          diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
+//	return true;
+//}
+//
+//bool Link::processFocusedForInteraction()
+//{
+//	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+//	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
+//	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
+//	return true;
+//}
 
-bool Link::processFocused()
-{
-	if (bypassTouchAction())
-	{
-		diwne.setDiwneAction(getTouchActionType());
-	}
-	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                          diwne.mp_settingsDiwne->objectFocusBorderColor,
-	                          diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
-	return true;
-}
-
-bool Link::processFocusedForInteraction()
-{
-	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
-	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
-	return true;
-}
-
-bool Link::content()
+void Link::content(FrameContext& context)
 {
 	if (m_selected)
 	{
@@ -106,7 +103,6 @@ bool Link::content()
 		diwne.AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 	});
-	return false;
 }
 
 } /* namespace DIWNE */

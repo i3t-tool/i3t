@@ -129,38 +129,40 @@ public:
 	bool m_diwneDebugExtra1 = false;
 	bool m_diwneDebugExtra2 = false;
 #endif
-	bool m_takeSnap; // TODO: Rename or at least add documentation,
-	                 //  this feature shouldn't be specific to our undo/redo system if it were to remain here
+	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
+	                        //  this feature shouldn't be specific to our undo/redo system if it were to remain here
 
 	////////////////////////////////////////////
 
 	DIWNE::SettingsDiwne* mp_settingsDiwne;
 
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
-	bool m_popupDrawn;
+	bool m_popupDrawn{false};
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
-	bool m_tooltipDrawn;
+	bool m_tooltipDrawn{false};
 	/// only one object can be focused
 	/// TODO: A flag indicating that an object has been focused that frame?
 	///  Review this flag, its hard to track, why not keep track of the "focused" object instead
 	///  Also still yet to exactly estabilish what "focused" really means
-	bool m_objectFocused;
+	bool m_objectFocused{false};
 	/// for example when holding ctrl nodes not going unselected when sleection rect get out of them
-	bool m_allowUnselectingNodes;
+	bool m_allowUnselectingNodes{false};
 
 protected:
-	std::unique_ptr<FrameContext> m_frameContext = std::make_unique<FrameContext>();
-
-	DiwneAction m_diwneAction, m_diwneAction_previousFrame;
+	// TODO: Review if we could keep DiwneAction info in Context?
+	//  Really begs the question where are we okay to use diwne member variables
+	//  and where it might be better to use method parameters / returns rather than a
+	//  "global" member context.
+	DiwneAction m_diwneAction{DiwneAction::None}, m_diwneAction_previousFrame{DiwneAction::None};
 
 	std::shared_ptr<DIWNE::Pin> mp_lastActivePin;
 	std::shared_ptr<DIWNE::Node> mp_lastActiveNode;
 
 	std::unique_ptr<DIWNE::Link> m_helperLink; /**< for showing link that is in process of creating */
 
-	bool m_nodesSelectionChanged;
+	bool m_nodesSelectionChanged{false};
 
-	ImRect m_selectionRectangeDiwne;
+	ImRect m_selectionRectangeDiwne{0, 0, 0, 0};
 	ImColor m_selectionRectangeTouchColor, m_selectionRectangeFullColor;
 
 	bool m_drawing /**< store whether ImGui window is ready to draw to it */;
@@ -191,7 +193,7 @@ public:
 	/** Clear all nodes from the node editor */
 	virtual void clear();
 
-	void draw(DrawMode drawMode) override;
+	void draw(DrawMode drawMode = DrawMode::Interacting) override;
 
 	FrameContext& getFrameContext() const;
 	void resetFrameContext(DrawMode drawMode);
@@ -209,14 +211,15 @@ public:
 		return DiwneAction::TouchWorkarea;
 	};
 
-	bool initializeDiwne() override;
 	bool allowDrawing() override;
-	bool beforeBeginDiwne() override;
-	void begin() override;
-	bool afterContentDiwne() override;
-	void end() override;
-	bool processInteractionsDiwne() override;
-	bool finalizeDiwne() override;
+
+	void initializeDiwne(FrameContext& context) override;
+
+	void begin(FrameContext& context) override;
+	void content(FrameContext& context) override;
+	void end(FrameContext& context) override;
+
+	void finalizeDiwne(FrameContext& context) override;
 
 	bool blockRaisePopup(); /**< sometimes we do not want to raise popup - here specify
 	                           it ( now it is when selecting action run ) */
@@ -226,9 +229,9 @@ public:
 		return getWorkAreaDiwne();
 	};
 
-	bool processDrag() override;
-
-	bool processInteractions() override;
+	//	bool processDrag() override;
+	//
+	//	bool processInteractions() override;
 
 	void updateWorkAreaRectangles(); /** \brief Update position and size of work
 	                                    area on screen and on diwne */

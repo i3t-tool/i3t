@@ -23,36 +23,36 @@ Pin::Pin(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne /*
 	setSelectable(false);
 }
 
-void Pin::begin()
+void Pin::begin(FrameContext& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup();
 }
 
-void Pin::end()
+void Pin::end(FrameContext& context)
 {
 	ImGui::EndGroup();
 	ImGui::PopID();
 }
 
-void Pin::updateSizes()
-{
-	m_pinRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
-	m_pinRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
+//void Pin::updateSizes()
+//{
+//	m_pinRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
+//	m_pinRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
+//
+//	updateConnectionPointDiwne();
+//}
 
-	updateConnectionPointDiwne();
-}
-
-bool Pin::processInteractionsAlways()
-{
-	bool interaction_happen = false;
-
-	interaction_happen |= processPin_Pre_ConnectLinkDiwne();
-	// Selection rectangle block showing popup etc.
-	interaction_happen |= DiwneObject::processInteractionsAlways();
-
-	return interaction_happen;
-}
+//bool Pin::processInteractionsAlways()
+//{
+//	bool interaction_happen = false;
+//
+//	interaction_happen |= processPin_Pre_ConnectLinkDiwne();
+//	// Selection rectangle block showing popup etc.
+//	interaction_happen |= DiwneObject::processInteractionsAlways();
+//
+//	return interaction_happen;
+//}
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
@@ -84,11 +84,11 @@ bool Pin::processConnectionPrepared()
 	return true;
 }
 
-bool Pin::processDrag()
-{
-	diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
-	diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
-	return true;
-}
+//bool Pin::processDrag()
+//{
+//	diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+//	diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
+//	return true;
+//}
 
 } /* namespace DIWNE */

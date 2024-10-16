@@ -26,11 +26,11 @@ public:
 	/** Default destructor */
 	virtual ~Link(){};
 
-	bool initialize() override;
-	bool initializeDiwne() override;
-	void begin() override{}; /*!< link is not ImGui element - it is just picture of line */
-	void end() override{};
-	bool content() override;
+	void initialize(FrameContext& context) override;
+	void initializeDiwne(FrameContext& context) override;
+	void begin(FrameContext& context) override{}; /*!< link is not ImGui element - it is just picture of line */
+	void end(FrameContext& context) override{};
+	void content(FrameContext& context) override;
 
 	DIWNE::DiwneAction getHoldActionType() const final
 	{
@@ -87,8 +87,8 @@ public:
 	virtual bool isHovered();
 	virtual bool bypassFocusForInteractionAction();
 
-	virtual bool processFocusedForInteraction();
-	virtual bool processFocused();
+//	virtual bool processFocusedForInteraction();
+//	virtual bool processFocused();
 
 	bool m_just_pluged /*!< not select link when just pluged */;
 

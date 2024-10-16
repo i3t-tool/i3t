@@ -128,17 +128,19 @@ public:                               /* \todo some attributes should be private
 	 */
 	virtual void finalize(FrameContext& context);
 
+
 	virtual bool allowInteraction(); ///< Decide whether the object can interact (not including content elements)
 	// TODO: Make this get called by the end() method
 	virtual void processInteractions(FrameContext& context);
 
-	virtual void popupContent(FrameContext& context); ///< Content of popup menu raise on this object
+//	virtual void popupContent(FrameContext& context); ///< Content of popup menu raise on this object
 
 	// Internal implementation methods, can still be overriden if needed
 protected:
 	virtual void initializeDiwne(FrameContext& context);
 	virtual void beginDiwne(FrameContext& context);
 	virtual void endDiwne(FrameContext& context);
+	virtual void finalizeDiwne(FrameContext& context);
 	virtual void processInteractionsDiwne(FrameContext& context);
 
 public:
@@ -300,6 +302,7 @@ public:
 	FrameContext(DrawMode drawMode) : drawMode(drawMode) {}
 
 	void merge(const FrameContext& other); ///< Updates the context with another context returned by a draw method.
+	void operator|=(const FrameContext& other); ///< A quick way to call the merge() method using an OR operator.
 	FrameContext& operator|(const FrameContext& other); ///< A quick way to call the merge() method using an OR operator.
 };
 
