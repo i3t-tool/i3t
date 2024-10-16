@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-FILES="Data* Config.json LICENSE.txt"
+FILES="Data* LICENSE.txt"
 
 # Assume this is the project root
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )"
