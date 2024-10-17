@@ -12,8 +12,6 @@
  */
 #pragma once
 
-#include "DIWNE/diwne_include.h"
-
 #include <algorithm>
 #include <map>
 #include <math.h>
@@ -23,6 +21,8 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+
+#include "DIWNE/diwne_include.h"
 
 #include "Config.h"
 #include "Core/Result.h"
@@ -75,14 +75,13 @@ public:
 
 	void clear() override;
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	bool beforeBegin() override;
-	bool beforeContent() override;
-	bool content() override;
-	bool afterContent() override;
-	bool afterEnd() override;
-	bool finalize() override;
+//	void initialize(DIWNE::DrawInfo& context) override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void content(DIWNE::DrawInfo& context) override;
+	void end(DIWNE::DrawInfo& context) override;
+	void finalize(DIWNE::DrawInfo& context) override;
 
 	void setWorkAreaZoom(float val = 1) override;
 
@@ -108,11 +107,26 @@ public:
 		                                                            : m_workspaceDiwneAction;
 	}
 
-	/**
-	 * \brief All WorkspaceNodes
-	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
-	 **/
-	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
+	// TODO: The nodes should be mainly stored in the DIWNE::NodeEditor not in a subclass
+	//  Or a system where the storage can be specified by subclasses should be created
+	//  However this turns out to be very tricky since vectors of derived classes cannot be easily converted
+	//  into vectors of base class. There are hacky workarounds like reinterpret_cast but generally at least a shallow
+	//  O(n) copy and cast of pointers is required. That may be insignificant but I'm not sure (large node counts?)
+	//  - The simplest solution is to use a single base node vector in NodeEditor. Issue is that in subclasses everytime
+	//    a non base functionality is required the fetched node would need to be (pseudo-safely) static-casted.
+	//    That is a lot of boilerplate code though.
+	//  - More complicated but still clean solution is to create a generic getNodes method that subclasses override,
+	//  however its not clear what this method would return, it can't return a base class vector, it also can't return
+	//  a generic iterator since it is type specific. It could return a pair of pointers for read only access.
+	//
+	// TODO: I've moved the CoreNode vector to DIWNE::NodeEditor for the time being.
+	//  This way the code can be rewritten in DIWNE but still compile and be tested in Workspace
+	//  Will see how we go from there.
+//	/**
+//	 * \brief All WorkspaceNodes
+//	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
+//	 **/
+//	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.
@@ -130,11 +144,13 @@ public:
 	std::vector<CoreLink*> m_linksToDraw;
 	std::vector<CoreLink> m_linksCameraToSequence;
 
+	Ptr<DIWNE::Link> m_cameraLink;
+
 	/**
 	 * \brief For a given input, create appropriate constructor box and plug it to this input
 	 * \return true if successful (input was not a Ptr)
 	 */
-	bool processCreateAndPlugTypeConstructor();
+	//	bool processCreateAndPlugTypeConstructor();
 
 	/**
 	 * O(N) where N is workspace nodes count.
@@ -157,32 +173,17 @@ public:
 		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
 	}
 
+	// TODO: Replace with DIWNE::NodeEditor functionality
 	template <class T>
 	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
-		// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
-		// size, padding etc.)
-		// Hence scaling is applied here if not active, and then restored to its original state at the end of this
-		// method
-		bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+		auto node = NodeEditor::createNode<T>(position, shiftToLeftByNodeWidth);
 
-		auto node = std::make_shared<T>(*this);
-
-		node->setNodePositionDiwne(position);
-
-		if (shiftToLeftByNodeWidth)
-		{
-			node->drawDiwne(); /* to obtain size */
-			node->translateNodePositionDiwne(
-			    ImVec2(-node->getNodeRectSizeDiwne().x - I3T::getSize(ESizeVec2::NewNode_positionShift).x,
-			           I3T::getSize(ESizeVec2::NewNode_positionShift).y));
-		}
-
-		m_workspaceCoreNodes.push_back(node);
 		m_takeSnap = true; /* JH maybe better in place where this function is called*/
-		detectRotationTransformAndSetFloatMode(node);
 
-		diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+		// TODO: This call makes no sense here, there should be another way
+		//	I'm thinking this should be handled by the respective Transformation subclasses
+		detectRotationTransformAndSetFloatMode(node);
 
 		return node;
 	}
@@ -199,6 +200,7 @@ public:
 		}
 	}
 
+	// TODO: Replace with DIWNE::NodeEditor functionality
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
@@ -214,6 +216,7 @@ public:
 
 	void processDragAllSelectedNodes();
 
+	// TODO: Move to DIWNE::NodeEditor
 	void selectAll();
 	void invertSelection();
 	void zoomToAll();
@@ -270,7 +273,7 @@ public:
 	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
 	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
-	bool m_updateDataItemsWidth; ///< Indicates a change in zoom level this frame
+	bool m_updateDataItemsWidth;      ///< Indicates a change in zoom level this frame
 	bool m_reconnectCameraToSequence; // TODO: Unused probably
 
 	bool m_trackingFromLeft;

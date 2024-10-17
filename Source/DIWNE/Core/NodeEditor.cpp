@@ -18,13 +18,16 @@
 #include "Node.h"
 #include "Pin.h"
 
+// TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+
 namespace DIWNE
 {
 NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
-    : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
+    : DiwneObject(*this, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
       m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max),
-      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), m_helperLink(std::make_unique<Link>(diwne, 0)),
-      m_popupPosition(settingsDiwne->initPopupPosition)
+      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), m_helperLink(std::make_unique<Link>(diwne)),
+      m_popupPosition(settingsDiwne->initPopupPosition), m_renderer(std::make_unique<DrawHelper>(this))
 {
 	setSelectable(false);
 }
@@ -39,27 +42,23 @@ void NodeEditor::draw(DrawMode drawMode)
 	DiwneObject::draw(drawMode);
 }
 
-bool NodeEditor::allowDrawing()
+void NodeEditor::initializeDiwne(DrawInfo& context)
 {
-	return m_drawing;
-}
-
-void NodeEditor::initializeDiwne(FrameContext& context)
-{
-	m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0, 0), false,
-	                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	m_diwneAction = DiwneAction::None;
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
 	DiwneObject::initializeDiwne(context);
 }
 
-void NodeEditor::begin(FrameContext& context)
+void NodeEditor::begin(DrawInfo& context)
 {
+	ImGui::BeginChild(this->m_labelDiwne.c_str(), ImVec2(0, 0), false,
+	                  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove);
+
 	updateWorkAreaRectangles();
 	m_nodesSelectionChanged = false;
 
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
-	ImGui::PushID(mp_settingsDiwne->editorlabel.c_str());
+	ImGui::PushID(m_labelDiwne.c_str()); // TODO: Is this necessary? We already do this in the Beign child no?
 	ImGui::BeginGroup();
 
 	applyZoomScaling();
@@ -132,34 +131,103 @@ void NodeEditor::begin(FrameContext& context)
 		default:
 			ImGui::Text("PrevDiwneAction: Unknown");
 		}
-	}); /* close of macro */
+	});
 }
 
-void NodeEditor::content(FrameContext& context) {}
+void NodeEditor::content(DrawInfo& context)
+{
+	// Debug work area rect
+	ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0, 255));
 
-void NodeEditor::end(FrameContext& context)
+	// NOTE: Nodes are "constructed" front to back, eg. the first UI code to run is from the TOP node, however the nodes
+	//  are then later drawn by ImGui back to front because we reorder the ImGui draw commands using a channel splitter.
+	// This is desirable as when ImGui elements overlap, the first element to receive input is the FIRST one that's
+	//  submitted to ImGui, as it is able to "grab" the input first, the later elements which are drawn on top of it
+	//  are not the ones to receive input even though they're "FIRST" in the sense they're on top and drawn last.
+	// This is rather counterintuitive and a direct result of the immediate mode methodology. There is a way around
+	//  this in ImGui in the form of ImGui::SetNextItemAllowOverlap() but it is a tricky multi-frame workaround.
+
+	int number_of_nodes = m_workspaceCoreNodes.size();
+	int node_count = number_of_nodes - 1; /* -1 for space for top node drawn above links */
+	                                      // TODO: Wait what? So if there is just one node it's not rendered?
+	if (number_of_nodes > 0)
+	{
+		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 1 /*+1 for links channel on top */);
+
+		/* draw nodes from back to begin (front to back) to catch interactions in
+		 * correct order */
+		int prev_size = m_workspaceCoreNodes.size();
+		bool takeSnap = false;
+		for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
+		{
+			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
+			{
+				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
+				                                    number_of_nodes); /* top node is above links */
+			}
+			else
+			{
+				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+			}
+
+			if ((*it) != nullptr)
+			{
+				// TODO: Viz related TODO comment above the drawNodeDiwne method (eg. why not call node->drawDiwne()?)
+				(*it)->drawNodeDiwne<Node>(context, DIWNE::DrawModeNodePosition::OnItsPosition);
+			}
+
+			// TODO: This seems like a bit of a "hacky" solution here, we just don't draw the rest of nodes after a
+			//  sequence that just lost or gained a subnode? Investigate, the node list can simply just be copied
+			//  beforehand or the insertion/deletion deferred after rendering, no?
+			if (prev_size != m_workspaceCoreNodes.size())
+				break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is
+				          affected and iterator is invalidated (at least with MVSC) */
+		}
+
+		// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
+		//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not
+		//  desirable. So maybe draw links as very first thing
+
+		/* draw links under last (on top) node */
+		// TODO: UNCOMMENT! Will be handling link drawing later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		//		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes - 1);
+		//		for (auto link : m_linksToDraw)
+		//		{
+		//			link->drawDiwne(context);
+		//		}
+
+		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+
+		DIWNE_DEBUG((*this), {
+			float zoom = getWorkAreaZoom();
+			ImGui::GetWindowDrawList()->AddCircleFilled(diwne2screen(ImVec2(0, 0)), 10.f * zoom,
+			                                            IM_COL32(255, 0, 255, 150));
+		});
+	}
+}
+
+void NodeEditor::end(DrawInfo& context)
 {
 	bool interaction_happen = false;
 	if (m_diwneAction == DiwneAction::NewLink)
 	{
-		FrameContext localContext = context;
-		localContext.drawMode = DrawMode::JustDraw;
-		m_helperLink->drawDiwne(localContext);
-		context |= localContext;
+		m_helperLink->drawDiwne(context, DrawMode::JustDraw);
 	}
 
 	diwne.restoreZoomScaling();
 
-	// TODO: Thid doesnt work anymore in newer ImGui versions, a dummy needs to be added
+	// TODO: This doesnt work anymore in newer ImGui versions, a dummy needs to be added
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
 	ImGui::EndGroup();
 	ImGui::PopID();
+	ImGui::EndChild();
 }
 
 void NodeEditor::clear()
 {
-	diwne.setLastActiveNode<DIWNE::Node>(nullptr);
-	diwne.setLastActivePin<DIWNE::Pin>(nullptr);
+	setLastActiveNode<DIWNE::Node>(nullptr);
+	setLastActivePin<DIWNE::Pin>(nullptr);
+	m_workspaceCoreNodes.clear();
 }
 
 void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
@@ -220,11 +288,10 @@ bool NodeEditor::allowProcessFocused()
 //	return interaction_happen;
 // }
 
-void NodeEditor::finalizeDiwne(FrameContext& context)
+void NodeEditor::finalizeDiwne(DrawInfo& context)
 {
 	DiwneObject::finalizeDiwne(context);
-	m_diwneAction_previousFrame = m_diwneAction;
-	ImGui::EndChild();
+	m_diwneAction_previousFrame = m_diwneAction; // TODO: This might end up being removed
 }
 
 bool NodeEditor::blockRaisePopup()
@@ -296,7 +363,7 @@ bool NodeEditor::processDiwneSelectionRectangle()
 			m_selectionRectangeDiwne.Max.y = startPos.y;
 		}
 
-		AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
+		m_renderer->AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
 
 		return true;
 	}
@@ -370,557 +437,6 @@ void NodeEditor::translateWorkAreaDiwneZoomed(ImVec2 const& distance)
 void NodeEditor::translateWorkAreaDiwne(ImVec2 const& distance)
 {
 	m_workAreaDiwne.Translate(distance);
-}
-
-void NodeEditor::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
-                                    ImDrawFlags rounding_corners, bool ignoreZoom) const
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                                 Clip rect for drawing of manual shapes, but
-	                                                 be careful with order of drew elements */
-	float zoom = diwne.getWorkAreaZoom();
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
-	                   rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners);
-}
-
-void NodeEditor::AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness, bool ignoreZoom) const
-{
-	float zoom = diwne.getWorkAreaZoom();
-	ImGui::GetWindowDrawList()->AddLine(diwne2screen(p1), diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
-	                                    thickness * (ignoreZoom ? 1.0f : zoom));
-}
-
-void NodeEditor::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
-                              ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList();
-	float zoom = diwne.getWorkAreaZoom();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
-	             rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : zoom));
-}
-
-void NodeEditor::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-                                     float thickness, int num_segments /*=0*/) const
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                                 Clip rect for drawing of manual shapes, but
-	                                                 be careful with order of drew elements */
-
-	idl->AddBezierCubic(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
-	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_workAreaZoom, num_segments);
-}
-
-void NodeEditor::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness /*=1*/) const
-{
-	ImVec2 center = ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
-	float radius = std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
-
-	idl->AddCircleFilled(center, radius, shapeColor);
-	if (!filled)
-	{
-		idl->AddCircleFilled(center, radius - thickness, innerColor);
-	}
-}
-
-void NodeEditor::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                   ImVec2 bottomRight, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/,
-                                   float rounding /*= 0*/) const
-{
-	idl->AddRectFilled(topLeft, bottomRight, shapeColor, rounding);
-	if (!filled)
-	{
-		idl->AddRectFilled(topLeft + thickness, bottomRight - thickness, innerColor, rounding);
-	}
-}
-void NodeEditor::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                               ImVec2 bottomRight, bool filled, ImVec2 thickness, float rounding) const
-{
-	const float width = bottomRight.x - topLeft.x;
-	// const float columnWidth = width / 3.0f;
-	const float columnWidth = width * 6.0f / 15.0f;
-	ImVec2 bottomRight1;
-	bottomRight1.x = topLeft.x + columnWidth;
-	bottomRight1.y = bottomRight.y;
-
-	ImVec2 topLeft2;
-	topLeft2.x = bottomRight.x - columnWidth;
-	topLeft2.y = topLeft.y;
-
-	idl->AddRectFilled(topLeft, bottomRight1, shapeColor, rounding);
-	idl->AddRectFilled(topLeft2, bottomRight, shapeColor, rounding);
-	if (!filled)
-	{
-		idl->AddRectFilled(topLeft + thickness, bottomRight1 - thickness, innerColor, rounding);
-		idl->AddRectFilled(topLeft2 + thickness, bottomRight - thickness, innerColor, rounding);
-	}
-}
-
-void NodeEditor::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
-	                       bottomRight, shapeColor);
-	if (!filled)
-	{
-		idl->AddTriangleFilled(ImVec2(bottomRight.x - thickness, topLeft.y + thickness),
-		                       ImVec2(topLeft.x + thickness, (topLeft.y + bottomRight.y) / 2),
-		                       bottomRight - ImVec2(thickness, thickness), innerColor);
-	}
-}
-
-// | I < | --- 1 1 5   vertical bar followed by the arrow
-void NodeEditor::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
-	ImVec2 bottomRight1;
-	bottomRight1.x = topLeft.x + columnWidth; // vertical bar
-	bottomRight1.y = bottomRight.y;
-
-	// float Left2x = bottomRight.x - 5.0f * columnWidth; // triangle
-	ImVec2 middleLeft2;
-	middleLeft2.x = bottomRight.x - 5.0f * columnWidth; // triangle
-	middleLeft2.y = (topLeft.y + bottomRight.y) / 2;
-
-	idl->AddRectFilled(topLeft, bottomRight1, shapeColor);
-	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), middleLeft2, bottomRight, shapeColor);
-	if (!filled)
-	{
-		idl->AddRectFilled(topLeft + ImVec2(thickness, thickness), bottomRight1 - ImVec2(thickness, thickness),
-		                   innerColor);
-		idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y) + ImVec2(-thickness, 2 * thickness),
-		                       middleLeft2 + ImVec2(2.0f * thickness, 0.0f),
-		                       bottomRight - ImVec2(thickness, 2 * thickness), innerColor);
-	}
-}
-
-// | < I | --- 5 1 1    arrow followed by the vertical bar
-void NodeEditor::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
-
-	ImVec2 middleLeft1 = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2); // triangle
-	ImVec2 topRight1 = ImVec2(topLeft.x + 5.0f * columnWidth, topLeft.y);
-	ImVec2 bottomRight1 = ImVec2(topRight1.x, bottomRight.y);
-
-	ImVec2 topLeft2 = ImVec2(bottomRight.x - 1.0f * columnWidth, topLeft.y); // rectangle
-
-	idl->AddTriangleFilled(middleLeft1, topRight1, bottomRight1, shapeColor);
-	idl->AddRectFilled(topLeft2, bottomRight, shapeColor);
-	if (!filled)
-	{
-		idl->AddTriangleFilled(middleLeft1 + ImVec2(2.0f * thickness, 0.0f),
-		                       topRight1 + ImVec2(-thickness, 2 * thickness),
-		                       bottomRight1 + ImVec2(-thickness, -2 * thickness), innerColor);
-		idl->AddRectFilled(topLeft2 + ImVec2(thickness, thickness), bottomRight - ImVec2(thickness, thickness),
-		                   innerColor);
-	}
-}
-void NodeEditor::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness) const
-{
-	const ImVec2 middleLeft = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2.0f);
-
-	const ImVec2 middlePoint = (topLeft + bottomRight) / 2.0f;
-	const ImVec2 topMiddle = ImVec2(middlePoint.x, topLeft.y);
-	const ImVec2 bottomMiddle = ImVec2(middlePoint.x, bottomRight.y);
-
-	const ImVec2 topRight = ImVec2(bottomRight.x, topLeft.y);
-
-	idl->AddTriangleFilled(topMiddle, middleLeft, bottomMiddle, shapeColor);
-	idl->AddTriangleFilled(topRight, middlePoint, bottomRight, shapeColor);
-
-	if (!filled)
-	{
-		idl->AddTriangleFilled(topMiddle + ImVec2(-thickness, 2 * thickness), middleLeft + ImVec2(2 * thickness, 0.0f),
-		                       bottomMiddle + ImVec2(-thickness, -2 * thickness), innerColor);
-		idl->AddTriangleFilled(topRight + ImVec2(-thickness, 2 * thickness),
-		                       middlePoint + ImVec2(2 * thickness, thickness),
-		                       bottomRight + ImVec2(-thickness, -2.0f * thickness), innerColor);
-	}
-}
-
-// | > I | --- 5 1 1   right arrow followed by the vertical bar
-void NodeEditor::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
-
-	ImVec2 middleRight1;
-	middleRight1.x = topLeft.x + 5.0f * columnWidth; // triangle
-	middleRight1.y = (topLeft.y + bottomRight.y) / 2;
-
-	ImVec2 topLeft2;
-	topLeft2.x = bottomRight.x - columnWidth; // vertical bar
-	topLeft2.y = topLeft.y;
-
-	idl->AddTriangleFilled(topLeft, middleRight1, ImVec2(topLeft.x, bottomRight.y), shapeColor);
-	idl->AddRectFilled(topLeft2, bottomRight, shapeColor);
-
-	if (!filled)
-	{
-		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness),
-		                       middleRight1 - ImVec2(2.0f * thickness, 0.0f),
-		                       ImVec2(topLeft.x, bottomRight.y) + ImVec2(thickness, -2 * thickness), innerColor);
-		idl->AddRectFilled(topLeft2 + ImVec2(thickness, thickness), bottomRight - ImVec2(thickness, thickness),
-		                   innerColor);
-	}
-}
-
-// | I > | --- 1 1 5     vertical bar followed by the right arrow
-void NodeEditor::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
-
-	ImVec2 bottomRight1;
-	bottomRight1.x = topLeft.x + columnWidth; // vertical bar
-	bottomRight1.y = bottomRight.y;
-
-	ImVec2 topLeft2 = ImVec2(bottomRight.x - 5.0f * columnWidth, topLeft.y); // triangle
-	ImVec2 bottomLeft2 = ImVec2(topLeft2.x, bottomRight.y);
-
-	ImVec2 middleRight2 = ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2.0f);
-
-	idl->AddRectFilled(topLeft, bottomRight1, shapeColor);
-	idl->AddTriangleFilled(topLeft2, bottomLeft2, middleRight2, shapeColor);
-
-	if (!filled)
-	{
-		idl->AddRectFilled(topLeft + ImVec2(thickness, thickness), bottomRight1 - ImVec2(thickness, thickness),
-		                   innerColor);
-
-		idl->AddTriangleFilled(topLeft2 + ImVec2(thickness, 2 * thickness),
-		                       bottomLeft2 + ImVec2(thickness, -2 * thickness),
-		                       middleRight2 + ImVec2(-2.0f * thickness, 0.0f), innerColor);
-	}
-}
-void NodeEditor::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thickness) const
-{
-	const ImVec2 bottomLeft = ImVec2(topLeft.x, bottomRight.y);
-
-	const ImVec2 middlePoint = (topLeft + bottomRight) / 2.0f;
-	const ImVec2 topMiddle = ImVec2(middlePoint.x, topLeft.y);
-	const ImVec2 bottomMiddle = ImVec2(middlePoint.x, bottomRight.y);
-
-	const ImVec2 middleRight = ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2.0f);
-
-	idl->AddTriangleFilled(topLeft, middlePoint, bottomLeft, shapeColor);
-	idl->AddTriangleFilled(topMiddle, middleRight, bottomMiddle, shapeColor);
-
-	if (!filled)
-	{
-		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness), middlePoint + ImVec2(-2 * thickness, 0.0f),
-		                       bottomLeft + ImVec2(thickness, -2 * thickness), innerColor);
-		idl->AddTriangleFilled(topMiddle + ImVec2(thickness, 2 * thickness), middleRight + ImVec2(-2 * thickness, 0.0f),
-		                       bottomMiddle + ImVec2(thickness, -2 * thickness), innerColor);
-	}
-}
-
-void NodeEditor::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	idl->AddTriangleFilled(topLeft, ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
-	                       ImVec2(topLeft.x, bottomRight.y), shapeColor);
-	if (!filled)
-	{
-		idl->AddTriangleFilled(topLeft + ImVec2(thickness, 2 * thickness), // (PF 2x for better border)
-		                       ImVec2(bottomRight.x - 2 * thickness, (topLeft.y + bottomRight.y) / 2),
-		                       ImVec2(topLeft.x + thickness, bottomRight.y - 2 * thickness), innerColor);
-	}
-}
-
-void NodeEditor::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                           ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	ImVec2 p1 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
-	ImVec2 p2 = bottomRight - ImVec2(0.5f, 0.5f);
-	ImVec2 p3 = ImVec2(bottomRight.x - 0.5f, topLeft.y + 0.5f);
-
-	idl->AddTriangleFilled(p1, p2, p3, shapeColor);
-	if (!filled)
-	{
-		idl->AddTriangleFilled(p1 + ImVec2(2 * thickness, -thickness), p2 - ImVec2(thickness, thickness),
-		                       p3 + ImVec2(-thickness, 2 * thickness), innerColor);
-	}
-}
-
-void NodeEditor::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                          ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	ImVec2 p1 = topLeft + ImVec2(0.5f, 0.5f);
-	ImVec2 p2 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
-	ImVec2 p3 = bottomRight - ImVec2(0.5f, 0.5f);
-
-	idl->AddTriangleFilled(p1, p2, p3, shapeColor);
-	if (!filled)
-	{
-		idl->AddTriangleFilled(p1 + ImVec2(thickness, 2 * thickness), p2 + ImVec2(thickness, -thickness),
-		                       p3 - ImVec2(2 * thickness, thickness), innerColor);
-	}
-}
-
-void NodeEditor::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
-
-	int lineCount = 3;
-	float padding = 1.5f * m_workAreaZoom;
-	float squaredPadding = sqrt(2) * padding;
-	float pointOffsetLong = 2 * squaredPadding;
-	float pointOffsetShort = padding;
-	float size = abs(bottomRight.y - topLeft.y) - pointOffsetLong - pointOffsetShort;
-	float step = size / lineCount;
-
-	for (int i = 0; i < lineCount; i++)
-	{
-		idl->AddLine(ImVec2(bottomRight.x - 1.2f * pointOffsetLong - (i * step), bottomRight.y - pointOffsetShort),
-		             ImVec2(topLeft.x + pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)), shapeColor,
-		             thickness * m_workAreaZoom);
-	}
-}
-
-void NodeEditor::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
-{
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
-
-	int lineCount = 3;
-	float padding = 1.5f * m_workAreaZoom;
-	float squaredPadding = sqrt(2) * padding;
-	float pointOffsetLong = 2 * squaredPadding;
-	float pointOffsetShort = padding;
-	float size = abs(bottomRight.y - topLeft.y) - pointOffsetLong - pointOffsetShort;
-	float step = size / lineCount;
-
-	for (int i = 0; i < lineCount; i++)
-	{
-		idl->AddLine(ImVec2(topLeft.x + 1.2f * pointOffsetLong + (i * step), bottomRight.y - pointOffsetShort),
-		             ImVec2(bottomRight.x - pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)),
-		             shapeColor, thickness * m_workAreaZoom);
-	}
-}
-
-void NodeEditor::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                               ImVec2 bottomRight, bool filled, float shapeThickness /*=4*/,
-                               float innerThickness /*=2*/) const
-{
-	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
-
-	innerThickness *= m_workAreaZoom;
-	shapeThickness *= m_workAreaZoom;
-
-	ImVec2 pTL = topLeft;
-	ImVec2 pBR = bottomRight;
-	ImVec2 pTR = ImVec2(bottomRight.x, topLeft.y);
-	ImVec2 pBL = ImVec2(topLeft.x, bottomRight.y);
-
-	// (DR): This is junky, but it seems to help making the cross look more symmetrical
-	//   The true reason for the asymmetry probably lies in the zoom level value, on my machine it steps in 0.125
-	//   intervals, every other zoom level is fine, the ones between can cause asymmetry, might be a good idea to
-	//   investigate this further and maybe restrict what values the zoom can have
-	// (PF) this should be set by Nodes_Transformation_ValidIcon_padding for isValid Icon.
-	//   for cross was (184, 196, 185, 196)
-	//   for hyphen is
-	pTR = pTR + ImVec2(0.01f, -0.01f);
-	pBR = pBR + ImVec2(0.01f, 0.01f);
-
-	//	LOG_INFO("zoom: {}", m_workAreaZoom);
-	//	LOG_INFO("pTL: {:10.3f},{:10.3f}  pBR: {:10.3f},{:10.3f}", pTL.x, pTL.y, pBR.x, pBR.y);
-	idl->AddLine(pTL, pBR, shapeColor, shapeThickness);
-	idl->AddLine(pBL, pTR, shapeColor, shapeThickness);
-
-	// TODO: (DR) Commenting this out for the time being as it isn't used anyway, needs to be rewritten to support
-	//   zooming like the code above
-	//	float thicknessDiff = (shapeThickness - thicknesInner) / 2;
-	//	ImVec2 thicknessDiffVec = ImVec2(thicknesDiff, thicknesDiff);
-	//	if (!filled)
-	//	{
-	//				idl->AddLine(topLeft + thicknessDiffVec, bottomRight - thicknessDiffVec, InnerColor,
-	// thicknessInner); 		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknessDiffVec,
-	// ImVec2(bottomRight.x, topLeft.y) - thicknessDiffVec, InnerColor, thicknessInner);
-	//	}
-}
-
-void NodeEditor::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness) const
-{
-	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
-
-	float middleY = (topLeft.y + bottomRight.y) / 2;
-	ImVec2 start = ImVec2(topLeft.x, middleY);
-	ImVec2 end = ImVec2(bottomRight.x, middleY);
-
-
-	idl->AddLine(start, end, shapeColor, thickness * m_workAreaZoom);
-}
-
-bool NodeEditor::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size,
-                            ImVec4 padding, bool filled, std::string const id) const
-{
-	return IconButton(bgIconType, bgShapeColor, bgInnerColor, DIWNE::IconType::NoIcon, IM_COL32_BLACK, IM_COL32_BLACK,
-	                  size, padding, filled, id);
-}
-
-void NodeEditor::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList();
-
-	const ImVec2 icon_min = ImGui::GetCursorScreenPos();
-	const ImVec2 icon_max = icon_min + size;
-
-	idl->AddRectFilled(icon_min, icon_max, color, rounding, ImDrawFlags_RoundCornersAll);
-	ImGui::SetCursorScreenPos(icon_min);
-}
-
-bool NodeEditor::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
-                            DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                            ImVec4 padding, bool filled, std::string const id) const
-{
-	ImVec2 initPos = ImGui::GetCursorScreenPos();
-
-	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled);
-
-	ImGui::SetCursorScreenPos(initPos);
-	bool result = ImGui::InvisibleButton(id.c_str(), size);
-	//    ImGui::SetItemAllowOverlap();
-	return result;
-}
-
-void NodeEditor::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
-                          DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                          ImVec4 padding, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList();
-
-	// (PF) move Icon slightly lower to match the position of the text
-	// todo make it more robust for larger icons?
-	float h = ImGui::GetTextLineHeight();
-	float dh = h > size.y ? (h - size.y) / 2.0f : 0.0f;
-	const ImVec2 icon_min = ImGui::GetCursorScreenPos() + ImVec2(0, dh);
-
-	// const ImVec2 icon_min = ImGui::GetCursorScreenPos();
-	const ImVec2 icon_max = icon_min + size;
-	const ImVec2 inner_icon_min = icon_min + ImVec2(padding.x, padding.w);
-	const ImVec2 inner_icon_max = icon_max - ImVec2(padding.z, padding.y);
-	const ImVec2 inner_icon_min2 = icon_min + ImVec2(1.5f * padding.x, 1.5f * padding.w);
-	const ImVec2 inner_icon_max2 = icon_max - ImVec2(1.5f * padding.z, 1.5f * padding.y);
-
-	switch (bgIconType)
-	{
-	case Circle:
-		DrawIconCircle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case AtFrom:
-	case AtTo:
-	case Rectangle:
-	case Pause:
-	case SkipBack:
-	case SkipBack2:
-	case SkipForward:
-	case SkipForward2:
-		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled, thickness, rounding);
-		break;
-	case TriangleLeft:
-		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case TriangleRight:
-		DrawIconTriangleRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case Cross:
-		DrawIconCross(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case Hyphen:
-		DrawIconHyphen(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case GrabDownLeft:
-		DrawIconGrabDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case GrabDownRight:
-		DrawIconGrabDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
-		break;
-	case NoIcon:
-	default:
-		break;
-	}
-
-	switch (fgIconType)
-	{
-	case Circle:
-		DrawIconCircle(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case Rectangle:
-		DrawIconRectangle(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case TriangleLeft:
-		DrawIconTriangleLeft(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case TriangleRight:
-		DrawIconTriangleRight(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case Cross:
-		DrawIconCross(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case Hyphen:
-		DrawIconHyphen(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		// DrawIconHyphen(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
-		break;
-	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
-		break;
-	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
-		break;
-	case GrabDownLeft:
-		DrawIconGrabDownLeft(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
-		break;
-	case GrabDownRight:
-		DrawIconGrabDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
-		break;
-	case Stop:
-		DrawIconRectangle(idl, fgShapeColor, fgInnerColor, inner_icon_min2, inner_icon_max2, filled);
-		break;
-	case Pause:
-		DrawIconPause(idl, fgShapeColor, fgInnerColor, inner_icon_min2, inner_icon_max2, filled);
-		break;
-	case SkipBack:
-		DrawIconSkipBack(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case SkipBack2:
-		DrawIconSkipBack2(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case SkipForward:
-		DrawIconSkipForward(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case SkipForward2:
-		DrawIconSkipForward2(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case Rewind:
-	case AtFrom:
-		DrawIconRewind(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case FastForward:
-	case AtTo:
-		DrawIconFastForward(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
-		break;
-	case NoIcon:
-	default:
-		break;
-	}
-
-	ImGui::Dummy(size);
 }
 
 ImVec2 NodeEditor::screen2workArea(const ImVec2& point) const
@@ -1120,8 +636,8 @@ bool NodeEditor::applyZoomScaling()
 	if (m_zoomScalingApplied)
 		return true;
 
-	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes are
-	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
+	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes
+	// are ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
 	// ImGui::SetWindowFontScale(m_workAreaZoom);
 
 	/// \todo
@@ -1220,6 +736,26 @@ bool NodeEditor::ensureZoomScaling(bool active)
 		}
 	}
 	return activeBefore;
+}
+
+void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2 position, bool shiftToLeftByNodeWidth)
+{
+	// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
+	// size, padding etc.)
+	// Hence scaling is applied here if not active, and then restored to its original state at the end of this
+	// method
+	bool zoomScalingWasActive = this->ensureZoomScaling(true);
+	node->setNodePositionDiwne(position);
+	if (shiftToLeftByNodeWidth)
+	{
+		node->draw(DIWNE::DrawMode::JustDraw); /* to obtain size */
+		node->move(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
+	}
+
+	LOG_INFO("ADDED NODE {}, {}", node->m_labelDiwne, this->m_workspaceCoreNodes.size());
+	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
+	m_workspaceCoreNodes.push_back(node);
+	this->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
 
 } /* namespace DIWNE */

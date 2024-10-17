@@ -145,6 +145,7 @@ file(GLOB_RECURSE I3T_SOURCE
         "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
+list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/DIWNE/diwne_example.cpp")
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
 # =============================================================

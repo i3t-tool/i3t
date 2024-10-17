@@ -91,7 +91,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
    The content() function is already prepared (see Node::content()), so you don't need to override it (if you don't want to).
 
-   The size of the node and its parts is updated at the end of the node drawing (see Node::updateSizes()).
+   The size of the node and its parts is updated at the end of the node drawing (see Node::updateLayout()).
 
  
 

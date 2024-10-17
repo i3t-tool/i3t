@@ -17,28 +17,28 @@
 namespace DIWNE
 {
 
-Pin::Pin(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwnePin"*/)
-    : DiwneObject(diwne, id, labelDiwne), m_pinRectDiwne(ImRect(0, 0, 0, 0)), m_connectionPointDiwne(ImVec2(0, 0))
+Pin::Pin(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwnePin"*/)
+    : DiwneObject(diwne, labelDiwne), m_connectionPointDiwne(ImVec2(0, 0))
 {
 	setSelectable(false);
 }
 
-void Pin::begin(FrameContext& context)
+void Pin::begin(DrawInfo& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup();
 }
 
-void Pin::end(FrameContext& context)
+void Pin::end(DrawInfo& context)
 {
 	ImGui::EndGroup();
 	ImGui::PopID();
 }
 
-//void Pin::updateSizes()
+//void Pin::updateLayout()
 //{
-//	m_pinRectDiwne.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
-//	m_pinRectDiwne.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
+//	m_rect.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
+//	m_rect.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 //
 //	updateConnectionPointDiwne();
 //}

@@ -30,6 +30,8 @@ typedef unsigned int ID;
 
 class NodeEditor;
 
+// TODO JH: some attributes should be private/protected // Agreed
+
 enum DiwneAction : unsigned int;
 
 /*! \brief Drawing mode of DiwneObject  */
@@ -39,23 +41,30 @@ enum DrawMode
 	Interacting /*!< Usual mode - draw and allow interaction too */
 };
 
-class FrameContext;
-class DrawResult;
+class DrawInfo;
 
 /**
  * The base class for all DIWNE elements containing common functionality.
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
-public:                               /* \todo some attributes should be private/protected */
-	DIWNE::NodeEditor& diwne;         /**< Every object have access to Diwne - is used for
-	                                share information if needed */
-	DIWNE::ID const m_idDiwne;        /**< Used for creating ImGui id/labels */
-	std::string const m_labelDiwne;   /**< Used for identifying object and creating
-	                                     ImGui id/labels */
+public:
+	// TODO: Might be better to have a pointer here, imagine cases where nodes are moved between editors / copy / move
+	DIWNE::NodeEditor& diwne; /**< Every object have access to Diwne - is used for share information if needed */
+	// TODO: Do we need id and label to be separate?
+	//  Pros: Easy lookup / comparsion using unique ID
+	//  Cons: Somewhat confusing? Both label and id are UNIQUE identifiers
+	//   label includes ID at the end which isn't too clear
+	//  Perhaps keep this and make clear in docs
+	static unsigned long long g_diwneIDCounter;
+	DIWNE::ID const m_idDiwne;      /**< Used for creating ImGui id/labels */
+	std::string const m_labelDiwne; /**< Used for identifying object and creating ImGui id/labels */
+	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
 	std::string const m_popupIDDiwne; /**< Used for identifying what element raise popup */
 
-	// TODO: Review if these flags are needed
+	ImRect m_rect;
+
+	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
 	/**
 	 * If some interaction happen with inner elements (DragFloat, Button, ...)
 	 * it block interaction with this object
@@ -66,6 +75,10 @@ public:                               /* \todo some attributes should be private
 	//  maybe its enough to pass around the frame context instead
 
 	//	DrawMode m_drawMode; /**< \see enum DrawMode */
+
+	/// Experimental, read-only flag thats updated on each drawDiwne() call.
+	/// Essentially just a way to avoid passing this along everywhere as it should be mostly constant
+	DrawMode m_drawMode2; // TODO: Rename, experimental (!)
 
 	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode)
 	bool m_selectable{true};
@@ -84,7 +97,7 @@ public:                               /* \todo some attributes should be private
 	 * \param id used to identification
 	 * \param labelDiwne used to identification
 	 */
-	DiwneObject(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne);
+	DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne);
 	virtual ~DiwneObject() = default;
 
 	/**
@@ -105,7 +118,9 @@ public:                               /* \todo some attributes should be private
 	 * @param context The drawing context of the current frame.
 	 * @return A DrawResult object reporting what interaction has occurred during the draw.
 	 */
-	virtual void drawDiwne(FrameContext& context);
+	virtual void drawDiwne(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
+
+	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
 	// Lifecycle/Content methods
 	// =============================================================================================================
@@ -113,35 +128,59 @@ public:                               /* \todo some attributes should be private
 	// TODO: Wrapper thought: Not every method seemingly needs a wrapper, maybe we could bunch up the "diwne" code into
 	//  a few internal methods with more descriptive names rather than to have a "Diwne" suffix method everywhere.
 
-	virtual void initialize(FrameContext& context); /**< is called every time in drawDiwne() do any
+	/**
+	 * First method to be called every frame. Does not handle drawing.
+	 * @param context
+	 */
+	virtual void initialize(DrawInfo& context); /**< is called every time in drawDiwne() do any
 	                              initialization of your object here */
-	// New methodology: Begin and End aren't "opening/closing" the object, its just begin and end drawing
-	virtual void begin(FrameContext& context) = 0; /**< begin of object  */
-	virtual void content(FrameContext& context);   /**< content of object */
-	virtual void end(FrameContext& context) = 0;   /**< closing object */
-
-	//	// TODO: Move this method into the Node implementation, eg. move the responsibility to the content method
-	//	virtual void updateSizes();        /**< store object size and position after this frame */
 
 	/**
-	 * The final lifecycle method, gets called every frame.
+	 * First method to be called during object drawing.
+	 * Can be used to initialize drawing code.
+	 * @param context Current frame context.
 	 */
-	virtual void finalize(FrameContext& context);
+	virtual void begin(DrawInfo& context) = 0;
 
+	/**
+	 * Called after begin() during drawing. Draws object content.
+	 * Is responsible for keeping track of objects size.
+	 * The objects m_rect variable should be set here.
+	 * @param context
+	 */
+	virtual void content(DrawInfo& context) = 0;
+
+	/**
+	 * Called last after content() during drawing.
+	 * At this point the pixel size of the object should be collected from the content() method and this method
+	 * should be able to work with it.
+	 * @param context
+	 */
+	virtual void end(DrawInfo& context) = 0;
+
+	/**
+	 * The final method to be called, gets called every frame and shouldn't do any drawing.
+	 */
+	virtual void finalize(DrawInfo& context);
+
+	// Interaction
+	// =============================================================================================================
 
 	virtual bool allowInteraction(); ///< Decide whether the object can interact (not including content elements)
-	// TODO: Make this get called by the end() method
-	virtual void processInteractions(FrameContext& context);
+	virtual void processInteractions(DrawInfo& context);
 
-//	virtual void popupContent(FrameContext& context); ///< Content of popup menu raise on this object
+	// Popups
+	// =============================================================================================================
+	virtual void popupContent(DrawInfo& context); ///< Content of popup menu raised on this object
 
-	// Internal implementation methods, can still be overriden if needed
 protected:
-	virtual void initializeDiwne(FrameContext& context);
-	virtual void beginDiwne(FrameContext& context);
-	virtual void endDiwne(FrameContext& context);
-	virtual void finalizeDiwne(FrameContext& context);
-	virtual void processInteractionsDiwne(FrameContext& context);
+	// Internal implementation methods, can still be overriden if needed
+	// =============================================================================================================
+	virtual void initializeDiwne(DrawInfo& context);
+	virtual void beginDiwne(DrawInfo& context);
+	virtual void endDiwne(DrawInfo& context);
+	virtual void finalizeDiwne(DrawInfo& context);
+	virtual void processInteractionsDiwne(DrawInfo& context);
 
 public:
 	// =============================================================================================================
@@ -165,7 +204,24 @@ public:
 
 	//
 
-	virtual ImRect getRectDiwne() const = 0; /**< return rectangle of object */
+	// TODO: Do we want to keep this purely virtual?
+	//  Or do we want each diwne object to keep and update its m_rect
+	//  BasicNode returns a composite of panel min maxes
+	//  What should Node return? What is a node? Just a square with single content?
+	//   It needs a rect as well doesn't it
+	//  Pin keeps its own pinRect
+
+	/**< return rectangle of object */
+	inline virtual ImRect getRectDiwne() const
+	{
+		return m_rect;
+	}
+	inline virtual ImVec2 getPosition() const
+	{
+		return m_rect.Min;
+	}
+	virtual void setPosition(const ImVec2& position);
+	virtual void translate(const ImVec2& vec);
 
 	// TODO: Reconsider during action rework
 	virtual DiwneAction getHoldActionType() const = 0;  /**< return which type of object/action this object is */
@@ -213,37 +269,34 @@ public:
 	// Process methods
 	// =============================================================================================================
 
-//	virtual void processRaisePopupDiwne(FrameContext& context); /**< processing raising popup menu */
-//	virtual void processShowPopupDiwne(FrameContext& context);  /**< processing showing popup menu */
-//
-//	virtual void processDrag(FrameContext& context);
-//	virtual void processHold(FrameContext& context);
-//	virtual void processUnhold(FrameContext& context);
-//	virtual void processSelect(FrameContext& context);
-//	virtual void processUnselect(FrameContext& context);
-//	virtual void processFocused(FrameContext& context); // TODO: Rename focused to just "hover", gets triggered on mouseover
-//	virtual void processFocusedForInteraction(FrameContext& context);
-//
-//	void processFocusedDiwne(FrameContext& context); // TODO: Rename focused to just "hover", gets triggered on mouseover
-//	void processFocusedForInteractionDiwne(FrameContext& context);
-//	void processHoldDiwne(FrameContext& context);
-//	void processUnholdDiwne(FrameContext& context);
-//	void processDragDiwne(FrameContext& context);
-//	void processSelectDiwne(FrameContext& context);
-//	void processUnselectDiwne(FrameContext& context);
+	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */
+	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */
+	//
+	//	virtual void processDrag(DrawInfo& context);
+	//	virtual void processHold(DrawInfo& context);
+	//	virtual void processUnhold(DrawInfo& context);
+	//	virtual void processSelect(DrawInfo& context);
+	//	virtual void processUnselect(DrawInfo& context);
+	//	virtual void processFocused(DrawInfo& context); // TODO: Rename focused to just "hover", gets triggered on
+	// mouseover 	virtual void processFocusedForInteraction(DrawInfo& context);
+	//
+	//	void processFocusedDiwne(DrawInfo& context); // TODO: Rename focused to just "hover", gets triggered on
+	// mouseover 	void processFocusedForInteractionDiwne(DrawInfo& context); 	void processHoldDiwne(DrawInfo&
+	// context); 	void processUnholdDiwne(DrawInfo& context); 	void processDragDiwne(FrameContext& context);
+	// void processSelectDiwne(FrameContext& context); 	void processUnselectDiwne(FrameContext& context);
 
-//	virtual bool allowProcessFocused(); // TODO: Rename focused to just "hover", gets triggered on mouseover
-//	virtual bool allowProcessFocusedForInteraction();
-//	virtual bool allowProcessHold();
-//	virtual bool allowProcessUnhold();
-//	virtual bool allowProcessDrag();
-//	virtual bool allowProcessSelect();
-//	virtual bool allowProcessUnselect();
-//	virtual bool allowProcessRaisePopup();
+	//	virtual bool allowProcessFocused(); // TODO: Rename focused to just "hover", gets triggered on mouseover
+	//	virtual bool allowProcessFocusedForInteraction();
+	//	virtual bool allowProcessHold();
+	//	virtual bool allowProcessUnhold();
+	//	virtual bool allowProcessDrag();
+	//	virtual bool allowProcessSelect();
+	//	virtual bool allowProcessUnselect();
+	//	virtual bool allowProcessRaisePopup();
 
 	// =============================================================================================================
 
-	inline DIWNE::ID const getIdDiwne() const
+	inline DIWNE::ID const getId() const
 	{
 		return m_idDiwne;
 	};
@@ -285,26 +338,40 @@ public:
  * An instance of this object is passed along the drawing code for any nested diwne objects and along the way it
  * collects information about what has already happened that frame.
  */
-class FrameContext
+class DrawInfo
 {
 public:
 	/**
 	 * Whether any kind of interaction that has a visual or logical impact is occurring.
 	 * This can be a simple mouse hover that doesn't capture input in any way.
 	 */
-	bool interacted{false};
+	unsigned short interacted{0};
 
 	/// Whether input has been captured by an object previously and should not be reacted to anymore.
-	bool inputConsumed{false};
+	unsigned short inputConsumed{0};
 
-	DrawMode drawMode{DrawMode::Interacting}; ///< The drawing mode for this frame
+	DrawInfo findChange(const DrawInfo& other) const;
 
-	FrameContext(DrawMode drawMode) : drawMode(drawMode) {}
-
-	void merge(const FrameContext& other); ///< Updates the context with another context returned by a draw method.
-	void operator|=(const FrameContext& other); ///< A quick way to call the merge() method using an OR operator.
-	FrameContext& operator|(const FrameContext& other); ///< A quick way to call the merge() method using an OR operator.
+	void merge(const DrawInfo& other);         ///< Updates the context with another context returned by a draw method.
+	void operator|=(const DrawInfo& other);    ///< A quick way to call the merge() method on itself.
+	DrawInfo operator|(const DrawInfo& other); ///< A quick way to call the merge() method on a new instance.
 };
+
+class ContextTracker
+{
+public:
+	std::shared_ptr<DrawInfo> m_contextCopy;
+	ContextTracker(const DrawInfo& context);
+	void begin(const DrawInfo& context);
+	DrawInfo end(const DrawInfo& context);
+};
+
+// DrawInfo ContextTracker::capture(const std::function<void()>& code)
+//{
+//	DrawInfo& originalContext(context);
+//	code();
+//	return context.findChange(originalContext);
+// }
 
 ///**
 // * This structure is returned by individual drawing methods to report what has occurred during the draw.

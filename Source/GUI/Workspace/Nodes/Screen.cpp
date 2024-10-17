@@ -46,7 +46,7 @@ void Screen::init()
 	m_renderOptions.clearColor = Config::BACKGROUND_COLOR;
 }
 
-void Screen::popupContent()
+void Screen::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -56,15 +56,7 @@ void Screen::popupContent()
 
 	ImGui::Separator();
 
-	Node::popupContent();
-}
-
-bool Screen::topContent()
-{
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
+	Node::popupContent(context);
 }
 
 //  The screen has one (formerly two) triangles for resize:
@@ -75,10 +67,8 @@ bool Screen::topContent()
 //  |       /|
 //  |      / |
 //  ----------
-bool Screen::middleContent()
+void Screen::centerContent(DIWNE::DrawInfo& context)
 {
-	bool interaction_happen = false;
-
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
@@ -126,9 +116,10 @@ bool Screen::middleContent()
 		ImGui::PopClipRect();
 	}
 
-	interaction_happen |= drawResizeHandles(topLeftCursorPos, zoomedTextureSize);
-
-	return interaction_happen;
+	if (drawResizeHandles(topLeftCursorPos, zoomedTextureSize))
+	{
+		context.interacted++;
+	}
 }
 
 int Screen::maxLengthOfData() // todo
@@ -205,7 +196,7 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	cursorPos = topLeftCursorPos + zoomedTextureSize - zoomedButtonSize;
 	ImGui::SetCursorScreenPos(cursorPos);
 
-	interaction_happen |= diwne.IconButton(
+	interaction_happen |= diwne.m_renderer->IconButton(
 	    DIWNE::IconType::TriangleDownRight, I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
 	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner), DIWNE::IconType::GrabDownRight,
 	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape), I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner),

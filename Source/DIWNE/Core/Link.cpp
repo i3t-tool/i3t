@@ -16,8 +16,8 @@
 
 namespace DIWNE
 {
-Link::Link(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwneLink"*/)
-    : DiwneObject(diwne, id, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
+Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"*/)
+    : DiwneObject(diwne, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
 {}
 
 void Link::updateSquareDistanceMouseFromLink()
@@ -41,16 +41,15 @@ bool Link::isLinkOnWorkArea()
 	return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
 }
 
-void Link::initialize(FrameContext& context)
+void Link::initialize(DrawInfo& context) {}
+void Link::initializeDiwne(DrawInfo& context)
 {
 	diwne.mp_settingsDiwne->linkColor.w =
 	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
 	diwne.mp_settingsDiwne->linkColorSelected.w = m_focusedForInteraction
 	                                                  ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
 	                                                  : diwne.mp_settingsDiwne->linkAlphaSelected;
-}
-void Link::initializeDiwne(FrameContext& context)
-{
+
 	initialize(context);
 	updateEndpoints();
 	updateControlPoints();
@@ -67,41 +66,42 @@ bool Link::bypassFocusForInteractionAction()
 	return isHovered();
 }
 //
-//bool Link::processFocused()
+// bool Link::processFocused()
 //{
 //	if (bypassTouchAction())
 //	{
 //		diwne.setDiwneAction(getTouchActionType());
 //	}
-//	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+//	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 //	                          diwne.mp_settingsDiwne->objectFocusBorderColor,
 //	                          diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
 //	return true;
 //}
 //
-//bool Link::processFocusedForInteraction()
+// bool Link::processFocusedForInteraction()
 //{
-//	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+//	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 //	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
 //	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
 //	return true;
 //}
 
-void Link::content(FrameContext& context)
+void Link::content(DrawInfo& context)
 {
 	if (m_selected)
 	{
-		diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-		                          diwne.mp_settingsDiwne->linkColorSelected,
-		                          diwne.mp_settingsDiwne->linkThicknessDiwne +
-		                              diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne);
+		diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
+		                                      m_endDiwne, diwne.mp_settingsDiwne->linkColorSelected,
+		                                      diwne.mp_settingsDiwne->linkThicknessDiwne +
+		                                          diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne);
 	}
-	diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                          diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
+	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+	                                      diwne.mp_settingsDiwne->linkColor,
+	                                      diwne.mp_settingsDiwne->linkThicknessDiwne);
 	DIWNE_DEBUG(diwne, {
-		diwne.AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
-		diwne.AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
-		diwne.AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+		diwne.m_renderer->AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+		diwne.m_renderer->AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+		diwne.m_renderer->AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 	});
 }
 

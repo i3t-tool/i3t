@@ -54,23 +54,23 @@ public:
 	}
 
 	// bool drawDataFull(, int index);
-	int maxLengthOfData() override; // todo
-	bool middleContent() override;  // the most important function
-	bool topContent() override;
+	int maxLengthOfData() override;                        // todo
+	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
 	void drawMenuLevelOfDetail() override; // todo
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContent_axis_showmodel();
 
-	/**
-	 * Overridden function for viewport model selection highlight.
-	 */
-	bool processSelect() override;
-
-	/**
-	 * Overridden function for viewport model selection highlight.
-	 */
-	bool processUnselect() override;
+	// TODO: Uncomment
+	//	/**
+	//	 * Overridden function for viewport model selection highlight.
+	//	 */
+	//	bool processSelect() override;
+	//
+	//	/**
+	//	 * Overridden function for viewport model selection highlight.
+	//	 */
+	//	bool processUnselect() override;
 
 private:
 	void init();

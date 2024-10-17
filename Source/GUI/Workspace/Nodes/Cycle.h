@@ -39,10 +39,9 @@ public:
 	bool buttonRewind(); ///< Set the current value to \a From
 	bool buttonWind();   ///< Set the current value to \a To
 
-	bool topContent() override;
-	bool middleContent() override;
-	bool leftContent() override;
-	bool rightContent() override;
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void leftContent(DIWNE::DrawInfo& context) override;
+	void rightContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 

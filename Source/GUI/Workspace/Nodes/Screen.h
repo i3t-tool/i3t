@@ -52,11 +52,10 @@ public:
 	/////////////////////////////////////////////////////////////
 
 	// bool drawDataFull(, int index);
-	int maxLengthOfData() override;        // todo
-	bool middleContent() override;         // the most important function
-	bool topContent() override;            // rendering header part
-	void drawMenuLevelOfDetail() override; // todo
-	void popupContent() override;
+	int maxLengthOfData() override;                        // todo
+	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	void drawMenuLevelOfDetail() override;                 // todo
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const override
 	{

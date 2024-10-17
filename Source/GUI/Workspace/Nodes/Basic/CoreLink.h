@@ -28,7 +28,7 @@ protected:
 	CoreInPin* const m_endPin;
 
 public:
-	CoreLink(DIWNE::NodeEditor& diwne, DIWNE::ID id, CoreInPin* endPin);
+	CoreLink(DIWNE::NodeEditor& diwne, CoreInPin* endPin);
 
 	CoreOutPin* getStartPin() const
 	{
@@ -44,8 +44,8 @@ public:
 	};
 	void unplug();
 
-	void popupContent() override;
-	bool initialize() override;
+//	void popupContent() override;
+	void initialize(DIWNE::DrawInfo& context) override;
 
 	void updateEndpoints() override;
 	void updateControlPointsOffsets();

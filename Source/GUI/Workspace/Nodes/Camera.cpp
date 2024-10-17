@@ -108,7 +108,7 @@ float Camera::updateDataItemsWidth()
 	return CoreNode::updateDataItemsWidth();
 }
 
-void Camera::popupContent()
+void Camera::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -223,7 +223,7 @@ void Camera::popupContent()
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
 glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
@@ -235,28 +235,16 @@ glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
 	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
 	return color;
 }
-bool Camera::topContent()
+
+void Camera::centerContent(DIWNE::DrawInfo& context)
 {
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
-}
-
-bool Camera::middleContent()
-{
-	bool inner_interaction_happen = false;
-
 	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
 	// Label LOD
 	{
-		inner_interaction_happen |=
-		    m_projection->drawNodeDiwne<Sequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+		m_projection->drawNodeDiwne<Sequence>(context, DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode2);
 		ImGui::SameLine();
-		inner_interaction_happen |=
-		    m_view->drawNodeDiwne<Sequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+		m_view->drawNodeDiwne<Sequence>(context, DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode2);
 	}
-	return inner_interaction_happen;
 }
 
 void Camera::drawMenuLevelOfDetail()
@@ -280,19 +268,19 @@ bool Camera::isCamera()
 	return true;
 }
 
-bool Camera::processSelect()
-{
-	auto model = m_viewportCamera.lock();
-	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-	model->m_highlight = true;
-
-	return CoreNodeWithPins::processSelect();
-}
-
-bool Camera::processUnselect()
-{
-	auto model = m_viewportCamera.lock();
-	model->m_highlight = false;
-
-	return CoreNodeWithPins::processUnselect();
-}
+//bool Camera::processSelect()
+//{
+//	auto model = m_viewportCamera.lock();
+//	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+//	model->m_highlight = true;
+//
+//	return CoreNodeWithPins::processSelect();
+//}
+//
+//bool Camera::processUnselect()
+//{
+//	auto model = m_viewportCamera.lock();
+//	model->m_highlight = false;
+//
+//	return CoreNodeWithPins::processUnselect();
+//}

@@ -53,10 +53,10 @@ public:
 
 	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
-	bool leftContent() override;
-	bool rightContent() override;
+	void leftContent(DIWNE::DrawInfo& context) override;
+	void rightContent(DIWNE::DrawInfo& context) override;
 
-	bool finalize() override;
+	void finalize(DIWNE::DrawInfo& context) override;
 };
 } // namespace Workspace
 

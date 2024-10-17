@@ -16,8 +16,8 @@
 
 using namespace Workspace;
 
-CoreLink::CoreLink(DIWNE::NodeEditor& diwne, DIWNE::ID id, CoreInPin* endPin)
-    : DIWNE::Link(diwne, id), m_endPin(endPin), m_startPin(nullptr)
+CoreLink::CoreLink(DIWNE::NodeEditor& diwne, CoreInPin* endPin)
+    : DIWNE::Link(diwne), m_endPin(endPin), m_startPin(nullptr)
 {}
 
 void CoreLink::unplug()
@@ -26,13 +26,14 @@ void CoreLink::unplug()
 	m_startPin = nullptr;
 }
 
-void CoreLink::popupContent()
-{
-	if (ImGui::MenuItem("Delete"))
-	{
-		unplug();
-	}
-}
+// TODO: Uncomment
+//void CoreLink::popupContent()
+//{
+//	if (ImGui::MenuItem("Delete"))
+//	{
+//		unplug();
+//	}
+//}
 
 void CoreLink::updateEndpoints()
 {
@@ -56,7 +57,7 @@ void CoreLink::updateControlPointsOffsets()
 	diwne.mp_settingsDiwne->linkEndControlOffsetDiwne = ImVec2(-offset, 0);
 }
 
-bool CoreLink::initialize()
+void CoreLink::initialize(DIWNE::DrawInfo& context)
 {
 	updateControlPointsOffsets();
 
@@ -75,5 +76,4 @@ bool CoreLink::initialize()
 
 		diwne.mp_settingsDiwne->linkColorSelected.w = I3T::getSize(ESize::Links_selected_alpha);
 	}
-	return false;
 }

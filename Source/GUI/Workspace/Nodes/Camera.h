@@ -61,24 +61,22 @@ public:
 		return m_view;
 	};
 
-	// bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no
-	// data */
-	bool topContent() override;
-	bool middleContent() override;
+	void centerContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	int maxLengthOfData() override;
 
 	bool isCamera();
 
-	//	bool leftContent(DIWNE::Diwne &diwne);
-	//	bool rightContent(DIWNE::Diwne &diwne);
+	//	void leftContent(DIWNE::Diwne &diwne);
+	//	void rightContent(DIWNE::Diwne &diwne);
 
-	bool processSelect() override;
-	bool processUnselect() override;
+	// TODO: Uncomment
+//	bool processSelect() override;
+//	bool processUnselect() override;
 	float updateDataItemsWidth() override;
 
 private:

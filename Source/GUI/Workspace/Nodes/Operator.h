@@ -70,27 +70,19 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	virtual bool beforeContent() override
-	{
-		// TODO: Refactor, remove method and merge into content / begin
-		/* whole node background */
-		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgOperator),
-		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawFlags_RoundCornersAll);
-		return false;
-	}
+	// TODO: Uncomment
+	//	virtual bool beforeContent() override
+	//	{
+	//		// TODO: Refactor, remove method and merge into content / begin
+	//		/* whole node background */
+	//		diwne.m_renderer->AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+	// I3T::getTheme().get(EColor::NodeBgOperator), I3T::getSize(ESize::Nodes_Operators_Rounding),
+	// ImDrawFlags_RoundCornersAll); 		return false;
+	//	}
 
-	virtual bool topContent() override
+	virtual void inline centerContent(DIWNE::DrawInfo& context) override
 	{
-		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-		                         I3T::getTheme().get(EColor::NodeHeaderOperator),
-		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawFlags_RoundCornersTop);
-
-		return CoreNode::topContent();
-	}
-
-	virtual bool inline middleContent() override
-	{
-		return false;
+		// TODO: Why is this empty?
 	}
 
 	void drawMenuLevelOfDetail() override
@@ -119,14 +111,11 @@ public:
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
 	{}
 
-	bool leftContent() override
+	void leftContent(DIWNE::DrawInfo& context) override
 	{
-		bool interaction_happen = false;
-
-		interaction_happen |= ImGui::Checkbox("/2", &m_halfAngle);
-
-		if (interaction_happen) /* mode changed */
+		if (ImGui::Checkbox("/2", &m_halfAngle)) /* mode changed */
 		{
+			context.interacted++;
 			if (m_workspaceInputs.at(m_halfAngle ? 0 : 1)->isConnected()) /* previous mode pin is connected */
 			{
 				/* connect visible pin and unplug hidden one */
@@ -137,10 +126,8 @@ public:
 			}
 		}
 
-		interaction_happen |= m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne();
-		interaction_happen |= m_workspaceInputs.at(2)->drawDiwne();
-
-		return interaction_happen;
+		m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne(context, m_drawMode2);
+		m_workspaceInputs.at(2)->drawDiwne(context, m_drawMode2);
 	}
 };
 } // namespace Workspace

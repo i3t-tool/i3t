@@ -159,7 +159,7 @@ glm::vec3 Model::calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model)
 	return color;
 }
 
-void Model::popupContent()
+void Model::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -177,7 +177,7 @@ void Model::popupContent()
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
 void Model::init()
@@ -202,23 +202,11 @@ void Model::init()
 	});
 }
 
-bool Model::topContent()
+void Model::centerContent(DIWNE::DrawInfo& context)
 {
-	// TODO: (DR) This call might be unnecessary as the same call is made in WorkspaceNode, for color
-	//  override perhaps? Similarly in WorkspaceScreen. (Note sure, noting so I don't forget)
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
-}
-
-bool Model::middleContent()
-{
-	bool interaction_happen = false;
-
 	if (m_levelOfDetail == LevelOfDetail::Label)
 	{
-		return interaction_happen;
+		return;
 	}
 
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
@@ -243,8 +231,6 @@ bool Model::middleContent()
 	{
 		ImGui::Text("Failed to draw preview!");
 	}
-
-	return interaction_happen;
 }
 
 int Model::maxLengthOfData() // todo
@@ -258,30 +244,30 @@ void Model::drawMenuLevelOfDetail() // todo
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
 
-bool Model::processSelect()
-{
-	auto model = m_viewportModel.lock();
-	model->m_highlight = true;
-	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-
-	return CoreNodeWithPins::processSelect();
-}
-
-bool Model::processUnselect()
-{
-	auto model = m_viewportModel.lock();
-	if (m_influenceHighlight)
-	{
-		model->m_highlight = true;
-		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
-	}
-	else
-	{
-		model->m_highlight = false;
-	}
-
-	return CoreNodeWithPins::processUnselect();
-}
+//bool Model::processSelect()
+//{
+//	auto model = m_viewportModel.lock();
+//	model->m_highlight = true;
+//	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+//
+//	return CoreNodeWithPins::processSelect();
+//}
+//
+//bool Model::processUnselect()
+//{
+//	auto model = m_viewportModel.lock();
+//	if (m_influenceHighlight)
+//	{
+//		model->m_highlight = true;
+//		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
+//	}
+//	else
+//	{
+//		model->m_highlight = false;
+//	}
+//
+//	return CoreNodeWithPins::processUnselect();
+//}
 
 ModelProxy::ModelProxy(Ptr<Model> model)
 {

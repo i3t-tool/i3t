@@ -35,7 +35,7 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 			//                                                                ,   pin
 			//                                                                ,
 			//                                                                *this));
-			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin.Id, pin, *this));
+			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin, *this));
 			break;
 			//            case Core::EValueType::Vec4:
 			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinVector4>(
@@ -83,7 +83,7 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 			//                /* Pin with type Ptr have no graphic representation */
 			//                break;
 		default:
-			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin.Id, pin, *this));
+			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin, *this));
 			// Debug::Assert(false , "Unknown Pin type while loading input pins from
 			// Core to Workspace");
 		}
@@ -92,7 +92,7 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 	{
 		for (Core::Pin const& pin : outputPins)
 		{
-			m_workspaceOutputs.push_back(std::make_unique<CoreOutPin>(diwne, pin.Id, pin, *this));
+			m_workspaceOutputs.push_back(std::make_unique<CoreOutPin>(diwne, pin, *this));
 		}
 	}
 	else
@@ -107,28 +107,28 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 			switch (pin.ValueType)
 			{
 			case Core::EValueType::Matrix:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinMatrix>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinMatrix>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Vec4:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector4>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector4>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Vec3:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector3>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector3>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Float:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinFloat>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinFloat>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Quat:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinQuat>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinQuat>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Pulse:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinPulse>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinPulse>(diwne, pin, *this));
 				break;
 			case Core::EValueType::MatrixMul:
-				m_workspaceOutputs.push_back(std::make_unique<CoreOutPinMatrixMultiply>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<CoreOutPinMatrixMultiply>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Screen:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinScreen>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(std::make_unique<DataOutPinScreen>(diwne, pin, *this));
 				break;
 			case Core::EValueType::Ptr:
 				/* Pin with type Ptr have no graphic representation */
@@ -141,11 +141,12 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 	}
 }
 
-bool CoreNodeWithPins::finalize()
+void CoreNodeWithPins::finalize(DIWNE::DrawInfo& context)
 {
 	bool inner_interaction_happen = false;
 	WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
+	// TODO: Investigate pin/link hiding, probably relates to how links are drawn in the first place
 	if (!allowDrawing())
 	{
 		for (auto const& pin : m_workspaceInputs)
@@ -161,13 +162,11 @@ bool CoreNodeWithPins::finalize()
 			}
 		}
 	}
-	inner_interaction_happen |= CoreNode::finalize();
-	return inner_interaction_happen;
+	CoreNode::finalize(context);
 }
 
-bool CoreNodeWithPins::leftContent()
+void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 {
-	bool inner_interaction_happen = false;
 	bool pinsVisible = false;
 
 	// todo (PF) effectivity???
@@ -188,7 +187,7 @@ bool CoreNodeWithPins::leftContent()
 		{
 			// register the connected wires only.
 			// Connect them to the middle of the box left side (showing just the label)
-			ImRect nodeRect = getNodeRectDiwne();
+			ImRect nodeRect = getRectDiwne();
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
 			{
@@ -208,15 +207,14 @@ bool CoreNodeWithPins::leftContent()
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					inner_interaction_happen |= pin->drawDiwne(); // pin + register the wire
+					pin->drawDiwne(context, m_drawMode2); // pin + register the wire
 				}
 			}
 		}
 	}
-	return inner_interaction_happen;
 }
 
-bool CoreNodeWithPins::rightContent()
+void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 {
 	bool inner_interaction_happen = false;
 	bool pinsVisible = false;
@@ -230,6 +228,7 @@ bool CoreNodeWithPins::rightContent()
 		}
 	}
 
+	// TODO: Pins occasionally "vibrate", find out why (probably some kind of pixel rounding issue)
 	if (pinsVisible)
 	{
 		if (m_levelOfDetail == LevelOfDetail::Label ||   // Label draws the wires only
@@ -238,7 +237,7 @@ bool CoreNodeWithPins::rightContent()
 			// register the connected wires only.
 			// Connect them to the middle of the box right side (showing just the label)
 
-			const ImRect nodeRect = getNodeRectDiwne();
+			const ImRect nodeRect = getRectDiwne();
 			// todo (PF) pinConnectionPoint is wrong when output pulse pins are not drawn
 			const ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
@@ -261,7 +260,7 @@ bool CoreNodeWithPins::rightContent()
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					float act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
+					float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRectDiwne().GetWidth()) *
 					                                     diwne.getWorkAreaZoom()); /* no shift to the left */
 					m_minRightAlignOfRightPins =
 					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
@@ -270,7 +269,7 @@ bool CoreNodeWithPins::rightContent()
 					// LOG_INFO(cursor_pos);
 					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all output
 					                                                                      pins have the same width */
-					inner_interaction_happen |= pin->drawDiwne();
+					pin->drawDiwne(context);
 				}
 			}
 		}
@@ -280,5 +279,4 @@ bool CoreNodeWithPins::rightContent()
 		// TODO: (DR) (zoom-aware) Uncomment perhaps
 		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
-	return inner_interaction_happen;
 }

@@ -23,8 +23,8 @@
 using namespace Workspace;
 
 CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
-    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation()->defaultLabel),
-      m_nodebase(nodebase), m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
+    : Node(diwne, nodebase->getLabel()), m_nodebase(nodebase),
+      m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
       m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
                        diwne.getWorkAreaZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
@@ -77,8 +77,10 @@ CoreNode::~CoreNode()
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
 }
 
-bool CoreNode::topContent()
+void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
+	// Note: This method does not call superclass topContent!
+
 	bool interaction_happen = false;
 
 	float zoom = diwne.getWorkAreaZoom();
@@ -87,10 +89,12 @@ bool CoreNode::topContent()
 	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
 	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
 
+	// TODO: This should again be responsibility of the DIWNE library
+
 	// adding a border
-	diwne.AddRectDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBorder),
-	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
-	                   I3T::getTheme().get(ESize::Nodes_Border_Thickness));
+	diwne.m_renderer->AddRectDiwne(m_top.getMin(), m_bottom.getMax(), I3T::getTheme().get(EColor::NodeBorder),
+	                               I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
+	                               I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
 	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getWorkAreaZoom());
@@ -180,6 +184,8 @@ bool CoreNode::topContent()
 	const float widthSoFar =
 	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
+	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
+
 	// Header extra space
 	float trailingDummyWidth = style.FramePadding.x / zoom;
 	if (m_headerMinWidth > 0)
@@ -193,7 +199,8 @@ bool CoreNode::topContent()
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	return interaction_happen;
+	if (interaction_happen)
+		context.interacted++;
 }
 
 Ptr<Core::Node> const CoreNode::getNodebase() const
@@ -323,49 +330,51 @@ static void drawMenuStoreValues(Ptr<Core::Node> node)
 	}
 }
 
-void CoreNode::popupContent()
+void CoreNode::popupContent(DIWNE::DrawInfo& context)
 {
-	drawMenuSetEditable();
-
-	if (m_nodebase->getOperation()->isConstructor)
-	{
-		drawMenuStoreValues(getNodebase());
-	}
-
-	ImGui::Separator();
-
-	drawMenuSetPrecision();
-	drawMenuLevelOfDetail();
-
-	ImGui::Separator();
-
-	drawMenuDuplicate();
-
-	ImGui::Separator();
-
-	Node::popupContent();
+	// TODO: Uncomment
+	//	drawMenuSetEditable();
+	//
+	//	if (m_nodebase->getOperation()->isConstructor)
+	//	{
+	//		drawMenuStoreValues(getNodebase());
+	//	}
+	//
+	//	ImGui::Separator();
+	//
+	//	drawMenuSetPrecision();
+	//	drawMenuLevelOfDetail();
+	//
+	//	ImGui::Separator();
+	//
+	//	drawMenuDuplicate();
+	//
+	//	ImGui::Separator();
+	//
+	//	Node::popupContent();
 }
 
-bool CoreNode::processDrag()
-{
-	if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
-	{
-		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
-	}
-	return Node::processDrag();
-}
-
-bool CoreNode::processSelect()
-{
-	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-	return Node::processSelect();
-}
-
-bool CoreNode::processUnselect()
-{
-	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-	return Node::processUnselect();
-}
+// TODO: Uncomment
+// bool CoreNode::processDrag()
+//{
+//	if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
+//	{
+//		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+//	}
+//	return Node::processDrag();
+//}
+//
+// bool CoreNode::processSelect()
+//{
+//	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
+//	return Node::processSelect();
+//}
+//
+// bool CoreNode::processUnselect()
+//{
+//	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
+//	return Node::processUnselect();
+//}
 
 const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 {

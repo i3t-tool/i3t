@@ -84,7 +84,7 @@ public:
 		//  m_nodebase->as<Core::Transformation>()->enableSynergies(); // ??? JH
 		//  should be here ?
 
-		if (ImGui::BeginTable(fmt::format("##LoD{}", getIdDiwne()).c_str(), 2 /* label, value */,
+		if (ImGui::BeginTable(fmt::format("##LoD{}", getId()).c_str(), 2 /* label, value */,
 		                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 		{
 			for (auto& [key, valueStore] : nodebase->getDefaultValues())
@@ -363,7 +363,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::Scale>>();
-	if (ImGui::BeginTable(fmt::format("##LoD{}", getIdDiwne()).c_str(), 2 /* label, value */,
+	if (ImGui::BeginTable(fmt::format("##LoD{}", getId()).c_str(), 2 /* label, value */,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
 		for (auto& [key, valueStore] : nodebase->getDefaultValues())

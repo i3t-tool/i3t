@@ -29,19 +29,30 @@
 
 namespace DIWNE
 {
-DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne)
-    : diwne(diwne), m_idDiwne(id), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
+DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne)
+    : diwne(diwne), m_idDiwne(g_diwneIDCounter++), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
       m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
 {}
 
+unsigned long long DiwneObject::g_diwneIDCounter = 0;
+
 void DiwneObject::draw(DrawMode drawMode)
 {
-	FrameContext context(drawMode);
+	DrawInfo context(drawMode);
 	drawDiwne(context);
 };
 
-void DiwneObject::drawDiwne(FrameContext& context)
+DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)
 {
+	ContextTracker tracker(context);
+	drawDiwne(context, drawMode);
+	return tracker.end(context);
+}
+
+void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
+{
+	m_drawMode2 = mode;
+
 	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
 	initializeDiwne(context);
 
@@ -57,13 +68,10 @@ void DiwneObject::drawDiwne(FrameContext& context)
 		ImGui::PopStyleColor();
 
 		endDiwne(context);
-		//		updateSizes();
-		//		DIWNE_DEBUG((diwne), {
-		//			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
-		// ImDrawFlags_RoundCornersNone, 			                   1, true);
-		//		});
-		//		m_inner_interaction_happen |= afterEndDiwne();
-		//		m_inner_interaction_happen |= processInteractionsDiwne();
+		DIWNE_DEBUG((diwne), {
+			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
+			                               ImDrawFlags_RoundCornersNone, 1, true);
+		});
 	}
 	finalizeDiwne(context);
 
@@ -71,7 +79,7 @@ void DiwneObject::drawDiwne(FrameContext& context)
 }
 
 /*
-DrawResult DiwneObject::drawDiwne(const FrameContext& context)
+DrawResult DiwneObject::drawDiwne(DrawInfo& context)
 {
     // TODO: REWRITE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -155,10 +163,10 @@ DrawResult DiwneObject::drawDiwne(const FrameContext& context)
         });
 
         end();
-        updateSizes();
+        updateLayout();
         DIWNE_DEBUG((diwne), {
-            diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone,
-                               1, true);
+            diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
+ImDrawFlags_RoundCornersNone, 1, true);
         });
         m_inner_interaction_happen |= afterEndDiwne();
         DIWNE_DEBUG_EXTRA_1(diwne, { interactionAfterEnd = m_inner_interaction_happen; });
@@ -209,15 +217,10 @@ bool DiwneObject::allowDrawing()
 	return true;
 }
 
-void DiwneObject::initialize(FrameContext& context) {}
-void DiwneObject::initializeDiwne(FrameContext& context)
+void DiwneObject::initialize(DrawInfo& context) {}
+void DiwneObject::initializeDiwne(DrawInfo& context)
 {
 	return initialize(context);
-}
-
-void DiwneObject::content(FrameContext& context)
-{
-	ImGui::TextUnformatted(fmt::format("{} object content", m_labelDiwne).c_str());
 }
 
 bool DiwneObject::allowInteraction()
@@ -225,8 +228,8 @@ bool DiwneObject::allowInteraction()
 	return m_focusedForInteraction;
 }
 
-void DiwneObject::processInteractions(FrameContext& context) {}
-void DiwneObject::processInteractionsDiwne(FrameContext& context)
+void DiwneObject::processInteractions(DrawInfo& context) {}
+void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
 	//	bool interaction_happen = false;
 	//
@@ -283,16 +286,26 @@ void DiwneObject::processInteractionsDiwne(FrameContext& context)
 	//	DIWNE_DEBUG_EXTRA_2((diwne), {
 	//		if (m_isActive)
 	//		{
-	//			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
+	//			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
 	//			                   ImDrawFlags_RoundCornersNone, 1, true);
 	//		};
 	//	});
 }
 
-void DiwneObject::finalize(FrameContext& context) {}
-void DiwneObject::finalizeDiwne(FrameContext& context)
+void DiwneObject::finalize(DrawInfo& context) {}
+void DiwneObject::finalizeDiwne(DrawInfo& context)
 {
 	finalize(context);
+}
+
+void DiwneObject::setPosition(const ImVec2& position)
+{
+	translate(position - m_rect.Min);
+}
+
+void DiwneObject::translate(const ImVec2& vec)
+{
+	m_rect.Translate(vec);
 }
 
 //
@@ -315,31 +328,63 @@ bool DiwneObject::getSelectable()
 	return m_selectable;
 }
 
-void DiwneObject::beginDiwne(FrameContext& context)
+/**
+ *
+ * @param context
+ */
+void DiwneObject::beginDiwne(DrawInfo& context)
 {
 	begin(context);
 }
-void DiwneObject::endDiwne(FrameContext& context)
+
+/**
+ * Calls user end() method and then the internal processInteractionsDiwne() method.
+ */
+void DiwneObject::endDiwne(DrawInfo& context)
 {
 	end(context);
-	processInteractions(context);
+	processInteractionsDiwne(context);
 }
 
-void FrameContext::merge(const FrameContext& other)
+void DrawInfo::merge(const DrawInfo& other)
 {
 	this->inputConsumed |= other.inputConsumed;
 	this->interacted |= other.interacted;
 }
 
-void FrameContext::operator|=(const FrameContext& other)
+void DrawInfo::operator|=(const DrawInfo& other)
 {
 	merge(other);
 }
 
-FrameContext& FrameContext::operator|(const FrameContext& other)
+DrawInfo DrawInfo::operator|(const DrawInfo& other)
 {
-	merge(other);
-	return *this;
+	DrawInfo newInfo(*this);
+	newInfo.merge(other);
+	return newInfo;
+}
+
+DrawInfo DrawInfo::findChange(const DrawInfo& other) const
+{
+	DrawInfo change;
+	change.interacted = this->interacted - other.interacted;
+	change.inputConsumed = this->interacted - other.interacted;
+	return change;
+}
+
+ContextTracker::ContextTracker(const DrawInfo& context)
+{
+	begin(context);
+}
+
+void ContextTracker::begin(const DrawInfo& context)
+{
+	m_contextCopy = std::make_shared<DrawInfo>(context);
+}
+
+DrawInfo ContextTracker::end(const DrawInfo& context)
+{
+	return context.findChange(*m_contextCopy);
 }
 
 //
@@ -382,7 +427,12 @@ bool DiwneObject::bypassTouchAction()
 	return diwne.bypassIsMouseClicked0();
 }
 
-// void DiwneObject::processFocused(FrameContext& context)
+void DiwneObject::popupContent(DrawInfo& context)
+{
+	ImGui::MenuItem("Override this method with content of popup menu of your object");
+}
+
+// void DiwneObject::processFocused(DrawInfo& context)
 //{
 //	// TODO: CONTINUE HERE add custom pin impl <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //	if (bypassTouchAction())
@@ -393,12 +443,12 @@ bool DiwneObject::bypassTouchAction()
 //	{
 //		int x = 5; // Debug thing
 //	}
-//	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->objectFocusBorderColor,
-//	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-//	                   diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
-//	DIWNE_DEBUG(diwne, {
-//		diwne.AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1), DIWNE_MAGENTA_50, 0,
-//		                   ImDrawFlags_RoundCornersNone, 1);
+//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+// diwne.mp_settingsDiwne->objectFocusBorderColor, 	                   diwne.mp_settingsDiwne->selectionRounding,
+// ImDrawFlags_RoundCornersAll, 	                   diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
+// DIWNE_DEBUG(diwne, { 		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max -
+// ImVec2(1,
+// 1), DIWNE_MAGENTA_50, 0, 		                   ImDrawFlags_RoundCornersNone, 1);
 //	});
 //	context.interacted = true;
 // }
@@ -421,7 +471,7 @@ bool DiwneObject::bypassTouchAction()
 //	return ret;
 // }
 //
-// void DiwneObject::processFocusedDiwne(FrameContext& context)
+// void DiwneObject::processFocusedDiwne(DrawInfo& context)
 //{
 //	if (bypassFocusAction() && allowProcessFocused())
 //	{
@@ -435,15 +485,16 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::processFocusedForInteraction(FrameContext& context)
+// void DiwneObject::processFocusedForInteraction(DrawInfo& context)
 //{
 //	// TODO: Investiage exact usages and rename
-//	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
 //	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
 //	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 //	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
 //	DIWNE_DEBUG(diwne, {
-//		diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone, 1);
+//		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_GREEN_50, 0,
+// ImDrawFlags_RoundCornersNone, 1);
 //	});
 //	context.interacted = true;
 // }
@@ -451,7 +502,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return allowProcessFocused();
 // }
-// void DiwneObject::processFocusedForInteractionDiwne(FrameContext& context)
+// void DiwneObject::processFocusedForInteractionDiwne(DrawInfo& context)
 //{
 //	/* between frames mouse can go out of focus scope */
 //	if ((bypassFocusForInteractionAction() || m_isHeld) && allowProcessFocusedForInteraction())
@@ -470,7 +521,7 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::processHold(FrameContext& context)
+// void DiwneObject::processHold(DrawInfo& context)
 //{
 //	context.interacted = true;
 // }
@@ -478,7 +529,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return m_focusedForInteraction;
 // }
-// void DiwneObject::processHoldDiwne(FrameContext& context)
+// void DiwneObject::processHoldDiwne(DrawInfo& context)
 //{
 //	if (bypassHoldAction() && allowProcessHold())
 //	{
@@ -487,7 +538,7 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::processUnhold(FrameContext& context)
+// void DiwneObject::processUnhold(DrawInfo& context)
 //{
 //	context.interacted = true;
 // }
@@ -495,7 +546,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return true;
 // }
-// void DiwneObject::processUnholdDiwne(FrameContext& context)
+// void DiwneObject::processUnholdDiwne(DrawInfo& context)
 //{
 //	if (bypassUnholdAction() && allowProcessUnhold())
 //	{
@@ -509,7 +560,7 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::processDrag(FrameContext& context)
+// void DiwneObject::processDrag(DrawInfo& context)
 //{
 //	context.interacted = true;
 // }
@@ -517,7 +568,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return m_isHeld;
 // }
-// void DiwneObject::processDragDiwne(FrameContext& context)
+// void DiwneObject::processDragDiwne(DrawInfo& context)
 //{
 //	if (bypassDragAction() && allowProcessDrag())
 //	{
@@ -527,7 +578,7 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::processSelect(FrameContext& context)
+// void DiwneObject::processSelect(DrawInfo& context)
 //{
 //	context.interacted = true;
 // }
@@ -535,7 +586,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return m_isHeld && !m_isDragged;
 // }
-// void DiwneObject::processSelectDiwne(FrameContext& context)
+// void DiwneObject::processSelectDiwne(DrawInfo& context)
 //{
 //	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
 //	{
@@ -544,7 +595,7 @@ bool DiwneObject::bypassTouchAction()
 //	return false;
 // }
 //
-// void DiwneObject::processUnselect(FrameContext& context)
+// void DiwneObject::processUnselect(DrawInfo& context)
 //{
 //	return true;
 // }
@@ -552,7 +603,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return m_isHeld && !m_isDragged;
 // }
-// void DiwneObject::processUnselectDiwne(FrameContext& context)
+// void DiwneObject::processUnselectDiwne(DrawInfo& context)
 //{
 //	if (bypassUnselectAction() && allowProcessUnselect())
 //	{
@@ -564,7 +615,7 @@ bool DiwneObject::bypassTouchAction()
 //{
 //	return !diwne.blockRaisePopup();
 // }
-// void DiwneObject::processRaisePopupDiwne(FrameContext& context)
+// void DiwneObject::processRaisePopupDiwne(DrawInfo& context)
 //{
 //	if (bypassRaisePopupAction() && allowProcessRaisePopup())
 //	{
@@ -575,7 +626,7 @@ bool DiwneObject::bypassTouchAction()
 //	return false;
 // }
 //
-// void DiwneObject::processShowPopupDiwne(FrameContext& context)
+// void DiwneObject::processShowPopupDiwne(DrawInfo& context)
 //{
 //	if (diwne.m_popupDrawn)
 //	{
@@ -590,10 +641,6 @@ bool DiwneObject::bypassTouchAction()
 //	}
 // }
 //
-// void DiwneObject::popupContent(FrameContext& context)
-//{
-//	ImGui::MenuItem("Override this method with content of popup menu of your object");
-// }
 //
 // void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
 //{

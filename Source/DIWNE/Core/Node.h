@@ -12,7 +12,7 @@
  */
 #pragma once
 
-#include "DiwneObject.h"
+// #include "DiwneObject.h"
 
 #include "NodeEditor.h"
 
@@ -42,26 +42,109 @@ enum DrawModeNodePosition
  */
 class Node : public DiwneObject
 {
-public:
-	/** Default constructor */
-	Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneNode");
-	/** Default destructor */
-	virtual ~Node();
+protected:
+	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
+	DrawModeNodePosition m_nodePosMode{OnItsPosition};
+	bool m_toDelete = false; ///< Set to true after node delete action
+	bool m_render = true;    ///< used to hide nodes in tutorial scenes (action "toggleNodeWorkspaceVisibility")
+
+public:
+	bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
+	                         For example in the first frame after you created it
+	                         -> to obtain its real size */
+	// todo (PF) rename to something like m_forceToDraw, m_forceFirstTimeDraw, or m_forceToDrawFirstTime
+	// This variable is
+	// - set to true in the Node constructor only
+	// - dropped to false in Node::beforeBeginDiwne()
+	// - used to force drawing the node for the first time
+
+	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
+
+	~Node() override;
+
+	// TODO: Why was copy constuctor commented out? Is it ever used?
 	//        /** Copy constructor
 	//         *  \param other Object to copy from
 	//         */
 	//        Node(const Node& other);
 
+	// TODO: Does this operator make sense?
 	/** Assignment operator
 	 *  \param other Object to assign from
 	 *  \return A reference to this
 	 */
 	Node& operator=(const Node& other);
 
-	DIWNE::ID const getId() const
+	//	void updateLayout() override;
+
+	void begin(DrawInfo& context) override;
+	void content(DrawInfo& context) override;
+	void end(DrawInfo& context) override;
+
+	bool allowDrawing() override;
+
+	// TODO: Do we really need a "special" method for drawing nodes? Kinda makes inheritance pointless
+	//  Why not move the handling into the NodeEditor content method?
+	//  What does a node care about last diwneAction, that should be part of the editor context!
+	//  DiwneActions will probably be reworked anyway so take that into account
+	template <typename T>
+	void drawNodeDiwne(DrawInfo& context, DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
+	                   DrawMode drawMode = DrawMode::Interacting)
 	{
-		return m_idDiwne;
+		m_nodePosMode = nodePosMode;
+
+		if (!getRender()) // hide the node and its input wire in the tutorial scene
+			return;
+
+		DrawInfo drawResult = drawDiwneEx(context);
+
+		if (drawResult.interacted && !m_toDelete)
+		{
+			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
+			if (diwne.getDiwneActionActive() == DiwneAction::None ||
+			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent // no specific action
+			)
+			{
+				diwne.setDiwneAction(DiwneAction::InteractingContent);
+			}
+		}
+	}
+
+	// TODO: I'm pretty sure this is dumb, why use two separate delete flags for base and derived nodes?? <<<<<<<<<<
+	// TODO: Investigate usage of these methods
+	void deleteActionDiwne();
+	virtual void deleteAction(){};
+
+	bool setSelected(const bool selected) override;
+
+	//	bool processSelect() override;
+	//	bool processUnselect() override;
+	//
+	//	bool processDrag() override;
+
+	void setNodePositionDiwne(ImVec2 const& position)
+	{
+		m_nodePositionDiwne = position;
+		setPosition(position);
+	};
+	ImVec2 getNodePositionDiwne() const
+	{
+		return m_nodePositionDiwne;
+	};
+	void move(ImVec2 const amount)
+	{
+		m_nodePositionDiwne += amount;
+		translate(amount);
+	};
+
+	bool getRender() const
+	{
+		return m_render;
+	};
+	void setRender(bool render)
+	{
+		m_render = render;
 	};
 
 	DIWNE::DiwneAction getHoldActionType() const final
@@ -76,130 +159,6 @@ public:
 	{
 		return DiwneAction::TouchNode;
 	};
-
-//	void updateSizes() override;
-	void deleteActionDiwne();
-	virtual void deleteAction(){};
-
-	bool allowDrawing() override;
-//	bool beforeBeginDiwne() override;
-	void begin(FrameContext& context) override;
-	void content(FrameContext& context) override;
-	void end(FrameContext& context) override;
-//	bool afterEndDiwne() override;
-
-	/*
-	template <typename T>
-	bool drawNodeDiwne(DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
-	                   DrawMode drawMode = DrawMode::Interacting)
-	{
-		m_nodePosMode = nodePosMode;
-		m_drawMode = drawMode;
-
-
-		if (!getRender()) // hide the node and its input wire in the tutorial scene
-			return false;
-
-		drawDiwne(drawMode);
-
-		if (interaction_happen && !m_toDelete)
-		{
-			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-			if (diwne.getDiwneActionActive() == DiwneAction::None ||
-			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent // no specific action
-			)
-			{
-				diwne.setDiwneAction(DiwneAction::InteractingContent);
-			}
-		}
-
-		return interaction_happen;
-	}
-	*/
-
-	bool topContentDiwne();
-	bool leftContentDiwne();
-	bool middleContentDiwne();
-	bool rightContentDiwne();
-	bool bottomContentDiwne();
-
-	virtual ImRect getRectDiwne() const override
-	{
-		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
-	};
-
-	bool setSelected(const bool selected) override;
-
-//	bool processSelect() override;
-//	bool processUnselect() override;
-//
-//	bool processDrag() override;
-
-	virtual bool topContent();
-	virtual bool leftContent();
-	virtual bool middleContent();
-	virtual bool rightContent();
-	virtual bool bottomContent();
-
-	void setNodePositionDiwne(ImVec2 const& position)
-	{
-		m_nodePositionDiwne = position;
-		setNodeRectsPositionDiwne(position);
-	};
-	ImVec2 getNodePositionDiwne() const
-	{
-		return m_nodePositionDiwne;
-	};
-	void translateNodePositionDiwne(ImVec2 const amount)
-	{
-		m_nodePositionDiwne += amount;
-		translateNodeRectsDiwne(amount);
-	};
-
-	ImRect getNodeRectDiwne() const
-	{
-		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
-	};
-	ImVec2 getNodeRectSizeDiwne() const
-	{
-		return m_bottomRectDiwne.Max - m_topRectDiwne.Min;
-	};
-
-	bool getRender() const
-	{
-		return m_render;
-	};
-	void setRender(bool render)
-	{
-		m_render = render;
-	};
-
-	bool m_drawAnyway; /*!< you have to draw the node anyway. // (PF) was float!?!?
-	                         For example in the first frame after you created it
-	                         -> to obtain its real size */
-	// todo (PF) rename to something like m_forceToDraw, m_forceFirstTimeDraw, or m_forceToDrawFirstTime
-	// This variable is
-	// - set to true in the Node constructor only
-	// - dropped to false in Node::beforeBeginDiwne()
-	// - used to force drawing the node for the first time
-
-protected:
-	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
-
-	/** \brief Rectangle of parts of node in diwne,
-	 * are computed every frame based on node content and m_nodePositionDiwne.
-	 * Note that these rects are using "world" node editor coordinates, not scaled and translated screen ones.
-	 */
-	ImRect m_topRectDiwne, m_leftRectDiwne, m_middleRectDiwne, m_rightRectDiwne, m_bottomRectDiwne;
-	float m_centerDummySpace; ///< indent value to center the middle part
-
-	DrawModeNodePosition m_nodePosMode;
-	bool m_toDelete;      ///< Set to true after node delete action
-	bool m_render = true; ///< used to hide nodes in tutorial scenes (action "toggleNodeWorkspaceVisibility")
-
-private:
-	void setNodeRectsPositionDiwne(ImVec2 const& position);
-	void translateNodeRectsDiwne(ImVec2 const& distance);
 };
 
 } /* namespace DIWNE */

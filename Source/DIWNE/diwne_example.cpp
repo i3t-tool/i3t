@@ -8,29 +8,41 @@
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
 
-#include "Core/NodeEditor.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "imgui.h"
-
-#include <GLFW/glfw3.h>
-
 #include <stdio.h>
 
 #include <chrono>
 #include <thread>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
+#include <GLFW/glfw3.h>
+
+#include "Core/NodeEditor.h"
+#include "Basic/BasicNode.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+DIWNE::SettingsDiwne settings;
+std::shared_ptr<DIWNE::NodeEditor> editor;
+std::shared_ptr<DIWNE::BasicNode> node;
+
+void diwneInit()
+{
+	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
+	node = std::make_shared<DIWNE::BasicNode>(*editor, "Node 1");
+	editor->addNode(node, ImVec2(200, 200));
+}
+
 void diwneWindow()
 {
 	ImGui::Begin("DIWNE example");
-	DIWNE::SettingsDiwne settings;
-	DIWNE::NodeEditor editor(&settings);
-	editor.draw();
+	editor->draw();
 	ImGui::End();
 }
 
@@ -40,6 +52,8 @@ void mainLoop(GLFWwindow* window)
 	bool show_demo_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+	diwneInit();
 
 	while (!glfwWindowShouldClose(window))
 	{

@@ -69,18 +69,18 @@ public:
 	void drawMenuSetEditable();
 
 	/* DIWNE function */
-	bool topContent() override;
+	void topContent(DIWNE::DrawInfo& context) override;
 
 	virtual void drawMenuLevelOfDetail() = 0;
 	static void drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, std::vector<LevelOfDetail> const& levels_of_detail);
 
 	void drawMenuSetPrecision();
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	bool processDrag() override;
-	bool processSelect() override;
-	bool processUnselect() override;
+//	bool processDrag() override;
+//	bool processSelect() override;
+//	bool processUnselect() override;
 
 	// TODO: (DR) Figure out what this was about
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was

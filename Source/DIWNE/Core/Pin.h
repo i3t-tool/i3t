@@ -20,20 +20,9 @@ class Pin : public DiwneObject
 {
 public:
 	/** Default constructor */
-	Pin(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwnePin");
-	/** Default destructor */
-	virtual ~Pin(){};
+	Pin(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwnePin");
 
-	DIWNE::ID const getId() const
-	{
-		return m_idDiwne;
-	};
-
-	virtual bool content()
-	{
-		ImGui::TextUnformatted(fmt::format("{} content", m_labelDiwne).c_str());
-		return false;
-	};
+	void content(DrawInfo& context) override{};
 
 	DIWNE::DiwneAction getHoldActionType() const final
 	{
@@ -48,17 +37,17 @@ public:
 		return DiwneAction::TouchPin;
 	};
 
-	void begin(FrameContext& context) override;
-	void end(FrameContext& context) override;
-//	void updateSizes() override; //TODO: Uncomment
-//	bool processInteractionsAlways(FrameContext& context) override; //TODO: Uncomment
+	void begin(DrawInfo& context) override;
+	void end(DrawInfo& context) override;
+	//	void updateLayout() override; //TODO: Uncomment
+	//	bool processInteractionsAlways(DrawInfo& context) override; //TODO: Uncomment
 
 	virtual const ImVec2& getLinkConnectionPointDiwne()
 	{
 		return m_connectionPointDiwne;
 	};
 
-//	bool processDrag() override;
+	//	bool processDrag() override;
 
 	/*! \brief Wrapper is run when new link is created and goal pin is hovered but
 	 * action not released yet
@@ -78,18 +67,12 @@ public:
 		m_connectionPointDiwne = value;
 	};
 
-	ImRect getRectDiwne() const override
-	{
-		return m_pinRectDiwne;
-	};
-
 protected:
-	ImRect m_pinRectDiwne;         ///< PIN bounding rectangle
 	ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin (wire start or end) */
 
 	virtual void updateConnectionPointDiwne()
 	{
-		m_connectionPointDiwne = m_pinRectDiwne.GetCenter();
+		m_connectionPointDiwne = m_rect.GetCenter();
 	} /*!< intended to use when Pin is drawn (use properties dependent on drawing)
 	     - setConnectionPointDiwne is "hard" setting */
 };

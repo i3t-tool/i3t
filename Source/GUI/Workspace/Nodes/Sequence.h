@@ -47,7 +47,7 @@ public:
 	void setPostionOfDummyData(int positionOfDummyData = -1);
 
 	void popupContentTracking();
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	bool isSequence();
 
@@ -75,10 +75,7 @@ public:
 	const std::vector<Ptr<CoreNode>>& getInnerWorkspaceNodes() const;
 	std::optional<Ptr<CoreNode>> getTransform(int index) const;
 
-	bool beforeContent() override;
-	bool afterContent() override;
-	bool topContent() override;
-	bool middleContent() override;
+	void centerContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 

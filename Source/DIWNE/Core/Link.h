@@ -13,6 +13,7 @@
 #pragma once
 
 #include <algorithm>
+#include <limits>
 
 #include "DiwneObject.h"
 
@@ -21,16 +22,16 @@ namespace DIWNE
 class Link : public DiwneObject
 {
 public:
-	Link(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneLink");
+	Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwneLink");
 
 	/** Default destructor */
 	virtual ~Link(){};
 
-	void initialize(FrameContext& context) override;
-	void initializeDiwne(FrameContext& context) override;
-	void begin(FrameContext& context) override{}; /*!< link is not ImGui element - it is just picture of line */
-	void end(FrameContext& context) override{};
-	void content(FrameContext& context) override;
+	void initialize(DrawInfo& context) override;
+	void initializeDiwne(DrawInfo& context) override;
+	void begin(DrawInfo& context) override{}; /*!< link is not ImGui element - it is just picture of line */
+	void end(DrawInfo& context) override{};
+	void content(DrawInfo& context) override;
 
 	DIWNE::DiwneAction getHoldActionType() const final
 	{
@@ -87,8 +88,8 @@ public:
 	virtual bool isHovered();
 	virtual bool bypassFocusForInteractionAction();
 
-//	virtual bool processFocusedForInteraction();
-//	virtual bool processFocused();
+	//	virtual bool processFocusedForInteraction();
+	//	virtual bool processFocused();
 
 	bool m_just_pluged /*!< not select link when just pluged */;
 
@@ -96,7 +97,7 @@ protected:
 private:
 	ImVec2 m_startDiwne, m_endDiwne;
 	ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
-	float m_squaredDistanceMouseFromLink;
+	float m_squaredDistanceMouseFromLink{std::numeric_limits<float>::max()};
 };
 
 } /* namespace DIWNE */

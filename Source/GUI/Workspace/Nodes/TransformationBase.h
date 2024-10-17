@@ -31,19 +31,19 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	bool beforeBegin() override;
-	bool beforeContent() override;
-	bool topContent() override;
-	bool middleContent() override;
-	bool afterContent() override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void topContent(DIWNE::DrawInfo& context) override;
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void end(DIWNE::DrawInfo& context) override;
+
 	virtual void deleteAction() override;
 	virtual bool allowDrawing() override;
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	virtual void drawMenuLevelOfDetail() override = 0;
 	void drawMenuDelete() override;
 
-	void updateSizes() override;
+	void updateLayout();
 
 	//
 

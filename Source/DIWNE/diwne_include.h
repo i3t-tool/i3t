@@ -41,10 +41,8 @@
  */
 #pragma once
 
-#include "DiwneObject.h"
+#include "Core/NodeEditor.h"
 
-#include "NodeEditor.h"
-
-#include "Link.h"
-#include "Node.h"
-#include "Pin.h"
+#include "Core/Node.h"
+#include "Core/Pin.h"
+#include "Core/Link.h"

@@ -47,7 +47,7 @@ void Sequence::drawMenuLevelOfDetail()
 
 int Sequence::getInnerPosition(std::vector<ImVec2> points)
 {
-	ImRect rect = getNodeRectDiwne();
+	ImRect rect = getRectDiwne();
 	bool any_in = false;
 	ImVec2 in_point;
 	for (auto const& point : points)
@@ -67,7 +67,7 @@ int Sequence::getInnerPosition(std::vector<ImVec2> points)
 	int i = 0;
 	for (auto const& innerNode : getInnerWorkspaceNodes())
 	{
-		rect.Max.x = innerNode->getNodeRectDiwne().GetCenter().x;
+		rect.Max.x = innerNode->getRectDiwne().GetCenter().x;
 		if (rect.Contains(in_point))
 		{
 			return i;
@@ -181,7 +181,7 @@ void Sequence::popupContentTracking()
 	}
 }
 
-void Sequence::popupContent()
+void Sequence::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNodeWithPins::drawMenuSetEditable();
 
@@ -200,101 +200,29 @@ void Sequence::popupContent()
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
-bool Sequence::beforeContent()
+// TODO: Rewrite
+// bool Sequence::beforeContent()
+//{
+//	// TODO: Remove
+//	/* whole node background */
+//	diwne.m_renderer->AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+//	                         I3T::getTheme().get(EColor::NodeBgTransformation),
+//	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
+//	return false;
+//}
+
+void Sequence::centerContent(DIWNE::DrawInfo& context)
 {
-	/* whole node background */
-
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-	                         I3T::getTheme().get(EColor::NodeBgTransformation),
-	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
-	return false;
-}
-
-bool Sequence::afterContent()
-{
-	if (!Core::GraphManager::isTrackingEnabled())
-	{
-		return false;
-	}
-
-	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-
-	ImVec2 topleft = m_middleRectDiwne.Min;
-	ImVec2 bottomright = m_middleRectDiwne.Max;
-	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
-
-	Core::TrackingResult t = workspaceDiwne.tracking->result();
-
-	ImVec2 size = bottomright - topleft;
-	float inactiveMark = t.trackingProgress[this->getId()];
-
-	if (!trackingFromLeft && (inactiveMark != 0 || this->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected()))
-	{
-		bottomright.x = topleft.x;
-		bottomright.x += (1 - inactiveMark) * size.x;
-		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-	}
-	else if (inactiveMark != 0 || this->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
-	{ // Left tracking, top left moving left
-		topleft.x = bottomright.x;
-		topleft.x -= (1 - inactiveMark) * size.x;
-		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-	}
-	else
-	{
-		return false;
-	}
-
-	auto maybeInterpolatedSequence = Tools::findNodeById(workspaceDiwne.getAllNodes(), t.interpolatedTransformID);
-
-	if (!maybeInterpolatedSequence)
-	{
-		maybeInterpolatedSequence = Tools::findNodeById(workspaceDiwne.getAllNodes(),
-		                                                t.transformInfo[t.interpolatedTransformID].sequence->getId());
-	}
-
-	if (!maybeInterpolatedSequence)
-	{
-		Core::GraphManager::stopTracking();
-		return false;
-	}
-
-	auto interpolatedSequence = std::dynamic_pointer_cast<Sequence>(maybeInterpolatedSequence.value());
-	if (interpolatedSequence.get() == this)
-	{
-		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
-		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
-
-		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-		                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
-	}
-
-	return false;
-}
-
-bool Sequence::topContent()
-{
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-	                         I3T::getTheme().get(EColor::NodeHeaderTranformation) * m_tint,
-	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
-}
-
-bool Sequence::middleContent()
-{
-	DIWNE::FrameContext& context = diwne.getFrameContext();
-
 	bool inner_interaction_happen = false;
 	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
 	Ptr<TransformationBase> dragedNode;
 
 	if (m_levelOfDetail == LevelOfDetail::Label)
 	{
-		return false;
+		return;
 	}
 
 	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
@@ -310,14 +238,20 @@ bool Sequence::middleContent()
 		float valueOfChange;
 		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
 
-		return DataRenderer::drawData4x4(
-		    diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode, inputMatrix,
-		    {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked},
-		    valueChanged, rowOfChange, columnOfChange, valueOfChange);
+		// TODO: Pass context to draw data
+		if (DataRenderer::drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
+		                              inputMatrix,
+		                              {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked},
+		                              valueChanged, rowOfChange, columnOfChange, valueOfChange))
+		{
+			context.interacted++;
+		}
+		return;
 	}
 
 	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
@@ -326,13 +260,13 @@ bool Sequence::middleContent()
 		dragedNode = diwne.getLastActiveNode<TransformationBase>();
 		if (dragedNode != nullptr &&
 		    (dragedNode->aboveSequence == 0 ||
-		     dragedNode->aboveSequence == getIdDiwne())) /* only transformation can be in Sequence
+		     dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
 		                                                    && not above other sequence */
 		{
 			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
 			if (position_of_draged_node_in_sequence >= 0)
 			{
-				dragedNode->aboveSequence = getIdDiwne(); /* reset in transformation beforeBegin */
+				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
 			}
 #ifdef WORKSPACE_DEBUG
 			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
@@ -377,13 +311,16 @@ bool Sequence::middleContent()
 		    transformation->setSelected(false);
 		*/
 
+		// TODO: Adapt to new context <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 		/* \todo some better selected transformation/nodes politic (when dragging,
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
 		 * action to do and in WorkspaceDiwne react to this action  */
-		interaction_with_transformation_happen |= transformation->drawNodeDiwne<TransformationBase>(
-		    DIWNE::DrawModeNodePosition::OnCursorPosition, m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw
-		                                                       ? DIWNE::DrawMode::JustDraw
-		                                                       : DIWNE::DrawMode::Interacting);
+		// interaction_with_transformation_happen |=
+		transformation->drawNodeDiwne<TransformationBase>(context, DIWNE::DrawModeNodePosition::OnCursorPosition,
+		                                                  m_isHeld || m_drawMode2 == DIWNE::DrawMode::JustDraw
+		                                                      ? DIWNE::DrawMode::JustDraw
+		                                                      : DIWNE::DrawMode::Interacting);
 
 		ImGui::SameLine();
 
@@ -413,7 +350,7 @@ bool Sequence::middleContent()
 	}
 
 	/* pop NodeFrom Sequence */
-	if (m_drawMode == DIWNE::DrawMode::Interacting && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+	if (m_drawMode2 == DIWNE::DrawMode::Interacting && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
 	{
 		dragedNode = diwne.getLastActiveNode<TransformationBase>();
 		if (dragedNode != nullptr) /* only transformation can be in Sequence*/
@@ -427,7 +364,8 @@ bool Sequence::middleContent()
 		}
 	}
 
-	return inner_interaction_happen;
+	if (inner_interaction_happen)
+		context.interacted++;
 }
 
 void Sequence::setNumberOfVisibleDecimal(int value)

@@ -32,6 +32,7 @@
 #include "GUI/Elements/IWindow.h"
 #include "I3T.h"
 
+#include "DIWNE/Basic/BasicNode.h"
 #include "DIWNE/diwne_include.h"
 
 namespace Workspace
@@ -55,48 +56,18 @@ enum FloatPopupMode
 
 extern std::map<LevelOfDetail, std::string> LevelOfDetailName;
 
-class Node : public DIWNE::Node
+class Node : public DIWNE::BasicNode
 {
-protected:
-	std::string m_topLabel;
-	std::string m_middleLabel;
-
 public:
-	Node(DIWNE::NodeEditor& diwne, DIWNE::ID id, std::string const topLabel = "Header",
-	     std::string const middleLabel = "Content");
+	Node(DIWNE::NodeEditor& diwne, std::string label = "Header");
 	~Node();
-
-	std::string getTopLabel()
-	{
-		return m_topLabel;
-	}
-
-	std::string getMiddleLabel()
-	{
-		return m_middleLabel;
-	}
-
-	void setTopLabel(std::string label)
-	{
-		m_topLabel = label;
-	}
-
-	void setMiddleLabel(std::string label)
-	{
-		m_middleLabel = label;
-	}
 
 	/* DIWNE function */
 	virtual bool bypassFocusForInteractionAction() override;
-	virtual bool beforeContent() override;
-	virtual bool topContent() override;
-	virtual bool middleContent() override;
-	virtual bool leftContent() override;
-	virtual bool rightContent() override;
-	virtual bool bottomContent() override;
-	virtual void deleteAction() override;
 
-	bool m_removeFromWorkspaceWindow;
+	void deleteAction() override;
+
+	bool m_removeFromWorkspaceWindow{false};
 	bool getRemoveFromWorkspace() const
 	{
 		return m_removeFromWorkspaceWindow;
@@ -117,6 +88,6 @@ public:
 	};
 
 	virtual void drawMenuDelete();
-	virtual void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 };
 } // namespace Workspace

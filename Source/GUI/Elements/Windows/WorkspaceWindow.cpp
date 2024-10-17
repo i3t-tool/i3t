@@ -171,6 +171,20 @@ void WorkspaceWindow::render()
 				ImGui::EndMenu();
 			}
 #endif
+			// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<
+			if (ImGui::BeginMenu("Testing"))
+			{
+				if (ImGui::MenuItem("translate"))
+				{
+					LOG_INFO("TRANSLATE MENU CLICKED", g_diwne->m_workspaceCoreNodes.size());
+					g_diwne->addNodeToPosition<Transformation<Core::ETransformType::Translation>>(ImVec2(400, 400));
+				}
+				if (ImGui::MenuItem("model"))
+				{
+					g_diwne->addNodeToPosition<Model>(ImVec2(300, 300));
+				}
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenuBar();
 		}
 
@@ -180,7 +194,15 @@ void WorkspaceWindow::render()
 		{
 			drawMode = DIWNE::DrawMode::Interacting;
 		}
-		g_diwne->drawDiwne(drawMode);
+		static bool firstFrame = false;
+		if (!firstFrame)
+		{
+			firstFrame = true;
+			static auto node = g_diwne->createNode<Model>(ImVec2(200, 200));
+		}
+		LOG_INFO("DRAW START {}", g_diwne->m_workspaceCoreNodes.size());
+		g_diwne->draw(drawMode);
+		LOG_INFO("DRAW END {}", g_diwne->m_workspaceCoreNodes.size());
 	}
 	else
 	{

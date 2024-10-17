@@ -56,7 +56,7 @@ public:
 	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
 
 
-	CorePin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
 	//    bool allowInteraction() const override;
 	//    bool allowProcessFocused() const override;
@@ -76,14 +76,14 @@ public:
 	PinKind getKind() const;
 	Core::EValueType getType() const;
 	bool isConnected() const;
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	bool processFocused() override;
+	//	bool processFocused() override;
 
 	/* DIWNE function */
-	bool content() override;
-	bool processDrag() override;
-	bool processConnectionPrepared() override;
+	void content(DIWNE::DrawInfo& context) override;
+	//	bool processDrag() override;
+	//	bool processConnectionPrepared() override;
 
 	bool bypassFocusForInteractionAction() override;
 };
@@ -100,17 +100,24 @@ protected:
 
 
 public:
-	CoreInPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CoreInPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
 	/**
 	 * \brief Draw pin icon + label and register the connected wire
 	 * \return interaction happened
 	 */
-	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting) override;
+	void drawDiwne(DIWNE::DrawInfo& context, DIWNE::DrawMode drawMode) override;
 
 	CoreLink& getLink()
 	{
 		return m_link;
+		// TODO: <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		//	Its probably the fact that some code is using m_nodes and some m_workspaceNodes
+		//	Still not sure how to fix this duality.
+		//	Converting m_workspaceNodes to just a DIWNE::Node vector seems reasonable
+		//	But it introduces issues, will take a while to rewrite
+		//	We could have a util function in WorkspaceDiwne that converts the list to CoreNodes
+		//	That does take O(n) time though but just pointer static casts so somewhat quick.
 	};
 	void updateConnectionPointDiwne() override
 	{
@@ -130,8 +137,8 @@ public:
 	 * \brief Draw icon and label, if defined
 	 * \return false - both icon and label do not allow interactions
 	 */
-	bool content() override;
-	bool processInteractions() override;
+	void content(DIWNE::DrawInfo& context) override;
+	//	bool processInteractions() override;
 	virtual bool processCreateAndPlugConstrutorNode();
 	bool processUnplug();
 
@@ -144,22 +151,22 @@ class CoreOutPin : public CorePin
 {
 protected:
 public:
-	CoreOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	CoreOutPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
 	void updateConnectionPointDiwne() override
 	{
 		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
 	};
 
-	bool content() override;
+	void content(DIWNE::DrawInfo& context) override;
 };
 
 class DataOutPin : public CoreOutPin
 {
 public:
-	DataOutPin(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	DataOutPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
-	bool content() override; ///< draw data, label, and pin
+	void content(DIWNE::DrawInfo& context) override; ///< draw data, label, and pin
 
 	virtual bool drawData() = 0;
 	virtual int maxLengthOfData() = 0;
@@ -168,8 +175,7 @@ public:
 class DataOutPinMatrix : public DataOutPin
 {
 public:
-	DataOutPinMatrix(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
+	DataOutPinMatrix(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : DataOutPin(diwne, pin, node){};
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -178,8 +184,7 @@ public:
 class DataOutPinVector4 : public DataOutPin
 {
 public:
-	DataOutPinVector4(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
+	DataOutPinVector4(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : DataOutPin(diwne, pin, node){};
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -188,8 +193,7 @@ public:
 class DataOutPinVector3 : public DataOutPin
 {
 public:
-	DataOutPinVector3(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
+	DataOutPinVector3(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : DataOutPin(diwne, pin, node){};
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -198,8 +202,7 @@ public:
 class DataOutPinFloat : public DataOutPin
 {
 public:
-	DataOutPinFloat(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
+	DataOutPinFloat(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : DataOutPin(diwne, pin, node){};
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -208,8 +211,7 @@ public:
 class DataOutPinQuat : public DataOutPin
 {
 public:
-	DataOutPinQuat(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
+	DataOutPinQuat(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : DataOutPin(diwne, pin, node){};
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -219,8 +221,8 @@ class DataOutPinPulse : public DataOutPin
 {
 public:
 	// std::string m_buttonText;
-	DataOutPinPulse(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){
+	DataOutPinPulse(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
+	    : DataOutPin(diwne, pin, node){
 	          // m_buttonText = m_pin.getLabel();
 	      };
 
@@ -234,7 +236,7 @@ private:
 	GLuint renderTexture;
 
 public:
-	DataOutPinScreen(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	DataOutPinScreen(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
 	bool drawData() override;
 	int maxLengthOfData() override;
@@ -245,14 +247,14 @@ public:
 class CoreOutPinMatrixMultiply : public CoreOutPin
 {
 public:
-	CoreOutPinMatrixMultiply(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : CoreOutPin(diwne, id, pin, node){};
+	CoreOutPinMatrixMultiply(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
+	    : CoreOutPin(diwne, pin, node){};
 };
 
 class CoreInPinMatrixMultiply : public CoreInPin
 {
 public:
-	CoreInPinMatrixMultiply(DIWNE::NodeEditor& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : CoreInPin(diwne, id, pin, node){};
+	CoreInPinMatrixMultiply(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
+	    : CoreInPin(diwne, pin, node){};
 };
 } // namespace Workspace
