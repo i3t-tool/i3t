@@ -514,7 +514,10 @@ void ScriptingModule::onInit()
 	});
 
 	m_Lua.set_function("clear_timer", [this](Ptr<Timer> timer) {
-		m_chronos.clearTimer(timer);
+		if (timer)
+		{
+			m_chronos.clearTimer(timer);
+		}
 	});
 
 	//------------------------------------------------------------------------------------------------------------------

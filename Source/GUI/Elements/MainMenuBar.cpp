@@ -17,7 +17,6 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
-#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
