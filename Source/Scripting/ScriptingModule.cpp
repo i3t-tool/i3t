@@ -30,6 +30,16 @@ static Workspace::TransformBuilder g_TransformBuilder;
 
 std::function<void(const std::string& str)> g_printRef;
 
+//----------------------------------------------------------------------------//
+
+void print(const std::string& str)
+{
+	g_printRef(str);
+}
+
+
+//----------------------------------------------------------------------------//
+
 static Workspace::WorkspaceDiwne& getNodeEditor()
 {
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
@@ -134,6 +144,8 @@ void ScriptingModule::onInit()
 
 	m_Lua.open_libraries(sol::lib::base, sol::lib::package);
 
+	m_Lua["I3T"] = m_Lua.create_table();
+
 	//
 
 	// clang-format off
@@ -196,29 +208,34 @@ void ScriptingModule::onInit()
 	m_Lua.new_usertype<GuiOperator>(
 	    "Operator",
 		sol::base_classes, sol::bases<GuiNode>(),
+		// getters
 	    "get_float", &getValue<float>,
 		"get_vec3", &getValue<glm::vec3>,
 		"get_vec4", &getValue<glm::vec4>,
 		"get_mat4", &getValue<glm::mat4>,
+		// setters
 		"set_float", &setValue<float>,
 		"set_vec3", &setValue<glm::vec3>,
 		"set_vec4", &setValue<glm::vec4>,
-		"plug", [](Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to) {
+		// inputs/outputs
+		"plug", [](Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to) -> bool {
 		    return connectNodesNoSave(self, other, from, to);
 	    },
-	    "unplug_input", [&](Ptr<GuiOperator> self, int inputIndex) {
+	    "unplug_input", [&](Ptr<GuiOperator> self, int inputIndex) -> bool {
 		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 		    {
 			    if (node->getInputs().size() <= inputIndex)
 			    {
 				    print(fmt::format("No such input index {}", inputIndex));
-				    return;
+				    return false;
 			    }
 
 			    if (node->getInputs()[inputIndex]->isConnected())
 			    {
 				    node->getInputs()[inputIndex]->unplug();
 			    }
+
+			    return true;
 		    }
 	    },
 	    "unplug_output", [&](Ptr<GuiOperator> self, int outputIndex) {
@@ -227,7 +244,7 @@ void ScriptingModule::onInit()
 			    if (node->getOutputs().size() <= outputIndex)
 			    {
 				    print(fmt::format("No such output index {}", outputIndex));
-				    return;
+				    return false;
 			    }
 
 			    const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
@@ -248,6 +265,8 @@ void ScriptingModule::onInit()
 			    {
 				    childNode->getInputs()[inputIndex]->unplug();
 			    }
+
+			    return true;
 		    }
 	    },
 	    sol::meta_function::construct, [this](const std::string& type) -> Ptr<GuiOperator> {
@@ -289,11 +308,13 @@ void ScriptingModule::onInit()
 		    }
 	    },
 	    // get default value
-	    "get_float", &getDefaultValue<float>, "get_vec3", &getDefaultValue<glm::vec3>, "get_vec3",
-	    &getDefaultValue<glm::vec4>,
+	    "get_float", &getDefaultValue<float>,
+		"get_vec3", &getDefaultValue<glm::vec3>,
+		"get_vec3", &getDefaultValue<glm::vec4>,
 	    // set default value
-	    "set_float", &setDefaultValue<float>, "set_vec3", &setDefaultValue<glm::vec3>, "set_vec4",
-	    &setDefaultValue<glm::vec4>,
+	    "set_float", &setDefaultValue<float>,
+		"set_vec3", &setDefaultValue<glm::vec3>,
+		"set_vec4", &setDefaultValue<glm::vec4>,
 	    // synergies, ...
 	    "is_valid",
 	    [](Ptr<GuiTransform> self) {
@@ -418,6 +439,7 @@ void ScriptingModule::onInit()
 
 	//
 
+    /*
 	m_Lua.set_function("eval", [this](const std::string& scriptSource) {
 		runScript(scriptSource.c_str());
 	});
@@ -430,6 +452,7 @@ void ScriptingModule::onInit()
 		}
 		return true;
 	});
+     */
 
 	m_Lua.set_function("save_script", [](const std::string& path) {
 		/// \todo
@@ -507,10 +530,10 @@ void ScriptingModule::onInit()
 
 	//-- Timers --------------------------------------------------------------------------------------------------------
 
-	m_Lua.set_function("set_timer", [this](uint64_t intervalMs, sol::protected_function callback) {
+	m_Lua.set_function("set_timer", [this](double intervalSeconds, sol::protected_function callback) {
 		callback.set_error_handler(m_Lua["print"]);
 
-		return m_chronos.setTimer(intervalMs, callback);
+		return m_chronos.setTimer(intervalSeconds, callback);
 	});
 
 	m_Lua.set_function("clear_timer", [this](Ptr<Timer> timer) {
@@ -538,8 +561,12 @@ void ScriptingModule::onClose()
 
 bool ScriptingModule::runScript(const char* luaSource)
 {
+	// static int counter = 0;
+
 	try
 	{
+		// auto chunkName = fmt::format("script_{}", counter++);
+		// m_Lua.safe_script(luaSource, chunkName);
 		m_Lua.safe_script(luaSource);
 	}
 	catch (const std::exception& e)

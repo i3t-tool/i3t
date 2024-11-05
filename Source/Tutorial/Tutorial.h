@@ -139,6 +139,9 @@ struct TutorialStep
 	std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
 	std::string m_scriptToRunWhenShown;
 
+	/// Fall back to true for now.
+	bool m_completed = true;
+
 	// todo
 	// maybe call task?
 	// tasks - ptrs to all task widgets

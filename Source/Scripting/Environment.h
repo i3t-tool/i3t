@@ -25,6 +25,7 @@ private:
 	static inline std::vector<RegisterFn> m_functions;
 };
 
+/// Macro for registering Lua functions. It exposes a variable `L` of type `sol::state&` which represents the Lua state.
 #define LUA_REGISTRATION                                                                                               \
 	static void register__(sol::state& L);                                                                             \
 	namespace                                                                                                          \

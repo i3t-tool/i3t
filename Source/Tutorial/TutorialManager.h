@@ -37,9 +37,9 @@ inline ETutorialLanguage toggle(ETutorialLanguage language)
 
 class TutorialManager : public Singleton<TutorialManager>
 {
+public:
 	using UTutorialHeaders = std::vector<std::shared_ptr<TutorialHeader>>;
 
-public:
 	/// \brief searches through the tutorial directory and adds all found tutorial files to the window.
 	/// \todo Use language enum or locale string.
 	void reloadTutorials();
@@ -49,7 +49,7 @@ public:
 		return m_tutorialHeaders;
 	}
 
-	Ptr<Tutorial> getTutorial() const
+	Ptr<Tutorial>& getTutorial()
 	{
 		return m_currentTutorial;
 	}

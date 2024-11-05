@@ -64,7 +64,7 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 	                        &cb_user_data);
 }
 
-bool Button(const char* id, bool disabled)
+bool Button(const char* id, bool disabled, const ImVec2& size)
 {
 	if (disabled)
 	{
@@ -72,7 +72,7 @@ bool Button(const char* id, bool disabled)
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	const auto result = ImGui::Button(id);
+	const auto result = ImGui::Button(id, size);
 
 	if (disabled)
 	{

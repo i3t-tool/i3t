@@ -397,13 +397,15 @@ void TutorialWindow::renderTutorialControls()
 	ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
 
 	// Next button
+	const bool completed = tutorial->m_steps[currentStep].m_completed;
+
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
 	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 	if (currentStep < tutorial->getStepCount() - 1)
 	{
-		if (ImGui::Button("Next", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
+		if (GUI::Button("Next", !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep + 1);
 			// std::cout << m_currentStep << std::endl;
@@ -415,7 +417,7 @@ void TutorialWindow::renderTutorialControls()
 	}
 	else
 	{
-		if (ImGui::Button("Finish", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
+		if (GUI::Button("Finish", !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setTutorial(nullptr);
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;

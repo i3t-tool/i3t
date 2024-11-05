@@ -20,6 +20,7 @@
 void TutorialManager::reloadTutorials()
 {
 	m_tutorialHeaders.clear();
+
 	// preload all tutorials located in TUTORIALS_FOLDER recursively
 	std::string path = Config::TUTORIALS_FOLDER;
 	if (path[0] == '/')
@@ -27,38 +28,37 @@ void TutorialManager::reloadTutorials()
 		path.erase(0, 1);
 	}
 
-	if (std::filesystem::exists(path))
-	{
-		LOG_INFO("Searching for tutorials in: " + path);
-
-		const bool english = m_language == ETutorialLanguage::English;
-
-		// For all files in path recursively
-		for (auto const& entry : std::filesystem::recursive_directory_iterator(
-		         path, std::filesystem::directory_options::skip_permission_denied))
-		{
-			std::string filename = entry.path().stem().string();
-
-			if (entry.path().extension() == ".tut" && ((english && filename.substr(filename.size() - 2) == "en") ||
-			                                           (!english && filename.substr(filename.size() - 2) != "en")))
-			{
-				std::string pathString = entry.path().string();
-				LOG_INFO(pathString);
-				// Load header part of tutorial
-				if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header)
-				{
-					m_tutorialHeaders.push_back(std::move(header));
-				}
-				else
-				{
-					LOG_ERROR("Tutorial header " + pathString + " not loaded.");
-				}
-			}
-		}
-	}
-	else
+	if (!std::filesystem::exists(path))
 	{
 		LOG_INFO("Path for tutorials not found. Searched path: " + path);
+		return;
+	}
+
+	LOG_INFO("Searching for tutorials in: " + path);
+
+	const bool english = m_language == ETutorialLanguage::English;
+
+	// For all files in path recursively
+	for (auto const& entry : std::filesystem::recursive_directory_iterator(
+	         path, std::filesystem::directory_options::skip_permission_denied))
+	{
+		std::string filename = entry.path().stem().string();
+
+		if (entry.path().extension() == ".tut" && ((english && filename.substr(filename.size() - 2) == "en") ||
+		                                           (!english && filename.substr(filename.size() - 2) != "en")))
+		{
+			std::string pathString = entry.path().string();
+			LOG_INFO(pathString);
+			// Load header part of tutorial
+			if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header)
+			{
+				m_tutorialHeaders.push_back(std::move(header));
+			}
+			else
+			{
+				LOG_ERROR("Tutorial header " + pathString + " not loaded.");
+			}
+		}
 	}
 }
 

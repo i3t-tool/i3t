@@ -319,7 +319,7 @@ auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
 
 //
 
-bool connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin);
+bool connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPinIndex, int rhsPinIndex);
 
 bool connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin);
 
