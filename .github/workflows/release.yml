@@ -1,6 +1,8 @@
 name: Release
 on:
   push:
+    branches:
+      - 'ci/**'
     tags:
       - '*'
 
@@ -35,12 +37,16 @@ jobs:
           sudo rm -f /usr/bin/g++
           sudo ln /usr/bin/g++-12 /usr/bin/g++
 
-      - name: Build and create archive
+      - name: Build
         shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --target I3T -j 2
-          bash Scripts/CreateBundle.sh --postfix ${{ matrix.kind }} Release
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --target I3T -j 2
+
+      - name: Create bundle
+        shell: bash
+        run: |
+          bash Scripts/CreateBundle.sh --suffix ${{ matrix.kind }} RelWithDebInfo
 
       - name: Publish
         uses: softprops/action-gh-release@v1

@@ -45,6 +45,7 @@ build-app:
     - mkdir out && cd out
     - cmake ..
     - cmake --build . -j 8 --target I3T
+    - Scripts/CreateBundle.sh --suffix Linux Debug
   artifacts:
     paths:
       - Binaries
