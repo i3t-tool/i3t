@@ -35,15 +35,15 @@ void Pin::end(DrawInfo& context)
 	ImGui::PopID();
 }
 
-//void Pin::updateLayout()
-//{
-//	m_rect.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
-//	m_rect.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
-//
-//	updateConnectionPointDiwne();
-//}
+void Pin::updateLayout(DrawInfo& context)
+{
+	m_rect.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
+	m_rect.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
 
-//bool Pin::processInteractionsAlways()
+	updateConnectionPointDiwne();
+}
+
+// bool Pin::processInteractionsAlways()
 //{
 //	bool interaction_happen = false;
 //
@@ -52,7 +52,7 @@ void Pin::end(DrawInfo& context)
 //	interaction_happen |= DiwneObject::processInteractionsAlways();
 //
 //	return interaction_happen;
-//}
+// }
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
@@ -84,11 +84,11 @@ bool Pin::processConnectionPrepared()
 	return true;
 }
 
-//bool Pin::processDrag()
+// bool Pin::processDrag()
 //{
 //	diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
 //	diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
 //	return true;
-//}
+// }
 
 } /* namespace DIWNE */

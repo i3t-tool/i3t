@@ -80,6 +80,7 @@ CoreNode::~CoreNode()
 void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
 	// Note: This method does not call superclass topContent!
+	// TODO: But it should :|
 
 	bool interaction_happen = false;
 
@@ -128,6 +129,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 			setLevelOfDetail(LevelOfDetail::Full);
 		}
 		// TODO: replace with a layer that blocks interaction
+		// TODO: ^ What? Investigate
 		this->setSelected(!this->getSelected());
 	}
 	ImGui::PopStyleColor(4);

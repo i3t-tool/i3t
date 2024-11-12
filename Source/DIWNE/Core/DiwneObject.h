@@ -64,32 +64,50 @@ public:
 
 	ImRect m_rect;
 
-	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
-	/**
-	 * If some interaction happen with inner elements (DragFloat, Button, ...)
-	 * it block interaction with this object
-	 */
-	bool m_inner_interaction_happen{false};
+	//
 
 	// TODO: Not sure if its needed to keep this as a local variable
 	//  maybe its enough to pass around the frame context instead
-
 	//	DrawMode m_drawMode; /**< \see enum DrawMode */
 
 	/// Experimental, read-only flag thats updated on each drawDiwne() call.
 	/// Essentially just a way to avoid passing this along everywhere as it should be mostly constant
 	DrawMode m_drawMode2; // TODO: Rename, experimental (!)
 
+	//
+
 	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode)
+
+	//
+
 	bool m_selectable{true};
 	bool m_isHeld{false};    /**< Is object held. When dragged it is still held. */
 	bool m_isDragged{false}; /**< Is object dragged */
 	bool m_selected{false};  /**< Is object selected */
+
+	// TODO: This flag is oddly named, realistically this means whether we are hovered AND at the same time
+	//  hovered in some special area. This area is generally just the header of a node and this tells us when to
+	//  drag the node.
+	//  Eg we are hovered in some kind of an "active" / "interactable" area
+	/**< Is object focus on area that allow interaction with object */
 	bool m_focusedForInteraction{false};
-	/**< Is object focus on area that allow interaction with object */ // TODO: Rename / Rework
-	bool m_focused{false};
+
 	/**< Is object focused anywhere (and for example can not be focus other underlying object) */ // TODO: Rename to
-	                                                                                              // hover I think
+	                                                                                              // hover / Rework
+	bool m_hovered{false};
+
+	//
+	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
+	//  Rework so that DrawInfo context.inputConsumed is used instead
+	//  boolean returned from drawing code that is set as a member variable. Means that some part of the drawing code
+	//  returned true (eg. a button/slider was clicked) Related to m_isActive
+	/**
+	 * If some interaction happen with inner elements (DragFloat, Button, ...)
+	 * it block interaction with this object
+	 */
+	bool m_inner_interaction_happen{false};
+
+	// TODO: Active is marked true if this is the FIRST object that had m_inner_interaction_happen be true
 	bool m_isActive{false}; /**< Something happen with object */
 
 	/**
@@ -130,43 +148,48 @@ public:
 
 	/**
 	 * First method to be called every frame. Does not handle drawing.
-	 * @param context
 	 */
-	virtual void initialize(DrawInfo& context); /**< is called every time in drawDiwne() do any
-	                              initialization of your object here */
+	virtual void initialize(DrawInfo& context);
 
 	/**
 	 * First method to be called during object drawing.
 	 * Can be used to initialize drawing code.
-	 * @param context Current frame context.
 	 */
 	virtual void begin(DrawInfo& context) = 0;
 
 	/**
 	 * Called after begin() during drawing. Draws object content.
-	 * Is responsible for keeping track of objects size.
-	 * The objects m_rect variable should be set here.
-	 * @param context
 	 */
 	virtual void content(DrawInfo& context) = 0;
 
 	/**
-	 * Called last after content() during drawing.
-	 * At this point the pixel size of the object should be collected from the content() method and this method
-	 * should be able to work with it.
-	 * @param context
+	 * Called after content(). Used to end content drawing.
 	 */
 	virtual void end(DrawInfo& context) = 0;
 
 	/**
-	 * The final method to be called, gets called every frame and shouldn't do any drawing.
+	 * Update objects m_rect and any other object size variables.
+	 * In other words this method is responsible for keeping track of the objects size.
+	 * This method is called before the afterDraw() method which can use the calculated size values for final drawing.
+	 */
+	virtual void updateLayout(DrawInfo& context) = 0;
+
+	/**
+	 * Called last during drawing.
+	 * At this point the m_rect of the object should be calculated in the updateLayout() method and this method should
+	 * be able to work with it. Because of that the drawing code within shouldn't affect the objects size anymore.
+	 */
+	virtual void afterDraw(DrawInfo& context);
+
+	/**
+	 * The final method to be called, gets called every frame and doesn't do any drawing.
 	 */
 	virtual void finalize(DrawInfo& context);
 
 	// Interaction
 	// =============================================================================================================
 
-	virtual bool allowInteraction(); ///< Decide whether the object can interact (not including content elements)
+	virtual bool allowInteraction() const; ///< Decide whether the object can interact (not including content elements)
 	virtual void processInteractions(DrawInfo& context);
 
 	// Popups
@@ -179,6 +202,7 @@ protected:
 	virtual void initializeDiwne(DrawInfo& context);
 	virtual void beginDiwne(DrawInfo& context);
 	virtual void endDiwne(DrawInfo& context);
+	virtual void afterDrawDiwne(DrawInfo& context);
 	virtual void finalizeDiwne(DrawInfo& context);
 	virtual void processInteractionsDiwne(DrawInfo& context);
 
@@ -235,6 +259,48 @@ public:
 	virtual void setSelectable(bool const selectable);
 	virtual bool getSelectable();
 
+	// Interaction user methods
+	// =============================================================================================================
+	// TODO: Rename to onXXX
+
+	virtual void onHover(DrawInfo& context);
+	//  virtual void processFocusedForInteraction(DrawInfo& context);
+	//	virtual void processDrag(DrawInfo& context);
+	//	virtual void processHold(DrawInfo& context);
+	//	virtual void processUnhold(DrawInfo& context);
+	//	virtual void processSelect(DrawInfo& context);
+	//	virtual void processUnselect(DrawInfo& context);
+
+	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */
+	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */
+
+	// Interaction toggles
+	// =============================================================================================================
+	virtual bool allowHover() const; // TODO: Rename focused to just "hover", gets triggered on mouseover
+
+	//	virtual bool allowProcessFocusedForInteraction();
+	//	virtual bool allowProcessHold();
+	//	virtual bool allowProcessUnhold();
+	//	virtual bool allowProcessDrag();
+	//	virtual bool allowProcessSelect();
+	//	virtual bool allowProcessUnselect();
+	//	virtual bool allowProcessRaisePopup();
+
+protected:
+	// Interaction internal processing methods
+	// =============================================================================================================
+
+	void processHoverDiwne(DrawInfo& context);
+
+	//	void processFocusedForInteractionDiwne(DrawInfo& context);
+	//	void processHoldDiwne(DrawInfo& context);
+	//	void processUnholdDiwne(DrawInfo& context);
+	//	void processDragDiwne(FrameContext& context);
+	//	void processSelectDiwne(FrameContext& context);
+	//	void processUnselectDiwne(FrameContext& context);
+
+	// =============================================================================================================
+
 	// Bypass methods
 	// =============================================================================================================
 
@@ -249,10 +315,11 @@ public:
 	//   process - a more user customizable? version of the processDiwne, currently implemented in DiwneObject too
 	//             not sure if this makes sense might need some changes
 	//   allowProcess - tests if the action is currently allowed in this state
+protected:
+	virtual bool isHoveredDiwne(); ///< Is mouse hovering over the object? Prerequisite for further interaction.
 
+public:
 	virtual bool bypassRaisePopupAction();          /**< action used for raising popup menu */
-	virtual bool bypassFocusAction();               /**< action identified as focusing on object (and prevent
-	                                                   underlying object from focusing) */
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
 	                                                 */
@@ -265,37 +332,7 @@ public:
 	virtual bool bypassDragAction();                /**< action used for dragging object */
 	virtual bool bypassTouchAction();               /**< action used for touching object - not interact with
 	                                                   it, just move it to front of other objects */
-
-	// Process methods
-	// =============================================================================================================
-
-	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */
-	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */
-	//
-	//	virtual void processDrag(DrawInfo& context);
-	//	virtual void processHold(DrawInfo& context);
-	//	virtual void processUnhold(DrawInfo& context);
-	//	virtual void processSelect(DrawInfo& context);
-	//	virtual void processUnselect(DrawInfo& context);
-	//	virtual void processFocused(DrawInfo& context); // TODO: Rename focused to just "hover", gets triggered on
-	// mouseover 	virtual void processFocusedForInteraction(DrawInfo& context);
-	//
-	//	void processFocusedDiwne(DrawInfo& context); // TODO: Rename focused to just "hover", gets triggered on
-	// mouseover 	void processFocusedForInteractionDiwne(DrawInfo& context); 	void processHoldDiwne(DrawInfo&
-	// context); 	void processUnholdDiwne(DrawInfo& context); 	void processDragDiwne(FrameContext& context);
-	// void processSelectDiwne(FrameContext& context); 	void processUnselectDiwne(FrameContext& context);
-
-	//	virtual bool allowProcessFocused(); // TODO: Rename focused to just "hover", gets triggered on mouseover
-	//	virtual bool allowProcessFocusedForInteraction();
-	//	virtual bool allowProcessHold();
-	//	virtual bool allowProcessUnhold();
-	//	virtual bool allowProcessDrag();
-	//	virtual bool allowProcessSelect();
-	//	virtual bool allowProcessUnselect();
-	//	virtual bool allowProcessRaisePopup();
-
-	// =============================================================================================================
-
+public:
 	inline DIWNE::ID const getId() const
 	{
 		return m_idDiwne;

@@ -301,6 +301,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		{
 			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom());
 			ImGui::SameLine();
+			// TODO: (DR) Can we implement this without calling bypassUnholdAction? (Could then make those protected)
 			if (dragedNode->bypassUnholdAction())
 			{
 				push_index = i;

@@ -223,6 +223,11 @@ void NodeEditor::end(DrawInfo& context)
 	ImGui::EndChild();
 }
 
+void NodeEditor::updateLayout(DrawInfo& context)
+{
+	m_rect = getWorkAreaDiwne();
+}
+
 void NodeEditor::clear()
 {
 	setLastActiveNode<DIWNE::Node>(nullptr);
@@ -258,7 +263,7 @@ void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
 }
 
-bool NodeEditor::allowProcessFocused()
+bool NodeEditor::allowHover() const
 {
 	return m_isActive /* object is active from previous frame */
 	       ||

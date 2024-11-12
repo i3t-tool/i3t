@@ -123,12 +123,13 @@ WorkspaceWindow::~WorkspaceWindow()
 // TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
 void WorkspaceWindow::initDiwneFromTheme()
 {
+	// TODO: (DR) Port to DiwneStyle or refactor DiwneSettings
 	settingsDiwne.selectionRounding = I3T::getUI()->getTheme().get(ESize::Nodes_Rounding);
 	settingsDiwne.itemSelectedBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
 	settingsDiwne.itemSelectedBorderThicknessDiwne =
 	    I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
-	settingsDiwne.objectFocusBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder);
-	settingsDiwne.objectFocusBorderThicknessDiwne = I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
+	settingsDiwne.objectHoverBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder);
+	settingsDiwne.objectHoverBorderThicknessDiwne = I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
 	settingsDiwne.objectFocusForInteractionBorderColor =
 	    I3T::getUI()->getTheme().get(EColor::Workspace_InteractionFocusBorder);
 	settingsDiwne.objectFocusForInteractionBorderThicknessDiwne =
@@ -200,9 +201,7 @@ void WorkspaceWindow::render()
 			firstFrame = true;
 			static auto node = g_diwne->createNode<Model>(ImVec2(200, 200));
 		}
-		LOG_INFO("DRAW START {}", g_diwne->m_workspaceCoreNodes.size());
 		g_diwne->draw(drawMode);
-		LOG_INFO("DRAW END {}", g_diwne->m_workspaceCoreNodes.size());
 	}
 	else
 	{

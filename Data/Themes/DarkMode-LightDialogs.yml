@@ -59,7 +59,6 @@ colors:
   npin_Inner Color Quat: [0.098, 0.098, 0.098, 1.000]
   npin_Inner Color MatrixMul: [0.098, 0.098, 0.098, 1.000]
   npin_Inner Color Screen: [0.098, 0.098, 0.098, 1.000]
-  ngen_Item Selected Border: [0.757, 0.757, 0.757, 1.000]
   ngen_General Node Background: [0.195, 0.195, 0.195, 1.000]
   ngen_General Node Header: [0.020, 0.341, 0.012, 1.000]
   ngen_General Node Font (text): [1.000, 1.000, 1.000, 1.000]

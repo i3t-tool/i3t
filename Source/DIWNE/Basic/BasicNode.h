@@ -35,8 +35,7 @@ public:
 	virtual void rightContent(DrawInfo& context);
 	virtual void bottomContent(DrawInfo& context);
 
-	/**< store object size and position after this frame */
-	virtual void updateLayout();
+	void updateLayout(DrawInfo& context);
 
 	virtual void drawHeader();
 	virtual void drawBody();

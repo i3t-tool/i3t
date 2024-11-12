@@ -55,11 +55,15 @@ public:
 	// (PF) icon for the cycle box, Triangle elsewhere
 	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
 
-
 	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
-	//    bool allowInteraction() const override;
-	//    bool allowProcessFocused() const override;
+	//	bool processFocused() override;
+	/* DIWNE function */
+	void content(DIWNE::DrawInfo& context) override;
+	//	bool processDrag() override;
+	//	bool processConnectionPrepared() override;
+
+	bool allowInteraction() const override;
 
 	Core::Pin const& getCorePin() const;
 
@@ -77,13 +81,6 @@ public:
 	Core::EValueType getType() const;
 	bool isConnected() const;
 	void popupContent(DIWNE::DrawInfo& context) override;
-
-	//	bool processFocused() override;
-
-	/* DIWNE function */
-	void content(DIWNE::DrawInfo& context) override;
-	//	bool processDrag() override;
-	//	bool processConnectionPrepared() override;
 
 	bool bypassFocusForInteractionAction() override;
 };

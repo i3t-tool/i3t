@@ -73,22 +73,22 @@ void BasicNode::content(DrawInfo& context)
 void BasicNode::end(DrawInfo& context)
 {
 	Node::end(context);
-	updateLayout();
 }
 
-void BasicNode::topContent(DIWNE::DrawInfo& context)
+void BasicNode::topContent(DrawInfo& context)
 {
 	drawHeader();
 	ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1));
 	ImGui::SameLine();
 	ImGui::TextUnformatted(m_topLabel.c_str());
 }
-void BasicNode::leftContent(DIWNE::DrawInfo& context) {}
-void BasicNode::rightContent(DIWNE::DrawInfo& context) {}
-void BasicNode::centerContent(DIWNE::DrawInfo& context) {}
-void BasicNode::bottomContent(DIWNE::DrawInfo& context) {}
 
-void BasicNode::updateLayout()
+void BasicNode::leftContent(DrawInfo& context) {}
+void BasicNode::rightContent(DrawInfo& context) {}
+void BasicNode::centerContent(DrawInfo& context) {}
+void BasicNode::bottomContent(DrawInfo& context) {}
+
+void BasicNode::updateLayout(DrawInfo& context)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 

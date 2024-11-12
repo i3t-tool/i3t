@@ -56,28 +56,32 @@ void Link::initializeDiwne(DrawInfo& context)
 	updateSquareDistanceMouseFromLink();
 }
 
-bool Link::isHovered()
+void Link::updateLayout(DrawInfo& context)
+{
+	m_rect = ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+	                std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
+	                std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+	                std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+}
+
+/// Link isn't represented by an ImGui item so we need to detect hovering manually.
+bool Link::isHoveredDiwne()
 {
 	return m_squaredDistanceMouseFromLink <
 	       (diwne.mp_settingsDiwne->linkThicknessDiwne * diwne.mp_settingsDiwne->linkThicknessDiwne);
 }
-bool Link::bypassFocusForInteractionAction()
+
+void Link::onHover(DrawInfo& context)
 {
-	return isHovered();
+	// TODO: Investigate what the touch action is for
+	//	if (bypassTouchAction())
+	//	{
+	//		diwne.setDiwneAction(getTouchActionType());
+	//	}
+	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+	                                      diwne.mp_settingsDiwne->objectHoverBorderColor,
+	                                      diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 }
-//
-// bool Link::processFocused()
-//{
-//	if (bypassTouchAction())
-//	{
-//		diwne.setDiwneAction(getTouchActionType());
-//	}
-//	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-//	                          diwne.mp_settingsDiwne->objectFocusBorderColor,
-//	                          diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
-//	return true;
-//}
-//
 // bool Link::processFocusedForInteraction()
 //{
 //	diwne.m_renderer->AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,

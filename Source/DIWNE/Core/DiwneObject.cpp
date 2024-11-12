@@ -54,20 +54,14 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	m_drawMode2 = mode;
 
 	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
-	initializeDiwne(context);
 
+	initializeDiwne(context);
 	if (allowDrawing())
 	{
 		beginDiwne(context);
-
-		ImGui::PushStyleColor(ImGuiCol_Text,
-		                      diwne.mp_settingsDiwne->fontColor); // TODO: Sort this out in a theme rework
-
 		content(context);
-
-		ImGui::PopStyleColor();
-
 		endDiwne(context);
+		afterDrawDiwne(context);
 		DIWNE_DEBUG((diwne), {
 			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
 			                               ImDrawFlags_RoundCornersNone, 1, true);
@@ -197,7 +191,7 @@ ImDrawFlags_RoundCornersNone, 1, true);
         }
         ImGui::GetForegroundDrawList()->AddText(diwne.diwne2screen(originPos), IM_COL32_WHITE,
                                                 fmt::format("i:{},a:{},f:{}", m_inner_interaction_happen ? "Y" : "N",
-                                                            m_isActive ? "Y" : "N", m_focused ? "Y" : "N")
+                                                            m_isActive ? "Y" : "N", m_hovered ? "Y" : "N")
                                                     .c_str());
 
         ImGui::GetForegroundDrawList()->AddText(
@@ -212,18 +206,45 @@ ImDrawFlags_RoundCornersNone, 1, true);
 }
 */
 
-bool DiwneObject::allowDrawing()
-{
-	return true;
-}
-
 void DiwneObject::initialize(DrawInfo& context) {}
 void DiwneObject::initializeDiwne(DrawInfo& context)
 {
 	return initialize(context);
 }
 
-bool DiwneObject::allowInteraction()
+void DiwneObject::beginDiwne(DrawInfo& context)
+{
+	begin(context);
+}
+
+void DiwneObject::endDiwne(DrawInfo& context)
+{
+	end(context);
+}
+
+/**
+ * Updates layout, processes interactions and then calls the user afterDraw() method.
+ */
+void DiwneObject::afterDrawDiwne(DrawInfo& context)
+{
+	updateLayout(context);
+	processInteractionsDiwne(context);
+	afterDraw(context);
+}
+void DiwneObject::afterDraw(DrawInfo& context){};
+
+void DiwneObject::finalize(DrawInfo& context) {}
+void DiwneObject::finalizeDiwne(DrawInfo& context)
+{
+	finalize(context);
+}
+
+bool DiwneObject::allowDrawing()
+{
+	return true;
+}
+
+bool DiwneObject::allowInteraction() const
 {
 	return m_focusedForInteraction;
 }
@@ -231,6 +252,15 @@ bool DiwneObject::allowInteraction()
 void DiwneObject::processInteractions(DrawInfo& context) {}
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
+	if (m_drawMode2 != DrawMode::Interacting)
+		return;
+
+	// TODO: Lets do hover and drag first
+	// 1. Are we in a position where we can receive input?
+	//    In other words, are we hovered?
+	//    TODO: and input hasn't been consumed?
+	processHoverDiwne(context);
+
 	//	bool interaction_happen = false;
 	//
 	//	// Logger::getInstance().getAppLogger()->info("MouseDown: "
@@ -251,7 +281,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//			processFocusedDiwne(context);
 	//			processFocusedForInteractionDiwne(context);
 	//
-	//			if (m_focused) /* diwne.m_objectFocused is checked in
+	//			if (m_hovered) /* diwne.m_objectFocused is checked in
 	//			                  allowFocusedForInteraction() too */
 	//			{
 	//				diwne.m_objectFocused = true;
@@ -292,12 +322,6 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//	});
 }
 
-void DiwneObject::finalize(DrawInfo& context) {}
-void DiwneObject::finalizeDiwne(DrawInfo& context)
-{
-	finalize(context);
-}
-
 void DiwneObject::setPosition(const ImVec2& position)
 {
 	translate(position - m_rect.Min);
@@ -326,24 +350,6 @@ void DiwneObject::setSelectable(bool const selectable)
 bool DiwneObject::getSelectable()
 {
 	return m_selectable;
-}
-
-/**
- *
- * @param context
- */
-void DiwneObject::beginDiwne(DrawInfo& context)
-{
-	begin(context);
-}
-
-/**
- * Calls user end() method and then the internal processInteractionsDiwne() method.
- */
-void DiwneObject::endDiwne(DrawInfo& context)
-{
-	end(context);
-	processInteractionsDiwne(context);
 }
 
 void DrawInfo::merge(const DrawInfo& other)
@@ -393,14 +399,27 @@ bool DiwneObject::bypassRaisePopupAction()
 {
 	return diwne.bypassIsMouseReleased1();
 }
-bool DiwneObject::bypassFocusAction()
+
+/**
+ * This implementation assumes that the last ImGui item represents the entirety of the object.
+ * This method is indirectly called from processInteractionsDiwne() which is called right after end() method.
+ *
+ * If the DiwneObject isn't represented by an ImGui item, this method has to be overridden and modified accordingly.
+ * This default implementation uses ImGui::IsItemHovered() call as it handles all various cases of other UI elements or
+ * windows overlapping this object.
+ */
+bool DiwneObject::isHoveredDiwne()
 {
 	return ImGui::IsItemHovered();
-} /* block interaction with other elements; you have to override this if your
-     object is not ImGui item (like Link) */
+}
+
+/**
+ * This
+ * @return
+ */
 bool DiwneObject::bypassFocusForInteractionAction()
 {
-	return ImGui::IsItemHovered();
+	return isHoveredDiwne();
 } /* you have to override this if your object is not ImGui item (like Link) */
 bool DiwneObject::bypassHoldAction()
 {
@@ -432,59 +451,61 @@ void DiwneObject::popupContent(DrawInfo& context)
 	ImGui::MenuItem("Override this method with content of popup menu of your object");
 }
 
-// void DiwneObject::processFocused(DrawInfo& context)
-//{
-//	// TODO: CONTINUE HERE add custom pin impl <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//	if (bypassTouchAction())
-//	{
-//		diwne.setDiwneAction(getTouchActionType());
-//	}
-//	else
-//	{
-//		int x = 5; // Debug thing
-//	}
-//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-// diwne.mp_settingsDiwne->objectFocusBorderColor, 	                   diwne.mp_settingsDiwne->selectionRounding,
-// ImDrawFlags_RoundCornersAll, 	                   diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
-// DIWNE_DEBUG(diwne, { 		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max -
-// ImVec2(1,
-// 1), DIWNE_MAGENTA_50, 0, 		                   ImDrawFlags_RoundCornersNone, 1);
-//	});
-//	context.interacted = true;
-// }
-// bool DiwneObject::allowProcessFocused()
-//{
-//	// TODO: Rename, decode what we're doing here, note that his function is fully overriden in node editor which
-//	//  duplicates this code but changes the SelectionRect behaviour (which should to be changed)
-//	/* object is active from previous frame */
-//	/* only one object can be focused */
-//	/* not stole focus from selecting action */
-//	/* we want focus of other object while new link */
-//	bool ret =
-//	    m_isActive ||
-//	    (!diwne.m_objectFocused &&
-//	     !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) &&
-//	     (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink));
-//	LOG_INFO("{} FOCUSED active: {}, focused: {}, actionActive: {}, action: {}, source: {}", (ret ? "YES" : "NO "),
-//	         m_isActive, diwne.m_objectFocused, EnumUtils::name(diwne.getDiwneActionActive()),
-//	         EnumUtils::name(diwne.getDiwneAction()), m_labelDiwne)
-//	return ret;
-// }
-//
-// void DiwneObject::processFocusedDiwne(DrawInfo& context)
-//{
-//	if (bypassFocusAction() && allowProcessFocused())
-//	{
-//		m_focused = true;
-//		return processFocused(context);
-//	}
-//	else
-//	{
-//		m_focused = false;
-//		return;
-//	}
-// }
-//
+void DiwneObject::onHover(DrawInfo& context)
+{
+	// TODO: CONTINUE HERE add custom pin impl <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  Pins should probably have their own effect, come back to this later
+	if (bypassTouchAction())
+	{
+		diwne.setDiwneAction(getTouchActionType());
+	}
+	else
+	{
+		int x = 5; // Debug thing
+	}
+
+	context.interacted++; // Hovering is considered an interaction (not blocking input though)
+
+	// Draw hover border
+	// TODO: Not sure if this should remain in DiwneObject or be virtual.
+	//  Maybe move this impl into node and make it purely virtual?
+	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
+	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+
+	DIWNE_DEBUG(diwne, {
+		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+		                               DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
+	});
+}
+bool DiwneObject::allowHover() const
+{
+	// TODO: Rename, decode what we're doing here, note that his function is fully overriden in node editor which
+	//  duplicates this code but changes the SelectionRect behaviour (which should to be changed)
+	/* object is active from previous frame */
+	/* only one object can be focused */
+	/* not stole focus from selecting action */
+	/* we want focus of other object while new link */
+	bool ret =
+	    m_isActive ||
+	    (!diwne.m_objectFocused &&
+	     !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) &&
+	     (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink));
+	LOG_INFO("{} FOCUSED active: {}, focused: {}, actionActive: {}, action: {}, source: {}", (ret ? "YES" : "NO "),
+	         m_isActive, diwne.m_objectFocused, EnumUtils::name(diwne.getDiwneActionActive()),
+	         EnumUtils::name(diwne.getDiwneAction()), m_labelDiwne)
+	return ret;
+}
+
+void DiwneObject::processHoverDiwne(DrawInfo& context)
+{
+	m_hovered = isHoveredDiwne() && allowHover();
+	if (m_hovered)
+		onHover(context);
+	LOG_INFO("{} hovered: {}", m_labelDiwne, m_hovered);
+}
+
 // void DiwneObject::processFocusedForInteraction(DrawInfo& context)
 //{
 //	// TODO: Investiage exact usages and rename
@@ -500,7 +521,7 @@ void DiwneObject::popupContent(DrawInfo& context)
 // }
 // bool DiwneObject::allowProcessFocusedForInteraction()
 //{
-//	return allowProcessFocused();
+//	return allowHover();
 // }
 // void DiwneObject::processFocusedForInteractionDiwne(DrawInfo& context)
 //{

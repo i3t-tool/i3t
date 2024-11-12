@@ -50,13 +50,7 @@ public:
 	void updateControlPoints();
 	void updateSquareDistanceMouseFromLink();
 
-	virtual ImRect getRectDiwne() const override
-	{
-		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
-		              std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
-	};
+	void updateLayout(DrawInfo& context) override;
 
 	ImVec2 getStartpoint()
 	{
@@ -85,15 +79,14 @@ public:
 	                            endPoint) check - so could return true while Link
 	                            is not visible */
 
-	virtual bool isHovered();
-	virtual bool bypassFocusForInteractionAction();
 
-	//	virtual bool processFocusedForInteraction();
-	//	virtual bool processFocused();
+	void onHover(DrawInfo& context) override;
 
 	bool m_just_pluged /*!< not select link when just pluged */;
 
 protected:
+	bool isHoveredDiwne() override;
+
 private:
 	ImVec2 m_startDiwne, m_endDiwne;
 	ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;

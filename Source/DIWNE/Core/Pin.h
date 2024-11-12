@@ -22,32 +22,18 @@ public:
 	/** Default constructor */
 	Pin(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwnePin");
 
-	void content(DrawInfo& context) override{};
-
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldPin;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragPin;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchPin;
-	};
-
 	void begin(DrawInfo& context) override;
+	void content(DrawInfo& context) override{};
 	void end(DrawInfo& context) override;
-	//	void updateLayout() override; //TODO: Uncomment
+	void updateLayout(DrawInfo& context) override;
 	//	bool processInteractionsAlways(DrawInfo& context) override; //TODO: Uncomment
+
+	//	bool processDrag() override;
 
 	virtual const ImVec2& getLinkConnectionPointDiwne()
 	{
 		return m_connectionPointDiwne;
 	};
-
-	//	bool processDrag() override;
 
 	/*! \brief Wrapper is run when new link is created and goal pin is hovered but
 	 * action not released yet
@@ -65,6 +51,19 @@ public:
 	virtual void setConnectionPointDiwne(const ImVec2 value)
 	{
 		m_connectionPointDiwne = value;
+	};
+
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldPin;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragPin;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchPin;
 	};
 
 protected:

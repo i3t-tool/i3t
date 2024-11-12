@@ -30,9 +30,11 @@ bool TransformationBase::allowDrawing()
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
-void TransformationBase::updateLayout()
+void TransformationBase::updateLayout(DIWNE::DrawInfo& context)
 {
 	// TODO: Rework to use DiwnePanels or some other layout manager
+	//  Ideally we would want this handled straight in DIWNE::BasicNode impl and avoid this override completely
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// TODO: Is m_topOversizeSpace unused?
 	/* right align - have to be computed before DIWNE::Node::updateLayout(),
 	 * because after that are sizes updated */
@@ -41,7 +43,7 @@ void TransformationBase::updateLayout()
 	    std::max(0.0f, m_top.getWidth() - std::max(m_left.getWidth() + m_middle.getWidth() + m_right.getWidth() +
 	                                                   ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom(),
 	                                               m_bottom.getWidth()));
-	CoreNode::updateLayout();
+	CoreNode::updateLayout(context);
 }
 void TransformationBase::begin(DIWNE::DrawInfo& context)
 {

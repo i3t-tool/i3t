@@ -43,7 +43,7 @@ public:
 	virtual void drawMenuLevelOfDetail() override = 0;
 	void drawMenuDelete() override;
 
-	void updateLayout();
+	void updateLayout(DIWNE::DrawInfo& context) override;
 
 	//
 

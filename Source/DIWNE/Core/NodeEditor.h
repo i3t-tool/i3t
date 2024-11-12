@@ -55,8 +55,8 @@ struct SettingsDiwne
 	ImVec4 itemSelectedBorderColor = ImVec4(1.0, 0.9, 0.4, 0.6);
 	float itemSelectedBorderThicknessDiwne = 2.5;
 
-	ImVec4 objectFocusBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
-	float objectFocusBorderThicknessDiwne = 1.5;
+	ImVec4 objectHoverBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
+	float objectHoverBorderThicknessDiwne = 1.5;
 	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
 	float objectFocusForInteractionBorderThicknessDiwne = 1.5;
 
@@ -81,6 +81,7 @@ struct SettingsDiwne
 	float linkAlpha = 0.2;
 	float linkAlphaSelectedHovered = 1;
 	float linkAlphaSelected = 0.5;
+	// TODO: Font color is unused, was deleted, reimplement if needed
 	ImVec4 fontColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); ///< Color of the text in the node
 };
 // \todo   void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
@@ -203,12 +204,9 @@ public:
 	virtual bool bypassZoomAction();
 	virtual bool processZoom();
 	virtual bool processDiwneZoom();
-	virtual bool allowProcessFocused();
+	bool allowHover() const override;
 
-	ImRect getRectDiwne() const override
-	{
-		return getWorkAreaDiwne();
-	};
+	void updateLayout(DrawInfo& context) override;
 
 	bool blockRaisePopup(); /**< sometimes we do not want to raise popup - here specify
 	                           it ( now it is when selecting action run ) */
