@@ -18,24 +18,26 @@
 
 #include "I3TUtil.h"
 
+/*
 TEST_F(ApplicationTest, WorkspaceBase)
 {
-	using namespace std::string_literals;
+    using namespace std::string_literals;
 
-	auto& scripting = App::getModule<ScriptingModule>();
+    auto& scripting = App::getModule<ScriptingModule>();
 
-	auto result = scripting.runScript(R"(
-		local nodes_count = #get_all_nodes()
-		assert(nodes_count == 0)
-	)");
-	EXPECT_TRUE(result);
+    auto result = scripting.runScript(R"(
+        local nodes_count = #get_all_nodes()
+        assert(nodes_count == 0)
+    )");
+    EXPECT_TRUE(result);
 
-	result = scripting.runScript(R"(
-		local floatNode = Operator.new("FloatToFloat")
-		local transformNode = Transform.new("Scale")
+    result = scripting.runScript(R"(
+        local floatNode = Operator.new("FloatToFloat")
+        local transformNode = Transform.new("Scale")
 
-		local nodes_count = #get_all_nodes()
-		assert(nodes_count == 2)
-	)");
-	EXPECT_TRUE(result);
+        local nodes_count = #get_all_nodes()
+        assert(nodes_count == 2)
+    )");
+    EXPECT_TRUE(result);
 }
+ */

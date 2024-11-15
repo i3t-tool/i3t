@@ -42,10 +42,10 @@ build-app:
   rules:
     - !reference [.changes-rules, cpp]
   script:
-    - mkdir out && cd out
-    - cmake ..
-    - cmake --build . -j 8 --target I3T
-    - Scripts/CreateBundle.sh --suffix Linux Debug
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build --config Debug --target I3T -j 8
+    - apt update && apt install -y zip
+    - bash Scripts/CreateBundle.sh --suffix Linux Debug
   artifacts:
     paths:
       - Binaries
