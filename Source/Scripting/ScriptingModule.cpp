@@ -162,20 +162,33 @@ void ScriptingModule::onInit()
 	});
 	// clang-format on
 
-	//-- Timers --------------------------------------------------------------------------------------------------------
+	//-- Timers and timeouts -------------------------------------------------------------------------------------------
 
-	m_Lua.set_function("set_timer", [this](double intervalSeconds, sol::protected_function callback) {
+	api["set_timer"] = [this](double intervalSeconds, sol::protected_function callback) {
 		callback.set_error_handler(m_Lua["print"]);
 
 		return m_chronos.setTimer(intervalSeconds, callback);
-	});
+	};
 
-	m_Lua.set_function("clear_timer", [this](Ptr<Timer> timer) {
+	api["clear_timer"] = [this](Ptr<Timer> timer) {
 		if (timer)
 		{
 			m_chronos.clearTimer(timer);
 		}
-	});
+	};
+
+	api["set_timeout"] = [this](double intervalSeconds, sol::protected_function callback) {
+		callback.set_error_handler(m_Lua["print"]);
+
+		return m_chronos.setTimeout(intervalSeconds, callback);
+	};
+
+	api["clear_timeout"] = [this](Ptr<Timer> timer) {
+		if (timer)
+		{
+			m_chronos.clearTimer(timer);
+		}
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 

@@ -21,10 +21,12 @@
 
 class Timer
 {
+	friend class Chronos;
+
 public:
 	Timer() = default;
-	Timer(double intervalSeconds, sol::protected_function callback)
-	    : m_intervalSeconds(intervalSeconds), m_callback(std::move(callback))
+	Timer(double intervalSeconds, sol::protected_function callback, bool oneShot = false)
+	    : m_intervalSeconds(intervalSeconds), m_callback(std::move(callback)), m_oneShot(oneShot)
 	{}
 
 	/// \param dt in seconds
@@ -34,6 +36,11 @@ public:
 		{
 			m_lastTickSeconds = 0;
 			m_callback();
+
+			if (m_oneShot)
+			{
+				m_isExpired = true;
+			}
 		}
 		else
 		{
@@ -45,6 +52,8 @@ private:
 	double m_intervalSeconds = 0;
 	double m_lastTickSeconds = 0;
 	sol::protected_function m_callback;
+	bool m_oneShot = false;
+	bool m_isExpired = false;
 };
 
 class Chronos
@@ -57,12 +66,25 @@ public:
 		for (auto& timer : m_timers)
 		{
 			timer->tick(deltaSeconds);
+
+			if (timer->m_isExpired)
+			{
+				m_timersToDelete.emplace_back(timer);
+			}
 		}
 	}
 
 	Ptr<Timer> setTimer(double intervalSeconds, sol::protected_function callback)
 	{
 		auto timer = std::make_shared<Timer>(intervalSeconds, std::move(callback));
+		m_timers.emplace_back(timer);
+
+		return timer;
+	}
+
+	Ptr<Timer> setTimeout(double intervalSeconds, sol::protected_function callback)
+	{
+		auto timer = std::make_shared<Timer>(intervalSeconds, std::move(callback), true);
 		m_timers.emplace_back(timer);
 
 		return timer;
