@@ -17,38 +17,19 @@
 #include <string>
 
 #include "GUI/Elements/IWindow.h"
-
 #include "Tutorial/Tutorial.h"
 
 class StartWindow : public IWindow
 {
 public:
 	I3T_WINDOW(StartWindow)
-	StartWindow(bool show);
-	bool popupActive = false;
-	bool language_is_english = false;
-
-	/**
-	 * \brief searches through the tutorial directory and adds all found tutorial
-	 * files to the window
-	 */
-	void reloadTutorials(bool english);
+	explicit StartWindow(bool show);
 
 	void renderLeftPanel() const;
 	void renderRightPanel();
-	/**
-	 * \brief Renders the Start window using ImGui.
-	 */
-	void render() override;
 
-	Ptr<Tutorial> getTutorial()
-	{
-		return m_currentTutorial;
-	}
-	void setTutorial(Ptr<Tutorial> tut)
-	{
-		m_currentTutorial = tut;
-	}
+	/// \brief Renders the Start window using ImGui.
+	void render() override;
 
 private:
 	std::shared_ptr<GUIImage> m_dummyImage;
@@ -57,11 +38,5 @@ private:
 	std::shared_ptr<GUIImage> m_cvutImage;
 	std::shared_ptr<GUIImage> m_i3tImage;
 
-	/// Metadata of all discovered tutorials.
-	std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
-
-	Ptr<Tutorial> m_currentTutorial;
-	void renderTutorials();
-	void showTutorialPopup();
 	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
 };

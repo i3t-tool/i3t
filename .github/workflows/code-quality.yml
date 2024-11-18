@@ -1,0 +1,22 @@
+name: Code Quality
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/code-quality.yml'
+      - 'Source/**'
+      - 'Scripts/**'
+      - 'Test/**'
+      - '.clang-format'
+
+jobs:
+  check-format:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run clang-format check
+        run: |
+          bash Scripts/CheckFormat.sh

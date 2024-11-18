@@ -20,3 +20,13 @@ std::unique_ptr<I3TApplication> initI3T()
 	app->init();
 	return app;
 }
+
+void ApplicationTest::SetUp()
+{
+	app = std::move(initI3T());
+}
+
+void ApplicationTest::TearDown()
+{
+	app->close();
+}

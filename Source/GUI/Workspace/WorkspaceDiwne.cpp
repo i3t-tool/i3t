@@ -1633,14 +1633,16 @@ void WorkspaceDiwne::setWorkAreaZoom(float val)
 	}
 }
 
-bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
+bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPinIndex, int rhsPinIndex)
 {
-	bool success = std::static_pointer_cast<CoreNodeWithPins>(rhs)->getInputs().at(rhsPin)->plug(
-	    std::static_pointer_cast<CoreNodeWithPins>(lhs)->getOutputs().at(lhsPin).get(), false);
+	auto input = std::static_pointer_cast<CoreNodeWithPins>(rhs)->getInputs().at(rhsPinIndex);
+	auto output = std::static_pointer_cast<CoreNodeWithPins>(lhs)->getOutputs().at(lhsPinIndex);
+
+	bool success = input->plug(output.get(), false);
 	if (!success)
 	{
 		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
-		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
+		         rhs->getNodebase()->getSignature(), lhsPinIndex, rhsPinIndex);
 	}
 	rhs->updateDataItemsWidth();
 	lhs->updateDataItemsWidth();

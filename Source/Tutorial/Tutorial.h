@@ -139,6 +139,9 @@ struct TutorialStep
 	std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
 	std::string m_scriptToRunWhenShown;
 
+	/// Fall back to true for now.
+	bool m_completed = true;
+
 	// todo
 	// maybe call task?
 	// tasks - ptrs to all task widgets
@@ -166,23 +169,24 @@ struct TutorialHeader
  * \brief Structure for holding information need for showing a specific
  * tutorial. Should be created by \fn TutorialLoader::loadFile() function.
  */
-struct Tutorial
+class Tutorial
 {
+public:
 	Tutorial(std::shared_ptr<TutorialHeader> header, std::vector<TutorialStep> steps,
 	         std::unordered_map<std::string, std::shared_ptr<GUIImage>> filenameToImageMap)
 	    : m_header(std::move(header)), m_steps(std::move(steps)), m_filenameToImage(std::move(filenameToImageMap))
 	{}
-	~Tutorial() = default;
+
+	// other properties
+	auto getStepCount() const
+	{
+		return m_steps.size();
+	}
+
 	// general
 	std::shared_ptr<TutorialHeader> m_header;
 	// step content
 	std::vector<TutorialStep> m_steps;
-	// support structures
-	std::unordered_map<std::string, std::shared_ptr<GUIImage>>
-	    m_filenameToImage; // filename to GUIImage (including GLuint id)
-	// other properties
-	int getStepCount() const
-	{
-		return m_steps.size();
-	}
+	/// support structures, filename to GUIImage (including GLuint id)
+	std::unordered_map<std::string, std::shared_ptr<GUIImage>> m_filenameToImage;
 };
