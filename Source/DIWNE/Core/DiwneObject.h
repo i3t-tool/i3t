@@ -81,7 +81,8 @@ public:
 	//
 
 	bool m_selectable{true};
-	bool m_isHeld{false};    /**< Is object held. When dragged it is still held. */
+	bool m_isHeld{false};    /**< Is object held. Requirement for dragging. When dragged it is still held. */
+
 	bool m_isDragged{false}; /**< Is object dragged */
 	bool m_selected{false};  /**< Is object selected */
 
@@ -95,6 +96,7 @@ public:
 	/**< Is object focused anywhere (and for example can not be focus other underlying object) */ // TODO: Rename to
 	                                                                                              // hover / Rework
 	bool m_hovered{false};
+	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
 
 	//
 	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
@@ -110,6 +112,11 @@ public:
 	// TODO: Active is marked true if this is the FIRST object that had m_inner_interaction_happen be true
 	bool m_isActive{false}; /**< Something happen with object */
 
+protected:
+	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
+						  ///< Can be set in the end() method to determine if object is hovered if applicable
+
+public:
 	/**
 	 * \param diwne is node editor object that this object belongs to
 	 * \param id used to identification
@@ -259,16 +266,32 @@ public:
 	virtual void setSelectable(bool const selectable);
 	virtual bool getSelectable();
 
+	// INTERACTION
+	// =============================================================================================================
+	// DiwneObject has a few built-in interactions that derived classes can react to.
+	// These are basic actions like the mouse hovering over the object or the object being pressed on.
+	//
+	// The interaction code consists of four methods.
+	// 1. The user method - A callback of sorts that gets triggered when a certain interaction occurs.
+	// 2. The trigger method - A method defining a condition that triggers the interaction.
+	// 3. The toggle method - A method determining whether the user method should be called or not.
+	// 4. Internal implementation method - The internal implementation using the methods above.
+	//
+	// All except the user method are implemented by default in the DiwneObject.
+
 	// Interaction user methods
 	// =============================================================================================================
 	// TODO: Rename to onXXX
 
 	virtual void onHover(DrawInfo& context);
 	//  virtual void processFocusedForInteraction(DrawInfo& context);
-	//	virtual void processDrag(DrawInfo& context);
-	//	virtual void processHold(DrawInfo& context);
-	//	virtual void processUnhold(DrawInfo& context);
-	//	virtual void processSelect(DrawInfo& context);
+	// TODO: refactor processDrag()
+	virtual void onDrag(DrawInfo& context, bool dragStart, bool dragEnd);
+	virtual void onPressed(bool justPressed, DrawInfo& context);
+	virtual void onReleased(bool justReleased, DrawInfo& context);
+	//	virtual void processHold(DrawInfo& context); // TODO: Remove
+	//	virtual void processUnhold(DrawInfo& context); // TODO: Remove
+	//	virtual void processSelect(DrawInfo& context); // TODO: Renamed to clicked and merge with unselect
 	//	virtual void processUnselect(DrawInfo& context);
 
 	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */
@@ -279,12 +302,12 @@ public:
 	virtual bool allowHover() const; // TODO: Rename focused to just "hover", gets triggered on mouseover
 
 	//	virtual bool allowProcessFocusedForInteraction();
-	//	virtual bool allowProcessHold();
+	virtual bool allowPress() const;
 	//	virtual bool allowProcessUnhold();
-	//	virtual bool allowProcessDrag();
-	//	virtual bool allowProcessSelect();
-	//	virtual bool allowProcessUnselect();
-	//	virtual bool allowProcessRaisePopup();
+	virtual bool allowDrag() const; // TODO: Refactor allowProcessDrag()
+	                                //	virtual bool allowProcessSelect();
+	                                //	virtual bool allowProcessUnselect();
+	                                //	virtual bool allowProcessRaisePopup();
 
 protected:
 	// Interaction internal processing methods
@@ -293,15 +316,15 @@ protected:
 	void processHoverDiwne(DrawInfo& context);
 
 	//	void processFocusedForInteractionDiwne(DrawInfo& context);
-	//	void processHoldDiwne(DrawInfo& context);
+	void processPressAndReleaseDiwne(DrawInfo& context);
 	//	void processUnholdDiwne(DrawInfo& context);
-	//	void processDragDiwne(FrameContext& context);
+	void processDragDiwne(DrawInfo& context);
 	//	void processSelectDiwne(FrameContext& context);
 	//	void processUnselectDiwne(FrameContext& context);
 
 	// =============================================================================================================
 
-	// Bypass methods
+	// Trigger methods (Formerly bypass methods)
 	// =============================================================================================================
 
 	// TODO: Refactor / Restructure
@@ -317,21 +340,25 @@ protected:
 	//   allowProcess - tests if the action is currently allowed in this state
 protected:
 	virtual bool isHoveredDiwne(); ///< Is mouse hovering over the object? Prerequisite for further interaction.
+	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
 
 public:
 	virtual bool bypassRaisePopupAction();          /**< action used for raising popup menu */
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
 	                                                 */
-	virtual bool bypassHoldAction();                /**< action used for holding object (check
-	                                                   only if object is not held)*/
-	virtual bool bypassUnholdAction();              /**< action used for unholding object
-	                                                   (check only if object is held)*/
+	virtual bool isPressedDiwne();                  /**< action used for holding object (check
+	                                                     only if object is not held)*/
+	virtual bool bypassPressAction();               // TODO: Remove probably
+	virtual bool bypassReleaseAction();             // TODO: Remove probably
 	virtual bool bypassSelectAction();              /**< action used for selecting object */
 	virtual bool bypassUnselectAction();            /**< action used for unselecting object */
-	virtual bool bypassDragAction();                /**< action used for dragging object */
 	virtual bool bypassTouchAction();               /**< action used for touching object - not interact with
 	                                                   it, just move it to front of other objects */
+
+	// =============================================================================================================
+	// END OF INTERACTION
+
 public:
 	inline DIWNE::ID const getId() const
 	{
@@ -386,6 +413,19 @@ public:
 
 	/// Whether input has been captured by an object previously and should not be reacted to anymore.
 	unsigned short inputConsumed{0};
+
+	/// Whether objects should not be hovered anymore
+	unsigned short hoverConsumed{0};
+
+	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// Active action idea, we have a descriptor for the current "action", it has a source
+	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
+	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
+
+	unsigned short dragging{0}; // TODO: Maybe change this to a varchar representing the active perpetual "action"
+	std::string source;         // TODO: If the above was changed, then this can be the source of the action
+	// TODO: Question then arises what if there are multiple active actions? Do we make those two above arrays? vectors?
+
 
 	DrawInfo findChange(const DrawInfo& other) const;
 

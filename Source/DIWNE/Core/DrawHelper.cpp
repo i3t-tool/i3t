@@ -442,11 +442,16 @@ void DrawHelper::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImCo
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 
+	// TODO: I commented the below code out, it was causing ImGui item / DiwneObject rect / Visual rect misalignment
+	//  Centering pins and labels will be separate task to be done later
+
 	// (PF) move Icon slightly lower to match the position of the text
 	// todo make it more robust for larger icons?
-	float h = ImGui::GetTextLineHeight();
-	float dh = h > size.y ? (h - size.y) / 2.0f : 0.0f;
-	const ImVec2 icon_min = ImGui::GetCursorScreenPos() + ImVec2(0, dh);
+	//	float h = ImGui::GetTextLineHeight();
+	//	float dh = h > size.y ? (h - size.y) / 2.0f : 0.0f;
+	//	const ImVec2 icon_min = ImGui::GetCursorScreenPos() + ImVec2(0, dh);
+
+	const ImVec2 icon_min = ImGui::GetCursorScreenPos();
 
 	// const ImVec2 icon_min = ImGui::GetCursorScreenPos();
 	const ImVec2 icon_max = icon_min + size;
@@ -524,6 +529,7 @@ void DrawHelper::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImCo
 		DrawIconTriangleDownLeft(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleDownRight:
+
 		DrawIconTriangleDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
 		break;
 	case GrabDownLeft:
@@ -563,6 +569,13 @@ void DrawHelper::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImCo
 		break;
 	}
 
-	ImGui::Dummy(size);
+//	ImGui::Dummy(size); // Better to use InvisibleButton
+	// We're making the InvisibleButton disabled so that when its pressed / dragged it does not set an ActiveID in ImGui
+	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
+	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
+	// TODO: Maybe it actually is desirable, I'm not sure yet, but at least I know how it all works now
+	ImGui::BeginDisabled(true);
+	ImGui::InvisibleButton("DiwneIcon", ImRect(icon_min, icon_max).GetSize());
+	ImGui::EndDisabled();
 }
 } // namespace DIWNE

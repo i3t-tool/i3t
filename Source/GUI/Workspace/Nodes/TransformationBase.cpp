@@ -116,8 +116,10 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 		I3T_ABORT("drawData: Unknown m_levelOfDetail");
 		inner_interaction_happen = drawDataFull();
 	}
-	if (inner_interaction_happen)
+	if (inner_interaction_happen) {
 		context.interacted++; // TODO: Probably pass context to drawData methods too
+		context.inputConsumed++;
+	}
 }
 
 void TransformationBase::end(DIWNE::DrawInfo& context)

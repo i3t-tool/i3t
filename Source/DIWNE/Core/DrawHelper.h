@@ -50,8 +50,6 @@ public:
 	// TODO: Maybe move the drawing methods into a class of some sort
 	//  IconDrawing is related to this as well, could be put under some kind of a Drawer/Renderer helper class
 
-	float zoom() const;
-
 	void AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness = 1.0f, bool ignoreZoom = false) const;
 
 	/**
@@ -191,6 +189,9 @@ public:
 
 	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+protected:
+	float zoom() const;
 };
 
 } // namespace DIWNE

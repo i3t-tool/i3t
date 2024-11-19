@@ -53,7 +53,7 @@ void Node::deleteActionDiwne()
 
 bool Node::allowDrawing()
 {
-	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne());
+	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne()) || m_isDragged;
 }
 
 void Node::begin(DrawInfo& context)
@@ -146,6 +146,15 @@ bool Node::setSelected(const bool selected)
 	}
 	return m_selected;
 }
+void Node::afterDrawDiwne(DrawInfo& context)
+{
+	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
+	// This needs to be done BEFORE processing interactions as the default implementation relies on ImGui::IsItemHovered
+	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne())); // TODO: Use m_rect instead
+	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getWorkAreaZoom());
+	m_internalHover = ImGui::IsItemHovered();
+	DiwneObject::afterDrawDiwne(context);
+}
 
 // TODO: (DR) process/processUnselect seem to always return true, what is the purpose of the return value?
 // bool Node::processSelect()
@@ -159,11 +168,10 @@ bool Node::setSelected(const bool selected)
 //	diwne.setNodesSelectionChanged(true);
 //	return true;
 //}
-
-// bool Node::processDrag()
-//{
-//	move(diwne.bypassGetMouseDelta() / diwne.getWorkAreaZoom());
-//	return true;
-// }
+void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
+{
+	DiwneObject::onDrag(context, dragStart, dragEnd);
+	move(diwne.bypassGetMouseDelta() / diwne.getWorkAreaZoom());
+}
 
 } /* namespace DIWNE */

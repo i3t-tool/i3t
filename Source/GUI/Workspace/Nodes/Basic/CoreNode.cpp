@@ -49,11 +49,11 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 // 	        -InputManager::m_mouseYDragDelta >
 // ImGui::GetIO().MouseDragThreshold);
 // }
-// bool WorkspaceNodeWithCoreData::bypassHoldAction()
+// bool WorkspaceNodeWithCoreData::bypassPressAction()
 // {
 // 	return InputManager::isActionTriggered("hold", EKeyState::Pressed);
 // }
-// bool WorkspaceNodeWithCoreData::bypassUnholdAction()
+// bool WorkspaceNodeWithCoreData::bypassReleaseAction()
 // {
 // 	return InputManager::isActionTriggered("hold", EKeyState::Released);
 // }

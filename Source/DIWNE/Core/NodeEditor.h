@@ -46,6 +46,7 @@ struct SettingsDiwne
 	float workAreaInitialZoom = 1;         /**< initial value of zoom */
 	float zoomWheelReverseSenzitivity = 8; /**< Higher number -> smaller change, can not be 0 */
 	float selectionRounding = 0;           /**< rounding od selection */
+	float mouseDragThreshold = 2.0f; //6.0 is ImGui default
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
 
@@ -109,6 +110,8 @@ public:
 	std::vector<std::shared_ptr<Workspace::CoreNode>> m_workspaceCoreNodes;
 	std::vector<std::shared_ptr<Link>> m_links;
 
+	std::shared_ptr<DrawInfo> m_prevContext;
+
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
 	bool m_popupDrawn{false};
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
@@ -123,11 +126,8 @@ public:
 
 	DiwneStyle m_style;
 
-#if DIWNE_DEBUG_ENABLED
-	bool m_diwneDebug = false;
-	bool m_diwneDebugExtra1 = false;
-	bool m_diwneDebugExtra2 = false;
-#endif
+	DIWNE_DEBUG_VARS()
+
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
 	                        //  this feature shouldn't be specific to our undo/redo system if it were to remain here
 protected:
@@ -204,6 +204,8 @@ public:
 	virtual bool bypassZoomAction();
 	virtual bool processZoom();
 	virtual bool processDiwneZoom();
+
+	bool isPressedDiwne() override;
 	bool allowHover() const override;
 
 	void updateLayout(DrawInfo& context) override;
@@ -211,10 +213,14 @@ public:
 	bool blockRaisePopup(); /**< sometimes we do not want to raise popup - here specify
 	                           it ( now it is when selecting action run ) */
 
-	//	bool processDrag() override;
+	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 	//
 	//	bool processInteractions() override;
 
+protected:
+	bool isDraggedDiwne() override;
+
+public:
 	void updateWorkAreaRectangles(); /** \brief Update position and size of work
 	                                    area on screen and on diwne */
 

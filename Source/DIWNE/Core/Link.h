@@ -30,7 +30,7 @@ public:
 	void initialize(DrawInfo& context) override;
 	void initializeDiwne(DrawInfo& context) override;
 	void begin(DrawInfo& context) override{}; /*!< link is not ImGui element - it is just picture of line */
-	void end(DrawInfo& context) override{};
+	void end(DrawInfo& context) override{}; ///< No need to set m_internalHover as we handle hovering differently
 	void content(DrawInfo& context) override;
 
 	DIWNE::DiwneAction getHoldActionType() const final

@@ -16,6 +16,7 @@
 #include "Core/Input/InputManager.h"
 
 #include "NodeEditor.h"
+#include "diwne_debug.h"
 
 #if DIWNE_DEBUG_ENABLED
 #include "Pin.h"
@@ -61,10 +62,35 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 		beginDiwne(context);
 		content(context);
 		endDiwne(context);
+		updateLayout(context);
 		afterDrawDiwne(context);
 		DIWNE_DEBUG((diwne), {
 			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
 			                               ImDrawFlags_RoundCornersNone, 1, true);
+		});
+		DIWNE_DEBUG_INTERACTIONS(diwne, {
+			ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Max.y);
+			if (dynamic_cast<DIWNE::NodeEditor*>(this))
+			{
+				originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+			}
+			else if (dynamic_cast<DIWNE::Pin*>(this))
+			{
+				originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
+			}
+			ImGui::GetForegroundDrawList()->AddText(diwne.diwne2screen(originPos) + ImVec2(0, ImGui::GetFontSize()),
+			                                        IM_COL32_WHITE,
+			                                        (std::string() + (m_hovered ? "Hovered\n" : "") +
+			                                         (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : ""))
+			                                            .c_str());
+			if (dynamic_cast<NodeEditor*>(this))
+			{
+				ImGui::GetForegroundDrawList()->AddText(
+				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() / 2, 0), IM_COL32_WHITE,
+				    (std::string() + (context.dragging ? "[Dragging (" + context.source + ")]" : "") +
+				     (context.inputConsumed ? " [Input Consumed]" : ""))
+				        .c_str());
+			}
 		});
 	}
 	finalizeDiwne(context);
@@ -220,6 +246,7 @@ void DiwneObject::beginDiwne(DrawInfo& context)
 void DiwneObject::endDiwne(DrawInfo& context)
 {
 	end(context);
+	updateLayout(context);
 }
 
 /**
@@ -227,7 +254,6 @@ void DiwneObject::endDiwne(DrawInfo& context)
  */
 void DiwneObject::afterDrawDiwne(DrawInfo& context)
 {
-	updateLayout(context);
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
@@ -255,11 +281,25 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	if (m_drawMode2 != DrawMode::Interacting)
 		return;
 
-	// TODO: Lets do hover and drag first
-	// 1. Are we in a position where we can receive input?
-	//    In other words, are we hovered?
-	//    TODO: and input hasn't been consumed?
+	if (ImGui::IsKeyDown(ImGuiKey_E))
+		int x = 5;
+
+	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.bypassIsMouseDragging0())
+	{
+		int x = 5;
+	}
+	if (diwne.bypassIsMouseDragging0())
+		int x = 5;
+	if (diwne.bypassIsMouseDragging2())
+		int x = 5;
+
+
+	if (ImGui::IsMouseClicked(0))
+		int x = 5;
+
 	processHoverDiwne(context);
+	processPressAndReleaseDiwne(context);
+	processDragDiwne(context);
 
 	//	bool interaction_happen = false;
 	//
@@ -320,6 +360,129 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//			                   ImDrawFlags_RoundCornersNone, 1, true);
 	//		};
 	//	});
+}
+
+void DiwneObject::processHoverDiwne(DrawInfo& context)
+{
+	bool hovered = isHoveredDiwne() && allowHover();
+	m_hovered = hovered && !context.hoverConsumed;
+	if (m_hovered)
+	{
+		onHover(context);
+		if (m_hoverRoot)
+			context.hoverConsumed++;
+	}
+	//	LOG_INFO("{} hovered: {}", m_labelDiwne, m_hovered);
+}
+
+void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
+{
+	bool wasPressed = m_isHeld;
+	m_isHeld = false;
+	if (context.inputConsumed)
+		return;
+	if (context.dragging && context.source != m_labelDiwne)
+		return;
+
+	m_isHeld = isPressedDiwne() && allowPress();
+	bool justPressed = !wasPressed && m_isHeld;
+	bool justReleased = wasPressed && !m_isHeld;
+
+	if (m_isHeld)
+	{
+		onPressed(justPressed, context);
+	}
+	else
+	{
+		onReleased(justReleased, context);
+		// m_isDragged = false; // TODO: Investigate, I don't think this is necessary, drag ignores this variable, its
+		// read
+		//   only essentially. This was the original diwne behaviour.
+
+		// TODO: When drag ends we should take a snap, this is drags responsibility tho probably
+	}
+}
+
+void DiwneObject::processDragDiwne(DrawInfo& context)
+{
+	bool isDragged = isDraggedDiwne();
+	bool dragStart = false;
+	bool dragEnd = false;
+	LOG_INFO("{} processDrag", m_labelDiwne);
+	if (context.dragging) // Check if something is being dragged
+	{
+		if (context.source == m_labelDiwne) // This object is being dragged
+		{
+			if (isDragged)
+			{
+				// Continue drag
+				m_isDragged = true;
+			}
+			else
+			{
+				// Drag key no longer pressed, stop drag
+				dragEnd = true;
+				m_isDragged = false;
+				context.dragging = false;
+				context.source = "";
+			}
+		}
+		else // Something else is being dragged
+		{
+			m_isDragged = false;
+		}
+	}
+	else // Nothing is being dragged, try start drag
+	{
+		m_isDragged = isDragged && allowDrag(); // TODO: Rename allowDrag to allowStartDrag?
+		if (m_isDragged)
+		{
+			dragStart = true;
+			context.dragging = true;
+			context.source = m_labelDiwne;
+		}
+	}
+	if (m_isDragged || dragEnd) // Dispatch user method
+	{
+		onDrag(context, dragStart, dragEnd);
+	}
+	// TODO: Figure this stuff out, m_isDrag already signals drag, this further signals what kind of drag (eg. whats
+	// being dragged, that is cross frame info that we need to store somewhere)
+	// diwne.setDiwneAction(getDragActionType());
+}
+
+bool DiwneObject::allowHover() const
+{
+	// TODO: Rename, decode what we're doing here, note that his function is fully overriden in node editor which
+	//  duplicates this code but changes the SelectionRect behaviour (which should to be changed)
+	/* object is active from previous frame */
+	/* only one object can be focused */
+	/* not stole focus from selecting action */
+	/* we want focus of other object while new link */
+
+	// TODO: We don't really want to do any complicated logic here, for now lets just return true and see if we can
+	//  restrict
+	//  hovering in some other way
+
+	return true;
+	//	bool ret =
+	//	    m_isActive ||
+	//	    (!diwne.m_objectFocused &&
+	//	     !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
+	//&& 	     (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink)); 	LOG_INFO("{} FOCUSED
+	// active: {}, focused: {}, actionActive: {}, action: {}, source: {}", (ret ? "YES" : "NO "), 	         m_isActive,
+	// diwne.m_objectFocused, EnumUtils::name(diwne.getDiwneActionActive()), EnumUtils::name(diwne.getDiwneAction()),
+	// m_labelDiwne) 	return ret;
+}
+
+bool DiwneObject::allowPress() const
+{
+	return m_hovered;
+}
+
+bool DiwneObject::allowDrag() const
+{
+	return m_isHeld;
 }
 
 void DiwneObject::setPosition(const ImVec2& position)
@@ -410,24 +573,22 @@ bool DiwneObject::bypassRaisePopupAction()
  */
 bool DiwneObject::isHoveredDiwne()
 {
-	return ImGui::IsItemHovered();
+	return m_internalHover;
 }
 
+// TODO: Rename and update docs
 /**
- * This
+ * you have to override this if your object is not ImGui item (like Link)
  * @return
  */
 bool DiwneObject::bypassFocusForInteractionAction()
 {
 	return isHoveredDiwne();
-} /* you have to override this if your object is not ImGui item (like Link) */
-bool DiwneObject::bypassHoldAction()
-{
-	return diwne.bypassIsMouseClicked0();
 }
-bool DiwneObject::bypassUnholdAction()
+bool DiwneObject::isPressedDiwne()
 {
-	return diwne.bypassIsMouseReleased0();
+	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
+	return diwne.bypassIsMouseDown0();
 }
 bool DiwneObject::bypassSelectAction()
 {
@@ -437,7 +598,7 @@ bool DiwneObject::bypassUnselectAction()
 {
 	return diwne.bypassIsMouseReleased0();
 }
-bool DiwneObject::bypassDragAction()
+bool DiwneObject::isDraggedDiwne()
 {
 	return diwne.bypassIsMouseDragging0();
 }
@@ -469,8 +630,12 @@ void DiwneObject::onHover(DrawInfo& context)
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
 	//  Maybe move this impl into node and make it purely virtual?
-	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
+	//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+	//	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
+	//	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+	//	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+	// TODO: Remove later, temporarily use a bright color for hover
+	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 150),
 	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 
@@ -479,32 +644,7 @@ void DiwneObject::onHover(DrawInfo& context)
 		                               DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
 	});
 }
-bool DiwneObject::allowHover() const
-{
-	// TODO: Rename, decode what we're doing here, note that his function is fully overriden in node editor which
-	//  duplicates this code but changes the SelectionRect behaviour (which should to be changed)
-	/* object is active from previous frame */
-	/* only one object can be focused */
-	/* not stole focus from selecting action */
-	/* we want focus of other object while new link */
-	bool ret =
-	    m_isActive ||
-	    (!diwne.m_objectFocused &&
-	     !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) &&
-	     (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink));
-	LOG_INFO("{} FOCUSED active: {}, focused: {}, actionActive: {}, action: {}, source: {}", (ret ? "YES" : "NO "),
-	         m_isActive, diwne.m_objectFocused, EnumUtils::name(diwne.getDiwneActionActive()),
-	         EnumUtils::name(diwne.getDiwneAction()), m_labelDiwne)
-	return ret;
-}
 
-void DiwneObject::processHoverDiwne(DrawInfo& context)
-{
-	m_hovered = isHoveredDiwne() && allowHover();
-	if (m_hovered)
-		onHover(context);
-	LOG_INFO("{} hovered: {}", m_labelDiwne, m_hovered);
-}
 
 // void DiwneObject::processFocusedForInteraction(DrawInfo& context)
 //{
@@ -542,63 +682,61 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 //	}
 // }
 //
-// void DiwneObject::processHold(DrawInfo& context)
-//{
-//	context.interacted = true;
-// }
-// bool DiwneObject::allowProcessHold()
-//{
-//	return m_focusedForInteraction;
-// }
-// void DiwneObject::processHoldDiwne(DrawInfo& context)
-//{
-//	if (bypassHoldAction() && allowProcessHold())
-//	{
-//		m_isHeld = true;
-//		return processHold(context);
-//	}
-// }
-//
-// void DiwneObject::processUnhold(DrawInfo& context)
-//{
-//	context.interacted = true;
-// }
-// bool DiwneObject::allowProcessUnhold()
-//{
-//	return true;
-// }
-// void DiwneObject::processUnholdDiwne(DrawInfo& context)
-//{
-//	if (bypassUnholdAction() && allowProcessUnhold())
-//	{
-//		m_isHeld = false;
-//		if (m_isDragged)
-//		{
-//			diwne.m_takeSnap = true;
-//		}
-//		m_isDragged = false;
-//		return processUnhold(context);
-//	}
-// }
-//
-// void DiwneObject::processDrag(DrawInfo& context)
-//{
-//	context.interacted = true;
-// }
-// bool DiwneObject::allowProcessDrag()
-//{
-//	return m_isHeld;
-// }
-// void DiwneObject::processDragDiwne(DrawInfo& context)
-//{
-//	if (bypassDragAction() && allowProcessDrag())
-//	{
-//		m_isDragged = true;
-//		diwne.setDiwneAction(getDragActionType());
-//		return processDrag(context);
-//	}
-// }
-//
+void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
+{
+	context.interacted = true;
+	DIWNE_DEBUG_INTERACTIONS(diwne, {
+		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+		                               DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
+		if (justPressed)
+		{
+			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			                                     DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
+		}
+	});
+	//	Debug::debugRect(this->m_rect, ImColor(0, 255, 0, 50), diwne);
+}
+void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
+{
+	context.interacted = true;
+	DIWNE_DEBUG_INTERACTIONS(diwne, {
+		if (justReleased)
+		{
+			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			                                     DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
+		}
+	});
+	//	Debug::debugRect(this->m_rect, ImColor(255, 0, 0, 50), diwne);
+}
+void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
+{
+	context.interacted = true;
+
+	DIWNE_DEBUG_INTERACTIONS(diwne, {
+		if (dragStart)
+		{
+			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			                                     DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone);
+		}
+		if (dragEnd)
+		{
+			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			                                     DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
+		}
+		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+		                               DIWNE_CYAN_50, 0, ImDrawFlags_RoundCornersNone, 2);
+	});
+}
+
+bool DiwneObject::bypassPressAction()
+{
+	return false;
+}
+bool DiwneObject::bypassReleaseAction()
+{
+	return false;
+}
+
 // void DiwneObject::processSelect(DrawInfo& context)
 //{
 //	context.interacted = true;
@@ -616,27 +754,27 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 //	return false;
 // }
 //
-// void DiwneObject::processUnselect(DrawInfo& context)
+//  void DiwneObject::processUnselect(DrawInfo& context)
 //{
 //	return true;
-// }
-// bool DiwneObject::allowProcessUnselect()
+//  }
+//  bool DiwneObject::allowProcessUnselect()
 //{
 //	return m_isHeld && !m_isDragged;
-// }
-// void DiwneObject::processUnselectDiwne(DrawInfo& context)
+//  }
+//  void DiwneObject::processUnselectDiwne(DrawInfo& context)
 //{
 //	if (bypassUnselectAction() && allowProcessUnselect())
 //	{
 //		setSelected(false);
 //	}
-// }
+//  }
 //
-// bool DiwneObject::allowProcessRaisePopup()
+//  bool DiwneObject::allowProcessRaisePopup()
 //{
 //	return !diwne.blockRaisePopup();
-// }
-// void DiwneObject::processRaisePopupDiwne(DrawInfo& context)
+//  }
+//  void DiwneObject::processRaisePopupDiwne(DrawInfo& context)
 //{
 //	if (bypassRaisePopupAction() && allowProcessRaisePopup())
 //	{
@@ -645,9 +783,9 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 //		return true;
 //	}
 //	return false;
-// }
+//  }
 //
-// void DiwneObject::processShowPopupDiwne(DrawInfo& context)
+//  void DiwneObject::processShowPopupDiwne(DrawInfo& context)
 //{
 //	if (diwne.m_popupDrawn)
 //	{
@@ -660,10 +798,10 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 //		diwne.applyZoomScaling();
 //		return diwne.m_popupDrawn;
 //	}
-// }
+//  }
 //
 //
-// void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
+//  void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
 //{
 //	if (!diwne.m_tooltipDrawn)
 //	{
@@ -672,5 +810,5 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 //		ImGui::TextColored(color, label.c_str());
 //		ImGui::EndTooltip();
 //	}
-// }
+//  }
 } /* namespace DIWNE */

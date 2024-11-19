@@ -90,8 +90,8 @@ public:
 	//  overrides out for the time being
 
 	// bool bypassDragAction();
-	// bool bypassHoldAction();
-	// bool bypassUnholdAction();
+	// bool bypassPressAction();
+	// bool bypassReleaseAction();
 	// bool bypassSelectAction();
 	// bool bypassUnselectAction();
 	// bool bypassTouchAction();

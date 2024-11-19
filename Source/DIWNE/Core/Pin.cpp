@@ -33,6 +33,7 @@ void Pin::end(DrawInfo& context)
 {
 	ImGui::EndGroup();
 	ImGui::PopID();
+	m_internalHover = ImGui::IsItemHovered();
 }
 
 void Pin::updateLayout(DrawInfo& context)

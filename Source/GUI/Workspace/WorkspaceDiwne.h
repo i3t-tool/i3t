@@ -263,9 +263,6 @@ public:
 	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
 
 	bool bypassZoomAction() override;
-	bool bypassDragAction() override;
-	bool bypassHoldAction() override;
-	bool bypassUnholdAction() override;
 
 	bool processZoom() override;
 

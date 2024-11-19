@@ -12,37 +12,61 @@
 
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imgui_internal.h"
+
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
 #include <GLFW/glfw3.h>
 
-#include "Core/NodeEditor.h"
-#include "Basic/BasicNode.h"
+//#include "Core/NodeEditor.h"
+//#include "Basic/BasicNode.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-DIWNE::SettingsDiwne settings;
-std::shared_ptr<DIWNE::NodeEditor> editor;
-std::shared_ptr<DIWNE::BasicNode> node;
+//DIWNE::SettingsDiwne settings;
+//std::shared_ptr<DIWNE::NodeEditor> editor;
+//std::shared_ptr<DIWNE::BasicNode> node;
 
 void diwneInit()
 {
-	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
-	node = std::make_shared<DIWNE::BasicNode>(*editor, "Node 1");
-	editor->addNode(node, ImVec2(200, 200));
+//	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
+//	node = std::make_shared<DIWNE::BasicNode>(*editor, "Node 1");
+//	editor->addNode(node, ImVec2(200, 200));
+}
+
+void buttonHoverTest()
+{
+	if (ImGui::IsKeyDown(ImGuiKey_E))
+		int x = 5;
+	ImGui::Dummy(ImVec2(50, 50));
+	std::cout << ImGui::IsItemHovered() << ",";
+	ImGui::Button("test", ImVec2(50, 50));
+	std::cout << ImGui::IsItemHovered() << ",";
+	ImGui::BeginDisabled(true);
+	ImGui::InvisibleButton("test2", ImVec2(50, 50));
+	ImGui::EndDisabled();
+	std::cout << ImGui::IsItemHovered() << ",";
+	ImGui::SetCursorPos(ImVec2(0, 0));
+	ImGui::Button("blocker", ImVec2(100, 200));
+	std::cout << ImGui::IsItemHovered();
+	std::cout << std::endl << std::endl;
 }
 
 void diwneWindow()
 {
 	ImGui::Begin("DIWNE example");
-	editor->draw();
+
+	buttonHoverTest();
+
+//	editor->draw();
 	ImGui::End();
 }
 

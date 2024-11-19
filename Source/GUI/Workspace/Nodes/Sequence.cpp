@@ -301,8 +301,8 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		{
 			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom());
 			ImGui::SameLine();
-			// TODO: (DR) Can we implement this without calling bypassUnholdAction? (Could then make those protected)
-			if (dragedNode->bypassUnholdAction())
+			// TODO: (DR) Can we implement this without calling bypassReleaseAction? (Could then make those protected)
+			if (dragedNode->bypassReleaseAction())
 			{
 				push_index = i;
 			}
@@ -338,7 +338,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		                 ? I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom()
 		                 : I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom() /
 		                       2); /* smaller dummy if dragged node is not over Sequence */
-		if (dragedNode && dragedNode->bypassUnholdAction() && position_of_draged_node_in_sequence >= 0)
+		if (dragedNode && dragedNode->bypassReleaseAction() && position_of_draged_node_in_sequence >= 0)
 		{
 			push_index = i;
 		}

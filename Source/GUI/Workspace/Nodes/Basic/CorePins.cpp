@@ -184,7 +184,7 @@ bool CorePin::isConnected() const
 //	{
 //	case Core::ENodePlugResult::Ok:
 //		diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
-//		if (bypassUnholdAction())
+//		if (bypassReleaseAction())
 //		{
 //			CoreInPin* in = dynamic_cast<CoreInPin*>(input);
 //			in->plug(dynamic_cast<CoreOutPin*>(output));

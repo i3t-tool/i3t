@@ -43,6 +43,7 @@ enum DrawModeNodePosition
 class Node : public DiwneObject
 {
 protected:
+	// TODO: Use m_rect instead
 	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
 	DrawModeNodePosition m_nodePosMode{OnItsPosition};
@@ -82,6 +83,10 @@ public:
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
 
+protected:
+	void afterDrawDiwne(DrawInfo& context) override;
+
+public:
 	bool allowDrawing() override;
 
 	// TODO: Do we really need a "special" method for drawing nodes? Kinda makes inheritance pointless
@@ -121,7 +126,7 @@ public:
 	//	bool processSelect() override;
 	//	bool processUnselect() override;
 	//
-	//	bool processDrag() override;
+	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 
 	void setNodePositionDiwne(ImVec2 const& position)
 	{

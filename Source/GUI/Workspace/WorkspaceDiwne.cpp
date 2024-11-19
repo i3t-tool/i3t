@@ -1595,18 +1595,20 @@ bool WorkspaceDiwne::bypassZoomAction()
 {
 	return InputManager::isAxisActive("scroll") != 0;
 }
-bool WorkspaceDiwne::bypassDragAction()
-{
-	return InputManager::isAxisActive("pan") != 0;
-}
-bool WorkspaceDiwne::bypassHoldAction()
-{
-	return InputManager::isAxisActive("pan") != 0;
-}
-bool WorkspaceDiwne::bypassUnholdAction()
-{
-	return InputManager::isAxisActive("pan") == 0;
-}
+
+// TODO: Reintroduce overriding of inputs
+//bool WorkspaceDiwne::isDraggedDiwne()
+//{
+//	return InputManager::isAxisActive("pan") != 0;
+//}
+//bool WorkspaceDiwne::bypassPressAction()
+//{
+//	return InputManager::isAxisActive("pan") != 0;
+//}
+//bool WorkspaceDiwne::bypassReleaseAction()
+//{
+//	return InputManager::isAxisActive("pan") == 0;
+//}
 
 bool WorkspaceDiwne::bypassSelectionRectangleAction()
 {

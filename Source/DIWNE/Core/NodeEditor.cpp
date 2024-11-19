@@ -39,7 +39,15 @@ NodeEditor::~NodeEditor()
 
 void NodeEditor::draw(DrawMode drawMode)
 {
-	DiwneObject::draw(drawMode);
+	DrawInfo context(drawMode);
+	if (m_prevContext)
+	{
+		// Infer context from previous frame
+		context.dragging = m_prevContext->dragging;
+		context.source = m_prevContext->source;
+	}
+	drawDiwne(context);
+	m_prevContext = std::make_shared<DrawInfo>(std::move(context));
 }
 
 void NodeEditor::initializeDiwne(DrawInfo& context)
@@ -216,9 +224,17 @@ void NodeEditor::end(DrawInfo& context)
 
 	diwne.restoreZoomScaling();
 
-	// TODO: This doesnt work anymore in newer ImGui versions, a dummy needs to be added
+	// TODO: This doesnt work anymore in newer ImGui versions, a dummy needs to be added (I am not sure on that anymore)
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
 	ImGui::EndGroup();
+	m_internalHover = ImGui::IsItemHovered();
+	// TODO: NodeEditor is hovered even when another active item like a DragFloat within a node is dragged.
+	//  This is because the actual node editor does not have an InvisibleButton or other interactive item "behind" it,
+	//  representing it. The EndGroup call does not change ActiveId and thus it gets hovered even when there is an
+	//  active item. This does not happen to nodes, since those add an interactive InvisibleButton after EndGroup in the
+	//  afterDraw method. I am not sure what the desired behaviour here is.
+	//  I suppose there is no problem in making NodeEditor behave like a Node
+	//  (that would be required anyway for the ultimate test of a node editor inside a node editor)
 	ImGui::PopID();
 	ImGui::EndChild();
 }
@@ -265,12 +281,14 @@ void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 
 bool NodeEditor::allowHover() const
 {
-	return m_isActive /* object is active from previous frame */
-	       ||
-	       (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) ||
-	       (!diwne.m_objectFocused /* only one object can be focused */
-	        && (diwne.getDiwneAction() == None ||
-	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
+	return true; // TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<
+	             //	return m_isActive /* object is active from previous frame */
+	             //	       ||
+	//	       (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
+	//||
+	//	       (!diwne.m_objectFocused /* only one object can be focused */
+	//	        && (diwne.getDiwneAction() == None ||
+	//	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
 // bool NodeEditor::processInteractions()
@@ -375,11 +393,23 @@ bool NodeEditor::processDiwneSelectionRectangle()
 	return false;
 }
 
-// bool NodeEditor::processDrag()
-//{
-//	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
-//	return true;
-// }
+void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
+{
+	DiwneObject::onDrag(context, dragStart, dragEnd);
+	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
+}
+
+bool NodeEditor::isPressedDiwne()
+{
+	// To allow drag using middle mouse button
+	return DiwneObject::isPressedDiwne() || bypassIsMouseDown2();
+}
+
+bool NodeEditor::isDraggedDiwne()
+{
+	// Drag also using middle mouse button
+	return DiwneObject::isDraggedDiwne() || bypassIsMouseDragging2();
+}
 
 bool NodeEditor::processZoom()
 {
@@ -560,15 +590,15 @@ bool NodeEditor::bypassIsItemActive()
 }
 bool NodeEditor::bypassIsMouseDragging0()
 {
-	return ImGui::IsMouseDragging(0);
+	return ImGui::IsMouseDragging(0, mp_settingsDiwne->mouseDragThreshold);
 }
 bool NodeEditor::bypassIsMouseDragging1()
 {
-	return ImGui::IsMouseDragging(1);
+	return ImGui::IsMouseDragging(1, mp_settingsDiwne->mouseDragThreshold);
 }
 bool NodeEditor::bypassIsMouseDragging2()
 {
-	return ImGui::IsMouseDragging(2);
+	return ImGui::IsMouseDragging(2, mp_settingsDiwne->mouseDragThreshold);
 }
 ImVec2 NodeEditor::bypassGetMouseDragDelta0()
 {
@@ -757,10 +787,8 @@ void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2
 		node->move(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
 	}
 
-	LOG_INFO("ADDED NODE {}, {}", node->m_labelDiwne, this->m_workspaceCoreNodes.size());
 	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
 	m_workspaceCoreNodes.push_back(node);
 	this->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
-
 } /* namespace DIWNE */
