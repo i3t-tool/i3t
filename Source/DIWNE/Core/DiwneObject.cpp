@@ -16,7 +16,6 @@
 #include "Core/Input/InputManager.h"
 
 #include "NodeEditor.h"
-#include "diwne_debug.h"
 
 #if DIWNE_DEBUG_ENABLED
 #include "Pin.h"
@@ -377,16 +376,21 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 
 void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 {
-	bool wasPressed = m_isHeld;
-	m_isHeld = false;
 	if (context.inputConsumed)
 		return;
 	if (context.dragging && context.source != m_labelDiwne)
 		return;
 
-	m_isHeld = isPressedDiwne() && allowPress();
-	bool justPressed = !wasPressed && m_isHeld;
-	bool justReleased = wasPressed && !m_isHeld;
+	bool wasPressed = m_isHeld;
+	bool pressed = isPressedDiwne() && allowPress();
+	bool justPressed = isJustPressedDiwne() && pressed;
+	bool justReleased = wasPressed && !pressed;
+
+	if (wasPressed) {
+		m_isHeld = pressed;
+	} else {
+		m_isHeld = pressed && justPressed; // Require immediate key press to begin press cycle
+	}
 
 	if (m_isHeld)
 	{
@@ -587,9 +591,14 @@ bool DiwneObject::bypassFocusForInteractionAction()
 }
 bool DiwneObject::isPressedDiwne()
 {
-	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
 	return diwne.bypassIsMouseDown0();
 }
+bool DiwneObject::isJustPressedDiwne()
+{
+	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
+	return diwne.bypassIsMouseClicked0();
+}
+
 bool DiwneObject::bypassSelectAction()
 {
 	return diwne.bypassIsMouseReleased0();

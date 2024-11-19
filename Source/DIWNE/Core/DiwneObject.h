@@ -347,8 +347,25 @@ public:
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
 	                                                 */
-	virtual bool isPressedDiwne();                  /**< action used for holding object (check
-	                                                     only if object is not held)*/
+
+	/**
+	 * Determine whether a key is pressed down over the object.
+	 * While the key is down this method should return true until the key is released.
+	 * When this method returns true and other conditions are met (hovered, press allowed), the member pressed flag
+	 * is set to true and onPress() method is called. If multiple keys make this method return true it is necessary
+	 * to distinguish between them later in the implementation if different functionality for each key is desired.
+	 * @see When overriding also modify isJustPressedDiwne()
+	 */
+	virtual bool isPressedDiwne();
+
+	/**
+	 * Determine whether a key was just pressed. For the press action to be carried out this method must return
+	 * true at least once during the key press and release cycle. This method is needed to avoid starting the press and
+	 * release cycle when the key was not pressed initially over this object (Dragging pressed mouse over the object).
+	 * @see isPressedDiwne()
+	 */
+	virtual bool isJustPressedDiwne();
+
 	virtual bool bypassPressAction();               // TODO: Remove probably
 	virtual bool bypassReleaseAction();             // TODO: Remove probably
 	virtual bool bypassSelectAction();              /**< action used for selecting object */

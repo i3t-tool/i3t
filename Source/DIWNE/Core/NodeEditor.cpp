@@ -405,10 +405,17 @@ bool NodeEditor::isPressedDiwne()
 	return DiwneObject::isPressedDiwne() || bypassIsMouseDown2();
 }
 
+bool NodeEditor::isJustPressedDiwne()
+{
+	// To allow drag using middle mouse button
+	return DiwneObject::isJustPressedDiwne() || bypassIsMouseClicked2();
+}
+
 bool NodeEditor::isDraggedDiwne()
 {
 	// Drag also using middle mouse button
-	return DiwneObject::isDraggedDiwne() || bypassIsMouseDragging2();
+	return bypassIsMouseDragging2();
+	// TODO: Allow default LMB drag for selection rectangle
 }
 
 bool NodeEditor::processZoom()

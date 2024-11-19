@@ -206,6 +206,7 @@ public:
 	virtual bool processDiwneZoom();
 
 	bool isPressedDiwne() override;
+	bool isJustPressedDiwne() override;
 	bool allowHover() const override;
 
 	void updateLayout(DrawInfo& context) override;
