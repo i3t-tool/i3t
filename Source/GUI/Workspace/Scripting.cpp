@@ -113,6 +113,69 @@ static auto getWorkspaceNodes()
 
 //----------------------------------------------------------------------------//
 
+static bool plug(Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to)
+{
+	return connectNodesNoSave(self, other, from, to);
+}
+
+static bool unplug_input(Ptr<GuiOperator> self, int inputIndex)
+{
+	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
+	{
+		if (node->getInputs().size() <= inputIndex)
+		{
+			print(fmt::format("No such input index {}", inputIndex));
+			return false;
+		}
+
+		if (node->getInputs()[inputIndex]->isConnected())
+		{
+			node->getInputs()[inputIndex]->unplug();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+static bool unplug_output(Ptr<GuiOperator> self, int outputIndex)
+{
+	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
+	{
+		if (node->getOutputs().size() <= outputIndex)
+		{
+			print(fmt::format("No such output index {}", outputIndex));
+			return false;
+		}
+
+		const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
+		std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
+		for (const auto& outputPin : self->getNodebase()->getOutputPins())
+		{
+			for (const auto inputPin : outputPin.getOutComponents())
+			{
+				if (auto maybeNode = Workspace::Tools::findNodeById(nodes, inputPin->Owner.getId()))
+				{
+					auto nodeWithPin = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(*maybeNode);
+					toUnplug.push_back({nodeWithPin, inputPin->Index});
+				}
+			}
+		}
+
+		for (const auto& [childNode, inputIndex] : toUnplug)
+		{
+			childNode->getInputs()[inputIndex]->unplug();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+//----------------------------------------------------------------------------//
+
 LUA_REGISTRATION
 {
 	// clang-format off
@@ -122,77 +185,26 @@ LUA_REGISTRATION
 		    return self->getNodebase()->getOperation()->keyWord;
 	    },
 	    "get_position", &GuiNode::getNodePositionDiwne,
-	    "set_position", &GuiNode::setNodePositionDiwne
+	    "set_position", &GuiNode::setNodePositionDiwne,
+		// getters
+		"get_float", &getValue<float>,
+		"get_vec3", &getValue<glm::vec3>,
+		"get_vec4", &getValue<glm::vec4>,
+		"get_mat4", &getValue<glm::mat4>,
+		// setters
+		"set_value", sol::overload(
+			&setValue<float>,
+			&setValue<glm::vec3>,
+			&setValue<glm::vec4>
+		),
+		// inputs/outputs
+		"plug", plug,
+		"unplug_input", unplug_input,
+		"unplug_output", unplug_output
 	);
 
 	L.new_usertype<GuiOperator>(
 	    "Operator",
-	    sol::base_classes, sol::bases<GuiNode>(),
-	    // getters
-	    "get_float", &getValue<float>,
-	    "get_vec3", &getValue<glm::vec3>,
-	    "get_vec4", &getValue<glm::vec4>,
-	    "get_mat4", &getValue<glm::mat4>,
-	    // setters
-	    "set_float", &setValue<float>,
-	    "set_vec3", &setValue<glm::vec3>,
-	    "set_vec4", &setValue<glm::vec4>,
-	    // inputs/outputs
-	    "plug", [](Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to) -> bool {
-		    return connectNodesNoSave(self, other, from, to);
-	    },
-	    "unplug_input", [&](Ptr<GuiOperator> self, int inputIndex) -> bool {
-		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
-		    {
-			    if (node->getInputs().size() <= inputIndex)
-			    {
-				    print(fmt::format("No such input index {}", inputIndex));
-				    return false;
-			    }
-
-			    if (node->getInputs()[inputIndex]->isConnected())
-			    {
-				    node->getInputs()[inputIndex]->unplug();
-			    }
-
-			    return true;
-		    }
-
-			return false;
-	    },
-	    "unplug_output", [&](Ptr<GuiOperator> self, int outputIndex) {
-		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
-		    {
-			    if (node->getOutputs().size() <= outputIndex)
-			    {
-				    print(fmt::format("No such output index {}", outputIndex));
-				    return false;
-			    }
-
-			    const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
-			    std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
-			    for (const auto& outputPin : self->getNodebase()->getOutputPins())
-			    {
-				    for (const auto inputPin : outputPin.getOutComponents())
-				    {
-					    if (auto maybeNode = Workspace::Tools::findNodeById(nodes, inputPin->Owner.getId()))
-					    {
-						    auto nodeWithPin = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(*maybeNode);
-						    toUnplug.push_back({nodeWithPin, inputPin->Index});
-					    }
-				    }
-			    }
-
-			    for (const auto& [childNode, inputIndex] : toUnplug)
-			    {
-				    childNode->getInputs()[inputIndex]->unplug();
-			    }
-
-			    return true;
-		    }
-
-			return false;
-	    },
 	    sol::meta_function::construct, [](const std::string& type) -> Ptr<GuiOperator> {
 		    const auto maybeType = EnumUtils::value<Core::EOperatorType>(type);
 		    if (!maybeType.has_value())

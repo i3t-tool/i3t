@@ -204,6 +204,9 @@ void ScriptingModule::onClose()
 {
 	// Destroy timers before the workspace, because of weird DINWE nodes ownership issues.
 	m_chronos = {};
+
+	// Destroy the Lua state to ensure that all workspace node will be destroyed along with their Lua objects.
+	m_Lua = {};
 }
 
 bool ScriptingModule::runScript(const char* luaSource)

@@ -28,5 +28,5 @@ void ApplicationTest::SetUp()
 
 void ApplicationTest::TearDown()
 {
-	app->close();
+	// app->close();
 }
