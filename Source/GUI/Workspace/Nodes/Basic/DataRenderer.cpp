@@ -57,7 +57,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int con
 	    ImGui::DragFloat(label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 	                     1.0f); /* if power >1.0f the number changes logarithmic */
 
-	if (diwne.bypassIsItemActive())
+	if (diwne.bypassIsItemActive()) // TODO: This seems odd, why in the world would we override IsItemActive??
 		inner_interaction_happen = true;
 
 	if (!inactive && !diwne.m_popupDrawn)

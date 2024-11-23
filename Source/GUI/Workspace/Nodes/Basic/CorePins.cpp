@@ -116,7 +116,7 @@ void CorePin::popupContent(DIWNE::DrawInfo& context) {}
 
 bool CorePin::bypassFocusForInteractionAction()
 {
-	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
+	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
 }
 
 const Core::Pin& CorePin::getCorePin() const

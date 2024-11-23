@@ -17,6 +17,7 @@
 #include "DiwneObject.h"
 #include "DiwneStyle.h"
 #include "DrawHelper.h"
+#include "Input/NodeEditorInputAdapter.h"
 
 // TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 namespace Workspace
@@ -46,7 +47,7 @@ struct SettingsDiwne
 	float workAreaInitialZoom = 1;         /**< initial value of zoom */
 	float zoomWheelReverseSenzitivity = 8; /**< Higher number -> smaller change, can not be 0 */
 	float selectionRounding = 0;           /**< rounding od selection */
-	float mouseDragThreshold = 2.0f; //6.0 is ImGui default
+	float mouseDragThreshold = 2.0f;       // 6.0 is ImGui default
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
 
@@ -130,6 +131,9 @@ public:
 
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
 	                        //  this feature shouldn't be specific to our undo/redo system if it were to remain here
+
+	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(this);
+
 protected:
 	// TODO: Review if we could keep DiwneAction info in Context?
 	//  Really begs the question where are we okay to use diwne member variables
@@ -146,8 +150,8 @@ protected:
 
 	bool m_nodesSelectionChanged{false};
 
+	// TODO: Could be moved into Actions::SelectionRectData
 	ImRect m_selectionRectangeDiwne{0, 0, 0, 0};
-	ImColor m_selectionRectangeTouchColor, m_selectionRectangeFullColor;
 
 protected:
 	ImRect m_workAreaScreen; ///< Rectangle of work area on screen
@@ -215,8 +219,8 @@ public:
 	                           it ( now it is when selecting action run ) */
 
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
-	//
-	//	bool processInteractions() override;
+
+	void processInteractionsDiwne(DrawInfo& context) override;
 
 protected:
 	bool isDraggedDiwne() override;
@@ -342,42 +346,16 @@ public:
 
 	// TODO: Probably move all input related stuff into some kind of InputAdapter
 	//  Similarly another class should handle styling
-	virtual bool bypassIsItemClicked0();
-	virtual bool bypassIsItemClicked1();
-	virtual bool bypassIsItemClicked2();
-	virtual bool bypassIsMouseDown0();
-	virtual bool bypassIsMouseDown1();
-	virtual bool bypassIsMouseDown2();
-	virtual ImVec2 bypassMouseClickedPos0();
-	virtual ImVec2 bypassMouseClickedPos1();
-	virtual ImVec2 bypassMouseClickedPos2();
-	virtual bool bypassIsMouseClicked0();
-	virtual bool bypassIsMouseClicked1();
-	virtual bool bypassIsMouseClicked2();
-	virtual bool bypassIsMouseReleased0();
-	virtual bool bypassIsMouseReleased1();
-	virtual bool bypassIsMouseReleased2();
-	virtual bool bypassIsItemActive();
-	virtual bool bypassIsMouseDragging0();
-	virtual bool bypassIsMouseDragging1();
-	virtual bool bypassIsMouseDragging2();
-	virtual ImVec2 bypassGetMouseDragDelta0();
-	virtual ImVec2 bypassGetMouseDragDelta1();
-	virtual ImVec2 bypassGetMouseDragDelta2();
-	virtual ImVec2 bypassGetMouseDelta();
-	virtual ImVec2 bypassGetMousePos();
-	virtual float bypassGetMouseWheel();
 	virtual float bypassGetZoomDelta();
+
+	virtual bool bypassIsItemActive(); // TODO: Remove this is dumb
 
 	virtual bool bypassDiwneSetPopupPositionAction();
 	virtual ImVec2 bypassDiwneGetPopupNewPositionAction();
 
-	virtual bool allowProcessSelectionRectangle();
-	virtual bool bypassSelectionRectangleAction();
+	// TODO: These methods might not actually be necessary (handled in onDrag / InputAdapter)
+	// Selection rectangle
 	ImRect getSelectionRectangleDiwne();
-	virtual ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
-	virtual ImVec2 bypassDiwneGetSelectionRectangleSize();
-	virtual bool processDiwneSelectionRectangle();
 
 	////////////////////////////////////////////
 	// ZOOM SCALING

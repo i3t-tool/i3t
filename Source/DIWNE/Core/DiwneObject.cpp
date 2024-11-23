@@ -52,12 +52,14 @@ DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)
 void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 {
 	m_drawMode2 = mode;
+	m_drawnThisFrame = false;
 
 	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
 
 	initializeDiwne(context);
 	if (allowDrawing())
 	{
+		m_drawnThisFrame = true;
 		beginDiwne(context);
 		content(context);
 		endDiwne(context);
@@ -85,8 +87,14 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			if (dynamic_cast<NodeEditor*>(this))
 			{
 				ImGui::GetForegroundDrawList()->AddText(
-				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() / 2, 0), IM_COL32_WHITE,
-				    (std::string() + (context.dragging ? "[Dragging (" + context.source + ")]" : "") +
+				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.2, 0), IM_COL32_WHITE,
+				    (std::string() + (context.dragging ? "[Dragging (" + context.dragSource + ")]" : "") +
+				     (!context.action.empty()
+				          ? "[" + context.action + " (" + context.actionSource +
+				                (context.actionData.has_value() ? std::string(", ") + context.actionData.type().name()
+				                                                : "") +
+				                ")]"
+				          : "") +
 				     (context.inputConsumed ? " [Input Consumed]" : ""))
 				        .c_str());
 			}
@@ -261,6 +269,13 @@ void DiwneObject::afterDraw(DrawInfo& context){};
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
 {
+	if (!m_drawnThisFrame && context.dragging && context.dragSource == m_labelDiwne)
+	{
+		// Ensure dragging stops if the source isn't drawn
+		I3T_ASSERT(false, "Drag operation wasn't ended properly!");
+		context.dragging = false;
+		context.dragSource.clear();
+	}
 	finalize(context);
 }
 
@@ -274,7 +289,6 @@ bool DiwneObject::allowInteraction() const
 	return m_focusedForInteraction;
 }
 
-void DiwneObject::processInteractions(DrawInfo& context) {}
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
 	if (m_drawMode2 != DrawMode::Interacting)
@@ -283,13 +297,13 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	if (ImGui::IsKeyDown(ImGuiKey_E))
 		int x = 5;
 
-	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.bypassIsMouseDragging0())
+	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.m_input->bypassIsMouseDragging0())
 	{
 		int x = 5;
 	}
-	if (diwne.bypassIsMouseDragging0())
+	if (diwne.m_input->bypassIsMouseDragging0())
 		int x = 5;
-	if (diwne.bypassIsMouseDragging2())
+	if (diwne.m_input->bypassIsMouseDragging2())
 		int x = 5;
 
 
@@ -378,7 +392,7 @@ void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 {
 	if (context.inputConsumed)
 		return;
-	if (context.dragging && context.source != m_labelDiwne)
+	if (context.dragging && context.dragSource != m_labelDiwne)
 		return;
 
 	bool wasPressed = m_isHeld;
@@ -386,9 +400,12 @@ void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 	bool justPressed = isJustPressedDiwne() && pressed;
 	bool justReleased = wasPressed && !pressed;
 
-	if (wasPressed) {
+	if (wasPressed)
+	{
 		m_isHeld = pressed;
-	} else {
+	}
+	else
+	{
 		m_isHeld = pressed && justPressed; // Require immediate key press to begin press cycle
 	}
 
@@ -415,7 +432,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	LOG_INFO("{} processDrag", m_labelDiwne);
 	if (context.dragging) // Check if something is being dragged
 	{
-		if (context.source == m_labelDiwne) // This object is being dragged
+		if (context.dragSource == m_labelDiwne) // This object is being dragged
 		{
 			if (isDragged)
 			{
@@ -428,7 +445,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 				dragEnd = true;
 				m_isDragged = false;
 				context.dragging = false;
-				context.source = "";
+				context.dragSource = "";
 			}
 		}
 		else // Something else is being dragged
@@ -443,7 +460,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 		{
 			dragStart = true;
 			context.dragging = true;
-			context.source = m_labelDiwne;
+			context.dragSource = m_labelDiwne;
 		}
 	}
 	if (m_isDragged || dragEnd) // Dispatch user method
@@ -564,7 +581,7 @@ DrawInfo ContextTracker::end(const DrawInfo& context)
 
 bool DiwneObject::bypassRaisePopupAction()
 {
-	return diwne.bypassIsMouseReleased1();
+	return diwne.m_input->bypassIsMouseReleased1();
 }
 
 /**
@@ -591,29 +608,29 @@ bool DiwneObject::bypassFocusForInteractionAction()
 }
 bool DiwneObject::isPressedDiwne()
 {
-	return diwne.bypassIsMouseDown0();
+	return diwne.m_input->bypassIsMouseDown0();
 }
 bool DiwneObject::isJustPressedDiwne()
 {
 	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
-	return diwne.bypassIsMouseClicked0();
+	return diwne.m_input->bypassIsMouseClicked0();
 }
 
 bool DiwneObject::bypassSelectAction()
 {
-	return diwne.bypassIsMouseReleased0();
+	return diwne.m_input->bypassIsMouseReleased0();
 }
 bool DiwneObject::bypassUnselectAction()
 {
-	return diwne.bypassIsMouseReleased0();
+	return diwne.m_input->bypassIsMouseReleased0();
 }
 bool DiwneObject::isDraggedDiwne()
 {
-	return diwne.bypassIsMouseDragging0();
+	return diwne.m_input->bypassIsMouseDragging0();
 }
 bool DiwneObject::bypassTouchAction()
 {
-	return diwne.bypassIsMouseClicked0();
+	return diwne.m_input->bypassIsMouseClicked0();
 }
 
 void DiwneObject::popupContent(DrawInfo& context)

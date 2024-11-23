@@ -15,6 +15,7 @@
 #include "Logger/Logger.h"
 
 #include "NodeEditor.h"
+#include "diwne_actions.h"
 
 namespace DIWNE
 {
@@ -97,40 +98,6 @@ void Node::end(DrawInfo& context)
 	ImGui::PopID();
 }
 
-// bool Node::afterEndDiwne()
-//{
-//	if (m_selectable)
-//	{
-//		bool prev_selected = m_selected;
-//		if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull ||
-//		    diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
-//		{
-//			setSelected(diwne.getSelectionRectangleDiwne().Contains(getRectDiwne()) ? true
-//			            : diwne.m_allowUnselectingNodes                                 ? false
-//			                                                                            : m_selected);
-//		}
-//		else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch ||
-//		         diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch)
-//		{
-//			setSelected(diwne.getSelectionRectangleDiwne().Overlaps(getRectDiwne()) ? true
-//			            : diwne.m_allowUnselectingNodes                                 ? false
-//			                                                                            : m_selected);
-//		}
-//		if (m_selected)
-//		{
-//			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-// diwne.mp_settingsDiwne->itemSelectedBorderColor, diwne.mp_settingsDiwne->selectionRounding,
-// ImDrawFlags_RoundCornersAll, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
-//		}
-//	}
-//
-//	/* always block interactions with other nodes */
-//	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-//	ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getRectDiwne().GetSize() * diwne.getWorkAreaZoom());
-//
-//	return DiwneObject::afterEndDiwne();
-// }
-
 bool Node::setSelected(const bool selected)
 {
 	bool prevSelected = m_selected;
@@ -149,11 +116,40 @@ bool Node::setSelected(const bool selected)
 void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
-	// This needs to be done BEFORE processing interactions as the default implementation relies on ImGui::IsItemHovered
+	// This needs to be done BEFORE processing interactions as we check if this button is hovered.
 	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne())); // TODO: Use m_rect instead
 	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getWorkAreaZoom());
 	m_internalHover = ImGui::IsItemHovered();
 	DiwneObject::afterDrawDiwne(context);
+
+	// Check if the node is inside a selection rectangle
+	if (m_selectable)
+	{
+		if (context.action == Actions::selectionRect)
+		{
+			bool touch = std::any_cast<Actions::SelectionRectData&>(context.actionData).touch;
+			if (!touch)
+			{
+				setSelected(diwne.getSelectionRectangleDiwne().Contains(getRectDiwne()) ? true
+				            : diwne.m_allowUnselectingNodes                             ? false
+				                                                                        : m_selected);
+			}
+			else
+			{
+				setSelected(diwne.getSelectionRectangleDiwne().Overlaps(getRectDiwne()) ? true
+				            : diwne.m_allowUnselectingNodes                             ? false
+				                                                                        : m_selected);
+			}
+		}
+	}
+	// TODO: Maybe move the selection rect rendering to the processSelect equivalent in the future
+	if (m_selected)
+	{
+		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+		                               diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+		                               diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+	}
 }
 
 // TODO: (DR) process/processUnselect seem to always return true, what is the purpose of the return value?
@@ -171,7 +167,7 @@ void Node::afterDrawDiwne(DrawInfo& context)
 void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	DiwneObject::onDrag(context, dragStart, dragEnd);
-	move(diwne.bypassGetMouseDelta() / diwne.getWorkAreaZoom());
+	move(diwne.m_input->bypassGetMouseDelta() / diwne.getWorkAreaZoom());
 }
 
 } /* namespace DIWNE */

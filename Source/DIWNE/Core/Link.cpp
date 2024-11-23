@@ -22,7 +22,7 @@ Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"
 
 void Link::updateSquareDistanceMouseFromLink()
 {
-	ImVec2 mousePosDiwne = diwne.screen2diwne(diwne.bypassGetMousePos());
+	ImVec2 mousePosDiwne = diwne.screen2diwne(diwne.m_input->bypassGetMousePos());
 	ImVec2 closestPointOnLink =
 	    ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                       mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);

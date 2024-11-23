@@ -18,6 +18,8 @@
 #include "Node.h"
 #include "Pin.h"
 
+#include "diwne_actions.h"
+
 // TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 
@@ -43,8 +45,12 @@ void NodeEditor::draw(DrawMode drawMode)
 	if (m_prevContext)
 	{
 		// Infer context from previous frame
+		// TODO: Wrap this in a function or maybe rather reset the existing context instead of making a new one
 		context.dragging = m_prevContext->dragging;
-		context.source = m_prevContext->source;
+		context.dragSource = std::move(m_prevContext->dragSource);
+		context.action = std::move(m_prevContext->action);
+		context.actionSource = std::move(m_prevContext->actionSource);
+		context.actionData = std::move(m_prevContext->actionData);
 	}
 	drawDiwne(context);
 	m_prevContext = std::make_shared<DrawInfo>(std::move(context));
@@ -291,25 +297,15 @@ bool NodeEditor::allowHover() const
 	//	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
-// bool NodeEditor::processInteractions()
-//{
-//	return processDiwneSelectionRectangle();
-// }
 //
-// bool NodeEditor::processInteractionsDiwne()
-//{
-//	bool interaction_happen = false;
-//
-//	interaction_happen |= DiwneObject::processInteractionsDiwne();
-//
-//	// for example inner interaction (focus on node) is no problem with this actions
-//	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction())
-//	{
-//		interaction_happen |= processDiwneZoom();
-//	}
-//
-//	return interaction_happen;
-// }
+void NodeEditor::processInteractionsDiwne(DrawInfo& context)
+{
+	DiwneObject::processInteractionsDiwne(context);
+
+	// Handle zooming
+	if (m_hovered && !context.inputConsumed)
+		processDiwneZoom();
+}
 
 void NodeEditor::finalizeDiwne(DrawInfo& context)
 {
@@ -334,38 +330,32 @@ DIWNE::Link& NodeEditor::getHelperLink()
 	return *m_helperLink;
 }
 
-/* be careful for same mouse button in this functions */
-bool NodeEditor::allowProcessSelectionRectangle()
+void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	return m_focusedForInteraction;
-}
-bool NodeEditor::bypassSelectionRectangleAction()
-{
-	return bypassIsMouseDragging1();
-} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 NodeEditor::bypassDiwneGetSelectionRectangleStartPosition()
-{
-	return screen2diwne(bypassMouseClickedPos1());
-} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 NodeEditor::bypassDiwneGetSelectionRectangleSize()
-{
-	return bypassGetMouseDragDelta1() / getWorkAreaZoom();
-} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
-
-bool NodeEditor::processDiwneSelectionRectangle()
-{
-	if (bypassSelectionRectangleAction() && allowProcessSelectionRectangle())
+	DiwneObject::onDrag(context, dragStart, dragEnd);
+	if (m_input->bypassIsMouseDown2())
 	{
-		ImVec2 startPos = bypassDiwneGetSelectionRectangleStartPosition();
-		ImVec2 dragDelta = bypassDiwneGetSelectionRectangleSize();
+		translateWorkAreaDiwneZoomed(m_input->bypassGetMouseDelta() * -1);
+	}
+	if (m_input->selectionRectangleKeyDown())
+	{
+		ImVec2 startPos = m_input->selectionRectangleStartPosition();
+		ImVec2 dragDelta = m_input->selectionRectangleSize();
 		ImColor color;
 
+		if (dragStart && context.action.empty())
+		{
+			context.action = Actions::selectionRect;
+			context.actionSource = m_labelDiwne;
+			context.actionData = Actions::SelectionRectData();
+		}
 		if (dragDelta.x > 0)
 		{
 			setDiwneAction(DiwneAction::SelectionRectFull);
 			m_selectionRectangeDiwne.Min.x = startPos.x;
 			m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
 			color = mp_settingsDiwne->selectionRectFullColor;
+			std::any_cast<Actions::SelectionRectData&>(context.actionData).touch = false;
 		}
 		else
 		{
@@ -373,8 +363,8 @@ bool NodeEditor::processDiwneSelectionRectangle()
 			m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
 			m_selectionRectangeDiwne.Max.x = startPos.x;
 			color = mp_settingsDiwne->selectionRectTouchColor;
+			std::any_cast<Actions::SelectionRectData&>(context.actionData).touch = true;
 		}
-
 		if (dragDelta.y > 0)
 		{
 			m_selectionRectangeDiwne.Min.y = startPos.y;
@@ -385,44 +375,39 @@ bool NodeEditor::processDiwneSelectionRectangle()
 			m_selectionRectangeDiwne.Min.y = startPos.y + dragDelta.y;
 			m_selectionRectangeDiwne.Max.y = startPos.y;
 		}
-
 		m_renderer->AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
-
-		return true;
 	}
-	return false;
-}
-
-void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
-{
-	DiwneObject::onDrag(context, dragStart, dragEnd);
-	translateWorkAreaDiwneZoomed(bypassGetMouseDelta() * -1);
+	if (dragEnd && context.action == Actions::selectionRect)
+	{
+		context.action.clear();
+		context.actionSource.clear();
+		context.actionData.reset();
+	}
 }
 
 bool NodeEditor::isPressedDiwne()
 {
 	// To allow drag using middle mouse button
-	return DiwneObject::isPressedDiwne() || bypassIsMouseDown2();
+	return m_input->selectionRectangleKeyDown() || m_input->panKeyDown();
 }
 
 bool NodeEditor::isJustPressedDiwne()
 {
 	// To allow drag using middle mouse button
-	return DiwneObject::isJustPressedDiwne() || bypassIsMouseClicked2();
+	return m_input->selectionRectangleKeyPressed() || m_input->panKeyPressed();
 }
 
 bool NodeEditor::isDraggedDiwne()
 {
 	// Drag also using middle mouse button
-	return bypassIsMouseDragging2();
-	// TODO: Allow default LMB drag for selection rectangle
+	return m_input->selectionRectangleDragging() || m_input->panDragging();
 }
 
 bool NodeEditor::processZoom()
 {
-	ImVec2 mousePosDiwne = screen2diwne(bypassGetMousePos());
+	ImVec2 mousePosDiwne = screen2diwne(m_input->bypassGetMousePos());
 	setWorkAreaZoom(m_workAreaZoom + bypassGetZoomDelta());
-	translateWorkAreaDiwne(mousePosDiwne - screen2diwne(bypassGetMousePos()));
+	translateWorkAreaDiwne(mousePosDiwne - screen2diwne(m_input->bypassGetMousePos()));
 	return true;
 }
 
@@ -531,109 +516,14 @@ ImVec2 NodeEditor::diwne2screen_noZoom(const ImVec2& point) const
 	return workArea2screen(diwne2workArea_noZoom(point));
 }
 
-bool NodeEditor::bypassIsItemClicked0()
-{
-	return ImGui::IsItemClicked(0);
-}
-bool NodeEditor::bypassIsItemClicked1()
-{
-	return ImGui::IsItemClicked(1);
-}
-bool NodeEditor::bypassIsItemClicked2()
-{
-	return ImGui::IsItemClicked(2);
-}
-bool NodeEditor::bypassIsMouseDown0()
-{
-	return ImGui::IsMouseDown(0);
-}
-bool NodeEditor::bypassIsMouseDown1()
-{
-	return ImGui::IsMouseDown(1);
-}
-bool NodeEditor::bypassIsMouseDown2()
-{
-	return ImGui::IsMouseDown(2);
-}
-bool NodeEditor::bypassIsMouseClicked0()
-{
-	return ImGui::IsMouseClicked(0);
-}
-bool NodeEditor::bypassIsMouseClicked1()
-{
-	return ImGui::IsMouseClicked(1);
-}
-bool NodeEditor::bypassIsMouseClicked2()
-{
-	return ImGui::IsMouseClicked(2);
-}
-bool NodeEditor::bypassIsMouseReleased0()
-{
-	return ImGui::IsMouseReleased(0);
-}
-bool NodeEditor::bypassIsMouseReleased1()
-{
-	return ImGui::IsMouseReleased(1);
-}
-bool NodeEditor::bypassIsMouseReleased2()
-{
-	return ImGui::IsMouseReleased(2);
-}
-ImVec2 NodeEditor::bypassMouseClickedPos0()
-{
-	return ImGui::GetIO().MouseClickedPos[0];
-}
-ImVec2 NodeEditor::bypassMouseClickedPos1()
-{
-	return ImGui::GetIO().MouseClickedPos[1];
-}
-ImVec2 NodeEditor::bypassMouseClickedPos2()
-{
-	return ImGui::GetIO().MouseClickedPos[2];
-}
 bool NodeEditor::bypassIsItemActive()
 {
 	return ImGui::IsItemActive();
 }
-bool NodeEditor::bypassIsMouseDragging0()
-{
-	return ImGui::IsMouseDragging(0, mp_settingsDiwne->mouseDragThreshold);
-}
-bool NodeEditor::bypassIsMouseDragging1()
-{
-	return ImGui::IsMouseDragging(1, mp_settingsDiwne->mouseDragThreshold);
-}
-bool NodeEditor::bypassIsMouseDragging2()
-{
-	return ImGui::IsMouseDragging(2, mp_settingsDiwne->mouseDragThreshold);
-}
-ImVec2 NodeEditor::bypassGetMouseDragDelta0()
-{
-	return ImGui::GetMouseDragDelta(0);
-}
-ImVec2 NodeEditor::bypassGetMouseDragDelta1()
-{
-	return ImGui::GetMouseDragDelta(1);
-}
-ImVec2 NodeEditor::bypassGetMouseDragDelta2()
-{
-	return ImGui::GetMouseDragDelta(2);
-}
-ImVec2 NodeEditor::bypassGetMouseDelta()
-{
-	return ImGui::GetIO().MouseDelta;
-}
-ImVec2 NodeEditor::bypassGetMousePos()
-{
-	return ImGui::GetIO().MousePos;
-}
-float NodeEditor::bypassGetMouseWheel()
-{
-	return ImGui::GetIO().MouseWheel;
-}
+
 float NodeEditor::bypassGetZoomDelta()
 {
-	return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity;
+	return m_input->bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity;
 }
 
 bool NodeEditor::allowProcessZoom()
@@ -646,11 +536,11 @@ bool NodeEditor::bypassZoomAction()
 }
 bool NodeEditor::bypassDiwneSetPopupPositionAction()
 {
-	return bypassIsMouseClicked1();
+	return m_input->bypassIsMouseClicked1();
 }
 ImVec2 NodeEditor::bypassDiwneGetPopupNewPositionAction()
 {
-	return bypassGetMousePos();
+	return m_input->bypassGetMousePos();
 }
 
 ImRect NodeEditor::getSelectionRectangleDiwne()

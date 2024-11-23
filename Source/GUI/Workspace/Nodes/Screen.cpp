@@ -182,7 +182,7 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	//		interaction_happen = true;
 	//		resize_texture = true;
 	//
-	//		dragDelta = diwne.bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
+	//		dragDelta = diwne.m_input->bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
 	//
 	//		ImVec2 nodePos = getNodePositionDiwne();
 	//		nodePos.x += dragDelta.x;
@@ -206,12 +206,13 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	if (ImGui::IsItemHovered())
 		ImGui::SetMouseCursor(6);
 
-	if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
+	// TODO: Again, bypass isItemActive? just ImGui::IsItemActive bruh
+	if (diwne.bypassIsItemActive() && diwne.m_input->bypassIsMouseDragging0())
 	{
 		interaction_happen = true;
 		resize_texture = true;
 
-		dragDelta = diwne.bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
+		dragDelta = diwne.m_input->bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
 	}
 
 	// ask for texture resize, if the viewport size changed

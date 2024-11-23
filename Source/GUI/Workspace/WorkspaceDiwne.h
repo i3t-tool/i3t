@@ -266,10 +266,6 @@ public:
 
 	bool processZoom() override;
 
-	bool bypassSelectionRectangleAction() override;
-	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
-	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
-
 	bool m_updateDataItemsWidth;      ///< Indicates a change in zoom level this frame
 	bool m_reconnectCameraToSequence; // TODO: Unused probably
 

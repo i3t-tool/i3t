@@ -17,10 +17,9 @@
 
 #include <memory>
 #include <string>
+#include <any>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h"
-#include "imgui_internal.h"
+#include "diwne_imgui.h"
 
 #include "diwne_common.h"
 
@@ -77,6 +76,7 @@ public:
 	//
 
 	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode)
+	bool m_drawnThisFrame{false};
 
 	//
 
@@ -145,6 +145,7 @@ public:
 	 */
 	virtual void drawDiwne(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
+	// TODO: Docs
 	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
 	// Lifecycle/Content methods
@@ -197,7 +198,7 @@ public:
 	// =============================================================================================================
 
 	virtual bool allowInteraction() const; ///< Decide whether the object can interact (not including content elements)
-	virtual void processInteractions(DrawInfo& context);
+	virtual void processInteractions(DrawInfo& context) {};
 
 	// Popups
 	// =============================================================================================================
@@ -344,10 +345,14 @@ protected:
 
 public:
 	virtual bool bypassRaisePopupAction();          /**< action used for raising popup menu */
+	// TODO: Rename this to something like "action area" / "trigger area"?
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
 	                                                 */
 
+	// TODO: Maybe rename to isDownDiwne() or isKeyDownDiwne()
+	//  Begs the question which key, well that depends on the impl
+	//  The full verbose name is more like isAnyOfTheAllowedKeysPressed()
 	/**
 	 * Determine whether a key is pressed down over the object.
 	 * While the key is down this method should return true until the key is released.
@@ -438,11 +443,13 @@ public:
 	// Active action idea, we have a descriptor for the current "action", it has a source
 	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
 	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
+	std::string action;
+	std::string actionSource;
+	std::any actionData;
 
 	unsigned short dragging{0}; // TODO: Maybe change this to a varchar representing the active perpetual "action"
-	std::string source;         // TODO: If the above was changed, then this can be the source of the action
+	std::string dragSource;         // TODO: If the above was changed, then this can be the source of the action
 	// TODO: Question then arises what if there are multiple active actions? Do we make those two above arrays? vectors?
-
 
 	DrawInfo findChange(const DrawInfo& other) const;
 

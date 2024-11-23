@@ -1596,41 +1596,6 @@ bool WorkspaceDiwne::bypassZoomAction()
 	return InputManager::isAxisActive("scroll") != 0;
 }
 
-// TODO: Reintroduce overriding of inputs
-//bool WorkspaceDiwne::isDraggedDiwne()
-//{
-//	return InputManager::isAxisActive("pan") != 0;
-//}
-//bool WorkspaceDiwne::bypassPressAction()
-//{
-//	return InputManager::isAxisActive("pan") != 0;
-//}
-//bool WorkspaceDiwne::bypassReleaseAction()
-//{
-//	return InputManager::isAxisActive("pan") == 0;
-//}
-
-bool WorkspaceDiwne::bypassSelectionRectangleAction()
-{
-	return InputManager::isAxisActive("selectionRectangle") != 0 /* && (InputManager::m_mouseXDragDelta >
-	                                                                ImGui::GetIO().MouseDragThreshold ||F
-	                                                                InputManager::m_mouseYDragDelta >
-	                                                                ImGui::GetIO().MouseDragThreshold ||
-	                                                                -InputManager::m_mouseXDragDelta >
-	                                                                ImGui::GetIO().MouseDragThreshold ||
-	                                                                -InputManager::m_mouseYDragDelta >
-	                                                                ImGui::GetIO().MouseDragThreshold)*/
-	    ;
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition()
-{
-	return screen2diwne(bypassMouseClickedPos0());
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize()
-{
-	return bypassGetMouseDragDelta0() / getWorkAreaZoom();
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
-
 bool WorkspaceDiwne::processZoom()
 {
 	m_updateDataItemsWidth = true;

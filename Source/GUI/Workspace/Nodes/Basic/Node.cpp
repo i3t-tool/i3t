@@ -28,7 +28,7 @@ Node::~Node()
 
 bool Node::bypassFocusForInteractionAction()
 {
-	return (m_isHeld || m_top.getRect().Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
+	return (m_isHeld || m_top.getRect().Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos())));
 }
 
 void Node::deleteAction()
