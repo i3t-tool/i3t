@@ -42,7 +42,8 @@ b) Matrices (Transformations):
 Prepare the function ``updateValues()`` of the operator (specialization of the ``Operator`` template). 
 
 An example for conversion from Euler angles to Quaternion:
-```// EulerToQuat
+```
+// EulerToQuat
 template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
@@ -57,6 +58,6 @@ template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues
 		setInternalValue(glm::quat());
 	}
 }
-```	
+```
 	
 ### Writing the 

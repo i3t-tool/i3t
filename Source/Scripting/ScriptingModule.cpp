@@ -102,25 +102,26 @@ void ScriptingModule::onInit()
 
 	//
 
-    /*
-	m_Lua.set_function("eval", [this](const std::string& scriptSource) {
-		runScript(scriptSource.c_str());
-	});
-
-	m_Lua.set_function("eval_from_file", [this](const std::string& path) {
-		if (!fs::exists(fs::path(path)))
-		{
-			print("file does not exist");
-			return false;
-		}
-		return true;
-	});
-     */
-
 	auto api = m_Lua["I3T"];
 
 	api["save_script"] = [](const std::string& path) {
 		/// \todo
+	};
+
+	api["load_script"] = [this](const std::string& script) {
+		return runScript(script.c_str());
+	};
+
+	api["load_script_from"] = [this](const std::string& path) {
+		std::ifstream file(path);
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		std::string script((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+		return runScript(script.c_str());
 	};
 
 	//
@@ -130,7 +131,7 @@ void ScriptingModule::onInit()
 		      "(sol " SOL_VERSION_STRING ").");
 	});
 
-	//
+	// Print redirection to the console
 
 	m_Lua.set_function("_AppendToBuffer", [this](const std::string& str) {
 		print(str);
@@ -152,14 +153,6 @@ void ScriptingModule::onInit()
 			_AppendToBuffer(printResult)
 		end
 )");
-
-	m_Lua.set_function("load_scene", [](const std::string& path) {
-		/// \todo
-	});
-
-	m_Lua.set_function("save_scene", [](const std::string& path) {
-		/// \todo
-	});
 	// clang-format on
 
 	//-- Timers and timeouts -------------------------------------------------------------------------------------------

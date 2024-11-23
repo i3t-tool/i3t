@@ -14,7 +14,9 @@
 
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
+#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 #include "Scripting/Utils.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 static Workspace::OperatorBuilder g_OperatorBuilder;
 static Workspace::TransformBuilder g_TransformBuilder;
@@ -113,12 +115,12 @@ static auto getWorkspaceNodes()
 
 //----------------------------------------------------------------------------//
 
-static bool plug(Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to)
+static bool plug(Ptr<GuiNode> self, int from, Ptr<GuiNode> other, int to)
 {
 	return connectNodesNoSave(self, other, from, to);
 }
 
-static bool unplug_input(Ptr<GuiOperator> self, int inputIndex)
+static bool unplug_input(Ptr<GuiNode> self, int inputIndex)
 {
 	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 	{
@@ -139,7 +141,7 @@ static bool unplug_input(Ptr<GuiOperator> self, int inputIndex)
 	return false;
 }
 
-static bool unplug_output(Ptr<GuiOperator> self, int outputIndex)
+static bool unplug_output(Ptr<GuiNode> self, int outputIndex)
 {
 	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 	{
@@ -174,37 +176,55 @@ static bool unplug_output(Ptr<GuiOperator> self, int outputIndex)
 	return false;
 }
 
+//-- Workspace Management ----------------------------------------------------//
+
+
 //----------------------------------------------------------------------------//
+
+/*
+SOL_BASE_CLASSES(GuiNode, GuiSequence);
+SOL_DERIVED_CLASSES(GuiSequence, GuiNode);
+ */
+
+// These have to be set in each node type.
+#define I3T_NODE_COMMON                                                                                                \
+	"type",                                                                                                            \
+	    [](Ptr<GuiNode> self) {                                                                                        \
+		    return self->getNodebase()->getOperation()->keyWord;                                                       \
+	    },                                                                                                             \
+	    "get_float", &getValue<float>, "get_vec3", &getValue<glm::vec3>, "get_vec4", &getValue<glm::vec4>, "get_mat4", \
+	    &getValue<glm::mat4>, /* setters */                                                                            \
+	    "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>)
 
 LUA_REGISTRATION
 {
 	// clang-format off
 	L.new_usertype<GuiNode>(
 	    "Node",
-	    "type", [](Ptr<GuiNode> self) {
-		    return self->getNodebase()->getOperation()->keyWord;
-	    },
-	    "get_position", &GuiNode::getNodePositionDiwne,
-	    "set_position", &GuiNode::setNodePositionDiwne,
-		// getters
-		"get_float", &getValue<float>,
-		"get_vec3", &getValue<glm::vec3>,
-		"get_vec4", &getValue<glm::vec4>,
-		"get_mat4", &getValue<glm::mat4>,
-		// setters
-		"set_value", sol::overload(
-			&setValue<float>,
-			&setValue<glm::vec3>,
-			&setValue<glm::vec4>
-		),
+		sol::no_constructor,
+	    I3T_NODE_COMMON,
+		"get_id", &GuiNode::getId,
+		"get_position", &GuiNode::getNodePositionDiwne,
+		"set_position", &GuiNode::setNodePositionDiwne,
 		// inputs/outputs
-		"plug", plug,
+/*
+		"plug", [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
+			auto fromNode = getNodeEditor().getNode<GuiNode>(from);
+			auto toNode = getNodeEditor().getNode<GuiNode>(to);
+			return plug(fromNode, fromIdx, toNode, toIdx);
+		},
+*/
 		"unplug_input", unplug_input,
 		"unplug_output", unplug_output
+		// TODO TODO TODO
+		// TODO LOD
+ 		// TODO numberofdecimals
+		// TODO render
 	);
 
 	L.new_usertype<GuiOperator>(
 	    "Operator",
+		sol::base_classes, sol::bases<GuiNode>(),
 	    sol::meta_function::construct, [](const std::string& type) -> Ptr<GuiOperator> {
 		    const auto maybeType = EnumUtils::value<Core::EOperatorType>(type);
 		    if (!maybeType.has_value())
@@ -226,7 +246,8 @@ LUA_REGISTRATION
 
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
-	    sol::base_classes, sol::bases<GuiNode>());
+		I3T_NODE_COMMON
+	);
 
 	L.new_usertype<GuiTransform>(
 	    "Transform",
@@ -248,9 +269,16 @@ LUA_REGISTRATION
 	    "get_vec3", &getDefaultValue<glm::vec3>,
 	    "get_vec3", &getDefaultValue<glm::vec4>,
 	    // set default value
+		/*
 	    "set_float", &setDefaultValue<float>,
 	    "set_vec3", &setDefaultValue<glm::vec3>,
 	    "set_vec4", &setDefaultValue<glm::vec4>,
+	     */
+		"set_default_value", sol::overload(
+			&setDefaultValue<float>,
+			&setDefaultValue<glm::vec3>,
+			&setDefaultValue<glm::vec4>
+		),
 	    // synergies, ...
 	    "is_valid",
 	    [](Ptr<GuiTransform> self) {
@@ -308,13 +336,16 @@ LUA_REGISTRATION
 
 	L.new_usertype<GuiSequence>(
 	    "Sequence",
-	    sol::base_classes, sol::bases<GuiNode>(),
-	    "push", [](GuiSequence& self, Ptr<GuiTransform> transform) {
-		    self.moveNodeToSequence(transform);
-	    },
-	    "push", [](GuiSequence& self, Ptr<GuiTransform> transform, int index) {
-		    self.moveNodeToSequence(transform, index);
-	    },
+	    sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
+		I3T_NODE_COMMON,
+	    "push", sol::overload(
+			[](GuiSequence& self, Ptr<GuiTransform> transform) {
+				self.moveNodeToSequence(transform);
+			},
+	    	[](GuiSequence& self, Ptr<GuiTransform> transform, int index) {
+				self.moveNodeToSequence(transform, index);
+			}
+		),
 	    "pop", [](GuiSequence& self, int index) -> Ptr<GuiTransform> {
 		    auto maybeTransform = self.getTransform(index);
 		    if (!maybeTransform.has_value())
@@ -337,9 +368,66 @@ LUA_REGISTRATION
 		    return sequence;
 	    });
 
+	L.new_usertype<GuiModel>(
+		"Model",
+		sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
+		sol::meta_function::construct, []() -> Ptr<GuiModel> {
+			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+
+			print(fmt::format("ID: {}", model->getNodebase()->getId()));
+
+			return model;
+		},
+		sol::meta_function::construct, [](const std::string& modelAlias) -> Ptr<GuiModel> {
+			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+			model->m_viewportModel.lock()->setModel(modelAlias);
+
+			print(fmt::format("ID: {}", model->getNodebase()->getId()));
+
+			return model;
+		},
+		I3T_NODE_COMMON,
+		"set_visible", [](GuiModel& self, bool value) {
+			self.m_viewportModel.lock()->m_visible = value;
+		},
+		"show_axes", [](GuiModel& self, bool value) {
+			self.m_viewportModel.lock()->m_showAxes = value;
+		},
+		"set_opaque", [](GuiModel& self, bool value) {
+			self.m_viewportModel.lock()->m_opaque = value;
+		},
+		"set_opacity", [](GuiModel& self, float value) {
+			self.m_viewportModel.lock()->m_opacity = value;
+		},
+		"set_tint", [](GuiModel& self, const glm::vec3& value) {
+			self.m_viewportModel.lock()->m_tint = value;
+		},
+		"set_tint_strength", [](GuiModel& self, float value) {
+			self.m_viewportModel.lock()->m_tintStrength = value;
+		}
+	);
+
 	// I3T functions
 
 	auto api = L["I3T"];
+
+	api["workspace"] = L.create_table();
+	auto workspace = api["workspace"];
+
+	workspace["set_zoom"] = [](float value) {
+		getNodeEditor().diwne.setWorkAreaZoom(value);
+	};
+	workspace["set_work_area"] = [](const ImVec2& min, const ImVec2& max) {
+		ImRect area(min, max);
+		getNodeEditor().diwne.setWorkAreaDiwne(area);
+	};
+
+	workspace["clear"] = []() {
+		for (const auto& node : getWorkspaceNodes())
+		{
+			node->deleteActionDiwne();
+		}
+	};
 
 	api["get_all_nodes"] = getWorkspaceNodes;
 
@@ -371,6 +459,21 @@ LUA_REGISTRATION
 
 	api["delete_node"] = [](GuiNode& node) {
 		node.deleteActionDiwne();
+	};
+
+	//
+
+	api["plug"] = [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
+		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from);
+		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to);
+
+		if (!maybeFromNode || !maybeToNode)
+		{
+			print("Invalid node ID");
+			return false;
+		}
+
+		return plug(maybeFromNode.value(), fromIdx, maybeToNode.value(), toIdx);
 	};
 
 	//
