@@ -79,6 +79,16 @@ See `Timer` class in C++ code for more details.
 
 ### I3T API functions
 
+#### function `I3T.load_script(script: string): boolean`
+
+Executes the given `script` string as Lua code.
+
+#### function `I3T.load_script_from(path: string): boolean`
+
+Executes the Lua code from the file at the given `path`.
+
+<hr>
+
 #### function `I3T.set_timer(intervalSeconds: number, callback: function): Timer`
 
 Creates a new timer that will call the given `callback` function after

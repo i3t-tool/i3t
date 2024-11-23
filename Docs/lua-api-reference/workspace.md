@@ -212,3 +212,16 @@ Returns nil if the transform with the given `id` does not exist.
 #### function `I3T.delete_node(node: Node)`
 
 Deletes the given `node` from the workspace.
+
+#### function `I3T.workspace.clear()`
+
+Deletes all nodes from the workspace.
+
+#### function `I3T.workspace.set_zoom(value: number)`
+
+Sets the zoom level of the workspace.
+
+#### function `I3T.workspace.set_work_area(min: Vec2, max: Vec2)`
+
+Sets the work area of the workspace, where `min` is the top-left corner
+and `max` is the bottom-right corner.
