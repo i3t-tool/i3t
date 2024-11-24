@@ -50,8 +50,8 @@ static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
 	return maybeValue;
 }
 
-template <typename T>
-static bool setValue(Ptr<GuiNode> guiNode, const T& value)
+template <typename R, typename T>
+static bool setValue(Ptr<R> guiNode, const T& value)
 {
 	const auto node = guiNode->getNodebase();
 
@@ -186,15 +186,203 @@ SOL_BASE_CLASSES(GuiNode, GuiSequence);
 SOL_DERIVED_CLASSES(GuiSequence, GuiNode);
  */
 
+namespace LuaSerializer
+{
+std::string toConstructor(const ImVec2& vec)
+{
+	return fmt::format("Vec2.new({}, {})", vec.x, vec.y);
+}
+
+std::string toConstructor(const glm::vec3& vec)
+{
+	return fmt::format("Vec3.new({}, {}, {})", vec.x, vec.y, vec.z);
+}
+
+std::string toConstructor(const glm::vec4& vec)
+{
+	return fmt::format("Vec4.new({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+}
+
+std::string toConstructor(const glm::quat& vec)
+{
+	return fmt::format("Vec4.new({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+}
+
+std::string toConstructor(const glm::mat4 mat)
+{
+	std::string result = "Matrix.new(";
+	for (int i = 0; i < 4; ++i)
+	{
+		result += toConstructor(mat[i]);
+		if (i != 3)
+		{
+			result += ", ";
+		}
+	}
+	result += ")";
+
+	return result;
+}
+
+Result<std::string, Error> toConstructor(const Core::Data& data)
+{
+	switch (data.valueType)
+	{
+	case Core::EValueType::Pulse:
+		return Err("Not implemented!");
+	case Core::EValueType::Float:
+		return std::to_string(data.getFloat());
+	case Core::EValueType::Vec3:
+		return toConstructor(data.getVec3());
+	case Core::EValueType::Vec4:
+		return toConstructor(data.getVec4());
+	case Core::EValueType::Matrix:
+		return toConstructor(data.getMat4());
+	case Core::EValueType::Quat:
+		return toConstructor(data.getQuat());
+	case Core::EValueType::MatrixMul:
+		return Err("Not implemented!");
+	case Core::EValueType::Screen:
+		return Err("Not implemented!");
+	case Core::EValueType::Ptr:
+		return Err("Not implemented!");
+	}
+
+	return Err("Invalid data type!");
+}
+};
+
+class ToScriptVisitor : public NodeVisitor
+{
+public:
+	void append(const std::string& str)
+	{
+		m_stream << str;
+	}
+
+	std::string getScript() const
+	{
+		return m_stream.str();
+	}
+
+private:
+	void dumpCommon(const Ptr<Workspace::CoreNode>& node)
+	{
+		if (node->getTopLabel() != node->getNodebase()->getLabel())
+		{
+			m_stream << fmt::format("node_{}:set_label(\"{}\")\n", node->getId(), node->getTopLabel());
+		}
+		m_stream << fmt::format("node_{}:set_render({})\n", node->getId(), node->getRender());
+		m_stream << fmt::format("node_{}:set_number_of_decimals({})\n", node->getId(), node->getNumberOfVisibleDecimal());
+		m_stream << fmt::format("node_{}:set_lod({})\n", node->getId(), (int) node->getLevelOfDetail());
+		m_stream << fmt::format("node_{}:set_position({})\n", node->getId(), LuaSerializer::toConstructor(node->getNodePositionDiwne()));
+	}
+
+	void visit(const Ptr<GuiCamera>& node) override
+	{
+		/// \todo
+	}
+
+	void visit(const Ptr<GuiCycle>& node) override
+	{
+		/// \todo
+	}
+
+	void visit(const Ptr<GuiOperator>& node) override
+	{
+		auto coreNode = node->getNodebase();
+		auto props = coreNode->getOperation();
+
+		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props->keyWord);
+		dumpCommon(node);
+
+		if (props->isConstructor)
+		{
+			auto data = coreNode->data(0);
+			if (auto dataConstructor = LuaSerializer::toConstructor(data))
+			{
+				m_stream << fmt::format("node_{}:set_value({})\n", node->getId(), dataConstructor.value());
+			}
+			else
+			{
+				LOG_ERROR("Cannot serialize data to constructor on node {}", coreNode->getSignature());
+			}
+		}
+	}
+
+	void visit(const Ptr<GuiSequence>& node) override
+	{
+
+	}
+
+	void visit(const Ptr<GuiTransform>& node) override
+	{
+
+	}
+
+	void visit(const Ptr<GuiScreen>& node) override
+	{
+
+	}
+
+	void visit(const Ptr<GuiModel>& node) override
+	{
+
+	}
+
+	std::stringstream m_stream;
+};
+
+std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
+{
+	ToScriptVisitor visitor;
+
+	std::vector<glm::ivec4> connections;
+
+	for (const auto& node : nodes)
+	{
+		node->accept(visitor);
+
+		for (const auto& input : node->getNodebase()->getInputPins())
+		{
+			if (!input.isPluggedIn())
+			{
+				continue;
+			}
+
+			auto parent = input.getParentPin()->getOwner();
+
+			const auto fromId = parent->getId();
+			const auto fromPin = input.getParentPin()->Index;
+			const auto toId = node->getId();
+			const auto toPin = input.Index;
+
+			connections.push_back({fromId, fromPin, toId, toPin});
+		}
+	}
+
+	for (const auto& connection : connections)
+	{
+		visitor.append(fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x, connection.y, connection.z, connection.w));
+	}
+
+	return visitor.getScript();
+}
+
 // These have to be set in each node type.
+// clang-format off
 #define I3T_NODE_COMMON                                                                                                \
-	"type",                                                                                                            \
-	    [](Ptr<GuiNode> self) {                                                                                        \
-		    return self->getNodebase()->getOperation()->keyWord;                                                       \
-	    },                                                                                                             \
-	    "get_float", &getValue<float>, "get_vec3", &getValue<glm::vec3>, "get_vec4", &getValue<glm::vec4>, "get_mat4", \
-	    &getValue<glm::mat4>, /* setters */                                                                            \
-	    "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>)
+"type",                                                                                                                \
+	[](Ptr<GuiNode> self) {                                                                                            \
+		return self->getNodebase()->getOperation()->keyWord;                                                           \
+	},                                                                                                                 \
+"get_float", &getValue<float>,                                                                                         \
+"get_vec3", &getValue<glm::vec3>,                                                                                      \
+"get_vec4", &getValue<glm::vec4>,                                                                                      \
+"get_mat4", &getValue<glm::mat4>                                                                                      \
+/* setters */                                                                                                          \
+/* "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>) */
+// clang-format on
 
 LUA_REGISTRATION
 {
@@ -206,6 +394,14 @@ LUA_REGISTRATION
 		"get_id", &GuiNode::getId,
 		"get_position", &GuiNode::getNodePositionDiwne,
 		"set_position", &GuiNode::setNodePositionDiwne,
+		"get_label", &GuiNode::getTopLabel,
+		"set_label", &GuiNode::setTopLabel,
+		"get_render", &GuiNode::getRender,
+		"set_render", &GuiNode::setRender,
+		"get_number_of_decimals", &GuiNode::getNumberOfVisibleDecimal,
+		"set_number_of_decimals", &GuiNode::setNumberOfVisibleDecimal,
+		"get_lod", &GuiNode::getLevelOfDetail,
+		"set_lod", &GuiNode::setLevelOfDetail,
 		// inputs/outputs
 /*
 		"plug", [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
@@ -246,7 +442,17 @@ LUA_REGISTRATION
 
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
-		I3T_NODE_COMMON
+		// getters
+		"get_float", &getValue<float>,
+		"get_vec3", &getValue<glm::vec3>,
+		"get_vec4", &getValue<glm::vec4>,
+		"get_mat4", &getValue<glm::mat4>,
+		// setters
+		"set_value", sol::overload(
+			&setValue<GuiOperator, float>,
+			&setValue<GuiOperator, glm::vec3>,
+			&setValue<GuiOperator, glm::vec4>
+		)
 	);
 
 	L.new_usertype<GuiTransform>(
@@ -427,6 +633,10 @@ LUA_REGISTRATION
 		{
 			node->deleteActionDiwne();
 		}
+	};
+
+	api["to_script"] = []() -> std::string {
+		return to_script(getWorkspaceNodes());
 	};
 
 	api["get_all_nodes"] = getWorkspaceNodes;
