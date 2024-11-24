@@ -55,11 +55,14 @@ static bool setValue(Ptr<R> guiNode, const T& value)
 {
 	const auto node = guiNode->getNodebase();
 
-	if (!node->getOperation()->isConstructor)
+	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
+
+	if (!node->getOperation()->isConstructor && !isTransform)
 	{
 		print("cannot set value for this node");
 		return false;
 	}
+
 	if (node->data().index() != variant_index<Core::Data::Storage, T>())
 	{
 		print("invalid value type for this node");
@@ -210,7 +213,7 @@ std::string toConstructor(const glm::quat& vec)
 
 std::string toConstructor(const glm::mat4 mat)
 {
-	std::string result = "Matrix.new(";
+	std::string result = "Mat4.new(";
 	for (int i = 0; i < 4; ++i)
 	{
 		result += toConstructor(mat[i]);
@@ -241,16 +244,14 @@ Result<std::string, Error> toConstructor(const Core::Data& data)
 	case Core::EValueType::Quat:
 		return toConstructor(data.getQuat());
 	case Core::EValueType::MatrixMul:
-		return Err("Not implemented!");
 	case Core::EValueType::Screen:
-		return Err("Not implemented!");
 	case Core::EValueType::Ptr:
 		return Err("Not implemented!");
 	}
 
 	return Err("Invalid data type!");
 }
-};
+}; // namespace LuaSerializer
 
 class ToScriptVisitor : public NodeVisitor
 {
@@ -273,9 +274,11 @@ private:
 			m_stream << fmt::format("node_{}:set_label(\"{}\")\n", node->getId(), node->getTopLabel());
 		}
 		m_stream << fmt::format("node_{}:set_render({})\n", node->getId(), node->getRender());
-		m_stream << fmt::format("node_{}:set_number_of_decimals({})\n", node->getId(), node->getNumberOfVisibleDecimal());
+		m_stream << fmt::format("node_{}:set_number_of_decimals({})\n", node->getId(),
+		                        node->getNumberOfVisibleDecimal());
 		m_stream << fmt::format("node_{}:set_lod({})\n", node->getId(), (int) node->getLevelOfDetail());
-		m_stream << fmt::format("node_{}:set_position({})\n", node->getId(), LuaSerializer::toConstructor(node->getNodePositionDiwne()));
+		m_stream << fmt::format("node_{}:set_position({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(node->getNodePositionDiwne()));
 	}
 
 	void visit(const Ptr<GuiCamera>& node) override
@@ -312,22 +315,79 @@ private:
 
 	void visit(const Ptr<GuiSequence>& node) override
 	{
+		auto coreNode = node->getNodebase()->as<Core::Sequence>();
 
+		m_stream << fmt::format("local node_{} = Sequence.new()\n", node->getId());
+		dumpCommon(node);
+
+		for (const auto& transform : node->getInnerWorkspaceNodes())
+		{
+			transform->accept(*this);
+			m_stream << fmt::format("node_{}:push(node_{})\n", node->getId(), transform->getId());
+		}
 	}
 
 	void visit(const Ptr<GuiTransform>& node) override
 	{
+		auto coreNode = node->getNodebase()->as<Core::Transform>();
 
+		m_stream << fmt::format("local node_{} = Transform.new(\"{}\")\n", node->getId(),
+		                        coreNode->getOperation()->keyWord);
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_value({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(coreNode->data().getMat4()));
+
+		if (coreNode->hasSynergies())
+		{
+			m_stream << fmt::format("node_{}:enable_synergies()\n", node->getId());
+		}
+		else
+		{
+			m_stream << fmt::format("node_{}:disable_synergies()\n", node->getId());
+		}
+
+		if (coreNode->isLocked())
+		{
+			m_stream << fmt::format("node_{}:lock()\n", node->getId());
+		}
+		else
+		{
+			m_stream << fmt::format("node_{}:unlock()\n", node->getId());
+		}
+
+		for (const auto& [key, data] : coreNode->getDefaultValues())
+		{
+			if (auto dataConstructor = LuaSerializer::toConstructor(data))
+			{
+				m_stream << fmt::format("node_{}:set_default_value(\"{}\", {})\n", node->getId(), key,
+				                        dataConstructor.value());
+			}
+			else
+			{
+				LOG_ERROR("Cannot serialize data to constructor on node {}", coreNode->getSignature());
+			}
+		}
 	}
 
-	void visit(const Ptr<GuiScreen>& node) override
-	{
-
-	}
+	void visit(const Ptr<GuiScreen>& node) override {}
 
 	void visit(const Ptr<GuiModel>& node) override
 	{
+		auto coreNode = node->getNodebase();
 
+		m_stream << fmt::format("local node_{} = Model.new()\n", node->getId());
+		dumpCommon(node);
+
+		auto model = node->viewportModel().lock();
+
+		m_stream << fmt::format("node_{}:set_model(\"{}\")\n", node->getId(), model->getModel());
+		m_stream << fmt::format("node_{}:set_visible({})\n", node->getId(), model->m_visible);
+		m_stream << fmt::format("node_{}:show_axes({})\n", node->getId(), model->m_showAxes);
+		m_stream << fmt::format("node_{}:set_opaque({})\n", node->getId(), model->m_opaque);
+		m_stream << fmt::format("node_{}:set_opacity({})\n", node->getId(), model->m_opacity);
+		m_stream << fmt::format("node_{}:set_tint({})\n", node->getId(), LuaSerializer::toConstructor(model->m_tint));
+		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
 	}
 
 	std::stringstream m_stream;
@@ -363,7 +423,8 @@ std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
 
 	for (const auto& connection : connections)
 	{
-		visitor.append(fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x, connection.y, connection.z, connection.w));
+		visitor.append(fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x, connection.y,
+		                           connection.z, connection.w));
 	}
 
 	return visitor.getScript();
@@ -461,25 +522,22 @@ LUA_REGISTRATION
 	    "get_value", [](Ptr<GuiTransform> self) {
 		    return getValue<glm::mat4>(self);
 	    },
-	    "set_value",
-	    [](Ptr<GuiTransform> self, float value, const ImVec2& coords) {
-		    const auto glmCoords = glm::vec2(coords.x, coords.y);
-		    const auto result = self->getNodebase()->setValue(value, glmCoords);
-		    if (result.status != Core::SetValueResult::Status::Ok)
-		    {
-			    print(result.message);
-		    }
-	    },
 	    // get default value
 	    "get_float", &getDefaultValue<float>,
 	    "get_vec3", &getDefaultValue<glm::vec3>,
 	    "get_vec3", &getDefaultValue<glm::vec4>,
-	    // set default value
-		/*
-	    "set_float", &setDefaultValue<float>,
-	    "set_vec3", &setDefaultValue<glm::vec3>,
-	    "set_vec4", &setDefaultValue<glm::vec4>,
-	     */
+		// setters
+		"set_value", sol::overload(
+			&setValue<GuiTransform, glm::mat4>,
+			[](Ptr<GuiTransform> self, float value, const ImVec2& coords) {
+				const auto glmCoords = glm::vec2(coords.x, coords.y);
+				const auto result = self->getNodebase()->setValue(value, glmCoords);
+				if (result.status != Core::SetValueResult::Status::Ok)
+				{
+					print(result.message);
+				}
+			}
+		),
 		"set_default_value", sol::overload(
 			&setDefaultValue<float>,
 			&setDefaultValue<glm::vec3>,
@@ -577,22 +635,27 @@ LUA_REGISTRATION
 	L.new_usertype<GuiModel>(
 		"Model",
 		sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
-		sol::meta_function::construct, []() -> Ptr<GuiModel> {
-			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+		sol::meta_function::construct, sol::overload(
+			[]() -> Ptr<GuiModel> {
+				auto model = Workspace::addNodeToNodeEditor<GuiModel>();
 
-			print(fmt::format("ID: {}", model->getNodebase()->getId()));
+				print(fmt::format("ID: {}", model->getNodebase()->getId()));
 
-			return model;
-		},
-		sol::meta_function::construct, [](const std::string& modelAlias) -> Ptr<GuiModel> {
-			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
-			model->m_viewportModel.lock()->setModel(modelAlias);
+				return model;
+			},
+			[](const std::string& modelAlias) -> Ptr<GuiModel> {
+				auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+				model->m_viewportModel.lock()->setModel(modelAlias);
 
-			print(fmt::format("ID: {}", model->getNodebase()->getId()));
+				print(fmt::format("ID: {}", model->getNodebase()->getId()));
 
-			return model;
-		},
+				return model;
+			}
+		),
 		I3T_NODE_COMMON,
+		"set_model", [](GuiModel& self, const std::string& value) {
+			self.m_viewportModel.lock()->setModel(value);
+		},
 		"set_visible", [](GuiModel& self, bool value) {
 			self.m_viewportModel.lock()->m_visible = value;
 		},
@@ -696,7 +759,7 @@ LUA_REGISTRATION
 		}
 	};
 
-	api["print_transform_types"] = []() {
+	api["print_node_types"] = []() {
 		const auto types = magic_enum::enum_names<Core::ETransformType>();
 		for (const auto& t : types)
 		{
