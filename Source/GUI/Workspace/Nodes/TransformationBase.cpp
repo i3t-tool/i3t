@@ -117,8 +117,7 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 		inner_interaction_happen = drawDataFull();
 	}
 	if (inner_interaction_happen) {
-		context.interacted++; // TODO: Probably pass context to drawData methods too
-		context.inputConsumed++;
+		context.update(true, false, true); // TODO: Probably pass context to drawData methods too
 	}
 }
 

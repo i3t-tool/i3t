@@ -62,6 +62,7 @@ void I3TApplication::onInit()
 	stateManager->loadGlobal();
 	stateManager->newScene(true);
 
+	// TODO: (DR)s Isn't this redundant? This is already called in StateManager
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
 	});

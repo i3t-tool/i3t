@@ -16,6 +16,8 @@
 
 #include "NodeEditor.h"
 
+#include "Logger/Logger.h" // TODO: Remove
+
 namespace DIWNE
 {
 
@@ -104,7 +106,7 @@ public:
 
 		DrawInfo drawResult = drawDiwneEx(context);
 
-		if (drawResult.interacted && !m_toDelete)
+		if (drawResult.logicalUpdates && !m_toDelete)
 		{
 			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
 			if (diwne.getDiwneActionActive() == DiwneAction::None ||

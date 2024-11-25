@@ -201,8 +201,9 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	if (interaction_happen)
-		context.interacted++;
+	if (interaction_happen) {
+		context.update(true, true, true);
+	}
 }
 
 Ptr<Core::Node> const CoreNode::getNodebase() const

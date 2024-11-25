@@ -250,6 +250,11 @@ void NodeEditor::updateLayout(DrawInfo& context)
 	m_rect = getWorkAreaDiwne();
 }
 
+void NodeEditor::afterDraw(DrawInfo& context)
+{
+	shiftInteractingNodeToEnd();
+}
+
 void NodeEditor::clear()
 {
 	setLastActiveNode<DIWNE::Node>(nullptr);
@@ -418,6 +423,60 @@ bool NodeEditor::processDiwneZoom()
 		return processZoom();
 	}
 	return false;
+}
+
+void NodeEditor::shiftNodesToBegin(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift)
+{
+	for (int i = 0; i < nodesToShift.size(); i++)
+	{
+		auto ith_selected_node =
+		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		                 [nodesToShift, i](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
+			                 return node->getId() == nodesToShift.at(i)->getId();
+		                 });
+
+		if (ith_selected_node != m_workspaceCoreNodes.end())
+		{
+			std::iter_swap(m_workspaceCoreNodes.begin() + i, ith_selected_node);
+		}
+	}
+}
+
+void NodeEditor::shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift)
+{
+	int node_num = nodesToShift.size();
+	//    str2.erase(std::remove_if(str2.begin(),
+	//                              str2.end(),
+	//                              [](unsigned char x){return std::isspace(x);})
+	//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
+	for (int i = 0; i < node_num; i++)
+	{
+		auto ith_selected_node =
+		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		                 [nodesToShift, i](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
+			                 return node->getId() == nodesToShift.at(i)->getId();
+		                 });
+		if (ith_selected_node != m_workspaceCoreNodes.end())
+		{
+			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
+		}
+	}
+}
+
+void NodeEditor::shiftInteractingNodeToEnd()
+{
+	if (mp_lastActiveNode != nullptr && mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
+	{
+		auto draged_node_it = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		                                   [this](Ptr<Workspace::CoreNode> const& node) -> bool {
+			                                   return node.get() == this->mp_lastActiveNode.get();
+		                                   });
+
+		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end() - 1)
+		{
+			std::rotate(draged_node_it, draged_node_it + 1, m_workspaceCoreNodes.end());
+		}
+	}
 }
 
 void NodeEditor::updateWorkAreaRectangles()
@@ -686,6 +745,7 @@ void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2
 
 	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
 	m_workspaceCoreNodes.push_back(node);
+	node->m_parentLabel = m_labelDiwne;            // Set the editor as the node's parent
 	this->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
 } /* namespace DIWNE */

@@ -51,6 +51,9 @@ DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)
 
 void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 {
+#if DIWNE_DEBUG_ENABLED
+	auto debug_logicalUpdate = context.logicalUpdates;
+#endif
 	m_drawMode2 = mode;
 	m_drawnThisFrame = false;
 
@@ -79,11 +82,14 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			{
 				originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
 			}
-			ImGui::GetForegroundDrawList()->AddText(diwne.diwne2screen(originPos) + ImVec2(0, ImGui::GetFontSize()),
-			                                        IM_COL32_WHITE,
-			                                        (std::string() + (m_hovered ? "Hovered\n" : "") +
-			                                         (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : ""))
-			                                            .c_str());
+			auto interactionCount = context.logicalUpdates - debug_logicalUpdate;
+			ImGui::GetForegroundDrawList()->AddText(
+			    diwne.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
+			    (std::string() + m_labelDiwne +
+			     (m_parentLabel.empty() ? " (no parent)\n" : " (" + m_parentLabel + ")\n") +
+			     (m_hovered ? "Hovered\n" : "") + (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
+			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""))
+			        .c_str());
 			if (dynamic_cast<NodeEditor*>(this))
 			{
 				ImGui::GetForegroundDrawList()->AddText(
@@ -294,7 +300,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	if (m_drawMode2 != DrawMode::Interacting)
 		return;
 
-	if (ImGui::IsKeyDown(ImGuiKey_E))
+	if (ImGui::IsKeyDown(ImGuiKey_T))
 		int x = 5;
 
 	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.m_input->bypassIsMouseDragging0())
@@ -378,14 +384,16 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 void DiwneObject::processHoverDiwne(DrawInfo& context)
 {
 	bool hovered = isHoveredDiwne() && allowHover();
-	m_hovered = hovered && !context.hoverConsumed;
+	m_hovered =
+	    hovered && !context.hoverConsumed && (context.hoverTarget.empty() || context.hoverTarget == m_labelDiwne);
 	if (m_hovered)
 	{
 		onHover(context);
 		if (m_hoverRoot)
 			context.hoverConsumed++;
+		else
+			context.hoverTarget = m_parentLabel;
 	}
-	//	LOG_INFO("{} hovered: {}", m_labelDiwne, m_hovered);
 }
 
 void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
@@ -429,7 +437,6 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	bool isDragged = isDraggedDiwne();
 	bool dragStart = false;
 	bool dragEnd = false;
-	LOG_INFO("{} processDrag", m_labelDiwne);
 	if (context.dragging) // Check if something is being dragged
 	{
 		if (context.dragSource == m_labelDiwne) // This object is being dragged
@@ -536,17 +543,20 @@ bool DiwneObject::getSelectable()
 	return m_selectable;
 }
 
+// TDDO: Remove
 void DrawInfo::merge(const DrawInfo& other)
 {
 	this->inputConsumed |= other.inputConsumed;
-	this->interacted |= other.interacted;
+	// this->interacted |= other.interacted;
 }
 
+// TDDO: Remove
 void DrawInfo::operator|=(const DrawInfo& other)
 {
 	merge(other);
 }
 
+// TDDO: Remove
 DrawInfo DrawInfo::operator|(const DrawInfo& other)
 {
 	DrawInfo newInfo(*this);
@@ -557,9 +567,43 @@ DrawInfo DrawInfo::operator|(const DrawInfo& other)
 DrawInfo DrawInfo::findChange(const DrawInfo& other) const
 {
 	DrawInfo change;
-	change.interacted = this->interacted - other.interacted;
-	change.inputConsumed = this->interacted - other.interacted;
+	change.visualUpdates = this->visualUpdates - other.visualUpdates;
+	change.logicalUpdates = this->logicalUpdates - other.logicalUpdates;
+	change.inputConsumed = this->inputConsumed - other.inputConsumed;
+	change.hoverConsumed = this->hoverConsumed - other.hoverConsumed;
 	return change;
+}
+
+void DrawInfo::visualUpdate()
+{
+	visualUpdates++;
+}
+
+void DrawInfo::logicalUpdate(bool isVisualUpdateAsWell)
+{
+	if (isVisualUpdateAsWell)
+		visualUpdate();
+	logicalUpdates++;
+}
+
+void DrawInfo::consumeInput()
+{
+	inputConsumed++;
+}
+
+void DrawInfo::consumeHover()
+{
+	hoverConsumed++;
+}
+
+void DrawInfo::update(bool visual, bool logical, bool blockInput)
+{
+	if (visual)
+		visualUpdate();
+	if (logical)
+		logicalUpdate(false);
+	if (blockInput)
+		consumeInput();
 }
 
 ContextTracker::ContextTracker(const DrawInfo& context)
@@ -651,7 +695,7 @@ void DiwneObject::onHover(DrawInfo& context)
 		int x = 5; // Debug thing
 	}
 
-	context.interacted++; // Hovering is considered an interaction (not blocking input though)
+	context.update(true);
 
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
@@ -683,7 +727,7 @@ void DiwneObject::onHover(DrawInfo& context)
 //		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_GREEN_50, 0,
 // ImDrawFlags_RoundCornersNone, 1);
 //	});
-//	context.interacted = true;
+//	context.visualUpdate++;
 // }
 // bool DiwneObject::allowProcessFocusedForInteraction()
 //{
@@ -710,7 +754,8 @@ void DiwneObject::onHover(DrawInfo& context)
 //
 void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 {
-	context.interacted = true;
+	if (justPressed)
+		context.update(false, true);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
 		                               DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
@@ -724,7 +769,6 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 }
 void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 {
-	context.interacted = true;
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (justReleased)
 		{
@@ -736,7 +780,7 @@ void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 }
 void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	context.interacted = true;
+	context.update(true, true, false);
 
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (dragStart)
@@ -765,7 +809,7 @@ bool DiwneObject::bypassReleaseAction()
 
 // void DiwneObject::processSelect(DrawInfo& context)
 //{
-//	context.interacted = true;
+//	context.interacted++;
 // }
 // bool DiwneObject::allowProcessSelect()
 //{

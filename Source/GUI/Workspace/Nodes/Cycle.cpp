@@ -484,7 +484,8 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		{
 			m_nodebase->as<Core::Cycle>()->setFrom(localData);
 			updateDataItemsWidth();
-			context.interacted++;
+
+			context.update(true, true, true);
 		}
 
 		//----------------
@@ -550,7 +551,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		                                                                 : Core::EValueState::Editable,
 		    valueChanged);
 		if (interaction)
-			context.interacted++;
+			context.update(true, true, true);
 
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
@@ -907,7 +908,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 	ImGui::PopStyleVar(2); // FramePadding, ItemSpacing
 
 	if (inner_interaction_happen)
-		context.interacted++;
+		context.update(true, true, true);
 }
 
 int Cycle::maxLengthOfData()

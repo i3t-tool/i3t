@@ -188,6 +188,9 @@ public:
 	void end(DrawInfo& context) override;
 
 protected:
+	void afterDraw(DrawInfo& context) override;
+
+protected:
 	void finalizeDiwne(DrawInfo& context) override;
 
 public:
@@ -286,6 +289,8 @@ public:
 		return m_diwneAction_previousFrame;
 	};
 
+
+	// TODO: Remove these old action things
 	DiwneAction getDiwneActionActive() const;
 
 	DIWNE::DiwneAction getHoldActionType() const final
@@ -302,6 +307,13 @@ public:
 	};
 
 	DIWNE::Link& getHelperLink();
+
+	// Node shifting
+	// =============================================================================================================
+
+	void shiftNodesToBegin(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift);
+	void shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift);
+	void shiftInteractingNodeToEnd();
 
 	template <typename T>
 	std::shared_ptr<T> getLastActivePin()
@@ -334,6 +346,8 @@ public:
 		    std::is_base_of_v<DIWNE::Node, T>, "Node must be derived from DIWNE::Node class.");
 		mp_lastActiveNode = node;
 	}
+
+	// =============================================================================================================
 
 	void setNodesSelectionChanged(bool value)
 	{

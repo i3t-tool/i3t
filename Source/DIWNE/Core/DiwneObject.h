@@ -15,9 +15,9 @@
  */
 #pragma once
 
+#include <any>
 #include <memory>
 #include <string>
-#include <any>
 
 #include "diwne_imgui.h"
 
@@ -56,12 +56,14 @@ public:
 	//   label includes ID at the end which isn't too clear
 	//  Perhaps keep this and make clear in docs
 	static unsigned long long g_diwneIDCounter;
-	DIWNE::ID const m_idDiwne;      /**< Used for creating ImGui id/labels */
-	std::string const m_labelDiwne; /**< Used for identifying object and creating ImGui id/labels */
+	DIWNE::ID m_idDiwne;      /**< Used for creating ImGui id/labels */
+	std::string m_labelDiwne; /**< Used for identifying object and creating ImGui id/labels */
 	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
-	std::string const m_popupIDDiwne; /**< Used for identifying what element raise popup */
+	std::string m_popupIDDiwne; /**< Used for identifying what element raise popup */
 
 	ImRect m_rect;
+
+	std::string m_parentLabel; ///< Sets the parent object of object, relevant in hover hierarchy.
 
 	//
 
@@ -81,7 +83,7 @@ public:
 	//
 
 	bool m_selectable{true};
-	bool m_isHeld{false};    /**< Is object held. Requirement for dragging. When dragged it is still held. */
+	bool m_isHeld{false}; /**< Is object held. Requirement for dragging. When dragged it is still held. */
 
 	bool m_isDragged{false}; /**< Is object dragged */
 	bool m_selected{false};  /**< Is object selected */
@@ -114,7 +116,7 @@ public:
 
 protected:
 	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
-						  ///< Can be set in the end() method to determine if object is hovered if applicable
+	                      ///< Can be set in the end() method to determine if object is hovered if applicable
 
 public:
 	/**
@@ -198,7 +200,7 @@ public:
 	// =============================================================================================================
 
 	virtual bool allowInteraction() const; ///< Decide whether the object can interact (not including content elements)
-	virtual void processInteractions(DrawInfo& context) {};
+	virtual void processInteractions(DrawInfo& context){};
 
 	// Popups
 	// =============================================================================================================
@@ -344,7 +346,7 @@ protected:
 	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
 
 public:
-	virtual bool bypassRaisePopupAction();          /**< action used for raising popup menu */
+	virtual bool bypassRaisePopupAction(); /**< action used for raising popup menu */
 	// TODO: Rename this to something like "action area" / "trigger area"?
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
@@ -371,12 +373,12 @@ public:
 	 */
 	virtual bool isJustPressedDiwne();
 
-	virtual bool bypassPressAction();               // TODO: Remove probably
-	virtual bool bypassReleaseAction();             // TODO: Remove probably
-	virtual bool bypassSelectAction();              /**< action used for selecting object */
-	virtual bool bypassUnselectAction();            /**< action used for unselecting object */
-	virtual bool bypassTouchAction();               /**< action used for touching object - not interact with
-	                                                   it, just move it to front of other objects */
+	virtual bool bypassPressAction();    // TODO: Remove probably
+	virtual bool bypassReleaseAction();  // TODO: Remove probably
+	virtual bool bypassSelectAction();   /**< action used for selecting object */
+	virtual bool bypassUnselectAction(); /**< action used for unselecting object */
+	virtual bool bypassTouchAction();    /**< action used for touching object - not interact with
+	                                        it, just move it to front of other objects */
 
 	// =============================================================================================================
 	// END OF INTERACTION
@@ -427,19 +429,35 @@ public:
 class DrawInfo
 {
 public:
-	/**
-	 * Whether any kind of interaction that has a visual or logical impact is occurring.
-	 * This can be a simple mouse hover that doesn't capture input in any way.
-	 */
-	unsigned short interacted{0};
+	// TODO: Make actual fields private and add const getters.
+
+	/// Number of purely visual interactions that are occurring. This can be a simple mouse hover.
+	unsigned short visualUpdates{0};
+	void visualUpdate();
+
+	/// Indicates changes in logic, eg. change of some attribute or a non blocking button press. Requests focus.
+	unsigned short logicalUpdates{0};
+	void logicalUpdate(bool isVisualUpdateAsWell = true);
 
 	/// Whether input has been captured by an object previously and should not be reacted to anymore.
 	unsigned short inputConsumed{0};
+	void consumeInput();
 
-	/// Whether objects should not be hovered anymore
+	/// Whether objects should not be hovered anymore // TODO: This is currently unused, but potentially useful
 	unsigned short hoverConsumed{0};
+	std::string hoverTarget;
+	void consumeHover();
 
-	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	/// Composite update method
+	void update(bool visual, bool logical = false, bool blockInput = false);
+
+	// TODO: Stuff below this is more presistent than above, and cannot really be "versioned" with the short counter.
+	//  Meaning finding the difference between two DrawInfos becomes a little meaningless
+	//  Thus it would be a good argument to wrap the stuff below into a different struct and keep that as a NodeEditor
+	//  member or keep a pointer to it in the context and just pass that along
+	//  (would help with copying performance as well) (although I don't particulary consider that to be an issue anyway)
+
+	// TODO: Write docs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Active action idea, we have a descriptor for the current "action", it has a source
 	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
 	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
@@ -448,7 +466,7 @@ public:
 	std::any actionData;
 
 	unsigned short dragging{0}; // TODO: Maybe change this to a varchar representing the active perpetual "action"
-	std::string dragSource;         // TODO: If the above was changed, then this can be the source of the action
+	std::string dragSource;     // TODO: If the above was changed, then this can be the source of the action
 	// TODO: Question then arises what if there are multiple active actions? Do we make those two above arrays? vectors?
 
 	DrawInfo findChange(const DrawInfo& other) const;

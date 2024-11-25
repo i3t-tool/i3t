@@ -115,7 +115,7 @@ public:
 	{
 		if (ImGui::Checkbox("/2", &m_halfAngle)) /* mode changed */
 		{
-			context.interacted++;
+			context.update(true, true);
 			if (m_workspaceInputs.at(m_halfAngle ? 0 : 1)->isConnected()) /* previous mode pin is connected */
 			{
 				/* connect visible pin and unplug hidden one */

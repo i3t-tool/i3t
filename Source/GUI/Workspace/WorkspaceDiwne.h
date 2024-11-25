@@ -43,8 +43,6 @@
 
 namespace Workspace
 {
-typedef std::vector<Ptr<CoreNode>>::iterator coreNodeIter;
-
 enum WorkspaceDiwneAction
 {
 	None,
@@ -209,10 +207,6 @@ public:
 	}
 
 	void manipulatorStartCheck3D();
-
-	void shiftNodesToBegin(std::vector<Ptr<CoreNode>> const& nodesToShift);
-	void shiftNodesToEnd(std::vector<Ptr<CoreNode>> const& nodesToShift);
-	void shiftInteractingNodeToEnd();
 
 	void processDragAllSelectedNodes();
 

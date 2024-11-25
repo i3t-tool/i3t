@@ -1492,59 +1492,6 @@ std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllNodesInnerIncluded()
 	return allNodes;
 }
 
-void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<CoreNode>> const& nodesToShift)
-{
-
-	for (int i = 0; i < nodesToShift.size(); i++)
-	{
-		coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                              [nodesToShift, i](Ptr<CoreNode> const& node) -> bool {
-			                                              return node->getId() == nodesToShift.at(i)->getId();
-		                                              });
-
-		if (ith_selected_node != m_workspaceCoreNodes.end())
-		{
-			std::iter_swap(m_workspaceCoreNodes.begin() + i, ith_selected_node);
-		}
-	}
-}
-
-void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<CoreNode>> const& nodesToShift)
-{
-	int node_num = nodesToShift.size();
-	//    str2.erase(std::remove_if(str2.begin(),
-	//                              str2.end(),
-	//                              [](unsigned char x){return std::isspace(x);})
-	//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
-	for (int i = 0; i < node_num; i++)
-	{
-		coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                              [nodesToShift, i](Ptr<CoreNode> const& node) -> bool {
-			                                              return node->getId() == nodesToShift.at(i)->getId();
-		                                              });
-		if (ith_selected_node != m_workspaceCoreNodes.end())
-		{
-			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
-		}
-	}
-}
-
-void WorkspaceDiwne::shiftInteractingNodeToEnd()
-{
-	if (mp_lastActiveNode != nullptr && mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
-	{
-		coreNodeIter draged_node_it = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                           [this](Ptr<CoreNode> const& node) -> bool {
-			                                           return node.get() == this->mp_lastActiveNode.get();
-		                                           });
-
-		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end() - 1)
-		{
-			std::rotate(draged_node_it, draged_node_it + 1, m_workspaceCoreNodes.end());
-		}
-	}
-}
-
 std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodes()
 {
 	std::vector<Ptr<CoreNode>> selected;

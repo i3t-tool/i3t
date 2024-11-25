@@ -118,7 +118,7 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 	if (drawResizeHandles(topLeftCursorPos, zoomedTextureSize))
 	{
-		context.interacted++;
+		context.update(true, true, false);
 	}
 }
 

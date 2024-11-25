@@ -249,7 +249,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		                               Core::EValueState::Locked},
 		                              valueChanged, rowOfChange, columnOfChange, valueOfChange))
 		{
-			context.interacted++;
+			context.update(true, true, true);
 		}
 		return;
 	}
@@ -366,7 +366,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	}
 
 	if (inner_interaction_happen)
-		context.interacted++;
+		context.update(true, true, true);
 }
 
 void Sequence::setNumberOfVisibleDecimal(int value)
