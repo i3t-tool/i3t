@@ -288,7 +288,23 @@ private:
 
 	void visit(const Ptr<GuiCycle>& node) override
 	{
-		/// \todo
+		auto coreNode = node->getNodebase()->as<Core::Cycle>();
+
+		m_stream << fmt::format("local node_{} = Cycle.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_from({})\n", node->getId(), coreNode->getFrom());
+		m_stream << fmt::format("node_{}:set_to({})\n", node->getId(), coreNode->getTo());
+		m_stream << fmt::format("node_{}:set_manual_step({})\n", node->getId(), coreNode->getManualStep());
+		m_stream << fmt::format("node_{}:set_step({})\n", node->getId(), coreNode->getStep());
+		m_stream << fmt::format("node_{}:set_step_duration({})\n", node->getId(), coreNode->getStepDuration());
+		m_stream << fmt::format("node_{}:set_smooth({})\n", node->getId(), coreNode->getSmoothStep());
+		m_stream << fmt::format("node_{}:set_mode({})\n", node->getId(), (int) coreNode->getMode());
+
+		if (coreNode->isRunning())
+		{
+			m_stream << fmt::format("node_{}:play()\n", node->getId());
+		}
 	}
 
 	void visit(const Ptr<GuiOperator>& node) override
@@ -635,23 +651,13 @@ LUA_REGISTRATION
 	L.new_usertype<GuiModel>(
 		"Model",
 		sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
-		sol::meta_function::construct, sol::overload(
-			[]() -> Ptr<GuiModel> {
-				auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+		sol::meta_function::construct, []() -> Ptr<GuiModel> {
+			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
 
-				print(fmt::format("ID: {}", model->getNodebase()->getId()));
+			print(fmt::format("ID: {}", model->getNodebase()->getId()));
 
-				return model;
-			},
-			[](const std::string& modelAlias) -> Ptr<GuiModel> {
-				auto model = Workspace::addNodeToNodeEditor<GuiModel>();
-				model->m_viewportModel.lock()->setModel(modelAlias);
-
-				print(fmt::format("ID: {}", model->getNodebase()->getId()));
-
-				return model;
-			}
-		),
+			return model;
+		},
 		I3T_NODE_COMMON,
 		"set_model", [](GuiModel& self, const std::string& value) {
 			self.m_viewportModel.lock()->setModel(value);
@@ -673,6 +679,43 @@ LUA_REGISTRATION
 		},
 		"set_tint_strength", [](GuiModel& self, float value) {
 			self.m_viewportModel.lock()->m_tintStrength = value;
+		}
+	);
+
+	L.new_usertype<Workspace::Cycle>(
+		"Cycle",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Cycle> {
+			auto cycle = Workspace::addNodeToNodeEditor<Workspace::Cycle>();
+
+			print(fmt::format("ID: {}", cycle->getNodebase()->getId()));
+
+			return cycle;
+		},
+		"set_from", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setFrom(value);
+		},
+		"set_to", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setTo(value);
+		},
+		"set_manual_step", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStep(value);
+		},
+		"set_step", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStep(value);
+		},
+		"set_step_duration", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStepDuration(value);
+		},
+		"set_smooth", [](Workspace::Cycle& self, bool value) {
+			self.getNodebase()->as<Core::Cycle>()->setSmoothStep(value);
+		},
+		"set_mode", [](Workspace::Cycle& self, int value) {
+			auto mode = Core::Cycle::EMode(value);
+			self.getNodebase()->as<Core::Cycle>()->setMode(mode);
+		},
+		"play", [](Workspace::Cycle& self) {
+			self.getNodebase()->as<Core::Cycle>()->play();
 		}
 	);
 
