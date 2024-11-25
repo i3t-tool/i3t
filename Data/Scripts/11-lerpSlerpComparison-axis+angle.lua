@@ -1,0 +1,1 @@
+-- I3T.load_script_from("Data/Scripts/11-lerpSlerpComparison-axis+angle.lua")

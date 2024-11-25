@@ -261,14 +261,58 @@ public:
 		m_stream << str;
 	}
 
+	void appendConnections(const Ptr<Workspace::CoreNode>& node)
+	{
+		for (const auto& input : node->getNodebase()->getInputPins())
+		{
+			if (!input.isPluggedIn())
+			{
+				continue;
+			}
+
+			auto parent = input.getParentPin()->getOwner();
+
+			const auto fromId = parent->getId();
+			const auto fromPin = input.getParentPin()->Index;
+			const auto toId = node->getId();
+			const auto toPin = input.Index;
+
+			m_connections.push_back({fromId, fromPin, toId, toPin});
+		}
+	}
+
 	std::string getScript() const
 	{
-		return m_stream.str();
+		auto script = m_stream.str();
+
+		std::stringstream connectionsStream;
+
+		connectionsStream << "\n";
+		for (const auto& connection : m_connections)
+		{
+			connectionsStream << fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x,
+			                                 connection.y, connection.z, connection.w);
+		}
+
+		return script + connectionsStream.str();
 	}
 
 private:
+	void dumpTransforms(const Ptr<Workspace::Sequence>& sequence)
+	{
+		auto transforms = sequence->getInnerWorkspaceNodes();
+		std::reverse(transforms.begin(), transforms.end());
+		for (const auto& transform : transforms)
+		{
+			transform->accept(*this);
+			m_stream << fmt::format("node_{}:push(node_{})\n", sequence->getId(), transform->getId());
+		}
+	}
+
 	void dumpCommon(const Ptr<Workspace::CoreNode>& node)
 	{
+		appendConnections(node);
+
 		if (node->getTopLabel() != node->getNodebase()->getLabel())
 		{
 			m_stream << fmt::format("node_{}:set_label(\"{}\")\n", node->getId(), node->getTopLabel());
@@ -283,7 +327,20 @@ private:
 
 	void visit(const Ptr<GuiCamera>& node) override
 	{
-		/// \todo
+		auto coreNode = node->getNodebase()->as<Core::Camera>();
+
+		m_stream << fmt::format("local node_{} = Camera.new()\n", node->getId());
+		dumpCommon(node);
+
+		auto projection = node->getProjection();
+		m_stream << fmt::format("local node_{} = node_{}:get_projection()\n", projection->getId(), node->getId());
+		dumpTransforms(node->getProjection());
+		appendConnections(projection);
+
+		auto view = node->getView();
+		m_stream << fmt::format("local node_{} = node_{}:get_view()\n", view->getId(), node->getId());
+		dumpTransforms(node->getView());
+		appendConnections(view);
 	}
 
 	void visit(const Ptr<GuiCycle>& node) override
@@ -335,12 +392,7 @@ private:
 
 		m_stream << fmt::format("local node_{} = Sequence.new()\n", node->getId());
 		dumpCommon(node);
-
-		for (const auto& transform : node->getInnerWorkspaceNodes())
-		{
-			transform->accept(*this);
-			m_stream << fmt::format("node_{}:push(node_{})\n", node->getId(), transform->getId());
-		}
+		dumpTransforms(node);
 	}
 
 	void visit(const Ptr<GuiTransform>& node) override
@@ -386,7 +438,14 @@ private:
 		}
 	}
 
-	void visit(const Ptr<GuiScreen>& node) override {}
+	void visit(const Ptr<GuiScreen>& node) override
+	{
+		m_stream << fmt::format("local node_{} = Screen.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_aspect({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(node->getAspect()));
+	}
 
 	void visit(const Ptr<GuiModel>& node) override
 	{
@@ -406,6 +465,7 @@ private:
 		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
 	}
 
+	std::vector<glm::ivec4> m_connections;
 	std::stringstream m_stream;
 };
 
@@ -413,34 +473,9 @@ std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
 {
 	ToScriptVisitor visitor;
 
-	std::vector<glm::ivec4> connections;
-
 	for (const auto& node : nodes)
 	{
 		node->accept(visitor);
-
-		for (const auto& input : node->getNodebase()->getInputPins())
-		{
-			if (!input.isPluggedIn())
-			{
-				continue;
-			}
-
-			auto parent = input.getParentPin()->getOwner();
-
-			const auto fromId = parent->getId();
-			const auto fromPin = input.getParentPin()->Index;
-			const auto toId = node->getId();
-			const auto toPin = input.Index;
-
-			connections.push_back({fromId, fromPin, toId, toPin});
-		}
-	}
-
-	for (const auto& connection : connections)
-	{
-		visitor.append(fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x, connection.y,
-		                           connection.z, connection.w));
 	}
 
 	return visitor.getScript();
@@ -456,7 +491,7 @@ std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
 "get_float", &getValue<float>,                                                                                         \
 "get_vec3", &getValue<glm::vec3>,                                                                                      \
 "get_vec4", &getValue<glm::vec4>,                                                                                      \
-"get_mat4", &getValue<glm::mat4>                                                                                      \
+"get_mat4", &getValue<glm::mat4>                                                                                       \
 /* setters */                                                                                                          \
 /* "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>) */
 // clang-format on
@@ -719,6 +754,39 @@ LUA_REGISTRATION
 		}
 	);
 
+	L.new_usertype<Workspace::Camera>(
+		"Camera",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Camera> {
+			auto camera = Workspace::addNodeToNodeEditor<Workspace::Camera>();
+
+			print(fmt::format("ID: {}", camera->getNodebase()->getId()));
+
+			return camera;
+		},
+		"get_projection", [](Workspace::Camera& self) {
+			return self.getProjection();
+		},
+		"get_view", [](Workspace::Camera& self) {
+			return self.getView();
+		}
+	);
+
+	L.new_usertype<Workspace::Screen>(
+		"Screen",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Screen> {
+			auto screen = Workspace::addNodeToNodeEditor<Workspace::Screen>();
+
+			print(fmt::format("ID: {}", screen->getNodebase()->getId()));
+
+			return screen;
+		},
+		"set_aspect", [](Workspace::Screen& self, const ImVec2& value) {
+			self.setAspect(value);
+		}
+	);
+
 	// I3T functions
 
 	auto api = L["I3T"];
@@ -780,8 +848,9 @@ LUA_REGISTRATION
 	//
 
 	api["plug"] = [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
-		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from);
-		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to);
+		constexpr const bool searchInner = true;
+		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from, searchInner);
+		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to, searchInner);
 
 		if (!maybeFromNode || !maybeToNode)
 		{

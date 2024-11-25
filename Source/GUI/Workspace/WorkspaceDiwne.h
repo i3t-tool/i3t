@@ -141,7 +141,7 @@ public:
 	 * @return
 	 */
 	template <typename T>
-	Result<Ptr<T>, Error> getNode(Core::ID id) const;
+	Result<Ptr<T>, Error> getNode(Core::ID id, bool searchInner = false) const;
 
 	template <typename T>
 	void addTypeConstructorNode()
@@ -274,7 +274,7 @@ public:
 };
 
 template <typename T>
-Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id) const
+Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id, bool searchInner) const
 {
 	Ptr<GuiNode> node{};
 	for (const auto& n : getAllNodes())
@@ -282,6 +282,23 @@ Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id) const
 		if (n->getNodebase()->getId() == id)
 		{
 			node = n;
+			break;
+		}
+		else if (searchInner)
+		{
+			if (auto camera = std::dynamic_pointer_cast<Camera>(n))
+			{
+				if (camera->getProjection()->getNodebase()->getId() == id)
+				{
+					node = camera->getProjection();
+					break;
+				}
+				else if (camera->getView()->getNodebase()->getId() == id)
+				{
+					node = camera->getView();
+					break;
+				}
+			}
 		}
 	}
 
