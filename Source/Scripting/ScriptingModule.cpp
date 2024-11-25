@@ -104,10 +104,6 @@ void ScriptingModule::onInit()
 
 	auto api = m_Lua["I3T"];
 
-	api["save_script"] = [](const std::string& path) {
-		/// \todo
-	};
-
 	api["load_script"] = [this](const std::string& script) {
 		return runScript(script.c_str());
 	};

@@ -50,16 +50,19 @@ static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
 	return maybeValue;
 }
 
-template <typename T>
-static bool setValue(Ptr<GuiNode> guiNode, const T& value)
+template <typename R, typename T>
+static bool setValue(Ptr<R> guiNode, const T& value)
 {
 	const auto node = guiNode->getNodebase();
 
-	if (!node->getOperation()->isConstructor)
+	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
+
+	if (!node->getOperation()->isConstructor && !isTransform)
 	{
 		print("cannot set value for this node");
 		return false;
 	}
+
 	if (node->data().index() != variant_index<Core::Data::Storage, T>())
 	{
 		print("invalid value type for this node");
@@ -186,15 +189,312 @@ SOL_BASE_CLASSES(GuiNode, GuiSequence);
 SOL_DERIVED_CLASSES(GuiSequence, GuiNode);
  */
 
+namespace LuaSerializer
+{
+std::string toConstructor(const ImVec2& vec)
+{
+	return fmt::format("Vec2.new({}, {})", vec.x, vec.y);
+}
+
+std::string toConstructor(const glm::vec3& vec)
+{
+	return fmt::format("Vec3.new({}, {}, {})", vec.x, vec.y, vec.z);
+}
+
+std::string toConstructor(const glm::vec4& vec)
+{
+	return fmt::format("Vec4.new({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+}
+
+std::string toConstructor(const glm::quat& vec)
+{
+	return fmt::format("Vec4.new({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+}
+
+std::string toConstructor(const glm::mat4 mat)
+{
+	std::string result = "Mat4.new(";
+	for (int i = 0; i < 4; ++i)
+	{
+		result += toConstructor(mat[i]);
+		if (i != 3)
+		{
+			result += ", ";
+		}
+	}
+	result += ")";
+
+	return result;
+}
+
+Result<std::string, Error> toConstructor(const Core::Data& data)
+{
+	switch (data.valueType)
+	{
+	case Core::EValueType::Pulse:
+		return Err("Not implemented!");
+	case Core::EValueType::Float:
+		return std::to_string(data.getFloat());
+	case Core::EValueType::Vec3:
+		return toConstructor(data.getVec3());
+	case Core::EValueType::Vec4:
+		return toConstructor(data.getVec4());
+	case Core::EValueType::Matrix:
+		return toConstructor(data.getMat4());
+	case Core::EValueType::Quat:
+		return toConstructor(data.getQuat());
+	case Core::EValueType::MatrixMul:
+	case Core::EValueType::Screen:
+	case Core::EValueType::Ptr:
+		return Err("Not implemented!");
+	}
+
+	return Err("Invalid data type!");
+}
+}; // namespace LuaSerializer
+
+class ToScriptVisitor : public NodeVisitor
+{
+public:
+	void append(const std::string& str)
+	{
+		m_stream << str;
+	}
+
+	void appendConnections(const Ptr<Workspace::CoreNode>& node)
+	{
+		for (const auto& input : node->getNodebase()->getInputPins())
+		{
+			if (!input.isPluggedIn())
+			{
+				continue;
+			}
+
+			auto parent = input.getParentPin()->getOwner();
+
+			const auto fromId = parent->getId();
+			const auto fromPin = input.getParentPin()->Index;
+			const auto toId = node->getId();
+			const auto toPin = input.Index;
+
+			m_connections.push_back({fromId, fromPin, toId, toPin});
+		}
+	}
+
+	std::string getScript() const
+	{
+		auto script = m_stream.str();
+
+		std::stringstream connectionsStream;
+
+		connectionsStream << "\n";
+		for (const auto& connection : m_connections)
+		{
+			connectionsStream << fmt::format("I3T.plug(node_{}:get_id(), {}, node_{}:get_id(), {})\n", connection.x,
+			                                 connection.y, connection.z, connection.w);
+		}
+
+		return script + connectionsStream.str();
+	}
+
+private:
+	void dumpTransforms(const Ptr<Workspace::Sequence>& sequence)
+	{
+		auto transforms = sequence->getInnerWorkspaceNodes();
+		std::reverse(transforms.begin(), transforms.end());
+		for (const auto& transform : transforms)
+		{
+			transform->accept(*this);
+			m_stream << fmt::format("node_{}:push(node_{})\n", sequence->getId(), transform->getId());
+		}
+	}
+
+	void dumpCommon(const Ptr<Workspace::CoreNode>& node)
+	{
+		appendConnections(node);
+
+		if (node->getTopLabel() != node->getNodebase()->getLabel())
+		{
+			m_stream << fmt::format("node_{}:set_label(\"{}\")\n", node->getId(), node->getTopLabel());
+		}
+		m_stream << fmt::format("node_{}:set_render({})\n", node->getId(), node->getRender());
+		m_stream << fmt::format("node_{}:set_number_of_decimals({})\n", node->getId(),
+		                        node->getNumberOfVisibleDecimal());
+		m_stream << fmt::format("node_{}:set_lod({})\n", node->getId(), (int) node->getLevelOfDetail());
+		m_stream << fmt::format("node_{}:set_position({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(node->getNodePositionDiwne()));
+	}
+
+	void visit(const Ptr<GuiCamera>& node) override
+	{
+		auto coreNode = node->getNodebase()->as<Core::Camera>();
+
+		m_stream << fmt::format("local node_{} = Camera.new()\n", node->getId());
+		dumpCommon(node);
+
+		auto projection = node->getProjection();
+		m_stream << fmt::format("local node_{} = node_{}:get_projection()\n", projection->getId(), node->getId());
+		dumpTransforms(node->getProjection());
+		appendConnections(projection);
+
+		auto view = node->getView();
+		m_stream << fmt::format("local node_{} = node_{}:get_view()\n", view->getId(), node->getId());
+		dumpTransforms(node->getView());
+		appendConnections(view);
+	}
+
+	void visit(const Ptr<GuiCycle>& node) override
+	{
+		auto coreNode = node->getNodebase()->as<Core::Cycle>();
+
+		m_stream << fmt::format("local node_{} = Cycle.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_from({})\n", node->getId(), coreNode->getFrom());
+		m_stream << fmt::format("node_{}:set_to({})\n", node->getId(), coreNode->getTo());
+		m_stream << fmt::format("node_{}:set_manual_step({})\n", node->getId(), coreNode->getManualStep());
+		m_stream << fmt::format("node_{}:set_step({})\n", node->getId(), coreNode->getStep());
+		m_stream << fmt::format("node_{}:set_step_duration({})\n", node->getId(), coreNode->getStepDuration());
+		m_stream << fmt::format("node_{}:set_smooth({})\n", node->getId(), coreNode->getSmoothStep());
+		m_stream << fmt::format("node_{}:set_mode({})\n", node->getId(), (int) coreNode->getMode());
+
+		if (coreNode->isRunning())
+		{
+			m_stream << fmt::format("node_{}:play()\n", node->getId());
+		}
+	}
+
+	void visit(const Ptr<GuiOperator>& node) override
+	{
+		auto coreNode = node->getNodebase();
+		auto props = coreNode->getOperation();
+
+		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props->keyWord);
+		dumpCommon(node);
+
+		if (props->isConstructor)
+		{
+			auto data = coreNode->data(0);
+			if (auto dataConstructor = LuaSerializer::toConstructor(data))
+			{
+				m_stream << fmt::format("node_{}:set_value({})\n", node->getId(), dataConstructor.value());
+			}
+			else
+			{
+				LOG_ERROR("Cannot serialize data to constructor on node {}", coreNode->getSignature());
+			}
+		}
+	}
+
+	void visit(const Ptr<GuiSequence>& node) override
+	{
+		auto coreNode = node->getNodebase()->as<Core::Sequence>();
+
+		m_stream << fmt::format("local node_{} = Sequence.new()\n", node->getId());
+		dumpCommon(node);
+		dumpTransforms(node);
+	}
+
+	void visit(const Ptr<GuiTransform>& node) override
+	{
+		auto coreNode = node->getNodebase()->as<Core::Transform>();
+
+		m_stream << fmt::format("local node_{} = Transform.new(\"{}\")\n", node->getId(),
+		                        coreNode->getOperation()->keyWord);
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_value({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(coreNode->data().getMat4()));
+
+		if (coreNode->hasSynergies())
+		{
+			m_stream << fmt::format("node_{}:enable_synergies()\n", node->getId());
+		}
+		else
+		{
+			m_stream << fmt::format("node_{}:disable_synergies()\n", node->getId());
+		}
+
+		if (coreNode->isLocked())
+		{
+			m_stream << fmt::format("node_{}:lock()\n", node->getId());
+		}
+		else
+		{
+			m_stream << fmt::format("node_{}:unlock()\n", node->getId());
+		}
+
+		for (const auto& [key, data] : coreNode->getDefaultValues())
+		{
+			if (auto dataConstructor = LuaSerializer::toConstructor(data))
+			{
+				m_stream << fmt::format("node_{}:set_default_value(\"{}\", {})\n", node->getId(), key,
+				                        dataConstructor.value());
+			}
+			else
+			{
+				LOG_ERROR("Cannot serialize data to constructor on node {}", coreNode->getSignature());
+			}
+		}
+	}
+
+	void visit(const Ptr<GuiScreen>& node) override
+	{
+		m_stream << fmt::format("local node_{} = Screen.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{}:set_aspect({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(node->getAspect()));
+	}
+
+	void visit(const Ptr<GuiModel>& node) override
+	{
+		auto coreNode = node->getNodebase();
+
+		m_stream << fmt::format("local node_{} = Model.new()\n", node->getId());
+		dumpCommon(node);
+
+		auto model = node->viewportModel().lock();
+
+		m_stream << fmt::format("node_{}:set_model(\"{}\")\n", node->getId(), model->getModel());
+		m_stream << fmt::format("node_{}:set_visible({})\n", node->getId(), model->m_visible);
+		m_stream << fmt::format("node_{}:show_axes({})\n", node->getId(), model->m_showAxes);
+		m_stream << fmt::format("node_{}:set_opaque({})\n", node->getId(), model->m_opaque);
+		m_stream << fmt::format("node_{}:set_opacity({})\n", node->getId(), model->m_opacity);
+		m_stream << fmt::format("node_{}:set_tint({})\n", node->getId(), LuaSerializer::toConstructor(model->m_tint));
+		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
+	}
+
+	std::vector<glm::ivec4> m_connections;
+	std::stringstream m_stream;
+};
+
+std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
+{
+	ToScriptVisitor visitor;
+
+	for (const auto& node : nodes)
+	{
+		node->accept(visitor);
+	}
+
+	return visitor.getScript();
+}
+
 // These have to be set in each node type.
+// clang-format off
 #define I3T_NODE_COMMON                                                                                                \
-	"type",                                                                                                            \
-	    [](Ptr<GuiNode> self) {                                                                                        \
-		    return self->getNodebase()->getOperation()->keyWord;                                                       \
-	    },                                                                                                             \
-	    "get_float", &getValue<float>, "get_vec3", &getValue<glm::vec3>, "get_vec4", &getValue<glm::vec4>, "get_mat4", \
-	    &getValue<glm::mat4>, /* setters */                                                                            \
-	    "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>)
+"type",                                                                                                                \
+	[](Ptr<GuiNode> self) {                                                                                            \
+		return self->getNodebase()->getOperation()->keyWord;                                                           \
+	},                                                                                                                 \
+"get_float", &getValue<float>,                                                                                         \
+"get_vec3", &getValue<glm::vec3>,                                                                                      \
+"get_vec4", &getValue<glm::vec4>,                                                                                      \
+"get_mat4", &getValue<glm::mat4>                                                                                       \
+/* setters */                                                                                                          \
+/* "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>) */
+// clang-format on
 
 LUA_REGISTRATION
 {
@@ -206,6 +506,14 @@ LUA_REGISTRATION
 		"get_id", &GuiNode::getId,
 		"get_position", &GuiNode::getNodePositionDiwne,
 		"set_position", &GuiNode::setNodePositionDiwne,
+		"get_label", &GuiNode::getTopLabel,
+		"set_label", &GuiNode::setTopLabel,
+		"get_render", &GuiNode::getRender,
+		"set_render", &GuiNode::setRender,
+		"get_number_of_decimals", &GuiNode::getNumberOfVisibleDecimal,
+		"set_number_of_decimals", &GuiNode::setNumberOfVisibleDecimal,
+		"get_lod", &GuiNode::getLevelOfDetail,
+		"set_lod", &GuiNode::setLevelOfDetail,
 		// inputs/outputs
 /*
 		"plug", [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
@@ -246,7 +554,17 @@ LUA_REGISTRATION
 
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
-		I3T_NODE_COMMON
+		// getters
+		"get_float", &getValue<float>,
+		"get_vec3", &getValue<glm::vec3>,
+		"get_vec4", &getValue<glm::vec4>,
+		"get_mat4", &getValue<glm::mat4>,
+		// setters
+		"set_value", sol::overload(
+			&setValue<GuiOperator, float>,
+			&setValue<GuiOperator, glm::vec3>,
+			&setValue<GuiOperator, glm::vec4>
+		)
 	);
 
 	L.new_usertype<GuiTransform>(
@@ -255,25 +573,22 @@ LUA_REGISTRATION
 	    "get_value", [](Ptr<GuiTransform> self) {
 		    return getValue<glm::mat4>(self);
 	    },
-	    "set_value",
-	    [](Ptr<GuiTransform> self, float value, const ImVec2& coords) {
-		    const auto glmCoords = glm::vec2(coords.x, coords.y);
-		    const auto result = self->getNodebase()->setValue(value, glmCoords);
-		    if (result.status != Core::SetValueResult::Status::Ok)
-		    {
-			    print(result.message);
-		    }
-	    },
 	    // get default value
 	    "get_float", &getDefaultValue<float>,
 	    "get_vec3", &getDefaultValue<glm::vec3>,
 	    "get_vec3", &getDefaultValue<glm::vec4>,
-	    // set default value
-		/*
-	    "set_float", &setDefaultValue<float>,
-	    "set_vec3", &setDefaultValue<glm::vec3>,
-	    "set_vec4", &setDefaultValue<glm::vec4>,
-	     */
+		// setters
+		"set_value", sol::overload(
+			&setValue<GuiTransform, glm::mat4>,
+			[](Ptr<GuiTransform> self, float value, const ImVec2& coords) {
+				const auto glmCoords = glm::vec2(coords.x, coords.y);
+				const auto result = self->getNodebase()->setValue(value, glmCoords);
+				if (result.status != Core::SetValueResult::Status::Ok)
+				{
+					print(result.message);
+				}
+			}
+		),
 		"set_default_value", sol::overload(
 			&setDefaultValue<float>,
 			&setDefaultValue<glm::vec3>,
@@ -378,15 +693,10 @@ LUA_REGISTRATION
 
 			return model;
 		},
-		sol::meta_function::construct, [](const std::string& modelAlias) -> Ptr<GuiModel> {
-			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
-			model->m_viewportModel.lock()->setModel(modelAlias);
-
-			print(fmt::format("ID: {}", model->getNodebase()->getId()));
-
-			return model;
-		},
 		I3T_NODE_COMMON,
+		"set_model", [](GuiModel& self, const std::string& value) {
+			self.m_viewportModel.lock()->setModel(value);
+		},
 		"set_visible", [](GuiModel& self, bool value) {
 			self.m_viewportModel.lock()->m_visible = value;
 		},
@@ -404,6 +714,76 @@ LUA_REGISTRATION
 		},
 		"set_tint_strength", [](GuiModel& self, float value) {
 			self.m_viewportModel.lock()->m_tintStrength = value;
+		}
+	);
+
+	L.new_usertype<Workspace::Cycle>(
+		"Cycle",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Cycle> {
+			auto cycle = Workspace::addNodeToNodeEditor<Workspace::Cycle>();
+
+			print(fmt::format("ID: {}", cycle->getNodebase()->getId()));
+
+			return cycle;
+		},
+		"set_from", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setFrom(value);
+		},
+		"set_to", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setTo(value);
+		},
+		"set_manual_step", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStep(value);
+		},
+		"set_step", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStep(value);
+		},
+		"set_step_duration", [](Workspace::Cycle& self, float value) {
+			self.getNodebase()->as<Core::Cycle>()->setStepDuration(value);
+		},
+		"set_smooth", [](Workspace::Cycle& self, bool value) {
+			self.getNodebase()->as<Core::Cycle>()->setSmoothStep(value);
+		},
+		"set_mode", [](Workspace::Cycle& self, int value) {
+			auto mode = Core::Cycle::EMode(value);
+			self.getNodebase()->as<Core::Cycle>()->setMode(mode);
+		},
+		"play", [](Workspace::Cycle& self) {
+			self.getNodebase()->as<Core::Cycle>()->play();
+		}
+	);
+
+	L.new_usertype<Workspace::Camera>(
+		"Camera",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Camera> {
+			auto camera = Workspace::addNodeToNodeEditor<Workspace::Camera>();
+
+			print(fmt::format("ID: {}", camera->getNodebase()->getId()));
+
+			return camera;
+		},
+		"get_projection", [](Workspace::Camera& self) {
+			return self.getProjection();
+		},
+		"get_view", [](Workspace::Camera& self) {
+			return self.getView();
+		}
+	);
+
+	L.new_usertype<Workspace::Screen>(
+		"Screen",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::Screen> {
+			auto screen = Workspace::addNodeToNodeEditor<Workspace::Screen>();
+
+			print(fmt::format("ID: {}", screen->getNodebase()->getId()));
+
+			return screen;
+		},
+		"set_aspect", [](Workspace::Screen& self, const ImVec2& value) {
+			self.setAspect(value);
 		}
 	);
 
@@ -427,6 +807,10 @@ LUA_REGISTRATION
 		{
 			node->deleteActionDiwne();
 		}
+	};
+
+	api["to_script"] = []() -> std::string {
+		return to_script(getWorkspaceNodes());
 	};
 
 	api["get_all_nodes"] = getWorkspaceNodes;
@@ -464,8 +848,9 @@ LUA_REGISTRATION
 	//
 
 	api["plug"] = [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
-		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from);
-		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to);
+		constexpr const bool searchInner = true;
+		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from, searchInner);
+		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to, searchInner);
 
 		if (!maybeFromNode || !maybeToNode)
 		{
@@ -486,7 +871,7 @@ LUA_REGISTRATION
 		}
 	};
 
-	api["print_transform_types"] = []() {
+	api["print_node_types"] = []() {
 		const auto types = magic_enum::enum_names<Core::ETransformType>();
 		for (const auto& t : types)
 		{
