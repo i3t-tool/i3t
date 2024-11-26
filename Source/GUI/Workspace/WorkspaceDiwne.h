@@ -75,7 +75,7 @@ public:
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-//	void initialize(DIWNE::DrawInfo& context) override;
+	//	void initialize(DIWNE::DrawInfo& context) override;
 	void begin(DIWNE::DrawInfo& context) override;
 	void content(DIWNE::DrawInfo& context) override;
 	void end(DIWNE::DrawInfo& context) override;
@@ -120,11 +120,11 @@ public:
 	// TODO: I've moved the CoreNode vector to DIWNE::NodeEditor for the time being.
 	//  This way the code can be rewritten in DIWNE but still compile and be tested in Workspace
 	//  Will see how we go from there.
-//	/**
-//	 * \brief All WorkspaceNodes
-//	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
-//	 **/
-//	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
+	//	/**
+	//	 * \brief All WorkspaceNodes
+	//	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
+	//	 **/
+	//	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.
@@ -202,7 +202,7 @@ public:
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
-		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+		auto result = addNodeToPosition<T>(screen2diwne(diwne.getPopupPosition()));
 		return result;
 	}
 

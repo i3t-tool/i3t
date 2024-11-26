@@ -208,7 +208,7 @@ ImDrawFlags_RoundCornersNone, 1, true);
         // TODO: Move zoom scaling to the NodeEditor subclass
         if (this == (DiwneObject*) &diwne)
         {
-            diwne.restoreZoomScaling();
+            diwne.stopZoomScaling();
         }
     }
     m_inner_interaction_happen |= finalizeDiwne();
@@ -292,7 +292,7 @@ bool DiwneObject::allowDrawing()
 
 bool DiwneObject::allowInteraction() const
 {
-	return m_focusedForInteraction;
+	return true;
 }
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
@@ -311,14 +311,16 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 		int x = 5;
 	if (diwne.m_input->bypassIsMouseDragging2())
 		int x = 5;
-
-
 	if (ImGui::IsMouseClicked(0))
 		int x = 5;
+
+	if (!allowInteraction())
+		return;
 
 	processHoverDiwne(context);
 	processPressAndReleaseDiwne(context);
 	processDragDiwne(context);
+	processPopup(context);
 
 	//	bool interaction_happen = false;
 	//
@@ -586,16 +588,6 @@ void DrawInfo::logicalUpdate(bool isVisualUpdateAsWell)
 	logicalUpdates++;
 }
 
-void DrawInfo::consumeInput()
-{
-	inputConsumed++;
-}
-
-void DrawInfo::consumeHover()
-{
-	hoverConsumed++;
-}
-
 void DrawInfo::update(bool visual, bool logical, bool blockInput)
 {
 	if (visual)
@@ -622,11 +614,6 @@ DrawInfo ContextTracker::end(const DrawInfo& context)
 }
 
 //
-
-bool DiwneObject::bypassRaisePopupAction()
-{
-	return diwne.m_input->bypassIsMouseReleased1();
-}
 
 /**
  * This implementation assumes that the last ImGui item represents the entirety of the object.
@@ -815,70 +802,66 @@ bool DiwneObject::bypassReleaseAction()
 //{
 //	return m_isHeld && !m_isDragged;
 // }
-// void DiwneObject::processSelectDiwne(DrawInfo& context)
-//{
-//	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
-//	{
-//		setSelected(true);
-//	}
-//	return false;
-// }
+void DiwneObject::processSelectDiwne(DrawInfo& context)
+{
+	//	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
+	//	{
+	//		setSelected(true);
+	//	}
+}
 //
-//  void DiwneObject::processUnselect(DrawInfo& context)
+// void DiwneObject::processUnselect(DrawInfo& context)
 //{
 //	return true;
-//  }
-//  bool DiwneObject::allowProcessUnselect()
+//}
+// bool DiwneObject::allowProcessUnselect()
 //{
 //	return m_isHeld && !m_isDragged;
-//  }
-//  void DiwneObject::processUnselectDiwne(DrawInfo& context)
+//}
+// void DiwneObject::processUnselectDiwne(DrawInfo& context)
 //{
 //	if (bypassUnselectAction() && allowProcessUnselect())
 //	{
 //		setSelected(false);
 //	}
-//  }
-//
-//  bool DiwneObject::allowProcessRaisePopup()
-//{
-//	return !diwne.blockRaisePopup();
-//  }
-//  void DiwneObject::processRaisePopupDiwne(DrawInfo& context)
-//{
-//	if (bypassRaisePopupAction() && allowProcessRaisePopup())
-//	{
-//		diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
-//		ImGui::OpenPopup(m_popupIDDiwne.c_str());
-//		return true;
-//	}
-//	return false;
-//  }
-//
-//  void DiwneObject::processShowPopupDiwne(DrawInfo& context)
-//{
-//	if (diwne.m_popupDrawn)
-//	{
-//		return false;
-//	}
-//	else
-//	{
-//		diwne.restoreZoomScaling();
-//		diwne.m_popupDrawn = popupDiwne(m_popupIDDiwne, diwne.getPopupPosition(), &expandPopupContent, *this);
-//		diwne.applyZoomScaling();
-//		return diwne.m_popupDrawn;
-//	}
-//  }
-//
-//
-//  void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
-//{
-//	if (!diwne.m_tooltipDrawn)
-//	{
-//		diwne.m_tooltipDrawn = true;
-//		ImGui::BeginTooltip();
-//		ImGui::TextColored(color, label.c_str());
-//		ImGui::EndTooltip();
-//	}
-//  }
+//}
+
+bool DiwneObject::allowPopup() const
+{
+	return true;
+}
+void DiwneObject::processPopup(DrawInfo& context)
+{
+	if (m_hovered && !context.popupOpened && diwne.m_input->bypassIsMouseReleased1() && allowPopup())
+	{
+		ImGui::OpenPopup(m_popupIDDiwne.c_str());
+		context.update(true, true, true);
+		context.popup();
+		// Store popup position for stuff like adding nodes at the popup location
+		diwne.setPopupPosition(diwne.m_input->bypassGetMousePos());
+	}
+	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
+	{
+		const bool zoomScalingWasActive = diwne.ensureZoomScaling(false);
+		// I don't think we need to call ImGui::SetNextWindowPos as we want the popup to simply be where the mouse is
+		// and ImGui handles that on its own
+		if (ImGui::BeginPopup(m_popupIDDiwne.c_str()))
+		{
+			popupContent(context);
+			ImGui::EndPopup();
+		}
+		diwne.ensureZoomScaling(zoomScalingWasActive);
+	}
+}
+
+void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
+{
+	if (!diwne.m_tooltipDrawn)
+	{
+		diwne.m_tooltipDrawn = true;
+		ImGui::BeginTooltip();
+		ImGui::TextColored(color, label.c_str());
+		ImGui::EndTooltip();
+	}
+}
 } /* namespace DIWNE */

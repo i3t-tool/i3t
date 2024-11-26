@@ -1262,8 +1262,8 @@ void WorkspaceDiwne::duplicateClickedNode()
 
 	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
 	{
-		if (node->m_focusedForInteraction)
-		{
+//		if (node->m_focusedForInteraction)
+//		{
 			if (node->m_selected)
 			{
 				deselectNodes();
@@ -1280,7 +1280,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 				node->setDuplicateNode(true);
 				// duplicateNode(node, 5);
 			}
-		}
+//		}
 	}
 }
 

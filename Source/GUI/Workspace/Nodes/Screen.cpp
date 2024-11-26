@@ -112,7 +112,7 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 		float origScale = diwne.applyZoomScalingToFont(I3T::getFont(EFont::LargeBold));
 		GUI::TextCentered("NO INPUT", rect,
 		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
-		diwne.restoreZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
+		diwne.stopZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
 		ImGui::PopClipRect();
 	}
 

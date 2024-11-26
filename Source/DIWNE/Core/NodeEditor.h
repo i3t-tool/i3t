@@ -218,9 +218,6 @@ public:
 
 	void updateLayout(DrawInfo& context) override;
 
-	bool blockRaisePopup(); /**< sometimes we do not want to raise popup - here specify
-	                           it ( now it is when selecting action run ) */
-
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 
 	void processInteractionsDiwne(DrawInfo& context) override;
@@ -364,9 +361,6 @@ public:
 
 	virtual bool bypassIsItemActive(); // TODO: Remove this is dumb
 
-	virtual bool bypassDiwneSetPopupPositionAction();
-	virtual ImVec2 bypassDiwneGetPopupNewPositionAction();
-
 	// TODO: These methods might not actually be necessary (handled in onDrag / InputAdapter)
 	// Selection rectangle
 	ImRect getSelectionRectangleDiwne();
@@ -381,6 +375,8 @@ public:
 	};
 	virtual void setWorkAreaZoom(float val = 1);
 
+	// TODO: Return values of applyZoomScaling are a bit funky
+
 	/**
 	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
 	 * @return Whether zoom scaling was active before making this call
@@ -391,7 +387,7 @@ public:
 	 * Restores the current ImGuiStyle and Font back to its state before applyZoomScaling() was last called.
 	 * @return Whether zoom scaling was active before making this call
 	 */
-	bool restoreZoomScaling();
+	bool stopZoomScaling();
 
 	/**
 	 * Modifies the current Font depending on the current diwne zoom level.
@@ -399,7 +395,7 @@ public:
 	 */
 	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
 
-	void restoreZoomScalingToFont(ImFont* font, float originalScale);
+	void stopZoomScalingToFont(ImFont* font, float originalScale);
 
 	/**
 	 * Ensure that zoom scaling is active or not based on a passed parameter

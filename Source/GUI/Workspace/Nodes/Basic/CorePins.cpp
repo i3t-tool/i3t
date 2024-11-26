@@ -56,7 +56,7 @@ CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
 
 bool CorePin::allowInteraction() const
 {
-	return m_pin.isDisabled();
+	return !m_pin.isDisabled();
 }
 
 /**
@@ -536,7 +536,9 @@ bool CoreInPin::bypassCreateAndPlugConstructorNodeAction()
 }
 bool CoreInPin::allowCreateAndPlugConstructorNodeAction()
 {
-	return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
+	return true;
+	// TODO: Uncomment
+	// return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
 }
 bool CoreInPin::processCreateAndPlugConstrutorNode()
 {

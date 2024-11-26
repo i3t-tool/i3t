@@ -66,6 +66,8 @@ public:
 		return DiwneAction::TouchPin;
 	};
 
+	bool allowPopup() const override;
+
 protected:
 	ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin (wire start or end) */
 

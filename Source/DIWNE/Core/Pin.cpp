@@ -62,12 +62,14 @@ bool Pin::bypassPinLinkConnectionPreparedAction()
 
 bool Pin::allowProcessPin_Pre_ConnectLink()
 {
-	return m_focusedForInteraction && !m_isHeld &&
-	       (diwne.getDiwneAction() == DiwneAction::NewLink ||
-	        diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) /*&&
-	                                                                        diwne.getLastActivePin<DIWNE::Pin>().get()
-	                                                                        != this*/
-	    ;
+	// TODO: Rewrite <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//	return m_focusedForInteraction && !m_isHeld &&
+	//	       (diwne.getDiwneAction() == DiwneAction::NewLink ||
+	//	        diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) /*&&
+	//	                                                                        diwne.getLastActivePin<DIWNE::Pin>().get()
+	//	                                                                        != this*/
+	//	    ;
+	return true;
 }
 
 bool Pin::processPin_Pre_ConnectLinkDiwne()
@@ -83,6 +85,10 @@ bool Pin::processConnectionPrepared()
 {
 	ImGui::TextUnformatted("Prepared for connecting link");
 	return true;
+}
+bool Pin::allowPopup() const
+{
+	return false;
 }
 
 // bool Pin::processDrag()

@@ -75,6 +75,7 @@ void NodeEditor::begin(DrawInfo& context)
 	ImGui::PushID(m_labelDiwne.c_str()); // TODO: Is this necessary? We already do this in the Beign child no?
 	ImGui::BeginGroup();
 
+	assert(!diwne.m_zoomScalingApplied);
 	applyZoomScaling();
 
 	DIWNE_DEBUG_EXTRA_2((*this), {
@@ -222,13 +223,12 @@ void NodeEditor::content(DrawInfo& context)
 
 void NodeEditor::end(DrawInfo& context)
 {
-	bool interaction_happen = false;
 	if (m_diwneAction == DiwneAction::NewLink)
 	{
 		m_helperLink->drawDiwne(context, DrawMode::JustDraw);
 	}
 
-	diwne.restoreZoomScaling();
+	diwne.stopZoomScaling();
 
 	// TODO: This doesnt work anymore in newer ImGui versions, a dummy needs to be added (I am not sure on that anymore)
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
@@ -285,6 +285,8 @@ void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 	style.TabRounding = style.TabRounding * scale_factor;
 	style.TabMinWidthForCloseButton =
 	    (style.TabMinWidthForCloseButton != FLT_MAX) ? style.TabMinWidthForCloseButton * scale_factor : FLT_MAX;
+	style.SeparatorTextPadding = style.SeparatorTextPadding * scale_factor;
+	style.DockingSeparatorSize = style.DockingSeparatorSize * scale_factor;
 	style.DisplayWindowPadding = style.DisplayWindowPadding * scale_factor;
 	style.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding * scale_factor;
 	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
@@ -316,13 +318,6 @@ void NodeEditor::finalizeDiwne(DrawInfo& context)
 {
 	DiwneObject::finalizeDiwne(context);
 	m_diwneAction_previousFrame = m_diwneAction; // TODO: This might end up being removed
-}
-
-bool NodeEditor::blockRaisePopup()
-{
-	return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch ||
-	       m_diwneAction_previousFrame == DiwneAction::SelectionRectFull ||
-	       m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
 
 DiwneAction NodeEditor::getDiwneActionActive() const
@@ -593,14 +588,6 @@ bool NodeEditor::bypassZoomAction()
 {
 	return diwne.bypassGetZoomDelta() != 0;
 }
-bool NodeEditor::bypassDiwneSetPopupPositionAction()
-{
-	return m_input->bypassIsMouseClicked1();
-}
-ImVec2 NodeEditor::bypassDiwneGetPopupNewPositionAction()
-{
-	return m_input->bypassGetMousePos();
-}
 
 ImRect NodeEditor::getSelectionRectangleDiwne()
 {
@@ -641,15 +628,15 @@ bool NodeEditor::applyZoomScaling()
 	m_zoomOriginalFontScale = applyZoomScalingToFont(font);
 	ImGui::PushFont(font);
 
-	//	static int d = 0;
-	//	int dMax = 120;
-	//	d++;
-
 	// Scale the whole ImGui style, will be restored later
 	m_zoomOriginalStyle = ImGui::GetStyle();
 	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_workAreaZoom : 1.0f);
 	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_workAreaZoom : 1.0f);
 	ScaleAllSizes(ImGui::GetStyle(), m_workAreaZoom);
+
+	// TODO: We do not round styles, ImGui does round them, this introduces an issue with the cursor position not being
+	//  rounded when starting a new imgui item, once the cursor is moved to the next item ImGui automatically rounds it.
+	//  This creates an inconsistency where first elements can be offset a little and not others.
 
 	//	d %= dMax * 2;
 
@@ -657,7 +644,7 @@ bool NodeEditor::applyZoomScaling()
 	return false;
 }
 
-bool NodeEditor::restoreZoomScaling()
+bool NodeEditor::stopZoomScaling()
 {
 	if (!m_zoomScalingApplied)
 		return false;
@@ -665,7 +652,7 @@ bool NodeEditor::restoreZoomScaling()
 	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
 
 	// Need to reset default font BEFORE popping font
-	restoreZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
+	stopZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
 	ImGui::PopFont();
 
 	m_zoomScalingApplied = false;
@@ -706,7 +693,7 @@ float NodeEditor::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 	// password_font->IndexLookup.empty()); 	PushFont(password_font);
 }
 
-void NodeEditor::restoreZoomScalingToFont(ImFont* font, float originalScale)
+void NodeEditor::stopZoomScalingToFont(ImFont* font, float originalScale)
 {
 	font->Scale = originalScale;
 	ImGui::PopFont();
@@ -723,7 +710,7 @@ bool NodeEditor::ensureZoomScaling(bool active)
 		}
 		else
 		{
-			restoreZoomScaling();
+			stopZoomScaling();
 		}
 	}
 	return activeBefore;

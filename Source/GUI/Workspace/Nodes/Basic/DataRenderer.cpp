@@ -65,8 +65,10 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int con
 		if (bypassFloatFocusAction() && bypassFloatRaisePopupAction())
 		{
 			ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
-			diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
+			diwne.setPopupPosition(diwne.m_input->bypassGetMousePos());
 		}
+
+		// TODO: Investigate the popup behaviour now that it's changed! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 		diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode,
 		                                       value, valueChangedByPopup);
@@ -499,8 +501,8 @@ int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisible
 	return maximal;
 }
 
-bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
-                                FloatPopupMode& floatPopupMode, const glm::vec3& data,
+bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals,
+                                float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data,
                                 std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
                                 glm::vec3& valueOfChange)
 {
@@ -548,9 +550,9 @@ int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisible
 	return maximal;
 }
 
-bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth,
-                                 FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState,
-                                 bool& valueChanged, float& valueOfChange)
+bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int numberOfVisibleDecimals,
+                                 float dataWidth, FloatPopupMode& floatPopupMode, const float& data,
+                                 Core::EValueState const& dataState, bool& valueChanged, float& valueOfChange)
 {
 	bool inner_interaction_happen = false;
 
@@ -577,10 +579,10 @@ int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDec
 	return Tools::numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
 }
 
-bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
-                                      float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data,
-                                      std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
-                                      glm::quat& valueOfChange)
+bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id,
+                                      int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode,
+                                      const glm::quat& data, std::array<Core::EValueState, 4> const& dataState,
+                                      bool& valueChanged, glm::quat& valueOfChange)
 {
 	bool inner_interaction_happen = false;
 	bool actualValueChanged = false;

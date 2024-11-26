@@ -44,11 +44,15 @@ bool Link::isLinkOnWorkArea()
 void Link::initialize(DrawInfo& context) {}
 void Link::initializeDiwne(DrawInfo& context)
 {
-	diwne.mp_settingsDiwne->linkColor.w =
-	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
-	diwne.mp_settingsDiwne->linkColorSelected.w = m_focusedForInteraction
-	                                                  ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
-	                                                  : diwne.mp_settingsDiwne->linkAlphaSelected;
+	//	diwne.mp_settingsDiwne->linkColor.w =
+	//	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
+	//	diwne.mp_settingsDiwne->linkColorSelected.w = m_focusedForInteraction
+	//	                                                  ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
+	//	                                                  : diwne.mp_settingsDiwne->linkAlphaSelected;
+
+	// TODO: Review <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	diwne.mp_settingsDiwne->linkColor.w = diwne.mp_settingsDiwne->linkAlpha;
+	diwne.mp_settingsDiwne->linkColorSelected.w = diwne.mp_settingsDiwne->linkAlphaSelected;
 
 	initialize(context);
 	updateEndpoints();

@@ -93,7 +93,8 @@ public:
 	//  drag the node.
 	//  Eg we are hovered in some kind of an "active" / "interactable" area
 	/**< Is object focus on area that allow interaction with object */
-	bool m_focusedForInteraction{false};
+	//	bool m_focusedForInteraction{false};
+	// TODO: Reimplement focused for interaction (namely enable dragging by header only)
 
 	/**< Is object focused anywhere (and for example can not be focus other underlying object) */ // TODO: Rename to
 	                                                                                              // hover / Rework
@@ -297,9 +298,6 @@ public:
 	//	virtual void processSelect(DrawInfo& context); // TODO: Renamed to clicked and merge with unselect
 	//	virtual void processUnselect(DrawInfo& context);
 
-	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */
-	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */
-
 	// Interaction toggles
 	// =============================================================================================================
 	virtual bool allowHover() const; // TODO: Rename focused to just "hover", gets triggered on mouseover
@@ -311,19 +309,23 @@ public:
 	                                //	virtual bool allowProcessSelect();
 	                                //	virtual bool allowProcessUnselect();
 	                                //	virtual bool allowProcessRaisePopup();
+	virtual bool allowPopup() const;
 
 protected:
 	// Interaction internal processing methods
 	// =============================================================================================================
 
-	void processHoverDiwne(DrawInfo& context);
+	virtual void processHoverDiwne(DrawInfo& context);
 
 	//	void processFocusedForInteractionDiwne(DrawInfo& context);
-	void processPressAndReleaseDiwne(DrawInfo& context);
+	virtual void processPressAndReleaseDiwne(DrawInfo& context);
 	//	void processUnholdDiwne(DrawInfo& context);
-	void processDragDiwne(DrawInfo& context);
-	//	void processSelectDiwne(FrameContext& context);
-	//	void processUnselectDiwne(FrameContext& context);
+	virtual void processDragDiwne(DrawInfo& context);
+	virtual void processSelectDiwne(DrawInfo& context);
+	//	void processUnselectDiwne(DrawInfo& context);
+	virtual void processPopup(DrawInfo& context);
+	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */ //TODO: Remove
+	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */ //TODO: Remove
 
 	// =============================================================================================================
 
@@ -346,7 +348,6 @@ protected:
 	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
 
 public:
-	virtual bool bypassRaisePopupAction(); /**< action used for raising popup menu */
 	// TODO: Rename this to something like "action area" / "trigger area"?
 	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
 	                                                 * object for interacting with it
@@ -429,6 +430,7 @@ public:
 class DrawInfo
 {
 public:
+	// clang-format off
 	// TODO: Make actual fields private and add const getters.
 
 	/// Number of purely visual interactions that are occurring. This can be a simple mouse hover.
@@ -441,12 +443,17 @@ public:
 
 	/// Whether input has been captured by an object previously and should not be reacted to anymore.
 	unsigned short inputConsumed{0};
-	void consumeInput();
+	inline void consumeInput() { inputConsumed++; }
 
 	/// Whether objects should not be hovered anymore // TODO: This is currently unused, but potentially useful
 	unsigned short hoverConsumed{0};
 	std::string hoverTarget;
-	void consumeHover();
+	inline void consumeHover() { hoverConsumed++; }
+
+	unsigned short popupOpened{0};
+	inline void popup() { popupOpened++; }
+
+	// clang-format on
 
 	/// Composite update method
 	void update(bool visual, bool logical = false, bool blockInput = false);
@@ -484,57 +491,5 @@ public:
 	void begin(const DrawInfo& context);
 	DrawInfo end(const DrawInfo& context);
 };
-
-// DrawInfo ContextTracker::capture(const std::function<void()>& code)
-//{
-//	DrawInfo& originalContext(context);
-//	code();
-//	return context.findChange(originalContext);
-// }
-
-///**
-// * This structure is returned by individual drawing methods to report what has occurred during the draw.
-// * It is then used to update the overarching FrameContext object that is maintained by the DIWNE::NodeEditor instance.
-// */
-// struct DrawResult
-//{
-//	/**
-//	 * Whether any kind of interaction that has a visual or logical impact is occurring.
-//	 * This can be a simple mouse hover that doesn't capture input in any way.
-//	 */
-//	bool interacted{false};
-//
-//	/// Whether input has been captured by an object previously and should not be reacted to anymore.
-//	bool inputConsumed{false};
-//
-//	void merge(const DrawResult& update);     ///< Updates the context with another context returned by a draw method.
-//	DrawResult& operator|(const DrawResult& update); ///< A quick way to call the merge() method using an OR operator.
-//};
-//
-///**
-// * A structure used to relay information between DIWNE objects during their sequential construction/drawing
-// * in a single frame.
-// * This is mainly used to retain information about whether an object should react to user input or if a diwne object
-// * drawn earlier already "captured" the input and other objects should ignore it.
-// * An instance of this object is passed along the drawing code for any nested diwne objects and along the way it
-// * collects information about what has already happened that frame.
-// */
-// class FrameContext : public DrawResult
-//{
-// public:
-//	DrawMode drawMode{DrawMode::Interacting}; ///< The drawing mode for this frame
-//
-//	FrameContext(DrawMode drawMode) : drawMode(drawMode) {}
-//
-//	/**
-//	 * Copies over context variables, but default initializes parent class DrawResult variables.
-//	 * This preserves the usually fixed context specific variables but resets the DrawResult variables to be used as a
-//	 * newly created DrawResult object.
-//	 */
-//	FrameContext(const FrameContext& other) : drawMode(other.drawMode) {}
-//
-//	FrameContext& operator|(const FrameContext& update);
-//};
-
 
 } // namespace DIWNE
