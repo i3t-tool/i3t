@@ -25,10 +25,20 @@ struct UserData
 	/// If empty, LightMode or DarkMode is used based on system settings.
 	std::string customThemeName;
 
+	int maxRecentFiles = 15;
+
 	/// Last file is the most recent.
 	std::vector<std::filesystem::path> recentFiles;
 
+	int maxRecentCommands = 25;
+
+	/// Last command is the most recent.
+	std::vector<std::string> recentCommands;
+
 	void pushRecentFile(const std::filesystem::path& file);
+
+	void trimRecentFiles();
+	void trimRecentCommands();
 };
 
 UserData& getUserData();
