@@ -20,7 +20,8 @@ RTTR_REGISTRATION
 {
 	rttr::registration::class_<UserData>("UserData")
 	    .property("themeName", &UserData::customThemeName)
-	    .property("recentFiles", &UserData::recentFiles);
+	    .property("recentFiles", &UserData::recentFiles)
+	    .property("recentCommands", &UserData::recentCommands);
 }
 
 void UserData::pushRecentFile(const std::filesystem::path& file)
@@ -32,6 +33,24 @@ void UserData::pushRecentFile(const std::filesystem::path& file)
 	}
 
 	recentFiles.push_back(file);
+
+	trimRecentFiles();
+}
+
+void UserData::trimRecentFiles()
+{
+	if (recentFiles.size() > maxRecentFiles)
+	{
+		recentFiles.erase(recentFiles.begin(), recentFiles.end() - maxRecentFiles);
+	}
+}
+
+void UserData::trimRecentCommands()
+{
+	if (recentCommands.size() > maxRecentCommands)
+	{
+		recentCommands.erase(recentCommands.begin(), recentCommands.end() - maxRecentCommands);
+	}
 }
 
 UserData& getUserData()
