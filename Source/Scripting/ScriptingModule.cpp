@@ -100,6 +100,24 @@ void ScriptingModule::onInit()
 		    return Utils::toString(self, true);
 	    });
 
+	m_Lua["Math"] = m_Lua.create_table();
+
+	auto math = m_Lua["Math"];
+
+	math["equals"] = sol::overload(
+	    [](float a, float b) {
+		    return Math::eq(a, b);
+	    },
+	    [](const glm::vec3& a, const glm::vec3& b) {
+		    return Math::eq(a, b);
+	    },
+	    [](const glm::vec4& a, const glm::vec4& b) {
+		    return Math::eq(a, b);
+	    },
+	    [](const glm::mat4& a, const glm::mat4& b) {
+		    return Math::eq(a, b);
+	    });
+
 	//
 
 	auto api = m_Lua["I3T"];

@@ -53,6 +53,7 @@
 // todo
 #endif // unix
 
+#include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
 #include "Scripting/Environment.h"
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
@@ -461,11 +462,80 @@ void TutorialWindow::renderHeadline(Headline* headline)
 	ImGui::PopFont();
 }
 
-void TutorialWindow::renderChoiceTask(ChoiceTask* choice) {}
+static void renderTestQuestionControls(TestQuestion* task)
+{
+	if (ImGui::Button("Submit"))
+	{
+		task->submit();
+	}
 
-void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice) {}
+	if (task->m_isSubmitted)
+	{
+		if (!task->m_isCorrect)
+		{
+			ImGui::TextUnformatted("Incorrect!");
+		}
+		else
+		{
+			ImGui::TextUnformatted("Correct!");
+		}
+	}
+}
 
-void TutorialWindow::renderInputTask(InputTask* input) {}
+void TutorialWindow::renderChoiceTask(ChoiceTask* choice)
+{
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+	ImGui::TextUnformatted(choice->m_content.c_str());
+
+	ImGui::BeginDisabled(choice->m_isCorrect);
+
+	for (int i = 0; i < choice->m_choices.size(); i++)
+	{
+		ImGui::RadioButton(choice->m_choices[i].c_str(), &choice->m_selected, i);
+	}
+
+	ImGui::EndDisabled();
+
+	renderTestQuestionControls(choice);
+}
+
+void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice)
+{
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+	ImGui::TextUnformatted(multiChoice->m_content.c_str());
+
+	ImGui::BeginDisabled(multiChoice->m_isCorrect);
+
+	for (int i = 0; i < multiChoice->m_choices.size(); i++)
+	{
+		bool value = multiChoice->m_selected[i];
+		if (ImGui::Checkbox(multiChoice->m_choices[i].c_str(), &value))
+		{
+			multiChoice->m_selected[i] = value;
+		}
+	}
+
+	ImGui::EndDisabled();
+
+	renderTestQuestionControls(multiChoice);
+}
+
+void TutorialWindow::renderInputTask(InputTask* input)
+{
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+	ImGui::TextUnformatted(input->m_content.c_str());
+
+	ImGui::BeginDisabled(input->m_isCorrect);
+
+	constexpr auto size = sizeof(input->m_input);
+	ImGui::InputText("Answer", &input->m_input[0], size);
+
+	ImGui::SameLine();
+
+	ImGui::EndDisabled();
+
+	renderTestQuestionControls(input);
+}
 
 void TutorialWindow::renderTask(Task* task)
 {
@@ -496,15 +566,25 @@ void TutorialWindow::renderTask(Task* task)
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 
 	// Draw task blue square
-	ImVec2 drawPos =
-	    ImGui::GetCursorScreenPos() +
-	    ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), ImGui::GetStyle().FramePadding.y);
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-	ImU32 color = ImGui::ColorConvertFloat4ToU32(I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
-	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + squareSize, drawPos.y + squareSize),
-	                         color);
-	ImGui::Dummy(ImVec2(squareSize + I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), squareSize));
-	ImGui::SameLine();
+	if (!task->m_completed)
+	{
+		ImVec2 drawPos =
+		    ImGui::GetCursorScreenPos() +
+		    ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), ImGui::GetStyle().FramePadding.y);
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		ImU32 color = ImGui::ColorConvertFloat4ToU32(I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
+		draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + squareSize, drawPos.y + squareSize),
+		                         color);
+		ImGui::Dummy(ImVec2(squareSize + I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), squareSize));
+		ImGui::SameLine();
+	}
+	else
+	{
+		ImGui::Dummy(ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding) / 2, squareSize));
+		ImGui::SameLine();
+		ImGui::TextUnformatted(ICON_I3T_CHECK);
+		ImGui::SameLine();
+	}
 
 	// Load task font and color
 	ImGui::PushStyleColor(ImGuiCol_TextDisabled, I3T::getUI()->getTheme().get(EColor::TutorialHighlightText));

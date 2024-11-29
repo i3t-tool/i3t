@@ -29,18 +29,22 @@ static Workspace::WorkspaceDiwne& getNodeEditor()
 
 //----------------------------------------------------------------------------//
 
-template <typename T>
-static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
+template <typename R, typename T>
+static std::optional<T> getValue(Ptr<R> guiNode, int luaIndex)
 {
 	const auto node = guiNode->getNodebase();
 
-	if (index >= node->getOutputPins().size())
+	const auto index = luaIndex - 1;
+
+	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
+
+	if (index >= node->getOutputPins().size() && index == 0 && !isTransform)
 	{
 		print("no such index");
 		return std::nullopt;
 	}
 
-	const auto maybeValue = node->data(index).getValue<T>();
+	const auto maybeValue = node->data(index).template getValue<T>();
 	if (!maybeValue.has_value())
 	{
 		print("no such type of value");
@@ -116,6 +120,21 @@ static auto getWorkspaceNodes()
 	return getNodeEditor().m_workspaceCoreNodes;
 }
 
+static auto findNode(Core::ID id) -> Ptr<GuiNode>
+{
+	constexpr const bool searchInner = true;
+	const auto result = getNodeEditor().getNode<GuiNode>(id, searchInner);
+
+	if (!result)
+	{
+		print(result.error().str());
+
+		return nullptr;
+	}
+
+	return result.value();
+};
+
 //----------------------------------------------------------------------------//
 
 static bool plug(Ptr<GuiNode> self, int from, Ptr<GuiNode> other, int to)
@@ -123,7 +142,7 @@ static bool plug(Ptr<GuiNode> self, int from, Ptr<GuiNode> other, int to)
 	return connectNodesNoSave(self, other, from, to);
 }
 
-static bool unplug_input(Ptr<GuiNode> self, int inputIndex)
+static bool unplugInput(Ptr<GuiNode> self, int inputIndex)
 {
 	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 	{
@@ -144,7 +163,7 @@ static bool unplug_input(Ptr<GuiNode> self, int inputIndex)
 	return false;
 }
 
-static bool unplug_output(Ptr<GuiNode> self, int outputIndex)
+static bool unplugOutput(Ptr<GuiNode> self, int outputIndex)
 {
 	if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
 	{
@@ -481,20 +500,11 @@ std::string to_script(const std::vector<Ptr<Workspace::CoreNode>>& nodes)
 	return visitor.getScript();
 }
 
-// These have to be set in each node type.
-// clang-format off
-#define I3T_NODE_COMMON                                                                                                \
-"type",                                                                                                                \
-	[](Ptr<GuiNode> self) {                                                                                            \
-		return self->getNodebase()->getOperation()->keyWord;                                                           \
-	},                                                                                                                 \
-"get_float", &getValue<float>,                                                                                         \
-"get_vec3", &getValue<glm::vec3>,                                                                                      \
-"get_vec4", &getValue<glm::vec4>,                                                                                      \
-"get_mat4", &getValue<glm::mat4>                                                                                       \
-/* setters */                                                                                                          \
-/* "set_value", sol::overload(&setValue<float>, &setValue<glm::vec3>, &setValue<glm::vec4>) */
-// clang-format on
+template <typename T>
+static Ptr<T> cast(Ptr<Workspace::CoreNode> element)
+{
+	return std::dynamic_pointer_cast<T>(element);
+}
 
 LUA_REGISTRATION
 {
@@ -502,7 +512,6 @@ LUA_REGISTRATION
 	L.new_usertype<GuiNode>(
 	    "Node",
 		sol::no_constructor,
-	    I3T_NODE_COMMON,
 		"get_id", &GuiNode::getId,
 		"get_position", &GuiNode::getNodePositionDiwne,
 		"set_position", &GuiNode::setNodePositionDiwne,
@@ -514,20 +523,13 @@ LUA_REGISTRATION
 		"set_number_of_decimals", &GuiNode::setNumberOfVisibleDecimal,
 		"get_lod", &GuiNode::getLevelOfDetail,
 		"set_lod", &GuiNode::setLevelOfDetail,
-		// inputs/outputs
-/*
-		"plug", [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
-			auto fromNode = getNodeEditor().getNode<GuiNode>(from);
-			auto toNode = getNodeEditor().getNode<GuiNode>(to);
-			return plug(fromNode, fromIdx, toNode, toIdx);
-		},
-*/
-		"unplug_input", unplug_input,
-		"unplug_output", unplug_output
-		// TODO TODO TODO
-		// TODO LOD
- 		// TODO numberofdecimals
-		// TODO render
+		"as_operator", &cast<GuiOperator>,
+		"as_transform", &cast<GuiTransform>,
+		"as_sequence", &cast<GuiSequence>,
+		"as_camera", &cast<GuiCamera>,
+		"as_cycle", &cast<GuiCycle>,
+		"as_screen", &cast<GuiScreen>,
+		"as_model", &cast<GuiModel>
 	);
 
 	L.new_usertype<GuiOperator>(
@@ -555,10 +557,11 @@ LUA_REGISTRATION
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
 		// getters
-		"get_float", &getValue<float>,
-		"get_vec3", &getValue<glm::vec3>,
-		"get_vec4", &getValue<glm::vec4>,
-		"get_mat4", &getValue<glm::mat4>,
+		"get_float", &getValue<GuiOperator, float>,
+		"get_vec3", &getValue<GuiOperator, glm::vec3>,
+		"get_vec4", &getValue<GuiOperator, glm::vec4>,
+		"get_quat", &getValue<GuiOperator, glm::quat>,
+		"get_mat4", &getValue<GuiOperator, glm::mat4>,
 		// setters
 		"set_value", sol::overload(
 			&setValue<GuiOperator, float>,
@@ -570,13 +573,9 @@ LUA_REGISTRATION
 	L.new_usertype<GuiTransform>(
 	    "Transform",
 	    sol::base_classes, sol::bases<GuiNode>(),
-	    "get_value", [](Ptr<GuiTransform> self) {
-		    return getValue<glm::mat4>(self);
+	    "get_mat4", [](Ptr<GuiTransform> self) {
+		    return getValue<GuiTransform, glm::mat4>(self, 1);
 	    },
-	    // get default value
-	    "get_float", &getDefaultValue<float>,
-	    "get_vec3", &getDefaultValue<glm::vec3>,
-	    "get_vec3", &getDefaultValue<glm::vec4>,
 		// setters
 		"set_value", sol::overload(
 			&setValue<GuiTransform, glm::mat4>,
@@ -589,6 +588,10 @@ LUA_REGISTRATION
 				}
 			}
 		),
+		// get default value
+		"get_default_float", &getDefaultValue<float>,
+		"get_default_vec3", &getDefaultValue<glm::vec3>,
+		"get_default_vec4", &getDefaultValue<glm::vec4>,
 		"set_default_value", sol::overload(
 			&setDefaultValue<float>,
 			&setDefaultValue<glm::vec3>,
@@ -652,7 +655,7 @@ LUA_REGISTRATION
 	L.new_usertype<GuiSequence>(
 	    "Sequence",
 	    sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
-		I3T_NODE_COMMON,
+		"get_mat4", &getValue<Workspace::Sequence, glm::mat4>,
 	    "push", sol::overload(
 			[](GuiSequence& self, Ptr<GuiTransform> transform) {
 				self.moveNodeToSequence(transform);
@@ -693,7 +696,6 @@ LUA_REGISTRATION
 
 			return model;
 		},
-		I3T_NODE_COMMON,
 		"set_model", [](GuiModel& self, const std::string& value) {
 			self.m_viewportModel.lock()->setModel(value);
 		},
@@ -815,31 +817,7 @@ LUA_REGISTRATION
 
 	api["get_all_nodes"] = getWorkspaceNodes;
 
-	api["get_node"] = [](Core::ID id) -> Ptr<GuiNode> {
-		const auto result = getNodeEditor().getNode<GuiNode>(id);
-
-		if (!result)
-		{
-			print(result.error().str());
-
-			return nullptr;
-		}
-
-		return result.value();
-	};
-
-	api["get_transform"] = [](Core::ID id) -> Ptr<GuiTransform> {
-		const auto result = getNodeEditor().getNode<GuiTransform>(id);
-
-		if (!result)
-		{
-			print(result.error().str());
-
-			return nullptr;
-		}
-
-		return result.value();
-	};
+	api["get_node"] = findNode;
 
 	api["delete_node"] = [](GuiNode& node) {
 		node.deleteActionDiwne();
@@ -848,17 +826,37 @@ LUA_REGISTRATION
 	//
 
 	api["plug"] = [](Core::ID from, int fromIdx, Core::ID to, int toIdx) {
-		constexpr const bool searchInner = true;
-		auto maybeFromNode = getNodeEditor().getNode<GuiNode>(from, searchInner);
-		auto maybeToNode = getNodeEditor().getNode<GuiNode>(to, searchInner);
+		auto fromNode = findNode(from);
+		auto toNode = findNode(to);
 
-		if (!maybeFromNode || !maybeToNode)
+		if (!fromNode || !toNode)
 		{
-			print("Invalid node ID");
 			return false;
 		}
 
-		return plug(maybeFromNode.value(), fromIdx, maybeToNode.value(), toIdx);
+		return plug(fromNode, fromIdx, toNode, toIdx);
+	};
+
+	api["unplug_input"] = [](Core::ID id, int inputIndex) {
+		auto node = findNode(id);
+
+		if (!node)
+		{
+			return false;
+		}
+
+		return unplugInput(node, inputIndex);
+	};
+
+	api["unplug_output"] = [](Core::ID id, int outputIndex) {
+		auto node = findNode(id);
+
+		if (!node)
+		{
+			return false;
+		}
+
+		return unplugOutput(node, outputIndex);
 	};
 
 	//
@@ -871,7 +869,7 @@ LUA_REGISTRATION
 		}
 	};
 
-	api["print_node_types"] = []() {
+	api["print_transform_types"] = []() {
 		const auto types = magic_enum::enum_names<Core::ETransformType>();
 		for (const auto& t : types)
 		{

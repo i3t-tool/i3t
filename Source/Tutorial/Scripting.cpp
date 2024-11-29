@@ -45,6 +45,30 @@ static int showHint(Tutorial* self, std::string message)
 	return (int) currentStep.m_content.size();
 }
 
+template <typename R>
+static std::shared_ptr<TutorialElement> pushElement(Tutorial* self, std::shared_ptr<R> element)
+{
+	getCurrentStep(self).m_content.push_back(element);
+
+	return element;
+}
+
+template <typename R>
+static std::shared_ptr<TutorialElement> pushElementAt(Tutorial* self, std::shared_ptr<R> element, int luaIndex)
+{
+	auto index = luaIndex - 1;
+
+	if (!Math::withinInterval(index, 0, (int) getCurrentStep(self).m_content.size()))
+	{
+		print(fmt::format("index {} out of bounds", luaIndex));
+		return element;
+	}
+
+	getCurrentStep(self).m_content.insert(getCurrentStep(self).m_content.begin() + index, element);
+
+	return element;
+}
+
 static void popElement(Tutorial* self, int luaElementIdx)
 {
 	auto index = luaElementIdx - 1;
@@ -54,31 +78,148 @@ static void popElement(Tutorial* self, int luaElementIdx)
 		return;
 	}
 
-	auto it = getCurrentStep(self).m_content.begin() + index;
-	getCurrentStep(self).m_content.erase(it);
+	auto& step = getCurrentStep(self);
+
+	if (step.m_content.empty())
+	{
+		return;
+	}
+
+	auto it = step.m_content.begin() + index;
+	step.m_content.erase(it);
+}
+
+template <typename T>
+static Ptr<T> cast(Ptr<TutorialElement> element)
+{
+	return std::dynamic_pointer_cast<T>(element);
 }
 
 LUA_REGISTRATION
 {
 	// clang-format off
-	L.new_usertype<TutorialHeader>("TutorialHeader",
-	                               // "filename", sol::readonly(&TutorialHeader::m_filename),
-	                               "title", sol::readonly(&TutorialHeader::m_title),
-	                               "description", sol::readonly(&TutorialHeader::m_description));
 
-	L.new_usertype<TutorialStep>("TutorialStep",
-								 "completed", &TutorialStep::m_completed);
+	// Elements
+	L.new_usertype<TutorialElement>(
+		"TutorialElement",
+		sol::no_constructor,
+		"content", &TutorialElement::m_content,
+		"as_explanation", &cast<Explanation>,
+		"as_headline", &cast<Headline>,
+		"as_task", &cast<Task>,
+		"as_hint", &cast<Hint>,
+		"as_choice_task", &cast<ChoiceTask>,
+		"as_multi_choice_task", &cast<MultiChoiceTask>,
+		"as_input_task", &cast<InputTask>
+	);
 
-	L.new_usertype<Task>("TutorialTask",
-						 "completed", &Task::m_completed);
+	L.new_usertype<Explanation>(
+		"Explanation",
+		sol::meta_function::construct, [](std::string content) {
+			return std::make_shared<Explanation>(content);
+		},
+		sol::base_classes, sol::bases<TutorialElement>()
+	);
 
-	L.new_usertype<Tutorial>("Tutorial",
-						     "header", sol::readonly(&Tutorial::m_header),
-                             "steps", sol::readonly(&Tutorial::m_steps),
-                             "get_current_step", &getCurrentStep,
-                             "set_step", &setStep,
-							 "show_hint", &showHint,
-						     "pop_element", &popElement
+	L.new_usertype<Headline>(
+		"Headline",
+		sol::meta_function::construct, [](std::string content) {
+			return std::make_shared<Headline>(content);
+		},
+		sol::base_classes, sol::bases<TutorialElement>()
+	);
+
+	L.new_usertype<Task>(
+		"Task",
+		sol::meta_function::construct, [](std::string content) {
+			return std::make_shared<Task>(content);
+		},
+		sol::base_classes, sol::bases<TutorialElement>(),
+		"completed", &Task::m_completed
+	);
+
+	L.new_usertype<Hint>(
+		"Hint",
+		sol::meta_function::construct, [](std::string content) {
+			return std::make_shared<Hint>(content);
+		},
+		sol::base_classes, sol::bases<TutorialElement>(),
+		"expanded", &Hint::m_expanded
+	);
+
+	L.new_usertype<ChoiceTask>(
+		"ChoiceTask",
+		sol::meta_function::construct, [](std::string question, std::vector<std::string> choices, int correctChoice) {
+			return std::make_shared<ChoiceTask>(question, choices, correctChoice);
+		},
+		sol::base_classes, sol::bases<TutorialElement>(),
+		"choices", &ChoiceTask::m_choices,
+		"correct_choice", &ChoiceTask::m_correctChoice
+	);
+
+	L.new_usertype<MultiChoiceTask>(
+		"MultiChoiceTask",
+		sol::meta_function::construct, [](std::string question, std::vector<std::string> choices, std::vector<int> correctChoices) {
+			return std::make_shared<MultiChoiceTask>(question, choices, correctChoices);
+		},
+		sol::base_classes, sol::bases<TutorialElement>(),
+		"choices", &MultiChoiceTask::m_choices,
+		"correct_choices", &MultiChoiceTask::m_correctChoices
+	);
+
+	L.new_usertype<InputTask>(
+		"InputTask",
+		sol::meta_function::construct, [](std::string question, std::unordered_set<std::string> correctAnswers) {
+			return std::make_shared<InputTask>(question, correctAnswers);
+		},
+		sol::base_classes, sol::bases<TutorialElement>(),
+		"correct_answers", &InputTask::m_correctAnswers
+	);
+
+	// Tutorial
+
+	L.new_usertype<TutorialStep>(
+		"TutorialStep",
+		"completed", &TutorialStep::m_completed,
+		"content", &TutorialStep::m_content
+	);
+
+	L.new_usertype<TutorialHeader>(
+		"TutorialHeader",
+		// "filename", sol::readonly(&TutorialHeader::m_filename),
+		"title", sol::readonly(&TutorialHeader::m_title),
+		"description", sol::readonly(&TutorialHeader::m_description)
+	);
+
+	L.new_usertype<Tutorial>(
+		"Tutorial",
+		"header", sol::readonly(&Tutorial::m_header),
+        "steps", sol::readonly(&Tutorial::m_steps),
+        "get_current_step", &getCurrentStep,
+        "set_step", &setStep,
+		"push_element", sol::overload(
+			&pushElement<Explanation>,
+			&pushElement<Task>,
+			&pushElement<Hint>,
+			&pushElement<ChoiceTask>,
+			&pushElement<MultiChoiceTask>,
+			&pushElement<InputTask>
+		),
+		"push_element_at", sol::overload(
+			&pushElementAt<Explanation>,
+			&pushElementAt<Task>,
+			&pushElementAt<Hint>,
+			&pushElementAt<ChoiceTask>,
+			&pushElementAt<MultiChoiceTask>,
+			&pushElementAt<InputTask>
+		),
+		"pop_element", &popElement
 	);
 	// clang-format on
+
+	auto api = L["I3T"];
+
+	api["get_tutorial"] = []() -> Ptr<Tutorial> {
+		return TutorialManager::instance().getTutorial();
+	};
 }
