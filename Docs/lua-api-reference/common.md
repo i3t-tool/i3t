@@ -73,7 +73,7 @@ Returns a string representation of the vector in the form
 ### `Timer`
 
 Utility class to schedule functions to be called after a delay.
-Can be created with `I3T.set_timer` function.
+Can be created with `I3T.set_timer` or `I3T.set_timeout` functions.
 See `Timer` class in C++ code for more details.
 
 
@@ -95,5 +95,14 @@ Creates a new timer that will call the given `callback` function after
 the given `intervalSeconds` delay.
 
 #### function `I3T.clear_timer(timer: Timer)`
+
+Removes the given `timer` from the scheduler.
+
+#### function `I3T.set_timeout(delaySeconds: number, callback: function): Timer`
+
+Creates a new timer that will call the given `callback` function after
+the given `delaySeconds` delay.
+
+#### function `I3T.clear_timeout(timer: Timer)`
 
 Removes the given `timer` from the scheduler.

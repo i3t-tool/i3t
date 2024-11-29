@@ -19,7 +19,9 @@
 
 #include "I3TUtil.h"
 
-TEST_F(ApplicationTest, TutorialBase)
+using TutorialScriptingTest = ApplicationTest;
+
+TEST_F(TutorialScriptingTest, TutorialBase)
 {
 	using namespace std::string_literals;
 

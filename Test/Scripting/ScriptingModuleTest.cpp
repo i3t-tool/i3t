@@ -57,3 +57,15 @@ TEST(ScriptingModuleTest, VariablesArePerservedBetweenScripts)
 	)");
 	EXPECT_TRUE(result);
 }
+
+TEST(ScriptingModuleTest, MathFunctions)
+{
+	const auto scripting = std::make_unique<ScriptingModule>();
+	((Module*) scripting.get())->onInit();
+
+	auto result = scripting->runScript(R"(
+		assert(Math.equals(1.0002, 1.0001))
+		assert(Math.equals(Vec3.new(1, 1, 1), Vec3.new(1, 1, 1)))
+	)");
+	EXPECT_TRUE(result);
+}

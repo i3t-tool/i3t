@@ -27,9 +27,10 @@
 // forward declaration from TutorialRenderer.h to avoid cyclic dependency
 class ITutorialRenderer;
 
+/// Append new languages at the end of the list!
 enum class Language
 {
-	English,
+	English = 0,
 	Czech
 };
 
@@ -39,7 +40,7 @@ struct TutorialElement
 	{
 		m_content = "";
 	}
-	TutorialElement(std::string content) : m_content(std::move(content)) {}
+	explicit TutorialElement(std::string content) : m_content(std::move(content)) {}
 	virtual ~TutorialElement() = default;
 
 	std::string m_content;
@@ -50,7 +51,7 @@ struct TutorialElement
 
 struct Explanation : TutorialElement
 {
-	Explanation(std::string explanation) : TutorialElement(std::move(explanation)) {}
+	explicit Explanation(std::string explanation) : TutorialElement(std::move(explanation)) {}
 
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
@@ -60,7 +61,7 @@ struct Explanation : TutorialElement
 
 struct Headline : TutorialElement
 {
-	Headline(std::string headline) : TutorialElement(std::move(headline)) {}
+	explicit Headline(std::string headline) : TutorialElement(std::move(headline)) {}
 
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
@@ -70,7 +71,7 @@ struct Headline : TutorialElement
 
 struct Task : TutorialElement
 {
-	Task(std::string task) : TutorialElement(std::move(task)), m_completed(false) {}
+	explicit Task(std::string task) : TutorialElement(std::move(task)), m_completed(false) {}
 
 	bool m_completed; // todo future feature
 
@@ -82,7 +83,7 @@ struct Task : TutorialElement
 
 struct Hint : TutorialElement
 {
-	Hint(std::string hint) : TutorialElement(std::move(hint)), m_expanded(false) {}
+	explicit Hint(std::string hint) : TutorialElement(std::move(hint)), m_expanded(false) {}
 	bool m_expanded;
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
@@ -90,42 +91,92 @@ struct Hint : TutorialElement
 	}
 };
 
-/// \todo Not implemented!
-struct ChoiceTask : TutorialElement
+struct TestQuestion : TutorialElement
+{
+	explicit TestQuestion(std::string question) : TutorialElement(std::move(question)) {}
+
+	void submit()
+	{
+		m_isSubmitted = true;
+		onSubmit();
+	}
+
+	/// Set m_isCorrect based on the answer.
+	virtual void onSubmit() = 0;
+
+	bool m_isSubmitted = false;
+	bool m_isCorrect = false;
+};
+
+struct ChoiceTask : TestQuestion
 {
 	ChoiceTask(std::string question, std::vector<std::string> choices, int correctChoice)
-	    : TutorialElement(std::move(question)), m_choices(std::move(choices)), m_correctChoice(correctChoice)
+	    : TestQuestion(std::move(question)), m_choices(std::move(choices)), m_correctChoice(correctChoice)
 	{}
+
 	std::vector<std::string> m_choices;
 	int m_correctChoice;
+	int m_selected = -1;
+
+	void onSubmit() override
+	{
+		m_isCorrect = m_selected == m_correctChoice;
+	}
+
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
 		tutorialRenderer->renderChoiceTask(this);
 	}
 };
 
-/// \todo Not implemented!
-struct MultiChoiceTask : TutorialElement
+struct MultiChoiceTask : TestQuestion
 {
 	MultiChoiceTask(std::string question, std::vector<std::string> choices, std::vector<int> correctChoices)
-	    : TutorialElement(std::move(question)), m_choices(std::move(choices)),
-	      m_correctChoices(std::move(correctChoices))
-	{}
+	    : TestQuestion(std::move(question)), m_choices(std::move(choices)), m_correctChoices(std::move(correctChoices))
+	{
+		m_selected = std::vector<bool>(m_choices.size(), false);
+	}
+
 	std::vector<std::string> m_choices;
 	std::vector<int> m_correctChoices;
+	std::vector<bool> m_selected;
+
+	void onSubmit() override
+	{
+		m_isCorrect = true;
+		for (auto i = 0L; i < m_selected.size(); ++i)
+		{
+			const auto shouldBeSelected =
+			    m_correctChoices.end() != std::find(m_correctChoices.begin(), m_correctChoices.end(), i);
+			if (m_selected[i] != shouldBeSelected)
+			{
+				m_isCorrect = false;
+				return;
+			}
+		}
+	}
+
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
 		tutorialRenderer->renderMultiChoiceTask(this);
 	}
 };
 
-/// \todo Not implemented!
-struct InputTask : TutorialElement
+struct InputTask : TestQuestion
 {
 	InputTask(std::string question, std::unordered_set<std::string> correctAnswers)
-	    : TutorialElement(std::move(question)), m_correctAnswers(std::move(correctAnswers))
+	    : TestQuestion(std::move(question)), m_correctAnswers(std::move(correctAnswers))
 	{}
+
 	std::unordered_set<std::string> m_correctAnswers;
+	std::array<char, 64> m_input = {0};
+
+	void onSubmit() override
+	{
+		m_isSubmitted = true;
+		m_isCorrect = m_correctAnswers.contains(m_input.data());
+	}
+
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
 	{
 		tutorialRenderer->renderInputTask(this);

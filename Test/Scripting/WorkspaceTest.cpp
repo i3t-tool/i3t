@@ -42,21 +42,6 @@ TEST_F(WorkspaceScriptingTest, NodeData)
 	EXPECT_TRUE(result);
 }
 
-/// \todo
-/*
-TEST_F(WorkspaceScriptingTest, Sequence)
-{
-    auto& scripting = App::getModule<ScriptingModule>();
-
-    auto result = scripting.runScript(R"(
-        local sequence = Sequence.new()
-        local node = I3T.get_all_nodes()[1]
-        assert(node.push)
-    )");
-    EXPECT_TRUE(result);
-}
-*/
-
 TEST_F(WorkspaceScriptingTest, FoltaScenes)
 {
 	using namespace std::string_literals;
@@ -70,13 +55,40 @@ TEST_F(WorkspaceScriptingTest, FoltaScenes)
 			continue;
 		}
 
+		auto posixPath = file.path().string();
+		std::replace(posixPath.begin(), posixPath.end(), '\\', '/');
+
 		auto path = file.path().string();
-		auto script = R"(
-			I3T.workspace.clear()
-			I3T.load_script_from(")"s +
-		              path + R"(")
-)";
+		std::string script = "I3T.workspace.clear()\n" + fmt::format("I3T.load_script_from(\"{}\")", posixPath);
+
 		auto result = scripting.runScript(script.c_str());
 		EXPECT_TRUE(result);
 	}
+}
+
+TEST_F(WorkspaceScriptingTest, Sequence)
+{
+	auto& scripting = App::getModule<ScriptingModule>();
+
+	auto result = scripting.runScript(R"(
+		local vector = Vec3.new(1, 2, 3)
+		do
+			local sequence = Sequence.new()
+			transform = Transform.new("Scale")
+			sequence:push(transform)
+
+			transform:set_default_value("scale", vector)
+		end
+
+		local sequence = I3T.get_all_nodes()[1]:as_sequence()
+		assert(sequence.push)
+
+		assert(sequence:get_mat4(1) ~= nil)
+		assert(sequence:get_mat4(2) ~= nil)
+		assert(transform:get_mat4() ~= nil)
+
+		assert(Math.equals(sequence:get_mat4(1), transform:get_mat4()))
+		assert(Math.equals(sequence:get_mat4(2), transform:get_mat4()))
+		)");
+	EXPECT_TRUE(result);
 }

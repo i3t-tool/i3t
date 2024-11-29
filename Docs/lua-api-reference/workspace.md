@@ -8,6 +8,10 @@ Returns the type of the node in the form of a string.
 See `Operation::keyWord` and `EOperatorType`, or `ETransformType`
 in C++ code for possible values.
 
+#### method `get_id(): number`
+
+Returns the unique identifier of the node.
+
 #### method `get_position(): Vec2`
 
 Returns the position of the node within the Workspace.
@@ -15,6 +19,38 @@ Returns the position of the node within the Workspace.
 #### method `set_position(Vec2 value)`
 
 Sets the position of the node within the Workspace.
+
+#### method `get_label(): string`
+
+Returns the label of the node.
+
+#### method `set_label(string value)`
+
+Sets the label of the node.
+
+#### method `get_number_of_decimals(): number`
+
+Returns the number of decimals used for displaying the node's values.
+
+#### method `set_number_of_decimals(number value)`
+
+Sets the number of decimals used for displaying the node's values.
+
+#### method `get_lod(): number`
+
+Returns the level of detail of the node.
+
+#### method `set_lod(number value)`
+
+Sets the level of detail of the node.
+
+#### method `as_operator(): Operator`
+#### method `as_transform(): Transform`
+#### method `as_sequence(): Sequence`
+#### method `as_camera(): Camera`
+#### method `as_cycle(): Cycle`
+#### method `as_screen(): Screen`
+#### method `as_model(): Model`
 
 #### metamethod `__tostring(): string`
 
@@ -45,38 +81,30 @@ Returns nil if the output is not a `Vec3`.
 Get the output value of the operator at the given `index`.
 Returns nil if the output is not a `Vec4`.
 
+#### method `get_quat(index: number): Quat`
+
+Get the output value of the operator at the given `index`.
+Returns nil if the output is not a `Quat`.
+
 #### method `get_mat4(index: number): Mat4`
 
 Get the output value of the operator at the given `index`.
 Returns nil if the output is not a `Mat4`.
 
-#### method `set_float(value: number): boolean`
+#### method `set_value(value: number): boolean`
 
 Set the value of the operator to the given `value`.
 Returns true if the operation was successful.
 
-#### method `set_vec3(value: Vec3): boolean`
+#### method `set_value(value: Vec3): boolean`
 
 Set the value of the operator to the given `value`.
 Returns true if the operation was successful.
 
-#### method `set_vec4(value: Vec4): boolean`
+#### method `set_value(value: Vec4): boolean`
 
 Set the value of the operator to the given `value`.
 Returns true if the operation was successful.
-
-#### method `plug(from_index: number, to: Node, to_index: number): boolean`
-
-Returns false if cannot plug the output of the operator at `from_index`
-to the input of the `to` node at `to_index`.
-
-#### method `unplug_input(index: number)`
-
-Returns false if cannot unplug the input of the operator at `index`.
-
-#### method `unplug_output(index: number)`
-
-Returns false if cannot unplug the output of the operator at `index`.
 
 
 ### `Transform`
@@ -98,35 +126,35 @@ where `coords.x` is the column and `coords.y` is the row.
 Sets the `value` of transform matrix at the given `coords`
 where `coords.x` is the column and `coords.y` is the row.
 
-#### method `get_float(name: string): number`
+#### method `get_default_float(name: string): number`
 
 Returns the value of the `float` property with the given `name`.
 For example, `get_float("angle")` can be used to get the `angle` property
 of a `AxisAngle` rotation transform.
 
-#### method `get_vec3(name: string): Vec3`
+#### method `get_default_vec3(name: string): Vec3`
 
 Returns the value of the `Vec3` property with the given `name`.
 For example, `get_vec3("scale")` can be used to get the `scale` property
 of a `Scale` transform.
 
-#### method `get_vec4(name: string): Vec4`
+#### method `get_default_vec4(name: string): Vec4`
 
 Returns the value of the `Vec4` property with the given `name`.
 For example, `get_vec4("quat")` can be used to get the `quat` property
 of a `Quat` (quaternion) rotation transform.
 
-#### method `set_float(name: string, value: number)`
+#### method `set_default_float(name: string, value: number)`
 
 Sets the value of the `float` property with the given `name`.
 See `get_float` for examples.
 
-#### method `set_vec3(name: string, value: Vec3)`
+#### method `set_default_vec3(name: string, value: Vec3)`
 
 Sets the value of the `Vec3` property with the given `name`.
 See `get_vec3` for examples.
 
-#### method `set_vec4(name: string, value: Vec4)`
+#### method `set_default_vec4(name: string, value: Vec4)`
 
 Sets the value of the `Vec4` property with the given `name`.
 See `get_vec4` for examples.
@@ -178,6 +206,10 @@ Inherits all `Node` methods.
 
 #### constructor `new()`
 
+#### method `get_mat4(index: number): Mat4`
+
+Returns the transform matrix at the given `index`.
+
 #### method `push(transform: Transform)`
 
 Pushes the given `transform` to the back of the sequence.
@@ -186,9 +218,82 @@ Pushes the given `transform` to the back of the sequence.
 
 Inserts the given `transform` at the given `index` in the sequence.
 
-#### method `pop(): Transform`
 
-Removes and returns the last transform in the sequence.
+### `Model`
+
+Inherits all `Node` methods.
+
+#### constructor `new()`
+
+#### method `set_model(alias: string)`
+
+Sets new model by its `alias`.
+
+#### method `set_visible(value: boolean)`
+
+Sets the visibility of the model.
+
+#### method `show_axes(value: boolean)`
+
+Sets the visibility of the model's axes.
+
+#### method `set_opaque(value: boolean)`
+
+Sets the model to be opaque or transparent.
+
+#### method `set_opacity(value: number)`
+
+Sets the opacity of the model in the range [0, 1].
+
+#### method `set_tint(color: Vec3)`
+
+Sets the tint color of the model in the RGB format in the range [0, 1].
+
+#### method `set_tint_strength(value: number)`
+
+Sets the strength of the tint color in the range [0, 1].
+
+
+### `Cycle`
+
+Inherits all `Node` methods.
+
+#### constructor `new(): Cycle`
+
+#### method `set_from(value: float)`
+#### method `set_to(value: float)`
+#### method `set_manual_step(value: float)`
+#### method `set_step(value: float)`
+#### method `set_step_duration(value: float)`
+#### method `set_smooth(value: boolean)`
+#### method `set_mode(value: number)`
+#### method `play()`
+
+
+### `Camera`
+
+Inherits all `Node` methods.
+
+#### constructor `new(): Camera`
+
+#### method `get_projection(): Sequence`
+
+Returns the projection sequence of the camera.
+
+#### method `get_view(): Sequence`
+
+Returns the view sequence of the camera.
+
+
+### `Screen`
+
+Inherits all `Node` methods.
+
+#### constructor `new(): Screen`
+
+#### method `set_acpect(value: Vec2)`
+
+Sets the aspect.
 
 
 ### Workspace API functions
@@ -201,17 +306,46 @@ Prints all available operator types to the console.
 
 Prints all available transform types to the console.
 
+#### function `I3T.print_workspace()`
+
+Prints the workspace nodes to the console in the form of signatures.
+
 #### function `I3T.get_node(id: number): Node`
 
-Returns nil if the operator with the given `id` does not exist.
-
-#### function `I3T.get_transform(id: number): Transform`
-
-Returns nil if the transform with the given `id` does not exist.
+Returns nil if the node with the given `id` does not exist.
 
 #### function `I3T.delete_node(node: Node)`
 
 Deletes the given `node` from the workspace.
+
+#### function `I3T.to_script(): string`
+
+Returns the Lua script representation of the workspace.
+
+#### function `I3T.get_all_nodes(): Node[]`
+
+Returns all nodes in the workspace.
+
+#### function `I3T.get_node(id: number): Node`
+
+Returns the node with the given `id`.
+
+#### function `I3T.delete_node(node: Node)`
+
+Deletes the given `node` from the workspace.
+
+#### function `I3T.plug(from: number, from_index: number, to: number, to_index: number)`
+
+Plugs the output of the node with the given `from` id at the given `from_index`
+to the input of the node with the given `to` id at the given `to_index`.
+
+#### function `I3T.unplug_input(node: number, index: number)`
+
+Unplugs the input of the node with the given `node` id at the given `index`.
+
+#### function `I3T.unplug_output(node: number, index: number)`
+
+Unplugs the output of the node with the given `node` id at the given `index`.
 
 #### function `I3T.workspace.clear()`
 
