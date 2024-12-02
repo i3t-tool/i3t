@@ -121,7 +121,7 @@ public:
 	/// TODO: A flag indicating that an object has been focused that frame?
 	///  Review this flag, its hard to track, why not keep track of the "focused" object instead
 	///  Also still yet to exactly estabilish what "focused" really means
-	bool m_objectFocused{false};
+	bool m_objectFocused{false}; // TODO: Remove?
 	/// for example when holding ctrl nodes not going unselected when sleection rect get out of them
 	bool m_allowUnselectingNodes{false};
 
@@ -134,6 +134,8 @@ public:
 
 	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(this);
 
+	std::unique_ptr<DIWNE::Link> m_helperLink; /**< for showing link that is in process of creating */
+
 protected:
 	// TODO: Review if we could keep DiwneAction info in Context?
 	//  Really begs the question where are we okay to use diwne member variables
@@ -145,8 +147,6 @@ protected:
 
 	std::shared_ptr<DIWNE::Pin> mp_lastActivePin;
 	std::shared_ptr<DIWNE::Node> mp_lastActiveNode;
-
-	std::unique_ptr<DIWNE::Link> m_helperLink; /**< for showing link that is in process of creating */
 
 	bool m_nodesSelectionChanged{false};
 
@@ -289,21 +289,6 @@ public:
 
 	// TODO: Remove these old action things
 	DiwneAction getDiwneActionActive() const;
-
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldWorkarea;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragWorkarea;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchWorkarea;
-	};
-
-	DIWNE::Link& getHelperLink();
 
 	// Node shifting
 	// =============================================================================================================

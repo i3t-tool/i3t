@@ -57,13 +57,12 @@ public:
 
 	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node);
 
-	//	bool processFocused() override;
 	/* DIWNE function */
 	void content(DIWNE::DrawInfo& context) override;
-	//	bool processDrag() override;
-	//	bool processConnectionPrepared() override;
 
 	bool allowInteraction() const override;
+
+	void onPlug(bool hovering) override;
 
 	Core::Pin const& getCorePin() const;
 
@@ -82,7 +81,9 @@ public:
 	bool isConnected() const;
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	bool bypassFocusForInteractionAction() override;
+	bool bypassFocusForInteractionAction() override; // TODO: Remove
+	bool allowConnection() const override;
+	void onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd) override;
 };
 
 class CoreOutPin;

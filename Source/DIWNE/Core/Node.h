@@ -153,19 +153,6 @@ public:
 	{
 		m_render = render;
 	};
-
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldNode;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragNode;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchNode;
-	};
 };
 
 } /* namespace DIWNE */

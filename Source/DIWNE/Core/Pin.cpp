@@ -12,7 +12,9 @@
  */
 #include "Pin.h"
 
+#include "Logger/Logger.h"
 #include "NodeEditor.h"
+#include "diwne_actions.h"
 
 namespace DIWNE
 {
@@ -44,58 +46,45 @@ void Pin::updateLayout(DrawInfo& context)
 	updateConnectionPointDiwne();
 }
 
-// bool Pin::processInteractionsAlways()
-//{
-//	bool interaction_happen = false;
-//
-//	interaction_happen |= processPin_Pre_ConnectLinkDiwne();
-//	// Selection rectangle block showing popup etc.
-//	interaction_happen |= DiwneObject::processInteractionsAlways();
-//
-//	return interaction_happen;
-// }
-
-bool Pin::bypassPinLinkConnectionPreparedAction()
+void Pin::processInteractions(DrawInfo& context)
 {
-	return bypassFocusForInteractionAction();
-}
+	DiwneObject::processInteractions(context);
 
-bool Pin::allowProcessPin_Pre_ConnectLink()
-{
-	// TODO: Rewrite <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//	return m_focusedForInteraction && !m_isHeld &&
-	//	       (diwne.getDiwneAction() == DiwneAction::NewLink ||
-	//	        diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) /*&&
-	//	                                                                        diwne.getLastActivePin<DIWNE::Pin>().get()
-	//	                                                                        != this*/
-	//	    ;
-	return true;
-}
-
-bool Pin::processPin_Pre_ConnectLinkDiwne()
-{
-	if (bypassPinLinkConnectionPreparedAction() && allowProcessPin_Pre_ConnectLink())
+	// Check if another pin was dragged over this one
+	bool connectActionActive = context.action == Actions::connectPin && context.actionSource != m_labelDiwne;
+	if (m_hovered && context.dragging && connectActionActive && allowConnection())
 	{
-		return processConnectionPrepared();
+		onPlug(!context.dragEnd);
 	}
-	return false;
 }
 
-bool Pin::processConnectionPrepared()
+void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	ImGui::TextUnformatted("Prepared for connecting link");
-	return true;
+	DiwneObject::onDrag(context, dragStart, dragEnd);
+
+	if (dragStart)
+	{
+		diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
+		context.setAction(Actions::connectPin, m_labelDiwne, nullptr);
+	}
+	if (dragEnd)
+	{
+		context.clearAction();
+	}
 }
+
+void Pin::onPlug(bool hovering) {}
 bool Pin::allowPopup() const
 {
 	return false;
 }
-
-// bool Pin::processDrag()
-//{
-//	diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
-//	diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
-//	return true;
-// }
+bool Pin::allowConnection() const
+{
+	return true;
+}
+bool Pin::allowDrag() const
+{
+	return DiwneObject::allowDrag() && allowConnection();
+}
 
 } /* namespace DIWNE */

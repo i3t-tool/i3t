@@ -22,22 +22,23 @@ CoreLink::CoreLink(DIWNE::NodeEditor& diwne, CoreInPin* endPin)
 
 void CoreLink::unplug()
 {
-	m_endPin->unplug();
+	if (m_endPin)
+		m_endPin->unplug();
 	m_startPin = nullptr;
 }
 
-// TODO: Uncomment
-//void CoreLink::popupContent()
-//{
-//	if (ImGui::MenuItem("Delete"))
-//	{
-//		unplug();
-//	}
-//}
+void CoreLink::popupContent(DIWNE::DrawInfo& context)
+{
+	if (ImGui::MenuItem("Delete"))
+	{
+		unplug();
+	}
+}
 
 void CoreLink::updateEndpoints()
 {
-	ImVec2 start, end;
+	ImVec2 start = m_startDiwne;
+	ImVec2 end = m_endDiwne;
 	CoreOutPin* startPin = getStartPin();
 	CoreInPin* endPin = getEndPin();
 	if (startPin)
@@ -61,7 +62,11 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 {
 	updateControlPointsOffsets();
 
-	diwne.mp_settingsDiwne->linkColor = I3T::getTheme().get(PinColorBackground[m_endPin->getType()]);
+	if (m_endPin)
+		diwne.mp_settingsDiwne->linkColor = I3T::getTheme().get(PinColorBackground[m_endPin->getType()]);
+	else
+		diwne.mp_settingsDiwne->linkColor = ImColor(0.5f, 0.5f, 0.5f);
+
 	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
 	if (m_selected)

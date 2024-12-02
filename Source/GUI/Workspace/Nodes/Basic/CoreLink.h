@@ -42,9 +42,10 @@ public:
 	{
 		m_startPin = startPin;
 	};
+	// TODO: setEndPin is missing
 	void unplug();
 
-//	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	void initialize(DIWNE::DrawInfo& context) override;
 
 	void updateEndpoints() override;

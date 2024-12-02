@@ -26,47 +26,35 @@ public:
 	void content(DrawInfo& context) override{};
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
-	//	bool processInteractionsAlways(DrawInfo& context) override; //TODO: Uncomment
 
-	//	bool processDrag() override;
+	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 
 	virtual const ImVec2& getLinkConnectionPointDiwne()
 	{
 		return m_connectionPointDiwne;
 	};
 
-	/*! \brief Wrapper is run when new link is created and goal pin is hovered but
-	 * action not released yet
-	 *
-	 * \return virtual bool
-	 *
-	 */
-	virtual bool processPin_Pre_ConnectLinkDiwne();
-	virtual bool bypassPinLinkConnectionPreparedAction();
-	virtual bool allowProcessPin_Pre_ConnectLink();
+	 /**
+	  * Call when the mouse is hovering over the pin and when it is actually released over the pin.
+	  * The method is responsible for the underlying plug in logic and determining whether the connection is valid.
+	  * @param hovering True when the mouse is only hovering and the pin shouldn't be plugged in yet.
+	  */
+	virtual void onPlug(bool hovering);
 
-	virtual bool processConnectionPrepared(); /*!< your content/actions when new link hovered
-	                                             goal pin but not released yet */
+	/**
+	 * A condition for starting and receiving a link connection.
+	 * Can be used to specify an area where the pin can be dragged from or a link dropped at.
+	 */
+	virtual bool allowConnection() const;
 
 	virtual void setConnectionPointDiwne(const ImVec2 value)
 	{
 		m_connectionPointDiwne = value;
 	};
 
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldPin;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragPin;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchPin;
-	};
-
 	bool allowPopup() const override;
+	void processInteractions(DrawInfo& context) override;
+	bool allowDrag() const override;
 
 protected:
 	ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin (wire start or end) */

@@ -41,18 +41,20 @@ NodeEditor::~NodeEditor()
 
 void NodeEditor::draw(DrawMode drawMode)
 {
-	DrawInfo context(drawMode);
+	DrawInfo context;
 	if (m_prevContext)
 	{
 		// Infer context from previous frame
 		// TODO: Wrap this in a function or maybe rather reset the existing context instead of making a new one
+		m_prevContext->prepareForNextFrame();
 		context.dragging = m_prevContext->dragging;
 		context.dragSource = std::move(m_prevContext->dragSource);
+
 		context.action = std::move(m_prevContext->action);
 		context.actionSource = std::move(m_prevContext->actionSource);
 		context.actionData = std::move(m_prevContext->actionData);
 	}
-	drawDiwne(context);
+	drawDiwne(context, drawMode);
 	m_prevContext = std::make_shared<DrawInfo>(std::move(context));
 }
 
@@ -204,7 +206,6 @@ void NodeEditor::content(DrawInfo& context)
 		//  desirable. So maybe draw links as very first thing
 
 		/* draw links under last (on top) node */
-		// TODO: UNCOMMENT! Will be handling link drawing later <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		//		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes - 1);
 		//		for (auto link : m_linksToDraw)
 		//		{
@@ -333,11 +334,6 @@ DiwneAction NodeEditor::getDiwneActionActive() const
 	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
 }
 
-DIWNE::Link& NodeEditor::getHelperLink()
-{
-	return *m_helperLink;
-}
-
 void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	DiwneObject::onDrag(context, dragStart, dragEnd);
@@ -353,9 +349,7 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 
 		if (dragStart && context.action.empty())
 		{
-			context.action = Actions::selectionRect;
-			context.actionSource = m_labelDiwne;
-			context.actionData = Actions::SelectionRectData();
+			context.setAction(Actions::selectionRect, m_labelDiwne, Actions::SelectionRectData());
 		}
 		if (dragDelta.x > 0)
 		{
@@ -387,9 +381,7 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	}
 	if (dragEnd && context.action == Actions::selectionRect)
 	{
-		context.action.clear();
-		context.actionSource.clear();
-		context.actionData.reset();
+		context.clearAction();
 	}
 }
 

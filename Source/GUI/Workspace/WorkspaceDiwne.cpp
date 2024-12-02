@@ -16,6 +16,8 @@
 
 #include <ranges>
 
+#include "DIWNE/Core/diwne_actions.h"
+
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
@@ -40,7 +42,9 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
       m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_updateDataItemsWidth(false),
       m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
-{}
+{
+	m_helperLink = std::make_unique<CoreLink>(diwne, nullptr);
+}
 
 WorkspaceDiwne::~WorkspaceDiwne()
 {
@@ -52,7 +56,6 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
 
 	m_workspaceDiwneAction = WorkspaceDiwneAction::None;
-	m_linksToDraw.clear();
 	m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
 	m_reconnectCameraToSequence = false;
 	if (m_updateDataItemsWidth)
@@ -84,6 +87,32 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		/// );` exception.
 		return;
 	}
+
+	// Draw links first
+	for (auto link : m_linksToDraw)
+	{
+		// TODO: Possible crash when nodes are deleted before this call since links are owned by nodes from the prev
+		//  frame, viz rework below
+		link->drawDiwne(context);
+	}
+	// Clear the link list to rebuild it again this frame
+	m_linksToDraw.clear();
+	// TODO: A better approach imo is to treat links like nodes
+	// Simply keep a persistent list of them and delete / modify them as needed during the draw
+	// The way it is now, where each link is actually a member variable of a pin seems a little odd to me
+	// Like it works I suppose, no real issue with it, but just seems confusing for no good reason
+	// Admittedly links are more dynamic this way, more "immediate"
+	// If I were to keep a persistent list then I need to ensure their state is correct
+	// But isn't that what we're already doing with nodes? kinda the whole way how dinwe works
+	// The code just seems unreadable to me because of this, pin is a pin and it shouldn't handle its own link
+	// It should just create and delete the link based on whether two links are connected
+	// Also when handling link visibility we are actually checking if links
+	// are visible in the processInteractionsAlways method of the pin which seems dumb
+	// Another perhaps unnecessary thing is, why make a distinction between input and output pins
+	// I feel like it might be clearer if its a property of a pin rather than a different class
+	// Right now only the output pins drawData and there are subclasses for each data type
+	// Again seems like that could be handled with some kind of a switch and just free floating draw methods
+	// Rather than complicated polymorphism that doesn't have much of a meaning. I don't know.
 
 	// deletion of blocks
 	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
@@ -158,59 +187,62 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 				          affected and iterator is invalidated (at least with MVSC) */
 		}
 
-		/* draw links under last (on top) node */
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes - 1);
-		for (auto link : m_linksToDraw)
+		// Draw the helper link on top
+		if (context.action == DIWNE::Actions::connectPin)
 		{
-			link->drawDiwne(context);
+			m_helperLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
 		}
 
 		// END - SHOULD BE MOVED TO DIWNE
 
-		/* Cameras To Sequences links */
-		if (m_cameraLink == nullptr)
-			m_cameraLink = std::make_shared<DIWNE::Link>(diwne, "TemporalLink");
-		std::vector<Ptr<CoreNode>> all_cameras = getAllCameras();
-		if (all_cameras.size() > 0)
-		{
-			Ptr<CoreNodeWithPins> cameraWithPins;
+		// TODO: Figure out what to do about all this
+		//  I feel like we are on the verge of removing this anyway so its not a priority
 
-			std::vector<Ptr<CoreNode>> all_inputFree_Sequence = getAllInputFreeSequence();
-			if (all_inputFree_Sequence.size() > 0)
-			{
-				for (auto const& camera : all_cameras)
-				{
-					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
-					for (auto const& sequence : all_inputFree_Sequence)
-					{
-						m_cameraLink->setLinkEndpointsDiwne(
-						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
-						    std::dynamic_pointer_cast<CoreNodeWithPins>(sequence)
-						        ->getInputs()[Core::I3T_SEQ_IN_MUL]
-						        ->getLinkConnectionPointDiwne());
-						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
-					}
-				}
-			}
-
-			std::vector<Ptr<CoreNode>> all_inputFree_Model = getAllInputFreeModel();
-			if (all_inputFree_Model.size() > 0)
-			{
-				for (auto const& camera : all_cameras)
-				{
-					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
-					for (auto const& model : all_inputFree_Model)
-					{
-						m_cameraLink->setLinkEndpointsDiwne(
-						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
-						    std::dynamic_pointer_cast<CoreNodeWithPins>(model)
-						        ->getInputs()[0 /*\todo JH  \todo MH Some constant from core here*/]
-						        ->getLinkConnectionPointDiwne());
-						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
-					}
-				}
-			}
-		}
+		//		/* Cameras To Sequences links */
+		//		if (m_cameraLink == nullptr)
+		//			m_cameraLink = std::make_shared<DIWNE::Link>(diwne, "TemporalLink");
+		//		std::vector<Ptr<CoreNode>> all_cameras = getAllCameras();
+		//		if (all_cameras.size() > 0)
+		//		{
+		//			Ptr<CoreNodeWithPins> cameraWithPins;
+		//
+		//			std::vector<Ptr<CoreNode>> all_inputFree_Sequence = getAllInputFreeSequence();
+		//			if (all_inputFree_Sequence.size() > 0)
+		//			{
+		//				for (auto const& camera : all_cameras)
+		//				{
+		//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
+		//					for (auto const& sequence : all_inputFree_Sequence)
+		//					{
+		//						m_cameraLink->setLinkEndpointsDiwne(
+		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(sequence)
+		//						        ->getInputs()[Core::I3T_SEQ_IN_MUL]
+		//						        ->getLinkConnectionPointDiwne());
+		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
+		//					}
+		//				}
+		//			}
+		//
+		//			std::vector<Ptr<CoreNode>> all_inputFree_Model = getAllInputFreeModel();
+		//			if (all_inputFree_Model.size() > 0)
+		//			{
+		//				for (auto const& camera : all_cameras)
+		//				{
+		//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
+		//					for (auto const& model : all_inputFree_Model)
+		//					{
+		//						m_cameraLink->setLinkEndpointsDiwne(
+		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(model)
+		//						        ->getInputs()[0 /*\todo JH  \todo MH Some constant from core here*/]
+		//						        ->getLinkConnectionPointDiwne());
+		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
+		//					}
+		//				}
+		//			}
+		//		}
 
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
@@ -225,6 +257,12 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 }
 
 // TODO: THIS STUFF IS ESSENTIALLY INTERACTION (move to process interactions)
+//  Still gotta reimplement:
+//  Viewport selection update
+//  Multiple node drag
+//  Ctrl/Shift click selection
+//  Unselection on click
+//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // bool WorkspaceDiwne::afterContent()
 //{
 //
@@ -1262,25 +1300,25 @@ void WorkspaceDiwne::duplicateClickedNode()
 
 	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
 	{
-//		if (node->m_focusedForInteraction)
-//		{
-			if (node->m_selected)
+		//		if (node->m_focusedForInteraction)
+		//		{
+		if (node->m_selected)
+		{
+			deselectNodes();
+			// copy and paste to ensure connections
+			for (auto node : selectedNodes)
 			{
-				deselectNodes();
-				// copy and paste to ensure connections
-				for (auto node : selectedNodes)
-				{
-					node->setDuplicateNode(true);
-				}
-				// pasteNodes(copyNodes(selectedNodes, 5));
-			}
-			else
-			{
-				deselectNodes();
 				node->setDuplicateNode(true);
-				// duplicateNode(node, 5);
 			}
-//		}
+			// pasteNodes(copyNodes(selectedNodes, 5));
+		}
+		else
+		{
+			deselectNodes();
+			node->setDuplicateNode(true);
+			// duplicateNode(node, 5);
+		}
+		//		}
 	}
 }
 

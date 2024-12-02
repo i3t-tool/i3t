@@ -114,7 +114,13 @@ void CorePin::content(DIWNE::DrawInfo& context)
 
 void CorePin::popupContent(DIWNE::DrawInfo& context) {}
 
+// TODO: Remove, essentially replaced by allowConnection()
 bool CorePin::bypassFocusForInteractionAction()
+{
+	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+}
+
+bool CorePin::allowConnection() const
 {
 	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
 }
@@ -139,12 +145,6 @@ Core::EValueType CorePin::getType() const
 	return m_pin.ValueType;
 }
 
-/* \todo JH \todo MH implement this function in Core? */
-bool CorePin::isConnected() const
-{
-	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
-}
-
 // TODO: Uncomment
 // bool CorePin::processDrag()
 //{
@@ -162,64 +162,85 @@ bool CorePin::isConnected() const
 //	return Pin::processDrag();
 //}
 //
-// bool CorePin::processConnectionPrepared()
-//{
-//	/* here it is when goal pin is hoovered */
-//	CorePin *input, *output;
-//	if (getKind() == PinKind::Input)
-//	{
-//		input = this;
-//		output = diwne.getLastActivePin<CorePin>().get();
-//	}
-//	else
-//	{
-//		input = diwne.getLastActivePin<CorePin>().get();
-//		output = this;
-//	}
-//
-//	const auto& coreInput = input->getCorePin();
-//	const auto& coreOutput = output->getCorePin();
-//
-//	switch (Core::GraphManager::isPlugCorrect(coreInput, coreOutput))
-//	{
-//	case Core::ENodePlugResult::Ok:
-//		diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
-//		if (bypassReleaseAction())
-//		{
-//			CoreInPin* in = dynamic_cast<CoreInPin*>(input);
-//			in->plug(dynamic_cast<CoreOutPin*>(output));
-//		}
-//		break;
-//
-//	case Core::ENodePlugResult::Err_MismatchedPinTypes:
-//		diwne.showTooltipLabel("Mismatched pin Types (matrix/float/vec/...)",
-//		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	case Core::ENodePlugResult::Err_MismatchedPinKind:
-//		diwne.showTooltipLabel("Mismatched pin Kinds (in/out)", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	case Core::ENodePlugResult::Err_Loopback: /// Same nodes.
-//		diwne.showTooltipLabel("Loop to the same node", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	case Core::ENodePlugResult::Err_NonexistentPin:
-//		diwne.showTooltipLabel("Pin does not exist :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	case Core::ENodePlugResult::Err_Loop:
-//		diwne.showTooltipLabel("Loop not allowed", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	case Core::ENodePlugResult::Err_DisabledPin:
-//		diwne.showTooltipLabel("Pin is disabled :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//		break;
-//	default: // unreachable - all enum values are covered
-//		diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-//	}
-//	return true;
-//}
-//
-// bool CorePin::processFocused()
-//{
-//	return DiwneObject::processFocused();
-//}
+void CorePin::onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd)
+{
+	Pin::onDrag(context, dragStart, dragEnd);
+
+	const ImVec2 origin = getLinkConnectionPointDiwne();
+	const ImVec2 actual = diwne.screen2diwne(diwne.m_input->bypassGetMousePos());
+
+	if (getKind() == PinKind::Input)
+		diwne.m_helperLink->setLinkEndpointsDiwne(actual, origin);
+	else
+		diwne.m_helperLink->setLinkEndpointsDiwne(origin, actual);
+
+	// TODO: Set helperLink's start pin to THIS pin.
+	//  Obviously right now we can't because the start pin has to be an CoreInPin, why oh why.
+	//  All of this should be in the DIWNE library anyway, no point having this specialized for CorePin, there is
+	//  nothing Core related going on here, only the color.
+	//  Hopefully I'll rework the pins to not distungish betweem
+	//  start and end because frankly the distinction just complicates things.
+}
+
+void CorePin::onPlug(bool hovering)
+{
+	CorePin *input, *output;
+
+	if (getKind() == PinKind::Input)
+	{
+		input = this;
+		output = diwne.getLastActivePin<CorePin>().get();
+	}
+	else
+	{
+		input = diwne.getLastActivePin<CorePin>().get();
+		output = this;
+	}
+
+	const auto& coreInput = input->getCorePin();
+	const auto& coreOutput = output->getCorePin();
+
+	switch (Core::GraphManager::isPlugCorrect(coreInput, coreOutput))
+	{
+	case Core::ENodePlugResult::Ok:
+		diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
+		if (!hovering)
+		{
+			CoreInPin* in = dynamic_cast<CoreInPin*>(input);
+			in->plug(dynamic_cast<CoreOutPin*>(output));
+		}
+		break;
+
+	case Core::ENodePlugResult::Err_MismatchedPinTypes:
+		diwne.showTooltipLabel("Mismatched pin Types (matrix/float/vec/...)",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case Core::ENodePlugResult::Err_MismatchedPinKind:
+		diwne.showTooltipLabel("Mismatched pin Kinds (in/out)", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case Core::ENodePlugResult::Err_Loopback: /// Same nodes.
+		diwne.showTooltipLabel("Loop to the same node", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case Core::ENodePlugResult::Err_NonexistentPin:
+		diwne.showTooltipLabel("Pin does not exist :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case Core::ENodePlugResult::Err_Loop:
+		diwne.showTooltipLabel("Loop not allowed", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case Core::ENodePlugResult::Err_DisabledPin:
+		diwne.showTooltipLabel("Pin is disabled :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	default: // unreachable - all enum values are covered
+		diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+	}
+	//	return true;
+}
+
+/* \todo JH \todo MH implement this function in Core? */
+bool CorePin::isConnected() const
+{
+	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
+}
 
 CoreOutPin::CoreOutPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : CorePin(diwne, pin, node) {}
 
@@ -254,6 +275,8 @@ void DataOutPin::content(DIWNE::DrawInfo& context)
 		interaction_happen |= drawData();
 		ImGui::SameLine();
 	}
+	if (interaction_happen)
+		context.update(true, true, true);
 	CoreOutPin::content(context); // label and icon
 }
 

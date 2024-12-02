@@ -4,14 +4,6 @@
 
 namespace DIWNE
 {
-// TODO:\ CONTINUE HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//  For now I suppose we can make IDs be statically generated in DiwneObject
-//  As far as I can tell they aren't really used anywhere meaninfully (aside from unique identifer)
-//  All CoreNodes use the underlying Core::Node id which is also a simple num sequence
-//  But the fact its the Core::Node id is never really used, and that id can be retrieved
-//  anyway at any time using getNodebase()->getId().
-//  Also Node and Pin have their own virtual getId methods instead of inherited getIdDiwne (???) (fix that)
-
 BasicNode::BasicNode(NodeEditor& editor, std::string label)
     : Node(editor, label), m_topLabel(label), m_top(diwne, label + "_top"), m_left(diwne, label + "_left"),
       m_center(diwne, label + "_center"), m_right(diwne, label + "_right"), m_middle(diwne, label + "_middle")

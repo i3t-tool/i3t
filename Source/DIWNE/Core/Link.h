@@ -33,19 +33,6 @@ public:
 	void end(DrawInfo& context) override{}; ///< No need to set m_internalHover as we handle hovering differently
 	void content(DrawInfo& context) override;
 
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldLink;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragLink;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchLink;
-	};
-
 	virtual void updateEndpoints(){};
 	void updateControlPoints();
 	void updateSquareDistanceMouseFromLink();
@@ -87,7 +74,6 @@ public:
 protected:
 	bool isHoveredDiwne() override;
 
-private:
 	ImVec2 m_startDiwne, m_endDiwne;
 	ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
 	float m_squaredDistanceMouseFromLink{std::numeric_limits<float>::max()};

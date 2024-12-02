@@ -55,6 +55,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	auto debug_logicalUpdate = context.logicalUpdates;
 #endif
 	m_drawMode2 = mode;
+	bool wasDrawnLastFrame = m_drawnThisFrame;
 	m_drawnThisFrame = false;
 
 	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
@@ -93,8 +94,9 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			if (dynamic_cast<NodeEditor*>(this))
 			{
 				ImGui::GetForegroundDrawList()->AddText(
-				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.2, 0), IM_COL32_WHITE,
+				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.3, 0), IM_COL32_WHITE,
 				    (std::string() + (context.dragging ? "[Dragging (" + context.dragSource + ")]" : "") +
+				     (context.dragEnd ? "[DragEnd (" + context.dragSource + ")]" : "") +
 				     (!context.action.empty()
 				          ? "[" + context.action + " (" + context.actionSource +
 				                (context.actionData.has_value() ? std::string(", ") + context.actionData.type().name()
@@ -106,144 +108,12 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			}
 		});
 	}
+	m_justHidden = wasDrawnLastFrame && !m_drawnThisFrame;
 	finalizeDiwne(context);
 
+	// TODO: Remove
 	m_isActive = other_object_focused ? false : m_inner_interaction_happen;
 }
-
-/*
-DrawResult DiwneObject::drawDiwne(DrawInfo& context)
-{
-    // TODO: REWRITE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    // Summary of side effects:
-    // Member variables:
-    m_inner_interaction_happen;
-    m_isActive;
-    // + Gotta update rect probably at some point
-    // We're also reading:
-    diwne.m_objectFocused;
-
-    // Removal of "m_inner_interaction_happen"
-    // The variable is only really used in processInteractionDiwne
-    // There is decides 1. whether to processInteractions at all
-    // And then its a condition whether
-
-#if DIWNE_DEBUG_ENABLED
-    bool interactionInitialize = false;
-    bool interactionBegin = false;
-    bool interactionContent = false;
-    bool interactionAfterEnd = false;
-
-    bool interactionProcessInteraction = false;
-    bool interactionFinalize = false;
-#endif
-
-    if (ImGui::IsKeyDown(ImGuiKey_E)) // TODO: Remove when not using it anymore <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        int x = 5;
-
-    DIWNE_DEBUG_LAYOUT(diwne, {
-        if (this == (DiwneObject*) &diwne)
-        {
-            LOG_INFO("NODE EDITOR START");
-        }
-        LOG_INFO("drawDiwne() begin {}", m_labelDiwne);
-    });
-
-    bool other_object_focused = diwne.m_objectFocused;
-    m_inner_interaction_happen_previous_draw = m_inner_interaction_happen;
-    m_inner_interaction_happen = false;
-    m_drawMode = context.drawMode;
-    m_inner_interaction_happen |= initializeDiwne();
-    DIWNE_DEBUG_LAYOUT(diwne, { interactionInitialize = m_inner_interaction_happen; });
-    if (allowDrawing())
-    {
-        // TODO: Move zoom scaling to the NodeEditor subclass
-        if (this == (DiwneObject*) &diwne)
-        {
-            diwne.applyZoomScaling();
-        }
-        m_inner_interaction_happen |= beginDiwne();
-        DIWNE_DEBUG_LAYOUT(diwne, { interactionBegin = m_inner_interaction_happen; });
-        begin(context);
-
-        ImGui::PushStyleColor(ImGuiCol_Text, diwne.mp_settingsDiwne->fontColor);
-
-        content(context);
-        //		m_inner_interaction_happen |= beforeContentDiwne();
-        //		m_inner_interaction_happen |= contentDiwne();
-        //		m_inner_interaction_happen |= afterContentDiwne();
-        DIWNE_DEBUG_LAYOUT(diwne, { interactionContent = m_inner_interaction_happen; });
-
-        ImGui::PopStyleColor();
-        DIWNE_DEBUG_EXTRA_2((diwne), {
-            switch (m_drawMode)
-            {
-            case DrawMode::Interacting:
-                ImGui::Text("Interacting mode");
-                break;
-            case DrawMode::JustDraw:
-                ImGui::Text("JustDraw mode");
-                break;
-            }
-            ImGui::TextUnformatted(m_labelDiwne.c_str());
-            if (m_isHeld)
-                ImGui::TextUnformatted("Held");
-            if (m_isDragged)
-                ImGui::TextUnformatted("Dragged");
-            if (m_selected)
-                ImGui::TextUnformatted("Selected");
-        });
-
-        end();
-        updateLayout();
-        DIWNE_DEBUG((diwne), {
-            diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
-ImDrawFlags_RoundCornersNone, 1, true);
-        });
-        m_inner_interaction_happen |= afterEndDiwne();
-        DIWNE_DEBUG_LAYOUT(diwne, { interactionAfterEnd = m_inner_interaction_happen; });
-        m_inner_interaction_happen |= processInteractionsDiwne();
-        DIWNE_DEBUG_LAYOUT(diwne, { interactionProcessInteraction = m_inner_interaction_happen; });
-        // TODO: Move zoom scaling to the NodeEditor subclass
-        if (this == (DiwneObject*) &diwne)
-        {
-            diwne.stopZoomScaling();
-        }
-    }
-    m_inner_interaction_happen |= finalizeDiwne();
-    DIWNE_DEBUG_LAYOUT(diwne, { interactionFinalize = m_inner_interaction_happen; });
-
-    m_isActive = other_object_focused ? false : m_inner_interaction_happen;
-
-    DIWNE_DEBUG_LAYOUT(
-        diwne, { LOG_INFO("drawDiwne() end {}, i: {}, a: {}", m_labelDiwne, m_inner_interaction_happen, m_isActive); });
-    DIWNE_DEBUG_LAYOUT(diwne, {
-        ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Max.y);
-        if (dynamic_cast<DIWNE::NodeEditor*>(this))
-        {
-            originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
-        }
-        else if (dynamic_cast<DIWNE::Pin*>(this))
-        {
-            originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
-        }
-        ImGui::GetForegroundDrawList()->AddText(diwne.diwne2screen(originPos), IM_COL32_WHITE,
-                                                fmt::format("i:{},a:{},f:{}", m_inner_interaction_happen ? "Y" : "N",
-                                                            m_isActive ? "Y" : "N", m_hovered ? "Y" : "N")
-                                                    .c_str());
-
-        ImGui::GetForegroundDrawList()->AddText(
-            diwne.diwne2screen(originPos) + ImVec2(0, ImGui::GetFontSize()), IM_COL32_WHITE,
-            fmt::format("init: {}\nbegin: {}\ncontent: {}\nafterEnd: {}\nprocessI: {}\nfinalize: {}",
-                        interactionInitialize, interactionBeforeBegin, interactionContent, interactionAfterEnd,
-                        interactionProcessInteraction, interactionFinalize)
-                .c_str());
-    });
-
-    return m_inner_interaction_happen;
-}
-*/
 
 void DiwneObject::initialize(DrawInfo& context) {}
 void DiwneObject::initializeDiwne(DrawInfo& context)
@@ -275,12 +145,17 @@ void DiwneObject::afterDraw(DrawInfo& context){};
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
 {
-	if (!m_drawnThisFrame && context.dragging && context.dragSource == m_labelDiwne)
+	if (m_justHidden)
 	{
-		// Ensure dragging stops if the source isn't drawn
-		I3T_ASSERT(false, "Drag operation wasn't ended properly!");
-		context.dragging = false;
-		context.dragSource.clear();
+		if (context.dragging && context.dragSource == m_labelDiwne)
+		{
+			// Ensure dragging stops if the source isn't drawn anymore
+			I3T_ASSERT(false, "Drag operation wasn't ended properly!");
+			context.dragging = false;
+			context.dragEnd = false;
+			context.dragSource.clear();
+			onDrag(context, false, true);
+		}
 	}
 	finalize(context);
 }
@@ -321,6 +196,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	processPressAndReleaseDiwne(context);
 	processDragDiwne(context);
 	processPopup(context);
+	processInteractions(context); // Process other user interactions
 
 	//	bool interaction_happen = false;
 	//
@@ -438,10 +314,10 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 {
 	bool isDragged = isDraggedDiwne();
 	bool dragStart = false;
-	bool dragEnd = false;
+	bool weAreDragSource = context.dragSource == m_labelDiwne;
 	if (context.dragging) // Check if something is being dragged
 	{
-		if (context.dragSource == m_labelDiwne) // This object is being dragged
+		if (weAreDragSource) // This object is being dragged
 		{
 			if (isDragged)
 			{
@@ -451,10 +327,10 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 			else
 			{
 				// Drag key no longer pressed, stop drag
-				dragEnd = true;
 				m_isDragged = false;
-				context.dragging = false;
-				context.dragSource = "";
+				// We only mark the drag end by setting context.dragEnd to true
+				// But the dragging variables get reset at the end of the frame by the context.
+				context.dragEnd = true;
 			}
 		}
 		else // Something else is being dragged
@@ -472,9 +348,9 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 			context.dragSource = m_labelDiwne;
 		}
 	}
-	if (m_isDragged || dragEnd) // Dispatch user method
+	if (m_isDragged || (weAreDragSource && context.dragEnd)) // Dispatch user method
 	{
-		onDrag(context, dragStart, dragEnd);
+		onDrag(context, dragStart, context.dragEnd);
 	}
 	// TODO: Figure this stuff out, m_isDrag already signals drag, this further signals what kind of drag (eg. whats
 	// being dragged, that is cross frame info that we need to store somewhere)
@@ -566,6 +442,24 @@ DrawInfo DrawInfo::operator|(const DrawInfo& other)
 	return newInfo;
 }
 
+void DrawInfo::prepareForNextFrame()
+{
+	// Set dragging to false on dragEnd
+	// In the frame when dragging ends, dragging and dragEnd are both true.
+	// dragEnd resets next frame (we're not infering it over)
+	// But dragging needs to be set to false here at the end of frame.
+	if (dragEnd)
+	{
+		dragging = false;
+	}
+	// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
+	// Hence the action reset is defered to the end of the frame here.
+	if (clearActionThisFrame)
+	{
+		clearAction(true);
+	}
+}
+
 DrawInfo DrawInfo::findChange(const DrawInfo& other) const
 {
 	DrawInfo change;
@@ -596,6 +490,27 @@ void DrawInfo::update(bool visual, bool logical, bool blockInput)
 		logicalUpdate(false);
 	if (blockInput)
 		consumeInput();
+}
+
+void DrawInfo::setAction(std::string name, std::string source, std::any data)
+{
+	action = std::move(name);
+	actionSource = std::move(source);
+	actionData = std::move(data);
+}
+
+void DrawInfo::clearAction(bool immediately)
+{
+	if (immediately)
+	{
+		action.clear();
+		actionSource.clear();
+		actionData.reset();
+	}
+	else
+	{
+		clearActionThisFrame = true;
+	}
 }
 
 ContextTracker::ContextTracker(const DrawInfo& context)
@@ -673,14 +588,6 @@ void DiwneObject::onHover(DrawInfo& context)
 {
 	// TODO: CONTINUE HERE add custom pin impl <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//  Pins should probably have their own effect, come back to this later
-	if (bypassTouchAction())
-	{
-		diwne.setDiwneAction(getTouchActionType());
-	}
-	else
-	{
-		int x = 5; // Debug thing
-	}
 
 	context.update(true);
 

@@ -77,8 +77,9 @@ public:
 
 	//
 
-	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode)
+	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode) <<<<<<<<<<<<<<<<<<<<<<<
 	bool m_drawnThisFrame{false};
+	bool m_justHidden{false};
 
 	//
 
@@ -258,11 +259,6 @@ public:
 	virtual void setPosition(const ImVec2& position);
 	virtual void translate(const ImVec2& vec);
 
-	// TODO: Reconsider during action rework
-	virtual DiwneAction getHoldActionType() const = 0;  /**< return which type of object/action this object is */
-	virtual DiwneAction getDragActionType() const = 0;  /**< return which type of object/action this object is */
-	virtual DiwneAction getTouchActionType() const = 0; /**< return which type of object/action this object is */
-
 	virtual bool setSelected(bool const selected); ///< \return New state of selection
 	// TODO: Rename isSelected
 	// TODO: Go over m_selected usages and switch to using getter
@@ -288,13 +284,15 @@ public:
 	// TODO: Rename to onXXX
 
 	virtual void onHover(DrawInfo& context);
+
+	// TODO: Not sure if we need this, can't individual object decide when they want to react to certain input?
 	//  virtual void processFocusedForInteraction(DrawInfo& context);
-	// TODO: refactor processDrag()
+
+	// TODO: There should be an ABSOLUTE guarantee that dragStart and dragEnd will eventually be true ONCE.
 	virtual void onDrag(DrawInfo& context, bool dragStart, bool dragEnd);
 	virtual void onPressed(bool justPressed, DrawInfo& context);
 	virtual void onReleased(bool justReleased, DrawInfo& context);
-	//	virtual void processHold(DrawInfo& context); // TODO: Remove
-	//	virtual void processUnhold(DrawInfo& context); // TODO: Remove
+
 	//	virtual void processSelect(DrawInfo& context); // TODO: Renamed to clicked and merge with unselect
 	//	virtual void processUnselect(DrawInfo& context);
 
@@ -471,11 +469,28 @@ public:
 	std::string action;
 	std::string actionSource;
 	std::any actionData;
+	bool clearActionThisFrame{false};
+	void setAction(std::string name, std::string source, std::any actionData);
+	void clearAction(bool immediately = false); ///< Clears the current action, either right away or at the end of the frame.
 
-	unsigned short dragging{0}; // TODO: Maybe change this to a varchar representing the active perpetual "action"
+	bool dragging{false};
+	bool dragEnd{false};
 	std::string dragSource;     // TODO: If the above was changed, then this can be the source of the action
 	// TODO: Question then arises what if there are multiple active actions? Do we make those two above arrays? vectors?
 
+	/**
+	 * Some operations in the context are queued to be performed at the end of the frame / beginning of the next one.
+	 * This method performs those actions.
+	 */
+	void prepareForNextFrame();
+
+	/**
+	 * Find the difference between two contexts. This relates primarily to the few trivial unsigned short variables.
+	 * This is used to find the immediate change of the context between two points in time.
+	 * Which is useful to figure out how a certain draw call changed the context.
+	 * @param other The other, older, context to compare with.
+	 * @return New context representing the only change between this context and the other one.
+	 */
 	DrawInfo findChange(const DrawInfo& other) const;
 
 	void merge(const DrawInfo& other);         ///< Updates the context with another context returned by a draw method.
