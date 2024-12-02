@@ -253,6 +253,14 @@ void NodeEditor::updateLayout(DrawInfo& context)
 void NodeEditor::afterDraw(DrawInfo& context)
 {
 	shiftInteractingNodeToEnd();
+	DIWNE_DEBUG_LAYOUT(diwne, {
+		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+		ImGui::GetForegroundDrawList()->AddText(
+		    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.2, 0), IM_COL32_WHITE,
+		    (std::string() + "zoom: " + std::to_string(m_workAreaZoom) + ", " +
+		     "workArea: " + std::to_string(m_workAreaDiwne.Min.x) + ", " + std::to_string(m_workAreaDiwne.Min.y))
+		        .c_str());
+	});
 }
 
 void NodeEditor::clear()
@@ -630,6 +638,8 @@ bool NodeEditor::applyZoomScaling()
 
 	// Scale the whole ImGui style, will be restored later
 	m_zoomOriginalStyle = ImGui::GetStyle();
+
+	//	ImGui::GetStyle().ScaleAllSizes(m_workAreaZoom);
 	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_workAreaZoom : 1.0f);
 	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_workAreaZoom : 1.0f);
 	ScaleAllSizes(ImGui::GetStyle(), m_workAreaZoom);

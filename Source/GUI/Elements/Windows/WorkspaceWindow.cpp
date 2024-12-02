@@ -166,26 +166,13 @@ void WorkspaceWindow::render()
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 				ImGui::MenuItem("Enable", nullptr, &(Workspace::g_diwne->m_diwneDebug));
-				ImGui::MenuItem("Extras 1", nullptr, &(Workspace::g_diwne->m_diwneDebugExtra1));
+				ImGui::MenuItem("Layout", nullptr, &(Workspace::g_diwne->m_diwneDebugLayout));
+				ImGui::MenuItem("Interaction", nullptr, &(Workspace::g_diwne->m_diwneDebugInteractions));
 				ImGui::MenuItem("Extras 2", nullptr, &(Workspace::g_diwne->m_diwneDebugExtra2));
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}
 #endif
-			// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<
-			if (ImGui::BeginMenu("Testing"))
-			{
-				if (ImGui::MenuItem("translate"))
-				{
-					LOG_INFO("TRANSLATE MENU CLICKED", g_diwne->m_workspaceCoreNodes.size());
-					g_diwne->addNodeToPosition<Transformation<Core::ETransformType::Translation>>(ImVec2(400, 400));
-				}
-				if (ImGui::MenuItem("model"))
-				{
-					g_diwne->addNodeToPosition<Model>(ImVec2(300, 300));
-				}
-				ImGui::EndMenu();
-			}
 			ImGui::EndMenuBar();
 		}
 
@@ -199,7 +186,7 @@ void WorkspaceWindow::render()
 		if (!firstFrame)
 		{
 			firstFrame = true;
-			static auto node = g_diwne->createNode<Model>(ImVec2(200, 200));
+			g_diwne->addNodeToPosition<Model>(ImVec2(200, 200));
 		}
 		g_diwne->draw(drawMode);
 	}

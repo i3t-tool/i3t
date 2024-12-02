@@ -8,8 +8,8 @@ namespace DIWNE
 class BasicNode : public Node
 {
 public:
-	DiwnePanel m_top, m_left, m_center, m_right, m_bottom;
-	DiwnePanel m_middle;
+	DiwnePanel m_top, m_left, m_center, m_right;
+	DiwnePanel m_middle; // Parent panel of m_left, m_center and m_right.
 
 protected:
 	std::string m_topLabel;

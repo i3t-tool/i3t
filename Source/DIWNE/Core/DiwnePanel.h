@@ -45,16 +45,52 @@ protected:
 
 	ImRect m_rect{ImRect()};         ///< Actual rect including any extra spacings that can shrink.
 	float m_availableSpringWidth{0}; ///< Total width that can be filled with springs.
+
+	float m_submittedFixedWidth{0};  ///< Width filled with non-shrinkable items.
 	float m_submittedSpringWidth{0}; ///< Actual width filled with springs.
+
+	bool m_widthQueued{false};
+	float m_queuedFixedWidth{0};
 
 public:
 	DiwnePanel(NodeEditor& editor, std::string label);
 
-	void begin();
-	void end();
+	// Lifecycle
+	// =============================================================================================================
 
-	// TODO: Spring helper
-	inline void spring(float relSize) {}
+	void begin();
+	void end(DiwnePanel* parent = nullptr);
+
+	void layout();
+
+	// Widgets
+	// =============================================================================================================
+
+	inline void submitChild(DiwnePanel* child)
+	{
+		submitFixedWidth(child->getWidth());
+		applyQueuedWidth();
+	}
+
+	void spring(float relSize);
+
+	void sameLine(float spacing = -1.0f);
+
+	// Layouting
+	// =============================================================================================================
+
+	void submitFixedWidth(float width);
+
+	/**
+	 * When calling ImGui::SameLine() no width is actually added until an ImGui item is submitted.
+	 * Hence we can't automatically submit fixed width when DiwnePaneL::sameLine() is called since it may not actually
+	 * be "real" width if no other ImGui item is added afterwards.
+	 * So we instead queue the width to be submitted later when another item is added. This panel should be informed
+	 * about a new item being added with addChild() or spring() calls.
+	 */
+	void queueFixedWidth(float width);
+
+	void applyQueuedWidth();
 
 	/**
 	 * Mark this width as spring width which can shrink if needed.
@@ -62,19 +98,7 @@ public:
 	 * Total submitted width SHOULD NOT be more than the available spring width for this panel.
 	 * @param width
 	 */
-	inline void submitSpringWidth(float width)
-	{
-		m_submittedSpringWidth += width;
-	}
-
-	/**
-	 * Resets the submitted spring width counter. Should be called AFTER rendering and layouting has been done
-	 * and after next frame available spring width for the panel has been set.
-	 */
-	inline void resetSpringWidth()
-	{
-		m_submittedSpringWidth = 0;
-	}
+	void submitSpringWidth(float width);
 
 	/**
 	 * Returns this panel's cumulative spring width for the last frame.
@@ -97,7 +121,8 @@ public:
 		return m_availableSpringWidth;
 	}
 
-	// Higher level modification methods _______________________________
+	// Higher level modification methods
+	// =============================================================================================================
 
 	/**
 	 * Sets the width of the panel, extending the rectangle to the right. Or shrinking to the left.
@@ -116,7 +141,8 @@ public:
 		m_rect.Translate(v);
 	}
 
-	// Panel queries ____________________________________________________
+	// Panel queries
+	// =============================================================================================================
 
 	/**
 	 * Returns the real width of the diwne panel.
@@ -128,22 +154,26 @@ public:
 	/**
 	 * Returns the minimum width of the panel.
 	 * Minimum width does not contain spring widths as those are willing to shrink if necessary.
+	 * This width should equal getWidth() - getSpringWidth() (TODO: perhaps add an assert and warning if it doesnt).
+	 * But we don't use the m_rect width captured from ImGui here as that width includes spring items and unless
+	 * the ImGui measurements are exactly precise there is a risk of a feedback loop expanding the width indefinitely.
 	 */
 	inline float getMinimumWidth()
 	{
-		return getWidth() - getSpringWidth();
+		return m_submittedFixedWidth;
 	}
 
 	inline float getHeight() const
 	{
-		m_rect.GetHeight();
+		return m_rect.GetHeight();
 	}
 	inline ImVec2 getSize() const
 	{
-		m_rect.GetSize();
+		return m_rect.GetSize();
 	}
 
-	// Rect modification methods _______________________________________
+	// Rect modification methods
+	// =============================================================================================================
 
 	inline void setMinX(float x)
 	{
@@ -182,7 +212,8 @@ public:
 		setMax(rect.Max);
 	}
 
-	// Rect Getters _____________________________________________________
+	// Rect Getters
+	// =============================================================================================================
 
 	inline float getMinX() const
 	{
@@ -212,6 +243,11 @@ public:
 	{
 		return m_rect;
 	}
+
+protected:
+	// Internal
+	// =============================================================================================================
+	void reset();
 };
 
 

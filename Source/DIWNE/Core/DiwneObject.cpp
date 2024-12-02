@@ -142,7 +142,7 @@ DrawResult DiwneObject::drawDiwne(DrawInfo& context)
     if (ImGui::IsKeyDown(ImGuiKey_E)) // TODO: Remove when not using it anymore <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         int x = 5;
 
-    DIWNE_DEBUG_EXTRA_1(diwne, {
+    DIWNE_DEBUG_LAYOUT(diwne, {
         if (this == (DiwneObject*) &diwne)
         {
             LOG_INFO("NODE EDITOR START");
@@ -155,7 +155,7 @@ DrawResult DiwneObject::drawDiwne(DrawInfo& context)
     m_inner_interaction_happen = false;
     m_drawMode = context.drawMode;
     m_inner_interaction_happen |= initializeDiwne();
-    DIWNE_DEBUG_EXTRA_1(diwne, { interactionInitialize = m_inner_interaction_happen; });
+    DIWNE_DEBUG_LAYOUT(diwne, { interactionInitialize = m_inner_interaction_happen; });
     if (allowDrawing())
     {
         // TODO: Move zoom scaling to the NodeEditor subclass
@@ -164,7 +164,7 @@ DrawResult DiwneObject::drawDiwne(DrawInfo& context)
             diwne.applyZoomScaling();
         }
         m_inner_interaction_happen |= beginDiwne();
-        DIWNE_DEBUG_EXTRA_1(diwne, { interactionBegin = m_inner_interaction_happen; });
+        DIWNE_DEBUG_LAYOUT(diwne, { interactionBegin = m_inner_interaction_happen; });
         begin(context);
 
         ImGui::PushStyleColor(ImGuiCol_Text, diwne.mp_settingsDiwne->fontColor);
@@ -173,7 +173,7 @@ DrawResult DiwneObject::drawDiwne(DrawInfo& context)
         //		m_inner_interaction_happen |= beforeContentDiwne();
         //		m_inner_interaction_happen |= contentDiwne();
         //		m_inner_interaction_happen |= afterContentDiwne();
-        DIWNE_DEBUG_EXTRA_1(diwne, { interactionContent = m_inner_interaction_happen; });
+        DIWNE_DEBUG_LAYOUT(diwne, { interactionContent = m_inner_interaction_happen; });
 
         ImGui::PopStyleColor();
         DIWNE_DEBUG_EXTRA_2((diwne), {
@@ -202,9 +202,9 @@ DrawResult DiwneObject::drawDiwne(DrawInfo& context)
 ImDrawFlags_RoundCornersNone, 1, true);
         });
         m_inner_interaction_happen |= afterEndDiwne();
-        DIWNE_DEBUG_EXTRA_1(diwne, { interactionAfterEnd = m_inner_interaction_happen; });
+        DIWNE_DEBUG_LAYOUT(diwne, { interactionAfterEnd = m_inner_interaction_happen; });
         m_inner_interaction_happen |= processInteractionsDiwne();
-        DIWNE_DEBUG_EXTRA_1(diwne, { interactionProcessInteraction = m_inner_interaction_happen; });
+        DIWNE_DEBUG_LAYOUT(diwne, { interactionProcessInteraction = m_inner_interaction_happen; });
         // TODO: Move zoom scaling to the NodeEditor subclass
         if (this == (DiwneObject*) &diwne)
         {
@@ -212,13 +212,13 @@ ImDrawFlags_RoundCornersNone, 1, true);
         }
     }
     m_inner_interaction_happen |= finalizeDiwne();
-    DIWNE_DEBUG_EXTRA_1(diwne, { interactionFinalize = m_inner_interaction_happen; });
+    DIWNE_DEBUG_LAYOUT(diwne, { interactionFinalize = m_inner_interaction_happen; });
 
     m_isActive = other_object_focused ? false : m_inner_interaction_happen;
 
-    DIWNE_DEBUG_EXTRA_1(
+    DIWNE_DEBUG_LAYOUT(
         diwne, { LOG_INFO("drawDiwne() end {}, i: {}, a: {}", m_labelDiwne, m_inner_interaction_happen, m_isActive); });
-    DIWNE_DEBUG_EXTRA_1(diwne, {
+    DIWNE_DEBUG_LAYOUT(diwne, {
         ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Max.y);
         if (dynamic_cast<DIWNE::NodeEditor*>(this))
         {

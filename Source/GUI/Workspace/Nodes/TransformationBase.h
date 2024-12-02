@@ -43,8 +43,6 @@ public:
 	virtual void drawMenuLevelOfDetail() override = 0;
 	void drawMenuDelete() override;
 
-	void updateLayout(DIWNE::DrawInfo& context) override;
-
 	//
 
 	std::vector<ImVec2> getInteractionPointsWithSequence();
@@ -60,7 +58,6 @@ public:
 	};
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
-	float m_topOversizeSpace;
 
 	Ptr<Core::Node> getNodebaseSequence();
 

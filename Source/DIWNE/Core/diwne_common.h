@@ -36,25 +36,25 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #define DEBUG_TEMPLATE(editor, debugCode, debugVar)                                                                    \
 	do                                                                                                                 \
 	{                                                                                                                  \
-		if ((editor).m_diwneDebug && (editor).debugVar)                                                                    \
+		if ((editor).m_diwneDebug && (editor).debugVar)                                                                \
 		{                                                                                                              \
 			debugCode                                                                                                  \
 		}                                                                                                              \
 	} while (0) // do-while to prevent issues with single line statements
 #define DIWNE_DEBUG_VARS()                                                                                             \
 	bool m_diwneDebug = false;                                                                                         \
-	bool m_diwneDebugExtra1 = false;                                                                                   \
+	bool m_diwneDebugLayout = true;                                                                                    \
 	bool m_diwneDebugExtra2 = false;                                                                                   \
-	bool m_diwneDebugInteractions = true;
+	bool m_diwneDebugInteractions = false;
 #define DIWNE_DEBUG(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebug)
-#define DIWNE_DEBUG_EXTRA_1(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugExtra1)
+#define DIWNE_DEBUG_LAYOUT(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugLayout)
 #define DIWNE_DEBUG_EXTRA_2(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugExtra2)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugInteractions)
 
 #else
 #define DIWNE_DEBUG_VARS()
 #define DIWNE_DEBUG(editor, debugCode)
-#define DIWNE_DEBUG_EXTRA_1(editor, debugCode)
+#define DIWNE_DEBUG_LAYOUT(editor, debugCode)
 #define DIWNE_DEBUG_EXTRA_2(editor, debugCode)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode)
 #endif

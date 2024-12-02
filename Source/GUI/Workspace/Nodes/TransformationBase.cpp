@@ -20,7 +20,7 @@
 using namespace Workspace;
 
 TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
-    : CoreNode(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
+    : CoreNode(diwne, nodebase), aboveSequence(0)
 {
 	updateDataItemsWidth();
 }
@@ -30,21 +30,6 @@ bool TransformationBase::allowDrawing()
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
-void TransformationBase::updateLayout(DIWNE::DrawInfo& context)
-{
-	// TODO: Rework to use DiwnePanels or some other layout manager
-	//  Ideally we would want this handled straight in DIWNE::BasicNode impl and avoid this override completely
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// TODO: Is m_topOversizeSpace unused?
-	/* right align - have to be computed before DIWNE::Node::updateLayout(),
-	 * because after that are sizes updated */
-	/* space is between left-middle and middle-right, spacing is scaled in begin of frame */
-	m_topOversizeSpace =
-	    std::max(0.0f, m_top.getWidth() - std::max(m_left.getWidth() + m_middle.getWidth() + m_right.getWidth() +
-	                                                   ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom(),
-	                                               m_bottom.getWidth()));
-	CoreNode::updateLayout(context);
-}
 void TransformationBase::begin(DIWNE::DrawInfo& context)
 {
 	aboveSequence = 0; /* 0 is none */

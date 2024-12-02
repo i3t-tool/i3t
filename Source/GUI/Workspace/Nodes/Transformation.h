@@ -181,8 +181,6 @@ public:
 	} /* thus we can specify it for Core::ETransformType::Free  */
 };
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
@@ -190,8 +188,6 @@ inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 	ImGui::MenuItem("Enable synergies", NULL, false, false);
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 {
@@ -227,8 +223,6 @@ inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 {
@@ -270,8 +264,6 @@ inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 {
@@ -313,8 +305,6 @@ inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 {
@@ -356,8 +346,6 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 {
@@ -415,8 +403,6 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 	return inner_interaction_happen;
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
 {

@@ -93,7 +93,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// TODO: This should again be responsibility of the DIWNE library
 
 	// adding a border
-	diwne.m_renderer->AddRectDiwne(m_top.getMin(), m_bottom.getMax(), I3T::getTheme().get(EColor::NodeBorder),
+	diwne.m_renderer->AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
 	                               I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
 	                               I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
@@ -201,7 +201,8 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	if (interaction_happen) {
+	if (interaction_happen)
+	{
 		context.update(true, true, true);
 	}
 }
@@ -335,26 +336,25 @@ static void drawMenuStoreValues(Ptr<Core::Node> node)
 
 void CoreNode::popupContent(DIWNE::DrawInfo& context)
 {
-	// TODO: Uncomment
-	//	drawMenuSetEditable();
-	//
-	//	if (m_nodebase->getOperation()->isConstructor)
-	//	{
-	//		drawMenuStoreValues(getNodebase());
-	//	}
-	//
-	//	ImGui::Separator();
-	//
-	//	drawMenuSetPrecision();
-	//	drawMenuLevelOfDetail();
-	//
-	//	ImGui::Separator();
-	//
-	//	drawMenuDuplicate();
-	//
-	//	ImGui::Separator();
-	//
-	//	Node::popupContent();
+	drawMenuSetEditable();
+
+	if (m_nodebase->getOperation()->isConstructor)
+	{
+		drawMenuStoreValues(getNodebase());
+	}
+
+	ImGui::Separator();
+
+	drawMenuSetPrecision();
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	Node::popupContent(context);
 }
 
 // TODO: Uncomment
