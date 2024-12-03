@@ -66,27 +66,136 @@ Help
   - Debug info
 
 ### Shortcuts
-copy/paste/cut, ...
 
-## Workspace
+| **Action**                      | **Shortcut**     |
+|---------------------------------|------------------|
+| **Copy Component**              | `Ctrl + C`       |
+| **Paste Component**             | `Ctrl + V`       |
+| **Duplicate Component**         | `Ctrl + D`       |
+| **Cut Component**               | `Ctrl + X`       |
+| **Select All Components**       | `Ctrl + A`       |
+| **Invert Selection**            | `Ctrl + I`       |
+| **Undo Movement**               | `Ctrl + Z`       |
+| **Redo Movement**               | `Ctrl + Y`       |
+| **Zoom To All Components**      | `Ctrl + Alt + A` |
+| **Zoom To Selected Components** | `Ctrl + Alt + S` |
+| **Save Scene**                  | `Ctrl + S`       |
+| **Open Scene**                  | `Ctrl + O`       |
 
-Deeper description of the node system - how to add nodes, connect them and work with them
+
+## Workplace
+
+The **Workspace** window is where scenes are assembled. You can add, connect, and manipulate blocks to create the desired transformations and models.
+
+### Adding Blocks
+
+- To add blocks, right-click anywhere in the **Workspace** window to open the "Workspace menu."
+- Main block types include:
+  - **Transformation**: For moving, rotating, scaling, and projections (e.g., `translate`, `rotate`, `scale`, `projection`).
+  - **Operator**: Performs operations on matrices, vectors, quaternions, and floats (e.g., `normalize vec3`, `matrix inversion`, `quat * quat`).
+  - **Sequence**: Groups transformations and defines their order.
+  - **Model**: Represents 3D objects like cubes.
+  - **Camera**: Adds cameras for custom scene views.
+  - **Other Blocks**: Includes **Pulse**, **Screen**, and **Cycle** for specific use cases.
+
+### Connecting Blocks
+
+Blocks function like functions, with inputs and outputs. Connect blocks using **wires** to form a scene graph:
+- **Matrix input/output (🟥)**: For connecting matrices.
+- **Matrix multiplication (❎)**: Combines matrices by multiplying them.
+- **3D vector input/output (🔷)**: For connecting vector values.
+- **4D vector input/output (🟫)**: For connecting 4D vector values.
+- **Float input/output (🟩)**: For connecting float values.
+- **Screen output (🟦)**: Used specifically for cameras to output what they "see."
+- **Quaternion input/output (🟨)**: For connecting quaternion data.
+- **Pulse input/output (🟪)**: For triggering cyclic or time-based operations.
+
+Connections are visualized as colored wires, representing the flow of data through the scene graph. Each type of connection is specific to its data type (e.g., matrices, vectors, floats, quaternions, or pulses).
+
+
+### Transformations
+
+Transformations are always inserted into sequences in the order **Translation, Rotation, Scaling** (TRS). 
+
+### Modifying Values
+
+- Values in matrices can be adjusted by:
+  - Dragging with the left mouse button.
+  - Double-clicking and typing the value.
+- Use the **context menu** (right-click on the matrix) to:
+  - Disable synergies for independent axis scaling.
+  - Access "Choose value" to select specific values from a list (e.g., `1`, `sqrt(2)/2`).
 
 ### Tracking
 
-Introduce the tracking functionality, define what is needed to run it and showcase the controls (smooth/jagged tracking)
+The **Tracking** feature allows you to visualize the effects of transformations applied in sequences:
+- Add a tracking copy of the model connected to a sequence.
+- Use the arrows to step through transformations and observe how they are applied.
+![Tracking show off](../Data/Tutorials/3TUT/tracking.png?raw=true)
+ 
 
 ### Camera
 
-Introduce cameras and screens and showcase how they work in the program
+The **Camera block** allows you to add a camera to your scene. It contains two sequences:
+- **Projection**: A container for projection matrices (e.g., orthogonal or perspective).
+- **View**: A container for the view matrix, which positions and orients the camera.
+
+The **Camera** block has three outputs:
+![Tracking show off](../Data/Tutorials/4TUT/camera_block.png?raw=true)
+- 🔷 **Screen Output**: Displays what the camera sees (connect to a `Screen` block).
+- 🔴 **Matrix Copy Output**: Outputs the resulting matrix for further manipulation.
+- ❎ **Multiplication Output**: Allows multiplication with other matrices.
+
+To visualize what the camera sees:
+1. Add a **Screen** block to the workspace.
+2. Connect the camera’s **Screen Output** (🔷) to the Screen block.
+3. Adjust the screen size by dragging its red corners.
+
+<details> <summary>Projection Matrices</summary>
+
+Projection defines how 3D objects are displayed in 2D. There are two main types:
+- **Orthogonal Projection**: Creates a flat view (e.g., blueprints). Object size does not change with distance.
+  - Adjust parameters such as `left`, `right`, `top`, `bottom`, `near`, and `far`.
+  - Use **disable synergies** to adjust bounds independently.
+
+- **Perspective Projection**: Mimics human vision, where objects appear smaller as they move farther away.
+</details>
+
+<details> <summary> View Matrix </summary>
+
+The **View Matrix** defines the camera's position and orientation using the **lookAt** matrix. It consists of:
+- **Eye vector**: Camera position.
+- **Center vector**: Point the camera looks at.
+- **Up vector**: Direction considered "up" for the camera.
+
+The **lookAt** matrix cannot be edited directly but is controlled through these vectors.
+</details>
+
+
 
 ### Operators
 
-Define the use cases for operators and show a sample situation, show the 10th folta scene
+*Define the use cases for operators and show a sample situation. This will be a lot of work, new inpust and outputs / todo*
+
+#### Transformation
+<details> <summary>Translate</summary>
+  todo
+</details>
+<details> <summary>EulerAngle</summary>
+  todo
+</details>
+
+#### Matrix
+<details> <summary>Matrix</summary>
+  todo
+</details>
+<details> <summary>Inversion</summary>
+  todo
+</details>
 
 ## Manipulators
 
-Introduce manipulators
+Introduce manipulators (what are they?)
 
 ## Tutorials
 
