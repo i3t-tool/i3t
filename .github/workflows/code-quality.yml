@@ -2,6 +2,7 @@ name: Code Quality
 on:
   pull_request:
     branches:
+      - develop
       - master
     paths:
       - '.github/workflows/code-quality.yml'
@@ -9,6 +10,8 @@ on:
       - 'Scripts/**'
       - 'Test/**'
       - '.clang-format'
+      - '.clang-tidy'
+      - 'CMakeLists.txt'
 
 jobs:
   check-format:
