@@ -280,9 +280,9 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 	assignCommon(value, node);
 
-	if (value.HasMember("value") && coreNode->getOperation()->isConstructor)
+	if (value.HasMember("value") && coreNode->getOperation().isConstructor)
 	{
-		const auto valueType = coreNode->getOperation()->inputTypes[0];
+		const auto valueType = coreNode->getOperation().inputTypes[0];
 		if (auto maybeData = JSON::getData(value["value"], valueType))
 		{
 			const auto& data = *maybeData;

@@ -115,14 +115,14 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 	auto& operators = m_memento["workspace"]["operators"];
 	auto& edges = m_memento["workspace"]["edges"];
 
-	const auto* props = coreNode->getOperation();
+	const auto props = coreNode->getOperation();
 
 	rapidjson::Value op(rapidjson::kObjectType);
 	dumpCommon(op, node);
 
-	op.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+	op.AddMember("type", rapidjson::Value(props.keyWord.c_str(), alloc).Move(), alloc);
 
-	if (props->isConstructor)
+	if (props.isConstructor)
 	{
 		auto data = coreNode->data(0);
 		addData(op, "value", data);
@@ -250,12 +250,12 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 	const auto& coreNode = node->getNodebase()->as<Core::Transform>();
 	auto& alloc = m_memento.GetAllocator();
 
-	const auto* props = coreNode->getOperation();
+	const auto props = coreNode->getOperation();
 
 	rapidjson::Value transform(rapidjson::kObjectType);
 	dumpCommon(transform, node);
 
-	transform.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+	transform.AddMember("type", rapidjson::Value(props.keyWord.c_str(), alloc).Move(), alloc);
 
 	if (!coreNode->getDefaultValues().empty())
 	{

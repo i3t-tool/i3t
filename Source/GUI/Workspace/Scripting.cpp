@@ -62,7 +62,7 @@ static bool setValue(Ptr<R> guiNode, const T& value)
 
 	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
 
-	if (!node->getOperation()->isConstructor && !isTransform)
+	if (!node->getOperation().isConstructor && !isTransform)
 	{
 		print("cannot set value for this node");
 		return false;
@@ -387,12 +387,12 @@ private:
 	void visit(const Ptr<GuiOperator>& node) override
 	{
 		auto coreNode = node->getNodebase();
-		auto props = coreNode->getOperation();
+		auto& props = coreNode->getOperation();
 
-		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props->keyWord);
+		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props.keyWord);
 		dumpCommon(node);
 
-		if (props->isConstructor)
+		if (props.isConstructor)
 		{
 			auto data = coreNode->data(0);
 			if (auto dataConstructor = LuaSerializer::toConstructor(data))
@@ -420,7 +420,7 @@ private:
 		auto coreNode = node->getNodebase()->as<Core::Transform>();
 
 		m_stream << fmt::format("local node_{} = Transform.new(\"{}\")\n", node->getId(),
-		                        coreNode->getOperation()->keyWord);
+		                        coreNode->getOperation().keyWord);
 		dumpCommon(node);
 
 		m_stream << fmt::format("node_{}:set_value({})\n", node->getId(),
@@ -790,6 +790,32 @@ LUA_REGISTRATION
 		}
 	);
 
+	L.new_enum("ValueType",
+		"Float", Core::EValueType::Float,
+		"Vec3", Core::EValueType::Vec3,
+		"Vec4", Core::EValueType::Vec4,
+		"Matrix", Core::EValueType::Matrix,
+		"Quat", Core::EValueType::Quat
+	);
+
+	L.new_usertype<Core::Operation>(
+		"Operation",
+		sol::meta_function::construct, [](Core::PinGroup inputTypes, Core::PinGroup outputTypes, Core::PinNames defaultInputNames, Core::PinNames defaultOutputNames) -> Core::Operation {
+			return Core::Operation{
+				.keyWord = DEFAULT_SCRIPTING_NODE_OPERATION.keyWord,
+				.defaultLabel = DEFAULT_SCRIPTING_NODE_OPERATION.defaultLabel,
+				.inputTypes = std::move(inputTypes),
+				.outputTypes = std::move(outputTypes),
+				.defaultInputNames = std::move(defaultInputNames),
+				.defaultOutputNames = std::move(defaultOutputNames)
+			};
+		},
+		"inputTypes", sol::readonly(&Core::Operation::inputTypes),
+		"outputTypes", sol::readonly(&Core::Operation::outputTypes),
+		"inputNames", sol::readonly(&Core::Operation::defaultInputNames),
+		"outputNames", sol::readonly(&Core::Operation::defaultOutputNames)
+	);
+
 	// I3T functions
 
 	auto api = L["I3T"];
@@ -885,9 +911,9 @@ LUA_REGISTRATION
 		for (const auto& node : nodes)
 		{
 			const auto& coreNode = node->getNodebase();
-			const auto* op = coreNode->getOperation();
+			const auto& op = coreNode->getOperation();
 
-			print(fmt::format("node {}, type {}", coreNode->getId(), op->keyWord));
+			print(fmt::format("node {}, type {}", coreNode->getId(), op.keyWord));
 		}
 	};
 

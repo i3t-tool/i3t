@@ -177,7 +177,7 @@ public:
 	 */
 	static std::vector<Ptr<Node>> getOutputNodes(const Ptr<Node>& node, size_t index);
 
-	static const Operation* getOperation(const Pin* pin);
+	static const Operation& getOperation(const Pin* pin);
 
 	static bool isTrackingEnabled();
 	static void stopTracking();

@@ -1551,6 +1551,17 @@ std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodes()
 	return selected;
 }
 
+void WorkspaceDiwne::replaceNode(Ptr<CoreNode> oldNode, Ptr<CoreNode> newNode)
+{
+	// find node index in workspace
+	auto it = std::find(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), oldNode);
+	if (it != m_workspaceCoreNodes.end())
+	{
+		// replace node
+		*it = std::move(newNode);
+	}
+}
+
 void WorkspaceDiwne::manipulatorStartCheck3D()
 {
 	if (getNodesSelectionChanged())

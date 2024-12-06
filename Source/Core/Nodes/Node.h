@@ -78,7 +78,7 @@ protected:
 	 *
 	 * \param operation Node properties.
 	 */
-	explicit Node(const Operation* operation) : m_operation(operation) {}
+	explicit Node(const Operation& operation) : m_operation(operation) {}
 	virtual ~Node();
 
 public:
@@ -125,7 +125,7 @@ public:
 	 */
 	ID getId() const;
 
-	const Operation* getOperation() const
+	const Operation& getOperation() const
 	{
 		return m_operation;
 	}
@@ -378,7 +378,7 @@ public:
 
 	const char* getLabel() const
 	{
-		return m_operation->defaultLabel.c_str();
+		return m_operation.defaultLabel.c_str();
 	}
 
 	/// "{node type} #{node ID}"
@@ -386,10 +386,10 @@ public:
 	{
 		if (m_owner)
 		{
-			return fmt::format("{} #{}", m_owner->m_operation->keyWord, m_owner->m_id);
+			return fmt::format("{} #{}", m_owner->m_operation.keyWord, m_owner->m_id);
 		}
 
-		return fmt::format("{} #{}", m_operation->keyWord, m_id);
+		return fmt::format("{} #{}", m_operation.keyWord, m_id);
 	}
 
 private:
@@ -463,7 +463,7 @@ protected:
 	ID m_id{};
 
 	/// Operator node properties.
-	const Operation* m_operation = nullptr;
+	Operation m_operation;
 
 	/// Inputs of the box: Input tabs with glyphs.
 	std::vector<Pin> m_inputs;

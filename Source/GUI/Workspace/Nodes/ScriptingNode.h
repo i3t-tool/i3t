@@ -12,17 +12,33 @@
  */
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "Scripting/Environment.h"
 
+#include <memory>
 #include <string>
+
+static inline const Core::Operation DEFAULT_SCRIPTING_NODE_OPERATION = {"Script", "script"};
 
 namespace Workspace
 {
+struct ScriptInterface
+{
+	Core::Operation operation;
+	sol::function   onInit = sol::nil;
+	sol::function   onUpdate = sol::nil;
+};
+
+Result<std::unique_ptr<ScriptInterface>, Error> createScript(Core::ID id, const std::string& script);
+
+void removeScript(Core::ID id);
+
 class ScriptingNode : public CoreNodeWithPins
 {
 public:
 	ScriptingNode(DIWNE::Diwne& diwne);
-	ScriptingNode(DIWNE::Diwne& diwne, const std::string& script);
+	ScriptingNode(DIWNE::Diwne& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface);
 
+public:
 	void accept(NodeVisitor& visitor) override
 	{
 		visitor.visit(std::static_pointer_cast<ScriptingNode>(shared_from_this()));
@@ -33,5 +49,9 @@ public:
 	void drawMenuLevelOfDetail() override;
 
 	void reloadScript();
+
+private:
+	std::string     m_script;
+	std::unique_ptr<ScriptInterface> m_interface;
 };
 } // namespace Workspace
