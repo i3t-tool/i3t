@@ -15,6 +15,7 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Scripting/Utils.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -795,6 +796,8 @@ LUA_REGISTRATION
 
 	api["workspace"] = L.create_table();
 	auto workspace = api["workspace"];
+
+	workspace["__scripts"] = L.create_table();
 
 	workspace["set_zoom"] = [](float value) {
 		getNodeEditor().diwne.setWorkAreaZoom(value);

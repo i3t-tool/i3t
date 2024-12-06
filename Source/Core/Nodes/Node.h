@@ -78,7 +78,7 @@ protected:
 	 *
 	 * \param operation Node properties.
 	 */
-	Node(const Operation* operation) : m_operation(operation) {}
+	explicit Node(const Operation* operation) : m_operation(operation) {}
 	virtual ~Node();
 
 public:

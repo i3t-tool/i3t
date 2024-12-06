@@ -19,6 +19,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -941,6 +942,10 @@ void WorkspaceDiwne::popupContent()
 	if (ImGui::MenuItem("cycle"))
 	{
 		addNodeToPositionOfPopup<Cycle>();
+	}
+	if (ImGui::MenuItem("scripting node"))
+	{
+		addNodeToPositionOfPopup<ScriptingNode>();
 	}
 
 	ImGui::Separator();
