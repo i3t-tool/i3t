@@ -16,6 +16,45 @@
 #include "Scripting/Environment.h"
 #include "Scripting/ScriptingModule.h"
 
+struct ScriptInterface
+{
+	sol::function onInit;
+	sol::function onUpdate;
+};
+
+constexpr const char* SCRIPTING_NODE_TEMPLATE = R"(
+I3T.workspace.__scripts[{}] = {{}}
+do
+    local self = I3T.workspace.__scripts[{}]
+    {}
+end)";
+
+static Result<ScriptInterface, Error> createScript(Core::ID id, const std::string& script)
+{
+	auto& scripting = Application::getModule<ScriptingModule>();
+
+	auto toExecute = fmt::format(SCRIPTING_NODE_TEMPLATE, id, id, script);
+	const bool result = scripting.runScript(toExecute.c_str());
+
+	if (!result)
+	{
+		return Err(Error("Failed to create node from script"));
+	}
+
+	auto node = scripting.environment()["I3T"]["workspace"]["__scripts"][id];
+
+	return ScriptInterface{node["on_init"].get<sol::function>(), node["on_update_values"].get<sol::function>()};
+}
+
+static void removeScript(Core::ID id)
+{
+	auto& scripting = Application::getModule<ScriptingModule>();
+	auto scripts = scripting.environment()["I3T"]["workspace"]["__scripts"];
+	scripts[id] = sol::nil;
+}
+
+//------------------------------------------------------------------------------------------------//
+
 static Core::Operation operation = {"Script", "script"};
 
 class ScriptingNode : public Core::Node
@@ -25,53 +64,34 @@ public:
 
 	explicit ScriptingNode(const std::string& script) : Node(&operation), m_script(script)
 	{
-		/// \todo Delete old script node!
-		auto& scripting = Application::getModule<ScriptingModule>();
-
-		auto toExecute = fmt::format(R"(
-I3T.workspace.__scripts[{}] = {{}}
-do
-    local self = I3T.workspace.__scripts[{}]
-    {}
-end)",
-		                             getId(), getId(), script);
-
-		if (scripting.runScript(toExecute.c_str()))
-		{
-			auto node = scripting.environment()["I3T"]["workspace"]["__scripts"][getId()];
-			m_onInit = node["on_init"].get<sol::function>();
-			m_onUpdate = node["on_update_values"].get<sol::function>();
-		}
+		m_interface = createScript(getId(), script).value();
 	}
 
 	~ScriptingNode() override
 	{
-		auto& scripting = Application::getModule<ScriptingModule>();
-		auto scripts = scripting.environment()["I3T"]["workspace"]["__scripts"];
-		scripts[getId()] = sol::nil;
+		removeScript(getId());
 	}
 
 	void onInit() override
 	{
-		if (m_onInit)
+		if (m_interface.onInit)
 		{
-			m_onInit();
+			m_interface.onInit();
 		}
 	}
 
 	void updateValues(int inputIndex) override
 	{
-		if (m_onUpdate)
+		if (m_interface.onUpdate)
 		{
-			m_onUpdate();
+			m_interface.onUpdate();
 		}
 	}
 
 	std::string m_script;
 
 private:
-	sol::function m_onInit;
-	sol::function m_onUpdate;
+	ScriptInterface m_interface;
 };
 
 //------------------------------------------------------------------------------------------------//
@@ -91,17 +111,13 @@ public:
 
 	void onImGui() override
 	{
-		auto callback = [](ImGuiInputTextCallbackData* data) -> int {
-			if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-			{
-				auto* editedScript = (std::vector<char>*) (data->UserData);
-				editedScript->resize(data->BufSize);
-				data->Buf = editedScript->begin().operator->();
-			}
-			return 0;
-		};
 		ImGui::InputTextMultiline("##script", m_editedScript.data(), m_editedScript.size(), ImVec2(400, 400),
-		                          ImGuiInputTextFlags_CallbackResize, callback, (void*) &m_editedScript);
+		                          ImGuiInputTextFlags_CallbackResize, textEditCallback, (void*) &m_editedScript);
+
+		if (!m_message.empty())
+		{
+			ImGui::TextColored(ImVec4(0.8f, 0.0f, 0.0f, 1.0f), m_message.c_str());
+		}
 
 		if (ImGui::Button("Cancel"))
 		{
@@ -111,16 +127,46 @@ public:
 		ImGui::SameLine();
 		if (ImGui::Button("Save"))
 		{
-			// trim ending null character
-			m_editedScript.pop_back();
-			m_script = std::string(m_editedScript.begin(), m_editedScript.end());
+			onSave();
+		}
+	}
 
+private:
+	void onSave()
+	{
+		// Trim ending null character.
+		m_editedScript.pop_back();
+		std::string script(m_editedScript.begin(), m_editedScript.end());
+
+		// Try to execute the script.
+		const auto nextId = Core::IdGenerator::next();
+		auto result = createScript(nextId, script);
+		if (!result)
+		{
+			/// \todo Show error message from the script.
+			m_message = "Script has errors, see console or log output for details.";
+		}
+		else
+		{
+			m_script = script;
+			removeScript(nextId);
 			close();
 			m_onSave();
 		}
 	}
 
-private:
+	static int textEditCallback(ImGuiInputTextCallbackData* data)
+	{
+		if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+		{
+			auto* editedScript = (std::vector<char>*) (data->UserData);
+			editedScript->resize(data->BufSize);
+			data->Buf = editedScript->begin().operator->();
+		}
+		return 0;
+	}
+
+	std::string m_message;
 	std::string& m_script;
 	std::vector<char> m_editedScript;
 	std::function<void(void)> m_onSave;
