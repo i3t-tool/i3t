@@ -23,9 +23,10 @@ namespace Workspace
 {
 struct ScriptInterface
 {
+	Core::ID id;
 	Core::Operation operation;
-	sol::function   onInit = sol::nil;
-	sol::function   onUpdate = sol::nil;
+	sol::function onInit = sol::nil;
+	sol::function onUpdate = sol::nil;
 };
 
 Result<std::unique_ptr<ScriptInterface>, Error> createScript(Core::ID id, const std::string& script);
@@ -36,6 +37,8 @@ class ScriptingNode : public CoreNodeWithPins
 {
 public:
 	ScriptingNode(DIWNE::Diwne& diwne);
+
+	/// Constructor for swapping the script
 	ScriptingNode(DIWNE::Diwne& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface);
 
 public:
@@ -48,10 +51,14 @@ public:
 	int maxLengthOfData() override;
 	void drawMenuLevelOfDetail() override;
 
+	Core::ID getScriptId() const
+	{
+		return m_interface->id;
+	}
 	void reloadScript();
 
 private:
-	std::string     m_script;
-	std::unique_ptr<ScriptInterface> m_interface;
+	std::string m_script;
+	ScriptInterface* m_interface = nullptr;
 };
 } // namespace Workspace

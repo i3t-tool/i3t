@@ -1559,6 +1559,7 @@ void WorkspaceDiwne::replaceNode(Ptr<CoreNode> oldNode, Ptr<CoreNode> newNode)
 	{
 		// replace node
 		*it = std::move(newNode);
+		oldNode->deleteActionDiwne();
 	}
 }
 

@@ -106,7 +106,7 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_EmptyOperation)
 			{}
 		)
 		self.on_init = function() print(1) end
-		self.on_update = function() print(2) end
+		self.on_update_values = function() print(2) end
 	)";
 
 	auto nextId = Core::IdGenerator::next();
@@ -128,7 +128,7 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_NonEmptyOperation)
 			{"result"}
 		)
 		self.on_init = function() print(1) end
-		self.on_update = function() print(2) end
+		self.on_update_values = function() print(2) end
 	)";
 
 	auto nextId = Core::IdGenerator::next();
@@ -150,7 +150,7 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_ComplexExample)
 			{"result"}
 		)
 		self.on_init = function() print(1) end
-		self.on_update = function() print(2) end
+		self.on_update_values = function() print(2) end
 	)";
 
 	auto nextId = Core::IdGenerator::next();

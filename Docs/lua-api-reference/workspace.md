@@ -66,6 +66,39 @@ Inherits all `Node` methods.
 Creates a new operator of the given `type`.
 See `EOperatorType` enum and `Operation::keyWord` in C++ code for possible values.
 
+#### method `is_input_plugged(index: number): boolean`
+
+Returns true if the input at the given `index` is plugged.
+
+#### method `is_output_plugged(index: number): boolean`
+
+Returns true if the output at the given `index` is plugged.
+
+#### method `get_input_float(index: number): number`
+
+Get the input value of the operator at the given `index`.
+Returns nil if the input is not a `float`.
+
+#### method `get_input_vec3(index: number): Vec3`
+
+Get the input value of the operator at the given `index`.
+Returns nil if the input is not a `Vec3`.
+
+#### method `get_input_vec4(index: number): Vec4`
+
+Get the input value of the operator at the given `index`.
+Returns nil if the input is not a `Vec4`.
+
+#### method `get_input_quat(index: number): Quat`
+
+Get the input value of the operator at the given `index`.
+Returns nil if the input is not a `Quat`.
+
+#### method `get_input_mat4(index: number): Mat4`
+
+Get the input value of the operator at the given `index`.
+Returns nil if the input is not a `Mat4`.
+
 #### method `get_float(index: number): number`
 
 Get the output value of the operator at the given `index`.
@@ -296,6 +329,43 @@ Inherits all `Node` methods.
 Sets the aspect.
 
 
+### enum `ValueType`
+
+#### `ValueType.Float`
+
+#### `ValueType.Vec3`
+
+#### `ValueType.Vec4`
+
+#### `ValueType.Matrix`
+
+#### `ValueType.Quat`
+
+
+### `Operation`
+
+### constructor `new(inputTypes, outputTypes, defaultInputNames, defaultOutputNames)`
+
+Creates a new operation with the given parameters.
+Types of parameters are the same as `Operation` attributes.
+
+#### attribute `inputTypes: ValueType[]`
+
+Types of the operation's inputs.
+
+#### attribute `outputTypes: ValueType[]`
+
+Types of the operation's outputs.
+
+#### attribute `defaultInputNames: string[]`
+
+Names of the operation's inputs, must be the same length as `inputTypes`.
+
+#### attribute `defaultOutputNames: string[]`
+
+Names of the operation's outputs, must be the same length as `outputTypes`.
+
+
 ### Workspace API functions
 
 #### function `I3T.print_operator_types()`
@@ -359,3 +429,52 @@ Sets the zoom level of the workspace.
 
 Sets the work area of the workspace, where `min` is the top-left corner
 and `max` is the bottom-right corner.
+
+
+### Scripting Node API functions
+
+Scripting Node is a special node that can be modified using Lua scripts.
+You can specify node properties by creating a new `Operation` and attaching
+it to the node.
+The API provides a set of functions - `on_init` and `on_update_values` - that can be
+used in the script to interact with the node,
+you can also access the node's properties by using the `self.node` object.
+To save custom properties, you can use the `self` table, for example `self.my_property = 1`.
+
+Example of a simple script:
+
+```lua
+self.operation = Operation.new(
+	{ValueType.Float, ValueType.Float},
+	{ValueType.Vec3},
+	{"x", "y"},
+	{"result"}
+)
+self.on_init = function() print("Node initialized!") end
+self.on_update_values = function()
+	local operator = self.node:as_operator()
+	if (operator:is_input_plugged(1) and operator:is_input_plugged(2)) then
+		local x = operator:get_input_float(1)
+		local y = operator:get_input_float(2)
+		operator:set_value(Vec3.new(x, y, x + y))
+	end
+end
+```
+
+#### attribute `self.operation: Operation`
+
+The operation which is used to create the node.
+
+#### attribute `self.node: Operator`
+
+The node that the script is attached to.
+
+#### function `self.on_init()`
+
+Called when the node is created.
+Function is protected, errors will be caught and printed to the console.
+
+#### function `self.on_update_values()`
+
+Called when the node's values are updated.
+Function is protected, errors will be caught and printed to the console.

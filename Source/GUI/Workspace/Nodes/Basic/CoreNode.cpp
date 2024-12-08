@@ -23,8 +23,8 @@
 using namespace Workspace;
 
 CoreNode::CoreNode(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
-    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation().defaultLabel),
-      m_nodebase(nodebase), m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
+    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation().defaultLabel), m_nodebase(nodebase),
+      m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
       m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
                        diwne.getWorkAreaZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of

@@ -30,11 +30,69 @@ static Workspace::WorkspaceDiwne& getNodeEditor()
 
 //----------------------------------------------------------------------------//
 
+static bool isInputPlugged(Ptr<Workspace::CoreNodeWithPins> guiNode, int luaIndex)
+{
+	auto node = guiNode->getNodebase();
+	auto index = luaIndex - 1;
+
+	if (index < 0 || index >= node->getInputPins().size())
+	{
+		print("no such input index");
+		return false;
+	}
+
+	return node->getInput(index).isPluggedIn();
+}
+
+static bool isOutputPlugged(Ptr<Workspace::CoreNodeWithPins> guiNode, int luaIndex)
+{
+	auto node = guiNode->getNodebase();
+	auto index = luaIndex - 1;
+
+	if (index < 0 || index >= node->getOutputPins().size())
+	{
+		print("no such output index");
+		return false;
+	}
+
+	return node->getOutput(index).isPluggedIn();
+}
+
+//----------------------------------------------------------------------------//
+
+template <typename R, typename T>
+static std::optional<T> getInputValue(Ptr<R> guiNode, int luaIndex)
+{
+	const auto node = guiNode->getNodebase();
+	const auto index = luaIndex - 1;
+
+	if (0 > index && node->getInputPins().size() <= index)
+	{
+		print("no such index");
+		return std::nullopt;
+	}
+
+	auto& input = node->getInput(index);
+	if (!input.isPluggedIn())
+	{
+		print("input is not plugged in");
+		return std::nullopt;
+	}
+
+	const auto maybeValue = node->getInput(index).data().template getValue<T>();
+	if (!maybeValue.has_value())
+	{
+		print("no such type of value");
+		return std::nullopt;
+	}
+
+	return maybeValue;
+}
+
 template <typename R, typename T>
 static std::optional<T> getValue(Ptr<R> guiNode, int luaIndex)
 {
 	const auto node = guiNode->getNodebase();
-
 	const auto index = luaIndex - 1;
 
 	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
@@ -61,8 +119,9 @@ static bool setValue(Ptr<R> guiNode, const T& value)
 	const auto node = guiNode->getNodebase();
 
 	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
+	auto isScriptingNode = node->getOperation().keyWord == "Script";
 
-	if (!node->getOperation().isConstructor && !isTransform)
+	if (!node->getOperation().isConstructor && !isTransform && !isScriptingNode)
 	{
 		print("cannot set value for this node");
 		return false;
@@ -557,7 +616,15 @@ LUA_REGISTRATION
 
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
+		// pins
+		"is_input_plugged", isInputPlugged,
+		"is_output_plugged", isOutputPlugged,
 		// getters
+		"get_input_float", &getInputValue<GuiOperator, float>,
+		"get_input_vec3", &getInputValue<GuiOperator, glm::vec3>,
+		"get_input_vec4", &getInputValue<GuiOperator, glm::vec4>,
+		"get_input_quat", &getInputValue<GuiOperator, glm::quat>,
+		"get_input_mat4", &getInputValue<GuiOperator, glm::mat4>,
 		"get_float", &getValue<GuiOperator, float>,
 		"get_vec3", &getValue<GuiOperator, glm::vec3>,
 		"get_vec4", &getValue<GuiOperator, glm::vec4>,

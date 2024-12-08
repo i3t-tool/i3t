@@ -25,38 +25,66 @@ end)";
 
 //------------------------------------------------------------------------------------------------//
 
+/// \todo This function is not working properly, it is not possible to get the node from the environment.
+static auto getNode(ScriptingModule& scripting, Core::ID id)
+{
+	return scripting.environment()["I3T"]["workspace"]["__scripts"][id];
+}
+
 class ScriptingNode : public Core::Node
 {
 public:
 	ScriptingNode() : Node(DEFAULT_SCRIPTING_NODE_OPERATION) {}
 
-	explicit ScriptingNode(Workspace::ScriptInterface* interface) : Node(interface->operation), m_interface(interface)
-	{
-	}
+	explicit ScriptingNode(std::unique_ptr<Workspace::ScriptInterface> interface,
+	                       Workspace::ScriptingNode* workspaceNode)
+	    : Node(interface->operation), m_workspaceNode(workspaceNode), m_interface(std::move(interface))
+	{}
 
 	~ScriptingNode() override
 	{
-		Workspace::removeScript(getId());
+		if (m_interface)
+		{
+			Workspace::removeScript(m_interface->id);
+		}
 	}
 
-	void onInit() override
+	/// Cannot be used Node::onInit function because it is called before the node is added to the workspace.
+	void performInit()
 	{
-		if (m_interface && m_interface->onInit)
+		if (m_workspaceNode != nullptr && m_interface != nullptr)
 		{
-			m_interface->onInit();
+			auto& lua = Application::getModule<ScriptingModule>().environment();
+			auto script = lua["I3T"]["workspace"]["__scripts"][m_interface->id];
+
+			script["node"] = std::dynamic_pointer_cast<Workspace::CoreNode>(m_workspaceNode->shared_from_this());
+
+			if (m_interface->onInit)
+			{
+				m_interface->onInit();
+			}
+			m_isInitialized = true;
 		}
 	}
 
 	void updateValues(int inputIndex) override
 	{
-		if (m_interface && m_interface->onUpdate)
+		if (m_isInitialized && m_interface->onUpdate)
 		{
 			m_interface->onUpdate();
 		}
 	}
 
+	Workspace::ScriptInterface* getInterface() const
+	{
+		return m_interface.get();
+	}
+
 private:
-	Workspace::ScriptInterface* m_interface = nullptr;
+	Workspace::ScriptingNode* m_workspaceNode = nullptr;
+	std::unique_ptr<Workspace::ScriptInterface> m_interface = nullptr;
+
+	bool m_isInitialized = false;
 };
 
 //------------------------------------------------------------------------------------------------//
@@ -75,28 +103,41 @@ Result<std::unique_ptr<Workspace::ScriptInterface>, Error> createScript(Core::ID
 		return Err(Error("Failed to create node from script"));
 	}
 
-	auto node = scripting.environment()["I3T"]["workspace"]["__scripts"][id];
+	// auto node = getNode(scripting, id);
+	auto& lua = scripting.environment();
+	auto node = lua["I3T"]["workspace"]["__scripts"][id];
 
 	if (node["operation"] != sol::nil && !node["operation"].is<Core::Operation>())
 	{
 		return Err(Error("Node Operation is invalid."));
 	}
 
-	Core::Operation operation = node["operation"].is<Core::Operation>() ? node["operation"].get<Core::Operation>() : DEFAULT_SCRIPTING_NODE_OPERATION;
-	operation.keyWord = fmt::format("Script", id);
+	Core::Operation operation = node["operation"].get_or<Core::Operation>(DEFAULT_SCRIPTING_NODE_OPERATION);
 
-	return std::make_unique<Workspace::ScriptInterface>(
-	    operation,
-	    node["on_init"],
-	    node["on_update_values"]
-	);
+	auto onInit = node["on_init"].get_or<sol::function>(sol::nil);
+	if (onInit)
+	{
+		onInit.set_error_handler(lua["print"]);
+	}
+
+	auto onUpdate = node["on_update_values"].get_or<sol::function>(sol::nil);
+	if (onUpdate)
+	{
+		onUpdate.set_error_handler(lua["print"]);
+	}
+
+	return std::make_unique<Workspace::ScriptInterface>(id, operation, std::move(onInit), std::move(onUpdate));
 }
 
 void removeScript(Core::ID id)
 {
 	auto& scripting = Application::getModule<ScriptingModule>();
 	auto scripts = scripting.environment()["I3T"]["workspace"]["__scripts"];
-	scripts[id] = sol::nil;
+	if (scripts != sol::nil)
+	{
+		scripts[id]["node"] = sol::nil;
+		scripts[id] = sol::nil;
+	}
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -174,10 +215,10 @@ ScriptingNode::ScriptingNode(DIWNE::Diwne& diwne)
 {}
 
 ScriptingNode::ScriptingNode(DIWNE::Diwne& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface)
-    : CoreNodeWithPins(diwne, Core::GraphManager::createCustomNode<::ScriptingNode>(interface.get())),
-      m_script(script), m_interface(std::move(interface))
+    : CoreNodeWithPins(diwne, Core::GraphManager::createCustomNode<::ScriptingNode>(std::move(interface), this)),
+      m_script(script)
 {
-	(void) m_interface->operation;
+	m_interface = getNodebase()->as<::ScriptingNode>()->getInterface();
 }
 
 void ScriptingNode::popupContent()
@@ -185,7 +226,6 @@ void ScriptingNode::popupContent()
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
 	auto& nodes = nodeEditor.m_workspaceCoreNodes;
-
 
 	CoreNode::drawMenuSetEditable();
 
@@ -224,7 +264,8 @@ void ScriptingNode::reloadScript()
 {
 	auto self = std::static_pointer_cast<ScriptingNode>(shared_from_this());
 	auto coreNode = std::static_pointer_cast<::ScriptingNode>(m_nodebase);
-	auto interface = createScript(coreNode->getId(), m_script);
+	const auto id = Core::IdGenerator::next();
+	auto interface = createScript(id, m_script);
 	if (!interface)
 	{
 		LOG_ERROR("Failed to reload script");
@@ -236,7 +277,8 @@ void ScriptingNode::reloadScript()
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
 	nodeEditor.replaceNode(self, newNode);
+	self->m_interface = nullptr;
 
-	(void) self;
+	newNode->getNodebase()->as<::ScriptingNode>()->performInit();
 }
 } // namespace Workspace
