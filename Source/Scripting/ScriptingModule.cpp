@@ -20,6 +20,7 @@
 #include "Core/Nodes/NodeData.h"
 #include "Core/Nodes/Operations.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Scripting/Environment.h"
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
@@ -211,6 +212,33 @@ void ScriptingModule::onClose()
 {
 	// Destroy timers before the workspace, because of weird DINWE nodes ownership issues.
 	m_chronos = {};
+
+	// This is a hack to remove all scripting nodes from the workspace.
+	// It must be done before destroying the Lua state, because the nodes are holding Lua objects.
+	auto& nodeEditor = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor();
+	auto& nodes = nodeEditor.m_workspaceCoreNodes;
+	for (auto& node : nodes)
+	{
+		if (node->getNodebase()->getOperation().keyWord != "Script")
+		{
+			continue;
+		}
+		if (auto scriptingNode = std::dynamic_pointer_cast<Workspace::ScriptingNode>(node))
+		{
+			// Associated script must be removed here, because it holds shared_ptr reference to the workspace
+			// node and would prevent it from being destroyed.
+			if (auto id = scriptingNode->getScriptId())
+			{
+				Workspace::removeScript(id.value());
+			}
+		}
+	}
+	nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
+	                           [](auto node) {
+		                           return node->getNodebase()->getOperation().keyWord == "Script";
+	                           }),
+	            nodes.end());
+	nodeEditor.deselectNodes();
 
 	// Destroy the Lua state to ensure that all workspace node will be destroyed along with their Lua objects.
 	m_Lua = {};

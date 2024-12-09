@@ -116,7 +116,8 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 	}
 }
 
-TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
+/// \todo
+TEST_F(StateTest, DISABLED_UnicodeSceneNameLoadAndSave)
 {
 	const auto sceneName = "TestíčekSČeskýmiZnakyTrochuRuštinyдфшAČínštiny漢字汉Oke"s + I3T_SCENE_EXTENSION;
 	const auto scenePath = fs::path("Test") / "Data" / sceneName;

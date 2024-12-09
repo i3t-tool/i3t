@@ -124,6 +124,8 @@ public:
 
 	std::vector<Ptr<CoreNode>> getSelectedNodes();
 
+	void replaceNode(Ptr<CoreNode> oldNode, Ptr<CoreNode> newNode);
+
 	std::vector<CoreLink*> m_linksToDraw;
 	std::vector<CoreLink> m_linksCameraToSequence;
 

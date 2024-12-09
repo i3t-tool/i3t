@@ -19,6 +19,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -942,6 +943,10 @@ void WorkspaceDiwne::popupContent()
 	{
 		addNodeToPositionOfPopup<Cycle>();
 	}
+	if (ImGui::MenuItem("scripting node"))
+	{
+		addNodeToPositionOfPopup<ScriptingNode>();
+	}
 
 	ImGui::Separator();
 
@@ -1544,6 +1549,18 @@ std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodes()
 		};
 	}
 	return selected;
+}
+
+void WorkspaceDiwne::replaceNode(Ptr<CoreNode> oldNode, Ptr<CoreNode> newNode)
+{
+	// find node index in workspace
+	auto it = std::find(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), oldNode);
+	if (it != m_workspaceCoreNodes.end())
+	{
+		// replace node
+		*it = std::move(newNode);
+		oldNode->deleteActionDiwne();
+	}
 }
 
 void WorkspaceDiwne::manipulatorStartCheck3D()

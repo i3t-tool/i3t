@@ -15,6 +15,7 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Scripting/Utils.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -29,11 +30,69 @@ static Workspace::WorkspaceDiwne& getNodeEditor()
 
 //----------------------------------------------------------------------------//
 
+static bool isInputPlugged(Ptr<Workspace::CoreNodeWithPins> guiNode, int luaIndex)
+{
+	auto node = guiNode->getNodebase();
+	auto index = luaIndex - 1;
+
+	if (index < 0 || index >= node->getInputPins().size())
+	{
+		print("no such input index");
+		return false;
+	}
+
+	return node->getInput(index).isPluggedIn();
+}
+
+static bool isOutputPlugged(Ptr<Workspace::CoreNodeWithPins> guiNode, int luaIndex)
+{
+	auto node = guiNode->getNodebase();
+	auto index = luaIndex - 1;
+
+	if (index < 0 || index >= node->getOutputPins().size())
+	{
+		print("no such output index");
+		return false;
+	}
+
+	return node->getOutput(index).isPluggedIn();
+}
+
+//----------------------------------------------------------------------------//
+
+template <typename R, typename T>
+static std::optional<T> getInputValue(Ptr<R> guiNode, int luaIndex)
+{
+	const auto node = guiNode->getNodebase();
+	const auto index = luaIndex - 1;
+
+	if (0 > index && node->getInputPins().size() <= index)
+	{
+		print("no such index");
+		return std::nullopt;
+	}
+
+	auto& input = node->getInput(index);
+	if (!input.isPluggedIn())
+	{
+		print("input is not plugged in");
+		return std::nullopt;
+	}
+
+	const auto maybeValue = node->getInput(index).data().template getValue<T>();
+	if (!maybeValue.has_value())
+	{
+		print("no such type of value");
+		return std::nullopt;
+	}
+
+	return maybeValue;
+}
+
 template <typename R, typename T>
 static std::optional<T> getValue(Ptr<R> guiNode, int luaIndex)
 {
 	const auto node = guiNode->getNodebase();
-
 	const auto index = luaIndex - 1;
 
 	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
@@ -60,8 +119,9 @@ static bool setValue(Ptr<R> guiNode, const T& value)
 	const auto node = guiNode->getNodebase();
 
 	constexpr auto isTransform = std::is_same_v<R, GuiTransform>;
+	auto isScriptingNode = node->getOperation().keyWord == "Script";
 
-	if (!node->getOperation()->isConstructor && !isTransform)
+	if (!node->getOperation().isConstructor && !isTransform && !isScriptingNode)
 	{
 		print("cannot set value for this node");
 		return false;
@@ -386,12 +446,12 @@ private:
 	void visit(const Ptr<GuiOperator>& node) override
 	{
 		auto coreNode = node->getNodebase();
-		auto props = coreNode->getOperation();
+		auto& props = coreNode->getOperation();
 
-		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props->keyWord);
+		m_stream << fmt::format("local node_{} = Operator.new(\"{}\")\n", node->getId(), props.keyWord);
 		dumpCommon(node);
 
-		if (props->isConstructor)
+		if (props.isConstructor)
 		{
 			auto data = coreNode->data(0);
 			if (auto dataConstructor = LuaSerializer::toConstructor(data))
@@ -419,7 +479,7 @@ private:
 		auto coreNode = node->getNodebase()->as<Core::Transform>();
 
 		m_stream << fmt::format("local node_{} = Transform.new(\"{}\")\n", node->getId(),
-		                        coreNode->getOperation()->keyWord);
+		                        coreNode->getOperation().keyWord);
 		dumpCommon(node);
 
 		m_stream << fmt::format("node_{}:set_value({})\n", node->getId(),
@@ -482,6 +542,17 @@ private:
 		m_stream << fmt::format("node_{}:set_opacity({})\n", node->getId(), model->m_opacity);
 		m_stream << fmt::format("node_{}:set_tint({})\n", node->getId(), LuaSerializer::toConstructor(model->m_tint));
 		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
+	}
+
+	void visit(const Ptr<Workspace::ScriptingNode>& node) override
+	{
+		auto coreNode = node->getNodebase();
+
+		m_stream << fmt::format("local node_{} = ScriptingNode.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{} = node_{}:set_script([[{}]])\n", node->getId(), node->getId(),
+		                        node->getScript());
 	}
 
 	std::vector<glm::ivec4> m_connections;
@@ -556,7 +627,15 @@ LUA_REGISTRATION
 
 		    return std::dynamic_pointer_cast<GuiOperator>(op);
 	    },
+		// pins
+		"is_input_plugged", isInputPlugged,
+		"is_output_plugged", isOutputPlugged,
 		// getters
+		"get_input_float", &getInputValue<GuiOperator, float>,
+		"get_input_vec3", &getInputValue<GuiOperator, glm::vec3>,
+		"get_input_vec4", &getInputValue<GuiOperator, glm::vec4>,
+		"get_input_quat", &getInputValue<GuiOperator, glm::quat>,
+		"get_input_mat4", &getInputValue<GuiOperator, glm::mat4>,
 		"get_float", &getValue<GuiOperator, float>,
 		"get_vec3", &getValue<GuiOperator, glm::vec3>,
 		"get_vec4", &getValue<GuiOperator, glm::vec4>,
@@ -789,12 +868,54 @@ LUA_REGISTRATION
 		}
 	);
 
+	L.new_usertype<Workspace::ScriptingNode>(
+		"ScriptingNode",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::ScriptingNode> {
+			auto node = Workspace::addNodeToNodeEditor<Workspace::ScriptingNode>();
+
+			print(fmt::format("ID: {}", node->getNodebase()->getId()));
+
+			return node;
+		},
+		"get_script", &Workspace::ScriptingNode::getScript,
+		"set_script", &Workspace::ScriptingNode::setScript
+	);
+
+	L.new_enum("ValueType",
+		"Float", Core::EValueType::Float,
+		"Vec3", Core::EValueType::Vec3,
+		"Vec4", Core::EValueType::Vec4,
+		"Matrix", Core::EValueType::Matrix,
+		"Quat", Core::EValueType::Quat
+	);
+
+	L.new_usertype<Core::Operation>(
+		"Operation",
+		sol::meta_function::construct, [](Core::PinGroup inputTypes, Core::PinGroup outputTypes, Core::PinNames defaultInputNames, Core::PinNames defaultOutputNames) -> Core::Operation {
+			return Core::Operation{
+				.keyWord = DEFAULT_SCRIPTING_NODE_OPERATION.keyWord,
+				.defaultLabel = DEFAULT_SCRIPTING_NODE_OPERATION.defaultLabel,
+				.inputTypes = std::move(inputTypes),
+				.outputTypes = std::move(outputTypes),
+				.defaultInputNames = std::move(defaultInputNames),
+				.defaultOutputNames = std::move(defaultOutputNames)
+			};
+		},
+		"inputTypes", sol::readonly(&Core::Operation::inputTypes),
+		"outputTypes", sol::readonly(&Core::Operation::outputTypes),
+		"inputNames", sol::readonly(&Core::Operation::defaultInputNames),
+		"outputNames", sol::readonly(&Core::Operation::defaultOutputNames)
+	);
+
 	// I3T functions
 
 	auto api = L["I3T"];
 
 	api["workspace"] = L.create_table();
 	auto workspace = api["workspace"];
+
+	workspace["__scripts"] = L.create_table();
 
 	workspace["set_zoom"] = [](float value) {
 		getNodeEditor().diwne.setWorkAreaZoom(value);
@@ -882,9 +1003,9 @@ LUA_REGISTRATION
 		for (const auto& node : nodes)
 		{
 			const auto& coreNode = node->getNodebase();
-			const auto* op = coreNode->getOperation();
+			const auto& op = coreNode->getOperation();
 
-			print(fmt::format("node {}, type {}", coreNode->getId(), op->keyWord));
+			print(fmt::format("node {}, type {}", coreNode->getId(), op.keyWord));
 		}
 	};
 

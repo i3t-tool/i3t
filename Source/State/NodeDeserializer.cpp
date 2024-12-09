@@ -17,6 +17,7 @@
 #include "Core/Nodes/Transform.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/Tools.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -199,6 +200,22 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		}
 	}
 
+	for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
+	{
+		const auto node = Workspace::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
+		NodeDeserializer::assignCommon(value, node);
+
+		/// \todo Assign script after the node is connected with the other nodes.
+		if (value["script"].IsString())
+		{
+			if (auto newNode = node->setScript(value["script"].GetString()))
+			{
+				// Has to be here, node id gets changed by setScript.
+				createdNodes[value["id"].GetInt()] = newNode;
+			}
+		}
+	}
+
 	//
 
 	const auto& transforms = memento["workspace"]["transforms"];
@@ -280,9 +297,9 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 	assignCommon(value, node);
 
-	if (value.HasMember("value") && coreNode->getOperation()->isConstructor)
+	if (value.HasMember("value") && coreNode->getOperation().isConstructor)
 	{
-		const auto valueType = coreNode->getOperation()->inputTypes[0];
+		const auto valueType = coreNode->getOperation().inputTypes[0];
 		if (auto maybeData = JSON::getData(value["value"], valueType))
 		{
 			const auto& data = *maybeData;
