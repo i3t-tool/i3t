@@ -329,6 +329,22 @@ Inherits all `Node` methods.
 Sets the aspect.
 
 
+### `ScriptingNode`
+
+#### constructor `new()`
+
+Creates a new scripting node.
+
+#### method `get_script(): string`
+
+Returns the Lua script of the node.
+
+#### method `set_script(script: string): ScriptingNode`
+
+Sets the Lua script of the node.
+Note that on success the new node will be returned!
+
+
 ### enum `ValueType`
 
 #### `ValueType.Float`
@@ -364,6 +380,55 @@ Names of the operation's inputs, must be the same length as `inputTypes`.
 #### attribute `defaultOutputNames: string[]`
 
 Names of the operation's outputs, must be the same length as `outputTypes`.
+
+
+### Scripting Node API functions
+
+Scripting Node is a special node that can be modified using Lua scripts.
+You can specify node properties by creating a new `Operation` and attaching
+it to the node.
+The API provides a set of functions - `on_init` and `on_update_values` - that can be
+used in the script to interact with the node,
+you can also access the node's properties by using the `self.node` object.
+To save custom properties, you can use the `self` table, for example `self.my_property = 1`.
+
+Example of a simple script:
+
+```lua
+self.operation = Operation.new(
+	{ValueType.Float, ValueType.Float},
+	{ValueType.Vec3},
+	{"x", "y"},
+	{"result"}
+)
+self.on_init = function() print("Node initialized!") end
+self.on_update_values = function()
+	local operator = self.node:as_operator()
+	if (operator:is_input_plugged(1) and operator:is_input_plugged(2)) then
+		local x = operator:get_input_float(1)
+		local y = operator:get_input_float(2)
+		operator:set_value(Vec3.new(x, y, x + y))
+	end
+end
+```
+
+#### attribute `self.operation: Operation`
+
+The operation which is used to create the node.
+
+#### attribute `self.node: Operator`
+
+The node that the script is attached to.
+
+#### function `self.on_init()`
+
+Called when the node is created.
+Function is protected, errors will be caught and printed to the console.
+
+#### function `self.on_update_values()`
+
+Called when the node's values are updated.
+Function is protected, errors will be caught and printed to the console.
 
 
 ### Workspace API functions
@@ -429,52 +494,3 @@ Sets the zoom level of the workspace.
 
 Sets the work area of the workspace, where `min` is the top-left corner
 and `max` is the bottom-right corner.
-
-
-### Scripting Node API functions
-
-Scripting Node is a special node that can be modified using Lua scripts.
-You can specify node properties by creating a new `Operation` and attaching
-it to the node.
-The API provides a set of functions - `on_init` and `on_update_values` - that can be
-used in the script to interact with the node,
-you can also access the node's properties by using the `self.node` object.
-To save custom properties, you can use the `self` table, for example `self.my_property = 1`.
-
-Example of a simple script:
-
-```lua
-self.operation = Operation.new(
-	{ValueType.Float, ValueType.Float},
-	{ValueType.Vec3},
-	{"x", "y"},
-	{"result"}
-)
-self.on_init = function() print("Node initialized!") end
-self.on_update_values = function()
-	local operator = self.node:as_operator()
-	if (operator:is_input_plugged(1) and operator:is_input_plugged(2)) then
-		local x = operator:get_input_float(1)
-		local y = operator:get_input_float(2)
-		operator:set_value(Vec3.new(x, y, x + y))
-	end
-end
-```
-
-#### attribute `self.operation: Operation`
-
-The operation which is used to create the node.
-
-#### attribute `self.node: Operator`
-
-The node that the script is attached to.
-
-#### function `self.on_init()`
-
-Called when the node is created.
-Function is protected, errors will be caught and printed to the console.
-
-#### function `self.on_update_values()`
-
-Called when the node's values are updated.
-Function is protected, errors will be caught and printed to the console.
