@@ -260,7 +260,14 @@ void ScriptingNode::drawMenuLevelOfDetail()
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
 
-void ScriptingNode::reloadScript()
+Ptr<ScriptingNode> ScriptingNode::setScript(const std::string& script)
+{
+	m_script = script;
+
+	return reloadScript();
+}
+
+Ptr<ScriptingNode> ScriptingNode::reloadScript()
 {
 	auto self = std::static_pointer_cast<ScriptingNode>(shared_from_this());
 	auto coreNode = std::static_pointer_cast<::ScriptingNode>(m_nodebase);
@@ -269,7 +276,7 @@ void ScriptingNode::reloadScript()
 	if (!interface)
 	{
 		LOG_ERROR("Failed to reload script");
-		return;
+		return nullptr;
 	}
 
 	auto newNode = std::make_shared<ScriptingNode>(diwne, m_script, std::move(interface.value()));
@@ -280,5 +287,52 @@ void ScriptingNode::reloadScript()
 	self->m_interface = nullptr;
 
 	newNode->getNodebase()->as<::ScriptingNode>()->performInit();
+
+	// All connections are lost, so we need to reconnect the node.
+	auto connections = collectNeighbours(newNode->getId());
+	for (const auto& [fromId, fromIndex, toId, toIndex] : connections)
+	{
+		if (!Tools::plug(fromId, fromIndex, toId, toIndex))
+		{
+			LOG_ERROR("Failed to reconnect node: Node#{}[{}] -> Node#{}[{}]", fromId, fromIndex, toId, toIndex);
+		}
+	}
+	newNode->setNodePositionDiwne(getNodePositionDiwne());
+
+	return newNode;
+}
+
+std::vector<std::tuple<Core::ID, int, Core::ID, int>> ScriptingNode::collectNeighbours(Core::ID overrideId) const
+{
+	std::vector<std::tuple<Core::ID, int, Core::ID, int>> neighbours;
+	const auto node = getNodebase();
+	for (auto i = 0L; i < node->getInputPins().size(); i++)
+	{
+		auto& pin = node->getInputPins()[i];
+		if (pin.isPluggedIn())
+		{
+			auto* parentPin = pin.getParentPin();
+			auto fromId = parentPin->Owner.getId();
+			auto fromIndex = parentPin->Index;
+			auto toId = overrideId;
+			auto toIndex = i;
+			neighbours.emplace_back(fromId, fromIndex, toId, toIndex);
+		}
+	}
+
+	for (auto i = 0L; i < node->getOutputPins().size(); i++)
+	{
+		auto& pin = node->getOutputPins()[i];
+		for (auto* outputPin : pin.getOutComponents())
+		{
+			auto fromId = overrideId;
+			auto fromIndex = i;
+			auto toId = outputPin->Owner.getId();
+			auto toIndex = outputPin->Index;
+			neighbours.emplace_back(fromId, fromIndex, toId, toIndex);
+		}
+	}
+
+	return neighbours;
 }
 } // namespace Workspace

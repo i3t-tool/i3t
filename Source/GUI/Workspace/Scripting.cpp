@@ -544,6 +544,17 @@ private:
 		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
 	}
 
+	void visit(const Ptr<Workspace::ScriptingNode>& node) override
+	{
+		auto coreNode = node->getNodebase();
+
+		m_stream << fmt::format("local node_{} = ScriptingNode.new()\n", node->getId());
+		dumpCommon(node);
+
+		m_stream << fmt::format("node_{} = node_{}:set_script([[{}]])\n", node->getId(), node->getId(),
+		                        node->getScript());
+	}
+
 	std::vector<glm::ivec4> m_connections;
 	std::stringstream m_stream;
 };
@@ -855,6 +866,20 @@ LUA_REGISTRATION
 		"set_aspect", [](Workspace::Screen& self, const ImVec2& value) {
 			self.setAspect(value);
 		}
+	);
+
+	L.new_usertype<Workspace::ScriptingNode>(
+		"ScriptingNode",
+		sol::base_classes, sol::bases<GuiNode>(),
+		sol::meta_function::construct, []() -> Ptr<Workspace::ScriptingNode> {
+			auto node = Workspace::addNodeToNodeEditor<Workspace::ScriptingNode>();
+
+			print(fmt::format("ID: {}", node->getNodebase()->getId()));
+
+			return node;
+		},
+		"get_script", &Workspace::ScriptingNode::getScript,
+		"set_script", &Workspace::ScriptingNode::setScript
 	);
 
 	L.new_enum("ValueType",

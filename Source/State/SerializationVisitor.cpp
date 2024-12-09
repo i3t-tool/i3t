@@ -18,6 +18,7 @@
 #include "GUI/Workspace/Nodes/Model.h"
 #include "GUI/Workspace/Nodes/Operator.h"
 #include "GUI/Workspace/Nodes/Screen.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/Nodes/Sequence.h"
 #include "GUI/Workspace/Nodes/TransformationBase.h"
 #include "Logger/Logger.h"
@@ -52,6 +53,11 @@ void SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 
 	rapidjson::Value transforms(rapidjson::kArrayType);
 	workspace.AddMember("transforms", std::move(transforms), m_memento.GetAllocator());
+
+	rapidjson::Value scriptingNodes(rapidjson::kArrayType);
+	workspace.AddMember("scriptingNodes", std::move(scriptingNodes), m_memento.GetAllocator());
+
+	//
 
 	rapidjson::Value edges(rapidjson::kArrayType);
 	workspace.AddMember("edges", std::move(edges), m_memento.GetAllocator());
@@ -193,6 +199,24 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
 
 	models.PushBack(model, alloc);
+
+	addEdges(edges, coreNode);
+}
+
+void SerializationVisitor::visit(const Ptr<Workspace::ScriptingNode>& node)
+{
+	const auto& coreNode = node->getNodebase();
+	auto& alloc = m_memento.GetAllocator();
+	auto& scriptingNodes = m_memento["workspace"]["scriptingNodes"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value model(rapidjson::kObjectType);
+	dumpCommon(model, node);
+
+	const auto script = node->getScript();
+	model.AddMember("script", rapidjson::Value(script.c_str(), alloc), alloc);
+
+	scriptingNodes.PushBack(model, alloc);
 
 	addEdges(edges, coreNode);
 }

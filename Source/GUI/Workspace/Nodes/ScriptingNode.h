@@ -51,13 +51,22 @@ public:
 	int maxLengthOfData() override;
 	void drawMenuLevelOfDetail() override;
 
-	Core::ID getScriptId() const
+	std::optional<Core::ID> getScriptId() const
 	{
 		return m_interface->id;
 	}
-	void reloadScript();
+	const std::string& getScript() const
+	{
+		return m_script;
+	}
+	Ptr<ScriptingNode> setScript(const std::string& script);
+	Ptr<ScriptingNode> reloadScript();
 
 private:
+	/// \todo This can be somewhere else in the common code.
+	/// \returns fromId, fromIndex, toId, toIndex
+	std::vector<std::tuple<Core::ID, int, Core::ID, int>> collectNeighbours(Core::ID overrideId) const;
+
 	std::string m_script;
 	ScriptInterface* m_interface = nullptr;
 };

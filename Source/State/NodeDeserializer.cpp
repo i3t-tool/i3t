@@ -17,6 +17,7 @@
 #include "Core/Nodes/Transform.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/Tools.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -196,6 +197,22 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		if (value.HasMember("tintStrength") && value["tintStrength"].IsFloat())
 		{
 			mesh->m_tintStrength = value["tintStrength"].GetFloat();
+		}
+	}
+
+	for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
+	{
+		const auto node = Workspace::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
+		NodeDeserializer::assignCommon(value, node);
+
+		/// \todo Assign script after the node is connected with the other nodes.
+		if (value["script"].IsString())
+		{
+			if (auto newNode = node->setScript(value["script"].GetString()))
+			{
+				// Has to be here, node id gets changed by setScript.
+				createdNodes[value["id"].GetInt()] = newNode;
+			}
 		}
 	}
 

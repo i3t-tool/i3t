@@ -219,13 +219,17 @@ void ScriptingModule::onClose()
 	auto& nodes = nodeEditor.m_workspaceCoreNodes;
 	for (auto& node : nodes)
 	{
-		if (node->getNodebase()->getOperation().keyWord == "Script")
+		if (node->getNodebase()->getOperation().keyWord != "Script")
 		{
-			if (auto scriptingNode = std::dynamic_pointer_cast<Workspace::ScriptingNode>(node))
+			continue;
+		}
+		if (auto scriptingNode = std::dynamic_pointer_cast<Workspace::ScriptingNode>(node))
+		{
+			// Associated script must be removed here, because it holds shared_ptr reference to the workspace
+			// node and would prevent it from being destroyed.
+			if (auto id = scriptingNode->getScriptId())
 			{
-				// Associated script must be removed here, because it holds shared_ptr reference to the workspace
-				// node and would prevent it from being destroyed.
-				Workspace::removeScript(scriptingNode->getScriptId());
+				Workspace::removeScript(id.value());
 			}
 		}
 	}
