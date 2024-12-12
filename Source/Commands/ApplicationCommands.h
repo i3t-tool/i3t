@@ -40,3 +40,12 @@ class SetFocusedWindowCommand : public Command<SetFocusedWindowCommand, Ptr<IWin
 
 class SetTutorialCommand : public Command<SetTutorialCommand, std::shared_ptr<Tutorial>>
 {};
+
+class SetTutorialStepCommand : public Command<SetTutorialStepCommand, int>
+{};
+
+class LoadWindowLayoutFromFileCommand : public Command<LoadWindowLayoutFromFileCommand, std::string>
+{};
+
+class LoadWindowLayoutFromStringCommand : public Command<LoadWindowLayoutFromStringCommand, std::string>
+{};

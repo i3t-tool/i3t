@@ -57,7 +57,8 @@ void I3TApplication::onInit()
 	App::getModule<StateManager>().addOriginator(viewport);
 
 	createModule<ScriptingModule>();
-	createModule<UIModule>();
+	UIModule* uiModule = createModule<UIModule>();
+	App::getModule<StateManager>().addOriginator(uiModule);
 
 	stateManager->loadGlobal();
 	stateManager->newScene(true);

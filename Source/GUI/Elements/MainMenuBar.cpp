@@ -19,6 +19,7 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
+#include "GUI/Elements/Dialogs/SelectLayoutDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/ConfirmModal.h"
@@ -291,6 +292,20 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem(ICON_I3T_LOG " Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 #endif
 
+		ImGui::Separator();
+		if (ImGui::MenuItem(ICON_I3T_GRID " Layouts"))
+		{
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<SelectLayoutDialog>();
+		}
+#ifdef I3T_DEBUG
+		if (ImGui::BeginMenu(ICON_I3T_GRID " Layouts As Submenu"))
+		{
+
+			SelectLayoutDialog::showSelectLayoutMenu();
+
+			ImGui::EndMenu();
+		}
+#endif
 		ImGui::EndMenu();
 	}
 }

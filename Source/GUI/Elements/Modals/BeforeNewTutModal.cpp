@@ -73,4 +73,10 @@ void BeforeNewTutModal::submit()
 	Ptr<IWindow> tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
 	windowManager.showWindow(tutorialWindow, true);
 	windowManager.focusWindow(tutorialWindow);
+
+	// load layout for the tutorial if it is defined
+	if (tut->m_header->m_layout != "undefined")
+	{
+		LoadWindowLayoutFromFileCommand::dispatch(tut->m_header->m_layout);
+	}
 }
