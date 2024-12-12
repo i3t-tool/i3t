@@ -99,3 +99,15 @@ void TutorialManager::toggleLanguage()
 	m_language = toggle(m_language);
 	reloadTutorials();
 }
+
+std::shared_ptr<TutorialHeader> TutorialManager::findTutorialHeader(const std::string& tutorialName)
+{
+	for (const auto& header : m_tutorialHeaders)
+	{
+		if (header->m_filename == tutorialName)
+		{
+			return header;
+		}
+	}
+	return nullptr;
+}

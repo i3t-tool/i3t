@@ -204,9 +204,9 @@ struct TutorialStep
 struct TutorialHeader
 {
 	TutorialHeader(std::string filename, std::string title, std::string description, std::string scene,
-	               std::shared_ptr<GUIImage> thumbnail)
+	               std::shared_ptr<GUIImage> thumbnail, std::string layout)
 	    : m_filename(std::move(filename)), m_title(std::move(title)), m_description(std::move(description)),
-	      m_scene(std::move(scene)), m_thumbnailImage(std::move(thumbnail))
+	      m_scene(std::move(scene)), m_thumbnailImage(std::move(thumbnail)), m_layout(std::move(layout))
 	{}
 
 	fs::path m_filename;
@@ -214,6 +214,7 @@ struct TutorialHeader
 	std::string m_description;
 	std::string m_scene;
 	std::shared_ptr<GUIImage> m_thumbnailImage;
+	std::string m_layout;
 };
 
 /**

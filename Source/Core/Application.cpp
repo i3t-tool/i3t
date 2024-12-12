@@ -78,7 +78,7 @@ bool Application::init()
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Allocate path to the imgui ini file on heap.
-	io.IniFilename = "Data/imgui.ini";
+	io.IniFilename = "Data/I3T.ini";
 
 	// Call implementation of init() in derived class
 	onInit();

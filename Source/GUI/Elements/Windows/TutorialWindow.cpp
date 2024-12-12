@@ -80,6 +80,9 @@ TutorialWindow::TutorialWindow(bool show) : IWindow("Tutorial", show)
 	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
 		setTutorial(std::move(tutorial)); // COMMAND
 	});
+	SetTutorialStepCommand::addListener([](int step) {
+		TutorialManager::instance().setStep(step); // COMMAND
+	});
 }
 
 bool TutorialWindow::hasTutorial() const

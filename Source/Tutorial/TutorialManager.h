@@ -79,6 +79,9 @@ public:
 	/// Switches the language between Czech and English and reloads the tutorials.
 	void toggleLanguage();
 
+	/// \brief Finds existing tutorial header by its filename.
+	std::shared_ptr<TutorialHeader> findTutorialHeader(const std::string& tutorialName);
+
 private:
 	ETutorialLanguage m_language = ETutorialLanguage::Czech;
 

@@ -170,6 +170,19 @@ public:
 		openModal(std::move(modal));
 	}
 
+	void loadLayout(std::string path);
+
+	std::vector<Ptr<IWindow>> getDockableWindows() const
+	{
+		return m_dockableWindows;
+	}
+
+	Ptr<IWindow> findDockableWindowByID(const char* ID)
+	{
+		return findWindow(ID, m_dockableWindows);
+	}
+	Ptr<IWindow> findImGuiWindow(ImGuiWindow* window);
+
 private:
 	void updateWindowFocus();
 	bool windowDebugTable(const char* label);
@@ -181,7 +194,6 @@ private:
 	 */
 	std::string makeIDNice(const char* ID);
 
-	Ptr<IWindow> findImGuiWindow(ImGuiWindow* window);
 	Ptr<IWindow> findAnyWindow(std::string ID);
 
 	inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& windows)
