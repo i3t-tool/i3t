@@ -200,18 +200,21 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		}
 	}
 
-	for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
+	if (memento["workspace"].HasMember("scriptingNodes"))
 	{
-		const auto node = Workspace::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
-		NodeDeserializer::assignCommon(value, node);
-
-		/// \todo Assign script after the node is connected with the other nodes.
-		if (value["script"].IsString())
+		for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
 		{
-			if (auto newNode = node->setScript(value["script"].GetString()))
+			const auto node = Workspace::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
+			NodeDeserializer::assignCommon(value, node);
+
+			/// \todo Assign script after the node is connected with the other nodes.
+			if (value["script"].IsString())
 			{
-				// Has to be here, node id gets changed by setScript.
-				createdNodes[value["id"].GetInt()] = newNode;
+				if (auto newNode = node->setScript(value["script"].GetString()))
+				{
+					// Has to be here, node id gets changed by setScript.
+					createdNodes[value["id"].GetInt()] = newNode;
+				}
 			}
 		}
 	}
