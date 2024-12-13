@@ -33,11 +33,12 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
-      - name: Build
-        shell: bash
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --target I3T -j 2
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          target: 'I3T'
+          cmake_build_type: 'RelWithDebInfo'
+          jobs: '2'
 
       - name: Create bundle
         shell: bash
