@@ -26,10 +26,12 @@ jobs:
   test:
     strategy:
       matrix:
-        kind: [ 'Linux' ]
+        kind: [ 'Linux', 'Windows' ]
         include:
           - kind: 'Linux'
             os: ubuntu-latest
+          - kind: 'Windows'
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -39,8 +41,19 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
-      - name: Test
+      - name: Build tests
+        uses: ./.github/actions/build
+        with:
+          target: 'I3TTest'
+          cmake_build_type: 'Debug'
+          jobs: '2'
+
+      - name: Run tests with xvfb
+        if: matrix.kind == 'Linux'
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-          cmake --build build --config Debug --target I3TTest -j 2
           xvfb-run Binaries/Debug/I3TTest
+
+      - name: Run tests
+        if: matrix.kind == 'Windows'
+        run: |
+          Binaries/Debug/I3TTest
