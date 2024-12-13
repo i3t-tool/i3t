@@ -6,6 +6,6 @@ runs:
       shell: bash
       if: matrix.kind == 'Linux'
       run: |
-        sudo apt-get install -y build-essential g++-12 libgl-dev libopengl0 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+        sudo apt-get install -y build-essential g++-12 libgl-dev libopengl0 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb
         sudo rm -f /usr/bin/g++
         sudo ln /usr/bin/g++-12 /usr/bin/g++
