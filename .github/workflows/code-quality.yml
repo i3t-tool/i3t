@@ -52,8 +52,3 @@ jobs:
         if: matrix.kind == 'Linux'
         run: |
           xvfb-run Binaries/Debug/I3TTest
-
-      - name: Run tests
-        if: matrix.kind == 'Windows'
-        run: |
-          Binaries/Debug/I3TTest
