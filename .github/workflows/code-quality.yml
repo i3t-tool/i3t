@@ -23,3 +23,24 @@ jobs:
       - name: Run clang-format check
         run: |
           bash Scripts/CheckFormat.sh
+  test:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Test
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --config Debug --target I3TTest -j 2
+          xvfb-run Binaries/Debug/I3TTest
