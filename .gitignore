@@ -57,6 +57,7 @@ CMakeSettings.json
 *.exe
 *.obj
 /*.zip
+*.json.gz
 
 # Files used during development - to be preserved, but not put to release
 # ----------------------------------------------------------------------

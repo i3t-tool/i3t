@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      cmake_extra_args:
+        type: string
+        description: 'Extra arguments to pass to CMake'
+        required: false
+        default: ''
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Build tests
+        uses: ./.github/actions/build
+        with:
+          target: 'I3TTest'
+          cmake_build_type: 'Debug'
+          jobs: '2'
+          cmake_extra_args: ${{ inputs.cmake_extra_args }}
+
+      - name: Run tests with xvfb
+        if: matrix.kind == 'Linux'
+        run: |
+          xvfb-run Binaries/Debug/I3TTest
