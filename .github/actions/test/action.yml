@@ -1,0 +1,35 @@
+name: 'Build tests and run them'
+inputs:
+  cmake_gcc_extra_args:
+    description: 'Extra arguments to pass to CMake'
+    required: false
+    default: ''
+  cmake_msvc_extra_args:
+    description: 'Extra arguments to pass to CMake'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup environment
+      uses: ./.github/actions/setup-environment
+
+    - name: Build tests
+      uses: ./.github/actions/build
+      with:
+        target: 'I3TTest'
+        cmake_build_type: 'Debug'
+        jobs: '2'
+        cmake_extra_args: ${{ inputs.cmake_gcc_extra_args }}
+
+    # - name: Run tests
+    #   if: matrix.kind == 'Windows'
+    #   run: |
+    #     Binaries/Debug/I3TTest
+
+    - name: Run tests with xvfb
+      shell: bash
+      if: matrix.kind == 'Linux' || matrix.kind == 'macOS'
+      run: |
+        xvfb-run Binaries/Debug/I3TTest
