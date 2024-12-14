@@ -1,21 +1,28 @@
 on:
   workflow_call:
     inputs:
-      cmake_extra_args:
+      cmake_gcc_extra_args:
         type: string
         description: 'Extra arguments to pass to CMake'
         required: false
         default: ''
+      cmake_msvc_extra_args:
+        type: string
+        description: 'Extra arguments to pass to CMake'
+        required: false
+        default: ''
+      os:
+        type: string
+        description: 'The operating system to use'
+        required: true
+      kind:
+        type: string
+        description: 'The kind of the matrix'
+        required: true
 
 jobs:
   test:
-    strategy:
-      matrix:
-        kind: [ 'Linux' ]
-        include:
-          - kind: 'Linux'
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -30,9 +37,14 @@ jobs:
           target: 'I3TTest'
           cmake_build_type: 'Debug'
           jobs: '2'
-          cmake_extra_args: ${{ inputs.cmake_extra_args }}
+          cmake_extra_args: ${{ inputs.cmake_gcc_extra_args }}
+
+      # - name: Run tests
+      #   if: matrix.kind == 'Windows'
+      #   run: |
+      #     Binaries/Debug/I3TTest
 
       - name: Run tests with xvfb
-        if: matrix.kind == 'Linux'
+        if: inputs.kind == 'Linux' || inputs.kind == 'macOS'
         run: |
           xvfb-run Binaries/Debug/I3TTest
