@@ -23,32 +23,62 @@ jobs:
       - name: Run clang-format check
         run: |
           bash Scripts/CheckFormat.sh
+
   test:
+    uses: ./.github/workflows/test.yml
+
+  test-with-address-sanitizer:
     strategy:
       matrix:
-        kind: [ 'Linux', 'Windows' ]
+        kind: [ 'Linux' ]
         include:
           - kind: 'Linux'
             os: ubuntu-latest
-          - kind: 'Windows'
-            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           submodules: 'true'
 
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
-      - name: Build tests
+      - name: Build tests with AddressSanitizer
         uses: ./.github/actions/build
         with:
           target: 'I3TTest'
           cmake_build_type: 'Debug'
           jobs: '2'
+          cmake_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -static-libasan" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"'
 
-      - name: Run tests with xvfb
-        if: matrix.kind == 'Linux'
+      - name: Run tests with AddressSanitizer
         run: |
           xvfb-run Binaries/Debug/I3TTest
+
+  clang-tidy:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run clang-tidy check
+        shell: bash
+        run: |
+          cmake -G "Unix Makefiles" \
+              -S . \
+              -B build \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          bash Scripts/RunClangTidy.sh
