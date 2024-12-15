@@ -25,6 +25,7 @@ class Sequence;
 class TransformationBase;
 class Screen;
 class Model;
+class ScriptingNode;
 } // namespace Workspace
 
 using GuiNode = Workspace::CoreNode;
@@ -39,13 +40,14 @@ using GuiModel = Workspace::Model;
 class NodeVisitor
 {
 public:
-	virtual void visit(const Ptr<GuiCamera>& node){};
-	virtual void visit(const Ptr<GuiCycle>& node){};
-	virtual void visit(const Ptr<GuiOperator>& node){};
-	virtual void visit(const Ptr<GuiSequence>& node){};
-	virtual void visit(const Ptr<GuiTransform>& node){};
-	virtual void visit(const Ptr<GuiScreen>& node){};
-	virtual void visit(const Ptr<GuiModel>& node){};
+	virtual void visit(const Ptr<GuiCamera>& node) = 0;
+	virtual void visit(const Ptr<GuiCycle>& node) = 0;
+	virtual void visit(const Ptr<GuiOperator>& node) = 0;
+	virtual void visit(const Ptr<GuiSequence>& node) = 0;
+	virtual void visit(const Ptr<GuiTransform>& node) = 0;
+	virtual void visit(const Ptr<GuiScreen>& node) = 0;
+	virtual void visit(const Ptr<GuiModel>& node) = 0;
+	virtual void visit(const Ptr<Workspace::ScriptingNode>& node) = 0;
 };
 
 class IVisitable

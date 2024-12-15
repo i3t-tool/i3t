@@ -79,7 +79,7 @@ public:
 //------------------------------===//
 
 template <EOperatorType T>
-Operator<T>::Operator() : Node(&operations[static_cast<unsigned>(T)])
+Operator<T>::Operator() : Node(operations[static_cast<unsigned>(T)])
 {}
 
 //===-----------------------------------------------------------------------===//

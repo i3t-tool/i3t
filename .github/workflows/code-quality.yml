@@ -1,0 +1,106 @@
+name: Code Quality
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+    paths:
+      - '.github/workflows/code-quality.yml'
+      - 'Source/**'
+      - 'Scripts/**'
+      - 'Test/**'
+      - '.clang-format'
+      - '.clang-tidy'
+      - 'CMakeLists.txt'
+
+jobs:
+  check-format:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run clang-format check
+        run: |
+          bash Scripts/CheckFormat.sh
+
+  test:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fPIC -fprofile-arcs -ftest-coverage"'
+
+      - name: Run gcovr
+        run: |
+          python3 -m pip install gcovr
+          gcovr -r . --xml
+
+  test-with-address-sanitizer:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -static-libasan" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"'
+
+  test-with-undefined-behavior-sanitizer:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=undefined -fno-omit-frame-pointer" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=undefined"'
+
+  clang-tidy:
+    strategy:
+      matrix:
+        kind: [ 'Linux' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run clang-tidy check
+        shell: bash
+        run: |
+          cmake -G "Unix Makefiles" \
+              -S . \
+              -B build \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          bash Scripts/RunClangTidy.sh

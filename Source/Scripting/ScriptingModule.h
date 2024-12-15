@@ -34,6 +34,11 @@ public:
 		return m_oss;
 	}
 
+	sol::state& environment()
+	{
+		return m_Lua;
+	}
+
 private:
 	/**
 	 * @param str with no newline

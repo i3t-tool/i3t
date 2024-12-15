@@ -167,7 +167,7 @@ void GraphManager::update(double tick)
 	s_self->m_tracker.update();
 }
 
-const Operation* GraphManager::getOperation(const Pin* pin)
+const Operation& GraphManager::getOperation(const Pin* pin)
 {
 	return pin->Owner.getOperation();
 }

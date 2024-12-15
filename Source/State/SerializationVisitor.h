@@ -44,6 +44,7 @@ private:
 	void visit(const Ptr<GuiTransform>& node) override;
 	void visit(const Ptr<GuiScreen>& node) override;
 	void visit(const Ptr<GuiModel>& node) override;
+	void visit(const Ptr<Workspace::ScriptingNode>& node) override;
 
 	/// id and position
 	///

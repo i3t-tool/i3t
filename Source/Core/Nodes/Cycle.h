@@ -55,7 +55,7 @@ public:
 	};
 
 public:
-	Cycle() : Node(&g_CycleProperties) {}
+	Cycle() : Node(g_CycleProperties) {}
 
 	/**
 	 * \brief Perform a regular cycle value update (if running). Called by the GraphManager::update(double tick)

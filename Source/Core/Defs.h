@@ -61,6 +61,18 @@ namespace fs = std::filesystem;
 	LOG_FATAL(message);                                                                                                \
 	std::abort()
 
+/// Singleton
+template <typename T>
+class Singleton
+{
+public:
+	static T& instance()
+	{
+		static T instance;
+		return instance;
+	}
+};
+
 /// Enum utils
 
 /**

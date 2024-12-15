@@ -50,6 +50,16 @@ public:
 	static void init();
 	static void destroy();
 
+	template <typename T, typename... Args>
+	static Ptr<Node> createCustomNode(Args&&... args)
+	{
+		auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+		ret->init();
+		ret->updateValues(0);
+
+		return ret;
+	}
+
 	template <EOperatorType T>
 	static Ptr<Node> createNode()
 	{
@@ -167,7 +177,7 @@ public:
 	 */
 	static std::vector<Ptr<Node>> getOutputNodes(const Ptr<Node>& node, size_t index);
 
-	static const Operation* getOperation(const Pin* pin);
+	static const Operation& getOperation(const Pin* pin);
 
 	static bool isTrackingEnabled();
 	static void stopTracking();

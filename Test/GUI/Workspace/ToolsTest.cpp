@@ -46,7 +46,7 @@ TEST(NodeToolsTest, CopyNodes)
 	Ptr<GuiNode> valueNode;
 	Ptr<GuiNode> addNode;
 
-	if (f5->getNodebase()->getOperation()->isConstructor)
+	if (f5->getNodebase()->getOperation().isConstructor)
 	{
 		valueNode = f5;
 		addNode = f6;

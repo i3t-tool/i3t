@@ -47,14 +47,14 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 
 //===----------------------------------------------------------------------===//
 
-Transform::Transform(const TransformOperation& transformType) : Node(&(transformType.operation))
+Transform::Transform(const TransformOperation& transformType) : Node(transformType.operation)
 {
 	m_internalData.push_back(Data(EValueType::Matrix));
 }
 
 void Transform::createDefaults()
 {
-	const auto& opName = getOperation()->keyWord;
+	const auto& opName = getOperation().keyWord;
 	const auto& transformType = getTransformOperation(magic_enum::enum_cast<ETransformType>(opName).value());
 
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
@@ -74,7 +74,7 @@ Ptr<Node> Transform::getCurrentSequence()
 
 TransformOperation* Transform::properties() const
 {
-	return *getTransformOperation(getOperation()->keyWord);
+	return *getTransformOperation(getOperation().keyWord);
 }
 
 const Data& Transform::getDefaultValue(const std::string& name) const
@@ -112,7 +112,7 @@ void Transform::setDefaultValueWithSynergies(const std::string& name, Core::Data
 
 TransformOperation::ValueMap Transform::getDefaultTypes() const
 {
-	return getTransformDefaults(getOperation()->keyWord);
+	return getTransformDefaults(getOperation().keyWord);
 }
 
 Transform::DefaultValues& Transform::getDefaultValues()
@@ -123,7 +123,7 @@ Transform::DefaultValues& Transform::getDefaultValues()
 EValueState Transform::getValueState(glm::ivec2 coords) const
 {
 	const int idx = coords.y * 4 + coords.x;
-	auto& map = getTransformMap(getOperation()->keyWord);
+	auto& map = getTransformMap(getOperation().keyWord);
 
 	std::bitset<2> bitResult;
 	bitResult[0] = map[15 - idx] && m_hasSynergies; // synergies bit

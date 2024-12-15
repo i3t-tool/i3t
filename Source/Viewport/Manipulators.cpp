@@ -392,7 +392,7 @@ void Manipulators::addManipulator(Ptr<Core::Node> node)
 
 Manipulators::ManipulatorType Manipulators::determineManipulatorType(std::shared_ptr<Core::Node> node)
 {
-	const char* keyword = node->getOperation()->keyWord.c_str();
+	const char* keyword = node->getOperation().keyWord.c_str();
 	ManipulatorType type;
 	auto it = m_operationMap.find(keyword);
 	if (it != m_operationMap.end())
@@ -443,7 +443,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 	while (it != st.end())
 	{
 		auto n = *it;
-		// printf("skip %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
+		// printf("skip %s\n", nodeindex.get()->getOperation().keyWord.c_str());
 		// printf("%p %p\n",nodeindex.get(),node->get());
 		it++;
 		if (n == node)

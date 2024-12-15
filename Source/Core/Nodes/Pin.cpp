@@ -73,20 +73,20 @@ Data& Pin::dataMut()
 
 const std::string& Pin::getLabel() const
 {
-	auto* op = getOwner()->getOperation();
+	auto& op = getOwner()->getOperation();
 
 	if (IsInput)
 	{
-		if (!op->defaultInputNames.empty())
+		if (!op.defaultInputNames.empty())
 		{
-			return op->defaultInputNames[Index];
+			return op.defaultInputNames[Index];
 		}
 	}
 	else
 	{
-		if (!op->defaultOutputNames.empty())
+		if (!op.defaultOutputNames.empty())
 		{
-			return op->defaultOutputNames[Index];
+			return op.defaultOutputNames[Index];
 		}
 	}
 	// (PF) no output label for pulse
@@ -155,7 +155,7 @@ void Pin::unplug()
 
 	m_input = nullptr;
 
-	if (Owner.m_operation->isConstructor)
+	if (Owner.m_operation.isConstructor)
 	{
 		if (Owner.areAllInputsUnplugged())
 		{
@@ -216,7 +216,7 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 
 	std::vector<Ptr<Node>> stack;
 
-	if (!output.getOwner()->getOperation()->ignoreCycleDetection)
+	if (!output.getOwner()->getOperation().ignoreCycleDetection)
 	{
 		stack.push_back(output.getOwner());
 	}
@@ -237,7 +237,7 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 				Pin* ct = pin.m_input;
 
 				auto toPush = ct->Owner.getRootOwner();
-				if (!toPush->getOperation()->ignoreCycleDetection)
+				if (!toPush->getOperation().ignoreCycleDetection)
 				{
 					stack.push_back(ct->Owner.getRootOwner());
 					// stack.push_back(ct->getOwner());
