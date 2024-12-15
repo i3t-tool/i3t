@@ -36,7 +36,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'true'
+
       - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fPIC -fprofile-arcs -ftest-coverage"'
+
+      - name: Run gcovr
+        run: |
+          python3 -m pip install gcovr
+          gcovr -r . --xml
 
   test-with-address-sanitizer:
     strategy:
