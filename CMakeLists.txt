@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.15) # 3.13 for target_link_options and add_compile_definitions
-                                     # 3.15 to fix a "overriding /W3 with /W4" bug
+# 3.13 for target_link_options and add_compile_definitions
+# 3.15 to fix a "overriding /W3 with /W4" bug
+# 3.20 for EXPORT_COMPILE_COMMANDS target property
+cmake_minimum_required(VERSION 3.20)
 
 # Set project name.
 project(I3T VERSION 2.1.0)
@@ -54,6 +56,7 @@ endif()
 
 # Link C++17 filesystem library.
 if (UNIX)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
 endif()
 
@@ -211,6 +214,7 @@ add_executable(${PROJECT_NAME} ${I3T_SOURCE} Source/Main.cpp)
 # Set VS_DEBUGGER_WORKING_DIRECTORY
 set_target_properties(
         ${PROJECT_NAME} PROPERTIES
+        EXPORT_COMPILE_COMMANDS ON
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE

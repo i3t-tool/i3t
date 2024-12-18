@@ -49,6 +49,7 @@ CMakeSettings.json
 
 # system and other generated files
 # ----------------------------------------------------------------------
+*.gcov
 *.bak
 *.lnk
 *.swp
@@ -58,6 +59,8 @@ CMakeSettings.json
 *.obj
 /*.zip
 *.json.gz
+
+ReportCppCheck.txt
 
 # Files used during development - to be preserved, but not put to release
 # ----------------------------------------------------------------------

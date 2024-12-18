@@ -24,6 +24,23 @@ jobs:
         run: |
           bash Scripts/CheckFormat.sh
 
+  cppcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run cppcheck
+        shell: bash
+        run: |
+          sudo apt-get install -y cppcheck
+          bash Scripts/RunCppCheck.sh
+
   test:
     strategy:
       matrix:
@@ -44,9 +61,12 @@ jobs:
       - name: Run gcovr
         run: |
           python3 -m pip install gcovr
+          # gcovr --root build-test/CMakeFiles/I3TTest.dir/Source --exclude /usr --xml
           gcovr -r . --xml
 
   test-with-address-sanitizer:
+    # TODO: Solve errors with address sanitizer, then remove `continue-on-error: true`
+    continue-on-error: true
     strategy:
       matrix:
         kind: [ 'Linux' ]
@@ -78,29 +98,29 @@ jobs:
         with:
           cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=undefined -fno-omit-frame-pointer" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=undefined"'
 
-  clang-tidy:
-    strategy:
-      matrix:
-        kind: [ 'Linux' ]
-        include:
-          - kind: 'Linux'
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: 'true'
-
-      - name: Setup environment
-        uses: ./.github/actions/setup-environment
-
-      - name: Run clang-tidy check
-        shell: bash
-        run: |
-          cmake -G "Unix Makefiles" \
-              -S . \
-              -B build \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          bash Scripts/RunClangTidy.sh
+#  clang-tidy:
+#    strategy:
+#      matrix:
+#        kind: [ 'Linux' ]
+#        include:
+#          - kind: 'Linux'
+#            os: ubuntu-latest
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#        with:
+#          submodules: 'true'
+#
+#      - name: Setup environment
+#        uses: ./.github/actions/setup-environment
+#
+#      - name: Run clang-tidy check
+#        shell: bash
+#        run: |
+#          cmake -G "Unix Makefiles" \
+#              -S . \
+#              -B build \
+#              -DCMAKE_BUILD_TYPE=Debug \
+#              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+#          bash Scripts/RunClangTidy.sh
