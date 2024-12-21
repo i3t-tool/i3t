@@ -397,13 +397,14 @@ void UIModule::loadFonts()
 	// (PF) reduced font ranges above -> font atlas 1024x2048
 
 	m_fonts = {
-	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},         //
-	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},          //
-	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},         //
-	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)},       //
-	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},        //
+	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},   //
+	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},    //
+	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},   //
+	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)}, //
+	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},  //
+	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},  //
+	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},  //
+	    {"RobotoMono14", loadFont("Data/Fonts/RobotoMono-Regular.ttf", 14.0f, fontScale, &lqConfig, ranges, false)},
 	    {"RobotoItalic16", loadFont("Data/Fonts/Roboto-Italic.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},    //
 	    {"UbuntuBold18", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 18.0f, fontScale, &lqConfig, ranges, false)},        //
 	    {"UbuntuBold24", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 24.0f, fontScale, &lqConfig, ranges, false)},        //

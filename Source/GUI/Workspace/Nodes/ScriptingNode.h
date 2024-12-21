@@ -10,9 +10,11 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
+#pragma once
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "Scripting/Environment.h"
+#include "Scripting/ScriptingModule.h"
 
 #include <memory>
 #include <string>
@@ -29,7 +31,7 @@ struct ScriptInterface
 	sol::function onUpdate = sol::nil;
 };
 
-Result<std::unique_ptr<ScriptInterface>, Error> createScript(Core::ID id, const std::string& script);
+Result<std::unique_ptr<ScriptInterface>, ScriptError> createScript(Core::ID id, const std::string& script);
 
 void removeScript(Core::ID id);
 
@@ -53,6 +55,11 @@ public:
 
 	std::optional<Core::ID> getScriptId() const
 	{
+		if (m_interface == nullptr)
+		{
+			return std::nullopt;
+		}
+
 		return m_interface->id;
 	}
 	const std::string& getScript() const

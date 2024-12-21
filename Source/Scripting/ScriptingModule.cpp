@@ -13,6 +13,7 @@
 #include "Scripting/ScriptingModule.h"
 
 #include <functional>
+#include <regex>
 #include <string_view>
 
 #include "Commands/ApplicationCommands.h"
@@ -25,7 +26,9 @@
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
 
-std::function<void(const std::string& str)> g_printRef;
+// static std::regex SOL_ERROR_REGEX("sol: (.*?):.*?:(\\d+): (.*)");
+static std::regex SOL_ERROR_REGEX("(sol: (.*?):[\\S\\s]*?)\\[.*\\]:(\\d+): (.*)");
+static std::function<void(const std::string& str)> g_printRef;
 
 void print(const std::string& str)
 {
@@ -123,15 +126,19 @@ void ScriptingModule::onInit()
 
 	auto api = m_Lua["I3T"];
 
+	m_Lua.new_usertype<ScriptError>("ScriptError",
+		"line", &ScriptError::line,
+		"message", &ScriptError::message);
+
 	api["load_script"] = [this](const std::string& script) {
 		return runScript(script.c_str());
 	};
 
-	api["load_script_from"] = [this](const std::string& path) {
+	api["load_script_from"] = [this](const std::string& path) -> std::optional<ScriptError> {
 		std::ifstream file(path);
 		if (!file.is_open())
 		{
-			return false;
+			return ScriptError("failed to open file");
 		}
 
 		std::string script((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -244,7 +251,7 @@ void ScriptingModule::onClose()
 	m_Lua = {};
 }
 
-bool ScriptingModule::runScript(const char* luaSource)
+std::optional<ScriptError> ScriptingModule::runScript(const char* luaSource)
 {
 	// static int counter = 0;
 
@@ -252,15 +259,38 @@ bool ScriptingModule::runScript(const char* luaSource)
 	{
 		// auto chunkName = fmt::format("script_{}", counter++);
 		// m_Lua.safe_script(luaSource, chunkName);
-		m_Lua.safe_script(luaSource);
+		auto result = m_Lua.safe_script(luaSource);
+		(void) result;
 	}
-	catch (const std::exception& e)
+	catch (const sol::error& e)
 	{
-		print(e.what());
-		return false;
+		std::string what(e.what());
+
+		/*
+		auto newlinePos = what.find('\n');
+		if (newlinePos != std::string::npos)
+		{
+		    what = what.substr(0, newlinePos);
+		}
+		 */
+
+		std::smatch match;
+		if (std::regex_search(what, match, SOL_ERROR_REGEX))
+		{
+			auto message = match[1].str();
+			auto errorType = match[2].str();
+			auto line = std::stoi(match[3]);
+			auto messageSuffix = match[4].str();
+
+			auto type = errorType == "runtime error" ? ScriptError::Type::RuntimeError : ScriptError::Type::SyntaxError;
+
+			return ScriptError(line, type, message + messageSuffix);
+		}
+
+		return ScriptError(what);
 	}
 
-	return true;
+	return std::nullopt;
 }
 
 void ScriptingModule::print(const std::string& str)

@@ -10,9 +10,11 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 
+#include <regex>
+
+#include "GUI/Elements/Modals/ScriptEditor.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/ScriptingModule.h"
 
@@ -23,13 +25,11 @@ do
     {}
 end)";
 
-//------------------------------------------------------------------------------------------------//
+constexpr const auto ERROR_LINE_OFFSET = 4;
+/// This is somehow magic number based on the observed behavior of the error message.
+constexpr const auto ONE_LINE_SCRIPT_ERROR_LINE_OFFSET = 6;
 
-/// \todo This function is not working properly, it is not possible to get the node from the environment.
-static auto getNode(ScriptingModule& scripting, Core::ID id)
-{
-	return scripting.environment()["I3T"]["workspace"]["__scripts"][id];
-}
+//------------------------------------------------------------------------------------------------//
 
 class ScriptingNode : public Core::Node
 {
@@ -91,16 +91,39 @@ private:
 
 namespace Workspace
 {
-Result<std::unique_ptr<Workspace::ScriptInterface>, Error> createScript(Core::ID id, const std::string& script)
+Result<std::unique_ptr<Workspace::ScriptInterface>, ScriptError> createScript(Core::ID id, const std::string& script)
 {
 	auto& scripting = Application::getModule<ScriptingModule>();
 
 	auto toExecute = fmt::format(SCRIPTING_NODE_TEMPLATE, id, id, script);
-	const bool result = scripting.runScript(toExecute.c_str());
+	auto maybeError = scripting.runScript(toExecute.c_str());
 
-	if (!result)
+	if (maybeError)
 	{
-		return Err(Error("Failed to create node from script"));
+		auto& err = maybeError.value();
+
+		if (err.line)
+		{
+			auto type = err.type.value();
+			auto line = err.line.value();
+
+			// must contains max 1 newline character
+			const auto newlinesCount = std::ranges::count(script, '\n');
+			const auto isOneLine = newlinesCount == 0 || newlinesCount == 1;
+
+			if (isOneLine)
+			{
+				line -= ONE_LINE_SCRIPT_ERROR_LINE_OFFSET;
+			}
+			else
+			{
+				line -= ERROR_LINE_OFFSET;
+			}
+
+			err.line = line;
+		}
+
+		return Err(err);
 	}
 
 	// auto node = getNode(scripting, id);
@@ -109,7 +132,7 @@ Result<std::unique_ptr<Workspace::ScriptInterface>, Error> createScript(Core::ID
 
 	if (node["operation"] != sol::nil && !node["operation"].is<Core::Operation>())
 	{
-		return Err(Error("Node Operation is invalid."));
+		return Err(ScriptError("node Operation is invalid"));
 	}
 
 	Core::Operation operation = node["operation"].get_or<Core::Operation>(DEFAULT_SCRIPTING_NODE_OPERATION);
@@ -142,74 +165,6 @@ void removeScript(Core::ID id)
 
 //------------------------------------------------------------------------------------------------//
 
-class ScriptEditorModal : public ModalWindow
-{
-public:
-	explicit ScriptEditorModal(
-	    std::string& script, std::function<void(void)> onSave =
-	                             [] {
-	                             })
-	    : ModalWindow("Edit script"), m_script(script), m_onSave(std::move(onSave))
-	{
-		if (!m_script.empty())
-		{
-			std::copy(m_script.begin(), m_script.end(), m_editedScript.begin());
-		}
-	}
-
-	void onImGui() override
-	{
-		ImGui::InputTextMultiline("##script", m_editedScript.data(), m_editedScript.size(), ImVec2(400, 400));
-
-		if (!m_message.empty())
-		{
-			ImGui::TextColored(ImVec4(0.8f, 0.0f, 0.0f, 1.0f), m_message.c_str());
-		}
-
-		if (ImGui::Button("Cancel"))
-		{
-			close();
-		}
-
-		ImGui::SameLine();
-		if (ImGui::Button("Save"))
-		{
-			onSave();
-		}
-	}
-
-private:
-	void onSave()
-	{
-		// Trim ending null character.
-		std::string script(m_editedScript.begin(), m_editedScript.end());
-		script.erase(std::find(script.begin(), script.end(), '\0'), script.end());
-
-		// Try to execute the script.
-		const auto nextId = Core::IdGenerator::next();
-		auto result = createScript(nextId, script);
-		if (!result)
-		{
-			using namespace std::string_literals;
-			m_message = "Script has errors, see console or log output for details.\n"s + result.error().str();
-		}
-		else
-		{
-			m_script = script;
-			removeScript(nextId);
-			close();
-			m_onSave();
-		}
-	}
-
-	std::string m_message;
-	std::string& m_script;
-	std::array<char, 1024 * 10> m_editedScript = {0};
-	std::function<void(void)> m_onSave;
-};
-
-//------------------------------------------------------------------------------------------------//
-
 ScriptingNode::ScriptingNode(DIWNE::Diwne& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCustomNode<::ScriptingNode>())
 {}
@@ -237,9 +192,7 @@ void ScriptingNode::popupContent()
 
 	if (ImGui::MenuItem("Edit script"))
 	{
-		auto modal = std::make_unique<ScriptEditorModal>(m_script, [this] {
-			reloadScript();
-		});
+		auto modal = std::make_unique<ScriptEditorModal>((Workspace::ScriptingNode*) shared_from_this().get());
 		I3T::getUI()->getWindowManager().openModal(std::move(modal));
 	}
 

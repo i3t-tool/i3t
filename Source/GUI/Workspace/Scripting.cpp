@@ -892,7 +892,24 @@ LUA_REGISTRATION
 
 	L.new_usertype<Core::Operation>(
 		"Operation",
-		sol::meta_function::construct, [](Core::PinGroup inputTypes, Core::PinGroup outputTypes, Core::PinNames defaultInputNames, Core::PinNames defaultOutputNames) -> Core::Operation {
+		sol::meta_function::construct, [](std::map<std::string, Core::EValueType> inputs, std::map<std::string, Core::EValueType> outputs) -> Core::Operation {
+			std::vector<Core::EValueType> inputTypes;
+			std::vector<Core::EValueType> outputTypes;
+			std::vector<std::string> defaultInputNames;
+			std::vector<std::string> defaultOutputNames;
+
+			for (const auto& [name, type] : inputs)
+			{
+				inputTypes.push_back(type);
+				defaultInputNames.push_back(name);
+			}
+
+			for (const auto& [name, type] : outputs)
+			{
+				outputTypes.push_back(type);
+				defaultOutputNames.push_back(name);
+			}
+
 			return Core::Operation{
 				.keyWord = DEFAULT_SCRIPTING_NODE_OPERATION.keyWord,
 				.defaultLabel = DEFAULT_SCRIPTING_NODE_OPERATION.defaultLabel,

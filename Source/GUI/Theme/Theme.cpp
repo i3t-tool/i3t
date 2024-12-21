@@ -83,11 +83,13 @@ Theme Theme::createDefaultClassic()
 	return theme;
 }
 
-Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
+Theme::Theme(std::string name, bool isDark, const Theme::Colors& colors, const Theme::Sizes& sizes,
+             const Theme::SizesVec& sizesVec)
 {
 	initClassicProperties();
 
 	m_name = std::move(name);
+	m_isDark = isDark;
 	copyProperties(m_colors, colors);
 	copyProperties(m_sizes, sizes);
 	copyProperties(m_sizesVec2, sizesVec);
@@ -100,6 +102,7 @@ void Theme::initFonts()
 	m_fontsAssoc.insert(std::pair(EFont::Regular, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::LargeBold, "RobotoBold20"));
 
+	m_fontsAssoc.insert({EFont::Mono, "RobotoMono14"});
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
