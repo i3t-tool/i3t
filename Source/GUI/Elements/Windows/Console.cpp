@@ -118,7 +118,11 @@ void Console::drawOutput()
 	str[bufferSize - 2] = '\0';
 	str[bufferSize - 1] = '\0';
 
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
+
 	ImGui::InputTextMultiline("##ConsoleOutput", (char*) buffer.data(), bufferSize - 2, maxSize, flags);
+
+	ImGui::PopFont();
 
 	m_oss.seekp(-2, m_oss.cur);
 
@@ -143,11 +147,15 @@ void Console::drawInput()
 	const auto flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion |
 	                   ImGuiInputTextFlags_CallbackHistory;
 
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+
 	if (GUI::InputText("#Command", &m_Command, flags, &textEditCallbackStub, (void*) this))
 	{
 		execute();
 	}
+
+	ImGui::PopFont();
 }
 
 void Console::execute()

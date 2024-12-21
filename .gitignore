@@ -30,6 +30,7 @@ out/
 # cmake
 # ----------------------------------------------------------------------
 /build/
+/build-*
 *.cmake
 cmake-*
 cmake_install.cmake

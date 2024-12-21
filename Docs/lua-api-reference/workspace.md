@@ -360,10 +360,11 @@ Note that on success the new node will be returned!
 
 ### `Operation`
 
-### constructor `new(inputTypes, outputTypes, defaultInputNames, defaultOutputNames)`
+### constructor `new(inputs: table[string, ValueType], outputs: table[string, ValueType])`
 
-Creates a new operation with the given parameters.
-Types of parameters are the same as `Operation` attributes.
+Creates a new operation from the given `inputs` and `outputs`.
+The `inputs` and `outputs` tables should have the form `{ name = ValueType }`.
+If label name contains spaces, pass it like this: `{ ["label name"] = ValueType }`.
 
 #### attribute `inputTypes: ValueType[]`
 
@@ -396,10 +397,8 @@ Example of a simple script:
 
 ```lua
 self.operation = Operation.new(
-	{ValueType.Float, ValueType.Float},
-	{ValueType.Vec3},
-	{"x", "y"},
-	{"result"}
+	{ x = ValueType.Float, y = ValueType.Float },
+	{ result = ValueType.Vec3 }
 )
 self.on_init = function() print("Node initialized!") end
 self.on_update_values = function()

@@ -27,20 +27,20 @@ TEST_F(WorkspaceScriptingTest, NodeData)
 
 	auto& scripting = App::getModule<ScriptingModule>();
 
-	auto result = scripting.runScript(R"(
+	auto maybeErr = scripting.runScript(R"(
 	   local nodes_count = #I3T.get_all_nodes()
 	   assert(nodes_count == 0)
    )");
-	EXPECT_TRUE(result);
+	EXPECT_FALSE(maybeErr);
 
-	result = scripting.runScript(R"(
+	maybeErr = scripting.runScript(R"(
 	   local floatNode = Operator.new("FloatToFloat")
 	   local transformNode = Transform.new("Scale")
 
 	   local nodes_count = #I3T.get_all_nodes()
 	   assert(nodes_count == 2)
    )");
-	EXPECT_TRUE(result);
+	EXPECT_FALSE(maybeErr);
 }
 
 TEST_F(WorkspaceScriptingTest, FoltaScenes)
@@ -62,8 +62,8 @@ TEST_F(WorkspaceScriptingTest, FoltaScenes)
 		auto path = file.path().string();
 		std::string script = "I3T.workspace.clear()\n" + fmt::format("I3T.load_script_from(\"{}\")", posixPath);
 
-		auto result = scripting.runScript(script.c_str());
-		EXPECT_TRUE(result);
+		auto maybeErr = scripting.runScript(script.c_str());
+		EXPECT_FALSE(maybeErr);
 	}
 }
 
@@ -71,7 +71,7 @@ TEST_F(WorkspaceScriptingTest, Sequence)
 {
 	auto& scripting = App::getModule<ScriptingModule>();
 
-	auto result = scripting.runScript(R"(
+	auto maybeErr = scripting.runScript(R"(
 		local vector = Vec3.new(1, 2, 3)
 		do
 			local sequence = Sequence.new()
@@ -91,7 +91,7 @@ TEST_F(WorkspaceScriptingTest, Sequence)
 		assert(Math.equals(sequence:get_mat4(1), transform:get_mat4()))
 		assert(Math.equals(sequence:get_mat4(2), transform:get_mat4()))
 		)");
-	EXPECT_TRUE(result);
+	EXPECT_FALSE(maybeErr);
 }
 
 TEST_F(WorkspaceScriptingTest, ScriptingNode_EmptyOperation)
@@ -100,8 +100,6 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_EmptyOperation)
 
 	auto script = R"(
 		self.operation = Operation.new(
-			{},
-			{},
 			{},
 			{}
 		)
@@ -113,7 +111,7 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_EmptyOperation)
 	auto result = Workspace::createScript(nextId, script);
 	Workspace::removeScript(nextId);
 
-	EXPECT_TRUE(result.has_value());
+	EXPECT_TRUE(result);
 }
 
 TEST_F(WorkspaceScriptingTest, ScriptingNode_NonEmptyOperation)
@@ -122,10 +120,8 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_NonEmptyOperation)
 
 	auto script = R"(
 		self.operation = Operation.new(
-			{ValueType.Float, ValueType.Float},
-			{ValueType.Vec3},
-			{"x", "y"},
-			{"result"}
+			{x = ValueType.Float, y = ValueType.Float},
+			{result = ValueType.Vec3}
 		)
 		self.on_init = function() print(1) end
 		self.on_update_values = function() print(2) end
@@ -135,27 +131,5 @@ TEST_F(WorkspaceScriptingTest, ScriptingNode_NonEmptyOperation)
 	auto result = Workspace::createScript(nextId, script);
 	Workspace::removeScript(nextId);
 
-	EXPECT_TRUE(result.has_value());
-}
-
-TEST_F(WorkspaceScriptingTest, ScriptingNode_ComplexExample)
-{
-	auto& scripting = App::getModule<ScriptingModule>();
-
-	auto script = R"(
-		self.operation = Operation.new(
-			{ValueType.Float, ValueType.Float},
-			{ValueType.Vec3},
-			{"x", "y"},
-			{"result"}
-		)
-		self.on_init = function() print(1) end
-		self.on_update_values = function() print(2) end
-	)";
-
-	auto nextId = Core::IdGenerator::next();
-	auto result = Workspace::createScript(nextId, script);
-	Workspace::removeScript(nextId);
-
-	EXPECT_TRUE(result.has_value());
+	EXPECT_TRUE(result);
 }

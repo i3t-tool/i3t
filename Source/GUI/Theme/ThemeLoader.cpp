@@ -116,6 +116,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 
+	out << YAML::Key << "mode";
+	out << YAML::Value << (theme.isDark() ? "dark" : "light");
+
 	out << YAML::Key << "colors";
 	out << YAML::Value << YAML::BeginMap;
 	for (const auto& [key, val] : colors)
@@ -162,6 +165,18 @@ void saveTheme(const fs::path& path, Theme& theme)
 }
 
 //--------------------------------------------------------------------------------------------------------------------//
+
+static bool isDark(YAML::Node& yaml)
+{
+	if (!yaml["mode"] || !yaml["mode"].IsScalar())
+	{
+		return true;
+	}
+
+	auto shouldSetLight = yaml["mode"].as<std::string>() == "light";
+
+	return !shouldSetLight;
+}
 
 static Theme::Colors loadColors(YAML::Node& yaml)
 {
@@ -275,7 +290,7 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 	{
 		yaml = YAML::LoadFile(path.string());
 
-		auto theme = Theme(name, loadColors(yaml), loadSizes(yaml), loadSizeVectors(yaml));
+		auto theme = Theme(name, isDark(yaml), loadColors(yaml), loadSizes(yaml), loadSizeVectors(yaml));
 		theme.initFonts();
 
 		return theme;

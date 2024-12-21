@@ -99,7 +99,12 @@ void LogWindow::render()
 	}
 
 	ImGui::BeginChild(ID);
+
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
+
 	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
+
+	ImGui::PopFont();
 
 	// Set scroll to bottom of the child window.
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())

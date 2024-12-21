@@ -20,6 +20,23 @@
 #include "Core/Module.h"
 #include "Scripting/Timer.h"
 
+struct ScriptError
+{
+	enum Type
+	{
+		SyntaxError,
+		RuntimeError,
+	};
+
+	/// Line number from
+	std::optional<int> line;
+	std::optional<Type> type;
+	std::string message;
+
+	explicit ScriptError(std::string message) : message(std::move(message)) {}
+	ScriptError(int line, Type type, std::string message) : line(line), type(type), message(std::move(message)) {}
+};
+
 class ScriptingModule : public Module
 {
 	void onInit() override;
@@ -27,7 +44,7 @@ class ScriptingModule : public Module
 	void onClose() override;
 
 public:
-	bool runScript(const char* luaSource);
+	std::optional<ScriptError> runScript(const char* luaSource);
 
 	std::ostringstream& outputStream()
 	{

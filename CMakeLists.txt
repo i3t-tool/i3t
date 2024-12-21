@@ -28,6 +28,7 @@ include_directories(Dependencies/rttr-generated/src)
 include_directories(Dependencies/sol2/include)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
+include_directories(Dependencies/ImGuiColorTextEdit)
 include_directories(Dependencies/ImGuizmo/ImGuizmo)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
@@ -140,7 +141,8 @@ set(I3T_IMGUI_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/ImGuiColorTextEdit/TextEditor.cpp)
 
 file(GLOB_RECURSE I3T_SOURCE
     "Source/*.h"
