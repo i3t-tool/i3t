@@ -193,7 +193,31 @@ static auto findNode(Core::ID id) -> Ptr<GuiNode>
 	}
 
 	return result.value();
-};
+}
+
+static Ptr<Workspace::CoreNode> findNodePred(const std::vector<Ptr<Workspace::CoreNode>>& array, int fromLuaIdx,
+                                             int toLuaIdx, sol::function predicate)
+{
+	const auto fromIdx = std::max(fromLuaIdx - 1, 0);
+	const auto toIdx = toLuaIdx - 1;
+
+	const bool validIndex =
+	    0 <= fromIdx && fromIdx < array.size() && 0 <= toIdx && toIdx < array.size() && fromIdx <= toIdx;
+	if (!validIndex)
+	{
+		return nullptr;
+	}
+
+	for (std::size_t i = fromIdx; i <= toIdx; ++i)
+	{
+		if (predicate(array[i]))
+		{
+			return array[i];
+		}
+	}
+
+	return nullptr;
+}
 
 //----------------------------------------------------------------------------//
 
@@ -584,6 +608,7 @@ LUA_REGISTRATION
 	    "Node",
 		sol::no_constructor,
 		"get_id", &GuiNode::getId,
+		"get_keyword", &GuiNode::getKeyword,
 		"get_position", &GuiNode::getNodePositionDiwne,
 		"set_position", &GuiNode::setNodePositionDiwne,
 		"get_label", &GuiNode::getTopLabel,
@@ -956,6 +981,11 @@ LUA_REGISTRATION
 	api["get_all_nodes"] = getWorkspaceNodes;
 
 	api["get_node"] = findNode;
+
+	api["find_node"] = [](std::size_t fromLuaIdx, std::size_t toLuaIdx, sol::function predicate) {
+		return findNodePred(getWorkspaceNodes(), fromLuaIdx, toLuaIdx, predicate);
+	};
+	api["find_node_in"] = findNodePred;
 
 	api["delete_node"] = [](GuiNode& node) {
 		node.deleteActionDiwne();

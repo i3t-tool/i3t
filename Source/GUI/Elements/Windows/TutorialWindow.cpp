@@ -151,7 +151,7 @@ void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
 		return;
 	}
 
-	setTutorial(tutorial);
+	SetTutorialCommand::dispatch(tutorial);
 }
 
 void TutorialWindow::reloadTutorial()
@@ -487,6 +487,8 @@ static void renderTestQuestionControls(TestQuestion* task)
 
 void TutorialWindow::renderChoiceTask(ChoiceTask* choice)
 {
+	ImGui::PushID(choice->m_content.c_str());
+
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 	ImGui::TextUnformatted(choice->m_content.c_str());
 
@@ -500,10 +502,14 @@ void TutorialWindow::renderChoiceTask(ChoiceTask* choice)
 	ImGui::EndDisabled();
 
 	renderTestQuestionControls(choice);
+
+	ImGui::PopID();
 }
 
 void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice)
 {
+	ImGui::PushID(multiChoice->m_content.c_str());
+
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 	ImGui::TextUnformatted(multiChoice->m_content.c_str());
 
@@ -521,23 +527,29 @@ void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice)
 	ImGui::EndDisabled();
 
 	renderTestQuestionControls(multiChoice);
+
+	ImGui::PopID();
 }
 
 void TutorialWindow::renderInputTask(InputTask* input)
 {
+	ImGui::PushID(input->m_content.c_str());
+
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 	ImGui::TextUnformatted(input->m_content.c_str());
 
 	ImGui::BeginDisabled(input->m_isCorrect);
 
 	constexpr auto size = sizeof(input->m_input);
-	ImGui::InputText("Answer", &input->m_input[0], size);
+	ImGui::InputText("##Answer", &input->m_input[0], size);
 
 	ImGui::SameLine();
 
 	ImGui::EndDisabled();
 
 	renderTestQuestionControls(input);
+
+	ImGui::PopID();
 }
 
 void TutorialWindow::renderTask(Task* task)

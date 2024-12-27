@@ -95,6 +95,11 @@ public:
 		m_timersToDelete.emplace_back(timer);
 	}
 
+	void clearTimers()
+	{
+		m_timersToDelete = m_timers;
+	}
+
 private:
 	void clearPendingTimers()
 	{

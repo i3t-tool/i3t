@@ -40,6 +40,7 @@ public:
 	~CoreNode() override;
 
 	Ptr<Core::Node> const getNodebase() const;
+	const std::string& getKeyword() const;
 
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);

@@ -13,6 +13,7 @@
 
 #include "Scripting/Environment.h"
 
+#include "Scripting/ScriptingModule.h"
 #include "Scripting/Utils.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialManager.h"
@@ -97,6 +98,11 @@ static Ptr<T> cast(Ptr<TutorialElement> element)
 
 LUA_REGISTRATION
 {
+	SetTutorialCommand::addListener([]([[maybe_unused]] Ptr<Tutorial> _) {
+		auto& scripting = App::getModule<ScriptingModule>();
+		scripting.clearTimers();
+	});
+
 	// clang-format off
 
 	// Elements
@@ -153,6 +159,7 @@ LUA_REGISTRATION
 			return std::make_shared<ChoiceTask>(question, choices, correctChoice);
 		},
 		sol::base_classes, sol::bases<TutorialElement>(),
+		"completed", &ChoiceTask::m_isCorrect,
 		"choices", &ChoiceTask::m_choices,
 		"correct_choice", &ChoiceTask::m_correctChoice
 	);
@@ -163,6 +170,7 @@ LUA_REGISTRATION
 			return std::make_shared<MultiChoiceTask>(question, choices, correctChoices);
 		},
 		sol::base_classes, sol::bases<TutorialElement>(),
+		"completed", &MultiChoiceTask::m_isCorrect,
 		"choices", &MultiChoiceTask::m_choices,
 		"correct_choices", &MultiChoiceTask::m_correctChoices
 	);
@@ -173,6 +181,7 @@ LUA_REGISTRATION
 			return std::make_shared<InputTask>(question, correctAnswers);
 		},
 		sol::base_classes, sol::bases<TutorialElement>(),
+		"completed", &InputTask::m_isCorrect,
 		"correct_answers", &InputTask::m_correctAnswers
 	);
 
