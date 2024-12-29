@@ -15,6 +15,7 @@
 
 #include "Config.h"
 
+#include "Scripting/ScriptingModule.h"
 #include "Tutorial/TutorialLoader.h"
 
 void TutorialManager::reloadTutorials()
@@ -79,6 +80,9 @@ void TutorialManager::setStep(int stepNumber)
 		// set step
 		m_currentStep = stepNumber;
 		auto& step = m_currentTutorial->m_steps[m_currentStep];
+
+		auto& scripting = App::getModule<ScriptingModule>();
+		scripting.clearTimers();
 
 		// run script
 		if (!step.m_scriptToRunWhenShown.empty())

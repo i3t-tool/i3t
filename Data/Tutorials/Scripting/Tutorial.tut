@@ -1,0 +1,45 @@
+---
+title: Skriptování v I3T
+description: Nauč se základy skriptování v I3T a interaguj s programem pomocí Lua skriptů.
+thumbnail: lua-logo.png
+language: cs
+---
+
+headline: První kroky
+
+S nástrojem I3T můžeme také interagovat pomocí skriptů v jazyce Lua. V tomto tutoriálu se naučíme základy skriptování v I3T. Každý krok tutoriálu obsahuje ukázkový skript, který demonstruje funkcionalitu skriptování v I3T.
+
+Skripty je možné zapisovat ručně do konzole nebo do souborů, které se dají v každém kroku tutoriálu spustit.
+
+Podrobná dokumentace k API I3T je dostupná [zde](https://i3t-tool.org/lua-api-reference/).
+
+--
+
+headline: Úkol
+
+Soubor `Step2.lua` obsahuje skript, který periodicky testuje, zda uživatel vytvořil zadanou *Scale* transformaci.
+Pokud ano, skript nastaví úkol níže na splněný a uživatele pustí do dalšího kroku tutoriálu.
+
+task: Vytvoř Scale transformaci.
+
+scriptFile: Step2.lua
+
+--
+
+headline: Dynamický obsah tutoriálu
+
+Kromě klasických prvků jaké z tutoriálu již známe, můžeme v I3T pomocí skriptů vytvářet i dynamický obsah, jako jsou například testové otázky.
+V souboru `Step3.lua` je skript, který vytvoří testovou otázku, kterou uživatel musí správně zodpovědět, aby mohl pokračovat dále.
+Při správné odpovědi se vytvoří další otázka.
+
+scriptFile: Step3.lua
+
+--
+
+headline: Interakce s Workspace
+
+S veškerými krabičkami ve Workspace můžeme také interagovat pomocí skriptů. V souboru `Step4.lua` je příklad skriptu, který vytvoří novou krabičku a modifikuje její hodnoty včetně jejího nápisu.
+
+Vše, co najdeme v základních scénách nacházejících se v adresáři `Data/Scenes/Default_scenes`, je možné reprezentovat skripty, strojově generované jsou k nalezení v `Data/Scripts`.
+
+scriptFile: Step4.lua

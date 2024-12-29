@@ -448,6 +448,15 @@ Prints the workspace nodes to the console in the form of signatures.
 
 Returns nil if the node with the given `id` does not exist.
 
+#### function `I3T.find_node(startIdx: number, endIdx: number, pred): Node | nil`
+
+Finds a node in the workspace, see `I3T.find_node_in` for more information.
+
+#### function `I3T.find_node_in(nodes: Node[], startIdx: number, endIdx: number, pred): Node | nil`
+
+Finds a node in the given `nodes` array starting from the `startIdx` index up to the `endIdx` index,
+where `pred` is a function that takes a `Node` and returns a boolean (`function[bool(Node)]`).
+
 #### function `I3T.delete_node(node: Node)`
 
 Deletes the given `node` from the workspace.
@@ -472,6 +481,7 @@ Deletes the given `node` from the workspace.
 
 Plugs the output of the node with the given `from` id at the given `from_index`
 to the input of the node with the given `to` id at the given `to_index`.
+**Uses 0-based indexing.**
 
 #### function `I3T.unplug_input(node: number, index: number)`
 

@@ -52,7 +52,7 @@ void ScriptingModule::onInit()
 
 	//
 
-	m_Lua.open_libraries(sol::lib::base, sol::lib::package);
+	m_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::os);
 
 	m_Lua["I3T"] = m_Lua.create_table();
 
@@ -249,6 +249,11 @@ void ScriptingModule::onClose()
 
 	// Destroy the Lua state to ensure that all workspace node will be destroyed along with their Lua objects.
 	m_Lua = {};
+}
+
+void ScriptingModule::clearTimers()
+{
+	m_chronos.clearTimers();
 }
 
 std::optional<ScriptError> ScriptingModule::runScript(const char* luaSource)

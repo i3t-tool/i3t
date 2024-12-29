@@ -108,6 +108,10 @@ Whether the step is completed.
 Each step is considered completed by default.
 When set to `false` user cannot proceed to the next step.
 
+#### attribute `content: TutorialElement[]`
+
+List of elements that make up the step content.
+
 
 ### `Tutorial`
 

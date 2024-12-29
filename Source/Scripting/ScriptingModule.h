@@ -44,6 +44,8 @@ class ScriptingModule : public Module
 	void onClose() override;
 
 public:
+	void clearTimers();
+
 	std::optional<ScriptError> runScript(const char* luaSource);
 
 	std::ostringstream& outputStream()

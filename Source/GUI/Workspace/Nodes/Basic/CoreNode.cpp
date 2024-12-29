@@ -201,6 +201,11 @@ Ptr<Core::Node> const CoreNode::getNodebase() const
 	return m_nodebase;
 }
 
+const std::string& CoreNode::getKeyword() const
+{
+	return m_nodebase->getOperation().keyWord;
+}
+
 int CoreNode::getNumberOfVisibleDecimal()
 {
 	return m_numberOfVisibleDecimal;
