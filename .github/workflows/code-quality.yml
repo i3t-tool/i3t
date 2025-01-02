@@ -58,11 +58,13 @@ jobs:
         with:
           cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fPIC -fprofile-arcs -ftest-coverage"'
 
-      - name: Run gcovr
-        run: |
-          python3 -m pip install gcovr
-          # gcovr --root build-test/CMakeFiles/I3TTest.dir/Source --exclude /usr --xml
-          gcovr -r . --xml
+#      - name: Run gcovr
+#        run: |
+#          python3 -m pip install gcovr
+#          gcovr --root build-test/CMakeFiles/I3TTest.dir/Source \
+#            --exclude /usr \
+#            --gcov-executable /usr/bin/gcov-12 \
+#            --xml
 
   test-with-address-sanitizer:
     # TODO: Solve errors with address sanitizer, then remove `continue-on-error: true`
