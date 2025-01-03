@@ -44,10 +44,15 @@ jobs:
   test:
     strategy:
       matrix:
-        kind: [ 'Linux' ]
+        # kind: [ 'Linux', 'Windows', 'macOS' ]
+        kind: [ 'Linux', 'Windows' ]
         include:
           - kind: 'Linux'
             os: ubuntu-latest
+          - kind: 'Windows'
+            os: windows-latest
+          # - kind: 'macOS'
+          #   os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -55,8 +60,12 @@ jobs:
           submodules: 'true'
 
       - uses: ./.github/actions/test
+        if: ${{ matrix.kind == 'Linux' }}
         with:
           cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fPIC -fprofile-arcs -ftest-coverage"'
+
+      - uses: ./.github/actions/test
+        if: ${{ matrix.kind != 'Linux' }}
 
 #      - name: Run gcovr
 #        run: |
@@ -69,13 +78,7 @@ jobs:
   test-with-address-sanitizer:
     # TODO: Solve errors with address sanitizer, then remove `continue-on-error: true`
     continue-on-error: true
-    strategy:
-      matrix:
-        kind: [ 'Linux' ]
-        include:
-          - kind: 'Linux'
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -85,13 +88,7 @@ jobs:
           cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -static-libasan" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"'
 
   test-with-undefined-behavior-sanitizer:
-    strategy:
-      matrix:
-        kind: [ 'Linux' ]
-        include:
-          - kind: 'Linux'
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -102,6 +99,7 @@ jobs:
 
   clang-tidy:
     runs-on: ubuntu-24.04
+    # TODO: Solve errors with clang-tidy, then remove `continue-on-error: true`
     continue-on-error: true
     steps:
       - name: Checkout code

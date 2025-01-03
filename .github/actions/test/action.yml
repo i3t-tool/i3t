@@ -23,13 +23,16 @@ runs:
         jobs: '2'
         cmake_extra_args: ${{ inputs.cmake_gcc_extra_args }}
 
-    # - name: Run tests
-    #   if: matrix.kind == 'Windows'
-    #   run: |
-    #     Binaries/Debug/I3TTest
+     # TODO:
+     # We are not running the tests on Windows and macOS, because we have no way to run them with GUI.
+#    - name: Run tests
+#      shell: bash
+#      if: runner.os == 'Windows' || runner.os == 'macOS'
+#      run: |
+#        Binaries/Debug/I3TTest
 
     - name: Run tests with xvfb
       shell: bash
-      if: matrix.kind == 'Linux' || matrix.kind == 'macOS'
+      if: runner.os == 'Linux'
       run: |
         xvfb-run Binaries/Debug/I3TTest
