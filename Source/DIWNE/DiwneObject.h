@@ -17,6 +17,8 @@
 
 #include "diwne_include.h"
 
+#include <memory>
+
 namespace DIWNE
 {
 
