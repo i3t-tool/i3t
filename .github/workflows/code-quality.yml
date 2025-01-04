@@ -97,6 +97,33 @@ jobs:
         with:
           cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=undefined -fno-omit-frame-pointer" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=undefined"'
 
+  test-app:
+    strategy:
+      matrix:
+        kind: [ 'Linux', 'Windows' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+          - kind: 'Windows'
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Build tests
+        uses: ./.github/actions/build
+        with:
+          target: 'I3T'
+          cmake_build_type: 'Debug'
+          jobs: '2'
+
+      - name: Run end-to-end tests
+        if: ${{ matrix.kind == 'Linux' }}
+        run: |
+          export I3T_TEST_AUTO_RUN=1
+          xvfb-run Binaries/Debug/I3T
+
   clang-tidy:
     runs-on: ubuntu-24.04
     # TODO: Solve errors with clang-tidy, then remove `continue-on-error: true`

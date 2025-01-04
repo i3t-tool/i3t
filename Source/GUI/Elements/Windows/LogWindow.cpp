@@ -14,7 +14,6 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Core/Input/InputBindings.h"

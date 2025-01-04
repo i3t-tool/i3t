@@ -119,7 +119,7 @@ void UIModule::onInit()
 		// m_windowManager.openModal<BeforeCloseModal>();
 		// m_windowManager.openConfirmModal<BeforeCloseStrategy>();
 		askBeforeExitScene([]() {
-			CloseCommand::dispatch();
+			CloseCommand::dispatch(0);
 		});
 	});
 

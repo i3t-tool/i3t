@@ -12,7 +12,6 @@
  */
 #include "BeforeNewTutModal.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"

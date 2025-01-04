@@ -12,7 +12,6 @@
  */
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 // temporary
 #include "imgui_markdown.h" // tmeporary

@@ -12,7 +12,6 @@
  */
 #include "IWindow.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "GUI/Toolkit.h"

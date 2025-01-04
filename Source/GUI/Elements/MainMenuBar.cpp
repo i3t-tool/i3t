@@ -12,7 +12,6 @@
  */
 #include "MainMenuBar.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
@@ -31,6 +30,7 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/IconFonts/Icons.h"
+#include "GUI/Test/TestModule.h"
 #include "I3T.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
@@ -380,6 +380,8 @@ void MainMenuBar::showHelpMenu()
 #endif
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+			ImGui::MenuItem("Show test window", nullptr, &App::getModule<TestModule>().getShowTestWindow());
+
 			ImGui::EndMenu();
 		}
 
