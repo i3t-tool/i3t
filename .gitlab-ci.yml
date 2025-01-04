@@ -84,6 +84,17 @@ test:
   dependencies:
     - build-tests
 
+test-e2e:
+    stage: test
+    rules:
+      - !reference [ .changes-rules, cpp ]
+    variables:
+      I3T_TEST_AUTO_RUN: "1"
+    script:
+        - xvfb-run Binaries/Debug/I3T
+    dependencies:
+        - build-app
+
 ###
 
 # Do not remove this job!

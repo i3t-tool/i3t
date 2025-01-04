@@ -26,7 +26,8 @@ class NewProjectCommand : public Command<NewProjectCommand>
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
 {};
 
-class CloseCommand : public Command<CloseCommand>
+/// int - exit code
+class CloseCommand : public Command<CloseCommand, int>
 {};
 
 class HideWindowCommand : public Command<HideWindowCommand, std::string>

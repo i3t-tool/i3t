@@ -14,7 +14,6 @@
 
 #include "GUI/Elements/IWindow.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "TextEditor.h"
 
 #include <array>

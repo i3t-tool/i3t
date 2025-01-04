@@ -17,7 +17,6 @@
 #include <unordered_set>
 #include <vector>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Core/Nodes/Node.h"

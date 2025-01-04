@@ -109,6 +109,8 @@ set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW should not build docs.")
 
 #  Project dependencies which should be compiled.
+include(CMake/ImGui.cmake)
+
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
 add_subdirectory(Dependencies/lua)
@@ -135,18 +137,6 @@ add_compile_definitions(
 # =============================================================
 
 # ======== Source groups ======================================
-# Add ImGui source files.
-set(I3T_IMGUI_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/ImGuiColorTextEdit/TextEditor.cpp)
-
 file(GLOB_RECURSE I3T_SOURCE
     "Source/*.h"
     "Source/*.hpp"
@@ -197,6 +187,7 @@ target_link_libraries(
         RTTR::Core_Lib
         sol2
         yaml-cpp
+        ImGui
         ImGuizmo
 )
 
@@ -204,7 +195,9 @@ target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
 
 # Allow rapidjson to use std::string as it'll be always present
-target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
+        IMGUI_DEFINE_MATH_OPERATORS
+        RAPIDJSON_HAS_STDSTRING=1)
 
 # =============================================================
 
@@ -221,7 +214,9 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
 
 # Allow rapidjson to use std::string as it'll be always present
-target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+        IMGUI_DEFINE_MATH_OPERATORS
+        RAPIDJSON_HAS_STDSTRING=1)
 
 # Link I3T with following binaries.
 target_link_libraries(
@@ -235,6 +230,7 @@ target_link_libraries(
         sol2
         spdlog
         yaml-cpp
+        ImGui
         ImGuizmo
 )
 
