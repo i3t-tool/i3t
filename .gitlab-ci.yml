@@ -19,6 +19,7 @@ stages:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Dependencies/*"
+        - "Scripts/*"
         - .clang-format
         - .clang-tidy
         - .gitlab-ci.yml
@@ -28,12 +29,33 @@ stages:
         - "**/*.{h,cpp}"
 
 # Linting phase
+
 check-format:
   stage: lint
   rules:
     - !reference [.changes-rules, cpp]
   script:
     - bash Scripts/CheckFormat.sh
+
+clang-tidy:
+  stage: lint
+  allow_failure: true
+  rules:
+    - !reference [.changes-rules, cpp]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    - bash Scripts/RunClangTidy.sh
+
+cppcheck:
+  stage: lint
+  allow_failure: true
+  rules:
+    - !reference [ .changes-rules, cpp ]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    - bash Scripts/RunCppCheck.sh
 
 ###
 
