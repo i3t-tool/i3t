@@ -670,7 +670,9 @@ LUA_REGISTRATION
 		"set_value", sol::overload(
 			&setValue<GuiOperator, float>,
 			&setValue<GuiOperator, glm::vec3>,
-			&setValue<GuiOperator, glm::vec4>
+			&setValue<GuiOperator, glm::vec4>,
+			&setValue<GuiOperator, glm::quat>,
+			&setValue<GuiOperator, glm::mat4>
 		)
 	);
 
