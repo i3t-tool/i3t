@@ -12,7 +12,6 @@
  */
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include <array>
@@ -208,6 +207,7 @@ enum class EColor
 
 enum class EFont
 {
+	Mono,
 	Regular,
 	LargeBold,
 	MenuLarge,
@@ -395,20 +395,9 @@ public:
 	/// (std::unordered_map cannot be used).
 	using CategoryNames = std::map<std::string, const char*>;
 
-private:
-	std::string m_name = "default";
-
-	Colors m_colors;
-	Sizes m_sizes;
-	SizesVec m_sizesVec2;
-
-	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
-
-	std::map<EFont, std::string> m_fontsAssoc;
-
 public:
 	Theme() = default;
-	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
+	Theme(std::string name, bool isDark, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
 	static Theme createDefaultClassic();
 
@@ -466,6 +455,11 @@ public:
 		return m_name;
 	}
 
+	const bool isDark() const
+	{
+		return m_isDark;
+	}
+
 	void set(EColor color, ImVec4 value)
 	{
 		m_colors.insert(std::pair(color, value));
@@ -500,6 +494,17 @@ private:
 	}
 
 	static ThemeGroup& group(const char* name);
+
+	std::string m_name = "default";
+
+	bool m_isDark = true;
+	Colors m_colors;
+	Sizes m_sizes;
+	SizesVec m_sizesVec2;
+
+	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	std::map<EFont, std::string> m_fontsAssoc;
 
 	static inline std::vector<ThemeGroup> s_variables;
 };

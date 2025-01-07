@@ -97,12 +97,23 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 		LOG_INFO("Language not specified - setting english");
 		// todo
 	}
+	// layout
+	std::string layout = "undefined";
+	if (tutorial_yaml["layout"])
+	{
+		layout = tutorial_yaml["layout"].as<std::string>();
+		LOG_DEBUG(layout);
+	}
+	else
+	{
+		LOG_DEBUG("Layout not specified");
+	}
 
 	// we create our tutorial header object on heap, we are using shared ptr, so
 	// that when there aren't any references, we can eg properly free the loaded
 	// image and destroy it
 	return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(scene),
-	                                        std::move(thumbnail));
+	                                        std::move(thumbnail), std::move(layout));
 }
 
 std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)

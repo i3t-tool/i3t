@@ -17,6 +17,7 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
+#include "GUI/Test/TestModule.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
@@ -28,10 +29,6 @@ void I3TApplication::onInit()
 	Core::GraphManager::init();
 
 	//
-
-	CloseCommand::addListener([this] {
-		close();
-	});
 
 	InputManager::init();
 
@@ -57,10 +54,13 @@ void I3TApplication::onInit()
 	App::getModule<StateManager>().addOriginator(viewport);
 
 	createModule<ScriptingModule>();
-	createModule<UIModule>();
+	UIModule* uiModule = createModule<UIModule>();
+	App::getModule<StateManager>().addOriginator(uiModule);
 
 	stateManager->loadGlobal();
 	stateManager->newScene(true);
+
+	createModule<TestModule>();
 
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();

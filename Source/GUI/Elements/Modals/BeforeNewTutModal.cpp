@@ -12,7 +12,6 @@
  */
 #include "BeforeNewTutModal.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
@@ -20,6 +19,7 @@
 #include "GUI/Elements/Windows/StartWindow.h"
 #include "I3T.h"
 #include "State/StateManager.h"
+#include "Tutorial/TutorialManager.h"
 
 void BeforeNewTutModal::onImGui()
 {
@@ -61,7 +61,7 @@ void BeforeNewTutModal::submit()
 {
 	auto& windowManager = I3T::getUI()->getWindowManager();
 
-	Ptr<Tutorial> tut = windowManager.getWindowPtr<StartWindow>()->getTutorial();
+	Ptr<Tutorial> tut = TutorialManager::instance().getTutorial();
 	if (!App::getModule<StateManager>().loadScene(tut->m_header->m_scene))
 	{
 		// Tutorial has no scene, create new one.
@@ -72,4 +72,10 @@ void BeforeNewTutModal::submit()
 	Ptr<IWindow> tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
 	windowManager.showWindow(tutorialWindow, true);
 	windowManager.focusWindow(tutorialWindow);
+
+	// load layout for the tutorial if it is defined
+	if (tut->m_header->m_layout != "undefined")
+	{
+		LoadWindowLayoutFromFileCommand::dispatch(tut->m_header->m_layout);
+	}
 }

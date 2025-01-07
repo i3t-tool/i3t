@@ -17,10 +17,6 @@
 
 #include "glm/glm.hpp"
 
-#ifndef IMGUI_DEFINE_MATH_OPERATORS
-#define IMGUI_DEFINE_MATH_OPERATORS
-#endif
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -48,7 +44,7 @@ inline void TextCentered(const char* text, ImRect rect, ImU32 col)
 	ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), textOrigin, col, text);
 }
 
-bool Button(const char* id, bool disabled = false);
+bool Button(const char* id, bool disabled = false, const ImVec2& size = ImVec2(0, 0));
 
 bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
                void* user_data);

@@ -16,7 +16,6 @@
 
 #include "Core/Input/InputManager.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -30,6 +29,7 @@
 #include "I3T.h"
 #include "Logger/Logger.h"
 #include "Tutorial/TutorialLoader.h"
+#include "Tutorial/TutorialManager.h"
 #include "Utils/Other.h"
 
 StartWindow::StartWindow(bool show) : IWindow(ICON_I3T_HOME " Welcome", show)
@@ -37,80 +37,17 @@ StartWindow::StartWindow(bool show) : IWindow(ICON_I3T_HOME " Welcome", show)
 	// load images
 	try
 	{
-		m_dummyImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "dummy.png"));
+		m_dummyImage = std::make_shared<GUIImage>(Config::TEXTURE_FOLDER + "dummy.png");
+		m_folderImage = std::make_shared<GUIImage>(Config::TEXTURE_FOLDER + "pilkaFolder.png");
+		m_cvutImage = std::make_shared<GUIImage>(Config::TEXTURE_FOLDER + "cvutLogo.png");
+		m_i3tImage = std::make_shared<GUIImage>(Config::TEXTURE_FOLDER + "logoi3t.png");
 	}
 	catch (std::runtime_error& e)
 	{
 		LOG_ERROR(e.what())
-	}
-	try
-	{
-		m_folderImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "pilkaFolder.png"));
-	}
-	catch (std::runtime_error& e)
-	{
-		LOG_ERROR(e.what())
-	}
-	try
-	{
-		m_cvutImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "cvutLogo.png"));
-	}
-	catch (std::runtime_error& e)
-	{
-		LOG_ERROR(e.what())
-	}
-	try
-	{
-		m_i3tImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "logoi3t.png"));
-	}
-	catch (std::runtime_error& e)
-	{
-		LOG_ERROR(e.what())
-	}
-	language_is_english = false;
-	reloadTutorials(language_is_english);
-}
-
-void StartWindow::reloadTutorials(bool english)
-{
-	m_tutorial_headers.clear();
-	// preload all tutorials located in TUTORIALS_FOLDER recursively
-	std::string path = Config::TUTORIALS_FOLDER;
-	if (path[0] == '/')
-	{
-		path.erase(0, 1);
 	}
 
-	if (std::filesystem::exists(path))
-	{
-		LOG_INFO("Searching for tutorials in: " + path);
-		// For all files in path recursively
-		for (auto const& entry : std::filesystem::recursive_directory_iterator(
-		         path, std::filesystem::directory_options::skip_permission_denied))
-		{
-			std::string filename = entry.path().stem().string();
-
-			if (entry.path().extension() == ".tut" && ((english && filename.substr(filename.size() - 2) == "en") ||
-			                                           (!english && filename.substr(filename.size() - 2) != "en")))
-			{
-				std::string pathString = entry.path().string();
-				LOG_INFO(pathString);
-				// Load header part of tutorial
-				if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header)
-				{
-					m_tutorial_headers.push_back(std::move(header));
-				}
-				else
-				{
-					LOG_ERROR("Tutorial header " + pathString + " not loaded.");
-				}
-			}
-		}
-	}
-	else
-	{
-		LOG_INFO("Path for tutorials not found. Searched path: " + path);
-	}
+	TutorialManager::instance().reloadTutorials();
 }
 
 /**
@@ -194,15 +131,14 @@ void StartWindow::renderLeftPanel() const
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 
-		bool language = I3T::getWindowPtr<StartWindow>()->language_is_english;
+		const auto language = TutorialManager::instance().getLanguage();
 		GLuint flagCz = I3T::getResourceManager().texture("Data/Textures/flags/cz.png");
 		GLuint flagEn = I3T::getResourceManager().texture("Data/Textures/flags/gb.png");
-		GLuint flag = language ? flagEn : flagCz;
+		GLuint flag = language == ETutorialLanguage::Czech ? flagCz : flagEn;
 		if (ImGui::ImageButton("##LangButton", (void*) (intptr_t) flag, ImVec2(48, 36), ImVec2(0., 0.), ImVec2(1., 1.),
 		                       ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
 		{
-			I3T::getWindowPtr<StartWindow>()->language_is_english = !language;
-			I3T::getWindowPtr<StartWindow>()->reloadTutorials(!language);
+			TutorialManager::instance().toggleLanguage();
 		}
 		if (ImGui::IsItemHovered())
 		{
@@ -336,7 +272,7 @@ void StartWindow::renderRightPanel()
 		ImGui::Dummy(ImVec2(0, 5));
 
 		// THE LIST OF TUTORIALS
-		for (auto& header : m_tutorial_headers)
+		for (auto& header : TutorialManager::instance().getTutorialHeaders())
 		{
 			// ITEM
 			ImGui::BeginGroup();
@@ -587,7 +523,7 @@ void StartWindow::render()
 void StartWindow::loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut)
 {
 	I3T::getUI()->getWindowManager().showWindow(shared_from_this(), false);
-	setTutorial(tut);
+	TutorialManager::instance().setTutorial(tut);
 	m_windowManager->openModal<BeforeNewTutModal>();
 	LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 }

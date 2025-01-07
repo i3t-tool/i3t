@@ -102,7 +102,8 @@ int main(int argc, char* argv[])
 
 	LOG_INFO("Working directory is {}.", Configuration::root.string());
 
-	// Get application instance.
+	// Destroy app before logger
+	int exitCode = 0;
 	{
 		I3TApplication app;
 
@@ -113,12 +114,12 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 
-		app.run();
+		exitCode = app.run();
 	}
 
 	LOG_INFO("I3T is now exited.");
 
 	END_LOGGER;
 
-	return 0;
+	return exitCode;
 }

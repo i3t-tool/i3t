@@ -26,7 +26,7 @@
 
 class MainMenuBar;
 
-class UIModule final : public Module
+class UIModule final : public Module, public IStateful
 {
 	friend class Application;
 
@@ -100,4 +100,16 @@ private:
 	std::vector<Theme> m_allThemes;
 
 	Fonts m_fonts;
+
+private:
+	// Save layout and tutorial info to the file scene.
+	Memento saveScene(State::Scene* scene) override;
+	// Load layout and tutorial info from the file scene.
+	void loadScene(const Memento& memento, State::Scene* scene) override;
+	void clearScene() override;
+
+public:
+	Memento saveGlobal() override;
+	void loadGlobal(const Memento& memento) override;
+	void clearGlobal() override;
 };

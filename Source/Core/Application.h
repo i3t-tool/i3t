@@ -55,7 +55,7 @@ public:
 	/**
 	 * Enter main loop.
 	 */
-	void run();
+	int run();
 
 	void beginFrame();
 	void endFrame();

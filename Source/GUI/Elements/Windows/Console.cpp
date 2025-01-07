@@ -13,11 +13,14 @@
 #include "Console.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/Application.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"
+#include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
 #include "Scripting/ScriptingModule.h"
-#include <GUI/IconFonts/Icons.h>
+#include "State/StateManager.h"
+#include "UserData.h"
 
 using namespace UI;
 
@@ -28,7 +31,8 @@ static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 }
 
 Console::Console(bool show)
-    : IWindow(ICON_I3T_CONSOLE " Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream())
+    : IWindow(ICON_I3T_CONSOLE " Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream()),
+      m_History(getUserData().recentCommands)
 {
 	m_oss << "I3T console\n";
 }
@@ -63,15 +67,23 @@ int Console::textEditCallback(ImGuiInputTextCallbackData* data)
 		if (data->EventKey == ImGuiKey_UpArrow)
 		{
 			if (m_HistoryPos == -1)
+			{
 				m_HistoryPos = m_History.size() - 1;
+			}
 			else if (m_HistoryPos > 0)
+			{
 				m_HistoryPos--;
+			}
 		}
 		else if (data->EventKey == ImGuiKey_DownArrow)
 		{
 			if (m_HistoryPos != -1)
+			{
 				if (++m_HistoryPos >= m_History.size())
+				{
 					m_HistoryPos = -1;
+				}
+			}
 		}
 
 		// A better implementation would preserve the data on the current input line along with cursor position.
@@ -106,7 +118,11 @@ void Console::drawOutput()
 	str[bufferSize - 2] = '\0';
 	str[bufferSize - 1] = '\0';
 
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
+
 	ImGui::InputTextMultiline("##ConsoleOutput", (char*) buffer.data(), bufferSize - 2, maxSize, flags);
+
+	ImGui::PopFont();
 
 	m_oss.seekp(-2, m_oss.cur);
 
@@ -131,11 +147,15 @@ void Console::drawInput()
 	const auto flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion |
 	                   ImGuiInputTextFlags_CallbackHistory;
 
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+
 	if (GUI::InputText("#Command", &m_Command, flags, &textEditCallbackStub, (void*) this))
 	{
 		execute();
 	}
+
+	ImGui::PopFont();
 }
 
 void Console::execute()
@@ -163,6 +183,9 @@ void Console::execute()
 		}
 	}
 	m_History.push_back(m_Command);
+
+	getUserData().trimRecentCommands();
+	Application::getModule<StateManager>().saveUserData();
 
 	m_Command = "";
 }

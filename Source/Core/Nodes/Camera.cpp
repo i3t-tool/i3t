@@ -27,7 +27,7 @@ Ptr<Camera> Builder::createCamera()
 	return ret;
 }
 
-Camera::Camera() : Node(&g_cameraProperties) {}
+Camera::Camera() : Node(g_cameraProperties) {}
 
 void Camera::createComponents()
 {

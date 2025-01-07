@@ -1,8 +1,10 @@
-FROM debian:bookworm-slim
+FROM ubuntu:noble
 
 RUN apt update && apt install -y \
-    clang-format \
+    clang-format-16 \
+    clang-tidy-17 \
     cmake \
+    cppcheck \
     git \
     g++-12 \
     make \

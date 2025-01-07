@@ -14,7 +14,6 @@
 
 #include <deque>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "GUI/Elements/IWindow.h"
@@ -52,7 +51,8 @@ private:
 	//
 
 	std::string m_Command;
-	int m_HistoryPos;
-	std::vector<std::string> m_History;
+	int m_HistoryPos = -1;
+	/// Reference to UserData.recentCommands
+	std::vector<std::string>& m_History;
 };
 } // namespace UI

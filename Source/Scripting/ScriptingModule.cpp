@@ -13,6 +13,7 @@
 #include "Scripting/ScriptingModule.h"
 
 #include <functional>
+#include <regex>
 #include <string_view>
 
 #include "Commands/ApplicationCommands.h"
@@ -20,99 +21,18 @@
 #include "Core/Nodes/NodeData.h"
 #include "Core/Nodes/Operations.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "GUI/Workspace/Builder.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Scripting/Environment.h"
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
 
-static Workspace::OperatorBuilder g_OperatorBuilder;
-static Workspace::TransformBuilder g_TransformBuilder;
+// static std::regex SOL_ERROR_REGEX("sol: (.*?):.*?:(\\d+): (.*)");
+static std::regex SOL_ERROR_REGEX("(sol: (.*?):[\\S\\s]*?)\\[.*\\]:(\\d+): (.*)");
+static std::function<void(const std::string& str)> g_printRef;
 
-std::function<void(const std::string& str)> g_printRef;
-
-static Workspace::WorkspaceDiwne& getNodeEditor()
+void print(const std::string& str)
 {
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	return workspace->getNodeEditor();
-}
-
-//----------------------------------------------------------------------------//
-
-template <typename T>
-static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
-{
-	const auto node = guiNode->getNodebase();
-
-	if (index >= node->getOutputPins().size())
-	{
-		g_printRef("no such index");
-		return std::nullopt;
-	}
-
-	const auto maybeValue = node->data(index).getValue<T>();
-	if (!maybeValue.has_value())
-	{
-		g_printRef("no such type of value");
-		return std::nullopt;
-	}
-
-	return maybeValue;
-}
-
-template <typename T>
-static bool setValue(Ptr<GuiNode> guiNode, const T& value)
-{
-	const auto node = guiNode->getNodebase();
-
-	if (!node->getOperation()->isConstructor)
-	{
-		g_printRef("cannot set value for this node");
-		return false;
-	}
-	if (node->data().index() != variant_index<Core::Data::Storage, T>())
-	{
-		g_printRef("invalid value type for this node");
-		return false;
-	}
-
-	const auto result = node->setValue(value);
-	if (result.status != Core::SetValueResult::Status::Ok)
-	{
-		g_printRef(result.message);
-		return false;
-	}
-
-	return true;
-}
-
-//----------------------------------------------------------------------------//
-
-template <typename T>
-static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
-{
-	const auto transform = guiNode->getNodebase()->as<Core::Transform>();
-	const auto maybeValue = transform->getDefaultValue(name).getValue<T>();
-	if (!maybeValue.has_value())
-	{
-		g_printRef("transform does not have value of given type");
-	}
-
-	return maybeValue;
-}
-
-template <typename T>
-static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
-{
-	const auto node = guiNode->getNodebase()->as<Core::Transform>();
-	const auto result = node->setDefaultValue(name, value);
-	if (result.status != Core::SetValueResult::Status::Ok)
-	{
-		g_printRef(result.message);
-
-		return false;
-	}
-
-	return true;
+	g_printRef(str);
 }
 
 //----------------------------------------------------------------------------//
@@ -132,7 +52,9 @@ void ScriptingModule::onInit()
 
 	//
 
-	m_Lua.open_libraries(sol::lib::base, sol::lib::package);
+	m_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::os);
+
+	m_Lua["I3T"] = m_Lua.create_table();
 
 	//
 
@@ -182,258 +104,47 @@ void ScriptingModule::onInit()
 		    return Utils::toString(self, true);
 	    });
 
-	//
+	m_Lua["Math"] = m_Lua.create_table();
 
-	m_Lua.new_usertype<GuiNode>(
-		"Node",
-		"type", [](Ptr<GuiNode> self) {
-			return self->getNodebase()->getOperation()->keyWord;
-		},
-		"get_position", &GuiNode::getNodePositionDiwne,
-		"set_position", &GuiNode::setNodePositionDiwne
-	);
+	auto math = m_Lua["Math"];
 
-	m_Lua.new_usertype<GuiOperator>(
-	    "Operator",
-		sol::base_classes, sol::bases<GuiNode>(),
-	    "get_float", &getValue<float>,
-		"get_vec3", &getValue<glm::vec3>,
-		"get_vec4", &getValue<glm::vec4>,
-		"get_mat4", &getValue<glm::mat4>,
-		"set_float", &setValue<float>,
-		"set_vec3", &setValue<glm::vec3>,
-		"set_vec4", &setValue<glm::vec4>,
-		"plug", [](Ptr<GuiOperator> self, int from, Ptr<GuiOperator> other, int to) {
-		    return connectNodesNoSave(self, other, from, to);
+	math["equals"] = sol::overload(
+	    [](float a, float b) {
+		    return Math::eq(a, b);
 	    },
-	    "unplug_input", [&](Ptr<GuiOperator> self, int inputIndex) {
-		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
-		    {
-			    if (node->getInputs().size() <= inputIndex)
-			    {
-				    print(fmt::format("No such input index {}", inputIndex));
-				    return;
-			    }
-
-			    if (node->getInputs()[inputIndex]->isConnected())
-			    {
-				    node->getInputs()[inputIndex]->unplug();
-			    }
-		    }
+	    [](const glm::vec3& a, const glm::vec3& b) {
+		    return Math::eq(a, b);
 	    },
-	    "unplug_output", [&](Ptr<GuiOperator> self, int outputIndex) {
-		    if (auto node = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(self))
-		    {
-			    if (node->getOutputs().size() <= outputIndex)
-			    {
-				    print(fmt::format("No such output index {}", outputIndex));
-				    return;
-			    }
-
-			    const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
-			    std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
-			    for (const auto& outputPin : self->getNodebase()->getOutputPins())
-			    {
-				    for (const auto inputPin : outputPin.getOutComponents())
-				    {
-					    if (auto maybeNode = Workspace::Tools::findNodeById(nodes, inputPin->Owner.getId()))
-					    {
-						    auto nodeWithPin = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(*maybeNode);
-						    toUnplug.push_back({nodeWithPin, inputPin->Index});
-					    }
-				    }
-			    }
-
-			    for (const auto& [childNode, inputIndex] : toUnplug)
-			    {
-				    childNode->getInputs()[inputIndex]->unplug();
-			    }
-		    }
+	    [](const glm::vec4& a, const glm::vec4& b) {
+		    return Math::eq(a, b);
 	    },
-	    sol::meta_function::construct, [this](const std::string& type) -> Ptr<GuiOperator> {
-		    const auto maybeType = EnumUtils::value<Core::EOperatorType>(type);
-		    if (!maybeType.has_value())
-		    {
-			    print(fmt::format("Unknown operator \"{}\".", type));
-
-			    return nullptr;
-		    }
-
-		    const auto maybeOp = g_OperatorBuilder(type.c_str());
-		    if (!maybeOp)
-		    {
-			    return nullptr;
-		    }
-		    const auto op = *maybeOp;
-		    const auto ID = op->getNodebase()->getId();
-
-		    print(fmt::format("ID: {}", ID));
-
-		    return std::dynamic_pointer_cast<GuiOperator>(op);
-	    },
-		sol::base_classes, sol::bases<GuiNode>());
-
-	m_Lua.new_usertype<GuiTransform>(
-	    "Transform",
-		sol::base_classes, sol::bases<GuiNode>(),
-	    "get_value", [](Ptr<GuiTransform> self) {
-		    return getValue<glm::mat4>(self);
-	    },
-	    "set_value",
-	    [this](Ptr<GuiTransform> self, float value, const ImVec2& coords) {
-		    const auto glmCoords = glm::vec2(coords.x, coords.y);
-		    const auto result = self->getNodebase()->setValue(value, glmCoords);
-		    if (result.status != Core::SetValueResult::Status::Ok)
-		    {
-			    print(result.message);
-		    }
-	    },
-	    // get default value
-	    "get_float", &getDefaultValue<float>, "get_vec3", &getDefaultValue<glm::vec3>, "get_vec3",
-	    &getDefaultValue<glm::vec4>,
-	    // set default value
-	    "set_float", &setDefaultValue<float>, "set_vec3", &setDefaultValue<glm::vec3>, "set_vec4",
-	    &setDefaultValue<glm::vec4>,
-	    // synergies, ...
-	    "is_valid",
-	    [](Ptr<GuiTransform> self) {
-		    return self->getNodebase()->as<Core::Transform>()->isValid();
-	    },
-	    "is_locked",
-	    [](Ptr<GuiTransform> self) {
-		    return self->getNodebase()->as<Core::Transform>()->isLocked();
-	    },
-	    "is_in_sequence",
-	    [](Ptr<GuiTransform> self) {
-		    return self->getNodebase()->as<Core::Transform>()->isInSequence();
-	    },
-	    "lock",
-	    [](Ptr<GuiTransform> self) {
-		    self->getNodebase()->as<Core::Transform>()->lock();
-	    },
-	    "unlock",
-	    [](Ptr<GuiTransform> self) {
-		    self->getNodebase()->as<Core::Transform>()->unlock();
-	    },
-	    "has_synergies",
-	    [](Ptr<GuiTransform> self) {
-		    return self->getNodebase()->as<Core::Transform>()->hasSynergies();
-	    },
-	    "enable_synergies",
-	    [](Ptr<GuiTransform> self) {
-		    self->getNodebase()->as<Core::Transform>()->enableSynergies();
-	    },
-	    "disable_synergies",
-	    [](Ptr<GuiTransform> self) {
-		    self->getNodebase()->as<Core::Transform>()->disableSynergies();
-	    },
-	    sol::meta_function::construct,
-	    [this](const std::string& type) -> Ptr<GuiTransform> {
-		    const auto maybeType = EnumUtils::value<Core::ETransformType>(type);
-		    if (!maybeType.has_value())
-		    {
-			    print(fmt::format("Unknown transform \"{}\".", type));
-
-			    return nullptr;
-		    }
-
-		    const auto maybeTransform = g_TransformBuilder(type.c_str());
-		    if (!maybeTransform)
-		    {
-			    return nullptr;
-		    }
-		    const auto transform = *maybeTransform;
-		    const auto ID = transform->getNodebase()->getId();
-		    print(fmt::format("ID: {}", ID));
-
-		    return std::dynamic_pointer_cast<GuiTransform>(transform);
-	    });
-
-	m_Lua.new_usertype<GuiSequence>(
-	    "Sequence",
-	    sol::base_classes, sol::bases<GuiNode>(),
-	    "push", [this](GuiSequence& self, Ptr<GuiTransform> transform) {
-		    self.moveNodeToSequence(transform);
-	    },
-	    "push", [this](GuiSequence& self, Ptr<GuiTransform> transform, int index) {
-		    self.moveNodeToSequence(transform, index);
-	    },
-	    "pop", [this](GuiSequence& self, int index) -> Ptr<GuiTransform> {
-		    auto maybeTransform = self.getTransform(index);
-		    if (!maybeTransform.has_value())
-		    {
-			    print(fmt::format("{} is out of bounds", index));
-
-			    return nullptr;
-		    }
-
-		    auto transform = std::dynamic_pointer_cast<GuiTransform>(maybeTransform.value());
-		    self.moveNodeToWorkspace(transform);
-
-		    return transform;
-	    },
-	    sol::meta_function::construct, [this]() -> Ptr<GuiSequence> {
-		    auto sequence = Workspace::addNodeToNodeEditor<GuiSequence>();
-
-		    print(fmt::format("ID: {}", sequence->getNodebase()->getId()));
-
-		    return sequence;
+	    [](const glm::mat4& a, const glm::mat4& b) {
+		    return Math::eq(a, b);
 	    });
 
 	//
 
-	m_Lua.set_function("get_all_nodes", []() -> std::vector<Ptr<GuiNode>> {
-	  	return getNodeEditor().m_workspaceCoreNodes;
-	});
+	auto api = m_Lua["I3T"];
 
-	m_Lua.set_function("get_node", [this](Core::ID id) -> Ptr<GuiNode> {
-		const auto result = getNodeEditor().getNode<GuiNode>(id);
+	m_Lua.new_usertype<ScriptError>("ScriptError",
+		"line", &ScriptError::line,
+		"message", &ScriptError::message);
 
-		if (!result)
+	api["load_script"] = [this](const std::string& script) {
+		return runScript(script.c_str());
+	};
+
+	api["load_script_from"] = [this](const std::string& path) -> std::optional<ScriptError> {
+		std::ifstream file(path);
+		if (!file.is_open())
 		{
-			print(result.error().str());
-
-			return nullptr;
+			return ScriptError("failed to open file");
 		}
 
-		return result.value();
-	});
+		std::string script((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-	m_Lua.set_function("get_transform", [this](Core::ID id) -> Ptr<GuiTransform> {
-		const auto result = getNodeEditor().getNode<GuiTransform>(id);
-
-		if (!result)
-		{
-			print(result.error().str());
-
-			return nullptr;
-		}
-
-		return result.value();
-	});
-
-	m_Lua.set_function("delete", [](GuiNode& node) {
-		node.deleteActionDiwne();
-	});
-
-	//
-
-	m_Lua.set_function("eval", [this](const std::string& scriptSource) {
-		runScript(scriptSource.c_str());
-	});
-
-	m_Lua.set_function("eval_from_file", [this](const std::string& path) {
-		if (!fs::exists(fs::path(path)))
-		{
-			print("file does not exist");
-			return false;
-		}
-		return true;
-	});
-
-	m_Lua.set_function("save_script", [](const std::string& path) {
-		/// \todo
-	});
+		return runScript(script.c_str());
+	};
 
 	//
 
@@ -442,7 +153,7 @@ void ScriptingModule::onInit()
 		      "(sol " SOL_VERSION_STRING ").");
 	});
 
-	//
+	// Print redirection to the console
 
 	m_Lua.set_function("_AppendToBuffer", [this](const std::string& str) {
 		print(str);
@@ -464,58 +175,35 @@ void ScriptingModule::onInit()
 			_AppendToBuffer(printResult)
 		end
 )");
-
-	//
-
-	m_Lua.set_function("print_operator_types", [this]() {
-		const auto types = magic_enum::enum_names<Core::EOperatorType>();
-		for (const auto& t : types)
-		{
-			print(std::string(t));
-		}
-	});
-
-	m_Lua.set_function("print_transform_types", [this]() {
-		const auto types = magic_enum::enum_names<Core::ETransformType>();
-		for (const auto& t : types)
-		{
-			print(std::string(t));
-		}
-	});
-
-	m_Lua.set_function("print_workspace", [this]() {
-		const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
-		for (const auto& node : nodes)
-		{
-			const auto& coreNode = node->getNodebase();
-			const auto* op = coreNode->getOperation();
-
-			print(fmt::format("node {}, type {}", coreNode->getId(), op->keyWord));
-		}
-	});
-
-	//
-
-	m_Lua.set_function("load_scene", [](const std::string& path) {
-		/// \todo
-	});
-
-	m_Lua.set_function("save_scene", [](const std::string& path) {
-		/// \todo
-	});
 	// clang-format on
 
-	//-- Timers --------------------------------------------------------------------------------------------------------
+	//-- Timers and timeouts -------------------------------------------------------------------------------------------
 
-	m_Lua.set_function("set_timer", [this](uint64_t intervalMs, sol::protected_function callback) {
+	api["set_timer"] = [this](double intervalSeconds, sol::protected_function callback) {
 		callback.set_error_handler(m_Lua["print"]);
 
-		return m_chronos.setTimer(intervalMs, callback);
-	});
+		return m_chronos.setTimer(intervalSeconds, callback);
+	};
 
-	m_Lua.set_function("clear_timer", [this](Ptr<Timer> timer) {
-		m_chronos.clearTimer(timer);
-	});
+	api["clear_timer"] = [this](Ptr<Timer> timer) {
+		if (timer)
+		{
+			m_chronos.clearTimer(timer);
+		}
+	};
+
+	api["set_timeout"] = [this](double intervalSeconds, sol::protected_function callback) {
+		callback.set_error_handler(m_Lua["print"]);
+
+		return m_chronos.setTimeout(intervalSeconds, callback);
+	};
+
+	api["clear_timeout"] = [this](Ptr<Timer> timer) {
+		if (timer)
+		{
+			m_chronos.clearTimer(timer);
+		}
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 
@@ -531,21 +219,83 @@ void ScriptingModule::onClose()
 {
 	// Destroy timers before the workspace, because of weird DINWE nodes ownership issues.
 	m_chronos = {};
+
+	// This is a hack to remove all scripting nodes from the workspace.
+	// It must be done before destroying the Lua state, because the nodes are holding Lua objects.
+	auto& nodeEditor = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor();
+	auto& nodes = nodeEditor.m_workspaceCoreNodes;
+	for (auto& node : nodes)
+	{
+		if (node->getNodebase()->getOperation().keyWord != "Script")
+		{
+			continue;
+		}
+		if (auto scriptingNode = std::dynamic_pointer_cast<Workspace::ScriptingNode>(node))
+		{
+			// Associated script must be removed here, because it holds shared_ptr reference to the workspace
+			// node and would prevent it from being destroyed.
+			if (auto id = scriptingNode->getScriptId())
+			{
+				Workspace::removeScript(id.value());
+			}
+		}
+	}
+	nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
+	                           [](auto node) {
+		                           return node->getNodebase()->getOperation().keyWord == "Script";
+	                           }),
+	            nodes.end());
+	nodeEditor.deselectNodes();
+
+	// Destroy the Lua state to ensure that all workspace node will be destroyed along with their Lua objects.
+	m_Lua = {};
 }
 
-bool ScriptingModule::runScript(const char* luaSource)
+void ScriptingModule::clearTimers()
 {
+	m_chronos.clearTimers();
+}
+
+std::optional<ScriptError> ScriptingModule::runScript(const char* luaSource)
+{
+	// static int counter = 0;
+
 	try
 	{
-		m_Lua.safe_script(luaSource);
+		// auto chunkName = fmt::format("script_{}", counter++);
+		// m_Lua.safe_script(luaSource, chunkName);
+		auto result = m_Lua.safe_script(luaSource);
+		(void) result;
 	}
-	catch (const std::exception& e)
+	catch (const sol::error& e)
 	{
-		print(e.what());
-		return false;
+		std::string what(e.what());
+
+		/*
+		auto newlinePos = what.find('\n');
+		if (newlinePos != std::string::npos)
+		{
+		    what = what.substr(0, newlinePos);
+		}
+		 */
+
+		std::smatch match;
+		if (std::regex_search(what, match, SOL_ERROR_REGEX))
+		{
+			auto message = match[1].str();
+			auto errorType = match[2].str();
+			auto line = std::stoi(match[3]);
+			auto messageSuffix = match[4].str();
+
+			auto type = errorType == "runtime error" ? ScriptError::Type::RuntimeError : ScriptError::Type::SyntaxError;
+
+			return ScriptError(line, type, message + messageSuffix);
+		}
+
+		return ScriptError(what);
 	}
 
-	return true;
+	return std::nullopt;
 }
 
 void ScriptingModule::print(const std::string& str)

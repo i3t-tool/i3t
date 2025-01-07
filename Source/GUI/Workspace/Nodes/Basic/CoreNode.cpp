@@ -23,8 +23,8 @@
 using namespace Workspace;
 
 CoreNode::CoreNode(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
-    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation()->defaultLabel),
-      m_nodebase(nodebase), m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
+    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation().defaultLabel), m_nodebase(nodebase),
+      m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
       m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
                        diwne.getWorkAreaZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
@@ -201,6 +201,11 @@ Ptr<Core::Node> const CoreNode::getNodebase() const
 	return m_nodebase;
 }
 
+const std::string& CoreNode::getKeyword() const
+{
+	return m_nodebase->getOperation().keyWord;
+}
+
 int CoreNode::getNumberOfVisibleDecimal()
 {
 	return m_numberOfVisibleDecimal;
@@ -327,7 +332,7 @@ void CoreNode::popupContent()
 {
 	drawMenuSetEditable();
 
-	if (m_nodebase->getOperation()->isConstructor)
+	if (m_nodebase->getOperation().isConstructor)
 	{
 		drawMenuStoreValues(getNodebase());
 	}

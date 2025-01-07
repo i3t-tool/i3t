@@ -19,6 +19,7 @@ stages:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - "Dependencies/*"
+        - "Scripts/*"
         - .clang-format
         - .clang-tidy
         - .gitlab-ci.yml
@@ -28,12 +29,33 @@ stages:
         - "**/*.{h,cpp}"
 
 # Linting phase
+
 check-format:
   stage: lint
   rules:
     - !reference [.changes-rules, cpp]
   script:
     - bash Scripts/CheckFormat.sh
+
+clang-tidy:
+  stage: lint
+  allow_failure: true
+  rules:
+    - !reference [.changes-rules, cpp]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    - bash Scripts/RunClangTidy.sh
+
+cppcheck:
+  stage: lint
+  allow_failure: true
+  rules:
+    - !reference [ .changes-rules, cpp ]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    - bash Scripts/RunCppCheck.sh
 
 ###
 
@@ -42,10 +64,10 @@ build-app:
   rules:
     - !reference [.changes-rules, cpp]
   script:
-    - mkdir out && cd out
-    - cmake ..
-    - cmake --build . -j 8 --target I3T
-    - Scripts/CreateBundle.sh --suffix Linux Debug
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build --config Debug --target I3T -j 8
+    - apt update && apt install -y zip
+    - bash Scripts/CreateBundle.sh --suffix Linux Debug
   artifacts:
     paths:
       - Binaries
@@ -83,6 +105,17 @@ test:
     - xvfb-run Binaries/Debug/I3TTest
   dependencies:
     - build-tests
+
+test-e2e:
+    stage: test
+    rules:
+      - !reference [ .changes-rules, cpp ]
+    variables:
+      I3T_TEST_AUTO_RUN: "1"
+    script:
+        - xvfb-run Binaries/Debug/I3T
+    dependencies:
+        - build-app
 
 ###
 

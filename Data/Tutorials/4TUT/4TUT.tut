@@ -4,6 +4,7 @@ description: Nauč se pracovat s kamerami a projekčními maticemi
 thumbnail: thumb4.png
 language: cs
 scene: 4TUT/camera.scene
+layout: Data/Tutorials/4TUT/Tutorials.ini
 ---
 headline: Kamera, akce!
 

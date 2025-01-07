@@ -17,7 +17,6 @@
 #include <unordered_set>
 #include <vector>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Core/Nodes/Node.h"
@@ -44,6 +43,7 @@ private:
 	void visit(const Ptr<GuiTransform>& node) override;
 	void visit(const Ptr<GuiScreen>& node) override;
 	void visit(const Ptr<GuiModel>& node) override;
+	void visit(const Ptr<Workspace::ScriptingNode>& node) override;
 
 	/// id and position
 	///

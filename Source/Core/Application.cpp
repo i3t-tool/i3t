@@ -14,7 +14,6 @@
 
 #include <functional>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -78,7 +77,7 @@ bool Application::init()
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Allocate path to the imgui ini file on heap.
-	io.IniFilename = "Data/imgui.ini";
+	io.IniFilename = "Data/I3T.ini";
 
 	// Call implementation of init() in derived class
 	onInit();
@@ -91,7 +90,7 @@ bool Application::init()
 	return true;
 }
 
-void Application::run()
+int Application::run()
 {
 	// TODO: (DR) m_modules: I'm thinking it might be a good idea to use a data structure that would retain the module
 	// insertion order. That way there would be a consistent order in which modules are iterated/updated in. I suppose
@@ -99,11 +98,23 @@ void Application::run()
 	// "loop" of the application might save us some issues in case another C++ implementation decides to iterate in a
 	// different order.
 
+	int exitCode = 0;
+
+	CloseCommand::addListener([this, &exitCode](int result) {
+		exitCode = result;
+		close();
+	});
+
 	while (!m_shouldClose)
 	{
 		glfwPollEvents();
 
 		CommandDispatcher::get().execute();
+		if (m_shouldClose)
+		{
+			// Do not run the rest of the loop if the application is closing.
+			break;
+		}
 
 		beginFrame();
 
@@ -115,6 +126,8 @@ void Application::run()
 
 		endFrame();
 	}
+
+	return exitCode;
 }
 
 void Application::beginFrame()

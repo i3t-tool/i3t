@@ -1,0 +1,148 @@
+name: Code Quality
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+    paths:
+      - '.github/workflows/code-quality.yml'
+      - 'Source/**'
+      - 'Scripts/**'
+      - 'Test/**'
+      - '.clang-format'
+      - '.clang-tidy'
+      - 'CMakeLists.txt'
+
+jobs:
+  check-format:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run clang-format check
+        run: |
+          bash Scripts/CheckFormat.sh
+
+  cppcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run cppcheck
+        shell: bash
+        run: |
+          sudo apt-get install -y cppcheck
+          bash Scripts/RunCppCheck.sh
+
+  test:
+    strategy:
+      matrix:
+        # kind: [ 'Linux', 'Windows', 'macOS' ]
+        kind: [ 'Linux', 'Windows' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+          - kind: 'Windows'
+            os: windows-latest
+          # - kind: 'macOS'
+          #   os: macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - uses: ./.github/actions/test
+        if: ${{ matrix.kind == 'Linux' }}
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fPIC -fprofile-arcs -ftest-coverage"'
+
+      - uses: ./.github/actions/test
+        if: ${{ matrix.kind != 'Linux' }}
+
+#      - name: Run gcovr
+#        run: |
+#          python3 -m pip install gcovr
+#          gcovr --root build-test/CMakeFiles/I3TTest.dir/Source \
+#            --exclude /usr \
+#            --gcov-executable /usr/bin/gcov-12 \
+#            --xml
+
+  test-with-address-sanitizer:
+    # TODO: Solve errors with address sanitizer, then remove `continue-on-error: true`
+    continue-on-error: true
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -static-libasan" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"'
+
+  test-with-undefined-behavior-sanitizer:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - uses: ./.github/actions/test
+        with:
+          cmake_gcc_extra_args: '-DCMAKE_CXX_FLAGS="-fsanitize=undefined -fno-omit-frame-pointer" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=undefined"'
+
+  test-app:
+    strategy:
+      matrix:
+        kind: [ 'Linux', 'Windows' ]
+        include:
+          - kind: 'Linux'
+            os: ubuntu-latest
+          - kind: 'Windows'
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Build tests
+        uses: ./.github/actions/build
+        with:
+          target: 'I3T'
+          cmake_build_type: 'Debug'
+          jobs: '2'
+
+      - name: Run end-to-end tests
+        if: ${{ matrix.kind == 'Linux' }}
+        run: |
+          export I3T_TEST_AUTO_RUN=1
+          xvfb-run Binaries/Debug/I3T
+
+  clang-tidy:
+    runs-on: ubuntu-24.04
+    # TODO: Solve errors with clang-tidy, then remove `continue-on-error: true`
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run clang-tidy check
+        shell: bash
+        run: |
+          sudo apt-get install -y clang-tidy-17 libc++-17-dev libc++abi-17-dev
+          bash Scripts/RunClangTidy.sh

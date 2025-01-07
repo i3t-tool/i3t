@@ -1,8 +1,6 @@
 name: Release
 on:
   push:
-    branches:
-      - 'ci/**'
     tags:
       - '*'
 
@@ -14,15 +12,20 @@ jobs:
     name: Release
     strategy:
       matrix:
-        # kind: ['Linux', 'Windows', 'MacOS']
-        kind: ['Linux', 'Windows']
+        kind: ['Linux', 'Windows', 'macOS']
         include:
           - kind: 'Linux'
             os: ubuntu-latest
+            cmake_extra_args: ''
           - kind: 'Windows'
             os: windows-latest
-          # - kind: 'MacOS'
-          #   os: macos-latest
+            cmake_extra_args: ''
+          - kind: 'macOS'
+            os: macos-latest
+            compiler: 'gcc'
+            # Weirdly, the gcc is alias to clang on macOS, need to use gcc-14 with explicit version.
+            # And /usr/bin/gcc-14 is symlink to /opt/homebrew/bin/gcc-14
+            cmake_extra_args: '-DCMAKE_C_COMPILER=/opt/homebrew/bin/gcc-14 -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/gcc-14'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -30,18 +33,26 @@ jobs:
         with:
           submodules: 'true'
 
-      - name: Install Linux dependencies
-        if: matrix.kind == 'Linux'
-        run: |
-          sudo apt-get install -y build-essential g++-12 libgl-dev libopengl0 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
-          sudo rm -f /usr/bin/g++
-          sudo ln /usr/bin/g++-12 /usr/bin/g++
-
-      - name: Build
+      - name: "Remove me"
+        if : ${{ matrix.kind == 'macOS' }}
         shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --target I3T -j 2
+          echo $CC
+          echo $CXX
+          which gcc-14
+          gcc-14 --version
+          env | sort
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          target: 'I3T'
+          cmake_build_type: 'RelWithDebInfo'
+          cmake_extra_args: ${{ matrix.cmake_extra_args }}
+          jobs: '2'
 
       - name: Create bundle
         shell: bash

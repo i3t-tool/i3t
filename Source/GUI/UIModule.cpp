@@ -28,6 +28,8 @@
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "State/StateManager.h"
+#include "Tutorial/TutorialLoader.h"
+#include "Tutorial/TutorialManager.h"
 #include "UserData.h"
 #include "Utils/HSLColor.h"
 
@@ -38,6 +40,48 @@ using namespace UI;
 UIModule::~UIModule()
 {
 	delete m_menu;
+}
+
+
+static void* LayoutStateReadOpenFn(ImGuiContext*, ImGuiSettingsHandler*, const char* name)
+{
+	return (void*) App::getModule<UIModule>().getWindowManager().findDockableWindowByID(name).get();
+}
+
+static void LayoutStateReadLineFn(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line)
+{
+	IWindow* window = static_cast<IWindow*>(entry);
+	int isOpen = 0;
+	if (sscanf(line, "IsOpen=%d", &isOpen) == 1)
+	{
+		auto& g = *ImGui::GetCurrentContext();
+		if (!g.SettingsLoaded)
+		{
+			if (*window->getShowPtr() == false) // If window is not visible, do not open it
+			{
+				*window->getShowPtr() = isOpen;
+			}
+		}
+		else
+		{
+			*window->getShowPtr() = isOpen;
+		}
+	}
+}
+
+static void LayoutStateWriteAllFn(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf)
+{
+	LOG_INFO("Saving Layout information to file.");
+	if (App::getModule<UIModule>().getWindowManager().getDockableWindows().empty())
+	{
+		LOG_INFO("But there are no windows to save(handler name \"{}\").", handler->TypeName);
+	}
+	for (Ptr<IWindow> window : App::getModule<UIModule>().getWindowManager().getDockableWindows())
+	{
+		buf->appendf("[%s][%s]\n", handler->TypeName, window->getID());
+		buf->appendf("IsOpen=%d\n", window->isVisible());
+		buf->append("\n");
+	}
 }
 
 void UIModule::onInit()
@@ -75,7 +119,7 @@ void UIModule::onInit()
 		// m_windowManager.openModal<BeforeCloseModal>();
 		// m_windowManager.openConfirmModal<BeforeCloseStrategy>();
 		askBeforeExitScene([]() {
-			CloseCommand::dispatch();
+			CloseCommand::dispatch(0);
 		});
 	});
 
@@ -93,6 +137,24 @@ void UIModule::onInit()
 
 	// Apply theme to windows
 	m_currentTheme->apply();
+
+	LoadWindowLayoutFromFileCommand::addListener([this](std::string path) {
+		m_windowManager.loadLayout(path);
+	});
+
+	LoadWindowLayoutFromStringCommand::addListener([](std::string iniData) {
+		ImGui::LoadIniSettingsFromMemory(iniData.c_str(), iniData.size());
+	});
+
+	// New settings handler for Dear ImGui to save window layout
+	ImGuiSettingsHandler iniLayoutHandler;
+	iniLayoutHandler.TypeName = "Layout";
+	iniLayoutHandler.TypeHash = ImHashStr("Layout");
+	iniLayoutHandler.ReadOpenFn = LayoutStateReadOpenFn;
+	iniLayoutHandler.ReadLineFn = LayoutStateReadLineFn;
+	iniLayoutHandler.WriteAllFn = LayoutStateWriteAllFn;
+
+	ImGui::AddSettingsHandler(&iniLayoutHandler);
 }
 
 void UIModule::onBeginFrame()
@@ -110,6 +172,11 @@ void UIModule::onBeginFrame()
 
 void UIModule::onClose()
 {
+	// Save window layout before clearing windows
+	ImGui::SaveIniSettingsToDisk(ImGui::GetIO().IniFilename);
+	// and disable Dear ImGui saving
+	ImGui::GetIO().IniFilename = nullptr;
+
 	/// \todo MH - This may not be sufficient.
 	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	workspace->getNodeEditor().clear(); // We need to clear nodes here rather than later with destructors
@@ -330,13 +397,14 @@ void UIModule::loadFonts()
 	// (PF) reduced font ranges above -> font atlas 1024x2048
 
 	m_fonts = {
-	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},         //
-	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},          //
-	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},         //
-	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)},       //
-	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},        //
+	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},   //
+	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},    //
+	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},   //
+	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)}, //
+	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},  //
+	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},  //
+	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},  //
+	    {"RobotoMono14", loadFont("Data/Fonts/RobotoMono-Regular.ttf", 14.0f, fontScale, &lqConfig, ranges, false)},
 	    {"RobotoItalic16", loadFont("Data/Fonts/Roboto-Italic.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},    //
 	    {"UbuntuBold18", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 18.0f, fontScale, &lqConfig, ranges, false)},        //
 	    {"UbuntuBold24", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 24.0f, fontScale, &lqConfig, ranges, false)},        //
@@ -441,3 +509,88 @@ void UIModule::buildDockspace()
 		throw std::runtime_error("ImGui Docking is not enabled!");
 	}
 }
+
+
+Memento UIModule::saveScene(Scene* scene)
+{
+	rapidjson::Document doc;
+	doc.SetObject();
+
+	rapidjson::Document::AllocatorType& a = doc.GetAllocator();
+
+	rapidjson::Value layout(rapidjson::kObjectType);
+	size_t iniDataSize = 0;
+	const char* iniData = ImGui::SaveIniSettingsToMemory(&iniDataSize);
+
+	rapidjson::Value iniDataValue(rapidjson::kStringType);
+	iniDataValue.SetString(iniData, iniDataSize, a);
+	layout.AddMember("iniData", iniDataValue, a);
+	doc.AddMember("layout", layout, a);
+
+	rapidjson::Value tutorialData(rapidjson::kObjectType);
+	tutorialData.AddMember("LanguageId", (int) TutorialManager::instance().getLanguage(), a);
+	if (TutorialManager::instance().getTutorial())
+	{
+		rapidjson::Value currentTutorial(rapidjson::kStringType);
+		std::string currentTutorialName = TutorialManager::instance().getTutorial()->m_header->m_filename.string();
+		currentTutorial.SetString(currentTutorialName.c_str(), currentTutorialName.size(), a);
+		tutorialData.AddMember("CurrentTutorial", currentTutorial, a);
+	}
+	tutorialData.AddMember("CurrentStep", TutorialManager::instance().getStep(), a);
+	doc.AddMember("tutorialData", tutorialData, a);
+
+	return doc;
+}
+
+void UIModule::loadScene(const Memento& memento, Scene* scene)
+{
+	if (memento.HasMember("layout"))
+	{
+		const auto& layout = memento["layout"];
+		if (layout.HasMember("iniData"))
+		{
+			std::string iniData = layout["iniData"].GetString();
+			LoadWindowLayoutFromStringCommand::dispatch(iniData);
+		}
+	}
+	else
+	{
+		LOG_WARN("Cannot load scene layout data! No 'layout' entry found!");
+	}
+
+	if (memento.HasMember("tutorialData"))
+	{
+		const auto& tutorialData = memento["tutorialData"];
+		if (tutorialData.HasMember("LanguageId"))
+		{
+			TutorialManager::instance().setLanguage((ETutorialLanguage) tutorialData["LanguageId"].GetInt());
+		}
+		if (tutorialData.HasMember("CurrentTutorial"))
+		{
+			std::string currentTutorialName = tutorialData["CurrentTutorial"].GetString();
+			auto header = TutorialManager::instance().findTutorialHeader(currentTutorialName);
+			if (header)
+			{
+				auto tutorial = TutorialLoader::loadTutorial(header);
+				SetTutorialCommand::dispatch(tutorial);
+				LOG_INFO("Tutorial " + header->m_title + " loaded");
+			}
+		}
+		if (tutorialData.HasMember("CurrentStep"))
+		{
+			SetTutorialStepCommand::dispatch(tutorialData["CurrentStep"].GetInt());
+		}
+	}
+	else
+	{
+		LOG_WARN("Cannot load scene tutorial data! No 'tutorialData' entry found!");
+	}
+}
+void UIModule::clearScene() {}
+
+Memento UIModule::saveGlobal()
+{
+	return emptyMemento();
+}
+void UIModule::loadGlobal(const Memento& memento) {}
+void UIModule::clearGlobal() {}
