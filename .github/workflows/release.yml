@@ -12,21 +12,36 @@ jobs:
     name: Release
     strategy:
       matrix:
-        # kind: ['Linux', 'Windows', 'MacOS']
-        kind: ['Linux', 'Windows']
+        kind: ['Linux', 'Windows', 'macOS']
         include:
           - kind: 'Linux'
             os: ubuntu-latest
+            cmake_extra_args: ''
           - kind: 'Windows'
             os: windows-latest
-          # - kind: 'MacOS'
-          #   os: macos-latest
+            cmake_extra_args: ''
+          - kind: 'macOS'
+            os: macos-latest
+            compiler: 'gcc'
+            # Weirdly, the gcc is alias to clang on macOS, need to use gcc-14 with explicit version.
+            # And /usr/bin/gcc-14 is symlink to /opt/homebrew/bin/gcc-14
+            cmake_extra_args: '-DCMAKE_C_COMPILER=/opt/homebrew/bin/gcc-14 -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/gcc-14'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           submodules: 'true'
+
+      - name: "Remove me"
+        if : ${{ matrix.kind == 'macOS' }}
+        shell: bash
+        run: |
+          echo $CC
+          echo $CXX
+          which gcc-14
+          gcc-14 --version
+          env | sort
 
       - name: Setup environment
         uses: ./.github/actions/setup-environment
@@ -36,6 +51,7 @@ jobs:
         with:
           target: 'I3T'
           cmake_build_type: 'RelWithDebInfo'
+          cmake_extra_args: ${{ matrix.cmake_extra_args }}
           jobs: '2'
 
       - name: Create bundle
