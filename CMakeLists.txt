@@ -57,7 +57,12 @@ endif()
 # Link C++17 filesystem library.
 if (UNIX)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # TODO: Temporary disable warnings for Clang to get the build on macOS working.
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+    endif ()
 endif()
 
 # ---------- Set VS specific properties. -----------------------

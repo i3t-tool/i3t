@@ -3,10 +3,6 @@
 I3T.workspace.set_work_area(Vec2.new(160.0, 80.0), Vec2.new(1300.0, 890.0))
 I3T.workspace.set_zoom(1.25)
 
--- TODO
--- "numberOfDecimals": 1,
--- "LOD": "Full",
-
 local sequence = Sequence.new()
 sequence:set_position(Vec2.new(250.0, 300.0))
 
