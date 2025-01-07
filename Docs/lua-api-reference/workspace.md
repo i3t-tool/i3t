@@ -139,6 +139,15 @@ Returns true if the operation was successful.
 Set the value of the operator to the given `value`.
 Returns true if the operation was successful.
 
+#### method `set_value(value: Quat): boolean`
+
+Set the value of the operator to the given `value`.
+Returns true if the operation was successful.
+
+#### method `set_value(value: Mat4): boolean`
+
+Set the value of the operator to the given `value`.
+Returns true if the operation was successful.
 
 ### `Transform`
 
