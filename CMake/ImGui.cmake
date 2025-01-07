@@ -1,5 +1,8 @@
-file(GLOB_RECURSE IMGUI_TEST_ENGINE_SOURCE
-        "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_test_engine/imgui_test_engine/*.cpp")
+set(IMGUI_TEST_ENGINE_SOURCE "")
+if (NOT I3T_BUILD_WASM)
+    file(GLOB_RECURSE IMGUI_TEST_ENGINE_SOURCE
+            "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_test_engine/imgui_test_engine/*.cpp")
+endif ()
 
 set(I3T_IMGUI_SOURCE
         ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp

@@ -28,11 +28,14 @@ include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/rttr/src)
 include_directories(Dependencies/rttr-generated/src)
 include_directories(Dependencies/sol2/include)
-include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
 include_directories(Dependencies/ImGuiColorTextEdit)
 include_directories(Dependencies/ImGuizmo/ImGuizmo)
 include_directories(${OPENGL_INCLUDE_DIRS})
+
+if (NOT I3T_BUILD_WASM)
+    include_directories(Dependencies/spdlog/include)
+endif ()
 
 # ========== BUILD CONFIGURATION ==============================
 # ---------- Setup compiler parameters. ------------------------
@@ -57,8 +60,14 @@ endif()
 # Link C++17 filesystem library.
 if (UNIX)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+    if (NOT I3T_BUILD_WASM)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+    endif()
 endif()
+
+if (I3T_BUILD_WASM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+endif ()
 
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
@@ -87,6 +96,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
 # =============================================================
 
 # ========== Set project specific parameters. =================
+set(I3T_BUILD_WASM CACHE STRING "Build for WebAssembly.")
+
 set(CONFIGURATION_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS False CACHE BOOL "Assimp should not build build tests.")
@@ -112,10 +123,14 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW should not build docs.")
 include(CMake/ImGui.cmake)
 
 add_subdirectory(Dependencies/assimp)
-add_subdirectory(Dependencies/glfw)
+
+if (NOT I3T_BUILD_WASM)
+    add_subdirectory(Dependencies/glfw)
+    add_subdirectory(Dependencies/spdlog)
+endif ()
+
 add_subdirectory(Dependencies/lua)
 add_subdirectory(Dependencies/sol2)
-add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 add_subdirectory(Dependencies/ImGuizmo)
 
@@ -145,6 +160,10 @@ file(GLOB_RECURSE I3T_SOURCE
     "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
+
+if (I3T_BUILD_WASM)
+    list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/pgr-framework/src/gl_core_4_4.c")
+endif()
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
 # =============================================================

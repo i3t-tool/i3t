@@ -15,10 +15,9 @@
 #include <string>
 
 #include "glm/vec2.hpp"
-#include "spdlog/fmt/fmt.h"
 
 #include "Core/Input/InputController.h"
-#include <Core/Types.h>
+#include "Core/Types.h"
 
 #define I3T_WINDOW(WindowType)                                                                                         \
 public:                                                                                                                \

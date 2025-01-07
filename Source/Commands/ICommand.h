@@ -12,8 +12,6 @@
  */
 #pragma once
 
-#include "Core/Application.h"
-
 class ICommand
 {
 public:

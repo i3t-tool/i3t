@@ -50,6 +50,7 @@ bool operator&&(bool lhs, const Result<V, E>& rhs)
 
 #define Err(x) std::unexpected(x);
 
+#ifndef EMSCRIPTEN
 template <>
 struct fmt::formatter<Error>
 {
@@ -65,3 +66,4 @@ struct fmt::formatter<Error>
 		return fmt::format_to(ctx.out(), "{}", error.str());
 	};
 };
+#endif

@@ -13,7 +13,6 @@
 #include <filesystem>
 
 #include "rttr/registration.h"
-#include "rttr/type.h"
 
 #include "glm/glm.hpp"
 

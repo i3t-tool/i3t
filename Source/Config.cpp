@@ -12,11 +12,6 @@
  */
 #include "Config.h"
 
-#include <istream>
-
-#include "Core/Resources/ResourceManager.h"
-#include "Utils/JSON.h"
-
 // statics
 
 std::string Config::VERSION = "v006";

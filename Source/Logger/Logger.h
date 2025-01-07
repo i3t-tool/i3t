@@ -25,9 +25,33 @@
 #include <stack>
 #include <string>
 
+#ifndef EMSCRIPTEN
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
+#else
+namespace spdlog
+{
+class logger
+{
+public:
+	template <typename T, typename... Args>
+	void debug(T&& fmt, Args&&... args) {}
+
+	template <typename T, typename... Args>
+	void info(T&& fmt, Args&&... args) {}
+
+	template <typename T, typename... Args>
+	void warn(T&& fmt, Args&&... args) {}
+
+	template <typename T, typename... Args>
+	void error(T&& fmt, Args&&... args) {}
+
+	template <typename T, typename... Args>
+	void critical(T&& fmt, Args&&... args) {}
+};
+}
+#endif
 
 #ifdef _DEBUG
 #define LOG_DEBUG(...) Logger::getInstance().getAppLogger()->debug(__VA_ARGS__)

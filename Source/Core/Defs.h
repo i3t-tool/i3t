@@ -23,7 +23,20 @@
 #include <variant>
 
 #include "magic_enum.hpp"
+
+#ifndef EMSCRIPTEN
 #include "spdlog/formatter.h"
+#include "spdlog/fmt/fmt.h"
+#else
+namespace fmt
+{
+template <typename T, typename... Args>
+std::string format(const T& str, Args&&... args)
+{
+	return str;
+}
+}
+#endif
 
 #include "Core/Types.h"
 #include "Logger/Logger.h"

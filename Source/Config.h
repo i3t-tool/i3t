@@ -14,13 +14,10 @@
 
 #include <glm/glm.hpp>
 
-#include <fstream>
-#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "Core/Resources/Resource.h"
 #include "Utils/FilesystemUtils.h"
 
 // TODO: (DR) This stuff should probably be moved to StateManager, especially the root and sceneRoot

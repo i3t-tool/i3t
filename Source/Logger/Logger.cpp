@@ -18,10 +18,12 @@
 #undef GetObject
 #endif
 
+#ifndef EMSCRIPTEN
 #include "spdlog/cfg/env.h"
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
+#endif
 
 #include "Config.h"
 #include "Core/Window.h"
@@ -63,6 +65,7 @@ void Logger::initLogger(int argc, char* argv[])
 {
 	loadStrings();
 
+#ifndef EMSCRIPTEN
 	spdlog::set_level(spdlog::level::info);
 	spdlog::set_pattern(DEFAULT_LOG_PATTERN);
 
@@ -91,6 +94,7 @@ void Logger::initLogger(int argc, char* argv[])
 	spdlog::register_logger(mouseLogger);
 
 	spdlog::cfg::load_env_levels();
+#endif
 }
 
 void Logger::endLogger() const

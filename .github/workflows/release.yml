@@ -50,3 +50,19 @@ jobs:
           files: "I3T*.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  wasm:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup environment
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake emscripten
+          emcmake cmake -B build -S . -DI3T_BUILD_WASM=1
+          cmake --build build --target I3T -j 3

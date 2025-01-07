@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <functional>
 #include <list>
 #include <set>
 #include <utility>
