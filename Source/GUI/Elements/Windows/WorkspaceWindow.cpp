@@ -168,7 +168,7 @@ void WorkspaceWindow::render()
 				ImGui::MenuItem("Enable", nullptr, &(Workspace::g_diwne->m_diwneDebug));
 				ImGui::MenuItem("Layout", nullptr, &(Workspace::g_diwne->m_diwneDebugLayout));
 				ImGui::MenuItem("Interaction", nullptr, &(Workspace::g_diwne->m_diwneDebugInteractions));
-				ImGui::MenuItem("Extras 2", nullptr, &(Workspace::g_diwne->m_diwneDebugExtra2));
+				ImGui::MenuItem("Objects", nullptr, &(Workspace::g_diwne->m_diwneDebugObjects));
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}
@@ -271,10 +271,6 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 
 void WorkspaceWindow::clearScene()
 {
-	for (auto& node : getNodeEditor().m_workspaceCoreNodes)
-	{
-		node->deleteActionDiwne();
-	}
 	getNodeEditor().clear();
 }
 

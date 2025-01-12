@@ -23,6 +23,7 @@
 #include "glm/glm.hpp"
 
 #include "DIWNE/diwne_include.h"
+#include "diwne_config.h" // Some DIWNE trickery to use I3T logger
 
 #include "Config.h"
 #include "Core/Result.h"
@@ -139,11 +140,7 @@ public:
 
 	std::vector<Ptr<CoreNode>> getSelectedNodes();
 
-	std::vector<CoreLink*> m_linksToDraw;
-	std::vector<CoreLink> m_linksCameraToSequence;
-
-	Ptr<DIWNE::Link> m_cameraLink;
-
+	// TODO: Restore functionality
 	/**
 	 * \brief For a given input, create appropriate constructor box and plug it to this input
 	 * \return true if successful (input was not a Ptr)
@@ -163,8 +160,9 @@ public:
 	template <typename T>
 	void addTypeConstructorNode()
 	{
-		CoreInPin* pin = getLastActivePin<CoreInPin>().get();
-		auto newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
+		// TODO: Rework
+		CorePin* pin = getLastActivePin<CorePin>().get();
+		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
 		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
 		              ->getOutputs()
 		              .at(0)

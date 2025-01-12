@@ -49,8 +49,6 @@ protected:
 	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
 	DrawModeNodePosition m_nodePosMode{OnItsPosition};
-	bool m_toDelete = false; ///< Set to true after node delete action
-	bool m_render = true;    ///< used to hide nodes in tutorial scenes (action "toggleNodeWorkspaceVisibility")
 
 public:
 	bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
@@ -95,33 +93,27 @@ public:
 	//  Why not move the handling into the NodeEditor content method?
 	//  What does a node care about last diwneAction, that should be part of the editor context!
 	//  DiwneActions will probably be reworked anyway so take that into account
+
+	// TODO: The reason is we want to set last active node if a logical update occurred.
+	//  We can probably handle that in the NodeEditor content method rather than using a special method (to avoid
+	//  confusion of what this seemingly generic method is for, it is not generic, its specifcally for rendering nodes
+	//  by the node editor
 	template <typename T>
 	void drawNodeDiwne(DrawInfo& context, DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
 	                   DrawMode drawMode = DrawMode::Interacting)
 	{
 		m_nodePosMode = nodePosMode;
 
-		if (!getRender()) // hide the node and its input wire in the tutorial scene
+		if (!isRendered())
 			return;
 
 		DrawInfo drawResult = drawDiwneEx(context);
 
-		if (drawResult.logicalUpdates && !m_toDelete)
+		if (drawResult.logicalUpdates && !m_destroy)
 		{
 			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-			if (diwne.getDiwneActionActive() == DiwneAction::None ||
-			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent // no specific action
-			)
-			{
-				diwne.setDiwneAction(DiwneAction::InteractingContent);
-			}
 		}
 	}
-
-	// TODO: I'm pretty sure this is dumb, why use two separate delete flags for base and derived nodes?? <<<<<<<<<<
-	// TODO: Investigate usage of these methods
-	void deleteActionDiwne();
-	virtual void deleteAction(){};
 
 	bool setSelected(const bool selected) override;
 
@@ -129,6 +121,8 @@ public:
 	//	bool processUnselect() override;
 	//
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
+
+	void onDestroy(bool logEvent) override;
 
 	void setNodePositionDiwne(ImVec2 const& position)
 	{
@@ -143,15 +137,6 @@ public:
 	{
 		m_nodePositionDiwne += amount;
 		translate(amount);
-	};
-
-	bool getRender() const
-	{
-		return m_render;
-	};
-	void setRender(bool render)
-	{
-		m_render = render;
 	};
 };
 

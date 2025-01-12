@@ -13,11 +13,12 @@
 #include "Link.h"
 
 #include "NodeEditor.h"
+#include "Pin.h"
 
 namespace DIWNE
 {
 Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"*/)
-    : DiwneObject(diwne, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
+    : DiwneObject(diwne, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0))
 {}
 
 void Link::updateSquareDistanceMouseFromLink()
@@ -41,6 +42,11 @@ bool Link::isLinkOnWorkArea()
 	return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
 }
 
+bool Link::isPlugged()
+{
+	return m_startPin != nullptr && m_endPin != nullptr;
+}
+
 void Link::initialize(DrawInfo& context) {}
 void Link::initializeDiwne(DrawInfo& context)
 {
@@ -58,6 +64,18 @@ void Link::initializeDiwne(DrawInfo& context)
 	updateEndpoints();
 	updateControlPoints();
 	updateSquareDistanceMouseFromLink();
+}
+
+void Link::end(DrawInfo& context)
+{
+	DIWNE_DEBUG_OBJECTS((diwne), {
+		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+		ImGui::GetForegroundDrawList()->AddText(
+		    diwne.diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		    (std::string() + m_labelDiwne + "\nstart: " + (m_startPin ? m_startPin->m_labelDiwne : "null") +
+		     "\nend: " + (m_endPin ? m_endPin->m_labelDiwne : "null"))
+		        .c_str());
+	});
 }
 
 void Link::updateLayout(DrawInfo& context)
@@ -111,6 +129,94 @@ void Link::content(DrawInfo& context)
 		diwne.m_renderer->AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.m_renderer->AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 	});
+}
+
+void Link::updateEndpoints()
+{
+	Pin* startPin = getStartPin();
+	Pin* endPin = getEndPin();
+	if (startPin)
+		m_startDiwne = startPin->getConnectionPoint();
+	if (endPin)
+		m_endDiwne = endPin->getConnectionPoint();
+}
+
+void Link::setStartPoint(const ImVec2& mStartDiwne)
+{
+	m_startDiwne = mStartDiwne;
+}
+void Link::setEndPoint(const ImVec2& mEndDiwne)
+{
+	m_endDiwne = mEndDiwne;
+}
+bool Link::connect(Pin* startPin, Pin* endPin, bool logEvent)
+{
+	// Aside from special cases both ends of the link should be connected or not
+	// If both ends are already plugged and the ends differ from the new ones we must unplug them
+	if (isPlugged())
+	{
+		if (m_startPin != startPin)
+			disconnectPin(true, logEvent);
+		if (m_endPin != endPin)
+			disconnectPin(false, logEvent);
+	}
+
+	bool alreadyExisted = false;
+	assert(startPin != nullptr);
+	assert(endPin != nullptr);
+
+	if (!startPin->registerLink(this))
+		alreadyExisted = true;
+	if (!endPin->registerLink(this))
+		alreadyExisted = true;
+
+	setStartPin(startPin);
+	setEndPin(endPin);
+
+	startPin->onPlug(endPin, logEvent);
+	endPin->onPlug(startPin, logEvent);
+	return alreadyExisted;
+}
+
+bool Link::disconnect(bool logEvent)
+{
+	bool success = true;
+	success &= disconnectPin(true, logEvent);
+	success &= disconnectPin(false, logEvent);
+	return success;
+}
+
+bool Link::disconnectPin(Pin* pin, bool logEvent)
+{
+	bool isStartPin = pin == getStartPin();
+	bool isEndPin = pin == getEndPin();
+	if (!isStartPin && !isEndPin)
+	{
+		DIWNE_WARN("Attempted to disconnect link from a pin it is not attached to!");
+		return false;
+	}
+	return disconnectPin(isStartPin, logEvent);
+}
+
+bool Link::disconnectPin(bool startOrEndPin, bool logEvent)
+{
+	Pin* pin = startOrEndPin ? getStartPin() : getEndPin();
+	if (pin != nullptr)
+	{
+		if (!pin->unregisterLink(this))
+			return false;
+	}
+	startOrEndPin ? setStartPin(nullptr) : setEndPin(nullptr);
+
+	// Call the onUnplug callback
+	if (pin != nullptr)
+		pin->onUnplug(logEvent);
+	return true;
+}
+
+void Link::onDestroy(bool logEvent)
+{
+	disconnect(logEvent);
 }
 
 } /* namespace DIWNE */

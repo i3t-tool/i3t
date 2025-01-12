@@ -31,21 +31,20 @@ bool Node::bypassFocusForInteractionAction()
 	return (m_isHeld || m_top.getRect().Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos())));
 }
 
-void Node::deleteAction()
-{
-	// TODO: (DR) A little confused why we don't use the superclass m_toDelete boolean flag for this but whatever
-	m_removeFromWorkspaceWindow = true;
-}
-
 void Node::drawMenuDelete()
 {
 	if (ImGui::MenuItem("Delete", "Delete"))
 	{
-		deleteActionDiwne();
+		destroy();
 	}
 }
 
 void Node::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuDelete();
+}
+
+void Node::onDestroy(bool logEvent)
+{
+	m_removeFromWorkspaceWindow = true;
 }

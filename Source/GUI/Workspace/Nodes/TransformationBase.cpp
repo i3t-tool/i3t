@@ -247,19 +247,11 @@ void TransformationBase::drawMenuSetDataMap()
 	}
 }
 
-void TransformationBase::deleteAction()
+void TransformationBase::onDestroy(bool logEvent)
 {
-	Node::deleteAction();
+	CoreNode::onDestroy(logEvent);
 	m_removeFromSequence = true;
 	m_parentSequence.reset();
-}
-
-void TransformationBase::drawMenuDelete()
-{
-	if (ImGui::MenuItem("Delete"))
-	{
-		deleteActionDiwne();
-	}
 }
 
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()

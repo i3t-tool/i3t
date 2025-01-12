@@ -118,6 +118,7 @@ void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)
 
 void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node)
 {
+	// TODO: What the actual x is this?
 	node->setRemoveFromWorkspace(false);
 	dynamic_pointer_cast<TransformationBase>(node)->setRemoveFromSequence(true);
 	//	node->m_selectable = true;
@@ -254,25 +255,26 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		return;
 	}
 
-	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
-	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
-	{
-		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-		if (dragedNode != nullptr &&
-		    (dragedNode->aboveSequence == 0 ||
-		     dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
-		                                                    && not above other sequence */
-		{
-			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
-			if (position_of_draged_node_in_sequence >= 0)
-			{
-				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
-			}
-#ifdef WORKSPACE_DEBUG
-			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
-#endif // WORKSPACE_DEBUG
-		}
-	}
+	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
+	//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
+	//	{
+	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
+	//		if (dragedNode != nullptr &&
+	//		    (dragedNode->aboveSequence == 0 ||
+	//		     dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
+	//		                                                    && not above other sequence */
+	//		{
+	//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
+	//			if (position_of_draged_node_in_sequence >= 0)
+	//			{
+	//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
+	//			}
+	// #ifdef WORKSPACE_DEBUG
+	//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
+	// #endif // WORKSPACE_DEBUG
+	//		}
+	//	}
 
 	// Check if transform is marked for removal.
 	{
@@ -350,20 +352,21 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		inner_interaction_happen |= true;
 	}
 
+	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	/* pop NodeFrom Sequence */
-	if (m_drawMode2 == DIWNE::DrawMode::Interacting && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
-	{
-		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-		if (dragedNode != nullptr) /* only transformation can be in Sequence*/
-		{
-			if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
-			{
-				moveNodeToWorkspace(dragedNode);
-				inner_interaction_happen = false; /* do not set sequence as interacting node -> draged
-				                                     transformation should be only interacting */
-			}
-		}
-	}
+	//	if (m_drawMode2 == DIWNE::DrawMode::Interacting && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+	//	{
+	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
+	//		if (dragedNode != nullptr) /* only transformation can be in Sequence*/
+	//		{
+	//			if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+	//			{
+	//				moveNodeToWorkspace(dragedNode);
+	//				inner_interaction_happen = false; /* do not set sequence as interacting node -> draged
+	//				                                     transformation should be only interacting */
+	//			}
+	//		}
+	//	}
 
 	if (inner_interaction_happen)
 		context.update(true, true, true);

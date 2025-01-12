@@ -423,15 +423,16 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImVec2 pinConnectionPoint =
 		    ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
+		for (const auto& pin : m_workspaceInputs)
+		{
+			pin->setRendered(false);
+		}
 		for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP,
 		                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 		{
-			Ptr<CoreInPin> const pin = m_workspaceInputs.at(i);
+			Ptr<CorePin> const pin = m_workspaceInputs.at(i);
 			pin->setConnectionPointDiwne(pinConnectionPoint);
-			if (pin->isConnected())
-			{
-				wd.m_linksToDraw.push_back(&pin->getLink());
-			}
+			pin->setRendered(true);
 		}
 	}
 	else if (m_levelOfDetail == LevelOfDetail::Label)
@@ -591,10 +592,6 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
 					pin->setConnectionPointDiwne(pinConnectionPoint);
-					if (pin->isConnected())
-					{
-						wd.m_linksToDraw.push_back(&pin->getLink());
-					}
 				}
 			}
 		}

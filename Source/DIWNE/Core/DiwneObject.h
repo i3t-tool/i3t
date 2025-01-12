@@ -19,8 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "diwne_imgui.h"
-
+#include "diwne_actions.h"
 #include "diwne_common.h"
 
 namespace DIWNE
@@ -30,8 +29,6 @@ typedef unsigned int ID;
 class NodeEditor;
 
 // TODO JH: some attributes should be private/protected // Agreed
-
-enum DiwneAction : unsigned int;
 
 /*! \brief Drawing mode of DiwneObject  */
 enum DrawMode
@@ -62,6 +59,7 @@ public:
 	std::string m_popupIDDiwne; /**< Used for identifying what element raise popup */
 
 	ImRect m_rect;
+	bool m_destroy{false}; ///< Indicates the object is to be deleted
 
 	std::string m_parentLabel; ///< Sets the parent object of object, relevant in hover hierarchy.
 
@@ -76,6 +74,14 @@ public:
 	DrawMode m_drawMode2; // TODO: Rename, experimental (!)
 
 	//
+
+	// TODO: Workspace nodes use a LOD system, it might be a good idea to generalize that system into the DIWNE library
+	//  itself. The LOD system is also, coincidentally, useful as a true LOD system to improve performance (despite the
+	//  name meaning something else originally) For higher zooms the need of a LOD object simplification system is
+	//  rather big.
+	//  As for the m_rendered flag below, it could be replaced with a LOD level like "Hidden" or "DoNotRender".
+	//  Although that might be unnecessary as a basic rendered boolean flag is probably useful anyway.
+	bool m_rendered{true}; ///< Whether the object should be rendered
 
 	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode) <<<<<<<<<<<<<<<<<<<<<<<
 	bool m_drawnThisFrame{false};
@@ -152,7 +158,7 @@ public:
 	// TODO: Docs
 	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
-	// Lifecycle/Content methods
+	// Frame lifecycle/Content methods
 	// =============================================================================================================
 
 	// TODO: Wrapper thought: Not every method seemingly needs a wrapper, maybe we could bunch up the "diwne" code into
@@ -222,6 +228,7 @@ public:
 	// =============================================================================================================
 
 	// TODO: Add detailed docs to the main lifecycle functions (begin, content, end)
+
 	// TODO: + Solid processInteraction docs!
 	//  We should explain the "duality" of interaction, specifically that ImGui interactions and diwne interactions
 	//  are slightly different in the sense that ImGui interactions are handled directly in the drawing methods
@@ -232,22 +239,19 @@ public:
 	//  drawn object, which we only know at the end of drawing (in the endDiwne() method).
 	//  endDiwne method is the one that dispatches processInteractions AFTER the user end() method is called.
 
-	//	virtual bool processInteractions(); ///< react to interactions with this object */
-	//	virtual bool processInteractionsAlways(); ///< processes that happen even in allowInteraction() return false,
-	// but
-	//	                                          ///< object still has to be in DrawMode::Interaction
-	//	virtual bool processInteractionsDiwne();  /**< DIWNE wrapper */
+	/**
+	 * Marks the object for lazy deletion.
+	 * When the object is deleted and what deletion even means depends on the particular use case.
+	 * For example deletion of nodes and links is handled by the NodeEditor in the next frame.
+	 * @param logEvent The boolean flag passed to onDestroy(), can be used to determine where was destroy() called from.
+	 */
+	virtual void destroy(bool logEvent = true);
+	// TODO: Implement this, im still not sure if this should be called on the delete marking or the actual removal
+	//  Probably when marking as thats what the old Node::deleteAction() method did.
+	virtual void onDestroy(bool logEvent);
 
-	//
-
-	// TODO: Do we want to keep this purely virtual?
-	//  Or do we want each diwne object to keep and update its m_rect
-	//  BasicNode returns a composite of panel min maxes
-	//  What should Node return? What is a node? Just a square with single content?
-	//   It needs a rect as well doesn't it
-	//  Pin keeps its own pinRect
-
-	/**< return rectangle of object */
+	// TODO: Rename to just getRect()
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	inline virtual ImRect getRectDiwne() const
 	{
 		return m_rect;
@@ -258,6 +262,9 @@ public:
 	}
 	virtual void setPosition(const ImVec2& position);
 	virtual void translate(const ImVec2& vec);
+
+	bool isRendered() const;
+	void setRendered(bool mRendered);
 
 	virtual bool setSelected(bool const selected); ///< \return New state of selection
 	// TODO: Rename isSelected
@@ -298,10 +305,10 @@ public:
 
 	// Interaction toggles
 	// =============================================================================================================
-	virtual bool allowHover() const; // TODO: Rename focused to just "hover", gets triggered on mouseover
+	virtual bool allowHover() const;
 
 	//	virtual bool allowProcessFocusedForInteraction();
-	virtual bool allowPress() const;
+	virtual bool allowPress(const DrawInfo& context) const;
 	//	virtual bool allowProcessUnhold();
 	virtual bool allowDrag() const; // TODO: Refactor allowProcessDrag()
 	                                //	virtual bool allowProcessSelect();
@@ -319,6 +326,7 @@ protected:
 	virtual void processPressAndReleaseDiwne(DrawInfo& context);
 	//	void processUnholdDiwne(DrawInfo& context);
 	virtual void processDragDiwne(DrawInfo& context);
+
 	virtual void processSelectDiwne(DrawInfo& context);
 	//	void processUnselectDiwne(DrawInfo& context);
 	virtual void processPopup(DrawInfo& context);
@@ -330,17 +338,9 @@ protected:
 	// Trigger methods (Formerly bypass methods)
 	// =============================================================================================================
 
-	// TODO: Refactor / Restructure
-	//   Following actions have 4 associated methods: bypass, process, processDiwne and allowProcess
-	//   These could possibly be wrapped into some sort of an Action class or something just to keep things together
-	//   Furthermore bypass should be renamed, allowProcess possibly as well
-	//
-	//   Method usage:
-	//   bypass - method to check if action is triggered by user input (key is pressed, mouse is over etc.)
-	//   processDiwne - method call to check if the action should be triggered, called in the processInteraction step
-	//   process - a more user customizable? version of the processDiwne, currently implemented in DiwneObject too
-	//             not sure if this makes sense might need some changes
-	//   allowProcess - tests if the action is currently allowed in this state
+	// TODO: Rename to something clearer, keywords trigger or input.
+	//  isXXXTriggered might work, all these should be protected as well
+
 protected:
 	virtual bool isHoveredDiwne(); ///< Is mouse hovering over the object? Prerequisite for further interaction.
 	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
@@ -379,6 +379,12 @@ public:
 	virtual bool bypassTouchAction();    /**< action used for touching object - not interact with
 	                                        it, just move it to front of other objects */
 
+	// Miscellaneous
+	// =============================================================================================================
+public:
+	bool isDragging(DrawInfo& context);
+	void stopDrag(DrawInfo& context);
+
 	// =============================================================================================================
 	// END OF INTERACTION
 
@@ -396,26 +402,98 @@ public:
 	void showTooltipLabel(std::string const& label, ImColor const&& color);
 };
 
-// TODO: Outdated docs
+/*
+ * A persistent state storage holding information about multi-frame interactions.
+ * Each NodeEditor holds an instance of this state and sets a reference to it in the non-persistent DrawInfo context.
+ * By persistence we mean persistence across multiple frames.
+ */
+class InteractionState
+{
+public:
+	// TODO: Stuff below this is more persistent than above, and cannot really be "versioned" with the short counter.
+	//  Meaning finding the difference between two DrawInfos becomes a little meaningless
+	//  Thus it would be a good argument to wrap the stuff below into a different struct and keep that as a NodeEditor
+	//  member or keep a pointer to it in the context and just pass that along
+	//  (would help with copying performance as well)(although I don't particularly consider that to be an issue anyway)
 
-// TODO: Consider idea, make FrameContext flags an integer and count how many times it has been incremented
-//  An increment is like turning a flag to true, a zero flag is false
-//  => This way we can compare context before and after a draw call to get the latest change itself and react to it
-//  Solves the issue of a single global context "obscuring" changes in a single draw method.
-//  The context would have a method that would find the difference between two contexts (before/after) by subtraction
+	// TODO: Write docs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// Active action idea, we have a descriptor for the current "action", it has a source
+	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
+	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
 
-// Implementation note:
-// Each piece of drawing code gets passed a const FrameContext object and returns a new instance of the DrawResult
-// object. The returned DrawResult is used to modify the FrameContext object AFTER the method returns by the DIWNE
-// implementation.
-// This is all just a fancy way of keeping track of what occurred in a specific piece of drawing code and also keeping
-// track of what has occurred throughout a whole frame as the same FrameContext instance is passed along through the
-// drawing code and the individual changes are merged into it.
-//
-// This is currently used to store two crucial pieces of information:
-// 1. interacted - Whether the user has interacted with the object IN ANY WAY
-// 2. inputConsumed - And whether this interaction should also be exclusive to this object and not propagated further
-//                    to any other objects this frame.
+	//	std::string action;
+	//	std::string actionSource;
+	//	std::any actionData;
+	//	bool clearActionThisFrame{false};
+
+	std::unique_ptr<DiwneAction> action;
+
+	template <typename T, typename... Args>
+	T* setAction(Args&&... args)
+	{
+		setAction(std::make_unique<T>(std::forward<Args>(args)...));
+		return getAction<T>();
+	}
+
+	void setAction(std::unique_ptr<DiwneAction> action);
+
+	/// Clears the current action, either right away or at the end of the frame.
+	void clearAction(bool immediately = false);
+	bool isActionActive(const std::string& name);
+	/// Checks whether an action is active and its source is the passed source diwne label
+	bool isActionActive(const std::string& name, const std::string& source);
+	bool anyActionActive();
+
+	/**
+	 * Returns the current action casted to a specific type.
+	 * This method ASSUMES that we already know the action type ahead by calling isActionActive()!
+	 */
+	template <typename T>
+	T* getAction()
+	{
+		static_assert(std::is_base_of_v<DIWNE::DiwneAction, T>, "T must be derived from DIWNE::DiwneAction class.");
+#ifndef NDEBUG
+		if (action && dynamic_cast<T*>(action.get()) == nullptr)
+			assert(!"Invalid static cast!");
+#endif
+		return static_cast<T*>(action.get());
+	}
+
+	/**
+	 * Can be used to check if an action is active and return it if so.
+	 * @return Returns the specified action IF if it currently active. Otherwise null.
+	 */
+	template <typename T>
+	T* getActiveAction(const std::string& source = "")
+	{
+		static_assert(std::is_base_of_v<DIWNE::DiwneAction, T>, "T must be derived from DIWNE::DiwneAction class.");
+		T* ret = dynamic_cast<T*>(action.get());
+		if (ret != nullptr && !source.empty())
+		{
+			if (ret->source != source)
+				return nullptr;
+		}
+		return ret;
+	}
+
+	bool dragging{false};
+	bool dragEnd{false};
+	std::string dragSource; // TODO: If the above was changed, then this can be the source of the action
+	                        // TODO: Question then arises what if there are multiple active actions? Do we make those
+	                        // two above arrays? vectors?
+
+	// TODO: Docs to explain hover root and object parent references
+	/**
+	 * Used to specify which object can be handed hover when a hovered child object isn't a hover root.
+	 */
+	std::string hoverTarget;
+
+	/**
+	 * Some operations in the context are queued to be performed at the end of the frame / beginning of the next one.
+	 * This method performs those actions.
+	 */
+	void nextFrame();
+};
 
 /**
  * A structure used to relay information between DIWNE objects during their sequential construction/drawing
@@ -424,10 +502,13 @@ public:
  * drawn earlier already "captured" the input and other objects should ignore it.
  * An instance of this object is passed along the drawing code for any nested diwne objects and along the way it
  * collects information about what has already happened that frame.
+ * A reference to the persistent interaction state is also passed along to simplify access to it.
  */
 class DrawInfo
 {
 public:
+	DrawInfo(InteractionState& state);
+
 	// clang-format off
 	// TODO: Make actual fields private and add const getters.
 
@@ -445,7 +526,6 @@ public:
 
 	/// Whether objects should not be hovered anymore // TODO: This is currently unused, but potentially useful
 	unsigned short hoverConsumed{0};
-	std::string hoverTarget;
 	inline void consumeHover() { hoverConsumed++; }
 
 	unsigned short popupOpened{0};
@@ -453,36 +533,10 @@ public:
 
 	// clang-format on
 
+	InteractionState& state;
+
 	/// Composite update method
 	void update(bool visual, bool logical = false, bool blockInput = false);
-
-	// TODO: Stuff below this is more presistent than above, and cannot really be "versioned" with the short counter.
-	//  Meaning finding the difference between two DrawInfos becomes a little meaningless
-	//  Thus it would be a good argument to wrap the stuff below into a different struct and keep that as a NodeEditor
-	//  member or keep a pointer to it in the context and just pass that along
-	//  (would help with copying performance as well) (although I don't particulary consider that to be an issue anyway)
-
-	// TODO: Write docs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// Active action idea, we have a descriptor for the current "action", it has a source
-	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
-	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
-	std::string action;
-	std::string actionSource;
-	std::any actionData;
-	bool clearActionThisFrame{false};
-	void setAction(std::string name, std::string source, std::any actionData);
-	void clearAction(bool immediately = false); ///< Clears the current action, either right away or at the end of the frame.
-
-	bool dragging{false};
-	bool dragEnd{false};
-	std::string dragSource;     // TODO: If the above was changed, then this can be the source of the action
-	// TODO: Question then arises what if there are multiple active actions? Do we make those two above arrays? vectors?
-
-	/**
-	 * Some operations in the context are queued to be performed at the end of the frame / beginning of the next one.
-	 * This method performs those actions.
-	 */
-	void prepareForNextFrame();
 
 	/**
 	 * Find the difference between two contexts. This relates primarily to the few trivial unsigned short variables.
@@ -492,12 +546,12 @@ public:
 	 * @return New context representing the only change between this context and the other one.
 	 */
 	DrawInfo findChange(const DrawInfo& other) const;
-
-	void merge(const DrawInfo& other);         ///< Updates the context with another context returned by a draw method.
-	void operator|=(const DrawInfo& other);    ///< A quick way to call the merge() method on itself.
-	DrawInfo operator|(const DrawInfo& other); ///< A quick way to call the merge() method on a new instance.
 };
 
+/**
+ * A helper class used to track changes in DrawInfo context between two points in time.
+ * Used to determine changes a specific DiwneObject::drawDiwne call made.
+ */
 class ContextTracker
 {
 public:

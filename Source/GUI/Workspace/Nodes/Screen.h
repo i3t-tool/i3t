@@ -57,7 +57,7 @@ public:
 	void drawMenuLevelOfDetail() override;                 // todo
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const override
+	std::vector<Ptr<CorePin>> const getOutputsToShow() const override
 	{
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */

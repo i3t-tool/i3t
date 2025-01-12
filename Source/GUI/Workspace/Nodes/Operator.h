@@ -96,7 +96,7 @@ public:
 		int maxLen = 0;
 		for (auto const& pin : m_workspaceOutputs)
 		{
-			maxLen = std::max(maxLen, std::dynamic_pointer_cast<DataOutPin>(pin)->maxLengthOfData());
+			maxLen = std::max(maxLen, std::dynamic_pointer_cast<CorePin>(pin)->maxLengthOfData());
 		}
 		return maxLen;
 	}
@@ -119,10 +119,9 @@ public:
 			if (m_workspaceInputs.at(m_halfAngle ? 0 : 1)->isConnected()) /* previous mode pin is connected */
 			{
 				/* connect visible pin and unplug hidden one */
-				m_workspaceInputs.at(m_halfAngle ? 1 : 0)
-				    .get()
-				    ->plug(m_workspaceInputs.at(m_halfAngle ? 0 : 1)->getLink().getStartPin());
-				m_workspaceInputs.at(m_halfAngle ? 0 : 1)->unplug();
+				Ptr<DIWNE::Pin> visiblePin = m_workspaceInputs.at(m_halfAngle ? 1 : 0);
+				Ptr<DIWNE::Pin> hiddenPin = m_workspaceInputs.at(m_halfAngle ? 0 : 1);
+				visiblePin->plugLink(hiddenPin->getLink()->getStartPin(), hiddenPin->getLink(), false);
 			}
 		}
 

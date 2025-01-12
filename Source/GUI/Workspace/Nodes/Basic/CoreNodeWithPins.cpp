@@ -27,142 +27,16 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 
 	for (Core::Pin const& pin : inputPins)
 	{
-		switch (pin.ValueType)
-		{
-		case Core::EValueType::MatrixMul:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinMatrixMul>(
-			//                pin.Id
-			//                                                                ,   pin
-			//                                                                ,
-			//                                                                *this));
-			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin, *this));
-			break;
-			//            case Core::EValueType::Vec4:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinVector4>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Vec3:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinVector3>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Float:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinFloat>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Quat:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinQuaternion>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Pulse:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinPulse>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::MatrixMul:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinMatrixMul>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Screen:
-			//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinScreen>(
-			//                pin.Id
-			//                                                                                            ,   pin
-			//                                                                                            ,   *this));
-			//                break;
-			//            case Core::EValueType::Ptr:
-			//                /* Pin with type Ptr have no graphic representation */
-			//                break;
-		default:
-			m_workspaceInputs.push_back(std::make_unique<CoreInPin>(diwne, pin, *this));
-			// Debug::Assert(false , "Unknown Pin type while loading input pins from
-			// Core to Workspace");
-		}
+		m_workspaceInputs.push_back(std::make_unique<CorePin>(diwne, pin, this, true));
 	}
-	if (!m_showDataOnPins) /* default true, false for Camera and Sequence - they don't show data on their output pins*/
+
+	for (Core::Pin const& corePin : outputPins)
 	{
-		for (Core::Pin const& pin : outputPins)
-		{
-			m_workspaceOutputs.push_back(std::make_unique<CoreOutPin>(diwne, pin, *this));
-		}
+		Ptr<CorePin> pin = std::make_unique<CorePin>(diwne, corePin, this, false);
+		// default true, false for Camera and Sequence - they don't show data on their output pins
+		pin->m_showData = m_showDataOnPins;
+		m_workspaceOutputs.push_back(std::move(pin));
 	}
-	else
-	{
-
-		auto outs = nodebase->getOutputPins();
-		auto outsBegin = outs.begin();
-		auto outsEnd = outs.end();
-
-		for (Core::Pin const& pin : outputPins)
-		{
-			switch (pin.ValueType)
-			{
-			case Core::EValueType::Matrix:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinMatrix>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Vec4:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector4>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Vec3:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinVector3>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Float:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinFloat>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Quat:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinQuat>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Pulse:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinPulse>(diwne, pin, *this));
-				break;
-			case Core::EValueType::MatrixMul:
-				m_workspaceOutputs.push_back(std::make_unique<CoreOutPinMatrixMultiply>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Screen:
-				m_workspaceOutputs.push_back(std::make_unique<DataOutPinScreen>(diwne, pin, *this));
-				break;
-			case Core::EValueType::Ptr:
-				/* Pin with type Ptr have no graphic representation */
-				break;
-			default:
-				I3T_ABORT("Unknown Pin type while loading output pins from "
-				          "Core to Workspace");
-			}
-		}
-	}
-}
-
-void CoreNodeWithPins::finalize(DIWNE::DrawInfo& context)
-{
-	bool inner_interaction_happen = false;
-	WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
-
-	// TODO: Investigate pin/link hiding, probably relates to how links are drawn in the first place
-	if (!allowDrawing())
-	{
-		for (auto const& pin : m_workspaceInputs)
-		{
-			if (pin->isConnected())
-			{
-				Ptr<CoreInPin> in = std::dynamic_pointer_cast<CoreInPin>(pin);
-				if (in->getLink().isLinkOnWorkArea())
-				{
-					// inner_interaction_happen |= in->getLink().drawDiwne();
-					wd.m_linksToDraw.push_back(&pin->getLink());
-				}
-			}
-		}
-	}
-	CoreNode::finalize(context);
 }
 
 void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
@@ -194,10 +68,7 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
 					pin->setConnectionPointDiwne(pinConnectionPoint);
-					if (pin->isConnected())
-					{
-						wd.m_linksToDraw.push_back(&pin->getLink()); // register the wire
-					}
+					pin->setRendered(false);
 				}
 			}
 		}

@@ -16,42 +16,20 @@
 
 using namespace Workspace;
 
-CoreLink::CoreLink(DIWNE::NodeEditor& diwne, CoreInPin* endPin)
-    : DIWNE::Link(diwne), m_endPin(endPin), m_startPin(nullptr)
-{}
-
-void CoreLink::unplug()
-{
-	if (m_endPin)
-		m_endPin->unplug();
-	m_startPin = nullptr;
-}
+CoreLink::CoreLink(DIWNE::NodeEditor& diwne) : DIWNE::Link(diwne) {}
 
 void CoreLink::popupContent(DIWNE::DrawInfo& context)
 {
 	if (ImGui::MenuItem("Delete"))
 	{
-		unplug();
+		destroy();
 	}
-}
-
-void CoreLink::updateEndpoints()
-{
-	ImVec2 start = m_startDiwne;
-	ImVec2 end = m_endDiwne;
-	CoreOutPin* startPin = getStartPin();
-	CoreInPin* endPin = getEndPin();
-	if (startPin)
-		start = startPin->getLinkConnectionPointDiwne();
-	if (endPin)
-		end = endPin->getLinkConnectionPointDiwne();
-	setLinkEndpointsDiwne(start, end);
 }
 
 void CoreLink::updateControlPointsOffsets()
 {
 	float offset =
-	    (getEndpoint().x - getStartpoint().x) * I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
+	    (getEndPoint().x - getStartPoint().x) * I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
 	if (offset < I3T::getTheme().get(ESize::Links_ControlpointsPositionMin))
 		offset = I3T::getTheme().get(ESize::Links_ControlpointsPositionMin);
 	diwne.mp_settingsDiwne->linkStartControlOffsetDiwne = ImVec2(offset, 0);
@@ -63,9 +41,14 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 	updateControlPointsOffsets();
 
 	if (m_endPin)
-		diwne.mp_settingsDiwne->linkColor = I3T::getTheme().get(PinColorBackground[m_endPin->getType()]);
+	{
+		diwne.mp_settingsDiwne->linkColor =
+		    I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(m_endPin)->getType()]);
+	}
 	else
+	{
 		diwne.mp_settingsDiwne->linkColor = ImColor(0.5f, 0.5f, 0.5f);
+	}
 
 	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 

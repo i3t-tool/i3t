@@ -211,7 +211,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	{
 		target.AddMember("label", node->getTopLabel(), alloc);
 	}
-	target.AddMember("render", node->getRender(), alloc);
+	target.AddMember("render", node->isRendered(), alloc);
 	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
 	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
 

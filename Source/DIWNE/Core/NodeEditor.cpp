@@ -28,8 +28,8 @@ namespace DIWNE
 NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
     : DiwneObject(*this, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
       m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max),
-      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), m_helperLink(std::make_unique<Link>(diwne)),
-      m_popupPosition(settingsDiwne->initPopupPosition), m_renderer(std::make_unique<DrawHelper>(this))
+      m_workAreaZoom(settingsDiwne->workAreaInitialZoom), m_popupPosition(settingsDiwne->initPopupPosition),
+      m_renderer(std::make_unique<DrawHelper>(this))
 {
 	setSelectable(false);
 }
@@ -41,27 +41,17 @@ NodeEditor::~NodeEditor()
 
 void NodeEditor::draw(DrawMode drawMode)
 {
-	DrawInfo context;
-	if (m_prevContext)
-	{
-		// Infer context from previous frame
-		// TODO: Wrap this in a function or maybe rather reset the existing context instead of making a new one
-		m_prevContext->prepareForNextFrame();
-		context.dragging = m_prevContext->dragging;
-		context.dragSource = std::move(m_prevContext->dragSource);
-
-		context.action = std::move(m_prevContext->action);
-		context.actionSource = std::move(m_prevContext->actionSource);
-		context.actionData = std::move(m_prevContext->actionData);
-	}
+	interactionState.nextFrame();
+	DrawInfo context(interactionState);
 	drawDiwne(context, drawMode);
-	m_prevContext = std::make_shared<DrawInfo>(std::move(context));
 }
 
 void NodeEditor::initializeDiwne(DrawInfo& context)
 {
-	m_diwneAction = DiwneAction::None;
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
+
+	destroyObjects(); // Delete objects marked for destruction in the previous frame
+
 	DiwneObject::initializeDiwne(context);
 }
 
@@ -80,7 +70,7 @@ void NodeEditor::begin(DrawInfo& context)
 	assert(!diwne.m_zoomScalingApplied);
 	applyZoomScaling();
 
-	DIWNE_DEBUG_EXTRA_2((*this), {
+	DIWNE_DEBUG_OBJECTS((*this), {
 		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
 		                                    ImDrawFlags_RoundCornersNone, 10);
 		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x,
@@ -100,54 +90,8 @@ void NodeEditor::begin(DrawInfo& context)
 		                        ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x,
 		                        ImGui::GetCurrentWindow()->ClipRect.Max.y)
 		                .c_str());
-
-		switch (m_diwneAction_previousFrame)
-		{
-		case DiwneAction::None:
-			ImGui::Text("PrevDiwneAction: None");
-			break;
-		case DiwneAction::NewLink:
-			ImGui::Text("PrevDiwneAction: NewLink");
-			break;
-		case DiwneAction::HoldNode:
-			ImGui::Text("PrevDiwneAction: HoldNode");
-			break;
-		case DiwneAction::DragNode:
-			ImGui::Text("PrevDiwneAction: DragNode");
-			break;
-		case DiwneAction::HoldWorkarea:
-			ImGui::Text("PrevDiwneAction: HoldWorkarea");
-			break;
-		case DiwneAction::DragWorkarea:
-			ImGui::Text("PrevDiwneAction: DragWorkarea");
-			break;
-		case DiwneAction::SelectionRectFull:
-			ImGui::Text("PrevDiwneAction: SelectionRectFull");
-			break;
-		case DiwneAction::SelectionRectTouch:
-			ImGui::Text("PrevDiwneAction: SelectionRectTouch");
-			break;
-		case DiwneAction::InteractingContent:
-			ImGui::Text("PrevDiwneAction: InteractingContent");
-			break;
-		case DiwneAction::FocusOnObject:
-			ImGui::Text("PrevDiwneAction: FocusOnObject");
-			break;
-		case DiwneAction::HoldPin:
-			ImGui::Text("PrevDiwneAction: HoldPin");
-			break;
-		case DiwneAction::DragPin:
-			ImGui::Text("PrevDiwneAction: DragPin");
-			break;
-		case DiwneAction::HoldLink:
-			ImGui::Text("PrevDiwneAction: HoldLink");
-			break;
-		case DiwneAction::DragLink:
-			ImGui::Text("PrevDiwneAction: DragLink");
-			break;
-		default:
-			ImGui::Text("PrevDiwneAction: Unknown");
-		}
+		ImGui::TextUnformatted(fmt::format("Nodes: {}", m_workspaceCoreNodes.size()).c_str());
+		ImGui::TextUnformatted(fmt::format("Links: {}", m_links.size()).c_str());
 	});
 }
 
@@ -201,17 +145,6 @@ void NodeEditor::content(DrawInfo& context)
 				          affected and iterator is invalidated (at least with MVSC) */
 		}
 
-		// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
-		//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not
-		//  desirable. So maybe draw links as very first thing
-
-		/* draw links under last (on top) node */
-		//		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes - 1);
-		//		for (auto link : m_linksToDraw)
-		//		{
-		//			link->drawDiwne(context);
-		//		}
-
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 
 		DIWNE_DEBUG((*this), {
@@ -224,11 +157,6 @@ void NodeEditor::content(DrawInfo& context)
 
 void NodeEditor::end(DrawInfo& context)
 {
-	if (m_diwneAction == DiwneAction::NewLink)
-	{
-		m_helperLink->drawDiwne(context, DrawMode::JustDraw);
-	}
-
 	diwne.stopZoomScaling();
 
 	// TODO: This doesnt work anymore in newer ImGui versions, a dummy needs to be added (I am not sure on that anymore)
@@ -266,9 +194,19 @@ void NodeEditor::afterDraw(DrawInfo& context)
 
 void NodeEditor::clear()
 {
+	for (auto& node : m_workspaceCoreNodes)
+	{
+		node->destroy(false);
+	}
+	for (auto& link : m_links)
+	{
+		link->destroy(false);
+	}
+	m_workspaceCoreNodes.clear();
+	m_links.clear();
+
 	setLastActiveNode<DIWNE::Node>(nullptr);
 	setLastActivePin<DIWNE::Pin>(nullptr);
-	m_workspaceCoreNodes.clear();
 }
 
 void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
@@ -326,12 +264,6 @@ void NodeEditor::processInteractionsDiwne(DrawInfo& context)
 void NodeEditor::finalizeDiwne(DrawInfo& context)
 {
 	DiwneObject::finalizeDiwne(context);
-	m_diwneAction_previousFrame = m_diwneAction; // TODO: This might end up being removed
-}
-
-DiwneAction NodeEditor::getDiwneActionActive() const
-{
-	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
 }
 
 void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
@@ -347,25 +279,25 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		ImVec2 dragDelta = m_input->selectionRectangleSize();
 		ImColor color;
 
-		if (dragStart && context.action.empty())
+		using namespace Actions;
+
+		if (dragStart && !context.state.action)
 		{
-			context.setAction(Actions::selectionRect, m_labelDiwne, Actions::SelectionRectData());
+			context.state.setAction<SelectionRectAction>(m_labelDiwne);
 		}
 		if (dragDelta.x > 0)
 		{
-			setDiwneAction(DiwneAction::SelectionRectFull);
 			m_selectionRectangeDiwne.Min.x = startPos.x;
 			m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
 			color = mp_settingsDiwne->selectionRectFullColor;
-			std::any_cast<Actions::SelectionRectData&>(context.actionData).touch = false;
+			context.state.getAction<SelectionRectAction>()->touch = false;
 		}
 		else
 		{
-			setDiwneAction(DiwneAction::SelectionRectTouch);
 			m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
 			m_selectionRectangeDiwne.Max.x = startPos.x;
 			color = mp_settingsDiwne->selectionRectTouchColor;
-			std::any_cast<Actions::SelectionRectData&>(context.actionData).touch = true;
+			context.state.getAction<SelectionRectAction>()->touch = true;
 		}
 		if (dragDelta.y > 0)
 		{
@@ -379,9 +311,9 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		}
 		m_renderer->AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
 	}
-	if (dragEnd && context.action == Actions::selectionRect)
+	if (dragEnd && context.state.isActionActive(Actions::selectionRect))
 	{
-		context.clearAction();
+		context.state.clearAction();
 	}
 }
 
@@ -737,4 +669,24 @@ void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2
 	node->m_parentLabel = m_labelDiwne;            // Set the editor as the node's parent
 	this->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
+
+void NodeEditor::addLink(std::shared_ptr<Link> link)
+{
+	m_links.push_back(link);
+}
+
+void NodeEditor::destroyObjects()
+{
+	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+	                                          [](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
+		                                          return node->m_destroy;
+	                                          }),
+	                           m_workspaceCoreNodes.end());
+	m_links.erase(std::remove_if(m_links.begin(), m_links.end(),
+	                             [](const std::shared_ptr<Link>& link) -> bool {
+		                             return link->m_destroy;
+	                             }),
+	              m_links.end());
+}
+
 } /* namespace DIWNE */

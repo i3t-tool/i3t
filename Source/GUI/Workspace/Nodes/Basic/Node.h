@@ -62,13 +62,15 @@ public:
 	Node(DIWNE::NodeEditor& diwne, std::string label = "Header");
 	~Node();
 
-	/* DIWNE function */
+	// TODO: Ideally delete this whole class <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	// TODO: Remove this likely
 	virtual bool bypassFocusForInteractionAction() override;
 
-	// TODO: Make a delete method / callback a part of DiwneObject rather than workspace specific <<<<<<<<<<<<<<<<<<<<<<
-	// TODO: Upon deletion, we need to ensure that we aren't the source of dragging or action in the current context!!!
-	void deleteAction() override;
+	void onDestroy(bool logEvent) override;
 
+	// TODO: Remove this
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	bool m_removeFromWorkspaceWindow{false};
 	bool getRemoveFromWorkspace() const
 	{

@@ -32,7 +32,13 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
                                         true))
 {
 	// connect matrix P to matrix V internally
-	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+	// TODO: Figure out how to draw this link manually and not from the editor
+	//  That way we can draw it at the right moment inside the actual camera node content
+	//  Likely we'll add a flag to DiwneObject that indicates its drawing is handled custom and not by the editor
+	//  This mechanism could be also used for the dragged link instead of checking the active action
+	DIWNE::Pin* view0 = m_view->getInputs().at(0).get();
+	DIWNE::Pin* proj0 = m_projection->getOutputs().at(0).get();
+	view0->plug(proj0, false);
 
 	m_projection->setSelectable(false);
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
@@ -268,19 +274,19 @@ bool Camera::isCamera()
 	return true;
 }
 
-//bool Camera::processSelect()
+// bool Camera::processSelect()
 //{
 //	auto model = m_viewportCamera.lock();
 //	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
 //	model->m_highlight = true;
 //
 //	return CoreNodeWithPins::processSelect();
-//}
+// }
 //
-//bool Camera::processUnselect()
+// bool Camera::processUnselect()
 //{
 //	auto model = m_viewportCamera.lock();
 //	model->m_highlight = false;
 //
 //	return CoreNodeWithPins::processUnselect();
-//}
+// }

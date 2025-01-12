@@ -25,8 +25,8 @@ private:
 	float m_minRightAlignOfRightPins;
 
 protected:
-	std::vector<Ptr<CoreInPin>> m_workspaceInputs;
-	std::vector<Ptr<CoreOutPin>> m_workspaceOutputs;
+	std::vector<Ptr<CorePin>> m_workspaceInputs;
+	std::vector<Ptr<CorePin>> m_workspaceOutputs;
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
 public:
@@ -34,7 +34,7 @@ public:
 	 * \brief get vector of input pins
 	 * \return m_workspaceInputs
 	 */
-	std::vector<Ptr<CoreInPin>> const& getInputs() const
+	std::vector<Ptr<CorePin>> const& getInputs() const
 	{
 		return m_workspaceInputs;
 	};
@@ -42,11 +42,11 @@ public:
 	 * \brief get vector of output pins
 	 * \return m_workspaceOutputs
 	 */
-	std::vector<Ptr<CoreOutPin>> const& getOutputs() const
+	std::vector<Ptr<CorePin>> const& getOutputs() const
 	{
 		return m_workspaceOutputs;
 	};
-	virtual std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const
+	virtual std::vector<Ptr<CorePin>> const getOutputsToShow() const
 	{
 		return getOutputs();
 	};
@@ -55,8 +55,6 @@ public:
 
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
-
-	void finalize(DIWNE::DrawInfo& context) override;
 };
 } // namespace Workspace
 

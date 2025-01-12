@@ -16,6 +16,7 @@
 #include "Core/Input/InputManager.h"
 
 #include "NodeEditor.h"
+#include "diwne_actions.h"
 
 #if DIWNE_DEBUG_ENABLED
 #include "Pin.h"
@@ -38,8 +39,9 @@ unsigned long long DiwneObject::g_diwneIDCounter = 0;
 
 void DiwneObject::draw(DrawMode drawMode)
 {
-	DrawInfo context(drawMode);
-	drawDiwne(context);
+	// DiwneObjects should be drawn by an overarching NodeEditor or similar class
+	// They are then drawn using the drawDiwne() method that passes along the drawing context created by the NodeEditor.
+	throw std::exception("Not implemented");
 };
 
 DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)
@@ -93,16 +95,12 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			        .c_str());
 			if (dynamic_cast<NodeEditor*>(this))
 			{
+				InteractionState& state = context.state;
 				ImGui::GetForegroundDrawList()->AddText(
 				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.3, 0), IM_COL32_WHITE,
-				    (std::string() + (context.dragging ? "[Dragging (" + context.dragSource + ")]" : "") +
-				     (context.dragEnd ? "[DragEnd (" + context.dragSource + ")]" : "") +
-				     (!context.action.empty()
-				          ? "[" + context.action + " (" + context.actionSource +
-				                (context.actionData.has_value() ? std::string(", ") + context.actionData.type().name()
-				                                                : "") +
-				                ")]"
-				          : "") +
+				    (std::string() + (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "") +
+				     (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "") +
+				     (state.action ? "[" + state.action->name + " (" + state.action->source + ")]" : "") +
 				     (context.inputConsumed ? " [Input Consumed]" : ""))
 				        .c_str());
 			}
@@ -147,15 +145,10 @@ void DiwneObject::finalizeDiwne(DrawInfo& context)
 {
 	if (m_justHidden)
 	{
-		if (context.dragging && context.dragSource == m_labelDiwne)
-		{
-			// Ensure dragging stops if the source isn't drawn anymore
-			I3T_ASSERT(false, "Drag operation wasn't ended properly!");
-			context.dragging = false;
-			context.dragEnd = false;
-			context.dragSource.clear();
-			onDrag(context, false, true);
-		}
+		// TODO: [Medium priority] It might be better if dragging was processed outside the drawing code so that
+		//  visibility of the object doesn't affect it.
+		// When the object isn't drawn anymore its drag operation needs to stop
+		stopDrag(context);
 	}
 	finalize(context);
 }
@@ -250,7 +243,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//	{
 	//		diwne.m_objectFocused = true;
 	//	} /* any inner interaction (imgui too) block other DiwneObject to focus */
-	//	DIWNE_DEBUG_EXTRA_2((diwne), {
+	//	DIWNE_DEBUG_OBJECTS((diwne), {
 	//		if (m_isActive)
 	//		{
 	//			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
@@ -262,27 +255,22 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 void DiwneObject::processHoverDiwne(DrawInfo& context)
 {
 	bool hovered = isHoveredDiwne() && allowHover();
-	m_hovered =
-	    hovered && !context.hoverConsumed && (context.hoverTarget.empty() || context.hoverTarget == m_labelDiwne);
+	m_hovered = hovered && !context.hoverConsumed &&
+	            (context.state.hoverTarget.empty() || context.state.hoverTarget == m_labelDiwne);
 	if (m_hovered)
 	{
 		onHover(context);
 		if (m_hoverRoot)
 			context.hoverConsumed++;
 		else
-			context.hoverTarget = m_parentLabel;
+			context.state.hoverTarget = m_parentLabel;
 	}
 }
 
 void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 {
-	if (context.inputConsumed)
-		return;
-	if (context.dragging && context.dragSource != m_labelDiwne)
-		return;
-
 	bool wasPressed = m_isHeld;
-	bool pressed = isPressedDiwne() && allowPress();
+	bool pressed = isPressedDiwne() && allowPress(context);
 	bool justPressed = isJustPressedDiwne() && pressed;
 	bool justReleased = wasPressed && !pressed;
 
@@ -312,10 +300,12 @@ void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 
 void DiwneObject::processDragDiwne(DrawInfo& context)
 {
+	// TODO: [Low priority] Since we separated stopDrag into a method
+	//  the logic below seems a little too nested and complicated, simplify
 	bool isDragged = isDraggedDiwne();
 	bool dragStart = false;
-	bool weAreDragSource = context.dragSource == m_labelDiwne;
-	if (context.dragging) // Check if something is being dragged
+	bool weAreDragSource = context.state.dragSource == m_labelDiwne;
+	if (context.state.dragging) // Check if something is being dragged
 	{
 		if (weAreDragSource) // This object is being dragged
 		{
@@ -327,10 +317,8 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 			else
 			{
 				// Drag key no longer pressed, stop drag
-				m_isDragged = false;
-				// We only mark the drag end by setting context.dragEnd to true
-				// But the dragging variables get reset at the end of the frame by the context.
-				context.dragEnd = true;
+				stopDrag(context); // Stop drag calls onDrag()
+				return;
 			}
 		}
 		else // Something else is being dragged
@@ -340,21 +328,19 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	}
 	else // Nothing is being dragged, try start drag
 	{
-		m_isDragged = isDragged && allowDrag(); // TODO: Rename allowDrag to allowStartDrag?
+		m_isDragged = isDragged && allowDrag(); // TODO: Rename allowDrag to isDragAllowed? isDragStartAllowed?
+		                                        // allowStartDrag, yeah <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if (m_isDragged)
 		{
 			dragStart = true;
-			context.dragging = true;
-			context.dragSource = m_labelDiwne;
+			context.state.dragging = true;
+			context.state.dragSource = m_labelDiwne;
 		}
 	}
-	if (m_isDragged || (weAreDragSource && context.dragEnd)) // Dispatch user method
+	if (m_isDragged) // Dispatch user method
 	{
-		onDrag(context, dragStart, context.dragEnd);
+		onDrag(context, dragStart, false);
 	}
-	// TODO: Figure this stuff out, m_isDrag already signals drag, this further signals what kind of drag (eg. whats
-	// being dragged, that is cross frame info that we need to store somewhere)
-	// diwne.setDiwneAction(getDragActionType());
 }
 
 bool DiwneObject::allowHover() const
@@ -381,15 +367,37 @@ bool DiwneObject::allowHover() const
 	// m_labelDiwne) 	return ret;
 }
 
-bool DiwneObject::allowPress() const
+bool DiwneObject::allowPress(const DrawInfo& context) const
 {
-	return m_hovered;
+	if (!m_hovered) // Can't be pressed when not being hovered
+		return false;
+	if (context.inputConsumed) // Can't be pressed when input is consumed
+		return false;
+	// Can't be pressed when some other object is being dragged
+	if (context.state.dragging && context.state.dragSource != m_labelDiwne)
+		return false;
+	return true;
 }
 
 bool DiwneObject::allowDrag() const
 {
 	return m_isHeld;
 }
+
+void DiwneObject::destroy(bool logEvent)
+{
+	if (m_destroy)
+		return;
+	m_destroy = true;
+
+	// Ensure the object stops its drag before being destroyed
+	DrawInfo tmp = DrawInfo(diwne.interactionState); // Create an empty context for the stop drag call
+	stopDrag(tmp);
+
+	onDestroy(logEvent);
+}
+
+void DiwneObject::onDestroy(bool logEvent) {}
 
 void DiwneObject::setPosition(const ImVec2& position)
 {
@@ -401,7 +409,15 @@ void DiwneObject::translate(const ImVec2& vec)
 	m_rect.Translate(vec);
 }
 
-//
+bool DiwneObject::isRendered() const
+{
+	return m_rendered;
+}
+
+void DiwneObject::setRendered(bool mRendered)
+{
+	m_rendered = mRendered;
+}
 
 bool DiwneObject::setSelected(const bool selected)
 {
@@ -421,28 +437,40 @@ bool DiwneObject::getSelectable()
 	return m_selectable;
 }
 
-// TDDO: Remove
-void DrawInfo::merge(const DrawInfo& other)
+void InteractionState::setAction(std::unique_ptr<DiwneAction> a)
 {
-	this->inputConsumed |= other.inputConsumed;
-	// this->interacted |= other.interacted;
+	this->action = std::move(a);
 }
 
-// TDDO: Remove
-void DrawInfo::operator|=(const DrawInfo& other)
+void InteractionState::clearAction(bool immediately)
 {
-	merge(other);
+	if (immediately)
+	{
+		action->onEnd();
+		action = nullptr;
+	}
+	else
+	{
+		action->end();
+	}
 }
 
-// TDDO: Remove
-DrawInfo DrawInfo::operator|(const DrawInfo& other)
+bool InteractionState::isActionActive(const std::string& name)
 {
-	DrawInfo newInfo(*this);
-	newInfo.merge(other);
-	return newInfo;
+	return action != nullptr && action->name == name;
 }
 
-void DrawInfo::prepareForNextFrame()
+bool InteractionState::isActionActive(const std::string& name, const std::string& source)
+{
+	return isActionActive(name) && action->source == source;
+}
+
+bool InteractionState::anyActionActive()
+{
+	return action != nullptr;
+}
+
+void InteractionState::nextFrame()
 {
 	// Set dragging to false on dragEnd
 	// In the frame when dragging ends, dragging and dragEnd are both true.
@@ -454,15 +482,21 @@ void DrawInfo::prepareForNextFrame()
 	}
 	// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
 	// Hence the action reset is defered to the end of the frame here.
-	if (clearActionThisFrame)
+	if (action != nullptr && action->endActionThisFrame)
 	{
 		clearAction(true);
 	}
+
+	// Reset non-persistent variables
+	dragEnd = false;
+	hoverTarget.clear();
 }
+
+DrawInfo::DrawInfo(InteractionState& state) : state(state) {}
 
 DrawInfo DrawInfo::findChange(const DrawInfo& other) const
 {
-	DrawInfo change;
+	DrawInfo change(other.state);
 	change.visualUpdates = this->visualUpdates - other.visualUpdates;
 	change.logicalUpdates = this->logicalUpdates - other.logicalUpdates;
 	change.inputConsumed = this->inputConsumed - other.inputConsumed;
@@ -490,27 +524,6 @@ void DrawInfo::update(bool visual, bool logical, bool blockInput)
 		logicalUpdate(false);
 	if (blockInput)
 		consumeInput();
-}
-
-void DrawInfo::setAction(std::string name, std::string source, std::any data)
-{
-	action = std::move(name);
-	actionSource = std::move(source);
-	actionData = std::move(data);
-}
-
-void DrawInfo::clearAction(bool immediately)
-{
-	if (immediately)
-	{
-		action.clear();
-		actionSource.clear();
-		actionData.reset();
-	}
-	else
-	{
-		clearActionThisFrame = true;
-	}
 }
 
 ContextTracker::ContextTracker(const DrawInfo& context)
@@ -609,43 +622,6 @@ void DiwneObject::onHover(DrawInfo& context)
 	});
 }
 
-
-// void DiwneObject::processFocusedForInteraction(DrawInfo& context)
-//{
-//	// TODO: Investiage exact usages and rename
-//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-//	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
-//	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-//	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
-//	DIWNE_DEBUG(diwne, {
-//		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_GREEN_50, 0,
-// ImDrawFlags_RoundCornersNone, 1);
-//	});
-//	context.visualUpdate++;
-// }
-// bool DiwneObject::allowProcessFocusedForInteraction()
-//{
-//	return allowHover();
-// }
-// void DiwneObject::processFocusedForInteractionDiwne(DrawInfo& context)
-//{
-//	/* between frames mouse can go out of focus scope */
-//	if ((bypassFocusForInteractionAction() || m_isHeld) && allowProcessFocusedForInteraction())
-//	{
-//		if (!dynamic_cast<DIWNE::NodeEditor*>(this))
-//		{
-//			int x = 5;
-//		}
-//		m_focusedForInteraction = true;
-//		return processFocusedForInteraction(context);
-//	}
-//	else
-//	{
-//		m_focusedForInteraction = false;
-//		return;
-//	}
-// }
-//
 void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 {
 	if (justPressed)
@@ -739,6 +715,8 @@ bool DiwneObject::allowPopup() const
 }
 void DiwneObject::processPopup(DrawInfo& context)
 {
+	if (context.state.anyActionActive())
+		return;
 	if (m_hovered && !context.popupOpened && diwne.m_input->bypassIsMouseReleased1() && allowPopup())
 	{
 		ImGui::OpenPopup(m_popupIDDiwne.c_str());
@@ -771,4 +749,23 @@ void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& col
 		ImGui::EndTooltip();
 	}
 }
+
+bool DiwneObject::isDragging(DrawInfo& context)
+{
+	return context.state.dragging && context.state.dragSource == m_labelDiwne;
+}
+
+void DiwneObject::stopDrag(DrawInfo& context)
+{
+	if (isDragging(context))
+	{
+		m_isDragged = false;
+		// We only mark the drag end by setting context.dragEnd to true
+		// But the dragging variables get reset at the end of the frame by the context.
+		context.state.dragEnd = true;
+		onDrag(context, false, true);
+	}
+}
+
+
 } /* namespace DIWNE */

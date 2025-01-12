@@ -413,7 +413,7 @@ void ScriptingModule::onInit()
 	});
 
 	m_Lua.set_function("delete", [](GuiNode& node) {
-		node.deleteActionDiwne();
+		node.destroy();
 	});
 
 	//

@@ -16,6 +16,8 @@
 #pragma once
 #define DIWNE_DEBUG_ENABLED 1
 
+#include "diwne_imgui.h"
+
 static constexpr ImVec4 DIWNE_WHITE = ImVec4(1.f, 1.f, 1.f, 1.f);
 static constexpr ImVec4 DIWNE_BLACK = ImVec4(0.f, 0.f, 0.f, 1.f);
 static constexpr ImVec4 DIWNE_RED = ImVec4(1.f, 0.f, 0.f, 1.f);
@@ -32,6 +34,7 @@ static constexpr ImVec4 DIWNE_CYAN_50 = ImVec4(0.f, 1.f, 1.f, 1.f);
 static constexpr ImVec4 DIWNE_ORANGE = ImVec4(1.f, 0.5f, 0.f, 1.f);
 static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
+// Diwne debug macros used to execute code when diwne debug mode is enabled
 #if DIWNE_DEBUG_ENABLED
 #define DEBUG_TEMPLATE(editor, debugCode, debugVar)                                                                    \
 	do                                                                                                                 \
@@ -44,49 +47,26 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #define DIWNE_DEBUG_VARS()                                                                                             \
 	bool m_diwneDebug = false;                                                                                         \
 	bool m_diwneDebugLayout = true;                                                                                    \
-	bool m_diwneDebugExtra2 = false;                                                                                   \
+	bool m_diwneDebugObjects = false;                                                                                  \
 	bool m_diwneDebugInteractions = false;
 #define DIWNE_DEBUG(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebug)
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugLayout)
-#define DIWNE_DEBUG_EXTRA_2(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugExtra2)
+#define DIWNE_DEBUG_OBJECTS(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugObjects)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugInteractions)
 
 #else
 #define DIWNE_DEBUG_VARS()
 #define DIWNE_DEBUG(editor, debugCode)
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode)
-#define DIWNE_DEBUG_EXTRA_2(editor, debugCode)
+#define DIWNE_DEBUG_OBJECTS(editor, debugCode)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode)
 #endif
 
-#include "spdlog/fmt/fmt.h" // TODO: Probably shouldn't require fmt as a dependency hmm
+// Diwne logging macros, can be modified from outside of the library to integrate with existing loggers
+#define DIWNE_LOG_DEBUG(message)
+#define DIWNE_INFO(message)
+#define DIWNE_WARN(message)
+#define DIWNE_ERROR(message)
+
+#include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>
-
-namespace DIWNE
-{
-enum DiwneAction : unsigned int
-{
-	None,
-	FocusOnObject,
-	InteractingContent, /* for other unspecified interactions */
-	NewLink,
-
-	HoldNode,
-	HoldPin,
-	HoldLink,
-	HoldWorkarea,
-
-	DragNode,
-	DragPin,
-	DragLink, /* dragging already existing/connected link */
-	DragWorkarea,
-
-	TouchNode,
-	TouchPin,
-	TouchLink,
-	TouchWorkarea,
-
-	SelectionRectFull,
-	SelectionRectTouch
-};
-} // namespace DIWNE

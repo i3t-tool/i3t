@@ -404,7 +404,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 
 	if (value.HasMember("render"))
 	{
-		node->setRender(value["render"].GetBool());
+		node->setRendered(value["render"].GetBool());
 	}
 
 	if (value.HasMember("numberOfDecimals"))

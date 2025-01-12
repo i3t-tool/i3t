@@ -36,17 +36,16 @@ public:
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void end(DIWNE::DrawInfo& context) override;
 
-	virtual void deleteAction() override;
 	virtual bool allowDrawing() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 	virtual void drawMenuLevelOfDetail() override = 0;
-	void drawMenuDelete() override;
-
-	//
 
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 
+	void onDestroy(bool logEvent) override;
+
+	// TODO: REWORK sequence drag'n'drop <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	bool m_removeFromSequence;
 	bool getRemoveFromSequence() const
 	{

@@ -43,7 +43,8 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
       m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
 {
-	m_helperLink = std::make_unique<CoreLink>(diwne, nullptr);
+	//	m_helperLink = std::make_unique<CoreLink>(diwne);
+	// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 
 WorkspaceDiwne::~WorkspaceDiwne()
@@ -71,14 +72,12 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 
 void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 {
-	DIWNE_DEBUG_EXTRA_2((*this), {
-		if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::None)
-			ImGui::Text("WorkspaceWindowAction::None");
-		if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::CreateAndPlugTypeConstructor)
-			ImGui::Text("WorkspaceWindowPrevAction::CreateAndPlugTypeConstructor");
+	// TODO: DiwneObjects (Nodes, links) marked to be destroyed need to be deleted, likely here or maybe even better
+	//  in the initialize() method (as this is not related to drawing)
 
-		ImGui::TextUnformatted(fmt::format("Nodes: {}", m_workspaceCoreNodes.size()).c_str());
-	});
+	// TODO: [Performance] Could the channel splitter with its channel for each node be causing performance issues?
+	//  I haven't investigated too deep but presumably all draw commands (which are many) are being reordered in
+	//  an array every frame.
 
 	if (m_workspaceCoreNodes.empty()) // OK-DR
 	{
@@ -88,15 +87,6 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		return;
 	}
 
-	// Draw links first
-	for (auto link : m_linksToDraw)
-	{
-		// TODO: Possible crash when nodes are deleted before this call since links are owned by nodes from the prev
-		//  frame, viz rework below
-		link->drawDiwne(context);
-	}
-	// Clear the link list to rebuild it again this frame
-	m_linksToDraw.clear();
 	// TODO: A better approach imo is to treat links like nodes
 	// Simply keep a persistent list of them and delete / modify them as needed during the draw
 	// The way it is now, where each link is actually a member variable of a pin seems a little odd to me
@@ -113,13 +103,6 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 	// Right now only the output pins drawData and there are subclasses for each data type
 	// Again seems like that could be handled with some kind of a switch and just free floating draw methods
 	// Rather than complicated polymorphism that doesn't have much of a meaning. I don't know.
-
-	// deletion of blocks
-	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-	                                          [](Ptr<CoreNode> const& node) -> bool {
-		                                          return node->getRemoveFromWorkspace();
-	                                          }),
-	                           m_workspaceCoreNodes.end());
 
 	// duplication of blocks
 	std::vector<Ptr<CoreNode>> duplicatedNodes;
@@ -153,10 +136,13 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 	//  this in ImGui in the form of ImGui::SetNextItemAllowOverlap() but it is a tricky multi-frame workaround.
 
 	int number_of_nodes = m_workspaceCoreNodes.size();
-	int node_count = number_of_nodes - 1; /* -1 for space for top node drawn above links */
+	int node_count = number_of_nodes; /* -1 for space for top node drawn above links */
 	if (number_of_nodes > 0)
 	{
-		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 1 /*+1 for links channel on top */);
+		// Each node is in its own channel as they all need to be drawn in the reverse order.
+		// Then the temporary helper link is drawn atop everything
+		// And one channel is for all the links below everything
+		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 2 /*+1 for links channel on top */);
 
 		/* draw nodes from back to begin (front to back) to catch interactions in
 		 * correct order */
@@ -164,15 +150,16 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		bool takeSnap = false;
 		for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
 		{
-			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
-			{
-				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
-				                                    number_of_nodes); /* top node is above links */
-			}
-			else
-			{
-				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
-			}
+			//			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
+			//			{
+			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
+			//				                                    number_of_nodes); /* top node is above links */
+			//			}
+			//			else
+			//			{
+			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+			//			}
+			m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), node_count--);
 
 			if ((*it) != nullptr)
 			{
@@ -187,11 +174,28 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 				          affected and iterator is invalidated (at least with MVSC) */
 		}
 
-		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes - 1);
-		// Draw the helper link on top
-		if (context.action == DIWNE::Actions::connectPin)
+		auto connectPinAction = context.state.getActiveAction<DIWNE::Actions::ConnectPinAction>();
+
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+		// Draw links, first in drawing order, last in logical order
+		for (auto link : m_links)
 		{
-			m_helperLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
+			// Avoid drawing the dragged link if a new connection is being made
+			std::string draggedLinkLabel = "";
+			if (connectPinAction)
+			{
+				draggedLinkLabel = connectPinAction->draggedLink->m_labelDiwne;
+			}
+			if (link->isRendered() && draggedLinkLabel != link->m_labelDiwne)
+				link->drawDiwne(context);
+		}
+
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes + 1);
+
+		// Draw the dragged link on top if a new connection is made
+		if (connectPinAction)
+		{
+			connectPinAction->draggedLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
 		}
 
 		// END - SHOULD BE MOVED TO DIWNE
@@ -216,10 +220,10 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		//					for (auto const& sequence : all_inputFree_Sequence)
 		//					{
 		//						m_cameraLink->setLinkEndpointsDiwne(
-		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
 		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(sequence)
 		//						        ->getInputs()[Core::I3T_SEQ_IN_MUL]
-		//						        ->getLinkConnectionPointDiwne());
+		//						        ->getConnectionPoint());
 		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
 		//					}
 		//				}
@@ -234,10 +238,10 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		//					for (auto const& model : all_inputFree_Model)
 		//					{
 		//						m_cameraLink->setLinkEndpointsDiwne(
-		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
 		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(model)
 		//						        ->getInputs()[0 /*\todo JH  \todo MH Some constant from core here*/]
-		//						        ->getLinkConnectionPointDiwne());
+		//						        ->getConnectionPoint());
 		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
 		//					}
 		//				}
@@ -367,7 +371,6 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 void WorkspaceDiwne::clear()
 {
 	NodeEditor::clear();
-	m_workspaceCoreNodes.clear();
 }
 
 void WorkspaceDiwne::selectAll()
@@ -890,10 +893,15 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			{
 				if (workspaceCoreNode->getSelected())
 				{
-					workspaceCoreNode->deleteActionDiwne();
+					workspaceCoreNode->destroy();
 				}
 				else
 				{
+					// TODO: This whole thing seems iffy, ideally we'd like to avoid this specialization / edge case
+					//  for the sequence. Adding all nodes to the editor nodes list and then just ignoring the nested
+					//  ones during drawing might be better. But that is a rather major change and would need some
+					//  serious code changes / testing. I am not certain if thats worth the benefit.
+					//  A plus would be that the getNodes/getNodesInnerIncluded() calls would be trivial.
 					Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(workspaceCoreNode);
 					if (seq != nullptr)
 					{
@@ -901,7 +909,8 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 						{
 							if (nodeInSequence->getSelected())
 							{
-								std::dynamic_pointer_cast<TransformationBase>(nodeInSequence)->deleteActionDiwne();
+								// When the paremt sequence is destoryed, is destroy called on the nested nodes?
+								std::dynamic_pointer_cast<TransformationBase>(nodeInSequence)->destroy();
 							}
 						}
 					}
@@ -911,18 +920,11 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 		if (ImGui::MenuItem("Selected links"))
 		{
-			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+			for (auto& link : m_links)
 			{
-				Ptr<CoreNodeWithPins> node = std::dynamic_pointer_cast<CoreNodeWithPins>(workspaceCoreNode);
-				if (node != nullptr)
+				if (link->getSelected())
 				{
-					for (auto&& pin : node->getInputs())
-					{
-						if (pin->getLink().getSelected())
-						{
-							pin->unplug();
-						}
-					}
+					link->destroy();
 				}
 			}
 		}
@@ -934,16 +936,9 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 		if (ImGui::MenuItem("All links"))
 		{
-			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+			for (auto& link : m_links)
 			{
-				Ptr<CoreNodeWithPins> node = std::dynamic_pointer_cast<CoreNodeWithPins>(workspaceCoreNode);
-				if (node != nullptr)
-				{
-					for (auto&& pin : node->getInputs())
-					{
-						pin->unplug();
-					}
-				}
+				link->destroy();
 			}
 		}
 		ImGui::EndMenu();
@@ -984,14 +979,14 @@ void WorkspaceDiwne::toggleSelectedNodesVisibility()
 	{
 		for (auto node : getAllNodesInnerIncluded())
 		{
-			node->setRender(true);
+			node->setRendered(true);
 		}
 	}
 	else
 	{
 		for (auto node : selected)
 		{
-			node->setRender(false);
+			node->setRendered(false);
 			node->setSelected(false);
 		}
 	}
@@ -1169,19 +1164,13 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 
 void WorkspaceDiwne::deleteCallback()
 {
-	LOG_DEBUG("Deleting");
+	// TODO: Why do we need to check this? Could this be a hacky fix to the delete input propagating? shouldnt be needed
 	if (isNodeLabelBeingEdited())
 		return;
 
 	for (auto&& node : getSelectedNodesInnerIncluded())
 	{
-		node->deleteActionDiwne();
-
-		Ptr<TransformationBase> trn = std::dynamic_pointer_cast<TransformationBase>(node);
-		if (trn != nullptr)
-		{
-			trn->deleteActionDiwne();
-		}
+		node->destroy();
 	}
 }
 
@@ -1275,7 +1264,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 	// Delete copied nodes
 	for (auto node : nodes)
 	{
-		node->deleteActionDiwne();
+		node->destroy();
 	}
 }
 

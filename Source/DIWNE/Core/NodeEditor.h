@@ -111,8 +111,6 @@ public:
 	std::vector<std::shared_ptr<Workspace::CoreNode>> m_workspaceCoreNodes;
 	std::vector<std::shared_ptr<Link>> m_links;
 
-	std::shared_ptr<DrawInfo> m_prevContext;
-
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
 	bool m_popupDrawn{false};
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
@@ -125,6 +123,7 @@ public:
 	/// for example when holding ctrl nodes not going unselected when sleection rect get out of them
 	bool m_allowUnselectingNodes{false};
 
+	InteractionState interactionState;
 	DiwneStyle m_style;
 
 	DIWNE_DEBUG_VARS()
@@ -134,19 +133,27 @@ public:
 
 	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(this);
 
-	std::unique_ptr<DIWNE::Link> m_helperLink; /**< for showing link that is in process of creating */
+	// TODO: Might make sense to move this into the interaction state <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  I've actually made the change that the dragged link only a temporary reference during the actual dragging of the
+	//  link The draggedLink becomes a real link on release and the pointer should be reset A global reference to the
+	//  draggedLink is no longer needed if the info is retained in ActionData or InteractionState
+//	Link* m_draggedLink; ///< Reference to the currently dragged link, this link is drawn on top
+
+	// TODO: If the above thing is moved then this should be moved as well
+	/// Clear the dragged link reference at the beginning of the next frame.
+	/// So that draggedLink reference is valid throughout the whole frame when drag ends.
+//	bool m_resetDraggedLinkNextFrame{false};
 
 protected:
-	// TODO: Review if we could keep DiwneAction info in Context?
-	//  Really begs the question where are we okay to use diwne member variables
-	//  and where it might be better to use method parameters / returns rather than a
-	//  "global" member context.
-	DiwneAction m_diwneAction{DiwneAction::None}, m_diwneAction_previousFrame{DiwneAction::None};
-
 	ImDrawListSplitter m_channelSplitter;
 
-	std::shared_ptr<DIWNE::Pin> mp_lastActivePin;
-	std::shared_ptr<DIWNE::Node> mp_lastActiveNode;
+	// TODO: The dragged pin could be technically stored in the Context actionData, but I do have some concerns about
+	//  copying that info etc.
+	//  I am not sure if these concerns are valid, the mechanism for this is there and is nicer than using NodeEditor
+	//  member variables to store data
+	//	std::shared_ptr<DIWNE::Pin> mp_lastActivePin; ///< Used for storing which pin is being dragged //TODO: Maybe
+	// rename?
+	std::shared_ptr<DIWNE::Node> mp_lastActiveNode; ///< Last node that had a logical update
 
 	bool m_nodesSelectionChanged{false};
 
@@ -170,10 +177,7 @@ protected:
 	ImGuiStyle m_zoomOriginalStyle;
 
 public:
-	/** Default constructor */
 	NodeEditor(DIWNE::SettingsDiwne* settingsDiwne);
-
-	/** Default destructor */
 	virtual ~NodeEditor();
 
 	/** Clear all nodes from the node editor */
@@ -206,6 +210,22 @@ public:
 		addNode(node, position, shiftToLeftByNodeWidth);
 		return node;
 	}
+
+	/**
+	 * Create a new link of type T and add it to the node editor.
+	 * @tparam T
+	 * @return An owning shared ptr to the new link. Note that the link is already owned by the node editor at this
+	 * point in time.
+	 */
+	template <class T, typename... Args>
+	auto inline createLink(Args&&... args)
+	{
+		auto link = std::make_shared<T>(*this, std::forward<Args>(args)...);
+		addLink(link);
+		return link;
+	}
+
+	void addLink(std::shared_ptr<Link> link);
 
 	virtual bool allowProcessZoom();
 	virtual bool bypassZoomAction();
@@ -272,24 +292,15 @@ public:
 	ImVec2 screen2diwne_noZoom(const ImVec2& point) const;
 	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
 
-	DiwneAction getDiwneAction() const
-	{
-		return m_diwneAction;
-	};
-	void setDiwneAction(DiwneAction action)
-	{
-		m_diwneAction = action;
-	};
+protected:
+	// Node / Link management
 
-	DiwneAction getDiwneActionPreviousFrame() const
-	{
-		return m_diwneAction_previousFrame;
-	};
+	/**
+	 * Removes objects marked for deletion from the editor.
+	 */
+	void destroyObjects();
 
-
-	// TODO: Remove these old action things
-	DiwneAction getDiwneActionActive() const;
-
+public:
 	// Node shifting
 	// =============================================================================================================
 
@@ -297,11 +308,18 @@ public:
 	void shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift);
 	void shiftInteractingNodeToEnd();
 
+	// TODO: Perhaps use this utility getter functions in multiple places
+	//  might make the code cleaner, avoiding manual static_casts
+	//  However we should be using static_pointer_cast/static_cast as we should know which type we want.
+	//  We don't check if these methods return null anyway so its equivalent to a static cast (will crash on fail)
+	//  The static asserts might help with that though
+
 	template <typename T>
 	std::shared_ptr<T> getLastActivePin()
 	{
 		static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
-		return std::dynamic_pointer_cast<T>(mp_lastActivePin);
+		//		return std::dynamic_pointer_cast<T>(mp_lastActivePin);
+		return nullptr;
 	}
 
 	template <typename T>
@@ -309,7 +327,7 @@ public:
 	{
 		static_assert(std::is_same<T, std::nullptr_t>::value || std::is_base_of_v<DIWNE::Pin, T>,
 		              "Pin must be derived from DIWNE::Pin class.");
-		mp_lastActivePin = pin;
+		//		mp_lastActivePin = pin;
 	}
 
 	template <typename T>

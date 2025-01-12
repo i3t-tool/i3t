@@ -103,7 +103,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	Main attributes:
 
-	- m_connectionPointDiwne : the point to/from which the link will be pulled (by default).
+	- m_connectionPoint : the point to/from which the link will be pulled (by default).
 	
 - Link (see Link.h)
 

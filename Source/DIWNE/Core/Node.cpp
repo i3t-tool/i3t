@@ -31,27 +31,6 @@ Node& Node::operator=(const Node& rhs)
 	return *this;
 }
 
-void Node::deleteActionDiwne()
-{
-	if (m_toDelete) // Only delete once
-		return;
-
-	deleteAction();
-
-	if (m_selected)
-	{
-		diwne.setNodesSelectionChanged(true);
-	}
-
-	auto lastActiveNode = diwne.getLastActiveNode<DIWNE::Node>();
-	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
-	{
-		diwne.setLastActiveNode<DIWNE::Node>(nullptr);
-		diwne.setLastActivePin<DIWNE::Pin>(nullptr);
-	}
-	m_toDelete = true;
-}
-
 bool Node::allowDrawing()
 {
 	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne()) || m_isDragged;
@@ -84,17 +63,19 @@ void Node::content(DrawInfo& context)
 
 void Node::end(DrawInfo& context)
 {
-	DIWNE_DEBUG_EXTRA_2((diwne), {
-		ImRect nodeRectDiwne = getRectDiwne();
-		ImGui::Text(fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", nodeRectDiwne.Min.x,
-		                        nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
-		                        diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y,
-		                        diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
-		                        diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y,
-		                        diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y)
-		                .c_str());
-	});                /* close of macro */
-	ImGui::EndGroup(); /* End of node */
+	DIWNE_DEBUG_OBJECTS((diwne), {
+		ImRect rect = getRectDiwne();
+		ImVec2 originPos = ImVec2(rect.Min.x, rect.Max.y);
+		ImGui::GetForegroundDrawList()->AddText(
+		    diwne.diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		    fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", rect.Min.x, rect.Min.y, rect.Max.x, rect.Max.y,
+		                diwne.diwne2workArea(rect.Min).x, diwne.diwne2workArea(rect.Min).y,
+		                diwne.diwne2workArea(rect.Max).x, diwne.diwne2workArea(rect.Max).y,
+		                diwne.diwne2screen(rect.Min).x, diwne.diwne2screen(rect.Min).y, diwne.diwne2screen(rect.Max).x,
+		                diwne.diwne2screen(rect.Max).y)
+		        .c_str());
+	});
+	ImGui::EndGroup();
 	ImGui::PopID();
 }
 
@@ -125,10 +106,9 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	// Check if the node is inside a selection rectangle
 	if (m_selectable)
 	{
-		if (context.action == Actions::selectionRect)
+		if (auto action = context.state.getActiveAction<Actions::SelectionRectAction>())
 		{
-			bool touch = std::any_cast<Actions::SelectionRectData&>(context.actionData).touch;
-			if (!touch)
+			if (!action->touch)
 			{
 				setSelected(diwne.getSelectionRectangleDiwne().Contains(getRectDiwne()) ? true
 				            : diwne.m_allowUnselectingNodes                             ? false
@@ -168,6 +148,22 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	DiwneObject::onDrag(context, dragStart, dragEnd);
 	move(diwne.m_input->bypassGetMouseDelta() / diwne.getWorkAreaZoom());
+}
+
+void Node::onDestroy(bool logEvent)
+{
+	DiwneObject::onDestroy(logEvent);
+	if (m_selected)
+	{
+		diwne.setNodesSelectionChanged(true);
+	}
+
+	auto lastActiveNode = diwne.getLastActiveNode<DIWNE::Node>();
+	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
+	{
+		diwne.setLastActiveNode<DIWNE::Node>(nullptr);
+		diwne.setLastActivePin<DIWNE::Pin>(nullptr);
+	}
 }
 
 } /* namespace DIWNE */

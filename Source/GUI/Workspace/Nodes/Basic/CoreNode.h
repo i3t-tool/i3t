@@ -33,13 +33,13 @@ protected:
 	 *
 	 * WorkspaceNodeWithCoreData is owner
 	 */
-	Ptr<Core::Node> const m_nodebase;
+	const Ptr<Core::Node> m_nodebase;
 
 public:
 	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
 
-	Ptr<Core::Node> const getNodebase() const;
+	Ptr<Core::Node> getNodebase() const;
 
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);

@@ -206,6 +206,10 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	if (ImGui::IsItemHovered())
 		ImGui::SetMouseCursor(6);
 
+	// TODO: With the new drag anywhere stuff dragging the corner breaks
+	//  We will probably restrict drag to the header only so it might be an non issue
+	//  The fix is probably just consuming input when the corner is moved
+
 	// TODO: Again, bypass isItemActive? just ImGui::IsItemActive bruh
 	if (diwne.bypassIsItemActive() && diwne.m_input->bypassIsMouseDragging0())
 	{

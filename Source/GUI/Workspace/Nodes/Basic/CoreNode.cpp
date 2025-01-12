@@ -207,7 +207,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	}
 }
 
-Ptr<Core::Node> const CoreNode::getNodebase() const
+Ptr<Core::Node> CoreNode::getNodebase() const
 {
 	return m_nodebase;
 }

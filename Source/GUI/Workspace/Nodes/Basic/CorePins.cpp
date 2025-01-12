@@ -50,8 +50,8 @@ std::map<Core::EValueType, EColor> Workspace::PinColorForeground = {
     {Core::EValueType::Quat, EColor::InnerQuatPin},           {Core::EValueType::Screen, EColor::InnerScreenPin},
     {Core::EValueType::Vec3, EColor::InnerVec3Pin},           {Core::EValueType::Vec4, EColor::InnerVec4Pin}};
 
-CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
-    : DIWNE::Pin(diwne), m_pin(pin), m_node(node), m_iconRectDiwne(ImRect(0, 0, 0, 0))
+CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput)
+    : DIWNE::Pin(diwne, node, isInput), m_pin(pin)
 {}
 
 bool CorePin::allowInteraction() const
@@ -65,135 +65,104 @@ bool CorePin::allowInteraction() const
  */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
+	m_connectionChanged = false;
+
+	// TODO: The entire pin shouldn't be rendered when isRendered is false.
+	//  Either handle this here or in the Node with pins
 	// const bool interaction_happen = false; // no interaction in this function allowed
 	if (getCorePin().isRendered())
 	{
-		const float alpha = ImGui::GetStyle().Alpha;
+		drawDataEx(context);
+		drawLabel(context);
+		drawPin(context);
+	}
+}
 
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+void CorePin::drawPin(DIWNE::DrawInfo& context)
+{
+	const float alpha = ImGui::GetStyle().Alpha;
 
-		const DIWNE::IconType iconTypeBg = PinShapeBackground[getType()];
-		const ImColor iconColorBg = I3T::getColor(PinColorBackground[getType()]);
-		DIWNE::IconType iconTypeFg;
-		if (getType() == Core::EValueType::Pulse)
-		{
-			iconTypeFg = m_iconType; // (PF) icon for the cycle box, Triangle elsewhere
-			                         // iconTypeFg = DIWNE::IconType::SkipBack;
-			                         // iconTypeFg = DIWNE::IconType::SkipBack2;
-			                         // iconTypeFg = DIWNE::IconType::SkipForward;
-			                         // iconTypeFg = DIWNE::IconType::SkipForward2;
-			                         // iconTypeFg = DIWNE::IconType::Rewind;
-			                         // iconTypeFg = DIWNE::IconType::FastForward;
-		}
-		else
-		{
-			iconTypeFg = PinShapeForeground[getType()];
-		}
-		const ImColor iconColorFg = I3T::getColor(PinColorForeground[getType()]);
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
+	const DIWNE::IconType iconTypeBg = PinShapeBackground[getType()];
+	const ImColor iconColorBg = I3T::getColor(PinColorBackground[getType()]);
+	DIWNE::IconType iconTypeFg;
+	if (getType() == Core::EValueType::Pulse)
+	{
+		iconTypeFg = m_iconType; // (PF) icon for the cycle box, Triangle elsewhere
+		                         // iconTypeFg = DIWNE::IconType::SkipBack;
+		                         // iconTypeFg = DIWNE::IconType::SkipBack2;
+		                         // iconTypeFg = DIWNE::IconType::SkipForward;
+		                         // iconTypeFg = DIWNE::IconType::SkipForward2;
+		                         // iconTypeFg = DIWNE::IconType::Rewind;
+		                         // iconTypeFg = DIWNE::IconType::FastForward;
+	}
+	else
+	{
+		iconTypeFg = PinShapeForeground[getType()];
+	}
+	const ImColor iconColorFg = I3T::getColor(PinColorForeground[getType()]);
 
-		ImGuiContext& g = *GImGui;
+	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
 
-		// space between icon symbol and icon boundary
-		const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
+	ImGuiContext& g = *GImGui;
 
-		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
-		//   not visible anyway so we're just drawing stuff twice for no reason
-		// todo (PF) - I have temporally added the pin border drawing of not-connected pins
-		// connected pins have no border now
-		diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-		                           createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
-		                           ImVec4(padding, padding, padding, padding), isConnected());
-		m_iconRectDiwne =
-		    ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+	// space between icon symbol and icon boundary
+	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
-		ImGui::PopStyleVar();
+	// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
+	//   not visible anyway so we're just drawing stuff twice for no reason
+	// todo (PF) - I have temporally added the pi n border drawing of not-connected pins
+	// connected pins have no border now
+	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
+	                           createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
+	                           ImVec4(padding, padding, padding, padding), isConnected());
+	m_pinRect = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+
+	ImGui::PopStyleVar();
+}
+
+void CorePin::drawLabel(DIWNE::DrawInfo& context)
+{
+	const std::string& label = m_pin.getLabel();
+	// todo (PF) Label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
+	// probably not - would be good for scalars, but wrong for mat4
+	// if (!label.empty())
+	if (m_pin.ValueType != Core::EValueType::Pulse && !label.empty()) // no labels for pulse and cycle
+	{
+		ImGui::TextUnformatted(label.c_str());
+		ImGui::SameLine();
+	}
+}
+
+void CorePin::drawDataEx(DIWNE::DrawInfo& context)
+{
+	bool interaction_happen = false;
+	// if (getNode().getLevelOfDetail() == LevelOfDetail::Full ||
+	//     getNode().getLevelOfDetail() == LevelOfDetail::SetValues || // for cycle box
+	//     getNode().getLevelOfDetail() == LevelOfDetail::LightCycle)  // for cycle box
+	if (static_cast<CoreNode*>(getNode())->getLevelOfDetail() != LevelOfDetail::Label)
+	{
+		if (!m_isInput && m_showData)
+			drawData(context);
 	}
 }
 
 void CorePin::popupContent(DIWNE::DrawInfo& context) {}
 
-// TODO: Remove, essentially replaced by allowConnection()
-bool CorePin::bypassFocusForInteractionAction()
-{
-	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
-}
-
-bool CorePin::allowConnection() const
-{
-	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
-}
-
-const Core::Pin& CorePin::getCorePin() const
-{
-	return m_pin;
-}
-
-int CorePin::getIndex() const
-{
-	return m_pin.Index;
-}
-
-PinKind CorePin::getKind() const
-{
-	return m_pin.IsInput ? PinKind::Input : PinKind::Output;
-}
-
-Core::EValueType CorePin::getType() const
-{
-	return m_pin.ValueType;
-}
-
-// TODO: Uncomment
-// bool CorePin::processDrag()
-//{
-//	const ImVec2 origin = getLinkConnectionPointDiwne();
-//	const ImVec2 actual = diwne.screen2diwne(ImGui::GetIO().MousePos);
-//
-//	if (getKind() == PinKind::Output)
-//		diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
-//	else
-//		diwne.getHelperLink().setLinkEndpointsDiwne(actual, origin);
-//
-//	diwne.mp_settingsDiwne->linkColor = I3T::getTheme().get(PinColorBackground[getType()]);
-//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
-//
-//	return Pin::processDrag();
-//}
-//
-void CorePin::onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd)
-{
-	Pin::onDrag(context, dragStart, dragEnd);
-
-	const ImVec2 origin = getLinkConnectionPointDiwne();
-	const ImVec2 actual = diwne.screen2diwne(diwne.m_input->bypassGetMousePos());
-
-	if (getKind() == PinKind::Input)
-		diwne.m_helperLink->setLinkEndpointsDiwne(actual, origin);
-	else
-		diwne.m_helperLink->setLinkEndpointsDiwne(origin, actual);
-
-	// TODO: Set helperLink's start pin to THIS pin.
-	//  Obviously right now we can't because the start pin has to be an CoreInPin, why oh why.
-	//  All of this should be in the DIWNE library anyway, no point having this specialized for CorePin, there is
-	//  nothing Core related going on here, only the color.
-	//  Hopefully I'll rework the pins to not distungish betweem
-	//  start and end because frankly the distinction just complicates things.
-}
-
-void CorePin::onPlug(bool hovering)
+bool CorePin::tryPlug(DIWNE::Pin* startPin, DIWNE::Link* link, bool hovering)
 {
 	CorePin *input, *output;
 
-	if (getKind() == PinKind::Input)
+	// In I3T we always call the plug() method on the input pin, not the output pin.
+	if (isInput())
 	{
 		input = this;
-		output = diwne.getLastActivePin<CorePin>().get();
+		output = static_cast<CorePin*>(startPin);
 	}
 	else
 	{
-		input = diwne.getLastActivePin<CorePin>().get();
+		input = static_cast<CorePin*>(startPin);
 		output = this;
 	}
 
@@ -206,8 +175,8 @@ void CorePin::onPlug(bool hovering)
 		diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
 		if (!hovering)
 		{
-			CoreInPin* in = dynamic_cast<CoreInPin*>(input);
-			in->plug(dynamic_cast<CoreOutPin*>(output));
+			input->plugLink(output, link, true);
+			return true;
 		}
 		break;
 
@@ -233,193 +202,206 @@ void CorePin::onPlug(bool hovering)
 	default: // unreachable - all enum values are covered
 		diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 	}
-	//	return true;
+	return false;
 }
 
-/* \todo JH \todo MH implement this function in Core? */
-bool CorePin::isConnected() const
+bool CorePin::plugLink(Pin* startPin, DIWNE::Link* link, bool logEvent)
 {
-	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
-}
+	I3T_ASSERT(isInput() && !startPin->isInput(),
+	           "The plug method must be called on the input pin with the output pin as an argument!");
 
-CoreOutPin::CoreOutPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : CorePin(diwne, pin, node) {}
+	Core::Pin const* coreInput = &(getCorePin());
+	Core::Pin const* coreOutput = &(static_cast<CorePin*>(startPin)->getCorePin());
 
-/**
- * \brief Draw the output Pin: label and icon [float >]
- * \return true if value changed
- */
-void CoreOutPin::content(DIWNE::DrawInfo& context)
-{
-	const std::string& label = m_pin.getLabel();
-	// todo (PF) Label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
-	// probably not - would be good for scalars, but wrong for mat4
-	// if (!label.empty())
-	if (m_pin.ValueType != Core::EValueType::Pulse && !label.empty()) // no labels for pulse and cycle
+	// Check if Core pins can be plugged
+	Core::ENodePlugResult plugResult = Core::GraphManager::isPlugCorrect(*coreInput, *coreOutput);
+	if (plugResult != Core::ENodePlugResult::Ok)
+		return false;
+
+	// Then plug the UI
+	if (!Pin::plugLink(startPin, link, logEvent))
 	{
-		ImGui::TextUnformatted(label.c_str());
-		ImGui::SameLine();
+		LOG_ERROR("[WORKSPACE] Connected Core pins but failed to connect UI pins!");
+		return false;
 	}
-	CorePin::content(context); // icon
+
+	// And finally plug the Core pins, after UI unplug callbacks were already called
+	plugResult =
+	    Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(), coreOutput->Index, coreInput->Index);
+	if (plugResult != Core::ENodePlugResult::Ok)
+	{
+		LOG_ERROR("[WORKSPACE] Connected UI pins but failed to connect Core pins!");
+		return false;
+	}
+	return true;
 }
 
-DataOutPin::DataOutPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node) : CoreOutPin(diwne, pin, node) {}
-
-void DataOutPin::content(DIWNE::DrawInfo& context)
+void CorePin::onPlug(DIWNE::Pin* startPin, bool logEvent)
 {
-	bool interaction_happen = false;
-	// if (getNode().getLevelOfDetail() == LevelOfDetail::Full ||
-	//     getNode().getLevelOfDetail() == LevelOfDetail::SetValues || // for cycle box
-	//     getNode().getLevelOfDetail() == LevelOfDetail::LightCycle)  // for cycle box
-	if (getNode().getLevelOfDetail() != LevelOfDetail::Label)
+	Pin::onPlug(startPin, logEvent);
+	if (logEvent)
 	{
-		interaction_happen |= drawData();
-		ImGui::SameLine();
+		Core::Pin const* coreInput = &(getCorePin());
+		Core::Pin const* coreOutput = &(static_cast<CorePin*>(startPin)->getCorePin());
+		LOG_EVENT_CONNECT(coreOutput, coreInput);
+	}
+}
+
+void CorePin::onUnplug(bool logEvent)
+{
+	if (m_isInput)
+	{
+		const auto rightNode = getNode<CoreNode>()->getNodebase();
+		const auto* inputPin = &rightNode->getInputPins()[getCoreIndex()];
+		const auto* outputPin = inputPin->getParentPin();
+
+		if (logEvent)
+		{
+			LOG_EVENT_DISCONNECT(outputPin, inputPin);
+			diwne.m_takeSnap = true;
+		}
+
+		Core::GraphManager::unplugInput(getNode<CoreNode>()->getNodebase(), getCoreIndex());
+		m_connectionChanged = true;
+	}
+}
+
+bool CorePin::allowConnection() const
+{
+	return m_pinRect.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+}
+
+const Core::Pin& CorePin::getCorePin() const
+{
+	return m_pin;
+}
+
+int CorePin::getCoreIndex() const
+{
+	return m_pin.Index;
+}
+
+Core::EValueType CorePin::getType() const
+{
+	return m_pin.ValueType;
+}
+
+void CorePin::drawData(DIWNE::DrawInfo& context)
+{
+	switch (m_pin.ValueType)
+	{
+	case Core::EValueType::Matrix:
+	case Core::EValueType::Vec4:
+	case Core::EValueType::Vec3:
+	case Core::EValueType::Float:
+	case Core::EValueType::Quat:
+		drawBasicPinData(context);
+		break;
+	case Core::EValueType::Pulse:
+		drawPulsePinData(context);
+		break;
+	case Core::EValueType::Screen:
+		drawPulsePinData(context);
+		break;
+	case Core::EValueType::MatrixMul: // We never show data for matrix mul type
+	case Core::EValueType::Ptr:       // Pin with type Ptr have no graphical representation
+		break;
+	default:
+		I3T_ABORT("Unknown Pin type while loading output pins from "
+		          "Core to Workspace");
+	}
+}
+
+void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
+{
+	bool valueChanged = false;
+	bool interaction_happen = false;
+	CoreNode& node = *static_cast<CoreNode*>(getNode());
+
+	Core::EValueState valState = node.getNodebase()->getState(getCoreIndex());
+
+	switch (m_pin.ValueType)
+	{
+	case Core::EValueType::Matrix:
+	{
+		int rowOfChange, columnOfChange;
+		float valueOfChange;
+
+		interaction_happen =
+		    DataRenderer::drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		                              node.getFloatPopupMode(), getCorePin().data().getMat4(),
+		                              {valState, valState, valState, valState, valState, valState, valState, valState,
+		                               valState, valState, valState, valState, valState, valState, valState, valState},
+		                              valueChanged, rowOfChange, columnOfChange, valueOfChange);
+		if (valueChanged) // TODO: JM MH set values to given (this) pin*/
+			node.getNodebase()->setValue(valueOfChange, {columnOfChange, rowOfChange});
+	}
+	break;
+	case Core::EValueType::Vec4:
+	{
+		glm::vec4 valueOfChange;
+		interaction_happen = DataRenderer::drawDataVec4(
+		    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
+		    getCorePin().data().getVec4(), {valState, valState, valState, valState}, valueChanged, valueOfChange);
+		if (valueChanged)
+			node.getNodebase()->setValue(valueOfChange);
+	}
+	break;
+	case Core::EValueType::Vec3:
+	{
+		glm::vec3 valueOfChange;
+		interaction_happen = DataRenderer::drawDataVec3(
+		    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
+		    getCorePin().data().getVec3(), {valState, valState, valState}, valueChanged, valueOfChange);
+		if (valueChanged)
+			node.getNodebase()->setValue(valueOfChange);
+	}
+	break;
+	case Core::EValueType::Float:
+	{
+		float valueOfChange;
+		interaction_happen = DataRenderer::drawDataFloat(
+		    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
+		    getCorePin().data().getFloat(), node.getNodebase()->getState(getCoreIndex()), valueChanged, valueOfChange);
+		if (valueChanged)
+			node.getNodebase()->setValue(valueOfChange);
+	}
+	break;
+	case Core::EValueType::Quat:
+	{
+		glm::quat valueOfChange;
+		interaction_happen = DataRenderer::drawDataQuaternion(
+		    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
+		    getCorePin().data().getQuat(), {valState, valState, valState, valState}, valueChanged, valueOfChange);
+		if (valueChanged)
+			node.getNodebase()->setValue(valueOfChange);
+	}
+	break;
+	default:
+		I3T_ABORT("Unknown standard data pin!");
+		break;
+	}
+	ImGui::SameLine();
+	if (valueChanged)
+	{
+		node.updateDataItemsWidth();
 	}
 	if (interaction_happen)
 		context.update(true, true, true);
-	CoreOutPin::content(context); // label and icon
 }
 
-/* >>>> Pin types <<<< */
-
-bool DataOutPinMatrix::drawData()
-{
-	bool valueChanged = false, interaction_happen = false;
-	int rowOfChange, columnOfChange;
-	float valueOfChange;
-	CoreNode& node = getNode();
-
-	Core::EValueState valState = node.getNodebase()->getState(getIndex());
-	interaction_happen =
-	    DataRenderer::drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
-	                              node.getFloatPopupMode(), getCorePin().data().getMat4(),
-	                              {valState, valState, valState, valState, valState, valState, valState, valState,
-	                               valState, valState, valState, valState, valState, valState, valState, valState},
-	                              valueChanged, rowOfChange, columnOfChange, valueOfChange);
-	if (valueChanged)
-	{
-		/* \todo JM MH set values to given (this) pin*/
-		node.getNodebase()->setValue(valueOfChange, {columnOfChange, rowOfChange});
-		node.updateDataItemsWidth();
-	}
-	return interaction_happen;
-}
-
-int DataOutPinMatrix::maxLengthOfData()
-{
-	return DataRenderer::maxLengthOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
-}
-
-bool DataOutPinVector4::drawData()
-{
-	bool valueChanged = false, interaction_happen = false;
-	// int                        rowOfChange, columnOfChange;
-	glm::vec4 valueOfChange;
-	CoreNode& node = getNode();
-
-	Core::EValueState valState = node.getNodebase()->getState(getIndex());
-	interaction_happen = DataRenderer::drawDataVec4(
-	    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
-	    getCorePin().data().getVec4(), {valState, valState, valState, valState}, valueChanged, valueOfChange);
-
-	if (valueChanged)
-	{
-		node.getNodebase()->setValue(valueOfChange);
-		node.updateDataItemsWidth();
-	}
-	return interaction_happen;
-}
-
-int DataOutPinVector4::maxLengthOfData()
-{
-	return DataRenderer::maxLengthOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
-}
-
-bool DataOutPinVector3::drawData()
-{
-	bool valueChanged = false, interaction_happen = false;
-	// int                        rowOfChange, columnOfChange;
-	glm::vec3 valueOfChange;
-	CoreNode& node = getNode();
-
-	Core::EValueState valState = node.getNodebase()->getState(getIndex());
-	interaction_happen = DataRenderer::drawDataVec3(
-	    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
-	    getCorePin().data().getVec3(), {valState, valState, valState}, valueChanged, valueOfChange);
-
-	if (valueChanged)
-	{
-		node.getNodebase()->setValue(valueOfChange);
-		node.updateDataItemsWidth();
-	}
-	return interaction_happen;
-}
-
-int DataOutPinVector3::maxLengthOfData()
-{
-	return DataRenderer::maxLengthOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
-}
-
-bool DataOutPinFloat::drawData()
-{
-	bool valueChanged = false, interaction_happen = false;
-	// int                        rowOfChange, columnOfChange;
-	float valueOfChange;
-	CoreNode& node = getNode();
-
-	interaction_happen = DataRenderer::drawDataFloat(
-	    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
-	    getCorePin().data().getFloat(), node.getNodebase()->getState(getIndex()), valueChanged, valueOfChange);
-
-	if (valueChanged)
-	{
-		node.getNodebase()->setValue(valueOfChange);
-		node.updateDataItemsWidth();
-	}
-	return interaction_happen;
-}
-
-int DataOutPinFloat::maxLengthOfData()
-{
-	return DataRenderer::maxLengthOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
-}
-
-bool DataOutPinQuat::drawData()
-{
-	bool valueChanged = false, interaction_happen = false;
-	// int                        rowOfChange, columnOfChange;
-	glm::quat valueOfChange;
-	CoreNode& node = getNode();
-
-	Core::EValueState valState = node.getNodebase()->getState(getIndex());
-	interaction_happen = DataRenderer::drawDataQuaternion(
-	    diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(), node.getFloatPopupMode(),
-	    getCorePin().data().getQuat(), {valState, valState, valState, valState}, valueChanged, valueOfChange);
-
-	if (valueChanged)
-	{
-		node.getNodebase()->setValue(valueOfChange);
-		node.updateDataItemsWidth();
-	}
-	return interaction_happen;
-}
-
-int DataOutPinQuat::maxLengthOfData()
-{
-	return DataRenderer::maxLengthOfDataQuaternion(getCorePin().data().getQuat(),
-	                                               getNode().getNumberOfVisibleDecimal());
-}
-
-bool DataOutPinPulse::drawData()
+void CorePin::drawPulsePinData(DIWNE::DrawInfo& context)
 {
 	// (PF) Pulse box: The Pulse button appears only if no input is connected.
-	const Core::EValueState& state = getNode().getNodebase()->getState(getIndex());
+	CoreNode* node = static_cast<CoreNode*>(getNode());
+	const Core::EValueState& state = node->getNodebase()->getState(getCoreIndex());
 	if (state == Core::EValueState::Editable)
 	{
-		if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", "Pulse", getNode().getId(), m_idDiwne).c_str()))
+		if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", "Pulse", node->getId(), m_idDiwne).c_str()))
 		{
-			getNode().getNodebase()->pulse(getIndex());
-			return true;
+			node->getNodebase()->pulse(getCoreIndex());
+			context.update(true, true, true);
+			return;
 		}
 	}
 	else // Pulse with a connected Input. Cycle Pulse outputs.
@@ -435,165 +417,93 @@ bool DataOutPinPulse::drawData()
 
 		ImGui::Dummy(ImVec2(0.0, 0.0)); // to avoid unlimited cycle width
 	}
-	return false;
+	ImGui::SameLine();
 }
-int DataOutPinPulse::maxLengthOfData()
-{
-	return 0;
-} /* no data with length here*/
 
-DataOutPinScreen::DataOutPinScreen(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
-    : DataOutPin(diwne, pin, node)
-{}
-
-bool DataOutPinScreen::drawData()
+int CorePin::maxLengthOfData()
 {
-	if (getCorePin().isPluggedIn())
+	switch (m_pin.ValueType)
 	{
-		glm::mat4 camera =
-		    Core::GraphManager::getParent(getNode().getNodebase())->data(2).getMat4(); /* JH why magic 2? */
-
-		// ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f),
-		// ImVec2(1,0));
-		ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture),
-		             I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize) * diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f),
-		             ImVec2(1, 0)); // vertical flip
-	}
-	return false;
-}
-int DataOutPinScreen::maxLengthOfData()
-{
-	return 0;
-} /* no data with length here*/
-
-/* >>>> WorkspaceCoreInputPin <<<< */
-
-CoreInPin::CoreInPin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode& node)
-    : CorePin(diwne, pin, node), m_link(diwne, this)
-{}
-
-void CoreInPin::drawDiwne(DIWNE::DrawInfo& context, DIWNE::DrawMode drawMode)
-{
-	// TODO: Investigate this method, why do we need to touch the DIWNE implementation?
-	DIWNE::DrawMode drawModeTEST = m_interactive ? drawMode : DIWNE::DrawMode::JustDraw;
-
-	m_connectionChanged = false;
-
-	//	const bool inner_interaction_happen = CorePin::drawDiwne(m_drawMode);
-	CorePin::drawDiwne(context);
-
-	// ImGui::DebugDrawItemRect(ImColor(255, 127, 100, 127));
-
-	if (isConnected())
-	{
-		// inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
-		static_cast<WorkspaceDiwne&>(diwne).m_linksToDraw.push_back(&getLink());
+	case Core::EValueType::Matrix:
+		return DataRenderer::maxLengthOfData4x4(getCorePin().data().getMat4(),
+		                                        static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+	case Core::EValueType::Vec4:
+		return DataRenderer::maxLengthOfDataVec4(getCorePin().data().getVec4(),
+		                                         static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+	case Core::EValueType::Vec3:
+		return DataRenderer::maxLengthOfDataVec3(getCorePin().data().getVec3(),
+		                                         static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+	case Core::EValueType::Float:
+		return DataRenderer::maxLengthOfDataFloat(getCorePin().data().getFloat(),
+		                                          static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+	case Core::EValueType::Quat:
+		return DataRenderer::maxLengthOfDataQuaternion(getCorePin().data().getQuat(),
+		                                               static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+	case Core::EValueType::Pulse:
+	case Core::EValueType::MatrixMul:
+	case Core::EValueType::Screen:
+	case Core::EValueType::Ptr: /* Pin with type Ptr have no graphic representation */
+		return 0;
+	default:
+		I3T_ABORT("Unknown Pin type while loading output pins from "
+		          "Core to Workspace");
+		return 0;
 	}
 }
 
-void CoreInPin::setConnectedWorkspaceOutput(CoreOutPin* ou)
+/* \todo JH \todo MH implement this function in Core? */
+bool CorePin::isConnected() const
 {
-	m_link.setStartPin(ou);
+	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
 }
 
-void CoreInPin::unplug(bool logEvent)
+std::shared_ptr<DIWNE::Link> CorePin::createLink()
 {
-	const auto rightNode = getNode().getNodebase();
-	const auto* inputPin = &rightNode->getInputPins()[getIndex()];
-
-	if (logEvent)
-	{
-		LOG_EVENT_DISCONNECT(inputPin->getParentPin(), inputPin);
-		diwne.m_takeSnap = true;
-	}
-
-	Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
-	m_link.setStartPin(nullptr);
-	m_connectionChanged = true;
+	return diwne.createLink<CoreLink>();
 }
 
-bool CoreInPin::plug(CoreOutPin* ou, bool logEvent)
-{
-	Core::Pin const* coreInput = &(getCorePin());
-	Core::Pin const* coreOutput = &(ou->getCorePin());
-
-	if (Core::ENodePlugResult::Ok ==
-	    Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(), coreOutput->Index, coreInput->Index))
-	{
-		setConnectedWorkspaceOutput(ou);
-		m_link.m_just_pluged = true;
-		m_connectionChanged = true;
-
-		if (logEvent)
-		{
-			LOG_EVENT_CONNECT(coreOutput, coreInput);
-			diwne.m_takeSnap = true;
-		}
-		return true;
-	}
-	return false;
-}
-
-bool CoreInPin::connectionChanged() const
-{
-	return m_connectionChanged;
-}
-
-void CoreInPin::content(DIWNE::DrawInfo& context)
-{
-	CorePin::content(context); // icon
-
-	const std::string& label = m_pin.getLabel(); // label
-	if (m_pin.ValueType != Core::EValueType::Pulse &&
-	    !label.empty()) // no labels for pulse type in PulseToPulse and Cycle
-	{
-		ImGui::SameLine();
-		ImGui::TextUnformatted(label.c_str());
-	}
-	// std::cout << "Input Pin connected = " << isConnected() << std::endl;
-}
-
-bool CoreInPin::bypassCreateAndPlugConstructorNodeAction()
-{
-	return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);
-}
-bool CoreInPin::allowCreateAndPlugConstructorNodeAction()
-{
-	return true;
-	// TODO: Uncomment
-	// return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
-}
-bool CoreInPin::processCreateAndPlugConstrutorNode()
-{
-	if (allowCreateAndPlugConstructorNodeAction() && bypassCreateAndPlugConstructorNodeAction())
-	{
-		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction =
-		    WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
-		diwne.setLastActivePin<CoreInPin>(std::static_pointer_cast<CoreInPin>(shared_from_this()));
-		diwne.m_takeSnap = true;
-		return true;
-	}
-	return false;
-}
-
-bool CoreInPin::bypassUnplugAction()
-{
-	return InputManager::isActionTriggered("unplugInput", EKeyState::Pressed);
-}
-bool CoreInPin::processUnplug()
-{
-	if (isConnected() && bypassUnplugAction())
-	{
-		unplug();
-		return true;
-	}
-	return false;
-}
 // TODO: Uncomment
-// bool CoreInPin::processInteractions()
+// bool CorePin::bypassCreateAndPlugConstructorNodeAction()
+//{
+//	return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);
+//}
+// bool CorePin::allowCreateAndPlugConstructorNodeAction()
+//{
+//	return true;
+//	// TODO: Uncomment
+//	// return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
+//}
+// bool CorePin::processCreateAndPlugConstrutorNode()
+//{
+//	if (allowCreateAndPlugConstructorNodeAction() && bypassCreateAndPlugConstructorNodeAction())
+//	{
+//		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction =
+//		    WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
+//		diwne.setLastActivePin<CorePin>(std::static_pointer_cast<CorePin>(shared_from_this()));
+//		diwne.m_takeSnap = true;
+//		return true;
+//	}
+//	return false;
+//}
+
+// bool CorePin::bypassUnplugAction()
+//{
+//	return InputManager::isActionTriggered("unplugInput", EKeyState::Pressed);
+// }
+// bool CorePin::processUnplug()
+//{
+//	if (isConnected() && bypassUnplugAction())
+//	{
+//		unplug();
+//		return true;
+//	}
+//	return false;
+// }
+//  TODO: Uncomment
+//  bool CorePin::processInteractions()
 //{
 //	bool interaction_happen = CorePin::processInteractions();
 //	interaction_happen |= processUnplug();
 //	interaction_happen |= processCreateAndPlugConstrutorNode();
 //	return interaction_happen;
-//}
+// }
