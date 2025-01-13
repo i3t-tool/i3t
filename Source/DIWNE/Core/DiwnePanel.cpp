@@ -51,7 +51,7 @@ void DiwnePanel::end(DiwnePanel* parent)
 			ImGui::GetForegroundDrawList()->AddText(
 			    m_editor.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_label)
-			        //		     (m_ ? "Hovered\n" : "") + (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
+			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
 			        .c_str());
 		}
 	});
@@ -75,7 +75,7 @@ void DiwnePanel::layout()
 			ImGui::GetForegroundDrawList()->AddText(
 			    m_editor.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_label)
-			        //		     (m_ ? "Hovered\n" : "") + (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
+			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
 			        .c_str());
 		}
 	});

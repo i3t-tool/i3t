@@ -151,3 +151,12 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
 }
+
+void CoreNodeWithPins::onDestroy(bool logEvent)
+{
+	Node::onDestroy(logEvent);
+	for (auto pin : m_workspaceInputs)
+		pin->destroy(logEvent);
+	for (auto pin : m_workspaceOutputs)
+		pin->destroy(logEvent);
+}

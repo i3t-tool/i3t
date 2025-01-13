@@ -146,7 +146,7 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 	std::vector<const GameObject*> selectedObjects;
 	for (const auto& modelNode : Workspace::g_diwne->getAllModels())
 	{
-		if (!modelNode->m_selected)
+		if (!modelNode->getSelected())
 		{
 			continue;
 		}
@@ -160,7 +160,7 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 	}
 	for (const auto& cameraNode : Workspace::g_diwne->getAllCameras())
 	{
-		if (!cameraNode->m_selected)
+		if (!cameraNode->getSelected())
 		{
 			continue;
 		}

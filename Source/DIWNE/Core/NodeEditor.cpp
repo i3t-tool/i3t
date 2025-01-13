@@ -64,7 +64,7 @@ void NodeEditor::begin(DrawInfo& context)
 	m_nodesSelectionChanged = false;
 
 	ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
-	ImGui::PushID(m_labelDiwne.c_str()); // TODO: Is this necessary? We already do this in the Beign child no?
+	ImGui::PushID(m_labelDiwne.c_str()); // TODO: Is this necessary? We already do this in the Begin child no?
 	ImGui::BeginGroup();
 
 	assert(!diwne.m_zoomScalingApplied);
@@ -171,7 +171,6 @@ void NodeEditor::end(DrawInfo& context)
 	//  I suppose there is no problem in making NodeEditor behave like a Node
 	//  (that would be required anyway for the ultimate test of a node editor inside a node editor)
 	ImGui::PopID();
-	ImGui::EndChild();
 }
 
 void NodeEditor::updateLayout(DrawInfo& context)
@@ -190,23 +189,8 @@ void NodeEditor::afterDraw(DrawInfo& context)
 		     "workArea: " + std::to_string(m_workAreaDiwne.Min.x) + ", " + std::to_string(m_workAreaDiwne.Min.y))
 		        .c_str());
 	});
-}
-
-void NodeEditor::clear()
-{
-	for (auto& node : m_workspaceCoreNodes)
-	{
-		node->destroy(false);
-	}
-	for (auto& link : m_links)
-	{
-		link->destroy(false);
-	}
-	m_workspaceCoreNodes.clear();
-	m_links.clear();
-
-	setLastActiveNode<DIWNE::Node>(nullptr);
-	setLastActivePin<DIWNE::Pin>(nullptr);
+	// The editor child window is ended here instead of end() so that afterDraw() drawing is in the same window DrawList
+	ImGui::EndChild();
 }
 
 void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
@@ -252,18 +236,34 @@ bool NodeEditor::allowHover() const
 }
 
 //
-void NodeEditor::processInteractionsDiwne(DrawInfo& context)
+void NodeEditor::processInteractions(DrawInfo& context)
 {
-	DiwneObject::processInteractionsDiwne(context);
+	// Stop any action on ESC
+	if (ImGui::IsKeyDown(ImGuiKey_Escape))
+	{
+		if (interactionState.anyActionActive())
+			interactionState.endAction();
+	}
 
-	// Handle zooming
-	if (m_hovered && !context.inputConsumed)
-		processDiwneZoom();
+	if (!context.inputConsumed)
+	{
+		// Handle zooming
+		if (m_hovered)
+			processDiwneZoom();
+	}
 }
 
-void NodeEditor::finalizeDiwne(DrawInfo& context)
+void NodeEditor::onReleased(bool justReleased, DrawInfo& context)
 {
-	DiwneObject::finalizeDiwne(context);
+	// Unselect nodes on click
+	if (justReleased)
+	{
+		if (!context.logicalUpdates && !context.state.dragging && !m_input->multiSelectionActive())
+		{
+			deselectNodes();
+		}
+	}
+	DiwneObject::onReleased(justReleased, context);
 }
 
 void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
@@ -273,65 +273,71 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	{
 		translateWorkAreaDiwneZoomed(m_input->bypassGetMouseDelta() * -1);
 	}
+
+	using namespace Actions;
+
 	if (m_input->selectionRectangleKeyDown())
+	{
+		if (dragStart && !context.state.action)
+		{
+			context.state.startAction<SelectionRectAction>(m_labelDiwne);
+		}
+	}
+	if (context.state.isActionActive(Actions::selectionRect, m_labelDiwne))
 	{
 		ImVec2 startPos = m_input->selectionRectangleStartPosition();
 		ImVec2 dragDelta = m_input->selectionRectangleSize();
 		ImColor color;
 
-		using namespace Actions;
-
-		if (dragStart && !context.state.action)
-		{
-			context.state.setAction<SelectionRectAction>(m_labelDiwne);
-		}
+		SelectionRectAction* action = context.state.getAction<SelectionRectAction>();
 		if (dragDelta.x > 0)
 		{
-			m_selectionRectangeDiwne.Min.x = startPos.x;
-			m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
+			action->rect.Min.x = startPos.x;
+			action->rect.Max.x = startPos.x + dragDelta.x;
 			color = mp_settingsDiwne->selectionRectFullColor;
-			context.state.getAction<SelectionRectAction>()->touch = false;
+			action->touch = false;
 		}
 		else
 		{
-			m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
-			m_selectionRectangeDiwne.Max.x = startPos.x;
+			action->rect.Min.x = startPos.x + dragDelta.x;
+			action->rect.Max.x = startPos.x;
 			color = mp_settingsDiwne->selectionRectTouchColor;
-			context.state.getAction<SelectionRectAction>()->touch = true;
+			action->touch = true;
 		}
 		if (dragDelta.y > 0)
 		{
-			m_selectionRectangeDiwne.Min.y = startPos.y;
-			m_selectionRectangeDiwne.Max.y = startPos.y + dragDelta.y;
+			action->rect.Min.y = startPos.y;
+			action->rect.Max.y = startPos.y + dragDelta.y;
 		}
 		else
 		{
-			m_selectionRectangeDiwne.Min.y = startPos.y + dragDelta.y;
-			m_selectionRectangeDiwne.Max.y = startPos.y;
+			action->rect.Min.y = startPos.y + dragDelta.y;
+			action->rect.Max.y = startPos.y;
 		}
-		m_renderer->AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
-	}
-	if (dragEnd && context.state.isActionActive(Actions::selectionRect))
-	{
-		context.state.clearAction();
+		m_renderer->AddRectFilledDiwne(action->rect.Min, action->rect.Max, color);
+		m_renderer->AddRectDiwne(
+		    action->rect.Min, action->rect.Max,
+		    ImVec4(color.Value.x, color.Value.y, color.Value.z, mp_settingsDiwne->selectionRectBorderAlpha));
+
+		if (dragEnd)
+		{
+			context.state.endAction();
+		}
 	}
 }
 
 bool NodeEditor::isPressedDiwne()
 {
-	// To allow drag using middle mouse button
 	return m_input->selectionRectangleKeyDown() || m_input->panKeyDown();
 }
 
 bool NodeEditor::isJustPressedDiwne()
 {
-	// To allow drag using middle mouse button
 	return m_input->selectionRectangleKeyPressed() || m_input->panKeyPressed();
 }
 
 bool NodeEditor::isDraggedDiwne()
 {
-	// Drag also using middle mouse button
 	return m_input->selectionRectangleDragging() || m_input->panDragging();
 }
 
@@ -392,7 +398,9 @@ void NodeEditor::shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode
 
 void NodeEditor::shiftInteractingNodeToEnd()
 {
-	if (mp_lastActiveNode != nullptr && mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
+	if (mp_lastActiveNode == nullptr || m_workspaceCoreNodes.empty())
+		return;
+	if (mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
 	{
 		auto draged_node_it = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 		                                   [this](Ptr<Workspace::CoreNode> const& node) -> bool {
@@ -521,11 +529,6 @@ bool NodeEditor::bypassZoomAction()
 	return diwne.bypassGetZoomDelta() != 0;
 }
 
-ImRect NodeEditor::getSelectionRectangleDiwne()
-{
-	return m_selectionRectangeDiwne;
-}
-
 void NodeEditor::setWorkAreaZoom(float val /*=1*/)
 {
 	double old = m_workAreaZoom;
@@ -648,6 +651,53 @@ bool NodeEditor::ensureZoomScaling(bool active)
 		}
 	}
 	return activeBefore;
+}
+
+void NodeEditor::clear()
+{
+	for (auto& node : m_workspaceCoreNodes)
+	{
+		node->destroy(false);
+	}
+	for (auto& link : m_links)
+	{
+		link->destroy(false);
+	}
+	m_workspaceCoreNodes.clear();
+	m_links.clear();
+
+	setLastActiveNode<DIWNE::Node>(nullptr);
+}
+
+std::vector<std::shared_ptr<Workspace::CoreNode>> NodeEditor::getAllNodesInnerIncluded()
+{
+	return getAllNodes();
+}
+
+std::vector<std::shared_ptr<Workspace::CoreNode>> NodeEditor::getSelectedNodesInnerIncluded()
+{
+	return getSelectedNodes();
+}
+
+std::vector<Ptr<Workspace::CoreNode>> NodeEditor::getSelectedNodes()
+{
+	std::vector<Ptr<Workspace::CoreNode>> selected;
+	for (auto const& node : m_workspaceCoreNodes)
+	{
+		if (node->getSelected())
+		{
+			selected.push_back(node);
+		};
+	}
+	return selected;
+}
+
+void NodeEditor::deselectNodes()
+{
+	for (auto node : getAllNodesInnerIncluded())
+	{
+		node->setSelected(false);
+	}
 }
 
 void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2 position, bool shiftToLeftByNodeWidth)

@@ -57,7 +57,6 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
 
 	m_workspaceDiwneAction = WorkspaceDiwneAction::None;
-	m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
 	m_reconnectCameraToSequence = false;
 	if (m_updateDataItemsWidth)
 	{
@@ -262,59 +261,27 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 
 // TODO: THIS STUFF IS ESSENTIALLY INTERACTION (move to process interactions)
 //  Still gotta reimplement:
-//  Viewport selection update
-//  Multiple node drag
-//  Ctrl/Shift click selection
-//  Unselection on click
+//  1. CreateAndPlugConstructor
+//  2. Tracking
+//  3. Selection bring to front (maybe create focus flag that gets toggled onSelection())
+//  4. Viewport selection update
+//  5. Manipulators
 //  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // bool WorkspaceDiwne::afterContent()
 //{
-//
-//
-//	bool interaction_happen = false;
+//  // 1. CreateAndPlugConstructor
 //	interaction_happen |= processCreateAndPlugTypeConstructor();
 //
+//  // 2. Tracking
 //	processTrackingMove();
 //
-//	/* selection will be active in next frame */
-//	if (InputManager::isAxisActive("NOTunselectAll"))
-//	{
-//		setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
-//	}
+//  // 3. Selection bring to front (maybe create focus flag that gets toggled onSelection())
 //	if (getNodesSelectionChanged())
 //	{
 //		shiftNodesToEnd(getSelectedNodes());
-//
-//		if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes &&
-//		    getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectFull &&
-//		    getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectTouch)
-//		{
-//			for (auto node : getAllNodesInnerIncluded())
-//			{
-//				if (node != getLastActiveNode<CoreNode>())
-//				{
-//					if (node->getSelected())
-//					{
-//						node->setSelected(false);
-//					}
-//				}
-//			}
-//		}
 //	}
 //
-//	/* hold or drag or interacting or new_link  */
-//	if ((m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode ||
-//	     m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink ||
-//	     m_diwneAction == DIWNE::DiwneAction::TouchNode || m_diwneAction == DIWNE::DiwneAction::TouchPin))
-//	{
-//		shiftInteractingNodeToEnd();
-//	}
-//
-//	if (m_diwneAction == DIWNE::DiwneAction::DragNode && getLastActiveNode<CoreNode>()->getSelected())
-//	{
-//		processDragAllSelectedNodes();
-//	}
-//
+//  // 4. Viewport selection update
 //	// Handle reaction to selection in viewport
 //	if (m_viewportSelectionChanged)
 //	{
@@ -347,10 +314,9 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 //	}
 //	m_viewportSelectionChanged = false;
 //
+//  // 5. Manipulators
 //	// Handle manipulators
 //	manipulatorStartCheck3D();
-//
-//	return interaction_happen;
 //}
 
 void WorkspaceDiwne::end(DIWNE::DrawInfo& context)
@@ -1165,6 +1131,7 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 void WorkspaceDiwne::deleteCallback()
 {
 	// TODO: Why do we need to check this? Could this be a hacky fix to the delete input propagating? shouldnt be needed
+	//  Yes it is a hacky fix, remove it <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if (isNodeLabelBeingEdited())
 		return;
 
@@ -1197,7 +1164,7 @@ void WorkspaceDiwne::copySelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				deselectWorkspaceNode(transform);
+				transform->setSelected(false);
 			}
 		}
 		else
@@ -1209,25 +1176,17 @@ void WorkspaceDiwne::copySelectedNodes()
 				Ptr<Sequence> view = cam->getView();
 				for (auto transform : proj->getInnerWorkspaceNodes())
 				{
-					deselectWorkspaceNode(transform);
+					transform->setSelected(false);
 				}
 				for (auto transform : view->getInnerWorkspaceNodes())
 				{
-					deselectWorkspaceNode(transform);
+					transform->setSelected(false);
 				}
 			}
 		}
 	}
 	copiedNodes = Tools::copyNodes(getSelectedNodesInnerIncluded(),
 	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-}
-
-void WorkspaceDiwne::deselectWorkspaceNode(Ptr<CoreNode> transform)
-{
-	if (transform->getSelected())
-	{
-		transform->setSelected(false);
-	}
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -1253,7 +1212,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				deselectWorkspaceNode(transform);
+				transform->setSelected(false);
 			}
 		}
 	}
@@ -1278,9 +1237,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 		if (seq)
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
-			{
-				deselectWorkspaceNode(transform);
-			}
+				transform->setSelected(false);
 		}
 	}
 
@@ -1291,7 +1248,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 	{
 		//		if (node->m_focusedForInteraction)
 		//		{
-		if (node->m_selected)
+		if (node->getSelected())
 		{
 			deselectNodes();
 			// copy and paste to ensure connections
@@ -1321,9 +1278,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 		if (seq)
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
-			{
-				deselectWorkspaceNode(transform);
-			}
+				transform->setSelected(false);
 		}
 	}
 
@@ -1334,15 +1289,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 
 	for (auto node : selectedNodes)
 	{
-		deselectWorkspaceNode(node);
-	}
-}
-
-void WorkspaceDiwne::deselectNodes()
-{
-	for (auto node : getAllNodesInnerIncluded())
-	{
-		deselectWorkspaceNode(node);
+		node->setSelected(false);
 	}
 }
 
@@ -1519,19 +1466,6 @@ std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllNodesInnerIncluded()
 	return allNodes;
 }
 
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodes()
-{
-	std::vector<Ptr<CoreNode>> selected;
-	for (auto const& node : m_workspaceCoreNodes)
-	{
-		if (node->getSelected())
-		{
-			selected.push_back(node);
-		};
-	}
-	return selected;
-}
-
 void WorkspaceDiwne::manipulatorStartCheck3D()
 {
 	if (getNodesSelectionChanged())
@@ -1583,6 +1517,55 @@ void WorkspaceDiwne::setWorkAreaZoom(float val)
 	if (old != val)
 	{
 		m_updateDataItemsWidth = true;
+	}
+}
+
+void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
+{
+	NodeEditor::processInteractions(context);
+
+	if (!context.logicalUpdates && !context.inputConsumed)
+	{
+		if (InputManager::isActionTriggered("selectAll", EKeyState::Pressed))
+			g_diwne->selectAll();
+		if (InputManager::isActionTriggered("invertSelection", EKeyState::Pressed))
+			g_diwne->invertSelection();
+		if (InputManager::isActionTriggered("zoomToAll", EKeyState::Pressed))
+			g_diwne->zoomToAll();
+		if (InputManager::isActionTriggered("zoomToSelected", EKeyState::Pressed))
+			g_diwne->zoomToSelected();
+		if (InputManager::isActionTriggered("delete", EKeyState::Pressed))
+			g_diwne->deleteCallback();
+		if (InputManager::isActionTriggered("copy", EKeyState::Pressed))
+			g_diwne->copySelectedNodes();
+		if (InputManager::isActionTriggered("paste", EKeyState::Pressed))
+			g_diwne->pasteSelectedNodes();
+		if (InputManager::isActionTriggered("cut", EKeyState::Pressed))
+			g_diwne->cutSelectedNodes();
+		//	if (InputManager::isActionTriggered("duplicate", EKeyState::Pressed))
+		//		g_diwne->duplicateClickedNode();
+		//	if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
+		//		g_diwne->duplicateSelectedNodes();
+		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
+			g_diwne->trackingSwitchOff();
+		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+			g_diwne->trackingSmoothLeft();
+		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+			g_diwne->trackingSmoothRight();
+		if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
+			g_diwne->trackingJaggedLeft();
+		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+			g_diwne->trackingJaggedRight();
+		if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+			g_diwne->trackingModeSwitch();
+		if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+			g_diwne->trackingSwitch();
+		if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+			g_diwne->trackingSwitchOn();
+		if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+			g_diwne->trackingSwitchOff();
+		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
+			g_diwne->toggleSelectedNodesVisibility();
 	}
 }
 

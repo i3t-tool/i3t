@@ -40,6 +40,16 @@ bool NodeEditorInputAdapter::panDragging()
 	return bypassIsMouseDragging2();
 }
 
+bool NodeEditorInputAdapter::multiSelectionActive()
+{
+	return ImGui::IsKeyDown(ImGuiMod_Shift);
+}
+
+bool NodeEditorInputAdapter::multiDeselectionActive()
+{
+	return ImGui::IsKeyDown(ImGuiMod_Ctrl);
+}
+
 bool NodeEditorInputAdapter::bypassIsMouseDragging0()
 {
 	return ImGui::IsMouseDragging(0, editor->mp_settingsDiwne->mouseDragThreshold);

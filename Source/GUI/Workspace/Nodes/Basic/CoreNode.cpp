@@ -49,26 +49,6 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 // 	        -InputManager::m_mouseYDragDelta >
 // ImGui::GetIO().MouseDragThreshold);
 // }
-// bool WorkspaceNodeWithCoreData::bypassPressAction()
-// {
-// 	return InputManager::isActionTriggered("hold", EKeyState::Pressed);
-// }
-// bool WorkspaceNodeWithCoreData::bypassReleaseAction()
-// {
-// 	return InputManager::isActionTriggered("hold", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassSelectAction()
-// {
-// 	return InputManager::isActionTriggered("select", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassUnselectAction()
-// {
-// 	return InputManager::isActionTriggered("select", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassTouchAction()
-// {
-// 	return InputManager::isActionTriggered("touch", EKeyState::Released);
-// }
 
 CoreNode::~CoreNode()
 {

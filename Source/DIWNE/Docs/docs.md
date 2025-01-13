@@ -50,7 +50,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	- m_inner_interaction_happen, m_inner_interaction_happen_previous_draw : interaction information 
 
-	- m_drawMode, m_selectable, m_isHeld, m_isDragged, etc. : current  usage information
+	- m_drawMode, m_selectable, m_isPressed, m_isDragged, etc. : current  usage information
 
 
 
@@ -115,7 +115,7 @@ Some parts of DIWNE are not well programmed and it would be great to improve the
 - Renaming the bypass() functions
 - Handling user actions and interactions between objects. 
 
-There is currently a big mess in various parts of the code and objects. It seems like a good idea to just store the information that an action/interaction is taking place in a given object, and leave the response to that (and any other interactions that may take place in a single frame) interaction/action for the end of the frame processing.  
+There is currently a big mess in various parts of the code and objects. It seems like a good idea to just store the information that an action/interaction is taking place in a given object, and leave the response to that (**and any other interactions that may take place in a single frame**) interaction/action for the end of the frame processing.  
 
 With this approach, it would be possible to create a clear and easily auditable (action to action) matrix. Using this matrix, it would be easy to deal with situations where two actions interfere. This goes against the ImGui philosophy, but in a complicated environment (many interacting objects) it is very complicated to react immediately after an action in each individual object, as this action may interfere with previous and/or subsequent events. 
 - The zooming of the node editor is now solved by increasing the size of the font and icons (and thus the whole nodes). This is not a well thought out approach as it could affect other parts of the application and could have unpredictable consequences. A better approach is offered by https://github.com/thedmd/imgui-node-editor, for example, but the resource requirements are unknown.    

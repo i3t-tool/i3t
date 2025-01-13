@@ -88,37 +88,42 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	DiwneObject::onDrag(context, dragStart, dragEnd);
 	if (dragStart)
 	{
-		Actions::ConnectPinAction* action = context.state.setAction<Actions::ConnectPinAction>(m_labelDiwne);
-		action->startPin = this;
-		if (false && m_isInput && !m_allowMultipleConnections && isPlugged())
+		Actions::ConnectPinAction* action = context.state.startAction<Actions::ConnectPinAction>(m_labelDiwne);
+		if (action)
 		{
-			// Link of inputs that don't allow multiple connections can be reconnected elsewhere
-			Link* link = getLink();
-			link->disconnectPin(this, true);
-			action->draggedLink = link;
-		}
-		else
-		{
-			// Create a new link and set it to be the dragged link in the node editor
-			Pin* start = this->isInput() ? nullptr : this;
-			Pin* end = this->isInput() ? this : nullptr;
-			action->draggedLink = createLink().get();
-			action->draggedLink->setStartPin(start);
-			action->draggedLink->setEndPin(end);
+			action->startPin = this;
+			if (false && m_isInput && !m_allowMultipleConnections && isPlugged())
+			{
+				// Link of inputs that don't allow multiple connections can be reconnected elsewhere
+				Link* link = getLink();
+				link->disconnectPin(this, true);
+				action->draggedLink = link;
+			}
+			else
+			{
+				// Create a new link and set it to be the dragged link in the node editor
+				Pin* start = this->isInput() ? nullptr : this;
+				Pin* end = this->isInput() ? this : nullptr;
+				action->draggedLink = createLink().get();
+				action->draggedLink->setStartPin(start);
+				action->draggedLink->setEndPin(end);
+			}
 		}
 	}
-
-	Actions::ConnectPinAction* action = context.state.getAction<Actions::ConnectPinAction>();
-
-	// Update temporary link start/end point
-	if (isInput())
-		action->draggedLink->setStartPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
-	else
-		action->draggedLink->setEndPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
-
-	if (dragEnd)
+	if (context.state.isActionActive(Actions::connectPin, m_labelDiwne))
 	{
-		context.state.clearAction();
+		Actions::ConnectPinAction* action = context.state.getAction<Actions::ConnectPinAction>();
+
+		// Update temporary link start/end point
+		if (isInput())
+			action->draggedLink->setStartPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+		else
+			action->draggedLink->setEndPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+
+		if (dragEnd)
+		{
+			context.state.endAction();
+		}
 	}
 }
 
@@ -198,9 +203,9 @@ bool Pin::allowPopup() const
 {
 	return false;
 }
-bool Pin::allowDrag() const
+bool Pin::allowDragStart() const
 {
-	return DiwneObject::allowDrag() && allowConnection();
+	return DiwneObject::allowDragStart() && allowConnection();
 }
 Node* Pin::getNode()
 {
@@ -259,6 +264,13 @@ void Pin::initialize(DrawInfo& context)
 		DIWNE_WARN(std::string() + "Pin " + m_labelDiwne +
 		           " has multiple links but multiple connections are not allowed!");
 	}
+}
+
+void Pin::onDestroy(bool logEvent)
+{
+	DiwneObject::onDestroy(logEvent);
+	for (auto link : m_links)
+		link->destroy(logEvent);
 }
 
 } /* namespace DIWNE */

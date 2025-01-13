@@ -89,11 +89,32 @@ public:
 
 	//
 
-	bool m_selectable{true};
-	bool m_isHeld{false}; /**< Is object held. Requirement for dragging. When dragged it is still held. */
+protected:
+	bool m_selectable{true}; ///< Should not be accessed directly. @see setSelectable()
+	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
+
+public:
+	/**
+	 * Is the object pressed down (held)? Requirement for dragging. When dragged it is still pressed.
+	 * This flag becomes valid since the processInteractions() lifecycle step.
+	 * @see onPressed()
+	 */
+	bool m_isPressed{false};
+	/**
+	 * Read only flag indicating the object was pressed this frame (eg. onPressed() with justPressed=true was called)
+	 * This flag becomes valid since the processInteractions() lifecycle step.
+	 * @see onPressed()
+	 */
+	bool m_justPressed{false}; ///< Is object just pressed? Eg. was the button pressed down this frame.
+
+	/**
+	 * Read only flag indicating the object was released this frame (eg. onReleased() with justReleased true was called)
+	 * This flag becomes valid since the processInteractions() lifecycle step.
+	 * @see onReleased()
+	 */
+	bool m_justReleased{false}; ///< Is object just released? Eg. was the button released this frame.
 
 	bool m_isDragged{false}; /**< Is object dragged */
-	bool m_selected{false};  /**< Is object selected */
 
 	// TODO: This flag is oddly named, realistically this means whether we are hovered AND at the same time
 	//  hovered in some special area. This area is generally just the header of a node and this tells us when to
@@ -151,7 +172,8 @@ public:
 	/**
 	 * Internal draw method.
 	 * @param context The drawing context of the current frame.
-	 * @return A DrawResult object reporting what interaction has occurred during the draw.
+	 * @param drawMode The drawing mode of this draw.
+	 * @see @ref diwne_lifecycle
 	 */
 	virtual void drawDiwne(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
@@ -159,10 +181,20 @@ public:
 	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
 
 	// Frame lifecycle/Content methods
-	// =============================================================================================================
-
-	// TODO: Wrapper thought: Not every method seemingly needs a wrapper, maybe we could bunch up the "diwne" code into
-	//  a few internal methods with more descriptive names rather than to have a "Diwne" suffix method everywhere.
+	// ============================================================================================================
+	/// @page diwne_lifecycle DIWNE Object Lifecycle
+	/// Each DIWNE object is drawn using the drawDiwne() method (the draw method). This method is responsible
+	/// for drawing the object as well as reacting to any user input as it is equivalent to usual Dear ImGui draw calls.
+	/// The draw method is divided into several stages which should be overriden in derived objects.
+	///
+	/// # Lifecycle stages
+	/// There are two methods which are always called: the initialize() and finalize() methods.
+	/// Other methods are only called if the object is truly visible on the screen, eg. the allowDrawing() method
+	/// returns true.
+	///
+	/// # DrawInfo context and DrawMode
+	/// TODO: Docs
+	///
 
 	/**
 	 * First method to be called every frame. Does not handle drawing.
@@ -193,9 +225,17 @@ public:
 	virtual void updateLayout(DrawInfo& context) = 0;
 
 	/**
+	 * @brief Method for reacting to user input after the object is fully drawn and its dimensions are known.
+	 * It is called after end() and updateLayout(),
+	 * but before the afterDraw() lifecycle method. Internal interactions are processed right before.
+	 */
+	virtual void processInteractions(DrawInfo& context){};
+
+	/**
 	 * Called last during drawing.
 	 * At this point the m_rect of the object should be calculated in the updateLayout() method and this method should
 	 * be able to work with it. Because of that the drawing code within shouldn't affect the objects size anymore.
+	 * Interactions are processed before this method and thus interaction related member variables can be used within.
 	 */
 	virtual void afterDraw(DrawInfo& context);
 
@@ -203,12 +243,6 @@ public:
 	 * The final method to be called, gets called every frame and doesn't do any drawing.
 	 */
 	virtual void finalize(DrawInfo& context);
-
-	// Interaction
-	// =============================================================================================================
-
-	virtual bool allowInteraction() const; ///< Decide whether the object can interact (not including content elements)
-	virtual void processInteractions(DrawInfo& context){};
 
 	// Popups
 	// =============================================================================================================
@@ -266,55 +300,140 @@ public:
 	bool isRendered() const;
 	void setRendered(bool mRendered);
 
-	virtual bool setSelected(bool const selected); ///< \return New state of selection
+	/**
+	 * Set the selection state of the object.
+	 * This method can be used to select the object.
+	 * If the selection state is changed by the call the onSelection() method is invoked.
+	 * @return The new state of selection
+	 * @see setSelectable()
+	 */
+	virtual bool setSelected(bool selected); ///< \return New state of selection
 	// TODO: Rename isSelected
 	// TODO: Go over m_selected usages and switch to using getter
 	virtual bool getSelected() const; ///< Whether the object is selected or not
-	virtual void setSelectable(bool const selectable);
+
+	/**
+	 * Whether the object can be selected. When this is set to true the object cannot be selected anymore.
+	 * Although it may remain selected if it was selected beforehand.
+	 */
+	virtual void setSelectable(bool selectable);
 	virtual bool getSelectable();
 
-	// INTERACTION
+	// INTERACTIONS
 	// =============================================================================================================
-	// DiwneObject has a few built-in interactions that derived classes can react to.
-	// These are basic actions like the mouse hovering over the object or the object being pressed on.
-	//
-	// The interaction code consists of four methods.
-	// 1. The user method - A callback of sorts that gets triggered when a certain interaction occurs.
-	// 2. The trigger method - A method defining a condition that triggers the interaction.
-	// 3. The toggle method - A method determining whether the user method should be called or not.
-	// 4. Internal implementation method - The internal implementation using the methods above.
-	//
-	// All except the user method are implemented by default in the DiwneObject.
+	/// @page DIWNE Interactions
+	/// DiwneObject has a few built-in interactions that derived classes can react to.
+	/// These are basic actions like the mouse hovering over the object or the object being pressed on with the mouse.
+	/// As well as more complicated actions like dragging, selection and raising a popup over the object.
+	/// \n\n
+	/// The interaction code consists of four methods. XXX being the interaction name.\n
+	/// 1. The user method (onXXX) - A callback of sorts that gets triggered when a certain interaction occurs.\n
+	/// 2. The trigger method (isXXXDiwne) - A method defining a condition that triggers the interaction.\n
+	/// 3. The toggle method (allowXXX) - A method determining whether the type of interaction should be processed.\n
+	/// 4. Internal implementation method (processXXXDiwne) - The internal implementation using the methods above.
+	///   													  This method calls the user method when the interaction
+	/// 													  is allowed and triggered.\n
+	/// \n
+	/// All except the user method are implemented by default in the DiwneObject.\n\n
+	/// DiwneObject interactions and their default behavior:\n
+	/// - Hover - The mouse hovering over the object\n
+	/// - Press and release - The left mouse button being held down while hovering above the object\n
+	/// - Drag - The left mouse button being pressed and dragged awa\n
+	/// - SelectOnClick - The left mouse button was released over the object (while not dragging)\n
+	/// - Popup - Popup is triggered by releasing right click over the object\n
+	/// \n
+	/// These interactions are special states used for built in interaction in the node editor.
+	/// Custom interactions reacting to different inputs can be implemented in derived classes and resolved in the
+	/// DiwneObject::processInteractions() method which is called after resolving the built in interactions above.
 
-	// Interaction user methods
+	// Interaction user methods (callbacks)
 	// =============================================================================================================
-	// TODO: Rename to onXXX
 
+	/**
+	 * This method gets called when the object is hovered.
+	 * This generally indicates mouse hover, but the behavior can be changed via isHoveredDiwne().
+	 * @param context
+	 * @see processHoverDiwne()
+	 */
 	virtual void onHover(DrawInfo& context);
 
-	// TODO: Not sure if we need this, can't individual object decide when they want to react to certain input?
-	//  virtual void processFocusedForInteraction(DrawInfo& context);
-
-	// TODO: There should be an ABSOLUTE guarantee that dragStart and dragEnd will eventually be true ONCE.
+	/**
+	 * @brief This method gets called when the object is being dragged.
+	 *
+	 * Drag begins when the object is pressed and isDraggedDiwne() returns true.\n
+	 * A call with dragStart true, should always be followed by a call with dragEnd true.
+	 * @param dragStart The drag has just started this frame.
+	 * @param dragEnd The drag is ending this frame.
+	 * @see processDragDiwne(), processPressAndReleaseDiwne()
+	 */
 	virtual void onDrag(DrawInfo& context, bool dragStart, bool dragEnd);
-	virtual void onPressed(bool justPressed, DrawInfo& context);
-	virtual void onReleased(bool justReleased, DrawInfo& context);
 
-	//	virtual void processSelect(DrawInfo& context); // TODO: Renamed to clicked and merge with unselect
-	//	virtual void processUnselect(DrawInfo& context);
+	/**
+	 * Called when the object is pressed, meaning a key is pressed over it.
+	 * Which key or keys trigger this state is determined by is isPressedDiwne() and isJustPressedDiwne().
+	 * An object is allowed to be pressed only when allowPress() returns true.
+	 *
+	 * @note This isn't a general method for reacting to any input. This method signals a specific "pressed" or "held"
+	 * state of the object which is only triggered for certain keys specified by isPressedDiwne().
+	 * By default this means being "pressed by the left mouse button", but this behavior can vary in subclasses.
+	 *
+	 * @param justPressed True on the frame of the actual press, false otherwise when the key is held down.
+	 * @see isPressedDiwne(), processPressAndReleaseDiwne()
+	 */
+	virtual void onPressed(bool justPressed, DrawInfo& context);
+
+	/**
+	 * Called when the object is not pressed. Every frame either this or the onPressed() method is called.
+	 * @param justPressed True on the frame the object is released (becomes no longer pressed)
+	 * @see onPressed()
+	 */
+	virtual void onReleased(bool justReleased, DrawInfo& context);
+	virtual void onSelection(bool selected);
 
 	// Interaction toggles
 	// =============================================================================================================
+
+	/**
+	 * Decide whether the object should react to user input in general.
+	 * Dear ImGui components might require special handling.
+	 */
+	virtual bool allowInteraction() const;
+
+	/**
+	 * Determines whether the object can be hovered.
+	 * Is always allowed by default.
+	 * @see isHoveredDiwne()
+	 */
 	virtual bool allowHover() const;
 
-	//	virtual bool allowProcessFocusedForInteraction();
+	/**
+	 * Determines whether the object can be pressed.
+	 * By default this requires the object to be hovered, input not being consumed and nothing else being dragged.
+	 * @see isPressedDiwne(), allowHover(), DrawInfo::inputConsumed, InteractionState::dragging
+	 */
 	virtual bool allowPress(const DrawInfo& context) const;
-	//	virtual bool allowProcessUnhold();
-	virtual bool allowDrag() const; // TODO: Refactor allowProcessDrag()
-	                                //	virtual bool allowProcessSelect();
-	                                //	virtual bool allowProcessUnselect();
-	                                //	virtual bool allowProcessRaisePopup();
+
+	/**
+	 * Determines whether a drag operation can start from this object.
+	 * By default the only requirement is the object to be pressed.
+	 * @see isDraggedDiwne(), allowPress()
+	 */
+	virtual bool allowDragStart() const;
+
+	/**
+	 * Determines whether a popup can be raised over the object.
+	 * Allowed by default.
+	 * @see processPopupDiwne()
+	 */
 	virtual bool allowPopup() const;
+
+	/**
+	 * Determines whether the object can be selected by clicking it (eg. pressing and then releasing it).
+	 * This is a type of interaction and not related to whether the object is "selectable" or not.
+	 * Programmatical selection using DiwneObject::setSelected() is not affected.
+	 * @see processSelectDiwne()
+	 */
+	virtual bool allowSelectOnClick(const DrawInfo& context) const;
 
 protected:
 	// Interaction internal processing methods
@@ -322,45 +441,62 @@ protected:
 
 	virtual void processHoverDiwne(DrawInfo& context);
 
-	//	void processFocusedForInteractionDiwne(DrawInfo& context);
+	/**
+	 * Processes whether the object is currently pressed (held) and further if it was just pressed or released.
+	 * By default, being pressed means that the mouse is pressed down when hovering over it.
+	 * The first frame of the press is considered just pressed, same for the last with just released.
+	 * <br><br>
+	 * What key or keys trigger the pressed state depends on the implementation of isPressedDiwne()
+	 * and isJustPressedDiwne().
+	 * <br><br>
+	 * Regarding clicks or key presses:
+	 * The concept of a "click" is often ambiguous. In ImGui it generally means the moment the mouse is just pressed.
+	 * However clicks are more traditionally considered to be a rapid sequence of press and release.
+	 * In DIWNE the click terminology isn't really used, an equivalent would be just released whilist *not* dragging.
+	 * Meaning if you want to react to a click put an if (!context.state.dragging) in the onReleased() callback.
+	 */
 	virtual void processPressAndReleaseDiwne(DrawInfo& context);
-	//	void processUnholdDiwne(DrawInfo& context);
+
 	virtual void processDragDiwne(DrawInfo& context);
 
-	virtual void processSelectDiwne(DrawInfo& context);
-	//	void processUnselectDiwne(DrawInfo& context);
-	virtual void processPopup(DrawInfo& context);
-	//	virtual void processRaisePopupDiwne(DrawInfo& context); /**< processing raising popup menu */ //TODO: Remove
-	//	virtual void processShowPopupDiwne(DrawInfo& context);  /**< processing showing popup menu */ //TODO: Remove
+	/**
+	 * Processes whether a popup should be opened over this object. If it is, the popupContent() method is called.
+	 * @param context
+	 */
+	virtual void processPopupDiwne(DrawInfo& context);
 
-	// =============================================================================================================
+	/**
+	 * Processes any interactions related to whether the object should be selected.
+	 * The default behavior is selection when the object is pressed and then released (clicked).
+	 * @note This is not the only method which can select the object.
+	 * @param context
+	 * @return Whether selection processing should end. Can be used to exit early from derived methods.
+	 * @see processPressAndReleaseDiwne()
+	 */
+	virtual bool processSelectDiwne(DrawInfo& context);
 
+public:
 	// Trigger methods (Formerly bypass methods)
 	// =============================================================================================================
-
 	// TODO: Rename to something clearer, keywords trigger or input.
 	//  isXXXTriggered might work, all these should be protected as well
 
-protected:
 	virtual bool isHoveredDiwne(); ///< Is mouse hovering over the object? Prerequisite for further interaction.
 	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
-
-public:
-	// TODO: Rename this to something like "action area" / "trigger area"?
-	virtual bool bypassFocusForInteractionAction(); /**< action identified as focusing on
-	                                                 * object for interacting with it
-	                                                 */
 
 	// TODO: Maybe rename to isDownDiwne() or isKeyDownDiwne()
 	//  Begs the question which key, well that depends on the impl
 	//  The full verbose name is more like isAnyOfTheAllowedKeysPressed()
 	/**
-	 * Determine whether a key is pressed down over the object.
-	 * While the key is down this method should return true until the key is released.
-	 * When this method returns true and other conditions are met (hovered, press allowed), the member pressed flag
-	 * is set to true and onPress() method is called. If multiple keys make this method return true it is necessary
-	 * to distinguish between them later in the implementation if different functionality for each key is desired.
+	 * @brief Determine whether a key is pressed down over the object.
+	 *
+	 * While the key is down this method should return true until the key is released.<br>
+	 * When this method returns true and other conditions are met (hovered, press allowed), the object pressed flag
+	 * is set to true and onPress() method is called.<br>
+	 * If multiple keys make this method return true it is necessary to distinguish between them later
+	 * in the implementation if different functionality for each key is desired.
 	 * @see When overriding also modify isJustPressedDiwne()
+	 * @note Overriding the pressed state behavior will modify the dragging and selection behavior.
 	 */
 	virtual bool isPressedDiwne();
 
@@ -426,19 +562,26 @@ public:
 	//	std::any actionData;
 	//	bool clearActionThisFrame{false};
 
-	std::unique_ptr<DiwneAction> action;
+	std::unique_ptr<Actions::DiwneAction> action;
 
+	// TODO: Maybe rename to createAction
 	template <typename T, typename... Args>
-	T* setAction(Args&&... args)
+	T* startAction(Args&&... args)
 	{
-		setAction(std::make_unique<T>(std::forward<Args>(args)...));
-		return getAction<T>();
+		Actions::DiwneAction* action = startAction(std::make_unique<T>(std::forward<Args>(args)...));
+		if (action)
+			return static_cast<T*>(action);
+		return nullptr;
 	}
 
-	void setAction(std::unique_ptr<DiwneAction> action);
+	Actions::DiwneAction* startAction(std::unique_ptr<Actions::DiwneAction> action);
 
 	/// Clears the current action, either right away or at the end of the frame.
-	void clearAction(bool immediately = false);
+	void endAction(bool immediately = false);
+
+	// TODO: (DR) Resolve the dual access to actions via <T> and std::string name
+	//  Querying via type is cleaner as we can create actions that way
+	//  But it then requires a dynamic cast or something
 	bool isActionActive(const std::string& name);
 	/// Checks whether an action is active and its source is the passed source diwne label
 	bool isActionActive(const std::string& name, const std::string& source);
@@ -451,7 +594,8 @@ public:
 	template <typename T>
 	T* getAction()
 	{
-		static_assert(std::is_base_of_v<DIWNE::DiwneAction, T>, "T must be derived from DIWNE::DiwneAction class.");
+		static_assert(std::is_base_of_v<DIWNE::Actions::DiwneAction, T>,
+		              "T must be derived from DIWNE::DiwneAction class.");
 #ifndef NDEBUG
 		if (action && dynamic_cast<T*>(action.get()) == nullptr)
 			assert(!"Invalid static cast!");
@@ -464,13 +608,16 @@ public:
 	 * @return Returns the specified action IF if it currently active. Otherwise null.
 	 */
 	template <typename T>
-	T* getActiveAction(const std::string& source = "")
+	T* getActiveAction(const std::string& name = "", const std::string& source = "")
 	{
-		static_assert(std::is_base_of_v<DIWNE::DiwneAction, T>, "T must be derived from DIWNE::DiwneAction class.");
+		static_assert(std::is_base_of_v<DIWNE::Actions::DiwneAction, T>,
+		              "T must be derived from DIWNE::DiwneAction class.");
 		T* ret = dynamic_cast<T*>(action.get());
-		if (ret != nullptr && !source.empty())
+		if (ret != nullptr)
 		{
-			if (ret->source != source)
+			if (!name.empty() && ret->name != name)
+				return nullptr;
+			if (!source.empty() && ret->source != source)
 				return nullptr;
 		}
 		return ret;
@@ -516,7 +663,11 @@ public:
 	unsigned short visualUpdates{0};
 	void visualUpdate();
 
-	/// Indicates changes in logic, eg. change of some attribute or a non blocking button press. Requests focus.
+	/**
+	 * Indicates a logical interaction, eg. change of some attribute or a non blocking button press. Requests focus.
+	 * This can be used to detect whether an object is being clicked on directly, in which case the number of logical
+	 * updates should be 0. An object above another should submit a logical update in its onPressed() method.
+	 */
 	unsigned short logicalUpdates{0};
 	void logicalUpdate(bool isVisualUpdateAsWell = true);
 

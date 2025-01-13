@@ -321,7 +321,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		 * action to do and in WorkspaceDiwne react to this action  */
 		// interaction_with_transformation_happen |=
 		transformation->drawNodeDiwne<TransformationBase>(context, DIWNE::DrawModeNodePosition::OnCursorPosition,
-		                                                  m_isHeld || m_drawMode2 == DIWNE::DrawMode::JustDraw
+		                                                  m_isPressed || m_drawMode2 == DIWNE::DrawMode::JustDraw
 		                                                      ? DIWNE::DrawMode::JustDraw
 		                                                      : DIWNE::DrawMode::Interacting);
 

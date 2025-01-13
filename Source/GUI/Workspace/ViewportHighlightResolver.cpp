@@ -46,7 +46,7 @@ void ViewportHighlightResolver::resolve()
 		{
 			model->m_influenceHighlight = true;
 			auto viewportModel = model->m_viewportModel.lock();
-			if (!model->m_selected)
+			if (!model->getSelected())
 			{
 				viewportModel->m_highlight = true;
 				viewportModel->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
@@ -56,7 +56,7 @@ void ViewportHighlightResolver::resolve()
 		{
 			model->m_influenceHighlight = false;
 			auto viewportModel = model->m_viewportModel.lock();
-			if (!model->m_selected)
+			if (!model->getSelected())
 			{
 				viewportModel->m_highlight = false;
 			}

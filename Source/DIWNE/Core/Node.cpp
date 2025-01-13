@@ -17,6 +17,10 @@
 #include "NodeEditor.h"
 #include "diwne_actions.h"
 
+// TODO: (DR) Remove these imports <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+#include "GUI/Workspace/WorkspaceDiwne.h"
+
 namespace DIWNE
 {
 Node::Node(DIWNE::NodeEditor& diwne, std::string labelDiwne) : DiwneObject(diwne, labelDiwne) {}
@@ -79,21 +83,6 @@ void Node::end(DrawInfo& context)
 	ImGui::PopID();
 }
 
-bool Node::setSelected(const bool selected)
-{
-	bool prevSelected = m_selected;
-	DiwneObject::setSelected(selected);
-	if (prevSelected != m_selected)
-	{
-		// TODO: Uncomment
-		//		if (m_selected)
-		//			processSelect();
-		//		else
-		//			processUnselect();
-		diwne.m_takeSnap = true;
-	}
-	return m_selected;
-}
 void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
@@ -102,27 +91,31 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getWorkAreaZoom());
 	m_internalHover = ImGui::IsItemHovered();
 	DiwneObject::afterDrawDiwne(context);
+}
+
+bool Node::processSelectDiwne(DrawInfo& context)
+{
+	if (DiwneObject::processSelectDiwne(context))
+		return true;
 
 	// Check if the node is inside a selection rectangle
-	if (m_selectable)
+	if (auto action = context.state.getActiveAction<Actions::SelectionRectAction>())
 	{
-		if (auto action = context.state.getActiveAction<Actions::SelectionRectAction>())
+		bool inRect = action->touch ? action->rect.Overlaps(getRectDiwne()) : action->rect.Contains(getRectDiwne());
+		bool multiSelect = diwne.m_input->multiSelectionActive();
+		bool multiDeselect = diwne.m_input->multiDeselectionActive();
+		if (inRect)
 		{
-			if (!action->touch)
-			{
-				setSelected(diwne.getSelectionRectangleDiwne().Contains(getRectDiwne()) ? true
-				            : diwne.m_allowUnselectingNodes                             ? false
-				                                                                        : m_selected);
-			}
-			else
-			{
-				setSelected(diwne.getSelectionRectangleDiwne().Overlaps(getRectDiwne()) ? true
-				            : diwne.m_allowUnselectingNodes                             ? false
-				                                                                        : m_selected);
-			}
+			setSelected(multiDeselect ? false : true);
+		}
+		else
+		{
+			if (!multiSelect && !multiDeselect)
+				setSelected(false);
 		}
 	}
-	// TODO: Maybe move the selection rect rendering to the processSelect equivalent in the future
+
+	// Draw node selection indicator
 	if (m_selected)
 	{
 		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
@@ -130,24 +123,46 @@ void Node::afterDrawDiwne(DrawInfo& context)
 		                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 		                               diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 	}
+	return false;
 }
 
-// TODO: (DR) process/processUnselect seem to always return true, what is the purpose of the return value?
-// bool Node::processSelect()
-//{
-//	diwne.setNodesSelectionChanged(true);
-//	return true;
-//}
-//
-// bool Node::processUnselect()
-//{
-//	diwne.setNodesSelectionChanged(true);
-//	return true;
-//}
+void Node::onSelection(bool selected)
+{
+	DiwneObject::onSelection(selected);
+	diwne.setNodesSelectionChanged(true);
+}
+
 void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	DiwneObject::onDrag(context, dragStart, dragEnd);
-	move(diwne.m_input->bypassGetMouseDelta() / diwne.getWorkAreaZoom());
+
+	// Handle node dragging
+	if (dragStart)
+	{
+		std::vector<Node*> nodes;
+		if (m_selected)
+		{ // If the node is selected, it and all other selected nodes are dragged together
+			// TODO: (DR) Avoid the new list as getSelectedNodes should just return a plain Node* pointer.
+			for (auto&& node : diwne.getSelectedNodes())
+				nodes.push_back(static_cast<Node*>(node.get()));
+		}
+		else
+		{ // If the node isn't selected, dragging it selects it and deselects all others
+			if (diwne.mp_settingsDiwne->selectNodeOnDrag)
+			{
+				diwne.deselectNodes();
+				setSelected(true);
+			}
+			nodes.push_back(this);
+		}
+		context.state.startAction<Actions::DragNodeAction>(diwne, m_labelDiwne, std::move(nodes));
+	}
+	if (auto action = context.state.getActiveAction<Actions::DragNodeAction>(Actions::dragNode, m_labelDiwne))
+	{
+		action->onUpdate();
+		if (dragEnd)
+			action->end();
+	}
 }
 
 void Node::onDestroy(bool logEvent)
@@ -162,7 +177,6 @@ void Node::onDestroy(bool logEvent)
 	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
 	{
 		diwne.setLastActiveNode<DIWNE::Node>(nullptr);
-		diwne.setLastActivePin<DIWNE::Pin>(nullptr);
 	}
 }
 

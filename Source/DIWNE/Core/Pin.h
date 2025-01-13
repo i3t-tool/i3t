@@ -114,7 +114,7 @@ public:
 	virtual bool allowConnection() const;
 
 	bool allowPopup() const override;
-	bool allowDrag() const override;
+	bool allowDragStart() const override;
 
 	template <typename T = Node>
 	T* getNode()
@@ -139,6 +139,7 @@ public:
 
 	virtual void setConnectionPointDiwne(const ImVec2 value);
 	virtual const ImVec2& getConnectionPoint();
+	void onDestroy(bool logEvent) override;
 
 protected:
 	virtual void updateConnectionPoint();

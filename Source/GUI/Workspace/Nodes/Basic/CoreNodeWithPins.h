@@ -55,6 +55,8 @@ public:
 
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
+
+	void onDestroy(bool logEvent) override;
 };
 } // namespace Workspace
 

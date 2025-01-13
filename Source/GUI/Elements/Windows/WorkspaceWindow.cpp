@@ -42,68 +42,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//  Also we should react to actions on a per frame basis using if(trigger) syntax
 	//  rather than using bindings as its a more suitable approach in immediate mode UI
 
-	// Input actions for workspace window.
-	m_input->bindAction("selectAll", EKeyState::Pressed, [&]() {
-		g_diwne->selectAll();
-	});
-	m_input->bindAction("invertSelection", EKeyState::Pressed, [&]() {
-		g_diwne->invertSelection();
-	});
-	m_input->bindAction("zoomToAll", EKeyState::Pressed, [&]() {
-		g_diwne->zoomToAll();
-	});
-	m_input->bindAction("zoomToSelected", EKeyState::Pressed, [&]() {
-		g_diwne->zoomToSelected();
-	});
-	m_input->bindAction("delete", EKeyState::Pressed, [&]() {
-		g_diwne->deleteCallback();
-	});
-	m_input->bindAction("copy", EKeyState::Pressed, [&]() {
-		g_diwne->copySelectedNodes();
-	});
-	m_input->bindAction("paste", EKeyState::Pressed, [&]() {
-		g_diwne->pasteSelectedNodes();
-	});
-	m_input->bindAction("cut", EKeyState::Pressed, [&]() {
-		g_diwne->cutSelectedNodes();
-	});
-	m_input->bindAction("duplicate", EKeyState::Pressed, [&]() {
-		g_diwne->duplicateClickedNode();
-	});
-	m_input->bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
-		g_diwne->duplicateSelectedNodes();
-	});
-	m_input->bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOff();
-	});
-	m_input->bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSmoothLeft();
-	});
-	m_input->bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSmoothRight();
-	});
-	m_input->bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
-		g_diwne->trackingJaggedLeft();
-	});
-	m_input->bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
-		g_diwne->trackingJaggedRight();
-	});
-	m_input->bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() {
-		g_diwne->trackingModeSwitch();
-	});
-	m_input->bindAction("trackingSwitch", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitch();
-	});
-	m_input->bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOn();
-	});
-	m_input->bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOff();
-	});
-	m_input->bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() {
-		g_diwne->toggleSelectedNodesVisibility();
-	});
-
 	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback

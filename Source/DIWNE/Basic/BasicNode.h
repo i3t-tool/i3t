@@ -5,6 +5,16 @@
 
 namespace DIWNE
 {
+/**
+ * Parts of the node:
+ *  -------------------
+ *  |      Top        |
+ *  -------------------
+ *  |Left|Center|Right|  --> |L|C|R| == Middle
+ *  -------------------
+ *  |     Bottom      |
+ *  -------------------
+ */
 class BasicNode : public Node
 {
 public:

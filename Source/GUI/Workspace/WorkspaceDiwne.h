@@ -47,8 +47,7 @@ namespace Workspace
 enum WorkspaceDiwneAction
 {
 	None,
-	CreateAndPlugTypeConstructor,
-	NOTunselectAllNodes
+	CreateAndPlugTypeConstructor, // TODO: Reimplement create and plug constructor
 };
 
 extern WorkspaceDiwne* g_diwne;
@@ -133,12 +132,6 @@ public:
 	 */
 	std::unordered_map<Core::ID, CoreNode*> m_coreIdMap;
 
-	const std::vector<Ptr<CoreNode>>& getAllNodes() const
-	{
-		return m_workspaceCoreNodes;
-	};
-
-	std::vector<Ptr<CoreNode>> getSelectedNodes();
 
 	// TODO: Restore functionality
 	/**
@@ -160,13 +153,13 @@ public:
 	template <typename T>
 	void addTypeConstructorNode()
 	{
-		// TODO: Rework
-		CorePin* pin = getLastActivePin<CorePin>().get();
-		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
-		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
-		              ->getOutputs()
-		              .at(0)
-		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
+		// TODO: Rework <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//		CorePin* pin = getLastActivePin<CorePin>().get();
+//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
+//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
+//		              ->getOutputs()
+//		              .at(0)
+//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
 	}
 
 	// TODO: Replace with DIWNE::NodeEditor functionality
@@ -204,6 +197,8 @@ public:
 		return result;
 	}
 
+	void processInteractions(DIWNE::DrawInfo& context) override;
+
 	void manipulatorStartCheck3D();
 
 	void processDragAllSelectedNodes();
@@ -240,15 +235,12 @@ public:
 	void cutSelectedNodes();
 	void duplicateClickedNode();
 	void duplicateSelectedNodes();
-	void deselectNodes();
-	void deselectWorkspaceNode(Ptr<CoreNode> transform);
 	bool isNodeLabelBeingEdited();
 
-	// bool allowInteraction();
+	std::vector<Ptr<CoreNode>> getSelectedNodesInnerIncluded() override;
+	std::vector<Ptr<CoreNode>> getAllNodesInnerIncluded() override;
 
-	std::vector<Ptr<CoreNode>> getSelectedNodesInnerIncluded();
-	std::vector<Ptr<CoreNode>> getAllNodesInnerIncluded();
-
+	// TODO: (DR) Move to DIWNE::NodeEditor
 	std::vector<Ptr<CoreNode>> getAllCameras();
 	std::vector<Ptr<Model>> getAllModels();
 	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();

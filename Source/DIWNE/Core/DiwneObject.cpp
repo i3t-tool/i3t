@@ -69,7 +69,6 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 		beginDiwne(context);
 		content(context);
 		endDiwne(context);
-		updateLayout(context);
 		afterDrawDiwne(context);
 		DIWNE_DEBUG((diwne), {
 			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
@@ -90,7 +89,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			    diwne.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_labelDiwne +
 			     (m_parentLabel.empty() ? " (no parent)\n" : " (" + m_parentLabel + ")\n") +
-			     (m_hovered ? "Hovered\n" : "") + (m_isHeld ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
+			     (m_hovered ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
 			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""))
 			        .c_str());
 			if (dynamic_cast<NodeEditor*>(this))
@@ -188,7 +187,8 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	processHoverDiwne(context);
 	processPressAndReleaseDiwne(context);
 	processDragDiwne(context);
-	processPopup(context);
+	processSelectDiwne(context);
+	processPopupDiwne(context);
 	processInteractions(context); // Process other user interactions
 
 	//	bool interaction_happen = false;
@@ -226,10 +226,10 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//				{
 	//					m_selected ? processUnselectDiwne(context) : processSelectDiwne(context);
 	//				}
-	//				m_isHeld ? processUnholdDiwne(context) : processHoldDiwne(context);
-	//				if (m_isHeld)
+	//				m_isPressed ? processUnholdDiwne(context) : processHoldDiwne(context);
+	//				if (m_isPressed)
 	//				{
-	//					interaction_happen |= m_isHeld; /* holding (not only change in hold
+	//					interaction_happen |= m_isPressed; /* holding (not only change in hold
 	//					                                   state) is interaction */
 	//					diwne.setDiwneAction(getHoldActionType());
 	//				}
@@ -269,33 +269,30 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 
 void DiwneObject::processPressAndReleaseDiwne(DrawInfo& context)
 {
-	bool wasPressed = m_isHeld;
+	bool wasPressed = m_isPressed;
 	bool pressed = isPressedDiwne() && allowPress(context);
-	bool justPressed = isJustPressedDiwne() && pressed;
-	bool justReleased = wasPressed && !pressed;
+	m_justPressed = isJustPressedDiwne() && pressed;
+	m_justReleased = wasPressed && !pressed;
 
 	if (wasPressed)
 	{
-		m_isHeld = pressed;
+		m_isPressed = pressed;
 	}
 	else
 	{
-		m_isHeld = pressed && justPressed; // Require immediate key press to begin press cycle
+		m_isPressed = pressed && m_justPressed; // Require immediate key press to begin press cycle
 	}
 
-	if (m_isHeld)
+	if (m_isPressed)
 	{
-		onPressed(justPressed, context);
+		onPressed(m_justPressed, context);
 	}
 	else
 	{
-		onReleased(justReleased, context);
-		// m_isDragged = false; // TODO: Investigate, I don't think this is necessary, drag ignores this variable, its
-		// read
-		//   only essentially. This was the original diwne behaviour.
-
-		// TODO: When drag ends we should take a snap, this is drags responsibility tho probably
+		onReleased(m_justReleased, context);
 	}
+	// TODO: (DR) When drag ends we should take a snap, this is drags responsibility tho probably
+	//  DR: But why though? Individual drag actions like drag/selrect/connectpin should take a snap, not dragging
 }
 
 void DiwneObject::processDragDiwne(DrawInfo& context)
@@ -328,8 +325,8 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	}
 	else // Nothing is being dragged, try start drag
 	{
-		m_isDragged = isDragged && allowDrag(); // TODO: Rename allowDrag to isDragAllowed? isDragStartAllowed?
-		                                        // allowStartDrag, yeah <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		m_isDragged = isDragged && allowDragStart(); // TODO: Rename allowDrag to isDragAllowed? isDragStartAllowed?
+		                                             // allowStartDrag, yeah <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if (m_isDragged)
 		{
 			dragStart = true;
@@ -379,9 +376,9 @@ bool DiwneObject::allowPress(const DrawInfo& context) const
 	return true;
 }
 
-bool DiwneObject::allowDrag() const
+bool DiwneObject::allowDragStart() const
 {
-	return m_isHeld;
+	return m_isPressed;
 }
 
 void DiwneObject::destroy(bool logEvent)
@@ -419,16 +416,23 @@ void DiwneObject::setRendered(bool mRendered)
 	m_rendered = mRendered;
 }
 
-bool DiwneObject::setSelected(const bool selected)
+bool DiwneObject::setSelected(bool selected)
 {
+	bool prevSelected = m_selected;
 	m_selected = m_selectable ? selected : false;
+	if (prevSelected != m_selected)
+	{
+		onSelection(m_selected);
+		diwne.m_takeSnap = true;
+	}
 	return m_selected;
 }
+
 bool DiwneObject::getSelected() const
 {
 	return m_selected;
 };
-void DiwneObject::setSelectable(bool const selectable)
+void DiwneObject::setSelectable(bool selectable)
 {
 	m_selectable = selectable;
 };
@@ -437,12 +441,19 @@ bool DiwneObject::getSelectable()
 	return m_selectable;
 }
 
-void InteractionState::setAction(std::unique_ptr<DiwneAction> a)
+Actions::DiwneAction* InteractionState::startAction(std::unique_ptr<Actions::DiwneAction> a)
 {
-	this->action = std::move(a);
+	if (!this->action)
+	{
+		this->action = std::move(a);
+		return this->action.get();
+	}
+	DIWNE_WARN("Trying to start a new action '" + a->name + "' while an action '" + action->name +
+	           "' is already active!");
+	return nullptr;
 }
 
-void InteractionState::clearAction(bool immediately)
+void InteractionState::endAction(bool immediately)
 {
 	if (immediately)
 	{
@@ -484,7 +495,7 @@ void InteractionState::nextFrame()
 	// Hence the action reset is defered to the end of the frame here.
 	if (action != nullptr && action->endActionThisFrame)
 	{
-		clearAction(true);
+		endAction(true);
 	}
 
 	// Reset non-persistent variables
@@ -555,16 +566,6 @@ bool DiwneObject::isHoveredDiwne()
 {
 	return m_internalHover;
 }
-
-// TODO: Rename and update docs
-/**
- * you have to override this if your object is not ImGui item (like Link)
- * @return
- */
-bool DiwneObject::bypassFocusForInteractionAction()
-{
-	return isHoveredDiwne();
-}
 bool DiwneObject::isPressedDiwne()
 {
 	return diwne.m_input->bypassIsMouseDown0();
@@ -625,7 +626,7 @@ void DiwneObject::onHover(DrawInfo& context)
 void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 {
 	if (justPressed)
-		context.update(false, true);
+		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
 		                               DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
@@ -639,6 +640,9 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 }
 void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 {
+	// Clicking on a node is considered a logical update
+	if (justReleased)
+		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (justReleased)
 		{
@@ -668,6 +672,8 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	});
 }
 
+void DiwneObject::onSelection(bool selected) {}
+
 bool DiwneObject::bypassPressAction()
 {
 	return false;
@@ -677,46 +683,37 @@ bool DiwneObject::bypassReleaseAction()
 	return false;
 }
 
-// void DiwneObject::processSelect(DrawInfo& context)
-//{
-//	context.interacted++;
-// }
-// bool DiwneObject::allowProcessSelect()
-//{
-//	return m_isHeld && !m_isDragged;
-// }
-void DiwneObject::processSelectDiwne(DrawInfo& context)
+bool DiwneObject::allowSelectOnClick(const DrawInfo& context) const
 {
-	//	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
-	//	{
-	//		setSelected(true);
-	//	}
+	return !context.state.anyActionActive();
 }
-//
-// void DiwneObject::processUnselect(DrawInfo& context)
-//{
-//	return true;
-//}
-// bool DiwneObject::allowProcessUnselect()
-//{
-//	return m_isHeld && !m_isDragged;
-//}
-// void DiwneObject::processUnselectDiwne(DrawInfo& context)
-//{
-//	if (bypassUnselectAction() && allowProcessUnselect())
-//	{
-//		setSelected(false);
-//	}
-//}
+
+bool DiwneObject::processSelectDiwne(DrawInfo& context)
+{
+	if (!m_selectable)
+		return true;
+
+	if (m_justReleased && allowSelectOnClick(context))
+	{
+		bool wasSelected = m_selected;
+		bool multiSelect = diwne.m_input->multiSelectionActive();
+		if (!multiSelect)
+			diwne.deselectNodes();
+		setSelected(!wasSelected);
+	}
+	return false;
+}
 
 bool DiwneObject::allowPopup() const
 {
 	return true;
 }
-void DiwneObject::processPopup(DrawInfo& context)
+void DiwneObject::processPopupDiwne(DrawInfo& context)
 {
 	if (context.state.anyActionActive())
 		return;
+	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
+	// TODO: What about dragging? Will popup open at the end of a drag?
 	if (m_hovered && !context.popupOpened && diwne.m_input->bypassIsMouseReleased1() && allowPopup())
 	{
 		ImGui::OpenPopup(m_popupIDDiwne.c_str());

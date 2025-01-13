@@ -64,9 +64,6 @@ public:
 
 	// TODO: Ideally delete this whole class <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	// TODO: Remove this likely
-	virtual bool bypassFocusForInteractionAction() override;
-
 	void onDestroy(bool logEvent) override;
 
 	// TODO: Remove this
@@ -93,5 +90,6 @@ public:
 
 	virtual void drawMenuDelete();
 	void popupContent(DIWNE::DrawInfo& context) override;
+	bool allowDragStart() const override;
 };
 } // namespace Workspace

@@ -12,11 +12,7 @@
  */
 #pragma once
 
-// #include "DiwneObject.h"
-
 #include "NodeEditor.h"
-
-#include "Logger/Logger.h" // TODO: Remove
 
 namespace DIWNE
 {
@@ -31,26 +27,18 @@ enum DrawModeNodePosition
 };
 
 /**
- * \brief graphical representation od a box in the workspace node editor
- *
- *  Parts of the Node:
- * - -------------------
- * - |      Top        |
- * - -------------------
- * - |Left|Middle|Right|    -> |L|M|R| == Center
- * - -------------------
- * - |     Bottom      |
- * - -------------------
+ * TODO: Docs
  */
 class Node : public DiwneObject
 {
 protected:
-	// TODO: Use m_rect instead
+	// TODO: (DR) Use m_rect instead <<<<<<<<<<<<<<<<<<<<<<<<<<
 	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
 
 	DrawModeNodePosition m_nodePosMode{OnItsPosition};
 
 public:
+	// TODO: (DR) This should probably be a DiwneObject property
 	bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
 	                         For example in the first frame after you created it
 	                         -> to obtain its real size */
@@ -70,7 +58,7 @@ public:
 	//         */
 	//        Node(const Node& other);
 
-	// TODO: Does this operator make sense?
+	// TODO: Does this operator make sense? <<<<<<<<<<<<<<<<<<<<<<<<
 	/** Assignment operator
 	 *  \param other Object to assign from
 	 *  \return A reference to this
@@ -85,6 +73,7 @@ public:
 
 protected:
 	void afterDrawDiwne(DrawInfo& context) override;
+	bool processSelectDiwne(DrawInfo& context) override;
 
 public:
 	bool allowDrawing() override;
@@ -98,6 +87,9 @@ public:
 	//  We can probably handle that in the NodeEditor content method rather than using a special method (to avoid
 	//  confusion of what this seemingly generic method is for, it is not generic, its specifcally for rendering nodes
 	//  by the node editor
+	// TODO: Move this into the nodes drawDiwne() method
+	//  It should be possible to eliminate posMode alltogether by just always setting the position before drawing
+	//  Or call a setPosMode method before drawing, again, no need for a specialized drawing method
 	template <typename T>
 	void drawNodeDiwne(DrawInfo& context, DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
 	                   DrawMode drawMode = DrawMode::Interacting)
@@ -115,11 +107,8 @@ public:
 		}
 	}
 
-	bool setSelected(const bool selected) override;
+	void onSelection(bool selected) override;
 
-	//	bool processSelect() override;
-	//	bool processUnselect() override;
-	//
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 
 	void onDestroy(bool logEvent) override;
@@ -137,7 +126,7 @@ public:
 	{
 		m_nodePositionDiwne += amount;
 		translate(amount);
-	};
+	}
 };
 
 } /* namespace DIWNE */

@@ -51,8 +51,9 @@ struct SettingsDiwne
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
 
-	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.35);
-	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.35);
+	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.1);
+	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.1);
+	float selectionRectBorderAlpha = 0.8f;
 
 	ImVec4 itemSelectedBorderColor = ImVec4(1.0, 0.9, 0.4, 0.6);
 	float itemSelectedBorderThicknessDiwne = 2.5;
@@ -85,6 +86,9 @@ struct SettingsDiwne
 	float linkAlphaSelected = 0.5;
 	// TODO: Font color is unused, was deleted, reimplement if needed
 	ImVec4 fontColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); ///< Color of the text in the node
+
+	// Some new flags that are yet to be truly finalized, subject to be moved to a different place
+	bool selectNodeOnDrag = false;
 };
 // \todo   void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
 // v;}; /* from 0==left to 1==right */
@@ -120,8 +124,6 @@ public:
 	///  Review this flag, its hard to track, why not keep track of the "focused" object instead
 	///  Also still yet to exactly estabilish what "focused" really means
 	bool m_objectFocused{false}; // TODO: Remove?
-	/// for example when holding ctrl nodes not going unselected when sleection rect get out of them
-	bool m_allowUnselectingNodes{false};
 
 	InteractionState interactionState;
 	DiwneStyle m_style;
@@ -137,12 +139,12 @@ public:
 	//  I've actually made the change that the dragged link only a temporary reference during the actual dragging of the
 	//  link The draggedLink becomes a real link on release and the pointer should be reset A global reference to the
 	//  draggedLink is no longer needed if the info is retained in ActionData or InteractionState
-//	Link* m_draggedLink; ///< Reference to the currently dragged link, this link is drawn on top
+	//	Link* m_draggedLink; ///< Reference to the currently dragged link, this link is drawn on top
 
 	// TODO: If the above thing is moved then this should be moved as well
 	/// Clear the dragged link reference at the beginning of the next frame.
 	/// So that draggedLink reference is valid throughout the whole frame when drag ends.
-//	bool m_resetDraggedLinkNextFrame{false};
+	//	bool m_resetDraggedLinkNextFrame{false};
 
 protected:
 	ImDrawListSplitter m_channelSplitter;
@@ -156,9 +158,6 @@ protected:
 	std::shared_ptr<DIWNE::Node> mp_lastActiveNode; ///< Last node that had a logical update
 
 	bool m_nodesSelectionChanged{false};
-
-	// TODO: Could be moved into Actions::SelectionRectData
-	ImRect m_selectionRectangeDiwne{0, 0, 0, 0};
 
 protected:
 	ImRect m_workAreaScreen; ///< Rectangle of work area on screen
@@ -180,8 +179,8 @@ public:
 	NodeEditor(DIWNE::SettingsDiwne* settingsDiwne);
 	virtual ~NodeEditor();
 
-	/** Clear all nodes from the node editor */
-	virtual void clear();
+	// Lifecycle
+	// =============================================================================================================
 
 	void draw(DrawMode drawMode = DrawMode::Interacting) override;
 
@@ -191,13 +190,27 @@ public:
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
 
-protected:
 	void afterDraw(DrawInfo& context) override;
 
-protected:
-	void finalizeDiwne(DrawInfo& context) override;
-
 public:
+	// Node/Object management
+	// =============================================================================================================
+	/** Clear all nodes from the node editor */
+	virtual void clear();
+
+	const std::vector<std::shared_ptr<Workspace::CoreNode>>& getAllNodes() const
+	{
+		return m_workspaceCoreNodes;
+	};
+
+	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getAllNodesInnerIncluded();
+
+	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getSelectedNodes();
+
+	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getSelectedNodesInnerIncluded();
+
+	virtual void deselectNodes();
+
 	void addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2 position = ImVec2(0, 0),
 	             bool shiftToLeftByNodeWidth = false);
 
@@ -227,10 +240,10 @@ public:
 
 	void addLink(std::shared_ptr<Link> link);
 
-	virtual bool allowProcessZoom();
-	virtual bool bypassZoomAction();
-	virtual bool processZoom();
-	virtual bool processDiwneZoom();
+	virtual bool allowProcessZoom(); // TODO: Rename to allowZoom()
+	virtual bool bypassZoomAction(); // TODO: Rename to isZoomingDiwne()
+	virtual bool processZoom();      // TODO: Rename to onZoom()
+	virtual bool processDiwneZoom(); // TODO: Rename to processZoomDiwne()
 
 	bool isPressedDiwne() override;
 	bool isJustPressedDiwne() override;
@@ -240,7 +253,7 @@ public:
 
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 
-	void processInteractionsDiwne(DrawInfo& context) override;
+	void processInteractions(DrawInfo& context) override;
 
 protected:
 	bool isDraggedDiwne() override;
@@ -314,22 +327,8 @@ public:
 	//  We don't check if these methods return null anyway so its equivalent to a static cast (will crash on fail)
 	//  The static asserts might help with that though
 
-	template <typename T>
-	std::shared_ptr<T> getLastActivePin()
-	{
-		static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
-		//		return std::dynamic_pointer_cast<T>(mp_lastActivePin);
-		return nullptr;
-	}
-
-	template <typename T>
-	void setLastActivePin(std::shared_ptr<T> pin)
-	{
-		static_assert(std::is_same<T, std::nullptr_t>::value || std::is_base_of_v<DIWNE::Pin, T>,
-		              "Pin must be derived from DIWNE::Pin class.");
-		//		mp_lastActivePin = pin;
-	}
-
+	// TODO: (DR) Rename this to focused node. Adds docs relating it with DrawInfo logical updates.
+	//   Logical updates could maybe be called focusUpdate? As it in a way captures focus?
 	template <typename T>
 	std::shared_ptr<T> getLastActiveNode()
 	{
@@ -363,10 +362,6 @@ public:
 	virtual float bypassGetZoomDelta();
 
 	virtual bool bypassIsItemActive(); // TODO: Remove this is dumb
-
-	// TODO: These methods might not actually be necessary (handled in onDrag / InputAdapter)
-	// Selection rectangle
-	ImRect getSelectionRectangleDiwne();
 
 	////////////////////////////////////////////
 	// ZOOM SCALING
@@ -406,6 +401,7 @@ public:
 	 * restore original state
 	 */
 	bool ensureZoomScaling(bool active);
+	void onReleased(bool justReleased, DrawInfo& context) override;
 };
 
 typedef std::function<void(...)> popupContent_function_pointer; /**< \brief you can pass any arguments to you
