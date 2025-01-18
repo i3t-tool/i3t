@@ -39,4 +39,7 @@ private:
 	std::shared_ptr<GUIImage> m_i3tImage;
 
 	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
+
+	// for now leave it true, later it will be tested, we need to rename it -F
+	bool m_showFinishedTutorials = false;
 };
