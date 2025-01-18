@@ -6,7 +6,7 @@ Introduction and a short program description. A good idea is to read the tutoria
 ![startWindow](./assets/startWindow.png?raw=true) 
 The program starts with a *Start window* that serves as a signpost between selecting ready-made tutorials, opening an existing scene, or starting a new one.
 
-Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Data/Tutorials/1TUT/i3tscreens.png?raw=true)
+Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Docs/assets/i3tScenes.png?raw=true)
 
 In the *workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
@@ -14,17 +14,13 @@ by the graph is immediately visible in the 3D view in the *Scene View* window.
 
 The basic building block in the workspace window is a small rectangle
 with the title and contents, called *box*. 
-![Matrix with a model](../Data/Tutorials/1TUT/hintPosun.png?raw=true)
+![Matrix with a model](../Docs/assets/buildingBlocks.png?raw=true)
 The matrices are
 boxes with a 4x4 grid of real numbers. Matrices affect the object
 by being combined in the scene graph as they are put into a
 larger box called a sequence.
 
 Sequences have inputs and outputs marked by small icons.
-The ![x icon](../Data/Tutorials/1TUT/mult.png?raw=true) 
-represents matrix multiplication and matrices are multiplied
-by using the left-to-right order. The remaining ![icons with triangles](../Data/Tutorials/1TUT/vec3.png?raw=true) represent
-either input or output of the copy of the box.
 
 The key benefit of the I3T tool is its interactivity. The user can
 construct the scene graph interactively by ordering the matrices into
@@ -32,9 +28,6 @@ sequences, the sequences into graphs, and also interactively modify
 the values in the matrices. The effect of the transformation is
 immediately shown in the 3D scene view (Figure 1 and the accompanying
 video).
-
-
- top bar (how to load, append, save...), shortcuts
 
 ### Windows list
 - Start window - sign post, contains a list tutorials that teach basic controls
@@ -44,7 +37,7 @@ video).
 ### Main bars
 The I3T application has a stadard main menu in its top. 
 
-![Main menu](../Data/Tutorials/ADD_TUT/lista.png?raw=true)
+![Top bar](../Docs/assets/topBar.png?raw=true)
 
 - File 
   - Open - standard file dialog for scene file opening. The scenes should be located in Data/Scenes/ directory.
@@ -98,6 +91,8 @@ The **Workspace** window is where scenes are assembled. You can add, connect, an
   - **Camera**: Adds cameras for custom scene views.
   - **Other Blocks**: Includes **Pulse**, **Screen**, and **Cycle** for specific use cases.
 
+  ![Adding](../Docs/assets/addBlocks.png?raw=true)
+
 ### Connecting Blocks
 
 Blocks function like functions, with inputs and outputs. Connect blocks using **wires** to form a scene graph:
@@ -115,6 +110,7 @@ Connections are visualized as colored wires, representing the flow of data throu
 ### Transformations
 
 Transformations are always inserted into sequences in the order **Translation, Rotation, Scaling** (TRS). 
+  ![Adding](assets/transformations.png?raw=true)
 
 #### Modifying Values
 
@@ -130,7 +126,7 @@ Transformations are always inserted into sequences in the order **Translation, R
 The **Tracking** feature allows you to visualize the effects of transformations applied in sequences:
 - Add a tracking copy of the model connected to a sequence.
 - Use the arrows to step through transformations and observe how they are applied.
-![Tracking show off](../Data/Tutorials/3TUT/tracking.png?raw=true)
+![Tracking show off](../Docs/assets/tracking.png?raw=true)
 
 ### Camera
 
@@ -139,7 +135,7 @@ The **Camera block** allows you to add a camera to your scene. It contains two s
 - **View**: A container for the view matrix, which positions and orients the camera.
 
 The **Camera** block has three outputs:
-![Tracking show off](../Data/Tutorials/4TUT/camera_block.png?raw=true)
+![Camera](../Docs/assets/camera.png?raw=true)
 - 🔷 **Screen Output**: Displays what the camera sees (connect to a `Screen` block).
 - 🔴 **Matrix Copy Output**: Outputs the resulting matrix for further manipulation.
 - ❎ **Multiplication Output**: Allows multiplication with other matrices.
@@ -172,6 +168,7 @@ The **lookAt** matrix cannot be edited directly but is controlled through these 
 ### Cycle
 
 The **Cycle block** facilitates cyclic or time-based operations, providing control over value transitions, looping behaviors, and timing. It enables the creation of animations, repetitive movements, and smooth transitions within your scene.
+  ![Cycle](../Docs/assets/cycle.png?raw=true)
 
 #### Inputs and Outputs
 
@@ -226,6 +223,7 @@ The **Cycle block** offers three playback modes:
 ### Operators
 
 Operators in I3T perform calculations and manipulations on various data types, such as matrices, vectors, quaternions, and floats. They are categorized into different groups based on the type of operation they perform. Operators can be added through the **Workspace menu** and connected to other blocks to achieve specific results.
+  ![Operators](../Docs/assets/operators.png?raw=true)
 
 <details>
   <summary>Transformation Operators</summary>
@@ -585,6 +583,7 @@ Operators in I3T perform calculations and manipulations on various data types, s
 ## Manipulators
 
 Manipulators are interactive tools visible in the **Scene View** that allow users to adjust transformations (translate, rotate, scale) directly on objects. These manipulators provide a visual and intuitive way to modify object properties without directly editing the transformation matrices.
+  ![Manipulators](../Docs/assets/manipulators.png?raw=true)
 
 ### Types of Manipulators
 
