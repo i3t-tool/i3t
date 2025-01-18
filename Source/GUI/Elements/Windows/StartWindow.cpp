@@ -177,7 +177,7 @@ void StartWindow::renderRightPanel()
 	ImGui::BeginChild("panel", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 	{
 		// YOUR SCENE CHILD WINDOW
-		if (m_showFinishedTutorials)
+		if (m_finishedAllTutorials)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, innerPadding);
 			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding,
@@ -343,10 +343,6 @@ void StartWindow::renderRightPanel()
 			        ImGui::Dummy(ImVec2(0, 10)); // Spacer between entries
 			    }
 			}
-
-
-
-
 		}
 		//ImGui::Dummy(ImVec2(0, 5));
 

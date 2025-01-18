@@ -40,6 +40,6 @@ private:
 
 	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
 
-	// for now leave it true, later it will be tested, we need to rename it -F
-	bool m_showFinishedTutorials = false;
+	// for now leave it true, later it will be tested and decide what window to show
+	bool m_finishedAllTutorials = true;
 };
