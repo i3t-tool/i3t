@@ -63,14 +63,8 @@ void StartWindow::renderLeftPanel() const
 
 	// Styling constants todo move all constants here, possibly load from theme or
 	// other styling settings
-	// const ImVec2 logoOffset = ImVec2(5, -20);
 	const float titleVerticalOffset = I3T::getUI()->getTheme().get(ESize::StartWindow_TitleVerticalOffset);
 	const float leftBarWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_LeftBarWidth);
-
-	//// LOGO I3T
-	// ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
-	// ImGui::GetForegroundDrawList()->AddImage((ImTextureID) m_i3tImage->m_texID, logoPos,
-	//                                         logoPos + ImVec2(m_i3tImage->m_width, m_i3tImage->m_height));
 
 	// LEFT CHILD WINDOW
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
@@ -79,7 +73,6 @@ void StartWindow::renderLeftPanel() const
 	                  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar |
 	                      ImGuiWindowFlags_NoScrollWithMouse);
 	{
-		// ImGui::Dummy(ImVec2(0, titleVerticalOffset));
 		// LOGO
 		ImGui::Dummy(ImVec2(0, titleVerticalOffset / 2));
 		ImGui::Image((ImTextureID) (intptr_t) m_i3tImage->m_texID,
@@ -190,21 +183,13 @@ void StartWindow::renderRightPanel()
 			{
 				// FOLDER IMAGE
 				if (m_folderImage) {
-					// ImVec2 offset = ImVec2(ImGui::GetCursorPosX() + (thumbImageSize -
-					// folderImage->m_width)/2,ImGui::GetCursorPosY() + (thumbImageSize -
-					// folderImage->m_height)/2); ImGui::Dummy(ImVec2(thumbImageSize,
-					// thumbImageSize)); ImGui::SetCursorPos(offset);
 					ImGui::Image((ImTextureID)(intptr_t)m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 				}
 				ImGui::SameLine();
 
 				// YOUR SCENE TEXT
-				// ImGui::AlignTextToFramePadding();
 				ImGui::BeginGroup();
 				{
-					// ImGui::BeginVertical("yourScene", ImVec2(0, 0));
-					// ImGui::Spring(1);  // not working
-
 					ImGui::Dummy(ImVec2(0, 10));
 					ImGui::PushStyleColor(ImGuiCol_Text,
 										  I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
@@ -215,22 +200,14 @@ void StartWindow::renderRightPanel()
 					ImGui::Text("Start with an empty scene or open your previous work.");
 					ImGui::PopFont();
 					ImGui::PopStyleColor();
-					// ImGui::Spring(1);  // not working
-					// ImGui::EndVertical();
 				}
 				ImGui::EndGroup();
-				// ImGui::GetFontSize()
-				// ImGui::SetNextItemWidth(100.0f);
-				// const float itemSpacing = ImGui::GetStyle().
 
 				ImGui::SameLine(ImGui::GetContentRegionMax().x - loadBtnWidth);
 
 				// BUTTONS
 				ImGui::BeginGroup();
 				{
-					// ImGui::BeginVertical("buttons", ImVec2(0, 0));
-					// ImGui::Spring(1);
-
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
 					ImGui::PushStyleColor(ImGuiCol_Text,
 										  I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
@@ -243,7 +220,6 @@ void StartWindow::renderRightPanel()
 					if (ImGui::IsItemHovered()) {
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
-					// ImGui::SameLine();
 					ImGui::Dummy(ImVec2(0, 2));
 					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight))) {
 						if (MenuBarDialogs::open()) {
@@ -255,9 +231,6 @@ void StartWindow::renderRightPanel()
 					}
 					ImGui::PopStyleColor(2);
 					ImGui::PopFont();
-
-					// ImGui::Spring(1);
-					// ImGui::EndVertical();
 				}
 				ImGui::EndGroup();
 			}
@@ -272,7 +245,6 @@ void StartWindow::renderRightPanel()
 			ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle)); // Use a larger font for the headline
 			ImGui::PushStyleColor(ImGuiCol_Text,
 								  I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
-			//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // White color
 			ImGui::Text("Recent"); // Headline text
 			ImGui::PopStyleColor();
 			ImGui::PopFont();
@@ -344,8 +316,6 @@ void StartWindow::renderRightPanel()
 			    }
 			}
 		}
-		//ImGui::Dummy(ImVec2(0, 5));
-
 		// Add a small spacer below "Your Scene"
 		ImGui::Dummy(ImVec2(0, 10));
 
@@ -353,7 +323,6 @@ void StartWindow::renderRightPanel()
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle));
 		ImGui::PushStyleColor(ImGuiCol_Text,
 					  I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
-		//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // White color
 		ImGui::Text("Tutorials");
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
@@ -367,13 +336,6 @@ void StartWindow::renderRightPanel()
 			ImGui::BeginGroup();
 			{
 				ImGui::Indent(innerPadding.x);
-				const float titleDescWidth = ImGui::GetContentRegionAvail().x - (thumbImageSize + startBtnWidth);
-
-				// ImGui::Columns(3, "ThreeCols", false);
-				// ImGui::SetColumnWidth(0, thumbImageSize + 2 *
-				// ImGui::GetStyle().ColumnsMinSpacing); ImGui::SetColumnWidth(1,
-				// titleDescWidth - 2 * ImGui::GetStyle().ColumnsMinSpacing);
-				// ImGui::SetColumnWidth(2, startBtnWidth);
 
 				// THUMBNAIL IMAGE
 				auto img = header->m_thumbnailImage;
@@ -389,14 +351,11 @@ void StartWindow::renderRightPanel()
 					}
 				}
 
-				// ImGui::NextColumn();
-				// ImGui::SameLine(ImGui::GetCursorPosX() + innerPadding.x);
 				ImGui::SameLine();
 				std::string descChildName = "Desc##" + header->m_filename.string();
 				ImVec2 descSize(ImGui::GetContentRegionAvail().x, thumbImageSize);
 				descSize.x -= (startNewBtnWidth + 2 * innerPadding.x + outerPadding.x);
-				// ImGui::PushClipRect(ImGui::GetCursorScreenPos(), descBottomRight,
-				// true); ImGui::BeginGroup();
+
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 				ImGui::BeginChild(descChildName.c_str(), descSize, false,
 				                  ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
@@ -436,7 +395,6 @@ void StartWindow::renderRightPanel()
 				ImGui::EndChild();
 				ImGui::PopStyleVar();
 
-				// ImGui::NextColumn();
 				ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x - outerPadding.x);
 				// START BUTTON
 				ImGui::BeginGroup();
