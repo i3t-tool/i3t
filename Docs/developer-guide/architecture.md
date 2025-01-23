@@ -1,6 +1,7 @@
 # Architecture
 
-A brief overview of the I3T application architecture, including the project structure and key components.
+A very brief overview of the I3T application architecture, including the project structure and key components.
+
 
 ## Application Components Overview
 
@@ -14,6 +15,7 @@ Docs/
 Source/
     - Commands/             Commands for the command pattern.
     - Core/                 Core of the application.
+    - DIWNE/                Dear ImGui Wrapper for Node Editor.
     - GUI/                  ImGui windows, dialogs, elements.
         - Elements
             - Dialogs/      
@@ -21,6 +23,9 @@ Source/
             - Nodes/       
             - Windows/      
         - ImGui/            Implementation of ImGui backend.
+    - State/                State management (undo/redo, save/load).
+    - Tutorial/             Tutorial data structure and rendering.
+    - Viewport/             Scene rendering and object selection.
 Test/                       Unit tests, same structure as Source/ directory.
 ```
 
