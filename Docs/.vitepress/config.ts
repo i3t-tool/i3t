@@ -71,7 +71,6 @@ export default defineConfig({
       },
       {
         text: 'C++ API Reference',
-        link: '/cpp-api-reference/',
         collapsed: true,
         items: [
           ...autogenerate('Classes', 'classes'),
