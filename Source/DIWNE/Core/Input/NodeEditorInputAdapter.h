@@ -9,10 +9,10 @@ class NodeEditor;
 class NodeEditorInputAdapter : public InputAdapter
 {
 protected:
-	NodeEditor* editor;
+	NodeEditor& editor;
 
 public:
-	NodeEditorInputAdapter(NodeEditor* editor);
+	NodeEditorInputAdapter(NodeEditor& editor);
 
 	bool selectionRectangleKeyDown();
 	bool selectionRectangleKeyPressed();
@@ -34,6 +34,8 @@ public:
 	 * Subtractive selection version of the multi selection. Deselects a portion of items.
 	 */
 	bool multiDeselectionActive();
+
+	float getZoomDelta();
 
 	bool bypassIsMouseDragging0() override;
 	bool bypassIsMouseDragging1() override;

@@ -44,66 +44,27 @@
 
 namespace Workspace
 {
-enum WorkspaceDiwneAction
-{
-	None,
-	CreateAndPlugTypeConstructor, // TODO: Reimplement create and plug constructor
-};
-
 extern WorkspaceDiwne* g_diwne;
 
 class WorkspaceDiwne : public DIWNE::NodeEditor
 {
-	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node);
-
+	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node); // TODO: Friend stuff would be nice to avoid
 public:
-	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
-	~WorkspaceDiwne() override;
-
 	ImDrawListSplitter m_channelSplitter;
 	Memento* copiedNodes = nullptr;
 	Core::MatrixTracker* tracking;
 	float timeUntilNextTrack = 0;
 	bool smoothTracking;
 
-	ViewportHighlightResolver m_viewportHighlightResolver;
-
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
 
-	void clear() override;
+	ViewportHighlightResolver m_viewportHighlightResolver;
 
-	void popupContent(DIWNE::DrawInfo& context) override;
+	bool m_updateDataItemsWidth;      ///< Indicates a change in zoom level this frame
+	bool m_reconnectCameraToSequence; // TODO: Unused probably
 
-	//	void initialize(DIWNE::DrawInfo& context) override;
-	void begin(DIWNE::DrawInfo& context) override;
-	void content(DIWNE::DrawInfo& context) override;
-	void end(DIWNE::DrawInfo& context) override;
-	void finalize(DIWNE::DrawInfo& context) override;
-
-	void setWorkAreaZoom(float val = 1) override;
-
-	// TODO: This secondary set of unrelated DiwneActions seems really odd, we're redoing what we already have because
-	//  we can't add more keys to the diwne action enum in the subclass
-	//  The diwne action "system" probably needs to be reworked alltogether
-	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
-	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
-	{
-		m_workspaceDiwneAction = wda;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction()
-	{
-		return m_workspaceDiwneAction;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame()
-	{
-		return m_workspaceDiwneActionPreviousFrame;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
-	{
-		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
-		                                                            : m_workspaceDiwneAction;
-	}
+	bool m_trackingFromLeft;
 
 	// TODO: The nodes should be mainly stored in the DIWNE::NodeEditor not in a subclass
 	//  Or a system where the storage can be specified by subclasses should be created
@@ -132,6 +93,22 @@ public:
 	 */
 	std::unordered_map<Core::ID, CoreNode*> m_coreIdMap;
 
+	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+	~WorkspaceDiwne() override;
+
+	// Lifecycle
+	// =============================================================================================================
+	//	void initialize(DIWNE::DrawInfo& context) override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void content(DIWNE::DrawInfo& context) override;
+	void end(DIWNE::DrawInfo& context) override;
+	void finalize(DIWNE::DrawInfo& context) override;
+
+	void popupContent(DIWNE::DrawInfo& context) override;
+
+	// Interaction
+	// =============================================================================================================
+	void onZoom() override;
 
 	// TODO: Restore functionality
 	/**
@@ -140,6 +117,8 @@ public:
 	 */
 	//	bool processCreateAndPlugTypeConstructor();
 
+	// Node/Object management
+	// =============================================================================================================
 	/**
 	 * O(N) where N is workspace nodes count.
 	 *
@@ -154,12 +133,12 @@ public:
 	void addTypeConstructorNode()
 	{
 		// TODO: Rework <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//		CorePin* pin = getLastActivePin<CorePin>().get();
-//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
-//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
-//		              ->getOutputs()
-//		              .at(0)
-//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
+		//		CorePin* pin = getLastActivePin<CorePin>().get();
+		//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
+		//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
+		//		              ->getOutputs()
+		//		              .at(0)
+		//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
 	}
 
 	// TODO: Replace with DIWNE::NodeEditor functionality
@@ -170,30 +149,18 @@ public:
 
 		m_takeSnap = true; /* JH maybe better in place where this function is called*/
 
-		// TODO: This call makes no sense here, there should be another way
-		//	I'm thinking this should be handled by the respective Transformation subclasses
+		//TODO: This call makes no sense here, there should be another way
+		// I'm thinking this should be handled by the respective Transformation subclasses
 		detectRotationTransformAndSetFloatMode(node);
 
 		return node;
-	}
-
-	void detectRotationTransformAndSetFloatMode(auto node)
-	{
-		if (std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerX>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerY>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerZ>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::Quat>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::AxisAngle>>(node) != nullptr)
-		{
-			std::dynamic_pointer_cast<CoreNode>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
-		}
 	}
 
 	// TODO: Replace with DIWNE::NodeEditor functionality
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
-		auto result = addNodeToPosition<T>(screen2diwne(diwne.getPopupPosition()));
+		auto result = addNodeToPosition<T>(canvas().screen2diwne(diwne.getPopupPosition()));
 		return result;
 	}
 
@@ -246,14 +213,22 @@ public:
 	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();
 	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
 
-	bool bypassZoomAction() override;
+//	bool isZoomingDiwne() override;
 
 	bool processZoom() override;
 
-	bool m_updateDataItemsWidth;      ///< Indicates a change in zoom level this frame
-	bool m_reconnectCameraToSequence; // TODO: Unused probably
-
-	bool m_trackingFromLeft;
+	// TODO: (DR) Move somewhere else
+	void detectRotationTransformAndSetFloatMode(auto node)
+	{
+		if (std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerX>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerY>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerZ>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::Quat>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::AxisAngle>>(node) != nullptr)
+		{
+			std::dynamic_pointer_cast<CoreNode>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
+		}
+	}
 };
 
 template <typename T>

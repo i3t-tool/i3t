@@ -62,20 +62,28 @@ public:
 
 	virtual bool disconnectPin(Pin* pin, bool logEvent = true);
 
-	void onDestroy(bool logEvent) override;
-
+	// Lifecycle
+	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
-	void initializeDiwne(DrawInfo& context) override;
 	void begin(DrawInfo& context) override{}; /*!< link is not an ImGui element - it is just a drawn line */
-	void end(DrawInfo& context) override;   ///< No need to set m_internalHover as we handle hovering differently
 	void content(DrawInfo& context) override;
-
-	virtual void updateEndpoints();
-	void updateControlPoints();
-	void updateSquareDistanceMouseFromLink();
-
+	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
 	void updateLayout(DrawInfo& context) override;
 
+	void onDestroy(bool logEvent) override;
+
+protected:
+	void initializeDiwne(DrawInfo& context) override;
+
+public:
+	// Interaction
+	// =============================================================================================================
+	void onHover(DrawInfo& context) override;
+
+protected:
+	bool isHoveredDiwne() override;
+
+public:
 	Pin* getStartPin() const
 	{
 		return m_startPin;
@@ -92,7 +100,6 @@ public:
 	{
 		m_endPin = pin;
 	};
-
 	ImVec2 getStartPoint()
 	{
 		return m_startDiwne;
@@ -109,20 +116,20 @@ public:
 	{
 		return m_controlPointEndDiwne;
 	};
-
 	void setStartPoint(const ImVec2& mStartDiwne);
 	void setEndPoint(const ImVec2& mEndDiwne);
 
+	// TODO: (DR) figure out why this method isn't used (maybe related to allowDrawing?), what is the hiding behavior?
 	bool isLinkOnWorkArea(); /*!< in fact just rectangle (from startPoint to
 	                            endPoint) check - so could return true while Link
 	                            is not visible */
 
 	bool isPlugged(); ///< Whether the link is connected on both ends
 
-	void onHover(DrawInfo& context) override;
-
 protected:
-	bool isHoveredDiwne() override;
+	void updateSquareDistanceMouseFromLink();
+	virtual void updateEndpoints();
+	void updateControlPoints();
 };
 
 } /* namespace DIWNE */

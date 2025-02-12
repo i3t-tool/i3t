@@ -4,7 +4,7 @@
 
 namespace DIWNE
 {
-NodeEditorInputAdapter::NodeEditorInputAdapter(NodeEditor* editor) : editor(editor) {}
+NodeEditorInputAdapter::NodeEditorInputAdapter(NodeEditor& editor) : editor(editor) {}
 
 bool NodeEditorInputAdapter::selectionRectangleKeyDown()
 {
@@ -20,11 +20,11 @@ bool NodeEditorInputAdapter::selectionRectangleDragging()
 }
 ImVec2 NodeEditorInputAdapter::selectionRectangleStartPosition()
 {
-	return editor->screen2diwne(editor->m_input->bypassMouseClickedPos0());
+	return editor.canvas().screen2diwne(editor.input().bypassMouseClickedPos0());
 }
 ImVec2 NodeEditorInputAdapter::selectionRectangleSize()
 {
-	return editor->m_input->bypassGetMouseDragDelta0() / editor->getWorkAreaZoom();
+	return editor.input().bypassGetMouseDragDelta0() / editor.canvas().getZoom();
 }
 
 bool NodeEditorInputAdapter::panKeyDown()
@@ -50,16 +50,21 @@ bool NodeEditorInputAdapter::multiDeselectionActive()
 	return ImGui::IsKeyDown(ImGuiMod_Ctrl);
 }
 
+float NodeEditorInputAdapter::getZoomDelta()
+{
+	return bypassGetMouseWheel() / editor.mp_settingsDiwne->zoomWheelReverseSenzitivity;
+}
+
 bool NodeEditorInputAdapter::bypassIsMouseDragging0()
 {
-	return ImGui::IsMouseDragging(0, editor->mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(0, editor.mp_settingsDiwne->mouseDragThreshold);
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging1()
 {
-	return ImGui::IsMouseDragging(1, editor->mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(1, editor.mp_settingsDiwne->mouseDragThreshold);
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging2()
 {
-	return ImGui::IsMouseDragging(2, editor->mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(2, editor.mp_settingsDiwne->mouseDragThreshold);
 }
 } // namespace DIWNE

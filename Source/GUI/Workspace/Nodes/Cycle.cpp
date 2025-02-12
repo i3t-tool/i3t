@@ -69,7 +69,7 @@ bool Cycle::buttonPlayPause()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 
 	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
@@ -101,7 +101,7 @@ bool Cycle::buttonPlayPause()
 		// (left, bottom, right, top)
 		padding = ImVec4(9 * zoom, 6 * zoom, 7 * zoom, 6 * zoom); // todo I3T::getSize(ESizeVec2::Cycle_ButtonPadding)
 	}
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed)
@@ -121,12 +121,12 @@ bool Cycle::buttonPlayPause()
 
 	//-------------------------------------
 
-	// diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	// diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	//               ImVec4(padding, padding, padding, padding), true);
 
 
-	// m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()),
-	// diwne.screen2diwne(ImGui::GetItemRectMax()));
+	// m_iconRectDiwne = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
+	// diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 
 
 	// if (ImGui::Button(fmt::format("{}", "⏩").c_str()))
@@ -164,7 +164,7 @@ bool Cycle::buttonStopAndReset()
 	// const ImColor iconColorBg = ImColor(127, 127, 127, 255); // todo I3T::getColor(EColor::Cycle_ButtonBg);
 	// const ImColor iconColorFg = IM_COL32_BLACK;              // todo I3T::getColor(EColor::Cycle_ButtonFg);
 
-	// const float zoom = diwne.getWorkAreaZoom();
+	// const float zoom = diwne.getZoom();
 	// const ImVec2 iconSize = ImVec2(40.0f, 40.0f) * zoom; // todo use themes:
 	// I3T::getSize(ESizeVec2::Cycle_ButtonSize)
 
@@ -174,7 +174,7 @@ bool Cycle::buttonStopAndReset()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 
 	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
@@ -199,7 +199,7 @@ bool Cycle::buttonStopAndReset()
 
 	ImGui::SetCursorPos(position);
 
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed)
@@ -215,7 +215,7 @@ bool Cycle::buttonStepBack()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 
 
 	ImGuiContext& g = *GImGui;
@@ -246,7 +246,7 @@ bool Cycle::buttonStepBack()
 
 	ImGui::SetCursorPos(position);
 
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("SB"))
@@ -274,7 +274,7 @@ bool Cycle::buttonStepNext()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 
 
 	ImGuiContext& g = *GImGui;
@@ -304,7 +304,7 @@ bool Cycle::buttonStepNext()
 
 	ImGui::SetCursorPos(position);
 
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("SN"))
@@ -321,7 +321,7 @@ bool Cycle::buttonRewind()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 
 	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
@@ -344,7 +344,7 @@ bool Cycle::buttonRewind()
 
 	ImGui::SetCursorPos(position);
 
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("RR"))
@@ -360,7 +360,7 @@ bool Cycle::buttonWind()
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 
 	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
@@ -383,7 +383,7 @@ bool Cycle::buttonWind()
 
 	ImGui::SetCursorPos(position);
 
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                           padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("WW"))
@@ -407,9 +407,9 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 	bool inner_interaction_happen = false;
 
 	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	//                     I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	//                     I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	// ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	//                     I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	//                     I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	if (m_levelOfDetail == LevelOfDetail::LightCycle)
 	{
@@ -421,7 +421,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 		ImRect nodeRect = getRectDiwne();
 		ImVec2 pinConnectionPoint =
-		    ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
+		    ImVec2(nodeRect.Min.x, (diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
 		for (const auto& pin : m_workspaceInputs)
 		{
@@ -466,7 +466,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
 		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) *
-		                        diwne.getWorkAreaZoom()); // height of the float widget
+		                        diwne.getZoom()); // height of the float widget
 		ImGui::SameLine();
 		ImGui::Text(""); // probably adds the item separator
 		ImGui::SameLine();
@@ -508,7 +508,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
@@ -544,7 +544,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		// TODO: drawDragFloat should take the context parameter
 		bool interaction = DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
@@ -670,14 +670,14 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 	bool inner_interaction_happen = false;
 
 	// ImVec2 button_sz =
-	// I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
+	// I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getZoom();
 	float localData;
 	bool valueChanged;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	switch (m_levelOfDetail)
 	{
@@ -757,7 +757,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			if (radio_buttons_rect.GetWidth() > 0.0f) // area behind
 			{
 				ImGui::SetCursorPos(position - borderWidth);
-				diwne.m_renderer->EmptyButton(radio_buttons_rect.GetSize(),
+				diwne.canvas().EmptyButton(radio_buttons_rect.GetSize(),
 				                              (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
 				ImGui::SetCursorPos(position + borderWidth);
 			}

@@ -69,10 +69,10 @@ void Screen::popupContent(DIWNE::DrawInfo& context)
 //  ----------
 void Screen::centerContent(DIWNE::DrawInfo& context)
 {
-	int width = m_textureSize.x * diwne.getWorkAreaZoom();
-	int height = m_textureSize.y * diwne.getWorkAreaZoom();
+	int width = m_textureSize.x * diwne.getZoom();
+	int height = m_textureSize.y * diwne.getZoom();
 
-	ImVec2 zoomedTextureSize = m_textureSize * diwne.getWorkAreaZoom();
+	ImVec2 zoomedTextureSize = m_textureSize * diwne.getZoom();
 	ImVec2 topLeftCursorPos = ImGui::GetCursorScreenPos();
 
 	if (getNodebase()->getInput(0).isPluggedIn())
@@ -109,10 +109,10 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 		// Draw no input text
 		ImGui::PushClipRect(rect.Min, rect.Max, true);
-		float origScale = diwne.applyZoomScalingToFont(I3T::getFont(EFont::LargeBold));
+		float origScale = diwne.canvas().applyZoomScalingToFont(I3T::getFont(EFont::LargeBold));
 		GUI::TextCentered("NO INPUT", rect,
 		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
-		diwne.stopZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
+		diwne.canvas().stopZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
 		ImGui::PopClipRect();
 	}
 
@@ -144,13 +144,13 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	ImVec2 dragDelta;            /// zoom-scaled mouse move
 	ImVec2 buttonSize = I3T::getSize(ESizeVec2::Nodes_Screen_resizeButtonSize);
 	buttonSize = ImMax(ImVec2(1, 1), buttonSize);
-	float buttonIconPadding = 0.f; /// not used 2*diwne.getWorkAreaZoom();
+	float buttonIconPadding = 0.f; /// not used 2*diwne.getZoom();
 
 	// floored position - same as in ImGui
-	//	ImVec2 zoomedTextureSize = GUI::floorImVec2(m_textureSize * diwne.getWorkAreaZoom());
-	//	ImVec2 zoomedButtonSize = GUI::floorImVec2(buttonSize * diwne.getWorkAreaZoom());
+	//	ImVec2 zoomedTextureSize = GUI::floorImVec2(m_textureSize * diwne.getZoom());
+	//	ImVec2 zoomedButtonSize = GUI::floorImVec2(buttonSize * diwne.getZoom());
 	//	ImVec2 topLeftCursorPos = GUI::floorImVec2(ImGui::GetCursorScreenPos());
-	ImVec2 zoomedButtonSize = buttonSize * diwne.getWorkAreaZoom();
+	ImVec2 zoomedButtonSize = buttonSize * diwne.getZoom();
 
 	// NOTE: Prefer to use AddRectFilled as opposed to AddRect for debugging pixel positions
 	//   AddRect offsets coordinates by 0.5f
@@ -177,12 +177,12 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	//
 	//	ImGui::SameLine();
 	//
-	//	if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
+	//	if (ImGui::IsItemActive() && diwne.bypassIsMouseDragging0())
 	//	{
 	//		interaction_happen = true;
 	//		resize_texture = true;
 	//
-	//		dragDelta = diwne.m_input->bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
+	//		dragDelta = diwne.input().bypassGetMouseDragDelta0() / diwne.getZoom();
 	//
 	//		ImVec2 nodePos = getNodePositionDiwne();
 	//		nodePos.x += dragDelta.x;
@@ -196,7 +196,7 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	cursorPos = topLeftCursorPos + zoomedTextureSize - zoomedButtonSize;
 	ImGui::SetCursorScreenPos(cursorPos);
 
-	interaction_happen |= diwne.m_renderer->IconButton(
+	interaction_happen |= diwne.canvas().IconButton(
 	    DIWNE::IconType::TriangleDownRight, I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
 	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner), DIWNE::IconType::GrabDownRight,
 	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape), I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner),
@@ -211,22 +211,22 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	//  The fix is probably just consuming input when the corner is moved
 
 	// TODO: Again, bypass isItemActive? just ImGui::IsItemActive bruh
-	if (diwne.bypassIsItemActive() && diwne.m_input->bypassIsMouseDragging0())
+	if (ImGui::IsItemActive() && diwne.input().bypassIsMouseDragging0())
 	{
 		interaction_happen = true;
 		resize_texture = true;
 
-		dragDelta = diwne.m_input->bypassGetMouseDragDelta0() / diwne.getWorkAreaZoom();
+		dragDelta = diwne.input().bypassGetMouseDragDelta0() / diwne.getZoom();
 	}
 
 	// ask for texture resize, if the viewport size changed
 	// todo: check if we should use the floor too
 	if (resize_texture)
 	{
-		m_textureSize.x = std::max(2 * (buttonSize.x + ImGui::GetStyle().ItemSpacing.x / diwne.getWorkAreaZoom()),
+		m_textureSize.x = std::max(2 * (buttonSize.x + ImGui::GetStyle().ItemSpacing.x / diwne.getZoom()),
 		                           m_textureSize.x + dragDelta.x); /* button should fit into middle... */
-		m_textureSize.y = std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y / diwne.getWorkAreaZoom(),
-		                           m_textureSize.y + dragDelta.y);
+		m_textureSize.y =
+		    std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y / diwne.getZoom(), m_textureSize.y + dragDelta.y);
 
 		// must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
 		getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);

@@ -71,7 +71,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 		endDiwne(context);
 		afterDrawDiwne(context);
 		DIWNE_DEBUG((diwne), {
-			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
+			diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
 			                               ImDrawFlags_RoundCornersNone, 1, true);
 		});
 		DIWNE_DEBUG_INTERACTIONS(diwne, {
@@ -86,7 +86,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			}
 			auto interactionCount = context.logicalUpdates - debug_logicalUpdate;
 			ImGui::GetForegroundDrawList()->AddText(
-			    diwne.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
+			    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_labelDiwne +
 			     (m_parentLabel.empty() ? " (no parent)\n" : " (" + m_parentLabel + ")\n") +
 			     (m_hovered ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
@@ -96,7 +96,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			{
 				InteractionState& state = context.state;
 				ImGui::GetForegroundDrawList()->AddText(
-				    diwne.diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.3, 0), IM_COL32_WHITE,
+				    diwne.canvas().diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.3, 0), IM_COL32_WHITE,
 				    (std::string() + (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "") +
 				     (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "") +
 				     (state.action ? "[" + state.action->name + " (" + state.action->source + ")]" : "") +
@@ -170,13 +170,13 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	if (ImGui::IsKeyDown(ImGuiKey_T))
 		int x = 5;
 
-	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.m_input->bypassIsMouseDragging0())
+	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.input().bypassIsMouseDragging0())
 	{
 		int x = 5;
 	}
-	if (diwne.m_input->bypassIsMouseDragging0())
+	if (diwne.input().bypassIsMouseDragging0())
 		int x = 5;
-	if (diwne.m_input->bypassIsMouseDragging2())
+	if (diwne.input().bypassIsMouseDragging2())
 		int x = 5;
 	if (ImGui::IsMouseClicked(0))
 		int x = 5;
@@ -246,7 +246,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	//	DIWNE_DEBUG_OBJECTS((diwne), {
 	//		if (m_isActive)
 	//		{
-	//			diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
+	//			diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
 	//			                   ImDrawFlags_RoundCornersNone, 1, true);
 	//		};
 	//	});
@@ -568,29 +568,29 @@ bool DiwneObject::isHoveredDiwne()
 }
 bool DiwneObject::isPressedDiwne()
 {
-	return diwne.m_input->bypassIsMouseDown0();
+	return diwne.input().bypassIsMouseDown0();
 }
 bool DiwneObject::isJustPressedDiwne()
 {
 	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
-	return diwne.m_input->bypassIsMouseClicked0();
+	return diwne.input().bypassIsMouseClicked0();
 }
 
 bool DiwneObject::bypassSelectAction()
 {
-	return diwne.m_input->bypassIsMouseReleased0();
+	return diwne.input().bypassIsMouseReleased0();
 }
 bool DiwneObject::bypassUnselectAction()
 {
-	return diwne.m_input->bypassIsMouseReleased0();
+	return diwne.input().bypassIsMouseReleased0();
 }
 bool DiwneObject::isDraggedDiwne()
 {
-	return diwne.m_input->bypassIsMouseDragging0();
+	return diwne.input().bypassIsMouseDragging0();
 }
 bool DiwneObject::bypassTouchAction()
 {
-	return diwne.m_input->bypassIsMouseClicked0();
+	return diwne.input().bypassIsMouseClicked0();
 }
 
 void DiwneObject::popupContent(DrawInfo& context)
@@ -608,17 +608,17 @@ void DiwneObject::onHover(DrawInfo& context)
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
 	//  Maybe move this impl into node and make it purely virtual?
-	//	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+	//	diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
 	//	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
 	//	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	//	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 	// TODO: Remove later, temporarily use a bright color for hover
-	diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 150),
+	diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 150),
 	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 
 	DIWNE_DEBUG(diwne, {
-		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
 		                               DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
 	});
 }
@@ -628,11 +628,11 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 	if (justPressed)
 		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
-		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
 		                               DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
 		if (justPressed)
 		{
-			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
 			                                     DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
@@ -646,7 +646,7 @@ void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (justReleased)
 		{
-			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
 			                                     DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
@@ -659,15 +659,15 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (dragStart)
 		{
-			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
 			                                     DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 		if (dragEnd)
 		{
-			diwne.m_renderer->AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
 			                                     DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
 		}
-		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
 		                               DIWNE_CYAN_50, 0, ImDrawFlags_RoundCornersNone, 2);
 	});
 }
@@ -696,7 +696,7 @@ bool DiwneObject::processSelectDiwne(DrawInfo& context)
 	if (m_justReleased && allowSelectOnClick(context))
 	{
 		bool wasSelected = m_selected;
-		bool multiSelect = diwne.m_input->multiSelectionActive();
+		bool multiSelect = diwne.input().multiSelectionActive();
 		if (!multiSelect)
 			diwne.deselectNodes();
 		setSelected(!wasSelected);
@@ -714,17 +714,17 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 		return;
 	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
 	// TODO: What about dragging? Will popup open at the end of a drag?
-	if (m_hovered && !context.popupOpened && diwne.m_input->bypassIsMouseReleased1() && allowPopup())
+	if (m_hovered && !context.popupOpened && diwne.input().bypassIsMouseReleased1() && allowPopup())
 	{
 		ImGui::OpenPopup(m_popupIDDiwne.c_str());
 		context.update(true, true, true);
 		context.popup();
 		// Store popup position for stuff like adding nodes at the popup location
-		diwne.setPopupPosition(diwne.m_input->bypassGetMousePos());
+		diwne.setPopupPosition(diwne.input().bypassGetMousePos());
 	}
 	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
 	{
-		const bool zoomScalingWasActive = diwne.ensureZoomScaling(false);
+		const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(false);
 		// I don't think we need to call ImGui::SetNextWindowPos as we want the popup to simply be where the mouse is
 		// and ImGui handles that on its own
 		if (ImGui::BeginPopup(m_popupIDDiwne.c_str()))
@@ -732,7 +732,7 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 			popupContent(context);
 			ImGui::EndPopup();
 		}
-		diwne.ensureZoomScaling(zoomScalingWasActive);
+		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
 	}
 }
 

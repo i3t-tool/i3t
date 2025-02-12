@@ -42,7 +42,6 @@
 #pragma once
 
 #include "Core/diwne_common.h"
-#include "diwne_config.h"
 
 #include "Core/NodeEditor.h"
 

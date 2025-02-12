@@ -1,55 +1,324 @@
-#include "DrawHelper.h"
+#include "Canvas.h"
 
 #include "NodeEditor.h"
 
 namespace DIWNE
 {
-float DrawHelper::zoom() const
+Canvas::Canvas(NodeEditor& editor)
+    : editor(editor),
+      m_viewRectDiwne(editor.mp_settingsDiwne->workAreaDiwne.Min, editor.mp_settingsDiwne->workAreaDiwne.Max),
+      m_zoom(editor.mp_settingsDiwne->workAreaInitialZoom)
+{}
+
+void Canvas::setZoom(float val /*=1*/)
 {
-	return e->getWorkAreaZoom();
+	double old = m_zoom;
+	if (val < editor.mp_settingsDiwne->minWorkAreaZoom)
+	{
+		m_zoom = editor.mp_settingsDiwne->minWorkAreaZoom;
+	}
+	else if (val > editor.mp_settingsDiwne->maxWorkAreaZoom)
+	{
+		m_zoom = editor.mp_settingsDiwne->maxWorkAreaZoom;
+	}
+	else
+		m_zoom = val;
+	if (old != m_zoom)
+		editor.onZoom();
 }
 
-void DrawHelper::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
-                                    ImDrawFlags rounding_corners, bool ignoreZoom) const
+bool Canvas::applyZoomScaling()
+{
+	if (m_zoomScalingApplied)
+		return true;
+
+	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes
+	// are ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_zoom;
+	// ImGui::SetWindowFontScale(m_zoom);
+
+	auto* font = ImGui::GetFont();
+	if (!font)
+	{
+		return false;
+	}
+
+	m_zoomOriginalFontScale = applyZoomScalingToFont(font);
+	ImGui::PushFont(font);
+
+	// Scale the whole ImGui style, will be restored later
+	m_zoomOriginalStyle = ImGui::GetStyle();
+
+	//	ImGui::GetStyle().ScaleAllSizes(m_zoom);
+	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_zoom : 1.0f);
+	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_zoom : 1.0f);
+	ScaleAllSizes(ImGui::GetStyle(), m_zoom);
+
+	// TODO: We do not round styles, ImGui does round them, this introduces an issue with the cursor position not being
+	//  rounded when starting a new imgui item, once the cursor is moved to the next item ImGui automatically rounds it.
+	//  This creates an inconsistency where first elements can be offset a little and not others.
+
+	//	d %= dMax * 2;
+
+	m_zoomScalingApplied = true;
+	return false;
+}
+
+bool Canvas::stopZoomScaling()
+{
+	if (!m_zoomScalingApplied)
+		return false;
+
+	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
+
+	// Need to reset default font BEFORE popping font
+	stopZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
+	ImGui::PopFont();
+
+	m_zoomScalingApplied = false;
+	return true;
+}
+
+bool Canvas::ensureZoomScaling(bool active)
+{
+	bool activeBefore = m_zoomScalingApplied;
+	if (activeBefore != active)
+	{
+		if (active)
+		{
+			applyZoomScaling();
+		}
+		else
+		{
+			stopZoomScaling();
+		}
+	}
+	return activeBefore;
+}
+
+float Canvas::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
+{
+	if (!font)
+	{
+		return 1.0f;
+	}
+
+	ImFont* f = font;
+	if (largeFont != nullptr)
+	{
+		f = largeFont;
+	}
+	float originalScale = f->Scale;
+	f->Scale = m_zoom;
+	ImGui::PushFont(f);
+
+	return originalScale;
+
+	// TODO: Test dynamic font switching based on zoom level
+
+	// Temporary font idea from imgui password impl
+	//	const ImFontGlyph* glyph = g.Font->FindGlyph('*');
+	//	ImFont* password_font = &g.InputTextPasswordFont;
+	//	password_font->FontSize = g.Font->FontSize;
+	//	password_font->Scale = g.Font->Scale;
+	//	password_font->Ascent = g.Font->Ascent;
+	//	password_font->Descent = g.Font->Descent;
+	//	password_font->ContainerAtlas = g.Font->ContainerAtlas;
+	//	password_font->FallbackGlyph = glyph;
+	//	password_font->FallbackAdvanceX = glyph->AdvanceX;
+	//	IM_ASSERT(password_font->Glyphs.empty() && password_font->IndexAdvanceX.empty() &&
+	// password_font->IndexLookup.empty()); 	PushFont(password_font);
+}
+
+void Canvas::stopZoomScalingToFont(ImFont* font, float originalScale)
+{
+	font->Scale = originalScale;
+	ImGui::PopFont();
+}
+
+void Canvas::ScaleAllSizes(ImGuiStyle& style, float scale_factor)
+{
+	style.WindowPadding = style.WindowPadding * scale_factor;
+	style.WindowRounding = style.WindowRounding * scale_factor;
+	style.WindowMinSize = style.WindowMinSize * scale_factor;
+	style.ChildRounding = style.ChildRounding * scale_factor;
+	style.PopupRounding = style.PopupRounding * scale_factor;
+	style.FramePadding = style.FramePadding * scale_factor;
+	style.FrameRounding = style.FrameRounding * scale_factor;
+	style.ItemSpacing = style.ItemSpacing * scale_factor;
+	style.ItemInnerSpacing = style.ItemInnerSpacing * scale_factor;
+	style.CellPadding = style.CellPadding * scale_factor;
+	style.TouchExtraPadding = style.TouchExtraPadding * scale_factor;
+	style.IndentSpacing = style.IndentSpacing * scale_factor;
+	style.ColumnsMinSpacing = style.ColumnsMinSpacing * scale_factor;
+	style.ScrollbarSize = style.ScrollbarSize * scale_factor;
+	style.ScrollbarRounding = style.ScrollbarRounding * scale_factor;
+	style.GrabMinSize = style.GrabMinSize * scale_factor;
+	style.GrabRounding = style.GrabRounding * scale_factor;
+	style.LogSliderDeadzone = style.LogSliderDeadzone * scale_factor;
+	style.TabRounding = style.TabRounding * scale_factor;
+	style.TabMinWidthForCloseButton =
+	    (style.TabMinWidthForCloseButton != FLT_MAX) ? style.TabMinWidthForCloseButton * scale_factor : FLT_MAX;
+	style.SeparatorTextPadding = style.SeparatorTextPadding * scale_factor;
+	style.DockingSeparatorSize = style.DockingSeparatorSize * scale_factor;
+	style.DisplayWindowPadding = style.DisplayWindowPadding * scale_factor;
+	style.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding * scale_factor;
+	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
+}
+
+void Canvas::updateViewportRects()
+{
+	// \todo JH return negative number while sub-window can not move outside from aplication window
+	ImVec2 windowPos = ImGui::GetWindowPos();
+	ImVec2 windowSize = ImGui::GetWindowSize();
+
+	m_viewRectScreen.Min = windowPos;
+	m_viewRectScreen.Max = windowPos + windowSize;
+
+	m_viewRectDiwne.Max = m_viewRectDiwne.Min + windowSize / m_zoom;
+
+	DIWNE_INFO("waScreen: {}:{}, {}:{}, waDiwne: {}:{}, {}:{}", m_viewRectScreen.Min.x, m_viewRectScreen.Min.y,
+	           m_viewRectScreen.Max.x, m_viewRectScreen.Max.y, m_viewRectDiwne.Min.x, m_viewRectDiwne.Min.y,
+	           m_viewRectDiwne.Max.x, m_viewRectDiwne.Max.y)
+}
+
+ImVec2 Canvas::transformFromImGuiToDiwne(const ImVec2& point) const
+{
+	return workArea2screen(screen2workArea(point) / m_zoom); /* basically just zoom */
+}
+
+ImVec2 Canvas::transformFromDiwneToImGui(const ImVec2& point) const
+{
+	return workArea2screen(screen2workArea(point) * m_zoom); /* basically just zoom */
+}
+
+ImVec4 Canvas::transformFromImGuiToDiwne(const ImVec4& rect) const
+{
+	ImVec2 const topleft = transformFromImGuiToDiwne(ImVec2(rect.x, rect.y));
+	ImVec2 const bottomright = transformFromImGuiToDiwne(ImVec2(rect.z, rect.w));
+	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
+}
+
+ImVec4 Canvas::transformFromDiwneToImGui(const ImVec4& rect) const
+{
+	ImVec2 const topleft = transformFromDiwneToImGui(ImVec2(rect.x, rect.y));
+	ImVec2 const bottomright = transformFromDiwneToImGui(ImVec2(rect.z, rect.w));
+	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
+}
+
+void Canvas::moveViewportZoomed(ImVec2 const& distance)
+{
+	moveViewport(ImVec2(distance.x / m_zoom, distance.y / m_zoom));
+}
+
+void Canvas::moveViewport(ImVec2 const& distance)
+{
+	m_viewRectDiwne.Translate(distance);
+}
+
+ImVec2 Canvas::screen2workArea(const ImVec2& point) const
+{
+	return point - m_viewRectScreen.Min;
+}
+
+ImVec2 Canvas::workArea2screen(const ImVec2& point) const
+{
+	return point + m_viewRectScreen.Min;
+}
+
+ImVec2 Canvas::diwne2workArea(const ImVec2& point) const
+{
+	return diwne2workArea_noZoom(point) * m_zoom;
+}
+
+ImVec2 Canvas::workArea2diwne(const ImVec2& point) const
+{
+	return workArea2diwne_noZoom(point / m_zoom);
+}
+
+ImVec2 Canvas::screen2diwne(const ImVec2& point) const
+{
+	return workArea2diwne(screen2workArea(point));
+}
+
+ImVec2 Canvas::diwne2screen(const ImVec2& point) const
+{
+	return workArea2screen(diwne2workArea(point));
+}
+
+ImVec2 Canvas::diwne2workArea_noZoom(const ImVec2& point) const
+{
+	return point - m_viewRectDiwne.Min;
+}
+
+ImVec2 Canvas::workArea2diwne_noZoom(const ImVec2& point) const
+{
+	return point + m_viewRectDiwne.Min;
+}
+
+ImVec2 Canvas::screen2diwne_noZoom(const ImVec2& point) const
+{
+	return workArea2diwne_noZoom(screen2workArea(point));
+}
+
+ImVec2 Canvas::diwne2screen_noZoom(const ImVec2& point) const
+{
+	return workArea2screen(diwne2workArea_noZoom(point));
+}
+
+float Canvas::getZoom() const
+{
+	return m_zoom;
+};
+ImRect Canvas::getViewportRectDiwne() const
+{
+	return m_viewRectDiwne;
+};
+void Canvas::setViewportRectDiwne(ImRect rect)
+{
+	m_viewRectDiwne = rect;
+};
+ImRect Canvas::getViewportRectScreen() const
+{
+	return m_viewRectScreen;
+};
+
+void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                                ImDrawFlags rounding_corners, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
-	float zoom = e->getWorkAreaZoom();
-	idl->AddRectFilled(e->diwne2screen(p_min), e->diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
-	                   rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners);
+	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	                   rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners);
 }
 
-void DrawHelper::AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness, bool ignoreZoom) const
+void Canvas::AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness, bool ignoreZoom) const
 {
-	float zoom = e->getWorkAreaZoom();
-	ImGui::GetWindowDrawList()->AddLine(e->diwne2screen(p1), e->diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
-	                                    thickness * (ignoreZoom ? 1.0f : zoom));
+	ImGui::GetWindowDrawList()->AddLine(diwne2screen(p1), diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
+	                                    thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void DrawHelper::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
-                              ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
+void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                          ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	float zoom = e->getWorkAreaZoom();
-	idl->AddRect(e->diwne2screen(p_min), e->diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
-	             rounding * (ignoreZoom ? 1.0f : zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : zoom));
+	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void DrawHelper::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-                                     float thickness, int num_segments /*=0*/) const
+void Canvas::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
+                                 float thickness, int num_segments /*=0*/) const
 {
-	float zoom = e->getWorkAreaZoom();
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
 
-	idl->AddBezierCubic(e->diwne2screen(p1), e->diwne2screen(p2), e->diwne2screen(p3), e->diwne2screen(p4),
-	                    ImGui::ColorConvertFloat4ToU32(col), thickness * zoom, num_segments);
+	idl->AddBezierCubic(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
+	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_zoom, num_segments);
 }
 
-void DrawHelper::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness /*=1*/) const
+void Canvas::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                            bool filled, float thickness /*=1*/) const
 {
 	ImVec2 center = ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
 	float radius = std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
@@ -61,9 +330,9 @@ void DrawHelper::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor inn
 	}
 }
 
-void DrawHelper::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                   ImVec2 bottomRight, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/,
-                                   float rounding /*= 0*/) const
+void Canvas::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                               ImVec2 bottomRight, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/,
+                               float rounding /*= 0*/) const
 {
 	idl->AddRectFilled(topLeft, bottomRight, shapeColor, rounding);
 	if (!filled)
@@ -71,8 +340,8 @@ void DrawHelper::DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor 
 		idl->AddRectFilled(topLeft + thickness, bottomRight - thickness, innerColor, rounding);
 	}
 }
-void DrawHelper::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                               ImVec2 bottomRight, bool filled, ImVec2 thickness, float rounding) const
+void Canvas::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                           bool filled, ImVec2 thickness, float rounding) const
 {
 	const float width = bottomRight.x - topLeft.x;
 	// const float columnWidth = width / 3.0f;
@@ -94,8 +363,8 @@ void DrawHelper::DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor inne
 	}
 }
 
-void DrawHelper::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
 	                       bottomRight, shapeColor);
@@ -108,8 +377,8 @@ void DrawHelper::DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImCol
 }
 
 // | I < | --- 1 1 5   vertical bar followed by the arrow
-void DrawHelper::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                              ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 	ImVec2 bottomRight1;
@@ -134,8 +403,8 @@ void DrawHelper::DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor i
 }
 
 // | < I | --- 5 1 1    arrow followed by the vertical bar
-void DrawHelper::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                               ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -156,8 +425,8 @@ void DrawHelper::DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor 
 		                   innerColor);
 	}
 }
-void DrawHelper::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness) const
+void Canvas::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                            bool filled, float thickness) const
 {
 	const ImVec2 middleLeft = ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2.0f);
 
@@ -181,8 +450,8 @@ void DrawHelper::DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor inn
 }
 
 // | > I | --- 5 1 1   right arrow followed by the vertical bar
-void DrawHelper::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -208,8 +477,8 @@ void DrawHelper::DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColo
 }
 
 // | I > | --- 1 1 5     vertical bar followed by the right arrow
-void DrawHelper::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	const float columnWidth = (bottomRight.x - topLeft.x) / 7.0f; // width of vertical line & padding
 
@@ -235,8 +504,8 @@ void DrawHelper::DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImCol
 		                       middleRight2 + ImVec2(-2.0f * thickness, 0.0f), innerColor);
 	}
 }
-void DrawHelper::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled, float thickness) const
+void Canvas::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                 ImVec2 bottomRight, bool filled, float thickness) const
 {
 	const ImVec2 bottomLeft = ImVec2(topLeft.x, bottomRight.y);
 
@@ -258,8 +527,8 @@ void DrawHelper::DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColo
 	}
 }
 
-void DrawHelper::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	idl->AddTriangleFilled(topLeft, ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
 	                       ImVec2(topLeft.x, bottomRight.y), shapeColor);
@@ -271,8 +540,8 @@ void DrawHelper::DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImCo
 	}
 }
 
-void DrawHelper::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                           ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
 	ImVec2 p2 = bottomRight - ImVec2(0.5f, 0.5f);
@@ -286,8 +555,8 @@ void DrawHelper::DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, 
 	}
 }
 
-void DrawHelper::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                          ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
 	ImVec2 p1 = topLeft + ImVec2(0.5f, 0.5f);
 	ImVec2 p2 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
@@ -301,16 +570,14 @@ void DrawHelper::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, I
 	}
 }
 
-void DrawHelper::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	float zoom = e->getWorkAreaZoom();
-
 	topLeft = topLeft + ImVec2(0.5f, 0.5f);
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
 
 	int lineCount = 3;
-	float padding = 1.5f * zoom;
+	float padding = 1.5f * m_zoom;
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -321,20 +588,18 @@ void DrawHelper::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImCol
 	{
 		idl->AddLine(ImVec2(bottomRight.x - 1.2f * pointOffsetLong - (i * step), bottomRight.y - pointOffsetShort),
 		             ImVec2(topLeft.x + pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)), shapeColor,
-		             thickness * zoom);
+		             thickness * m_zoom);
 	}
 }
 
-void DrawHelper::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                       ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	float zoom = e->getWorkAreaZoom();
-
 	topLeft = topLeft + ImVec2(0.5f, 0.5f);
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
 
 	int lineCount = 3;
-	float padding = 1.5f * zoom;
+	float padding = 1.5f * m_zoom;
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -345,19 +610,17 @@ void DrawHelper::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImCo
 	{
 		idl->AddLine(ImVec2(topLeft.x + 1.2f * pointOffsetLong + (i * step), bottomRight.y - pointOffsetShort),
 		             ImVec2(bottomRight.x - pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)),
-		             shapeColor, thickness * zoom);
+		             shapeColor, thickness * m_zoom);
 	}
 }
 
-void DrawHelper::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                               ImVec2 bottomRight, bool filled, float shapeThickness /*=4*/,
-                               float innerThickness /*=2*/) const
+void Canvas::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                           bool filled, float shapeThickness /*=4*/, float innerThickness /*=2*/) const
 {
-	float zoom = e->getWorkAreaZoom();
 	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
-	innerThickness *= zoom;
-	shapeThickness *= zoom;
+	innerThickness *= m_zoom;
+	shapeThickness *= m_zoom;
 
 	ImVec2 pTL = topLeft;
 	ImVec2 pBR = bottomRight;
@@ -374,7 +637,7 @@ void DrawHelper::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor inne
 	pTR = pTR + ImVec2(0.01f, -0.01f);
 	pBR = pBR + ImVec2(0.01f, 0.01f);
 
-	//	LOG_INFO("zoom: {}", m_workAreaZoom);
+	//	LOG_INFO("zoom: {}", m_zoom);
 	//	LOG_INFO("pTL: {:10.3f},{:10.3f}  pBR: {:10.3f},{:10.3f}", pTL.x, pTL.y, pBR.x, pBR.y);
 	idl->AddLine(pTL, pBR, shapeColor, shapeThickness);
 	idl->AddLine(pBL, pTR, shapeColor, shapeThickness);
@@ -391,8 +654,8 @@ void DrawHelper::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor inne
 	//	}
 }
 
-void DrawHelper::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
-                                ImVec2 bottomRight, bool filled, float thickness) const
+void Canvas::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                            bool filled, float thickness) const
 {
 	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
@@ -401,17 +664,17 @@ void DrawHelper::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor inn
 	ImVec2 end = ImVec2(bottomRight.x, middleY);
 
 
-	idl->AddLine(start, end, shapeColor, thickness * zoom());
+	idl->AddLine(start, end, shapeColor, thickness * m_zoom);
 }
 
-bool DrawHelper::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size,
-                            ImVec4 padding, bool filled, std::string const id) const
+bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
+                        bool filled, std::string const id) const
 {
-	return IconButton(bgIconType, bgShapeColor, bgInnerColor, DIWNE::IconType::NoIcon, IM_COL32_BLACK, IM_COL32_BLACK,
-	                  size, padding, filled, id);
+	return IconButton(bgIconType, bgShapeColor, bgInnerColor, IconType::NoIcon, IM_COL32_BLACK, IM_COL32_BLACK, size,
+	                  padding, filled, id);
 }
 
-void DrawHelper::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
+void Canvas::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 
@@ -422,9 +685,9 @@ void DrawHelper::EmptyButton(ImVec2 size, ImColor color, float rounding /*= 0*/)
 	ImGui::SetCursorScreenPos(icon_min);
 }
 
-bool DrawHelper::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
-                            DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                            ImVec4 padding, bool filled, std::string const id) const
+bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
+                        ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
+                        std::string const id) const
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
 
@@ -436,9 +699,9 @@ bool DrawHelper::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, Im
 	return result;
 }
 
-void DrawHelper::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
-                          DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                          ImVec4 padding, bool filled, ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
+void Canvas::DrawIcon(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
+                      ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
+                      ImVec2 thickness /*=ImVec2(1, 1)*/, float rounding /*= 0*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 
@@ -569,7 +832,7 @@ void DrawHelper::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImCo
 		break;
 	}
 
-//	ImGui::Dummy(size); // Better to use InvisibleButton
+	//	ImGui::Dummy(size); // Better to use InvisibleButton
 	// We're making the InvisibleButton disabled so that when its pressed / dragged it does not set an ActiveID in ImGui
 	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
 	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.

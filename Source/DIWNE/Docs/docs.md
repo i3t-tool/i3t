@@ -63,12 +63,19 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	It provides shared functions and information and workspace information:
 	- mp_settingsDiwne : stores setting information (colors, margins, sizes, etc.)
+      - TODO: Style variables should be split into DIWNE::Style
 	- m_diwneAction, m_diwneAction_previousFrame : current and previous user actions
+      - TODO: Reworked via DiwneAction, previous frame is not tracked
 	- mp_lastActivePin, mp_lastActiveNode : last active objects that the user recently used
-	- m_workAreaScreen, m_workAreaDiwne : what part of the workspace is visible on the screen. The m_workAreaScreen is basically just a window, m_workAreaDiwne depends on the user's translation of the space (m_workAreaDiwne.Min), the window size and the zoom. See Diwne::updateWorkAreaRectangles()
+      - TODO: Last pin removed, last active node still exists
+	- m_viewRectScreen, m_viewRectDiwne : what part of the workspace is visible on the screen. The m_viewRectScreen is basically just a window, m_viewRectDiwne depends on the user's translation of the space (m_viewRectDiwne.Min), the window size and the zoom. See Diwne::updateWorkAreaRectangles()
+      - TODO: Moved to Canvas
 	- transform coordinates between ImGui-screen-workareas
+      - TODO: Moved to Canvas
 	- draw some basic icons
-	- Bypass...() function: the name "bypass" is a bit confusing. It wraps the original ImGui functions, allowing you to change the default ImGui behavior by overriding it. 
+      - TODO: Moved to Canvas
+	- Bypass...() function: the name "bypass" is a bit confusing. It wraps the original ImGui functions, allowing you to change the default ImGui behavior by overriding it.
+      - TODO: Replaced with InputAdapters
 
 - Node (see Node.h)
 	

@@ -57,7 +57,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int con
 	    ImGui::DragFloat(label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 	                     1.0f); /* if power >1.0f the number changes logarithmic */
 
-	if (diwne.bypassIsItemActive()) // TODO: This seems odd, why in the world would we override IsItemActive??
+	if (ImGui::IsItemActive()) // TODO: This seems odd, why in the world would we override IsItemActive??
 		inner_interaction_happen = true;
 
 	if (!inactive && !diwne.m_popupDrawn)
@@ -65,7 +65,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int con
 		if (bypassFloatFocusAction() && bypassFloatRaisePopupAction())
 		{
 			ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
-			diwne.setPopupPosition(diwne.m_input->bypassGetMousePos());
+			diwne.setPopupPosition(diwne.input().bypassGetMousePos());
 		}
 
 		// TODO: Investigate the popup behaviour now that it's changed! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -350,9 +350,9 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.canvas().getZoom());
 	valueChanged = false;
 
 	/* Drawing is row-wise */
@@ -460,9 +460,9 @@ bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_i
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	valueChanged = false;
 	// valueOfChange = data; /* will this work? */
@@ -511,9 +511,9 @@ bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, int
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	valueChanged = false;
 	ImGui::BeginGroup();
@@ -558,9 +558,9 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::ID node_id, in
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	valueChanged = false;
 	valueOfChange = data;
@@ -589,9 +589,9 @@ bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::ID const 
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	valueChanged = false;
 

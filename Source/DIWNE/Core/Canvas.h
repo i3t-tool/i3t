@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <string>
 
 #include "diwne_imgui.h"
@@ -8,47 +7,108 @@
 namespace DIWNE
 {
 class NodeEditor;
+enum IconType : unsigned int;
 
 /**
- * \brief pin icon shape type
- * used in WorkspaceCorePin::content(), file WorkspaceElementWitCoreData.cpp::379
- * drawn by Diwne::DrawIcon, method Diwne::DrawIconXXXX, file Diwne.cpp
+ * Representation of the 2D infinite plane of a node editor.
  */
-enum IconType : unsigned int
+class Canvas
 {
-	NoIcon,
-	Circle,
-	Rectangle,
-	TriangleLeft,
-	TriangleRight,
-	TriangleDownLeft,
-	TriangleDownRight,
-	GrabDownLeft,
-	GrabDownRight,
-	Cross,
-	Hyphen,
-	Stop,         ///< Black Square For Stop (U+23F9)
-	Pause,        ///< Double Vertical Bar (U+23F8)
-	SkipBack,     ///< |< vertical bar followed by the left arrow
-	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
-	SkipForward,  ///< ">|" right arrow followed by the vertical bar
-	SkipForward2, ///< |> vertical bar followed by the right arrow
-	Rewind,       ///< Black Left-Pointing Double Triangle (U+23EA)
-	FastForward,  ///< Black Right-Pointing Double Triangle (U+23E9)
-	AtFrom,       // todo, now a synonym to the FastForward
-	AtTo,         // todo, now a synonym to the Rewind
-};
+protected:
+	NodeEditor& editor;
 
-class DrawHelper
-{
 public:
-	NodeEditor* e;
+	/**
+	 * Bounds of the canvas viewport in canvas/editor's coordinates (diwne coordinates).
+	 * The top left corner (.Min) can be set manually, the bottom right corner (.Max) is determined by available space.
+	 */
+	ImRect m_viewRectDiwne;
+	ImRect m_viewRectScreen; ///< Viewport bounds in screen space coordinates.
+	float m_zoom;            ///< Viewport zoom factor (scale ratio between diwne and screen coordinates).
 
-	DrawHelper(NodeEditor* editor) : e(editor){};
+	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
+protected:
+	float m_zoomOriginalFontScale;  ///< Original font scale
+	ImGuiStyle m_zoomOriginalStyle; ///< Original ImGui style
 
-	// TODO: Maybe move the drawing methods into a class of some sort
-	//  IconDrawing is related to this as well, could be put under some kind of a Drawer/Renderer helper class
+public:
+	Canvas(NodeEditor& editor);
 
+	void moveViewportZoomed(ImVec2 const& distance);
+	void moveViewport(ImVec2 const& distance);
+
+	/// Update screen and diwne positions and sizes of viewport.
+	void updateViewportRects();
+
+	ImRect getViewportRectDiwne() const;
+	void setViewportRectDiwne(ImRect rect);
+
+	ImRect getViewportRectScreen() const;
+
+	// Zoom scaling
+	// =============================================================================================================
+
+	float getZoom() const;
+	virtual void setZoom(float val);
+
+	/**
+	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool applyZoomScaling();
+
+	/**
+	 * Restores the current ImGuiStyle and Font back to its state before applyZoomScaling() was last called.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool stopZoomScaling();
+
+	/**
+	 * Ensure that zoom scaling is active or not based on a passed parameter
+	 * @return Whether zoom scaling was active before making this call, can be later passed to this method again to
+	 * restore original state
+	 */
+	bool ensureZoomScaling(bool active);
+
+	/**
+	 * Modifies the current Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
+
+	/// @see applyZoomScalingToFont
+	void stopZoomScalingToFont(ImFont* font, float originalScale);
+
+protected:
+	void ScaleAllSizes(ImGuiStyle& style, float scale_factor);
+
+public:
+	// Coordinate conversion
+	// =============================================================================================================
+	ImVec2 transformFromImGuiToDiwne(const ImVec2& point) const;
+	ImVec2 transformFromDiwneToImGui(const ImVec2& point) const;
+	ImVec4 transformFromImGuiToDiwne(const ImVec4& point) const;
+	ImVec4 transformFromDiwneToImGui(const ImVec4& point) const;
+
+	// TODO: Rename workArea in the methods below to viewport
+	// Essentially, we have 3 coordinate systems:
+	// 1. Screen - Coordinates in screen space of the display device
+	// 2. Viewport - Coordinates in screen space, but with origin in the top left corner of the node editor component
+	// 3. Diwne - Coordinates in canvas (infinite plane) space, eg. of the node editor's contents affected by zoom.
+
+	ImVec2 screen2workArea(const ImVec2& point) const;
+	ImVec2 workArea2screen(const ImVec2& point) const;
+	ImVec2 diwne2workArea(const ImVec2& point) const;
+	ImVec2 workArea2diwne(const ImVec2& point) const;
+	ImVec2 screen2diwne(const ImVec2& point) const;
+	ImVec2 diwne2screen(const ImVec2& point) const;
+	ImVec2 diwne2workArea_noZoom(const ImVec2& point) const;
+	ImVec2 workArea2diwne_noZoom(const ImVec2& point) const;
+	ImVec2 screen2diwne_noZoom(const ImVec2& point) const;
+	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
+
+	// Basic drawing utilities
+	// =============================================================================================================
 	void AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness = 1.0f, bool ignoreZoom = false) const;
 
 	/**
@@ -85,11 +145,13 @@ public:
 	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
 	                         float thickness, int num_segments = 0) const;
 
+	// Icon drawing
+	// =============================================================================================================
 	/**
 	 * Add ImGui Button with icon on it \see DrawIcon()
 	 * \return true if interaction with button happen, false otherwise
 	 */
-	bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
+	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
 	                bool filled, std::string const id) const;
 	/**
 	 * \brief Just the shape of the button, no interaction
@@ -103,7 +165,7 @@ public:
 	 * Add ImGui Button with icon on it \see DrawIcon()
 	 * \return true if interaction with button happen, false otherwise
 	 */
-	bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
+	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
 	                ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
 	                std::string const id) const;
 
@@ -129,7 +191,7 @@ public:
 	 *  - false draw both shapes with a ShapeColor border and fill them with InnerColor
 	 * \return void
 	 */
-	void DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
+	void DrawIcon(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
 	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
 	              ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
 
@@ -188,9 +250,34 @@ public:
 
 	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+};
 
-protected:
-	float zoom() const;
+/**
+ * \brief Icon shape types
+ */
+enum IconType : unsigned int
+{
+	NoIcon,
+	Circle,
+	Rectangle,
+	TriangleLeft,
+	TriangleRight,
+	TriangleDownLeft,
+	TriangleDownRight,
+	GrabDownLeft,
+	GrabDownRight,
+	Cross,
+	Hyphen,
+	Stop,         ///< Black Square For Stop (U+23F9)
+	Pause,        ///< Double Vertical Bar (U+23F8)
+	SkipBack,     ///< |< vertical bar followed by the left arrow
+	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
+	SkipForward,  ///< ">|" right arrow followed by the vertical bar
+	SkipForward2, ///< |> vertical bar followed by the right arrow
+	Rewind,       ///< Black Left-Pointing Double Triangle (U+23EA)
+	FastForward,  ///< Black Right-Pointing Double Triangle (U+23E9)
+	AtFrom,       // todo, now a synonym to the FastForward
+	AtTo,         // todo, now a synonym to the Rewind
 };
 
 } // namespace DIWNE

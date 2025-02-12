@@ -182,8 +182,8 @@ Memento WorkspaceWindow::saveScene(Scene* scene)
 	SerializationVisitor visitor(memento);
 	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
 
-	JSON::addFloat(memento["workspace"], "zoom", g_diwne->getWorkAreaZoom(), a);
-	JSON::addRect(memento["workspace"], "workArea", g_diwne->getWorkAreaDiwne(), a);
+	JSON::addFloat(memento["workspace"], "zoom", g_diwne->canvas().getZoom(), a);
+	JSON::addRect(memento["workspace"], "workArea", g_diwne->canvas().getViewportRectDiwne(), a);
 
 	return memento;
 }
@@ -201,10 +201,10 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 	NodeDeserializer::createFrom(memento);
 
 	if (memento["workspace"].HasMember("zoom"))
-		g_diwne->setWorkAreaZoom(memento["workspace"]["zoom"].GetFloat());
+		g_diwne->setZoom(memento["workspace"]["zoom"].GetFloat());
 
 	if (memento["workspace"].HasMember("workArea"))
-		g_diwne->setWorkAreaDiwne(JSON::getRect(memento["workspace"]["workArea"]));
+		g_diwne->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
 }
 
 void WorkspaceWindow::clearScene()

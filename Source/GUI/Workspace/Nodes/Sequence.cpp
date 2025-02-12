@@ -209,7 +209,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 //{
 //	// TODO: Remove
 //	/* whole node background */
-//	diwne.m_renderer->AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+//	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
 //	                         I3T::getTheme().get(EColor::NodeBgTransformation),
 //	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
 //	return false;
@@ -301,7 +301,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	{
 		if (position_of_draged_node_in_sequence == i)
 		{
-			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom());
+			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom());
 			ImGui::SameLine();
 			// TODO: (DR) Can we implement this without calling bypassReleaseAction? (Could then make those protected)
 			if (dragedNode->bypassReleaseAction())
@@ -337,8 +337,8 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	if (i == 0 || position_of_draged_node_in_sequence == i) /* add dummy after last inner or if empty */
 	{
 		ImGui::Dummy(position_of_draged_node_in_sequence == i
-		                 ? I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom()
-		                 : I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getWorkAreaZoom() /
+		                 ? I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom()
+		                 : I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom() /
 		                       2); /* smaller dummy if dragged node is not over Sequence */
 		if (dragedNode && dragedNode->bypassReleaseAction() && position_of_draged_node_in_sequence >= 0)
 		{

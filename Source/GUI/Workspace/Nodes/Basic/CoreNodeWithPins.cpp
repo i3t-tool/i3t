@@ -132,7 +132,7 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 				if (pin->getCorePin().isRendered())
 				{
 					float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRectDiwne().GetWidth()) *
-					                                     diwne.getWorkAreaZoom()); /* no shift to the left */
+					                                     diwne.getZoom()); /* no shift to the left */
 					m_minRightAlignOfRightPins =
 					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
 					                                                        between two node sizes */

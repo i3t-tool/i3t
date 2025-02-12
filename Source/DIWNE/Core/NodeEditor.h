@@ -14,9 +14,9 @@
 
 #include <functional>
 
+#include "Canvas.h"
 #include "DiwneObject.h"
 #include "DiwneStyle.h"
-#include "DrawHelper.h"
 #include "Input/NodeEditorInputAdapter.h"
 
 // TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -40,7 +40,7 @@ struct SettingsDiwne
 	                                                      have identification label too */
 	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /**< workarea in Diwne coordinates (so what part of infinite space
 	                                                    of node editor is on window) only initial value - mostly based
-	                                                    on window size ( \see updateWorkAreaRectangles() ) */
+	                                                    on window size ( \see updateViewportRects() ) */
 
 	float minWorkAreaZoom = 0.25;          /**< minimal value of zoom */
 	float maxWorkAreaZoom = 4;             /**< maximal value of zoom */
@@ -109,8 +109,7 @@ class Link;
 class NodeEditor : public DiwneObject
 {
 public:
-	DIWNE::SettingsDiwne* mp_settingsDiwne;
-	std::unique_ptr<DIWNE::DrawHelper> m_renderer;
+	SettingsDiwne* mp_settingsDiwne;
 
 	std::vector<std::shared_ptr<Workspace::CoreNode>> m_workspaceCoreNodes;
 	std::vector<std::shared_ptr<Link>> m_links;
@@ -126,27 +125,17 @@ public:
 	bool m_objectFocused{false}; // TODO: Remove?
 
 	InteractionState interactionState;
-	DiwneStyle m_style;
-
-	DIWNE_DEBUG_VARS()
 
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
 	                        //  this feature shouldn't be specific to our undo/redo system if it were to remain here
 
-	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(this);
-
-	// TODO: Might make sense to move this into the interaction state <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  I've actually made the change that the dragged link only a temporary reference during the actual dragging of the
-	//  link The draggedLink becomes a real link on release and the pointer should be reset A global reference to the
-	//  draggedLink is no longer needed if the info is retained in ActionData or InteractionState
-	//	Link* m_draggedLink; ///< Reference to the currently dragged link, this link is drawn on top
-
-	// TODO: If the above thing is moved then this should be moved as well
-	/// Clear the dragged link reference at the beginning of the next frame.
-	/// So that draggedLink reference is valid throughout the whole frame when drag ends.
-	//	bool m_resetDraggedLinkNextFrame{false};
+	DIWNE_DEBUG_VARS()
 
 protected:
+	std::unique_ptr<Canvas> m_canvas = std::make_unique<Canvas>(*this);
+	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(*this);
+	std::unique_ptr<DiwneStyle> m_style = std::make_unique<DiwneStyle>();
+
 	ImDrawListSplitter m_channelSplitter;
 
 	// TODO: The dragged pin could be technically stored in the Context actionData, but I do have some concerns about
@@ -155,33 +144,20 @@ protected:
 	//  member variables to store data
 	//	std::shared_ptr<DIWNE::Pin> mp_lastActivePin; ///< Used for storing which pin is being dragged //TODO: Maybe
 	// rename?
-	std::shared_ptr<DIWNE::Node> mp_lastActiveNode; ///< Last node that had a logical update
+	std::shared_ptr<Node> mp_lastActiveNode; ///< Last node that had a logical update
 
 	bool m_nodesSelectionChanged{false};
-
-protected:
-	ImRect m_workAreaScreen; ///< Rectangle of work area on screen
-	ImRect m_workAreaDiwne;  ///< Rectangle of work area on diwne
-	                         ///< - .Min is set by user, .Max is computed from m_workAreaScreen */
-	float m_workAreaZoom;    ///< Workspace zoom factor
 
 	ImVec2 m_popupPosition;
 
 	ImDrawListSplitter m_splitter; ///< Every nodes should be draw to its own channel
 
-	/* zoom scaling restore information */
-	bool m_zoomScalingApplied = false;
-
-	float m_zoomOriginalFontScale; ///< For restore value after this window is done
-	ImGuiStyle m_zoomOriginalStyle;
-
 public:
-	NodeEditor(DIWNE::SettingsDiwne* settingsDiwne);
+	NodeEditor(SettingsDiwne* settingsDiwne);
 	virtual ~NodeEditor();
 
 	// Lifecycle
 	// =============================================================================================================
-
 	void draw(DrawMode drawMode = DrawMode::Interacting) override;
 
 	void initializeDiwne(DrawInfo& context) override;
@@ -192,7 +168,66 @@ public:
 
 	void afterDraw(DrawInfo& context) override;
 
+	void updateLayout(DrawInfo& context) override;
+
+	// Interaction
+	// =============================================================================================================
+
+	bool isPressedDiwne() override;
+	bool isJustPressedDiwne() override;
+	bool allowHover() const override;
+
+	void processInteractions(DrawInfo& context) override;
+
+	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
+
+	void onReleased(bool justReleased, DrawInfo& context) override;
+
+protected:
+	bool isDraggedDiwne() override;
+
 public:
+	// Interaction - Zooming
+	// =============================================================================================================
+	virtual bool allowProcessZoom(); // TODO: Rename to allowZoom()
+	virtual bool isZoomingDiwne();
+	virtual bool processZoom();      // TODO: Rename to onZoom()
+	virtual bool processDiwneZoom(); // TODO: Rename to processZoomDiwne()
+
+	/**
+	 * Called by Canvas::setZoom() when the zoom level changes.
+	 */
+	virtual void onZoom(){};
+
+	// Subsystems
+	// =============================================================================================================
+	/**
+	 * Get a reference to the canvas component of the node editor.
+	 * Canvas contains information about the position of the viewport displaying the editor's infinite 2D plane.
+	 * It also holds utility methods used for drawing content within the plane (diwne coordinates).
+	 */
+	Canvas& canvas() const
+	{
+		return *m_canvas;
+	}
+	// TODO: Add a way to change input adapter
+	/**
+	 * Get a reference to the node editors input adapter.
+	 * This object contains input bindings and can be set on the fly externally to swap input schemes.
+	 */
+	NodeEditorInputAdapter& input() const
+	{
+		return *m_input;
+	}
+	// TODO: Migrate style settings from legacy DiwneSettings into style, add a way to change styles and some defaults
+	/**
+	 * Get a reference to the editors style settings, which specify various colors and sizes much like ImStyle.
+	 */
+	DiwneStyle& style() const
+	{
+		return *m_style;
+	}
+
 	// Node/Object management
 	// =============================================================================================================
 	/** Clear all nodes from the node editor */
@@ -240,74 +275,7 @@ public:
 
 	void addLink(std::shared_ptr<Link> link);
 
-	virtual bool allowProcessZoom(); // TODO: Rename to allowZoom()
-	virtual bool bypassZoomAction(); // TODO: Rename to isZoomingDiwne()
-	virtual bool processZoom();      // TODO: Rename to onZoom()
-	virtual bool processDiwneZoom(); // TODO: Rename to processZoomDiwne()
-
-	bool isPressedDiwne() override;
-	bool isJustPressedDiwne() override;
-	bool allowHover() const override;
-
-	void updateLayout(DrawInfo& context) override;
-
-	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
-
-	void processInteractions(DrawInfo& context) override;
-
 protected:
-	bool isDraggedDiwne() override;
-
-public:
-	void updateWorkAreaRectangles(); /** \brief Update position and size of work
-	                                    area on screen and on diwne */
-
-	ImRect getWorkAreaDiwne() const
-	{
-		return m_workAreaDiwne;
-	};
-	void setWorkAreaDiwne(ImRect rect)
-	{
-		m_workAreaDiwne = rect;
-	};
-
-	ImRect getWorkAreaScreen() const
-	{
-		return m_workAreaScreen;
-	};
-
-	ImVec2 const& getPopupPosition() const
-	{
-		return m_popupPosition;
-	};
-	void setPopupPosition(ImVec2 position)
-	{
-		m_popupPosition = position;
-	};
-
-	// TODO: All this stuff below could be moved into some kind of Canvas class
-	void translateWorkAreaDiwneZoomed(ImVec2 const& distance);
-	void translateWorkAreaDiwne(ImVec2 const& distance);
-
-	ImVec2 transformFromImGuiToDiwne(const ImVec2& point) const;
-	ImVec2 transformFromDiwneToImGui(const ImVec2& point) const;
-	ImVec4 transformFromImGuiToDiwne(const ImVec4& point) const;
-	ImVec4 transformFromDiwneToImGui(const ImVec4& point) const;
-
-	ImVec2 screen2workArea(const ImVec2& point) const;
-	ImVec2 workArea2screen(const ImVec2& point) const;
-	ImVec2 diwne2workArea(const ImVec2& point) const;
-	ImVec2 workArea2diwne(const ImVec2& point) const;
-	ImVec2 screen2diwne(const ImVec2& point) const;
-	ImVec2 diwne2screen(const ImVec2& point) const;
-	ImVec2 diwne2workArea_noZoom(const ImVec2& point) const;
-	ImVec2 workArea2diwne_noZoom(const ImVec2& point) const;
-	ImVec2 screen2diwne_noZoom(const ImVec2& point) const;
-	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
-
-protected:
-	// Node / Link management
-
 	/**
 	 * Removes objects marked for deletion from the editor.
 	 */
@@ -332,7 +300,7 @@ public:
 	template <typename T>
 	std::shared_ptr<T> getLastActiveNode()
 	{
-		static_assert(std::is_base_of_v<DIWNE::Node, T> /* || std::is_same<T, std::nullptr_t>::value*/,
+		static_assert(std::is_base_of_v<Node, T> /* || std::is_same<T, std::nullptr_t>::value*/,
 		              "Node must be derived from DIWNE::Node class.");
 		return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
 	}
@@ -342,70 +310,27 @@ public:
 	{
 		static_assert(
 		    // std::is_same<T, std::nullptr_t>::value ||
-		    std::is_base_of_v<DIWNE::Node, T>, "Node must be derived from DIWNE::Node class.");
+		    std::is_base_of_v<Node, T>, "Node must be derived from DIWNE::Node class.");
 		mp_lastActiveNode = node;
 	}
 
 	// =============================================================================================================
 
-	void setNodesSelectionChanged(bool value)
+	ImVec2 const& getPopupPosition() const;
+	void setPopupPosition(ImVec2 position);
+
+	void setNodesSelectionChanged(bool value);
+	bool getNodesSelectionChanged();
+
+	void setZoom(float val)
 	{
-		m_nodesSelectionChanged = value;
-	};
-	bool getNodesSelectionChanged()
+		m_canvas->setZoom(val);
+	}
+	float getZoom() const
 	{
-		return m_nodesSelectionChanged;
-	};
-
-	// TODO: Probably move all input related stuff into some kind of InputAdapter
-	//  Similarly another class should handle styling
-	virtual float bypassGetZoomDelta();
-
-	virtual bool bypassIsItemActive(); // TODO: Remove this is dumb
-
-	////////////////////////////////////////////
-	// ZOOM SCALING
-	////////////////////////////////////////////
-
-	float getWorkAreaZoom() const
-	{
-		return m_workAreaZoom;
-	};
-	virtual void setWorkAreaZoom(float val = 1);
-
-	// TODO: Return values of applyZoomScaling are a bit funky
-
-	/**
-	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
-	 * @return Whether zoom scaling was active before making this call
-	 */
-	bool applyZoomScaling();
-
-	/**
-	 * Restores the current ImGuiStyle and Font back to its state before applyZoomScaling() was last called.
-	 * @return Whether zoom scaling was active before making this call
-	 */
-	bool stopZoomScaling();
-
-	/**
-	 * Modifies the current Font depending on the current diwne zoom level.
-	 * @return Whether zoom scaling was active before making this call
-	 */
-	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
-
-	void stopZoomScalingToFont(ImFont* font, float originalScale);
-
-	/**
-	 * Ensure that zoom scaling is active or not based on a passed parameter
-	 * @return Whether zoom scaling was active before making this call, can be later passed to this method again to
-	 * restore original state
-	 */
-	bool ensureZoomScaling(bool active);
-	void onReleased(bool justReleased, DrawInfo& context) override;
+		return m_canvas->getZoom();
+	}
 };
-
-typedef std::function<void(...)> popupContent_function_pointer; /**< \brief you can pass any arguments to you
-                                                                   function with popup menu content */
 
 template <typename T, std::enable_if<std::is_base_of<DiwneObject, T>::value, bool>::type = true>
 static void expandPopupContent(T& object) /**< \brief used for popupContent() functions that

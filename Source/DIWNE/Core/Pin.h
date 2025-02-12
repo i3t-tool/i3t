@@ -43,16 +43,26 @@ protected:
 public:
 	Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne = "DiwnePin");
 
-	bool isInput() const;
-
+	// Lifecycle
+	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override{};
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
 
+	void onDestroy(bool logEvent) override;
+
+	// Interaction
+	// =============================================================================================================
 	void processInteractions(DrawInfo& context) override;
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
+
+	bool allowPopup() const override;
+	bool allowDragStart() const override;
+
+	// Link management
+	// =============================================================================================================
 
 	/**
 	 * Called when the mouse is hovering over the pin and when it is actually released over the pin.
@@ -104,26 +114,19 @@ public:
 	 */
 	virtual bool plugLink(Pin* startPin, Link* link, bool logEvent);
 
-public:
+	Link* getLink(size_t index = 0);
+
 	bool isPlugged() const;
 	bool connectionChanged() const;
+
 	/**
 	 * A condition for starting and receiving a link connection.
 	 * Can be used to specify an area where the pin can be dragged from or a link dropped at.
 	 */
 	virtual bool allowConnection() const;
 
-	bool allowPopup() const override;
-	bool allowDragStart() const override;
-
-	template <typename T = Node>
-	T* getNode()
-	{
-		static_assert(std::is_base_of_v<DIWNE::Node, T>);
-		return static_cast<T*>(m_node);
-	}
-	Node* getNode();
-	Link* getLink(size_t index = 0);
+	virtual void setConnectionPointDiwne(const ImVec2 value);
+	virtual const ImVec2& getConnectionPoint();
 
 	/**
 	 * Adds the link to the pin's list of links
@@ -137,12 +140,21 @@ public:
 	 */
 	bool unregisterLink(Link* link);
 
-	virtual void setConnectionPointDiwne(const ImVec2 value);
-	virtual const ImVec2& getConnectionPoint();
-	void onDestroy(bool logEvent) override;
-
 protected:
 	virtual void updateConnectionPoint();
+
+public:
+	// Getters
+	// =============================================================================================================
+	bool isInput() const;
+
+	template <typename T = Node>
+	T* getNode()
+	{
+		static_assert(std::is_base_of_v<DIWNE::Node, T>);
+		return static_cast<T*>(m_node);
+	}
+	Node* getNode();
 };
 
 } /* namespace DIWNE */

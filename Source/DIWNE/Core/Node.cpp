@@ -37,7 +37,7 @@ Node& Node::operator=(const Node& rhs)
 
 bool Node::allowDrawing()
 {
-	return m_drawAnyway || getRectDiwne().Overlaps(diwne.getWorkAreaDiwne()) || m_isDragged;
+	return m_drawAnyway || getRectDiwne().Overlaps(diwne.canvas().getViewportRectDiwne()) || m_isDragged;
 }
 
 void Node::begin(DrawInfo& context)
@@ -45,10 +45,10 @@ void Node::begin(DrawInfo& context)
 	switch (m_nodePosMode)
 	{
 	case DrawModeNodePosition::OnItsPosition:
-		ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+		ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(m_nodePositionDiwne));
 		break;
 	case DrawModeNodePosition::OnCursorPosition:
-		setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+		setNodePositionDiwne(diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()));
 		break;
 	}
 	if (m_drawAnyway)
@@ -71,12 +71,12 @@ void Node::end(DrawInfo& context)
 		ImRect rect = getRectDiwne();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Max.y);
 		ImGui::GetForegroundDrawList()->AddText(
-		    diwne.diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		    fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", rect.Min.x, rect.Min.y, rect.Max.x, rect.Max.y,
-		                diwne.diwne2workArea(rect.Min).x, diwne.diwne2workArea(rect.Min).y,
-		                diwne.diwne2workArea(rect.Max).x, diwne.diwne2workArea(rect.Max).y,
-		                diwne.diwne2screen(rect.Min).x, diwne.diwne2screen(rect.Min).y, diwne.diwne2screen(rect.Max).x,
-		                diwne.diwne2screen(rect.Max).y)
+		                diwne.canvas().diwne2workArea(rect.Min).x, diwne.canvas().diwne2workArea(rect.Min).y,
+		                diwne.canvas().diwne2workArea(rect.Max).x, diwne.canvas().diwne2workArea(rect.Max).y,
+		                diwne.canvas().diwne2screen(rect.Min).x, diwne.canvas().diwne2screen(rect.Min).y, diwne.canvas().diwne2screen(rect.Max).x,
+		                diwne.canvas().diwne2screen(rect.Max).y)
 		        .c_str());
 	});
 	ImGui::EndGroup();
@@ -87,8 +87,8 @@ void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
 	// This needs to be done BEFORE processing interactions as we check if this button is hovered.
-	ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne())); // TODO: Use m_rect instead
-	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getWorkAreaZoom());
+	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getNodePositionDiwne())); // TODO: Use m_rect instead
+	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getZoom());
 	m_internalHover = ImGui::IsItemHovered();
 	DiwneObject::afterDrawDiwne(context);
 }
@@ -102,8 +102,8 @@ bool Node::processSelectDiwne(DrawInfo& context)
 	if (auto action = context.state.getActiveAction<Actions::SelectionRectAction>())
 	{
 		bool inRect = action->touch ? action->rect.Overlaps(getRectDiwne()) : action->rect.Contains(getRectDiwne());
-		bool multiSelect = diwne.m_input->multiSelectionActive();
-		bool multiDeselect = diwne.m_input->multiDeselectionActive();
+		bool multiSelect = diwne.input().multiSelectionActive();
+		bool multiDeselect = diwne.input().multiDeselectionActive();
 		if (inRect)
 		{
 			setSelected(multiDeselect ? false : true);
@@ -118,7 +118,7 @@ bool Node::processSelectDiwne(DrawInfo& context)
 	// Draw node selection indicator
 	if (m_selected)
 	{
-		diwne.m_renderer->AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
 		                               diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 		                               diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);

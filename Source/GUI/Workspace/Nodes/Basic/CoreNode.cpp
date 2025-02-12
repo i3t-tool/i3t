@@ -26,7 +26,7 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
     : Node(diwne, nodebase->getLabel()), m_nodebase(nodebase),
       m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
       m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
-                       diwne.getWorkAreaZoom()) /* just for safe if someone not call
+                       diwne.getZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
                                                    child class... */
       ,
@@ -64,7 +64,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	bool interaction_happen = false;
 
-	float zoom = diwne.getWorkAreaZoom();
+	float zoom = diwne.getZoom();
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
@@ -73,12 +73,12 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// TODO: This should again be responsibility of the DIWNE library
 
 	// adding a border
-	diwne.m_renderer->AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
-	                               I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
-	                               I3T::getTheme().get(ESize::Nodes_Border_Thickness));
+	diwne.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
+	                            I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
+	                            I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
-	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getWorkAreaZoom());
+	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
 	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
@@ -86,7 +86,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	LevelOfDetail detail = getLevelOfDetail();
 	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), ImDrawFlags_RoundCornersTopLeft,
-	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getWorkAreaZoom()))
+	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
 	{
 		if (detail == LevelOfDetail::Full)
 		{
@@ -210,15 +210,15 @@ float CoreNode::getDataItemsWidth()
 
 float CoreNode::updateDataItemsWidth()
 {
-	const bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+	const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(true);
 	const float fontSize = ImGui::GetFontSize();
 	const float oneCharWidth = fontSize / 2;
-	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getWorkAreaZoom();
+	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getZoom();
 	const float maxLength = static_cast<float>(maxLengthOfData());
 	m_dataItemsWidth = maxLength * oneCharWidth + 2 * padding;
 	// LOG_INFO("SetDataItemsWidth() in node: '{}'\nfS: {}, oCW: {}, mLOD: {}, dataWidth: {}",
 	//         this->getNodebase()->getLabel(), fontSize, oneCharWidth, maxLengthOfData, m_dataItemsWidth);
-	diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+	diwne.canvas().ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	return m_dataItemsWidth;
 }
 

@@ -38,9 +38,8 @@ WorkspaceDiwne* Workspace::g_diwne = nullptr;
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
-    : NodeEditor(settingsDiwne), m_workspaceDiwneAction(WorkspaceDiwneAction::None),
-      m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_updateDataItemsWidth(false),
-      m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
+    : NodeEditor(settingsDiwne), m_updateDataItemsWidth(false), m_trackingFromLeft(false), tracking(nullptr),
+      smoothTracking(true), m_viewportHighlightResolver(this)
 
 {
 	//	m_helperLink = std::make_unique<CoreLink>(diwne);
@@ -56,7 +55,6 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 {
 	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
 
-	m_workspaceDiwneAction = WorkspaceDiwneAction::None;
 	m_reconnectCameraToSequence = false;
 	if (m_updateDataItemsWidth)
 	{
@@ -322,7 +320,6 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 void WorkspaceDiwne::end(DIWNE::DrawInfo& context)
 {
 	NodeEditor::end(context);
-	m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
 	m_viewportHighlightResolver.resolve();
 }
 
@@ -332,11 +329,6 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 	{
 		App::getModule<StateManager>().takeSnapshot();
 	}
-}
-
-void WorkspaceDiwne::clear()
-{
-	NodeEditor::clear();
 }
 
 void WorkspaceDiwne::selectAll()
@@ -1121,11 +1113,11 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 	if (rect.Min.x == 0 && rect.Min.y == 0 && rect.Max.x == 0 && rect.Max.y == 0)
 		return;
 
-	ImRect waScreen = getWorkAreaScreen();
+	ImRect waScreen = canvas().getViewportRectScreen();
 	float heightZoom = waScreen.GetHeight() / rect.GetHeight(), widthZoom = waScreen.GetWidth() / rect.GetWidth();
-	setWorkAreaZoom(std::min(heightZoom, widthZoom));
+	setZoom(std::min(heightZoom, widthZoom));
 
-	translateWorkAreaDiwne(rect.Min - getWorkAreaDiwne().Min);
+	canvas().moveViewport(rect.Min - canvas().getViewportRectDiwne().Min);
 }
 
 void WorkspaceDiwne::deleteCallback()
@@ -1499,10 +1491,11 @@ void WorkspaceDiwne::processTrackingMove()
 	}
 }
 
-bool WorkspaceDiwne::bypassZoomAction()
-{
-	return InputManager::isAxisActive("scroll") != 0;
-}
+// TODO: This is inconsistent with the getZoomDelta method!
+// bool WorkspaceDiwne::isZoomingDiwne()
+//{
+//	return InputManager::isAxisActive("scroll") != 0;
+//}
 
 bool WorkspaceDiwne::processZoom()
 {
@@ -1510,14 +1503,9 @@ bool WorkspaceDiwne::processZoom()
 	return NodeEditor::processZoom();
 }
 
-void WorkspaceDiwne::setWorkAreaZoom(float val)
+void WorkspaceDiwne::onZoom()
 {
-	float old = m_workAreaZoom;
-	NodeEditor::setWorkAreaZoom(val);
-	if (old != val)
-	{
-		m_updateDataItemsWidth = true;
-	}
+	m_updateDataItemsWidth = true;
 }
 
 void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)

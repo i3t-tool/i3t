@@ -65,11 +65,12 @@ public:
 	 */
 	Node& operator=(const Node& other);
 
-	//	void updateLayout() override;
-
+	// Lifecycle
+	// =============================================================================================================
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
+	//	void updateLayout() override;
 
 protected:
 	void afterDrawDiwne(DrawInfo& context) override;
@@ -107,11 +108,13 @@ public:
 		}
 	}
 
+	// Interaction
+	// =============================================================================================================
 	void onSelection(bool selected) override;
-
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
-
 	void onDestroy(bool logEvent) override;
+
+	// =============================================================================================================
 
 	void setNodePositionDiwne(ImVec2 const& position)
 	{

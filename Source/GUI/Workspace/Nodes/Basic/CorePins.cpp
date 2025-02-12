@@ -103,21 +103,21 @@ void CorePin::drawPin(DIWNE::DrawInfo& context)
 	}
 	const ImColor iconColorFg = I3T::getColor(PinColorForeground[getType()]);
 
-	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
+	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getZoom();
 
 	ImGuiContext& g = *GImGui;
 
 	// space between icon symbol and icon boundary
-	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
+	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
 
 	// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 	//   not visible anyway so we're just drawing stuff twice for no reason
 	// todo (PF) - I have temporally added the pi n border drawing of not-connected pins
 	// connected pins have no border now
-	diwne.m_renderer->DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
 	                           createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
 	                           ImVec4(padding, padding, padding, padding), isConnected());
-	m_pinRect = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()), diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 
 	ImGui::PopStyleVar();
 }
@@ -268,7 +268,7 @@ void CorePin::onUnplug(bool logEvent)
 
 bool CorePin::allowConnection() const
 {
-	return m_pinRect.Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+	return m_pinRect.Contains(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 }
 
 const Core::Pin& CorePin::getCorePin() const

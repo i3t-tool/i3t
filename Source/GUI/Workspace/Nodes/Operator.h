@@ -75,7 +75,7 @@ public:
 	//	{
 	//		// TODO: Refactor, remove method and merge into content / begin
 	//		/* whole node background */
-	//		diwne.m_renderer->AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+	//		diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
 	// I3T::getTheme().get(EColor::NodeBgOperator), I3T::getSize(ESize::Nodes_Operators_Rounding),
 	// ImDrawFlags_RoundCornersAll); 		return false;
 	//	}

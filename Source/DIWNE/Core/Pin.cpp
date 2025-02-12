@@ -47,8 +47,8 @@ void Pin::end(DrawInfo& context)
 
 void Pin::updateLayout(DrawInfo& context)
 {
-	m_rect.Min = diwne.screen2diwne(ImGui::GetItemRectMin());
-	m_rect.Max = diwne.screen2diwne(ImGui::GetItemRectMax());
+	m_rect.Min = diwne.canvas().screen2diwne(ImGui::GetItemRectMin());
+	m_rect.Max = diwne.canvas().screen2diwne(ImGui::GetItemRectMax());
 
 	updateConnectionPoint();
 }
@@ -116,9 +116,9 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 
 		// Update temporary link start/end point
 		if (isInput())
-			action->draggedLink->setStartPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+			action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 		else
-			action->draggedLink->setEndPoint(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+			action->draggedLink->setEndPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 
 		if (dragEnd)
 		{

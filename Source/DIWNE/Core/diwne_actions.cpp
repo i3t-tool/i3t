@@ -20,7 +20,7 @@ void ConnectPinAction::onEnd()
 
 void DragNodeAction::onUpdate()
 {
-	ImVec2 offset = editor.m_input->bypassGetMouseDelta() / editor.getWorkAreaZoom();
+	ImVec2 offset = editor.input().bypassGetMouseDelta() / editor.getZoom();
 	for (auto node : nodes)
 	{
 		node->move(offset);

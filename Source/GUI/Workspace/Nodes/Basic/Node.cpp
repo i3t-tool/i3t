@@ -31,7 +31,7 @@ bool Node::allowDragStart() const
 	// TODO: I feel like in general we should allow nodes to be dragged anywhere, and restrict specific node areas where
 	//  it is not so appropriate. Eg. block dragging in matrix data content, but drag a model node anywhere.
 	// Restrict node dragging to only the top header (meaning it can only be moved by the header)
-	// && m_top.getRect().Contains(diwne.screen2diwne(diwne.m_input->bypassGetMousePos()));
+	// && m_top.getRect().Contains(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 	return DiwneObject::allowDragStart();
 }
 

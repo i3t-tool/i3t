@@ -63,10 +63,12 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #endif
 
 // Diwne logging macros, can be modified from outside of the library to integrate with existing loggers
-#define DIWNE_LOG_DEBUG(message)
-#define DIWNE_INFO(message)
-#define DIWNE_WARN(message)
-#define DIWNE_ERROR(message)
+#define DIWNE_LOG_DEBUG(...)
+#define DIWNE_INFO(...)
+#define DIWNE_WARN(...)
+#define DIWNE_ERROR(...)
 
 #include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>
+
+#include "DIWNE/diwne_config.h"

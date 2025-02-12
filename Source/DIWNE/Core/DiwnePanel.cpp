@@ -33,8 +33,8 @@ void DiwnePanel::end(DiwnePanel* parent)
 	ImGui::EndGroup();
 	ImGui::PopID();
 
-	m_rect.Min = m_editor.screen2diwne(ImGui::GetItemRectMin());
-	m_rect.Max = m_editor.screen2diwne(ImGui::GetItemRectMax());
+	m_rect.Min = m_editor.canvas().screen2diwne(ImGui::GetItemRectMin());
+	m_rect.Max = m_editor.canvas().screen2diwne(ImGui::GetItemRectMax());
 
 	// Submit itself to the parent panel
 	if (parent != nullptr)
@@ -45,11 +45,11 @@ void DiwnePanel::end(DiwnePanel* parent)
 	DIWNE_DEBUG_LAYOUT((m_editor), {
 		if (m_rect.GetArea() > 0.0f)
 		{
-			m_editor.m_renderer->AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(0, 0, 255, 100), 0,
+			m_editor.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(0, 0, 255, 100), 0,
 			                                  ImDrawFlags_RoundCornersNone, 1);
 			ImVec2 originPos = ImVec2(m_rect.Min.x, m_rect.Max.y);
 			ImGui::GetForegroundDrawList()->AddText(
-			    m_editor.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
+			    m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_label)
 			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
 			        .c_str());
@@ -69,11 +69,11 @@ void DiwnePanel::layout()
 	DIWNE_DEBUG_LAYOUT((m_editor), {
 		if (m_rect.GetArea() > 0.0f)
 		{
-			m_editor.m_renderer->AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(255, 0, 255, 100), 0,
+			m_editor.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(255, 0, 255, 100), 0,
 			                                  ImDrawFlags_RoundCornersNone, 2);
 			ImVec2 originPos = ImVec2(m_rect.Min.x, m_rect.Max.y);
 			ImGui::GetForegroundDrawList()->AddText(
-			    m_editor.diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
+			    m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_label)
 			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
 			        .c_str());
@@ -124,7 +124,7 @@ void DiwnePanel::spring(float relSize)
 {
 	float springWidth = m_availableSpringWidth * relSize;
 	if (springWidth > 0.0f) {
-		ImGui::Dummy(ImVec2(springWidth * m_editor.getWorkAreaZoom(), 0));
+		ImGui::Dummy(ImVec2(springWidth * m_editor.getZoom(), 0));
 		ImGui::SameLine(0, 0);
 		applyQueuedWidth();
 		submitSpringWidth(springWidth);
@@ -134,7 +134,7 @@ void DiwnePanel::spring(float relSize)
 void DiwnePanel::sameLine(float spacing)
 {
 	ImGui::SameLine(0.0, spacing);
-	queueFixedWidth(spacing == -1.0f ? ImGui::GetStyle().ItemSpacing.x / m_editor.getWorkAreaZoom() : spacing);
+	queueFixedWidth(spacing == -1.0f ? ImGui::GetStyle().ItemSpacing.x / m_editor.getZoom() : spacing);
 }
 
 } // namespace DIWNE

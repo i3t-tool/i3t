@@ -209,12 +209,12 @@ void Model::centerContent(DIWNE::DrawInfo& context)
 		return;
 	}
 
-	int width = m_textureSize.x * diwne.getWorkAreaZoom();
-	int height = m_textureSize.y * diwne.getWorkAreaZoom();
+	int width = m_textureSize.x * diwne.getZoom();
+	int height = m_textureSize.y * diwne.getZoom();
 
 #define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
 	ImVec2 zoomedTextureSize =
-	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+	    FLOOR_VEC2(m_textureSize * diwne.getZoom()); // floored position - same as in ImGui
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 

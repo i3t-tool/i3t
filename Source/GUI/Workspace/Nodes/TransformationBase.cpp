@@ -52,13 +52,13 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		//    WorkspaceNodeWithCoreData::topContent() */
 		//    /* right align */
 		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f,
-		//    getRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x
+		//    getRectDiwne().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
 		//    /*actual free space*/ - iconSize.x -
-		//    m_topOversizeSpace)*diwne.getWorkAreaZoom());
+		//    m_topOversizeSpace)*diwne.getZoom());
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
 		GUI::startVerticalAlign(style.FramePadding.y);
-		diwne.m_renderer->DrawIcon(DIWNE::IconType::Circle,
+		diwne.canvas().DrawIcon(DIWNE::IconType::Circle,
 		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
 		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
 		                           /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
@@ -131,14 +131,14 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 	{
 		bottomright.x = topleft.x;
 		bottomright.x += (1 - inactiveMark) * size.x;
-		diwne.m_renderer->AddRectFilledDiwne(topleft, bottomright,
+		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
 		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 	else
 	{ // Left tracking, top left moving left
 		topleft.x = bottomright.x;
 		topleft.x -= (1 - inactiveMark) * size.x;
-		diwne.m_renderer->AddRectFilledDiwne(topleft, bottomright,
+		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
 		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 
@@ -157,7 +157,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middle.getRect().GetCenter().y);
 		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
-		diwne.m_renderer->AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
+		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
 		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
 	}
 }
@@ -325,9 +325,9 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	ImGui::TableNextRow();
 
@@ -370,9 +370,9 @@ bool TransformationBase::drawDataSetValuesTable_builder(std::string const corner
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+		                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 		/* header labels */
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
