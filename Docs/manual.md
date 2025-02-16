@@ -3,17 +3,15 @@
 This manual serves as a comprehensive guide to using the **I3T** tool, focusing on its key features and functionality. It is designed to assist users in navigating the application, understanding its interface, and mastering its tools for 3D transformations and scene composition. For first-time users, it is recommended to follow the introductory tutorials (*Začínáme s I3T* and *Pokročilé funkce programu*) for a hands-on start.
 
 ## User interface
-![startWindow](./assets/startWindow.png?raw=true) 
-The program starts with a *Start window* that serves as a signpost between selecting ready-made tutorials, opening an existing scene, or starting a new one.
-
+![startWindow](./assets/startWindow.png?raw=true)
+The program begins with the **Start Window**, which allows you to choose between tutorials, opening an existing scene, or creating a new one.
 Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Docs/assets/i3tScenes.png?raw=true)
 
 In the *workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
 by the graph is immediately visible in the 3D view in the *Scene View* window. 
 
-The basic building nodes in the workspace window is a small rectangle
-with the title and contents, called *node*. 
+The basic building blocks in the **Workspace** are small rectangles called **nodes**, which contain titles and content.
 
 <img src="../Docs/assets/buildingBlocks.png?raw=true" height="150">
 
@@ -44,7 +42,7 @@ The I3T application has a standard main menu in its top.
 - **Recent**: Displays a list of recently used scenes for quick access.
 - **Save**: Saves the current scene. *(Shortcut: Ctrl + S)*
 - **Save As**: Saves the current scene under a new name.
-- **Manage Models**: Allows importing new models into I3T. Supported formats include `.gltf` (with `.bin`) or `.glfb`.
+- **Manage Models**: Import new models into I3T. Supported formats include `.gltf` (with `.bin`) and `.glfb`.
 - **Exit**: Closes the application.
 
 #### **Edit Menu**
@@ -93,7 +91,7 @@ The **Workspace** window is where scenes are assembled. You can add, connect, an
 
 ![Adding](../Docs/assets/addBlocks.png?raw=true)
 
-- To add node, <em>right-click</em> anywhere in the **Workspace** window to open the "Workspace menu."
+- To add node, <em>right-click</em> anywhere in the **Workspace** to open the context menu.
 - Main node types include:
   - **Transformation**: For moving, rotating, scaling, and projections (e.g., `translate`, `rotate`, `scale`, `projection`).
   - **Operator**: Performs operations on matrices, vectors, quaternions, and floats (e.g., `normalize vec3`, `matrix inversion`, `quat * quat`).
@@ -167,7 +165,7 @@ Transformations are always inserted into sequences. The order can be arbitrary. 
   <li>
     <strong>Sequence Multiplication:</strong>
     <ul>
-      <li>Transformations added to a sequence are <strong>multiplied from left to right</strong>.</li>
+      <li>Transformations in a sequence are <strong>multiplied from left to right</strong>, meaning the order matters.</li>
       <li>For example, placing <code>Translate</code> followed by <code>Rotate</code> will first move the object, then rotate it around the new position.</li>
     </ul>
   </li>
@@ -209,9 +207,8 @@ Transformations are always inserted into sequences. The order can be arbitrary. 
 
 ### Tracking
 
-The **Tracking** feature allows you to visualize the effects of transformations applied in sequences:
-- Add a tracking copy of the model connected to a sequence.
-- Use the arrows to step through transformations and observe how they are applied.
+The **Tracking** feature allows you to observe how transformations are applied step-by-step in a sequence by interpolating matrices over time. This is particularly useful for understanding and debugging transformations.
+
 ![Tracking show off](../Docs/assets/tracking.png?raw=true)
 
 <details>
@@ -223,8 +220,8 @@ The **Tracking** feature allows you to visualize the effects of transformations 
         <li>In the <em>Workspace</em>, right-click on a sequence node to open the context menu.</li>
         <li>Choose one of the following options:
           <ul>
-            <li><strong>Start Tracking from Right:</strong> The tracking line starts on the right side of the sequence.</li>
-            <li><strong>Start Tracking from Left:</strong> The tracking line starts on the left side of the sequence.</li>
+            <li><strong>Start Tracking from Left:</strong> Tracking begins with the first transformation in the sequence.</li>
+            <li><strong>Start Tracking from Right:</strong> Tracking begins with the last transformation in the sequence.</li>
           </ul>
         </li>
       </ul>
@@ -232,7 +229,7 @@ The **Tracking** feature allows you to visualize the effects of transformations 
     <li>
       <strong>Tracking Copy:</strong>
       <ul>
-        <li>A copy of the model appears in the <em>Scene View</em> to represent the tracked transformations.</li>
+        <li>A copy of the model appears in the <em>Scene View</em>, allowing you to visualize the transformations interactively.</li>
       </ul>
     </li>
   </ol>
@@ -245,16 +242,16 @@ The **Tracking** feature allows you to visualize the effects of transformations 
       <strong>Start Tracking from Left:</strong>
       <ul>
         <li>The tracking line starts at the <strong>leftmost position</strong> of the sequence.</li>
-        <li>Transformations are applied in the <strong>natural order they are listed in the sequence</strong>.</li>
-        <li>Moving the tracking line <strong>rightward</strong> visually applies the transformations step-by-step, showing how the model changes with each transformation in the order they were constructed.</li>
+        <li>Interpolates matrices from left to right, following the order of transformations as defined in the sequence.</li>
+        <li>Pressing the <strong>right arrow key</strong> moves the line forward, showing how the model moves from <em>model space</em> to <em>world space</em>.</li>
       </ul>
     </li>
     <li>
       <strong>Start Tracking from Right:</strong>
       <ul>
         <li>The tracking line starts at the <strong>rightmost position</strong> of the sequence.</li>
-        <li>Transformations are applied in the <strong>reverse order of the sequence</strong>.</li>
-        <li>Moving the tracking line <strong>leftward</strong> incrementally applies the transformations in this reversed order, allowing you to see the sequence’s <strong>final transformations first</strong> and work backward.</li>
+        <li>Interpolates matrices from right to left, effectively reversing the order of transformations.</li>
+        <li>The final matrix is decomposed into its transformations and applied in reverse.</li>
       </ul>
     </li>
   </ul>
@@ -267,21 +264,13 @@ The **Tracking** feature allows you to visualize the effects of transformations 
       <strong>Right-Click on the Sequence Node:</strong>
       <ul>
         <li>To stop tracking, right-click on the sequence node again and select <strong>Stop Tracking</strong> from the context menu.</li>
-        <li>This removes the tracking copy and line.</li>
+        <li>The tracking copy and line will be removed.</li>
       </ul>
     </li>
   </ul>
 </details>
 
-<details>
-  <summary style="font-weight: bold; cursor: pointer;">Benefits of Tracking</summary>
-  <ul>
-    <li>Allows users to understand how transformations are applied incrementally within a sequence.</li>
-    <li>Useful for debugging and verifying the order and effect of transformations in complex sequences.</li>
-  </ul>
-</details>
-
-
+ 
 ### Camera
 
 The **Camera node** allows you to add a camera to your scene. It contains two sequences:
@@ -304,7 +293,7 @@ To visualize what the camera sees:
   <summary style="font-weight: bold; cursor: pointer;">Projection Matrices</summary>
   <details>
     <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Orthogonal Projection</summary>
-    <p style="margin-left: 40px;">Creates a flat view (e.g., blueprints). Object size does not change with distance.</p>
+    <p style="margin-left: 40px;">Creates a flat view (e.g., blueprints), where object size remains constant regardless of distance.</p>
     <p style="margin-left: 40px;">- Adjust parameters such as <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>, <code>near</code>, and <code>far</code>.</p>
     <p style="margin-left: 40px;">- Use <strong>disable synergies</strong> to adjust bounds independently.</p>
   </details>
@@ -322,6 +311,14 @@ To visualize what the camera sees:
   <p style="margin-left: 40px;">- <strong>Up vector</strong>: Direction considered "up" for the camera.</p>
   <p style="margin-left: 20px;">The <strong>lookAt</strong> matrix cannot be edited directly but is controlled through these vectors.</p>
 </details>
+
+<p><br>
+Theory: 
+<br>
+<a href="https://cent.felk.cvut.cz/courses/PGR/lectures/05_Transform_2.pdf" target="_blank" rel="noopener noreferrer">Projection and viewport</a>
+<br>
+<a href="https://cent.felk.cvut.cz/courses/PGR/lectures/05-transformace-2-priloha.pdf" target="_blank" rel="noopener noreferrer">More on projection transformations</a></p>
+
 
 ### Cycle
 
@@ -397,48 +394,61 @@ Operators in I3T perform calculations and manipulations on various data types, s
 
   ![Operators](../Docs/assets/operators.png?raw=true)
 
-
 <details>
-  <summary style="font-weight: bold; cursor: pointer;">Transformation Operators</summary>
+  <summary style="font-weight: bold; cursor: pointer;">Transformation  Operators</summary>
+
+  <p><strong>Transformation Operators:</strong><br>These operators are used to modify the position, rotation, and scale of objects in 3D space.</p>
   <table>
     <thead>
       <tr>
-        <th><strong>Transformation Operator</strong></th>
+        <th><strong>Operator</strong></th>
         <th><strong>Description</strong></th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><strong>Translate</strong></td>
-        <td>Used for moving objects along the X, Y, and Z axes.</td>
+        <td>Moves objects along the X, Y, and Z axes.</td>
       </tr>
       <tr>
         <td><strong>EulerAngleX</strong></td>
-        <td>Rotates objects around the X-axis using Euler angles.</td>
+        <td>Rotates objects around the X-axis.</td>
       </tr>
       <tr>
         <td><strong>EulerAngleY</strong></td>
-        <td>Rotates objects around the Y-axis using Euler angles.</td>
+        <td>Rotates objects around the Y-axis.</td>
       </tr>
       <tr>
         <td><strong>EulerAngleZ</strong></td>
-        <td>Rotates objects around the Z-axis using Euler angles.</td>
+        <td>Rotates objects around the Z-axis.</td>
       </tr>
       <tr>
         <td><strong>Rotate</strong></td>
-        <td>Provides generic rotation in 3D space using rotation matrices.</td>
+        <td>Generic rotation in 3D space.</td>
       </tr>
       <tr>
         <td><strong>Scale</strong></td>
-        <td>Changes the size of an object along its X, Y, and Z axes.</td>
+        <td>Scales objects along the X, Y, and Z axes.</td>
       </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Projection Operators:</strong><br>These operators generate matrices for viewing transformations.</p>
+  <table>
+    <thead>
       <tr>
-        <td><strong>Ortho</strong></td>
+        <th><strong>Operator</strong></th>
+        <th><strong>Description</strong></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Orthogonal</strong></td>
         <td>Creates an orthogonal projection matrix.</td>
       </tr>
       <tr>
         <td><strong>Perspective</strong></td>
-        <td>Generates a perspective projection matrix for 3D rendering.</td>
+        <td>Generates a perspective projection matrix.</td>
       </tr>
       <tr>
         <td><strong>Frustum</strong></td>
@@ -455,6 +465,26 @@ Operators in I3T perform calculations and manipulations on various data types, s
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Matrix Operators</summary>
+
+  <details>
+    <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Coordinate Systems and Model-View-Projection</summary>
+    <p style="margin-left: 40px">In 3D graphics, objects are rendered using a series of <strong>coordinate systems</strong>. Transformations move objects between these systems:</p>
+    <ul style="margin-left: 60px">
+      <li><strong>Model Space</strong>: Defines coordinates relative to the object's local origin.</li>
+      <li><strong>World Space</strong>: Positions the object in a global scene.</li>
+      <li><strong>View Space</strong>: Aligns the scene with the camera's perspective.</li>
+      <li><strong>Clip Space</strong>: Normalizes the scene for rendering (visible range: [-1, 1]).</li>
+    </ul>
+    <p style="margin-left: 40px">The <strong>Model-View-Projection (MVP)</strong> pipeline combines these transformations into a single workflow:</p>
+    <ol style="margin-left: 60px">
+      <li><strong>Model Matrix</strong>: Transforms from Model Space to World Space (applies translation, rotation, and scaling).</li>
+      <li><strong>View Matrix</strong>: Transforms from World Space to View Space (positions and orients the camera).</li>
+      <li><strong>Projection Matrix</strong>: Transforms from View Space to Clip Space (applies perspective or orthographic projection).</li>
+    </ol>
+    <p style="margin-left: 40px">The final transformation is achieved by multiplying the matrices in this order: <code>MVP = Projection * View * Model</code>.</p>
+  </details>
+
+
   <table>
     <thead>
       <tr>
@@ -829,12 +859,12 @@ The **Scene View** provides a real-time 3D visualization of your scene, allowing
 
 ### Manipulators
 
-Manipulators are tools used to adjust individual transformations (translate, rotate, scale). These manipulators can only modify existing transformations—they cannot create new transformations or connect them to models.
+Manipulators are tools for adjusting transformations like translate, rotate, and scale. These manipulators can only modify existing transformations—they cannot create new transformations or connect them to models.
   ![Manipulators](../Docs/assets/manipulators.png?raw=true)
 
 #### Visual Indicators in Scene View
 
-- **Orange Outline**: Indicates the currently selected model in the **Scene View**.
+- **Orange Outline**: Highlights the currently selected model in the **Scene View**.
 - **Blue Outline**: Appears when a transformation selected in the **Workspace** affects a model in the **Scene View**. This blue outline serves as an indicator and not as a selection.
 
 #### Types of Manipulators
