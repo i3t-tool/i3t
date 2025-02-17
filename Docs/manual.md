@@ -5,9 +5,9 @@ This manual serves as a comprehensive guide to using the **I3T** tool, focusing 
 ## User interface
 ![startWindow](./assets/startWindow.png?raw=true)
 The program begins with the **Start Window**, which allows you to choose between tutorials, opening an existing scene, or creating a new one.
-Once selected, it enters the workspace mode, consisting of two main windows. ![i3tscreens](../Docs/assets/i3tScenes.png?raw=true)
+Once selected, it enters the Workspace mode, consisting of two main windows. ![i3tscreens](../Docs/assets/i3tScenes.png?raw=true)
 
-In the *workspace* window, the user prepares individual transformations and models and plugs
+In the *Workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
 by the graph is immediately visible in the 3D view in the *Scene View* window. 
 
@@ -29,7 +29,7 @@ The greatest strength of the I3T tool lies in its **interactivity**. Users can:
 ### Windows list
 - Start Window - sign post, contains a list tutorials that teach basic controls
 - Workspace - main window for working with the program and building the scene graph
-- Scene view - shows what you created in the workspace window
+- Scene view - shows what you created in the Workspace window
 
 ### Main bars
 The I3T application has a standard main menu in its top. 
@@ -127,14 +127,59 @@ Selecting nodes in the **Workspace** is a key step for organizing and editing yo
 ### Connecting Nodes
 
 Nodes function like functions, with inputs and outputs. Connect nodes using **wires** to form a scene graph:
-- **Matrix input/output** <img src="../Docs/assets/matrix.png?raw=true" width="20" height="20">: For connecting matrices.
-- **Matrix multiplication** <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20">: Combines matrices by multiplying them.
-- **3D vector input/output** <img src="../Docs/assets/3Dvector.png?raw=true" width="20" height="20">: For connecting vector values.
-- **4D vector input/output** <img src="../Docs/assets/4Dvector.png?raw=true" width="20" height="20">: For connecting 4D vector values.
-- **Float input/output** <img src="../Docs/assets/float.png?raw=true" width="20" height="20">: For connecting float values.
-- **Screen output** <img src="../Docs/assets/screen.png?raw=true" width="20" height="20">: Used specifically for cameras to output what they "see."
-- **Quaternion input/output** <img src="../Docs/assets/quaternion.png?raw=true" width="20" height="20">: For connecting quaternion data.
-- **Pulse input/output** <img src="../Docs/assets/pulse.png?raw=true" width="20" height="20">: For triggering cyclic or time-based operations.
+<div style="margin-left: 20px;">
+  <table>
+    <thead>
+      <tr>
+        <th><strong>Icon</strong></th>
+        <th><strong>Name</strong></th>
+        <th><strong>Description</strong></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img src="../Docs/assets/matrix.png?raw=true" width="20" height="20"></td>
+        <td><strong>Matrix input/output</strong></td>
+        <td>For connecting matrices.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20"></td>
+        <td><strong>Matrix multiplication</strong></td>
+        <td>Combines matrices by multiplying them.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/3Dvector.png?raw=true" width="20" height="20"></td>
+        <td><strong>3D vector input/output</strong></td>
+        <td>For connecting vector values.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/4Dvector.png?raw=true" width="20" height="20"></td>
+        <td><strong>4D vector input/output</strong></td>
+        <td>For connecting 4D vector values.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/float.png?raw=true" width="20" height="20"></td>
+        <td><strong>Float input/output</strong></td>
+        <td>For connecting float values.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/screen.png?raw=true" width="20" height="20"></td>
+        <td><strong>Screen output</strong></td>
+        <td>Used specifically for cameras to output what they "see."</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/quaternion.png?raw=true" width="20" height="20"></td>
+        <td><strong>Quaternion input/output</strong></td>
+        <td>For connecting quaternion data.</td>
+      </tr>
+      <tr>
+        <td><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"></td>
+        <td><strong>Pulse input/output</strong></td>
+        <td>For triggering cyclic or time-based operations.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Connections are visualized as colored wires, representing the flow of data through the scene graph. Each type of connection is specific to its data type (e.g., matrices, vectors, floats, quaternions, or pulses).
 
@@ -284,32 +329,37 @@ The **Camera** node has three outputs:
 - **Multiplication Output** <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20">: Allows multiplication with other matrices.
 
 To visualize what the camera sees:
-1. Add a **Screen** node to the workspace.
+1. Add a **Screen** node to the Workspace.
 2. Connect the camera’s **Screen Output** <img src="../Docs/assets/screen.png?raw=true" width="20" height="20"> to the Screen node.
 3. Adjust the screen size by dragging its red corners.
 
-
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Projection Matrices</summary>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Orthogonal Projection</summary>
-    <p style="margin-left: 40px;">Creates a flat view (e.g., blueprints), where object size remains constant regardless of distance.</p>
-    <p style="margin-left: 40px;">- Adjust parameters such as <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>, <code>near</code>, and <code>far</code>.</p>
-    <p style="margin-left: 40px;">- Use <strong>disable synergies</strong> to adjust bounds independently.</p>
-  </details>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Perspective Projection</summary>
-    <p style="margin-left: 40px;">Mimics human vision, where objects appear smaller as they move farther away.</p>
-  </details>
+  <div style="margin-left: 20px;">
+    <p><strong>Orthogonal Projection</strong></p>
+    <ul>
+      <li>Creates a flat view (e.g., blueprints), where object size remains constant regardless of distance.</li>
+      <li>Use <strong>disable synergies</strong> to adjust bounds independently.</li>
+    </ul>
+    <p><strong>Perspective Projection</strong></p>
+    <ul>
+      <li>Mimics human vision, where objects appear smaller as they move farther away.</li>
+      <li>Commonly used for realistic 3D scenes requiring depth perception.</li>
+    </ul>
+  </div>
 </details>
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">View Matrix</summary>
-  <p style="margin-left: 20px;">The <strong>View Matrix</strong> defines the camera's position and orientation using the <strong>lookAt</strong> matrix. It consists of:</p>
-  <p style="margin-left: 40px;">- <strong>Eye vector</strong>: Camera position.</p>
-  <p style="margin-left: 40px;">- <strong>Center vector</strong>: Point the camera looks at.</p>
-  <p style="margin-left: 40px;">- <strong>Up vector</strong>: Direction considered "up" for the camera.</p>
-  <p style="margin-left: 20px;">The <strong>lookAt</strong> matrix cannot be edited directly but is controlled through these vectors.</p>
+  <div style="margin-left: 20px;">
+    <p><strong>The View Matrix</strong> defines the camera's position and orientation using the <strong>lookAt</strong> matrix. It consists of:</p>
+    <ul>
+      <li><strong>Eye vector:</strong> Camera position.</li>
+      <li><strong>Center vector:</strong> Point the camera looks at.</li>
+      <li><strong>Up vector:</strong> Direction considered "up" for the camera.</li>
+    </ul>
+    <p>The <strong>lookAt</strong> matrix cannot be edited directly but is controlled through these vectors.</p>
+  </div>
 </details>
 
 <p><br>
@@ -328,41 +378,127 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
 
 #### Inputs and Outputs
 <details>
-  <summary style="font-weight: bold; cursor: pointer;margin-left: 20px;">Inputs</summary>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 40px;">Float Inputs <img src="../Docs/assets/float.png?raw=true" width="20" height="20"></summary>
-    <p style="margin-left: 60px;"><strong>From</strong>: Starting value of the cycle.</p>
-    <p style="margin-left: 60px;"><strong>To</strong>: Ending value of the cycle.</p>
-    <p style="margin-left: 60px;"><strong>Step</strong>: The increment or decrement applied to the value at each step.</p>
-  </details>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 40px;">Pulse Inputs <img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"></summary>
-    <p style="margin-left: 60px;"><strong>Start</strong>: Begins or resumes the cycle.</p>
-    <p style="margin-left: 60px;"><strong>Pause</strong>: Temporarily halts the cycle without resetting values.</p>
-    <p style="margin-left: 60px;"><strong>Stop</strong>: Ends the cycle and resets the value to <strong>From</strong>.</p>
-    <p style="margin-left: 60px;"><strong>Skip to Start</strong>: Immediately sets the value to <strong>From</strong> and resumes if running.</p>
-    <p style="margin-left: 60px;"><strong>Skip to End</strong>: Immediately sets the value to <strong>To</strong> and resumes if running.</p>
-  </details>
+  <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Inputs</summary>
+
+  <div style="margin-left: 40px;">
+    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20"><strong> Float Inputs:</strong><br>These inputs control the numerical values for the cycle's progression.</p>
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Input</strong></th>
+          <th><strong>Description</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>From</strong></td>
+          <td>Starting value of the cycle.</td>
+        </tr>
+        <tr>
+          <td><strong>To</strong></td>
+          <td>Ending value of the cycle.</td>
+        </tr>
+        <tr>
+          <td><strong>Step</strong></td>
+          <td>The increment or decrement applied at each step.</td>
+        </tr>
+      </tbody>
+    </table>
+    &nbsp;
+    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"><strong> Pulse Inputs:</strong><br>These inputs trigger actions or changes within the cycle.</p>
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Input</strong></th>
+          <th><strong>Description</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Start</strong></td>
+          <td>Begins or resumes the cycle.</td>
+        </tr>
+        <tr>
+          <td><strong>Pause</strong></td>
+          <td>Temporarily halts the cycle without resetting values.</td>
+        </tr>
+        <tr>
+          <td><strong>Stop</strong></td>
+          <td>Ends the cycle and resets the value to <strong>From</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>Skip to Start</strong></td>
+          <td>Sets the cycle to <strong>From</strong> and continues if running.</td>
+        </tr>
+        <tr>
+          <td><strong>Skip to End</strong></td>
+          <td>Sets the cycle to <strong>To</strong> and continues if running.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </details>
-
-
+&nbsp;
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Outputs</summary>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 40px;">Float Output <img src="../Docs/assets/float.png?raw=true" width="20" height="20"></summary>
-    <p style="margin-left: 60px;"><strong>Value</strong>: The current value of the cycle.</p>
-  </details>
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 40px;">Pulse Outputs <img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"></summary>
-    <p style="margin-left: 60px;">Sent at specific events:</p>
-    <p style="margin-left: 80px;"><strong>Start</strong>: When the cycle begins.</p>
-    <p style="margin-left: 80px;"><strong>Pause</strong>: When the cycle is paused.</p>
-    <p style="margin-left: 80px;"><strong>Stop</strong>: When the cycle is stopped and reset.</p>
-    <p style="margin-left: 80px;"><strong>Skip to Start</strong>: When the value is set to <strong>From</strong>.</p>
-    <p style="margin-left: 80px;"><strong>Skip to End</strong>: When the value is set to <strong>To</strong>.</p>
-    <p style="margin-left: 80px;"><strong>Value Increment</strong>: When the value starts increasing.</p>
-    <p style="margin-left: 80px;"><strong>Value Decrement</strong>: When the value starts decreasing.</p>
-  </details>
+
+  <div style="margin-left: 40px;">
+    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20"><strong> Float Output:</strong><br>This output provides the current value of the cycle.</p>
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Output</strong></th>
+          <th><strong>Description</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Value</strong></td>
+          <td>The current value of the cycle.</td>
+        </tr>
+      </tbody>
+    </table>
+    &nbsp;
+    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"><strong> Pulse Outputs:</strong><br>These outputs are triggered during specific cycle events.</p>
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Output</strong></th>
+          <th><strong>Description</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Start</strong></td>
+          <td>Triggered when the cycle begins.</td>
+        </tr>
+        <tr>
+          <td><strong>Pause</strong></td>
+          <td>Triggered when the cycle is paused.</td>
+        </tr>
+        <tr>
+          <td><strong>Stop</strong></td>
+          <td>Triggered when the cycle is stopped and reset.</td>
+        </tr>
+        <tr>
+          <td><strong>Skip to Start</strong></td>
+          <td>Triggered when the value is set to <strong>From</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>Skip to End</strong></td>
+          <td>Triggered when the value is set to <strong>To</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>Value Increment</strong></td>
+          <td>Triggered when the value starts increasing.</td>
+        </tr>
+        <tr>
+          <td><strong>Value Decrement</strong></td>
+          <td>Triggered when the value starts decreasing.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </details>
 
 #### Parameters
@@ -483,7 +619,7 @@ Operators in I3T perform calculations and manipulations on various data types, s
     </ol>
     <p style="margin-left: 40px">The final transformation is achieved by multiplying the matrices in this order: <code>MVP = Projection * View * Model</code>.</p>
   </details>
-
+  &nbsp;
 
   <table>
     <thead>
@@ -860,7 +996,8 @@ The **Scene View** provides a real-time 3D visualization of your scene, allowing
 ### Manipulators
 
 Manipulators are tools for adjusting transformations like translate, rotate, and scale. These manipulators can only modify existing transformations—they cannot create new transformations or connect them to models.
-  ![Manipulators](../Docs/assets/manipulators.png?raw=true)
+
+![Manipulators](../Docs/assets/manipulators.png?raw=true)
 
 #### Visual Indicators in Scene View
 
@@ -912,27 +1049,10 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Adjusting Values</summary>
   <ul style="margin-left: 40px;">
-    <li>Changes made via manipulators are reflected directly in the selected transformation matrices in the <strong>Workspace</strong> window.</li>
-    <li>Combine manipulator adjustments with precise matrix editing for finer control.</li>
+    <li>Changes made via manipulators are reflected directly in the selected transformation matrices in the <strong>Workspace</strong> window and also next to the model in <strong>Scene View</strong>.</li>
   </ul>
 </details>
 
-#### Combining Manipulations
-
-<details>
-  <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Combining Manipulations</summary>
-  <ul style="margin-left: 40px;">
-    <li>To apply multiple transformations (e.g., translate, rotate, scale), users must manually create and connect these transformations in the <strong>Workspace</strong>.</li>
-    <li>Manipulators serve as a tool to modify one transformation at a time.</li>
-    <li>For example:
-      <ol>
-        <li><strong>Translate</strong> the object to a position using the translate manipulator.</li>
-        <li><strong>Rotate</strong> it around an axis using the rotation manipulator.</li>
-        <li><strong>Scale</strong> it to the desired size using the scale manipulator.</li>
-      </ol>
-    </li>
-  </ul>
-</details>
 
 ## Tutorials
 
