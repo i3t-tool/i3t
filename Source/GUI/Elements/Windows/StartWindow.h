@@ -40,6 +40,6 @@ private:
 
 	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
 
-	// for now leave it true, later it will be tested and decide what window to show
+	// for now leave it true, later it will be tested and decide what window to show according to persona
 	bool m_finishedAllTutorials = true;
 };
