@@ -1,22 +1,33 @@
 # I3T Manual
 
-This manual serves as a comprehensive guide to using the **I3T** tool, focusing on its key features and functionality. It is designed to assist users in navigating the application, understanding its interface, and mastering its tools for 3D transformations and scene composition. For first-time users, it is recommended to follow the introductory tutorials (*Začínáme s I3T* and *Pokročilé funkce programu*) for a hands-on start.
+This manual serves as a comprehensive guide to using the **I3T** tool, focusing on its key features and functionality. It helps users navigate the application, understand its interface, and master tools for 3D transformations and scene composition. For first-time users we recommend following the introductory tutorials (Začínáme s I3T and Pokročilé funkce programu) for a hands-on start.
 
 ## User interface
-![startWindow](./assets/startWindow.png?raw=true)
-The program begins with the **Start Window**, which allows you to choose between tutorials, opening an existing scene, or creating a new one.
-Once selected, it enters the Workspace mode, consisting of two main windows. ![i3tscreens](../Docs/assets/i3tScenes.png?raw=true)
+<div style="text-align: center;">
+    <img src="./assets/startWindow.png?raw=true" height="350">
+</div>
+<br>
 
+The program begins with the **Start Window**, which allows you to choose between tutorials, opening an existing scene, or creating a new one.
+Once selected, it enters the Workspace mode, consisting of two main windows. 
+
+<div style="text-align: center;">
+    <img src="./assets/i3tScenes.png?raw=true" height="400">
+</div>
+<br>
+height="350">
 In the *Workspace* window, the user prepares individual transformations and models and plugs
 them into the scene graph. The resulting 3D representation of the structure generated
 by the graph is immediately visible in the 3D view in the *Scene View* window. 
 
 The basic building blocks in the **Workspace** are small rectangles called **nodes**, which contain titles and content.
 
-<img src="../Docs/assets/buildingBlocks.png?raw=true" height="150">
+<div style="text-align: center;">
+    <img src="../Docs/assets/buildingBlocks.png?raw=true" height="150">
+</div>
+<br>
 
-The matrices are nodes with a 4x4 grid of real numbers. Matrices affect the object
-by being combined in the scene graph as they are put into a larger node called a sequence.
+Matrices function as nodes with a 4x4 grid of real numbers. Matrices affect objects when you combine them in the scene graph and place them into a larger node called a sequence.
 
 Sequences have inputs and outputs marked by small icons.
 
@@ -27,14 +38,16 @@ The greatest strength of the I3T tool lies in its **interactivity**. Users can:
 </ul>
 
 ### Windows list
-- Start Window - sign post, contains a list tutorials that teach basic controls
+- Start Window -  a signpost that contains a list of tutorials teaching basic controls
 - Workspace - main window for working with the program and building the scene graph
-- Scene view - shows what you created in the Workspace window
+- Scene view - displays a real-time visualization of created scene from the Workspace window
 
 ### Main bars
 The I3T application has a standard main menu in its top. 
+<div style="text-align: center;">
+  <img src="../Docs/assets/topBar.png?raw=true" height="50">
+</div>
 
-<img src="../Docs/assets/topBar.png?raw=true" height="50">
 
 #### **File Menu**
 - **New**: Creates a new scene.
@@ -67,29 +80,29 @@ The I3T application has a standard main menu in its top.
 
 ### Shortcuts
 
-| **Action**                      | **Shortcut**     |
-|---------------------------------|------------------|
-| **Copy Component**              | `Ctrl + C`       |
-| **Paste Component**             | `Ctrl + V`       |
-| **Duplicate Component**         | `Ctrl + D`       |
-| **Cut Component**               | `Ctrl + X`       |
-| **Select All Components**       | `Ctrl + A`       |
-| **Invert Selection**            | `Ctrl + I`       |
-| **Undo Movement**               | `Ctrl + Z`       |
-| **Redo Movement**               | `Ctrl + Y`       |
-| **Zoom To All Components**      | `Ctrl + Alt + A` |
-| **Zoom To Selected Components** | `Ctrl + Alt + S` |
-| **Save Scene**                  | `Ctrl + S`       |
-| **Open Scene**                  | `Ctrl + O`       |
+| **Action**                      | **Shortcut**                                    |
+|---------------------------------|-------------------------------------------------|
+| **Copy Component**              | <kbd>Ctrl</kbd> + <kbd>C</kbd>                  |
+| **Paste Component**             | <kbd>Ctrl</kbd> + <kbd>V</kbd>                  |
+| **Duplicate Component**         | <kbd>Ctrl</kbd> + <kbd>D</kbd>                  |
+| **Cut Component**               | <kbd>Ctrl</kbd> + <kbd>X</kbd>                  |
+| **Select All Components**       | <kbd>Ctrl</kbd> + <kbd>A</kbd>                  |
+| **Invert Selection**            | <kbd>Ctrl</kbd> + <kbd>I</kbd>                  |
+| **Undo Movement**               | <kbd>Ctrl</kbd> + <kbd>Z</kbd>                  |
+| **Redo Movement**               | <kbd>Ctrl</kbd> + <kbd>Y</kbd>                  |
+| **Zoom To All Components**      | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>A</kbd> |
+| **Zoom To Selected Components** | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> |
+| **Save Scene**                  | <kbd>Ctrl</kbd> + <kbd>S</kbd>                  |
+| **Open Scene**                  | <kbd>Ctrl</kbd> + <kbd>O</kbd>                  |
 
 
-## Workplace
+## Workspace
 
 The **Workspace** window is where scenes are assembled. You can add, connect, and manipulate nodes to create the desired transformations and models.
 
 ### Adding Nodes
 
-![Adding](../Docs/assets/addBlocks.png?raw=true)
+<img src="../Docs/assets/addBlocks.png?raw=true">
 
 - To add node, <em>right-click</em> anywhere in the **Workspace** to open the context menu.
 - Main node types include:
@@ -117,12 +130,12 @@ Selecting nodes in the **Workspace** is a key step for organizing and editing yo
     <strong>Full Selection (Blue Box):</strong>
     <ul>
       <li>Click and drag with the <em>left mouse button</em> from <strong>left to right</strong> outside of the nodes.</li>
-      <li>A blue selection box appears. Nodes must be fully covered by the selection box to be selected.</li>
+      <li>A blue selection box appears. You must fully cover nodes with the selection box to select them.</li>
       <li>Release the mouse button.</li>
     </ul>
   </li>
 </ol>
-      <li>Selected nodes are outlined in <strong>orange</strong>.</li>
+Selected nodes are outlined in <strong>orange</strong>.</li>
 
 ### Connecting Nodes
 
@@ -181,12 +194,14 @@ Nodes function like functions, with inputs and outputs. Connect nodes using **wi
   </table>
 </div>
 
-Connections are visualized as colored wires, representing the flow of data through the scene graph. Each type of connection is specific to its data type (e.g., matrices, vectors, floats, quaternions, or pulses).
+Colored wires visualize connections, showing the flow of data through the scene graph. Each type of connection is specific to its data type (e.g., matrices, vectors, floats, quaternions, or pulses).
 
 ### Transformations
 
 Transformations are always inserted into sequences. The order can be arbitrary. A typical order is **Translation, Rotation, Scaling** (TRS). 
-<img src="../Docs/assets/transformations.png?raw=true" height="180">
+
+<img src="../Docs/assets/transformations.png?raw=true" height="150">
+
 
 
 #### How to Add Transformations to a Sequence
@@ -254,7 +269,7 @@ Transformations are always inserted into sequences. The order can be arbitrary. 
 
 The **Tracking** feature allows you to observe how transformations are applied step-by-step in a sequence by interpolating matrices over time. This is particularly useful for understanding and debugging transformations.
 
-![Tracking show off](../Docs/assets/tracking.png?raw=true)
+<img src="../Docs/assets/tracking.png?raw=true" height="120">
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">How to Enable Tracking</summary>
@@ -282,25 +297,48 @@ The **Tracking** feature allows you to observe how transformations are applied s
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">How Tracking Works</summary>
+  <p style="margin-left: 20px">
+    Tracking helps visualize how transformations are applied in sequences by interpolating between transformation matrices step by step. 
+  </p>
+
   <ul>
-    <li>
-      <strong>Start Tracking from Left:</strong>
-      <ul>
+    <details>
+      <summary style="font-weight: bold; cursor: pointer;">Start Tracking from Left</summary>
+      <ul style="margin-left: 20px">
         <li>The tracking line starts at the <strong>leftmost position</strong> of the sequence.</li>
-        <li>Interpolates matrices from left to right, following the order of transformations as defined in the sequence.</li>
-        <li>Pressing the <strong>right arrow key</strong> moves the line forward, showing how the model moves from <em>model space</em> to <em>world space</em>.</li>
+        <li>Each transformation is applied sequentially, gradually altering the coordinate system.</li>
+        <li>For example, with a TRS sequence:
+        <br>
+        <img src="../Docs/assets/trackingFromLeft.gif?raw=true" height="300">
+          <ul style="margin-left: 20px">
+            <li>First, the coordinate system is <strong>translated</strong>, moving the reference point.</li>
+            <li>Next, it is <strong>rotated</strong>, changing the orientation of subsequent transformations.</li>
+            <li>Finally, the object is <strong>scaled</strong> in the transformed coordinate system.</li>
+          </ul>
+        </li>
+        <li>Pressing the <strong>right arrow key</strong> moves the line forward.</li>
+        <li>Shows how transformations progressively modify the coordinate system before applying them to the object.</li>
       </ul>
-    </li>
-    <li>
-      <strong>Start Tracking from Right:</strong>
-      <ul>
+    </details>
+    <details>
+      <summary style="font-weight: bold; cursor: pointer;">Start Tracking from Right</summary>
+      <ul style="margin-left: 20px">
         <li>The tracking line starts at the <strong>rightmost position</strong> of the sequence.</li>
-        <li>Interpolates matrices from right to left, effectively reversing the order of transformations.</li>
-        <li>The final matrix is decomposed into its transformations and applied in reverse.</li>
+        <li>Each transformation is applied in reverse order, maintaining a global coordinate system.</li>
+        <li>For example, with a TRS sequence:
+          <ul style="margin-left: 20px">
+            <li>First, the object is <strong>scaled</strong> in global coordinates.</li>
+            <li>Next, it is <strong>rotated</strong>, affecting the entire model uniformly.</li>
+            <li>Finally, it is <strong>translated</strong>, shifting its final position.</li>
+          </ul>
+        </li>
+        <li>Pressing the <strong>left arrow key</strong> moves the line backward.</li>
+        <li>Shows how transformations affect the object directly in global space before altering the coordinate system.</li>
       </ul>
-    </li>
+    </details>
   </ul>
 </details>
+
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Stopping Tracking</summary>
@@ -315,7 +353,7 @@ The **Tracking** feature allows you to observe how transformations are applied s
   </ul>
 </details>
 
- 
+
 ### Camera
 
 The **Camera node** allows you to add a camera to your scene. It contains two sequences:
@@ -323,25 +361,27 @@ The **Camera node** allows you to add a camera to your scene. It contains two se
 - **View**: A container for the view matrix, which positions and orients the camera.
 
 The **Camera** node has three outputs:
-![Camera](../Docs/assets/camera.png?raw=true)
-- **Screen Output** <img src="../Docs/assets/screen.png?raw=true" width="20" height="20">: Displays what the camera sees (connect to a `Screen` node).
-- **Matrix Copy Output** <img src="../Docs/assets/matrix.png?raw=true" width="20" height="20">: Outputs the resulting matrix for further manipulation.
-- **Multiplication Output** <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20">: Allows multiplication with other matrices.
+
+<img src="../Docs/assets/camera.png?raw=true" height="100">
+
+- <img src="../Docs/assets/screen.png?raw=true" width="20" height="20">  **Screen Output**: Displays what the camera sees (connect to a `Screen` node).
+- <img src="../Docs/assets/matrix.png?raw=true" width="20" height="20">  **Matrix Copy Output**: Outputs the resulting matrix for further manipulation.
+- <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20">  **Multiplication Output**: Allows multiplication with other matrices.
 
 To visualize what the camera sees:
 1. Add a **Screen** node to the Workspace.
-2. Connect the camera’s **Screen Output** <img src="../Docs/assets/screen.png?raw=true" width="20" height="20"> to the Screen node.
+2. Connect the camera’s <img src="../Docs/assets/screen.png?raw=true" width="20" height="20"> **Screen Output** to the Screen node.
 3. Adjust the screen size by dragging its red corners.
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Projection Matrices</summary>
   <div style="margin-left: 20px;">
-    <p><strong>Orthogonal Projection</strong></p>
+    <strong>Orthogonal Projection</strong>
     <ul>
       <li>Creates a flat view (e.g., blueprints), where object size remains constant regardless of distance.</li>
       <li>Use <strong>disable synergies</strong> to adjust bounds independently.</li>
     </ul>
-    <p><strong>Perspective Projection</strong></p>
+    <strong>Perspective Projection</strong>
     <ul>
       <li>Mimics human vision, where objects appear smaller as they move farther away.</li>
       <li>Commonly used for realistic 3D scenes requiring depth perception.</li>
@@ -352,7 +392,7 @@ To visualize what the camera sees:
 <details>
   <summary style="font-weight: bold; cursor: pointer;">View Matrix</summary>
   <div style="margin-left: 20px;">
-    <p><strong>The View Matrix</strong> defines the camera's position and orientation using the <strong>lookAt</strong> matrix. It consists of:</p>
+    <strong>The View Matrix</strong> defines the camera's position and orientation using the <strong>lookAt</strong> matrix. It consists of:
     <ul>
       <li><strong>Eye vector:</strong> Camera position.</li>
       <li><strong>Center vector:</strong> Point the camera looks at.</li>
@@ -363,7 +403,7 @@ To visualize what the camera sees:
 </details>
 
 <p><br>
-Theory: 
+<strong>Theory: </strong>
 <br>
 <a href="https://cent.felk.cvut.cz/courses/PGR/lectures/05_Transform_2.pdf" target="_blank" rel="noopener noreferrer">Projection and viewport</a>
 <br>
@@ -374,7 +414,7 @@ Theory:
 
 The **Cycle node** facilitates cyclic or time-based operations, providing control over value transitions, looping behaviors, and timing. It enables the creation of animations, repetitive movements, and smooth transitions within your scene.
 
-<img src="../Docs/assets/cycle.png?raw=true" height="170">
+<img src="../Docs/assets/cycle.png?raw=true" height="150">
 
 #### Inputs and Outputs
 <details>
@@ -528,7 +568,7 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
 
 Operators in I3T perform calculations and manipulations on various data types, such as matrices, vectors, quaternions, and floats. They are categorized into different groups based on the type of operation they perform. Operators can be added through the **Workspace menu** and connected to other nodes to achieve specific results.
 
-  ![Operators](../Docs/assets/operators.png?raw=true)
+  <img src="../Docs/assets/operators.png?raw=true" height="250">
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Transformation  Operators</summary>
@@ -601,25 +641,6 @@ Operators in I3T perform calculations and manipulations on various data types, s
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Matrix Operators</summary>
-
-  <details>
-    <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Coordinate Systems and Model-View-Projection</summary>
-    <p style="margin-left: 40px">In 3D graphics, objects are rendered using a series of <strong>coordinate systems</strong>. Transformations move objects between these systems:</p>
-    <ul style="margin-left: 60px">
-      <li><strong>Model Space</strong>: Defines coordinates relative to the object's local origin.</li>
-      <li><strong>World Space</strong>: Positions the object in a global scene.</li>
-      <li><strong>View Space</strong>: Aligns the scene with the camera's perspective.</li>
-      <li><strong>Clip Space</strong>: Normalizes the scene for rendering (visible range: [-1, 1]).</li>
-    </ul>
-    <p style="margin-left: 40px">The <strong>Model-View-Projection (MVP)</strong> pipeline combines these transformations into a single workflow:</p>
-    <ol style="margin-left: 60px">
-      <li><strong>Model Matrix</strong>: Transforms from Model Space to World Space (applies translation, rotation, and scaling).</li>
-      <li><strong>View Matrix</strong>: Transforms from World Space to View Space (positions and orients the camera).</li>
-      <li><strong>Projection Matrix</strong>: Transforms from View Space to Clip Space (applies perspective or orthographic projection).</li>
-    </ol>
-    <p style="margin-left: 40px">The final transformation is achieved by multiplying the matrices in this order: <code>MVP = Projection * View * Model</code>.</p>
-  </details>
-  &nbsp;
 
   <table>
     <thead>
@@ -996,8 +1017,9 @@ The **Scene View** provides a real-time 3D visualization of your scene, allowing
 ### Manipulators
 
 Manipulators are tools for adjusting transformations like translate, rotate, and scale. These manipulators can only modify existing transformations—they cannot create new transformations or connect them to models.
-
-![Manipulators](../Docs/assets/manipulators.png?raw=true)
+<div style="text-align: center;">
+  <img src="../Docs/assets/manipulators.png?raw=true" height="350">
+</div>
 
 #### Visual Indicators in Scene View
 
@@ -1009,6 +1031,7 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Translate Manipulator</summary>
   <ul style="margin-left: 40px;">
+    <img src="../Docs/assets/translate.png?raw=true" width="200">
     <li>Shown as colored arrows (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Drag the arrows to move the object along a specific axis.</li>
   </ul>
@@ -1017,6 +1040,7 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Rotate Manipulator</summary>
   <ul style="margin-left: 40px;">
+    <img src="../Docs/assets/rotate.png?raw=true" width="200">
     <li>Appears as colored circles around the object (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Click and drag a circle to rotate the object around the corresponding axis.</li>
   </ul>
@@ -1025,7 +1049,8 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Scale Manipulator</summary>
   <ul style="margin-left: 40px;">
-    <li>Displayed as colored squares (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
+    <img src="../Docs/assets/scale.png?raw=true" width="190">
+    <li>Displayed as colored dots (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Drag the squares to scale the object along a specific axis.</li>
   </ul>
 </details>
