@@ -96,8 +96,7 @@ void StartWindow::renderLeftPanel() const
 		for (int i = 0; i < 3; i++)
 		{
 			auto dotColor =
-			    ImGui::ColorConvertFloat4ToU32(I3T::getUI()->
-						getTheme().get(EColor::StartWindow_NewSceneButton));
+			    ImGui::ColorConvertFloat4ToU32(I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
 			draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x + size, y + size), dotColor);
 			x += size + space;
 		}
@@ -106,8 +105,7 @@ void StartWindow::renderLeftPanel() const
 		ImGui::Dummy(ImVec2(0, 10));
 		// DESCRIPTION
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeDescription));
-		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()
-				->getTheme().get(EColor::StartWindow_DescriptionFont));
+		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 		ImGui::TextWrapped("I3T is an educational application that allows the "
 		                   "study of 3D transformations and their "
 		                   "hierarchy in an illustrative way.");
@@ -125,22 +123,17 @@ void StartWindow::renderLeftPanel() const
 		ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - m_cvutImage->m_height);
 
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
-		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()
-			->getTheme().get(EColor::TutorialButtonText));
-		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()
-			->getTheme().get(EColor::TutorialButtonBg));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()
-			->getTheme().get(EColor::TutorialButtonActive));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()
-			->getTheme().get(EColor::TutorialButtonHovered));
+		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 
 		const auto language = TutorialManager::instance().getLanguage();
 		GLuint flagCz = I3T::getResourceManager().texture("Data/Textures/flags/cz.png");
 		GLuint flagEn = I3T::getResourceManager().texture("Data/Textures/flags/gb.png");
 		GLuint flag = language == ETutorialLanguage::Czech ? flagCz : flagEn;
-		if (ImGui::ImageButton("##LangButton", (void*) (intptr_t) flag,
-					ImVec2(48, 36), ImVec2(0., 0.), ImVec2(1., 1.),
-		            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+		if (ImGui::ImageButton("##LangButton", (void*) (intptr_t) flag, ImVec2(48, 36), ImVec2(0., 0.), ImVec2(1., 1.),
+		                       ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
 		{
 			TutorialManager::instance().toggleLanguage();
 		}
@@ -162,45 +155,37 @@ void StartWindow::renderRightPanel()
 {
 	// Styling constants todo move all constants here, possibly load from theme or
 	// other styling settings
-	const float loadBtnWidth = I3T::getUI()
-		->getTheme().get(ESize::StartWindow_LoadButtonWidth);
+	const float loadBtnWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_LoadButtonWidth);
 	const float startNewBtnWidth = loadBtnWidth;
-	const float buttonHeight = I3T::getUI()
-		->getTheme().get(ESize::StartWindow_ButtonHeight);
-	const float thumbImageSize = I3T::getUI()
-		->getTheme().get(ESize::StartWindow_ThumbImageSize);
-	const float startBtnWidth = I3T::getUI()
-		->getTheme().get(ESize::StartWindow_StartButtonWidth);
+	const float buttonHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_ButtonHeight);
+	const float thumbImageSize = I3T::getUI()->getTheme().get(ESize::StartWindow_ThumbImageSize);
+	const float startBtnWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_StartButtonWidth);
 
 	// RIGHT CHILD WINDOW
-	const ImVec2 outerPadding = I3T::getUI()
-		->getTheme().get(ESizeVec2::StartWindow_RightWinOuterPadding);
-	const ImVec2 innerPadding = I3T::getUI()
-		->getTheme().get(ESizeVec2::StartWindow_RightWinInnerPadding);
+	const ImVec2 outerPadding = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_RightWinOuterPadding);
+	const ImVec2 innerPadding = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_RightWinInnerPadding);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, outerPadding);
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, I3T::getUI()
-		->getTheme().get(EColor::StartWindow_WindowBackground));
-	ImGui::BeginChild("panel", ImVec2(0, 0),
-		false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, I3T::getUI()->getTheme().get(EColor::StartWindow_WindowBackground));
+	ImGui::BeginChild("panel", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 	{
 		// YOUR SCENE CHILD WINDOW
 		if (m_finishedAllTutorials)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, innerPadding);
 			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding,
-								I3T::getUI()->getTheme().get(ESize::StartWindow_YourSceneWinRounding));
+			                    I3T::getUI()->getTheme().get(ESize::StartWindow_YourSceneWinRounding));
 			ImGui::PushStyleColor(ImGuiCol_ChildBg,
-								  I3T::getUI()->getTheme().get(EColor::StartWindow_YourSceneWinBackground));
+			                      I3T::getUI()->getTheme().get(EColor::StartWindow_YourSceneWinBackground));
 			ImGui::BeginChild("header", ImVec2(0, thumbImageSize + 2 * innerPadding.y), true,
-							  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollWithMouse |
-								  ImGuiWindowFlags_NoScrollbar);
+			                  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollWithMouse |
+			                      ImGuiWindowFlags_NoScrollbar);
 			{
 				// FOLDER IMAGE
 				if (m_folderImage)
 				{
-					ImGui::Image((ImTextureID)(intptr_t)m_folderImage->m_texID,
-					ImVec2(thumbImageSize, thumbImageSize));
+					ImGui::Image((ImTextureID) (intptr_t) m_folderImage->m_texID,
+					             ImVec2(thumbImageSize, thumbImageSize));
 				}
 				ImGui::SameLine();
 
@@ -209,7 +194,7 @@ void StartWindow::renderRightPanel()
 				{
 					ImGui::Dummy(ImVec2(0, 10));
 					ImGui::PushStyleColor(ImGuiCol_Text,
-										  I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemTitle));
 					ImGui::Text("Your scene");
 					ImGui::PopFont();
@@ -227,9 +212,9 @@ void StartWindow::renderRightPanel()
 				{
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
 					ImGui::PushStyleColor(ImGuiCol_Text,
-										  I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
 					ImGui::PushStyleColor(ImGuiCol_Button,
-										  I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
@@ -265,9 +250,9 @@ void StartWindow::renderRightPanel()
 
 			// Headline for Recent section
 			ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle)); // Use a larger font for the headline
-			ImGui::PushStyleColor(ImGuiCol_Text,
-					I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
-			ImGui::Text("Recent"); // Headline text
+			ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(
+			                                         EColor::StartWindow_DescriptionFont)); // Depending on the theme
+			ImGui::Text("Recent");                                                          // Headline text
 			ImGui::PopStyleColor();
 			ImGui::PopFont();
 
@@ -279,74 +264,74 @@ void StartWindow::renderRightPanel()
 
 			if (recentFiles.empty())
 			{
-			    ImGui::Text("No recent files");
+				ImGui::Text("No recent files");
 			}
 			else
 			{
-			    const float buttonWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_StartButtonWidth);
-			    const float buttonHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_ButtonHeight);
-			    const float spacing = 20.0f; // Larger space between text and button
-			    const float paddingRight = 10.0f; // Add padding from the right side
-			    const float availableWidth = ImGui::GetContentRegionAvail().x;
+				const float buttonWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_StartButtonWidth);
+				const float buttonHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_ButtonHeight);
+				const float spacing = 20.0f;      // Larger space between text and button
+				const float paddingRight = 10.0f; // Add padding from the right side
+				const float availableWidth = ImGui::GetContentRegionAvail().x;
 
 				int count = 0;
-			    for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it) {
-			    	if (count >= 3)
-			    	{
-			            break;
-			        }
-			        count++;
-			    	ImGui::BeginGroup();
+				for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it)
+				{
+					if (count >= 3)
+					{
+						break;
+					}
+					count++;
+					ImGui::BeginGroup();
 
-			        // Calculate column widths
-			        const float textWidth = availableWidth - buttonWidth - spacing - paddingRight;
+					// Calculate column widths
+					const float textWidth = availableWidth - buttonWidth - spacing - paddingRight;
 
-			        // Column 1: File name and path
-			        ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()
-							->getTheme().get(EColor::StartWindow_TitleFont));
-			        ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemTitle));
-			        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + textWidth);
-			        ImGui::Text(it->filename().string().c_str());
-			        ImGui::PopTextWrapPos();
-			        ImGui::PopFont();
-			        ImGui::PopStyleColor();
+					// Column 1: File name and path
+					ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_TitleFont));
+					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemTitle));
+					ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + textWidth);
+					ImGui::Text(it->filename().string().c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::PopFont();
+					ImGui::PopStyleColor();
 
-			        ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()
-							->getTheme().get(EColor::StartWindow_DescriptionFont));
-			        ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemDescription));
-			        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + textWidth);
-			        ImGui::TextWrapped(it->string().c_str()); // File path
-			        ImGui::PopTextWrapPos();
-			        ImGui::PopFont();
-			        ImGui::PopStyleColor();
+					ImGui::PushStyleColor(ImGuiCol_Text,
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
+					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemDescription));
+					ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + textWidth);
+					ImGui::TextWrapped(it->string().c_str()); // File path
+					ImGui::PopTextWrapPos();
+					ImGui::PopFont();
+					ImGui::PopStyleColor();
 
-			        // Column 2: Button (Aligned Right with Padding)
-			        ImGui::SameLine(availableWidth - buttonWidth - paddingRight);
+					// Column 2: Button (Aligned Right with Padding)
+					ImGui::SameLine(availableWidth - buttonWidth - paddingRight);
 
-			        ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
-			        ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()
-						->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
-			        ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()
-						->getTheme().get(EColor::StartWindow_NewSceneButton));
-			        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()
-						->getTheme().get(EColor::TutorialButtonHovered));
-			        ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()
-						->getTheme().get(EColor::TutorialButtonActive));
+					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
+					ImGui::PushStyleColor(ImGuiCol_Text,
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
+					ImGui::PushStyleColor(ImGuiCol_Button,
+					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 
-			        if (ImGui::Button(("Open##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
-			        {
-			            this->hide(); // Close Welcome window
-			            askBeforeExitScene([scenePath = *it]() {
-			                App::getModule<StateManager>().loadScene(scenePath);
-			            });
-			        }
+					if (ImGui::Button(("Open##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
+					{
+						this->hide(); // Close Welcome window
+						askBeforeExitScene([scenePath = *it]() {
+							App::getModule<StateManager>().loadScene(scenePath);
+						});
+					}
 
-			        ImGui::PopStyleColor(4);
-			        ImGui::PopFont();
+					ImGui::PopStyleColor(4);
+					ImGui::PopFont();
 
-			        ImGui::EndGroup();
-			        ImGui::Dummy(ImVec2(0, 10)); // Spacer between entries
-			    }
+					ImGui::EndGroup();
+					ImGui::Dummy(ImVec2(0, 10)); // Spacer between entries
+				}
 			}
 		}
 		// Add a small spacer below "Your Scene"
@@ -354,8 +339,8 @@ void StartWindow::renderRightPanel()
 
 		// Headline for tutorials
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle));
-		ImGui::PushStyleColor(ImGuiCol_Text,
-					  I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
+		ImGui::PushStyleColor(
+		    ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
 		ImGui::Text("Tutorials");
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
@@ -364,7 +349,8 @@ void StartWindow::renderRightPanel()
 		ImGui::Dummy(ImVec2(0, 5));
 
 		// THE LIST OF TUTORIALS
-		for (auto& header : TutorialManager::instance().getTutorialHeaders()) {
+		for (auto& header : TutorialManager::instance().getTutorialHeaders())
+		{
 			// ITEM
 			ImGui::BeginGroup();
 			{
@@ -374,14 +360,14 @@ void StartWindow::renderRightPanel()
 				auto img = header->m_thumbnailImage;
 				if (img)
 				{
-					ImGui::Image((ImTextureID)(intptr_t)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+					ImGui::Image((ImTextureID) (intptr_t) img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 				}
 				else
 				{
 					// todo load dummy at introwindow init
 					if (m_dummyImage)
 					{
-						ImGui::Image((ImTextureID)(intptr_t)m_dummyImage->m_texID,
+						ImGui::Image((ImTextureID) (intptr_t) m_dummyImage->m_texID,
 						             ImVec2(thumbImageSize, thumbImageSize));
 					}
 					else
@@ -400,8 +386,7 @@ void StartWindow::renderRightPanel()
 				                  ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 				{
 					// TITLE
-					ImGui::PushStyleColor(ImGuiCol_Text,
-					                      I3T::getUI()->getTheme().get(EColor::StartWindow_TitleFont));
+					ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_TitleFont));
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemTitle));
 					ImGui::TextWrapped(header->m_title.c_str());
 					ImGui::PopStyleColor();
@@ -410,9 +395,9 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_Text,
 					                      I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemDescription));
-					float predictedTextSize = ImGui::CalcTextSize(header
-						->m_description.c_str(), nullptr, false,
-					                                           ImGui::GetContentRegionAvail().x).y;
+					float predictedTextSize = ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false,
+					                                              ImGui::GetContentRegionAvail().x)
+					                              .y;
 					bool willTextFit = ImGui::GetContentRegionAvail().y - predictedTextSize >= 0;
 					ImGui::TextWrapped(header->m_description.c_str());
 					// Show tooltip when description doesn't fit
@@ -435,16 +420,13 @@ void StartWindow::renderRightPanel()
 				ImGui::EndChild();
 				ImGui::PopStyleVar();
 
-				ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth
-									- innerPadding.x - outerPadding.x);
+				ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x - outerPadding.x);
 				// START BUTTON
 				ImGui::BeginGroup();
 				{
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::Button));
-					ImGui::PushStyleColor(ImGuiCol_Text,
-					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
-					ImGui::PushStyleColor(ImGuiCol_Button,
-					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
+					ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
+					ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive,
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
@@ -489,7 +471,7 @@ void StartWindow::render()
 	const float minWinWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_WinWidth);
 	const float minWinHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_WinHeight);
 
-	//const ImVec2 logoOffset = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_LogoOffset);
+	// const ImVec2 logoOffset = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_LogoOffset);
 
 	// Set initial window size
 	ImVec2 windowSize = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_WinSize);
