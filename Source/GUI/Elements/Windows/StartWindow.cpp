@@ -197,7 +197,8 @@ void StartWindow::renderRightPanel()
 								  ImGuiWindowFlags_NoScrollbar);
 			{
 				// FOLDER IMAGE
-				if (m_folderImage) {
+				if (m_folderImage)
+				{
 					ImGui::Image((ImTextureID)(intptr_t)m_folderImage->m_texID,
 					ImVec2(thumbImageSize, thumbImageSize));
 				}
@@ -229,20 +230,25 @@ void StartWindow::renderRightPanel()
 										  I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
 					ImGui::PushStyleColor(ImGuiCol_Button,
 										  I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
-					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight))) {
+					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
+					{
 						this->hide();
 						InputManager::triggerAction("new", EKeyState::Pressed);
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::Dummy(ImVec2(0, 2));
-					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight))) {
-						if (MenuBarDialogs::open()) {
+					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight)))
+					{
+						if (MenuBarDialogs::open())
+						{
 							this->hide();
 						}
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::PopStyleColor(2);
@@ -271,9 +277,12 @@ void StartWindow::renderRightPanel()
 			// Show recent files (limit to 3)
 			const auto& recentFiles = getUserData().recentFiles;
 
-			if (recentFiles.empty()) {
+			if (recentFiles.empty())
+			{
 			    ImGui::Text("No recent files");
-			} else {
+			}
+			else
+			{
 			    const float buttonWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_StartButtonWidth);
 			    const float buttonHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_ButtonHeight);
 			    const float spacing = 20.0f; // Larger space between text and button
@@ -282,7 +291,8 @@ void StartWindow::renderRightPanel()
 
 				int count = 0;
 			    for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it) {
-			    	if (count >= 3) {
+			    	if (count >= 3)
+			    	{
 			            break;
 			        }
 			        count++;
@@ -323,7 +333,8 @@ void StartWindow::renderRightPanel()
 			        ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()
 						->getTheme().get(EColor::TutorialButtonActive));
 
-			        if (ImGui::Button(("Open##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight))) {
+			        if (ImGui::Button(("Open##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
+			        {
 			            this->hide(); // Close Welcome window
 			            askBeforeExitScene([scenePath = *it]() {
 			                App::getModule<StateManager>().loadScene(scenePath);
@@ -361,14 +372,20 @@ void StartWindow::renderRightPanel()
 
 				// THUMBNAIL IMAGE
 				auto img = header->m_thumbnailImage;
-				if (img) {
+				if (img)
+				{
 					ImGui::Image((ImTextureID)(intptr_t)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
-				} else {
+				}
+				else
+				{
 					// todo load dummy at introwindow init
-					if (m_dummyImage) {
+					if (m_dummyImage)
+					{
 						ImGui::Image((ImTextureID)(intptr_t)m_dummyImage->m_texID,
 						             ImVec2(thumbImageSize, thumbImageSize));
-					} else {
+					}
+					else
+					{
 						ImGui::Image(nullptr, ImVec2(thumbImageSize, thumbImageSize));
 					}
 				}
@@ -399,7 +416,8 @@ void StartWindow::renderRightPanel()
 					bool willTextFit = ImGui::GetContentRegionAvail().y - predictedTextSize >= 0;
 					ImGui::TextWrapped(header->m_description.c_str());
 					// Show tooltip when description doesn't fit
-					if (!willTextFit && ImGui::IsItemHovered()) {
+					if (!willTextFit && ImGui::IsItemHovered())
+					{
 						ImGui::BeginTooltip();
 						{
 							ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
@@ -432,15 +450,20 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 					std::string buttonName = "Start##" + header->m_filename.string();
-					if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight))) {
+					if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
+					{
 						auto tutorial = TutorialLoader::loadTutorial(header);
-						if (tutorial) {
+						if (tutorial)
+						{
 							loadTutorialAndShowWindow(header, tutorial);
-						} else {
+						}
+						else
+						{
 							LOG_INFO("ERR: Tutorial " + header->m_title + " not loaded");
 						}
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::PopStyleColor(4);
