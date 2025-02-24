@@ -38,7 +38,7 @@ private:
 	std::shared_ptr<GUIImage> m_cvutImage;
 	std::shared_ptr<GUIImage> m_i3tImage;
 
-	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
+	void loadTutorialAndShowWindow(const Ptr<TutorialHeader>& header, Ptr<Tutorial> tut);
 
 	// for now leave it true, later it will be tested and decide what window to show according to persona
 	bool m_finishedAllTutorials = true;
