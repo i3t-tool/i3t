@@ -489,7 +489,7 @@ void StartWindow::render()
 	const float minWinWidth = I3T::getUI()->getTheme().get(ESize::StartWindow_WinWidth);
 	const float minWinHeight = I3T::getUI()->getTheme().get(ESize::StartWindow_WinHeight);
 
-	const ImVec2 logoOffset = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_LogoOffset);
+	//const ImVec2 logoOffset = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_LogoOffset);
 
 	// Set initial window size
 	ImVec2 windowSize = I3T::getUI()->getTheme().get(ESizeVec2::StartWindow_WinSize);
