@@ -4,7 +4,7 @@ This manual serves as a comprehensive guide to using the **I3T** tool, focusing 
 
 ## User interface
 <div style="text-align: center;">
-    <img src="./assets/startWindow.png?raw=true" height="350">
+    <img src="./assets/startWindow.png?raw=true" height="350" alt="">
 </div>
 <br>
 
@@ -12,7 +12,7 @@ The program begins with the **Start Window**, which allows you to choose between
 Once selected, it enters the Workspace mode, consisting of two main windows. 
 
 <div style="text-align: center;">
-    <img src="./assets/i3tScenes.png?raw=true" height="400">
+    <img src="./assets/i3tScenes.png?raw=true" height="400" alt="">
 </div>
 <br>
 height="350">
@@ -23,7 +23,7 @@ by the graph is immediately visible in the 3D view in the *Scene View* window.
 The basic building blocks in the **Workspace** are small rectangles called **nodes**, which contain titles and content.
 
 <div style="text-align: center;">
-    <img src="../Docs/assets/buildingBlocks.png?raw=true" height="150">
+    <img src="../Docs/assets/buildingBlocks.png?raw=true" height="150" alt="">
 </div>
 <br>
 
@@ -45,7 +45,7 @@ The greatest strength of the I3T tool lies in its **interactivity**. Users can:
 ### Main bars
 The I3T application has a standard main menu in its top. 
 <div style="text-align: center;">
-  <img src="../Docs/assets/topBar.png?raw=true" height="50">
+  <img src="../Docs/assets/topBar.png?raw=true" height="50" alt="">
 </div>
 
 
@@ -102,7 +102,7 @@ The **Workspace** window is where scenes are assembled. You can add, connect, an
 
 ### Adding Nodes
 
-<img src="../Docs/assets/addBlocks.png?raw=true">
+<img src="../Docs/assets/addBlocks.png?raw=true" alt="">
 
 - To add node, <em>right-click</em> anywhere in the **Workspace** to open the context menu.
 - Main node types include:
@@ -135,7 +135,7 @@ Selecting nodes in the **Workspace** is a key step for organizing and editing yo
     </ul>
   </li>
 </ol>
-Selected nodes are outlined in <strong>orange</strong>.</li>
+Selected nodes are outlined in <strong>orange</strong>.
 
 ### Connecting Nodes
 
@@ -151,42 +151,42 @@ Nodes function like functions, with inputs and outputs. Connect nodes using **wi
     </thead>
     <tbody>
       <tr>
-        <td><img src="../Docs/assets/matrix.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/matrix.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Matrix input/output</strong></td>
         <td>For connecting matrices.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Matrix multiplication</strong></td>
         <td>Combines matrices by multiplying them.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/3Dvector.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/3Dvector.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>3D vector input/output</strong></td>
         <td>For connecting vector values.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/4Dvector.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/4Dvector.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>4D vector input/output</strong></td>
         <td>For connecting 4D vector values.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/float.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/float.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Float input/output</strong></td>
         <td>For connecting float values.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/screen.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/screen.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Screen output</strong></td>
         <td>Used specifically for cameras to output what they "see."</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/quaternion.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/quaternion.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Quaternion input/output</strong></td>
         <td>For connecting quaternion data.</td>
       </tr>
       <tr>
-        <td><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"></td>
+        <td><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20" alt=""></td>
         <td><strong>Pulse input/output</strong></td>
         <td>For triggering cyclic or time-based operations.</td>
       </tr>
@@ -200,12 +200,12 @@ Colored wires visualize connections, showing the flow of data through the scene 
 
 Transformations are always inserted into sequences. The order can be arbitrary. A typical order is **Translation, Rotation, Scaling** (TRS). 
 
-<img src="../Docs/assets/transformations.png?raw=true" height="150">
+<img src="../Docs/assets/transformations.png?raw=true" height="150" alt="">
 
 
 
 #### How to Add Transformations to a Sequence
-<img src="../Docs/assets/sequenceGIF.gif?raw=true" height="200">
+<img src="../Docs/assets/sequenceGIF.gif?raw=true" height="200" alt="">
 
 <ol>
   <li>
@@ -232,7 +232,7 @@ Transformations are always inserted into sequences. The order can be arbitrary. 
 </ol>
 
 #### Modifying Values
-<img src="../Docs/assets/modifyingGIF.gif?raw=true" height="200">
+<img src="../Docs/assets/modifyingGIF.gif?raw=true" height="200" alt="">
 
 <ul>
   <li>
@@ -269,7 +269,7 @@ Transformations are always inserted into sequences. The order can be arbitrary. 
 
 The **Tracking** feature allows you to observe how transformations are applied step-by-step in a sequence by interpolating matrices over time. This is particularly useful for understanding and debugging transformations.
 
-<img src="../Docs/assets/tracking.png?raw=true" height="120">
+<img src="../Docs/assets/tracking.png?raw=true" height="120" alt="">
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">How to Enable Tracking</summary>
@@ -309,7 +309,7 @@ The **Tracking** feature allows you to observe how transformations are applied s
         <li>Each transformation is applied sequentially, gradually altering the coordinate system.</li>
         <li>For example, with a TRS sequence:
         <br>
-        <img src="../Docs/assets/trackingFromLeft.gif?raw=true" height="300">
+        <img src="../Docs/assets/trackingFromLeft.gif?raw=true" height="300" alt="">
           <ul style="margin-left: 20px">
             <li>First, the coordinate system is <strong>translated</strong>, moving the reference point.</li>
             <li>Next, it is <strong>rotated</strong>, changing the orientation of subsequent transformations.</li>
@@ -362,11 +362,11 @@ The **Camera node** allows you to add a camera to your scene. It contains two se
 
 The **Camera** node has three outputs:
 
-<img src="../Docs/assets/camera.png?raw=true" height="100">
+<img src="../Docs/assets/camera.png?raw=true" height="100" alt="">
 
-- <img src="../Docs/assets/screen.png?raw=true" width="20" height="20">  **Screen Output**: Displays what the camera sees (connect to a `Screen` node).
-- <img src="../Docs/assets/matrix.png?raw=true" width="20" height="20">  **Matrix Copy Output**: Outputs the resulting matrix for further manipulation.
-- <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20">  **Multiplication Output**: Allows multiplication with other matrices.
+- <img src="../Docs/assets/screen.png?raw=true" width="20" height="20" alt="">  **Screen Output**: Displays what the camera sees (connect to a `Screen` node).
+- <img src="../Docs/assets/matrix.png?raw=true" width="20" height="20" alt="">  **Matrix Copy Output**: Outputs the resulting matrix for further manipulation.
+- <img src="../Docs/assets/matrixMultiplication.png?raw=true" width="20" height="20" alt="">  **Multiplication Output**: Allows multiplication with other matrices.
 
 To visualize what the camera sees:
 1. Add a **Screen** node to the Workspace.
@@ -414,14 +414,14 @@ To visualize what the camera sees:
 
 The **Cycle node** facilitates cyclic or time-based operations, providing control over value transitions, looping behaviors, and timing. It enables the creation of animations, repetitive movements, and smooth transitions within your scene.
 
-<img src="../Docs/assets/cycle.png?raw=true" height="150">
+<img src="../Docs/assets/cycle.png?raw=true" height="150" alt="">
 
 #### Inputs and Outputs
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Inputs</summary>
 
   <div style="margin-left: 40px;">
-    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20"><strong> Float Inputs:</strong><br>These inputs control the numerical values for the cycle's progression.</p>
+    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20" alt=""><strong> Float Inputs:</strong><br>These inputs control the numerical values for the cycle's progression.</p>
     <table>
       <thead>
         <tr>
@@ -445,7 +445,7 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
       </tbody>
     </table>
     &nbsp;
-    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"><strong> Pulse Inputs:</strong><br>These inputs trigger actions or changes within the cycle.</p>
+    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20" alt=""><strong> Pulse Inputs:</strong><br>These inputs trigger actions or changes within the cycle.</p>
     <table>
       <thead>
         <tr>
@@ -483,7 +483,7 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px;">Outputs</summary>
 
   <div style="margin-left: 40px;">
-    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20"><strong> Float Output:</strong><br>This output provides the current value of the cycle.</p>
+    <p><img src="../Docs/assets/float.png?raw=true" width="20" height="20" alt=""><strong> Float Output:</strong><br>This output provides the current value of the cycle.</p>
     <table>
       <thead>
         <tr>
@@ -499,7 +499,7 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
       </tbody>
     </table>
     &nbsp;
-    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20"><strong> Pulse Outputs:</strong><br>These outputs are triggered during specific cycle events.</p>
+    <p><img src="../Docs/assets/pulse.png?raw=true" width="20" height="20" alt=""><strong> Pulse Outputs:</strong><br>These outputs are triggered during specific cycle events.</p>
     <table>
       <thead>
         <tr>
@@ -568,7 +568,7 @@ The **Cycle node** facilitates cyclic or time-based operations, providing contro
 
 Operators in I3T perform calculations and manipulations on various data types, such as matrices, vectors, quaternions, and floats. They are categorized into different groups based on the type of operation they perform. Operators can be added through the **Workspace menu** and connected to other nodes to achieve specific results.
 
-  <img src="../Docs/assets/operators.png?raw=true" height="250">
+  <img src="../Docs/assets/operators.png?raw=true" height="250" alt="">
 
 <details>
   <summary style="font-weight: bold; cursor: pointer;">Transformation  Operators</summary>
@@ -1018,7 +1018,7 @@ The **Scene View** provides a real-time 3D visualization of your scene, allowing
 
 Manipulators are tools for adjusting transformations like translate, rotate, and scale. These manipulators can only modify existing transformations—they cannot create new transformations or connect them to models.
 <div style="text-align: center;">
-  <img src="../Docs/assets/manipulators.png?raw=true" height="350">
+  <img src="../Docs/assets/manipulators.png?raw=true" height="350" alt="">
 </div>
 
 #### Visual Indicators in Scene View
@@ -1031,7 +1031,7 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Translate Manipulator</summary>
   <ul style="margin-left: 40px;">
-    <img src="../Docs/assets/translate.png?raw=true" width="200">
+    <img src="../Docs/assets/translate.png?raw=true" width="200" alt="">
     <li>Shown as colored arrows (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Drag the arrows to move the object along a specific axis.</li>
   </ul>
@@ -1040,7 +1040,7 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Rotate Manipulator</summary>
   <ul style="margin-left: 40px;">
-    <img src="../Docs/assets/rotate.png?raw=true" width="200">
+    <img src="../Docs/assets/rotate.png?raw=true" width="200" alt="">
     <li>Appears as colored circles around the object (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Click and drag a circle to rotate the object around the corresponding axis.</li>
   </ul>
@@ -1049,7 +1049,7 @@ Manipulators are tools for adjusting transformations like translate, rotate, and
 <details>
   <summary style="font-weight: bold; cursor: pointer; margin-left: 20px">Scale Manipulator</summary>
   <ul style="margin-left: 40px;">
-    <img src="../Docs/assets/scale.png?raw=true" width="190">
+    <img src="../Docs/assets/scale.png?raw=true" width="190" alt="">
     <li>Displayed as colored dots (Red: X-axis, Green: Y-axis, Blue: Z-axis).</li>
     <li>Drag the squares to scale the object along a specific axis.</li>
   </ul>
