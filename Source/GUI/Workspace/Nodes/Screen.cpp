@@ -184,9 +184,9 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 	//
 	//		dragDelta = diwne.input().bypassGetMouseDragDelta0() / diwne.getZoom();
 	//
-	//		ImVec2 nodePos = getNodePositionDiwne();
+	//		ImVec2 nodePos = getPosition();
 	//		nodePos.x += dragDelta.x;
-	//		setNodePositionDiwne(nodePos);
+	//		setPosition(nodePos);
 	//
 	//		dragDelta.x *= -1; /* (the drag direction sign) - in order to have the same
 	//		                      code in   if(resize_texture) */

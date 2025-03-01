@@ -89,7 +89,7 @@ void NodeEditor::begin(DrawInfo& context)
 		                        ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x,
 		                        ImGui::GetCurrentWindow()->ClipRect.Max.y)
 		                .c_str());
-		ImGui::TextUnformatted(fmt::format("Nodes: {}", m_workspaceCoreNodes.size()).c_str());
+		ImGui::TextUnformatted(fmt::format("Nodes: {}", m_nodes.size()).c_str());
 		ImGui::TextUnformatted(fmt::format("Links: {}", m_links.size()).c_str());
 	});
 }
@@ -100,6 +100,33 @@ void NodeEditor::content(DrawInfo& context)
 	ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
 	                                    ImColor(255, 0, 0, 255));
 
+	// TODO: DiwneObjects (Nodes, links) marked to be destroyed need to be deleted, likely here or maybe even better
+	//  in the initialize() method (as this is not related to drawing) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	// TODO: [Performance] Could the channel splitter with its channel for each node be causing performance issues?
+	//  I haven't investigated too deep but presumably all draw commands (which are many) are being reordered in
+	//  an array every frame.
+
+	// TODO: A better approach imo is to treat links like nodes
+	// Simply keep a persistent list of them and delete / modify them as needed during the draw
+	// The way it is now, where each link is actually a member variable of a pin seems a little odd to me
+	// Like it works I suppose, no real issue with it, but just seems confusing for no good reason
+	// Admittedly links are more dynamic this way, more "immediate"
+	// If I were to keep a persistent list then I need to ensure their state is correct
+	// But isn't that what we're already doing with nodes? kinda the whole way how dinwe works
+	// The code just seems unreadable to me because of this, pin is a pin and it shouldn't handle its own link
+	// It should just create and delete the link based on whether two links are connected
+	// Also when handling link visibility we are actually checking if links
+	// are visible in the processInteractionsAlways method of the pin which seems dumb
+	// Another perhaps unnecessary thing is, why make a distinction between input and output pins
+	// I feel like it might be clearer if its a property of a pin rather than a different class
+	// Right now only the output pins drawData and there are subclasses for each data type
+	// Again seems like that could be handled with some kind of a switch and just free floating draw methods
+	// Rather than complicated polymorphism that doesn't have much of a meaning. I don't know.
+
+	// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
+	//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not desirable.
+
 	// NOTE: Nodes are "constructed" front to back, eg. the first UI code to run is from the TOP node, however the nodes
 	//  are then later drawn by ImGui back to front because we reorder the ImGui draw commands using a channel splitter.
 	// This is desirable as when ImGui elements overlap, the first element to receive input is the FIRST one that's
@@ -108,51 +135,87 @@ void NodeEditor::content(DrawInfo& context)
 	// This is rather counterintuitive and a direct result of the immediate mode methodology. There is a way around
 	//  this in ImGui in the form of ImGui::SetNextItemAllowOverlap() but it is a tricky multi-frame workaround.
 
-	int number_of_nodes = m_workspaceCoreNodes.size();
-	int node_count = number_of_nodes - 1; /* -1 for space for top node drawn above links */
-	                                      // TODO: Wait what? So if there is just one node it's not rendered?
+	int number_of_nodes = m_nodes.size();
+	int node_count = number_of_nodes; /* -1 for space for top node drawn above links */
 	if (number_of_nodes > 0)
 	{
-		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 1 /*+1 for links channel on top */);
+		// Each node is in its own channel as they all need to be drawn in the reverse order.
+		// Then the temporary helper link is drawn atop everything
+		// And one channel is for all the links below everything
+		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 2 /*+1 for links channel on top */);
 
 		/* draw nodes from back to begin (front to back) to catch interactions in
 		 * correct order */
-		int prev_size = m_workspaceCoreNodes.size();
+		int prev_size = m_nodes.size();
 		bool takeSnap = false;
-		for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
+		for (auto it = m_nodes.rbegin(); it != m_nodes.rend(); ++it)
 		{
-			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
-			{
-				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
-				                                    number_of_nodes); /* top node is above links */
-			}
-			else
-			{
-				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
-			}
+			auto& node = *it;
+			//			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
+			//			{
+			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
+			//				                                    number_of_nodes); /* top node is above links */
+			//			}
+			//			else
+			//			{
+			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+			//			}
+			m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), node_count--);
 
-			if ((*it) != nullptr)
+			if (node != nullptr && node->isRendered())
 			{
-				// TODO: Viz related TODO comment above the drawNodeDiwne method (eg. why not call node->drawDiwne()?)
-				(*it)->drawNodeDiwne<Node>(context, DIWNE::DrawModeNodePosition::OnItsPosition);
+				// Set the ImGui cursor position to the position of the node
+				ImGui::SetCursorScreenPos(canvas().diwne2screen(node->getPosition()));
+				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode2);
+				if (drawResult.logicalUpdates && !node->m_destroy) // TODO: There was !m_destroy
+				{
+					setLastActiveNode(std::static_pointer_cast<Node>(node));
+				}
 			}
 
 			// TODO: This seems like a bit of a "hacky" solution here, we just don't draw the rest of nodes after a
 			//  sequence that just lost or gained a subnode? Investigate, the node list can simply just be copied
 			//  beforehand or the insertion/deletion deferred after rendering, no?
-			if (prev_size != m_workspaceCoreNodes.size())
+			if (prev_size != m_nodes.size())
 				break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is
 				          affected and iterator is invalidated (at least with MVSC) */
 		}
 
-		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+		auto connectPinAction = context.state.getActiveAction<DIWNE::Actions::ConnectPinAction>();
 
-		DIWNE_DEBUG((*this), {
-			float zoom = m_canvas->getZoom();
-			ImGui::GetWindowDrawList()->AddCircleFilled(m_canvas->diwne2screen(ImVec2(0, 0)), 10.f * zoom,
-			                                            IM_COL32(255, 0, 255, 150));
-		});
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+		// Draw links, first in drawing order, last in logical order
+		for (auto link : m_links)
+		{
+			// Avoid drawing the dragged link if a new connection is being made
+			std::string draggedLinkLabel = "";
+			if (connectPinAction)
+			{
+				draggedLinkLabel = connectPinAction->draggedLink->m_labelDiwne;
+			}
+			if (link->isRendered() && draggedLinkLabel != link->m_labelDiwne)
+				link->drawDiwne(context);
+		}
+
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes + 1);
+
+		// Draw the dragged link on top if a new connection is made
+		if (connectPinAction)
+		{
+			connectPinAction->draggedLink->drawDiwne(context, DIWNE::DrawMode_JustDraw);
+		}
+		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
+
+	DIWNE_DEBUG((*this), {
+		float zoom = m_canvas->getZoom();
+		ImGui::GetWindowDrawList()->AddCircleFilled(m_canvas->diwne2screen(ImVec2(0, 0)), 10.f * zoom,
+		                                            IM_COL32(255, 0, 255, 150));
+	});
+
+	// TODO: Figure out if we need to take a snap here
+	// m_takeSnap |= interaction_happen;
+	/// \todo see #111, wrongly computed m_takeSnap value.
 }
 
 void NodeEditor::end(DrawInfo& context)
@@ -328,24 +391,23 @@ bool NodeEditor::processDiwneZoom()
 	return false;
 }
 
-void NodeEditor::shiftNodesToBegin(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift)
+void NodeEditor::shiftNodesToBegin(const std::vector<std::shared_ptr<Node>>& nodesToShift)
 {
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
 		auto ith_selected_node =
-		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                 [nodesToShift, i](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
-			                 return node->getId() == nodesToShift.at(i)->getId();
-		                 });
+		    std::find_if(m_nodes.begin(), m_nodes.end(), [nodesToShift, i](const auto& node) -> bool {
+			    return node->getId() == nodesToShift.at(i)->getId();
+		    });
 
-		if (ith_selected_node != m_workspaceCoreNodes.end())
+		if (ith_selected_node != m_nodes.end())
 		{
-			std::iter_swap(m_workspaceCoreNodes.begin() + i, ith_selected_node);
+			std::iter_swap(m_nodes.begin() + i, ith_selected_node);
 		}
 	}
 }
 
-void NodeEditor::shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift)
+void NodeEditor::shiftNodesToEnd(const std::vector<std::shared_ptr<Node>>& nodesToShift)
 {
 	int node_num = nodesToShift.size();
 	//    str2.erase(std::remove_if(str2.begin(),
@@ -355,31 +417,29 @@ void NodeEditor::shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode
 	for (int i = 0; i < node_num; i++)
 	{
 		auto ith_selected_node =
-		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                 [nodesToShift, i](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
-			                 return node->getId() == nodesToShift.at(i)->getId();
-		                 });
-		if (ith_selected_node != m_workspaceCoreNodes.end())
+		    std::find_if(m_nodes.begin(), m_nodes.end(), [nodesToShift, i](const auto& node) -> bool {
+			    return node->getId() == nodesToShift.at(i)->getId();
+		    });
+		if (ith_selected_node != m_nodes.end())
 		{
-			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
+			std::iter_swap(m_nodes.end() - node_num + i, ith_selected_node);
 		}
 	}
 }
 
 void NodeEditor::shiftInteractingNodeToEnd()
 {
-	if (mp_lastActiveNode == nullptr || m_workspaceCoreNodes.empty())
+	if (mp_lastActiveNode == nullptr || m_nodes.empty())
 		return;
-	if (mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
+	if (mp_lastActiveNode.get() != m_nodes.back().get())
 	{
-		auto draged_node_it = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                   [this](Ptr<Workspace::CoreNode> const& node) -> bool {
-			                                   return node.get() == this->mp_lastActiveNode.get();
-		                                   });
+		auto draged_node_it = std::find_if(m_nodes.begin(), m_nodes.end(), [this](const auto& node) -> bool {
+			return node.get() == this->mp_lastActiveNode.get();
+		});
 
-		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end() - 1)
+		if (draged_node_it != m_nodes.end() && draged_node_it != m_nodes.end() - 1)
 		{
-			std::rotate(draged_node_it, draged_node_it + 1, m_workspaceCoreNodes.end());
+			std::rotate(draged_node_it, draged_node_it + 1, m_nodes.end());
 		}
 	}
 }
@@ -395,7 +455,7 @@ bool NodeEditor::isZoomingDiwne()
 
 void NodeEditor::clear()
 {
-	for (auto& node : m_workspaceCoreNodes)
+	for (auto& node : m_nodes)
 	{
 		node->destroy(false);
 	}
@@ -403,59 +463,43 @@ void NodeEditor::clear()
 	{
 		link->destroy(false);
 	}
-	m_workspaceCoreNodes.clear();
+	m_nodes.clear();
 	m_links.clear();
 
-	setLastActiveNode<DIWNE::Node>(nullptr);
-}
-
-std::vector<std::shared_ptr<Workspace::CoreNode>> NodeEditor::getAllNodesInnerIncluded()
-{
-	return getAllNodes();
-}
-
-std::vector<std::shared_ptr<Workspace::CoreNode>> NodeEditor::getSelectedNodesInnerIncluded()
-{
-	return getSelectedNodes();
-}
-
-std::vector<Ptr<Workspace::CoreNode>> NodeEditor::getSelectedNodes()
-{
-	std::vector<Ptr<Workspace::CoreNode>> selected;
-	for (auto const& node : m_workspaceCoreNodes)
-	{
-		if (node->getSelected())
-		{
-			selected.push_back(node);
-		};
-	}
-	return selected;
+	setLastActiveNode(nullptr);
 }
 
 void NodeEditor::deselectNodes()
 {
-	for (auto node : getAllNodesInnerIncluded())
+	for (auto& node : getAllNodesInnerIncluded())
 	{
-		node->setSelected(false);
+		node.setSelected(false);
 	}
 }
 
-void NodeEditor::addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2 position, bool shiftToLeftByNodeWidth)
+void NodeEditor::addNode(std::shared_ptr<Node> node)
+{
+	addNode(node, node->getPosition(), false);
+}
+
+void NodeEditor::addNode(std::shared_ptr<Node> node, const ImVec2 position, bool shiftToLeftByNodeWidth)
 {
 	// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
 	// size, padding etc.)
 	// Hence scaling is applied here if not active, and then restored to its original state at the end of this
 	// method
 	bool zoomScalingWasActive = m_canvas->ensureZoomScaling(true);
-	node->setNodePositionDiwne(position);
+	node->setPosition(position);
 	if (shiftToLeftByNodeWidth)
 	{
-		node->draw(DIWNE::DrawMode::JustDraw); /* to obtain size */
-		node->move(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
+		// TODO: Is the call below a noop? It shouldnt be implemented in node (-> drawDiwne()), investigate
+		//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw); /* to obtain size */
+		node->translate(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
 	}
 
 	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
-	m_workspaceCoreNodes.push_back(node);
+	m_nodes.push_back(node);
 	node->m_parentLabel = m_labelDiwne;                // Set the editor as the node's parent
 	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
@@ -467,13 +511,13 @@ void NodeEditor::addLink(std::shared_ptr<Link> link)
 
 void NodeEditor::destroyObjects()
 {
-	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-	                                          [](std::shared_ptr<Workspace::CoreNode> const& node) -> bool {
-		                                          return node->m_destroy;
-	                                          }),
-	                           m_workspaceCoreNodes.end());
+	m_nodes.erase(std::remove_if(m_nodes.begin(), m_nodes.end(),
+	                             [](const auto& node) -> bool {
+		                             return node->m_destroy;
+	                             }),
+	              m_nodes.end());
 	m_links.erase(std::remove_if(m_links.begin(), m_links.end(),
-	                             [](const std::shared_ptr<Link>& link) -> bool {
+	                             [](const auto& link) -> bool {
 		                             return link->m_destroy;
 	                             }),
 	              m_links.end());

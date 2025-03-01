@@ -41,8 +41,6 @@
  */
 #pragma once
 
-#include "Core/diwne_common.h"
-
 #include "Core/NodeEditor.h"
 
 #include "Core/Link.h"

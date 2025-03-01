@@ -12,13 +12,14 @@
  */
 #pragma once
 
-#include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "DIWNE/Core/NodeContainer.h"
 
+#include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "TransformationBase.h"
 
 namespace Workspace
 {
-class Sequence : public CoreNodeWithPins
+class Sequence : public CoreNodeWithPins, public DIWNE::NodeContainer
 {
 private:
 	bool m_isCameraSequence;
@@ -29,7 +30,9 @@ protected:
 	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
 
 	// bool m_drawPins;  // \todo (PF) was not used - remove
-	std::vector<Ptr<CoreNode>> m_workspaceInnerTransformations;
+
+	/// List of inner workspace transformations. Is guaranteed to contain nodes derived from CoreNode.
+	std::vector<Ptr<DIWNE::Node>> m_workspaceInnerTransformations;
 
 public:
 	Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
@@ -64,15 +67,16 @@ public:
 
 	virtual bool allowDrawing() override;
 
-	void popNode(Ptr<CoreNode> node);
-	void pushNode(Ptr<CoreNode> node, int index = 0);
-
 	void moveNodeToSequence(Ptr<CoreNode> dragedNode, int index = 0);
 	void moveNodeToWorkspace(Ptr<CoreNode> dragedNode);
 
 	void setNumberOfVisibleDecimal(int value) override;
 
-	const std::vector<Ptr<CoreNode>>& getInnerWorkspaceNodes() const;
+	DIWNE::NodeRange<CoreNode> getInnerWorkspaceNodes();
+	DIWNE::ConstNodeRange<CoreNode> getInnerWorkspaceNodes() const;
+
+	DIWNE::NodeRange<> getNodes() const override;
+
 	std::optional<Ptr<CoreNode>> getTransform(int index) const;
 
 	void centerContent(DIWNE::DrawInfo& context) override;
@@ -80,5 +84,11 @@ public:
 	void drawMenuLevelOfDetail() override;
 
 	int maxLengthOfData() override;
+
+	void onDestroy(bool logEvent) override;
+
+protected:
+	void popNode(int index);
+	void pushNode(Ptr<CoreNode> node, int index = 0);
 };
 } // namespace Workspace

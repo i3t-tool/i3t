@@ -216,12 +216,6 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	// connect edges
 
 	const auto& edges = memento["workspace"]["edges"];
-	auto& workspaceNodes = App::getModule<UIModule>()
-	                           .getWindowManager()
-	                           .getWindowPtr<WorkspaceWindow>()
-	                           ->getNodeEditor()
-	                           .m_workspaceCoreNodes;
-
 	for (auto& edge : edges.GetArray())
 	{
 		if (!createdNodes.contains(edge[0].GetInt()) || !createdNodes.contains(edge[2].GetInt()))
@@ -420,7 +414,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 	}
 
 	const auto position = JSON::getVec2(value["position"].GetArray());
-	node->setNodePositionDiwne(position);
+	node->setPosition(position);
 }
 
 void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)

@@ -59,6 +59,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_projection->setTopLabel("projection");
+	m_projection->m_deletable = false;
 
 	m_view->setSelectable(false);
 	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
@@ -72,6 +73,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_view->getNodebase()->getInputPins()[1].setRendered(true);
 	m_view->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_view->setTopLabel("view");
+	m_view->m_deletable = false;
 
 	// Hide multiplication output to discourage interaction
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
@@ -244,12 +246,13 @@ glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
 
 void Camera::centerContent(DIWNE::DrawInfo& context)
 {
+	// TODO: (DR) Investigate LOD behavior of the camera node <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
 	// Label LOD
 	{
-		m_projection->drawNodeDiwne<Sequence>(context, DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode2);
+		m_projection->drawDiwne(context, m_drawMode2);
 		ImGui::SameLine();
-		m_view->drawNodeDiwne<Sequence>(context, DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode2);
+		m_view->drawDiwne(context, m_drawMode2);
 	}
 }
 

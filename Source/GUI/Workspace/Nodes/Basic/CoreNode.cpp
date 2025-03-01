@@ -36,6 +36,8 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
 	// Register core node calbacks
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.registerNodeCallbacks(m_nodebase.get());
+	// Set a bit flag identifying this node as a core node
+	setFlag(CORE_NODE_FLAG, true);
 }
 
 // TODO: (DR) Commented out for now, more info in the header file
@@ -250,12 +252,13 @@ void CoreNode::drawMenuDuplicate()
 {
 	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
 	{
+		WorkspaceDiwne& workspace = static_cast<WorkspaceDiwne&>(diwne);
 		// duplicate
-		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+		workspace.deselectNodes();
 		Tools::duplicateNode(std::static_pointer_cast<CoreNode>(shared_from_this()),
 		                     I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 		// move original node behind the new one
-		static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
+		workspace.shiftNodesToBegin(workspace.getSelectedNodes().collect());
 	}
 }
 

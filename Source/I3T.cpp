@@ -16,7 +16,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/Elements/Modals/BeforeNewTutModal.h"
+#include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"

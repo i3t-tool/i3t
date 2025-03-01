@@ -11,6 +11,8 @@ enum IconType : unsigned int;
 
 /**
  * Representation of the 2D infinite plane of a node editor.
+ *
+ * // TODO: Coordinate systems docs (screen space, viewport coordinates, canvas/editor/diwne coordinates
  */
 class Canvas
 {

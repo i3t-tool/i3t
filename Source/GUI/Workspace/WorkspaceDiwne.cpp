@@ -56,12 +56,16 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
 
 	m_reconnectCameraToSequence = false;
+	// TODO: This system is tbh kinda stupid, why can't the nodes update themselves before drawing?
+	//  Why iterate over everything again? What am I missing?
+	//  On another node I think data items width could be updated every frame, its not that deep
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if (m_updateDataItemsWidth)
 	{
 		m_updateDataItemsWidth = false;
-		for (auto node : getAllNodesInnerIncluded())
+		for (auto& node : getAllCoreNodes())
 		{
-			node->updateDataItemsWidth();
+			node.updateDataItemsWidth();
 		}
 	}
 	DIWNE::NodeEditor::begin(context);
@@ -69,46 +73,16 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 
 void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 {
-	// TODO: DiwneObjects (Nodes, links) marked to be destroyed need to be deleted, likely here or maybe even better
-	//  in the initialize() method (as this is not related to drawing)
-
-	// TODO: [Performance] Could the channel splitter with its channel for each node be causing performance issues?
-	//  I haven't investigated too deep but presumably all draw commands (which are many) are being reordered in
-	//  an array every frame.
-
-	if (m_workspaceCoreNodes.empty()) // OK-DR
-	{
-		/// \todo Cannot draw with empty workspace ->
-		/// `m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count
-		/// );` exception.
-		return;
-	}
-
-	// TODO: A better approach imo is to treat links like nodes
-	// Simply keep a persistent list of them and delete / modify them as needed during the draw
-	// The way it is now, where each link is actually a member variable of a pin seems a little odd to me
-	// Like it works I suppose, no real issue with it, but just seems confusing for no good reason
-	// Admittedly links are more dynamic this way, more "immediate"
-	// If I were to keep a persistent list then I need to ensure their state is correct
-	// But isn't that what we're already doing with nodes? kinda the whole way how dinwe works
-	// The code just seems unreadable to me because of this, pin is a pin and it shouldn't handle its own link
-	// It should just create and delete the link based on whether two links are connected
-	// Also when handling link visibility we are actually checking if links
-	// are visible in the processInteractionsAlways method of the pin which seems dumb
-	// Another perhaps unnecessary thing is, why make a distinction between input and output pins
-	// I feel like it might be clearer if its a property of a pin rather than a different class
-	// Right now only the output pins drawData and there are subclasses for each data type
-	// Again seems like that could be handled with some kind of a switch and just free floating draw methods
-	// Rather than complicated polymorphism that doesn't have much of a meaning. I don't know.
-
 	// duplication of blocks
 	std::vector<Ptr<CoreNode>> duplicatedNodes;
 	bool shouldDuplicate = false;
-	for (auto node : getAllNodesInnerIncluded())
+	// TODO: Only core nodes can be duplicated? Why?
+	auto allCoreNodes = getAllCoreNodes();
+	for (auto node = allCoreNodes.begin(); node != allCoreNodes.end(); ++node)
 	{
 		if (node->getDuplicateNode())
 		{
-			duplicatedNodes.push_back(node);
+			duplicatedNodes.push_back(node.sharedPtr());
 			node->setDuplicateNode(false);
 			shouldDuplicate = true;
 		}
@@ -119,142 +93,55 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 	}
 
-	// START - SHOULD BE MOVED TO DIWNE
+	NodeEditor::content(context);
 
-	// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
-	//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not desirable.
+	// TODO: Figure out what to do about all this
+	//  I feel like we are on the verge of removing this anyway so its not a priority
 
-	// NOTE: Nodes are "constructed" front to back, eg. the first UI code to run is from the TOP node, however the nodes
-	//  are then later drawn by ImGui back to front because we reorder the ImGui draw commands using a channel splitter.
-	// This is desirable as when ImGui elements overlap, the first element to receive input is the FIRST one that's
-	//  submitted to ImGui, as it is able to "grab" the input first, the later elements which are drawn on top of it
-	//  are not the ones to receive input even though they're "FIRST" in the sense they're on top and drawn last.
-	// This is rather counterintuitive and a direct result of the immediate mode methodology. There is a way around
-	//  this in ImGui in the form of ImGui::SetNextItemAllowOverlap() but it is a tricky multi-frame workaround.
-
-	int number_of_nodes = m_workspaceCoreNodes.size();
-	int node_count = number_of_nodes; /* -1 for space for top node drawn above links */
-	if (number_of_nodes > 0)
-	{
-		// Each node is in its own channel as they all need to be drawn in the reverse order.
-		// Then the temporary helper link is drawn atop everything
-		// And one channel is for all the links below everything
-		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 2 /*+1 for links channel on top */);
-
-		/* draw nodes from back to begin (front to back) to catch interactions in
-		 * correct order */
-		int prev_size = m_workspaceCoreNodes.size();
-		bool takeSnap = false;
-		for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
-		{
-			//			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
-			//			{
-			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
-			//				                                    number_of_nodes); /* top node is above links */
-			//			}
-			//			else
-			//			{
-			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
-			//			}
-			m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), node_count--);
-
-			if ((*it) != nullptr)
-			{
-				(*it)->drawNodeDiwne<CoreNode>(context, DIWNE::DrawModeNodePosition::OnItsPosition);
-			}
-
-			// TODO: This seems like a bit of a "hacky" solution here, we just don't draw the rest of nodes after a
-			//  sequence that just lost or gained a subnode? Investigate, the node list can simply just be copied
-			//  beforehand or the insertion/deletion deferred after rendering, no?
-			if (prev_size != m_workspaceCoreNodes.size())
-				break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is
-				          affected and iterator is invalidated (at least with MVSC) */
-		}
-
-		auto connectPinAction = context.state.getActiveAction<DIWNE::Actions::ConnectPinAction>();
-
-		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
-		// Draw links, first in drawing order, last in logical order
-		for (auto link : m_links)
-		{
-			// Avoid drawing the dragged link if a new connection is being made
-			std::string draggedLinkLabel = "";
-			if (connectPinAction)
-			{
-				draggedLinkLabel = connectPinAction->draggedLink->m_labelDiwne;
-			}
-			if (link->isRendered() && draggedLinkLabel != link->m_labelDiwne)
-				link->drawDiwne(context);
-		}
-
-		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes + 1);
-
-		// Draw the dragged link on top if a new connection is made
-		if (connectPinAction)
-		{
-			connectPinAction->draggedLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
-		}
-
-		// END - SHOULD BE MOVED TO DIWNE
-
-		// TODO: Figure out what to do about all this
-		//  I feel like we are on the verge of removing this anyway so its not a priority
-
-		//		/* Cameras To Sequences links */
-		//		if (m_cameraLink == nullptr)
-		//			m_cameraLink = std::make_shared<DIWNE::Link>(diwne, "TemporalLink");
-		//		std::vector<Ptr<CoreNode>> all_cameras = getAllCameras();
-		//		if (all_cameras.size() > 0)
-		//		{
-		//			Ptr<CoreNodeWithPins> cameraWithPins;
-		//
-		//			std::vector<Ptr<CoreNode>> all_inputFree_Sequence = getAllInputFreeSequence();
-		//			if (all_inputFree_Sequence.size() > 0)
-		//			{
-		//				for (auto const& camera : all_cameras)
-		//				{
-		//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
-		//					for (auto const& sequence : all_inputFree_Sequence)
-		//					{
-		//						m_cameraLink->setLinkEndpointsDiwne(
-		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
-		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(sequence)
-		//						        ->getInputs()[Core::I3T_SEQ_IN_MUL]
-		//						        ->getConnectionPoint());
-		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
-		//					}
-		//				}
-		//			}
-		//
-		//			std::vector<Ptr<CoreNode>> all_inputFree_Model = getAllInputFreeModel();
-		//			if (all_inputFree_Model.size() > 0)
-		//			{
-		//				for (auto const& camera : all_cameras)
-		//				{
-		//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
-		//					for (auto const& model : all_inputFree_Model)
-		//					{
-		//						m_cameraLink->setLinkEndpointsDiwne(
-		//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
-		//						    std::dynamic_pointer_cast<CoreNodeWithPins>(model)
-		//						        ->getInputs()[0 /*\todo JH  \todo MH Some constant from core here*/]
-		//						        ->getConnectionPoint());
-		//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode::JustDraw);
-		//					}
-		//				}
-		//			}
-		//		}
-
-		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
-	}
-
-	/// \todo see #111, wrongly computed m_takeSnap value.
-	/*
-	if (m_diwneAction == DIWNE::DiwneAction::InteractingContent)
-	{
-	    m_takeSnap |= interaction_happen;
-	}
-	 */
+	//		/* Cameras To Sequences links */
+	//		if (m_cameraLink == nullptr)
+	//			m_cameraLink = std::make_shared<DIWNE::Link>(diwne, "TemporalLink");
+	//		std::vector<Ptr<CoreNode>> all_cameras = getAllCameras();
+	//		if (all_cameras.size() > 0)
+	//		{
+	//			Ptr<CoreNodeWithPins> cameraWithPins;
+	//
+	//			std::vector<Ptr<CoreNode>> all_inputFree_Sequence = getAllInputFreeSequence();
+	//			if (all_inputFree_Sequence.size() > 0)
+	//			{
+	//				for (auto const& camera : all_cameras)
+	//				{
+	//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
+	//					for (auto const& sequence : all_inputFree_Sequence)
+	//					{
+	//						m_cameraLink->setLinkEndpointsDiwne(
+	//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
+	//						    std::dynamic_pointer_cast<CoreNodeWithPins>(sequence)
+	//						        ->getInputs()[Core::I3T_SEQ_IN_MUL]
+	//						        ->getConnectionPoint());
+	//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode_JustDraw);
+	//					}
+	//				}
+	//			}
+	//
+	//			std::vector<Ptr<CoreNode>> all_inputFree_Model = getAllInputFreeModel();
+	//			if (all_inputFree_Model.size() > 0)
+	//			{
+	//				for (auto const& camera : all_cameras)
+	//				{
+	//					cameraWithPins = std::dynamic_pointer_cast<CoreNodeWithPins>(camera);
+	//					for (auto const& model : all_inputFree_Model)
+	//					{
+	//						m_cameraLink->setLinkEndpointsDiwne(
+	//						    cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getConnectionPoint(),
+	//						    std::dynamic_pointer_cast<CoreNodeWithPins>(model)
+	//						        ->getInputs()[0 /*\todo JH  \todo MH Some constant from core here*/]
+	//						        ->getConnectionPoint());
+	//						m_cameraLink->drawDiwne(context, DIWNE::DrawMode_JustDraw);
+	//					}
+	//				}
+	//			}
+	//		}
 }
 
 // TODO: THIS STUFF IS ESSENTIALLY INTERACTION (move to process interactions)
@@ -335,38 +222,35 @@ void WorkspaceDiwne::selectAll()
 {
 	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
-		if (workspaceCoreNode->getIsLabelBeingEdited())
-			return;
-	}
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		if (!workspaceCoreNode->getSelected())
+		if (!workspaceCoreNode.getSelected())
 		{
-			workspaceCoreNode->setSelected(true);
+			workspaceCoreNode.setSelected(true);
 		}
 	}
 }
 
 void WorkspaceDiwne::invertSelection()
 {
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+	for (auto& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
-		bool selected = !workspaceCoreNode->getSelected();
-		if (workspaceCoreNode->getSelected() != selected)
+		bool selected = !workspaceCoreNode.getSelected();
+		if (workspaceCoreNode.getSelected() != selected)
 		{
-			workspaceCoreNode->setSelected(selected);
+			workspaceCoreNode.setSelected(selected);
 		}
 	}
 }
 
 void WorkspaceDiwne::zoomToAll()
 {
-	zoomToRectangle(getOverNodesRectangleDiwne(getAllNodesInnerIncluded()));
+	auto allNodes = getAllNodesInnerIncluded();
+	zoomToRectangle(getOverNodesRectangleDiwne(allNodes.collect()));
 }
 
 void WorkspaceDiwne::zoomToSelected()
 {
-	zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded()));
+	auto allSelectedNodes = getSelectedNodesInnerIncluded();
+	zoomToRectangle(getOverNodesRectangleDiwne(allSelectedNodes.collect()));
 }
 
 void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
@@ -847,33 +731,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	{
 		if (ImGui::MenuItem("Selected nodes"))
 		{
-			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-			{
-				if (workspaceCoreNode->getSelected())
-				{
-					workspaceCoreNode->destroy();
-				}
-				else
-				{
-					// TODO: This whole thing seems iffy, ideally we'd like to avoid this specialization / edge case
-					//  for the sequence. Adding all nodes to the editor nodes list and then just ignoring the nested
-					//  ones during drawing might be better. But that is a rather major change and would need some
-					//  serious code changes / testing. I am not certain if thats worth the benefit.
-					//  A plus would be that the getNodes/getNodesInnerIncluded() calls would be trivial.
-					Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(workspaceCoreNode);
-					if (seq != nullptr)
-					{
-						for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
-						{
-							if (nodeInSequence->getSelected())
-							{
-								// When the paremt sequence is destoryed, is destroy called on the nested nodes?
-								std::dynamic_pointer_cast<TransformationBase>(nodeInSequence)->destroy();
-							}
-						}
-					}
-				}
-			}
+			deleteSelectedNodes();
 		}
 
 		if (ImGui::MenuItem("Selected links"))
@@ -932,12 +790,12 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 void WorkspaceDiwne::toggleSelectedNodesVisibility()
 {
-	auto selected = getSelectedNodesInnerIncluded();
+	auto selected = getSelectedNodesInnerIncluded().collectRaw();
 	if (selected.empty())
 	{
 		for (auto node : getAllNodesInnerIncluded())
 		{
-			node->setRendered(true);
+			node.setRendered(true);
 		}
 	}
 	else
@@ -1030,9 +888,10 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<Sequence> sequence, bool isRightToLeft
 {
 	if (sequence == nullptr)
 	{
-		for (auto&& node : getSelectedNodesInnerIncluded())
+		auto selectedNodes = getSelectedNodesInnerIncluded();
+		for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
 		{
-			sequence = std::dynamic_pointer_cast<Sequence>(node);
+			sequence = std::dynamic_pointer_cast<Sequence>(node.sharedPtr());
 			if (sequence)
 			{
 				const auto models = getSequenceModels(sequence);
@@ -1082,13 +941,14 @@ void WorkspaceDiwne::trackingSwitchOff()
 	LOG_INFO("TRACKING OFF CALLED");
 	if (Core::GraphManager::isTrackingEnabled())
 	{
-		auto seq = Tools::findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
+		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
+		auto seq = Tools::findNodeById(getAllCoreNodes().collect(), tracking->getSequence()->getId()).value();
 		std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
 		tracking->getSequence()->stopTracking();
 	}
 }
 
-ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<CoreNode>> nodes)
+ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes)
 {
 	ImRect rect = ImRect(0, 0, 0, 0);
 	if (nodes.size() == 0)
@@ -1101,7 +961,7 @@ ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<CoreNode>> nod
 	}
 
 	rect = nodes.at(0)->getRectDiwne();
-	for (auto&& workspaceCoreNode : nodes)
+	for (auto& workspaceCoreNode : nodes)
 	{
 		rect.Add(workspaceCoreNode->getRectDiwne());
 	}
@@ -1122,62 +982,16 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 
 void WorkspaceDiwne::deleteCallback()
 {
-	// TODO: Why do we need to check this? Could this be a hacky fix to the delete input propagating? shouldnt be needed
-	//  Yes it is a hacky fix, remove it <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	if (isNodeLabelBeingEdited())
-		return;
-
-	for (auto&& node : getSelectedNodesInnerIncluded())
-	{
-		node->destroy();
-	}
-}
-
-bool WorkspaceDiwne::isNodeLabelBeingEdited()
-{
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		if (workspaceCoreNode->getIsLabelBeingEdited())
-			return true;
-	}
-	return false;
+	deleteSelectedNodes();
 }
 
 void WorkspaceDiwne::copySelectedNodes()
 {
+	// TODO: (DR) Review and rewrite using new iterators
 	LOG_INFO("Copying nodes");
-	if (isNodeLabelBeingEdited())
-		return;
 	// Preventing double duplication of selected transformations in a sequence
-	for (auto node : getSelectedNodesInnerIncluded())
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq)
-		{
-			for (auto transform : seq->getInnerWorkspaceNodes())
-			{
-				transform->setSelected(false);
-			}
-		}
-		else
-		{
-			Ptr<Camera> cam = std::dynamic_pointer_cast<Camera>(node);
-			if (cam)
-			{
-				Ptr<Sequence> proj = cam->getProjection();
-				Ptr<Sequence> view = cam->getView();
-				for (auto transform : proj->getInnerWorkspaceNodes())
-				{
-					transform->setSelected(false);
-				}
-				for (auto transform : view->getInnerWorkspaceNodes())
-				{
-					transform->setSelected(false);
-				}
-			}
-		}
-	}
-	copiedNodes = Tools::copyNodes(getSelectedNodesInnerIncluded(),
+	deselectAllChildNodes();
+	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodes().collect(),
 	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
@@ -1186,30 +1000,44 @@ void WorkspaceDiwne::pasteSelectedNodes()
 	LOG_INFO("Pasting nodes");
 	if (copiedNodes == nullptr)
 		return;
-	if (isNodeLabelBeingEdited())
-		return;
 	deselectNodes();
 	Tools::pasteNodes(*copiedNodes);
+}
+
+void WorkspaceDiwne::deselectSequenceTransformations()
+{
+	auto selectedNodes = getSelectedNodesInnerIncluded();
+	for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
+	{
+		Sequence* seq = dynamic_cast<Sequence*>(node.ptr());
+		if (seq)
+		{
+			for (auto& transform : seq->getInnerWorkspaceNodes())
+				transform.setSelected(false);
+		}
+	}
+}
+
+void WorkspaceDiwne::deselectAllChildNodes()
+{
+	auto selectedNodes = getSelectedNodesInnerIncluded();
+	for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
+	{
+		Sequence* seq = dynamic_cast<Sequence*>(node.ptr());
+		if (seq)
+		{
+			for (auto& transform : seq->getInnerWorkspaceNodes())
+				transform.setSelected(false);
+		}
+	}
 }
 
 void WorkspaceDiwne::cutSelectedNodes()
 {
 	// Prevent double duplication of inner nodes
-	if (isNodeLabelBeingEdited())
-		return;
-	for (auto node : getSelectedNodesInnerIncluded())
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq)
-		{
-			for (auto transform : seq->getInnerWorkspaceNodes())
-			{
-				transform->setSelected(false);
-			}
-		}
-	}
+	deselectAllChildNodes();
 
-	auto nodes = getSelectedNodesInnerIncluded();
+	auto nodes = getAllSelectedCoreNodes().collect();
 	copiedNodes = Tools::copyNodes(nodes);
 
 	// Delete copied nodes
@@ -1223,37 +1051,36 @@ void WorkspaceDiwne::duplicateClickedNode()
 {
 	LOG_INFO("Duplicating")
 	// Preventing double duplication of selected transformations in a sequence
-	for (auto node : getSelectedNodesInnerIncluded())
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq)
-		{
-			for (auto transform : seq->getInnerWorkspaceNodes())
-				transform->setSelected(false);
-		}
-	}
+	// TODO: Isn't this stupid? I mean if we don't want to copy inner nodes just iterate over the top level nodes?
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  This pattern repeats like 4 times in other duplication related methods.
+	deselectAllChildNodes();
+
+	// TODO: The code below makes absolutely no sense? Why ~n^2 iteration?
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	// Duplicating either focused node or all selected nodes
-	auto selectedNodes = getSelectedNodesInnerIncluded();
+	auto selectedNodes = getAllSelectedCoreNodes();
 
-	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
+	for (auto& node : getAllCoreNodes())
+	//	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
 	{
 		//		if (node->m_focusedForInteraction)
 		//		{
-		if (node->getSelected())
+		if (node.getSelected())
 		{
 			deselectNodes();
 			// copy and paste to ensure connections
-			for (auto node : selectedNodes)
+			for (auto& selectedNode : selectedNodes)
 			{
-				node->setDuplicateNode(true);
+				selectedNode.setDuplicateNode(true);
 			}
 			// pasteNodes(copyNodes(selectedNodes, 5));
 		}
 		else
 		{
 			deselectNodes();
-			node->setDuplicateNode(true);
+			node.setDuplicateNode(true);
 			// duplicateNode(node, 5);
 		}
 		//		}
@@ -1264,17 +1091,9 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 {
 	LOG_INFO("Duplicating")
 	// Preventing double duplication of selected transformations in a sequence
-	for (auto node : getSelectedNodesInnerIncluded())
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq)
-		{
-			for (auto transform : seq->getInnerWorkspaceNodes())
-				transform->setSelected(false);
-		}
-	}
+	deselectAllChildNodes();
 
-	auto selectedNodes = getSelectedNodesInnerIncluded();
+	auto selectedNodes = getAllSelectedCoreNodes().collect();
 
 	// copy and paste to ensure connections
 	Tools::pasteNodes(*Tools::copyNodes(selectedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
@@ -1285,23 +1104,34 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	}
 }
 
+void WorkspaceDiwne::deleteSelectedNodes()
+{
+	for (DIWNE::Node& node : getSelectedNodesInnerIncluded())
+	{
+		if (node.m_deletable)
+			node.destroy();
+	}
+}
+
+// TODO: Rewrite with filtered iterator
 std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllCameras()
 {
 	std::vector<Ptr<CoreNode>> cameras;
-	for (auto const& node : m_workspaceCoreNodes)
+	for (auto const& node : m_nodes)
 	{
 		if (std::dynamic_pointer_cast<Camera>(node))
 		{
-			cameras.push_back(node);
+			cameras.push_back(std::static_pointer_cast<CoreNode>(node));
 		};
 	}
 	return cameras;
 }
 
+// TODO: Rewrite with filtered iterator
 std::vector<Ptr<Model>> WorkspaceDiwne::getAllModels()
 {
 	std::vector<Ptr<Model>> models;
-	for (auto const& node : m_workspaceCoreNodes)
+	for (auto const& node : m_nodes)
 	{
 		if (auto model = std::dynamic_pointer_cast<Model>(node))
 		{
@@ -1311,58 +1141,50 @@ std::vector<Ptr<Model>> WorkspaceDiwne::getAllModels()
 	return models;
 }
 
+// TODO: Rewrite with filtered iterator
 std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
 {
-	auto filtered = m_workspaceCoreNodes | std::views::filter([&seq](Ptr<CoreNode>& node) {
-		                const auto isModel = std::dynamic_pointer_cast<Model>(node);
-		                const auto isSequenceChild =
-		                    Core::GraphManager::getParent(node->getNodebase()) == seq->getNodebase();
-
-		                return isModel && isSequenceChild;
-	                }) |
-	                std::views::transform([](Ptr<CoreNode>& node) {
-		                return std::dynamic_pointer_cast<Model>(node);
-	                });
-
-	return {filtered.begin(), filtered.end()};
+	std::vector<Ptr<Model>> models;
+	for (const auto& node : m_nodes)
+	{
+		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
+		if (!model)
+			continue;
+		if (Core::GraphManager::getParent(model->getNodebase()) != seq->getNodebase())
+			continue;
+		models.push_back(model);
+	}
+	return models;
 }
 
+// TODO: Rewrite with filtered iterator
 std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeSequence()
 {
 	std::vector<Ptr<CoreNode>> sequences;
-	for (auto const& node : m_workspaceCoreNodes)
+	for (auto const& node : m_nodes)
 	{
 		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
 		if (seq && !seq->getInputs()[0]->isConnected())
 		{
-			sequences.push_back(node);
+			sequences.push_back(std::static_pointer_cast<CoreNode>(node));
 		}; /* \todo JH  \todo MH Always 0? */
 	}
 	return sequences;
 }
 
+// TODO: Rewrite with filtered iterator
 std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeModel()
 {
 	std::vector<Ptr<CoreNode>> models;
-	for (auto const& node : m_workspaceCoreNodes)
+	for (auto const& node : m_nodes)
 	{
 		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
 		if (model && !model->getInputs()[0]->isConnected())
 		{
-			models.push_back(node);
+			models.push_back(std::static_pointer_cast<CoreNode>(node));
 		}; /* \todo JH  \todo MH Always 0? */
 	}
 	return models;
-}
-
-void WorkspaceDiwne::processDragAllSelectedNodes()
-{
-	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-	{
-		// TODO: Uncomment
-		//		if (workspaceCoreNode->getSelected() && workspaceCoreNode != getLastActiveNode<CoreNode>())
-		//			workspaceCoreNode->processDrag();
-	}
 }
 
 // bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
@@ -1404,70 +1226,70 @@ void WorkspaceDiwne::processDragAllSelectedNodes()
 //	return false; // for Ptr and for a possible non-existent wire type in EValueType
 // }
 
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodesInnerIncluded()
-{
-	std::vector<Ptr<CoreNode>> selected;
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		if (workspaceCoreNode->getSelected())
-		{
-			selected.push_back(workspaceCoreNode);
-		}
-	}
-	return selected;
-}
+// std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodesInnerIncluded()
+//{
+//	std::vector<Ptr<CoreNode>> selected;
+//	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+//	{
+//		if (workspaceCoreNode->getSelected())
+//		{
+//			selected.push_back(workspaceCoreNode);
+//		}
+//	}
+//	return selected;
+// }
 
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllNodesInnerIncluded()
-{
-	std::vector<Ptr<CoreNode>> allNodes;
-	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-	{
-		allNodes.push_back(workspaceCoreNode);
-
-		/* inner of Sequence */
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(workspaceCoreNode);
-		if (seq != nullptr)
-		{
-			for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
-			{
-				allNodes.push_back(nodeInSequence);
-			}
-		}
-
-		/* inner of Sequences in Camera */
-		// TODO: (DR) What about the sequence nodes inside the Camera? Those are omitted, that caused problems with for
-		//   example these inner sequences not gettinng the proper zoom changed events. Overall its just an
-		//   inconsistency that I elected to not fix yet as to not distrub other systems which may not account for this.
-		//   Should be changed after a discussion. Namely I'm not sure how node duplication would handle this.
-		//   WorkspaceCamera currently overrides the updateDataItemsWidth() to overcome this but that should be reverted
-		//   if the above is fixed.
-		Ptr<Camera> cam = std::dynamic_pointer_cast<Camera>(workspaceCoreNode);
-		if (cam != nullptr)
-		{
-			for (auto&& nodeInSequence : cam->getProjection()->getInnerWorkspaceNodes())
-			{
-				allNodes.push_back(nodeInSequence);
-			}
-			for (auto&& nodeInSequence : cam->getView()->getInnerWorkspaceNodes())
-			{
-				allNodes.push_back(nodeInSequence);
-			}
-		}
-	}
-
-	return allNodes;
-}
+// std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllNodesInnerIncluded()
+//{
+//	std::vector<Ptr<CoreNode>> allNodes;
+//	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+//	{
+//		allNodes.push_back(workspaceCoreNode);
+//
+//		/* inner of Sequence */
+//		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(workspaceCoreNode);
+//		if (seq != nullptr)
+//		{
+//			for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+//			{
+//				allNodes.push_back(nodeInSequence);
+//			}
+//		}
+//
+//		/* inner of Sequences in Camera */
+//		// TODO: (DR) What about the sequence nodes inside the Camera? Those are omitted, that caused problems with for
+//		//   example these inner sequences not gettinng the proper zoom changed events. Overall its just an
+//		//   inconsistency that I elected to not fix yet as to not distrub other systems which may not account for this.
+//		//   Should be changed after a discussion. Namely I'm not sure how node duplication would handle this.
+//		//   WorkspaceCamera currently overrides the updateDataItemsWidth() to overcome this but that should be reverted
+//		//   if the above is fixed.
+//		Ptr<Camera> cam = std::dynamic_pointer_cast<Camera>(workspaceCoreNode);
+//		if (cam != nullptr)
+//		{
+//			for (auto&& nodeInSequence : cam->getProjection()->getInnerWorkspaceNodes())
+//			{
+//				allNodes.push_back(nodeInSequence);
+//			}
+//			for (auto&& nodeInSequence : cam->getView()->getInnerWorkspaceNodes())
+//			{
+//				allNodes.push_back(nodeInSequence);
+//			}
+//		}
+//	}
+//
+//	return allNodes;
+// }
 
 void WorkspaceDiwne::manipulatorStartCheck3D()
 {
 	if (getNodesSelectionChanged())
 	{
 		I3T::getViewport()->getManipulators().clearManipulators();
-
-		std::vector<Ptr<CoreNode>> selectedNodes = getSelectedNodesInnerIncluded();
-		for (const auto& node : selectedNodes)
+		
+		auto selectedCoreNodes = getAllSelectedCoreNodes();
+		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
 		{
-			Ptr<TransformationBase> selected_transformation = std::dynamic_pointer_cast<TransformationBase>(node);
+			Ptr<TransformationBase> selected_transformation = std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
 			if (selected_transformation != nullptr)
 			{
 				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());

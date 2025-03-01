@@ -45,7 +45,7 @@ public:
 	virtual void rightContent(DrawInfo& context);
 	virtual void bottomContent(DrawInfo& context);
 
-	void updateLayout(DrawInfo& context);
+	void updateLayout(DrawInfo& context) override;
 
 	virtual void drawHeader();
 	virtual void drawBody();

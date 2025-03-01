@@ -14,6 +14,8 @@
 
 #include <memory>
 
+#include "spdlog/spdlog.h"
+
 class I3TApplication;
 
-std::unique_ptr<I3TApplication> initI3T();
+std::unique_ptr<I3TApplication> initI3T(spdlog::level::level_enum logLevel = spdlog::level::info);

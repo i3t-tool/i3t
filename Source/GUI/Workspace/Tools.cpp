@@ -41,12 +41,12 @@ Memento* Tools::copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 	SerializationVisitor serializer(*memento);
 	for (auto node : nodes)
 	{
-		node->move(ImVec2(-offset, -offset));
+		node->translate(ImVec2(-offset, -offset));
 	}
 	serializer.dump(nodes);
 	for (auto node : nodes)
 	{
-		node->move(ImVec2(offset, offset));
+		node->translate(ImVec2(offset, offset));
 	}
 	return memento;
 }

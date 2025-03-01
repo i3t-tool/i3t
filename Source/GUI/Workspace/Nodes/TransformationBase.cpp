@@ -143,7 +143,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 	}
 
 	auto maybeInterpolatedTransform =
-	    Tools::findNodeById(workspaceDiwne.getAllNodesInnerIncluded(), t.interpolatedTransformID);
+	    Tools::findNodeById(workspaceDiwne.getAllCoreNodes().collect(), t.interpolatedTransformID);
 
 	if (!maybeInterpolatedTransform)
 	{

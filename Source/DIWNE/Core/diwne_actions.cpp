@@ -2,6 +2,7 @@
 
 #include "diwne_actions.h"
 
+#include "NodeEditor.h"
 #include "Link.h"
 #include "Node.h"
 #include "Pin.h"
@@ -23,7 +24,7 @@ void DragNodeAction::onUpdate()
 	ImVec2 offset = editor.input().bypassGetMouseDelta() / editor.getZoom();
 	for (auto node : nodes)
 	{
-		node->move(offset);
+		node->translate(offset);
 	}
 }
 

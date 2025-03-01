@@ -170,7 +170,7 @@ bool ViewportHighlightResolver::anyInSequenceSelected(Sequence* sequence)
 	{
 		for (const auto& transformation : sequence->getInnerWorkspaceNodes())
 		{
-			if (transformation->getSelected())
+			if (transformation.getSelected())
 			{
 				return true;
 			}

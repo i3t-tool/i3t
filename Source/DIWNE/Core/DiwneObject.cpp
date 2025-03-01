@@ -63,7 +63,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
 
 	initializeDiwne(context);
-	if (allowDrawing())
+	if (allowDrawing() || mode & DrawMode_ForceDraw)
 	{
 		m_drawnThisFrame = true;
 		beginDiwne(context);
@@ -72,7 +72,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 		afterDrawDiwne(context);
 		DIWNE_DEBUG((diwne), {
 			diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
-			                               ImDrawFlags_RoundCornersNone, 1, true);
+			                            ImDrawFlags_RoundCornersNone, 1, true);
 		});
 		DIWNE_DEBUG_INTERACTIONS(diwne, {
 			ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Max.y);
@@ -164,7 +164,7 @@ bool DiwneObject::allowInteraction() const
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
-	if (m_drawMode2 != DrawMode::Interacting)
+	if (m_drawMode2 != DrawMode_Interactive)
 		return;
 
 	if (ImGui::IsKeyDown(ImGuiKey_T))
@@ -614,12 +614,12 @@ void DiwneObject::onHover(DrawInfo& context)
 	//	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 	// TODO: Remove later, temporarily use a bright color for hover
 	diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 150),
-	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+	                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+	                            diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 
 	DIWNE_DEBUG(diwne, {
 		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
-		                               DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
+		                            DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
 	});
 }
 
@@ -629,11 +629,11 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
-		                               DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
+		                            DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
 		if (justPressed)
 		{
 			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
-			                                     DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
+			                                  DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
 	//	Debug::debugRect(this->m_rect, ImColor(0, 255, 0, 50), diwne);
@@ -647,7 +647,7 @@ void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 		if (justReleased)
 		{
 			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
-			                                     DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
+			                                  DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
 	//	Debug::debugRect(this->m_rect, ImColor(255, 0, 0, 50), diwne);
@@ -660,15 +660,15 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		if (dragStart)
 		{
 			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
-			                                     DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone);
+			                                  DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 		if (dragEnd)
 		{
 			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
-			                                     DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
+			                                  DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
 		}
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
-		                               DIWNE_CYAN_50, 0, ImDrawFlags_RoundCornersNone, 2);
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1), DIWNE_CYAN_50,
+		                            0, ImDrawFlags_RoundCornersNone, 2);
 	});
 }
 

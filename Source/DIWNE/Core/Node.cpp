@@ -37,23 +37,12 @@ Node& Node::operator=(const Node& rhs)
 
 bool Node::allowDrawing()
 {
-	return m_drawAnyway || getRectDiwne().Overlaps(diwne.canvas().getViewportRectDiwne()) || m_isDragged;
+	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
+	return DiwneObject::allowDrawing() || getRectDiwne().Overlaps(viewportRect) || m_isDragged;
 }
 
 void Node::begin(DrawInfo& context)
 {
-	switch (m_nodePosMode)
-	{
-	case DrawModeNodePosition::OnItsPosition:
-		ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(m_nodePositionDiwne));
-		break;
-	case DrawModeNodePosition::OnCursorPosition:
-		setNodePositionDiwne(diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()));
-		break;
-	}
-	if (m_drawAnyway)
-		m_drawAnyway = false;
-
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup(); /* Begin of node */
 }
@@ -61,8 +50,6 @@ void Node::begin(DrawInfo& context)
 void Node::content(DrawInfo& context)
 {
 	ImGui::Text("Node %d", m_idDiwne);
-	m_rect.Min = ImGui::GetItemRectMin();
-	m_rect.Max = ImGui::GetItemRectMax();
 }
 
 void Node::end(DrawInfo& context)
@@ -71,23 +58,30 @@ void Node::end(DrawInfo& context)
 		ImRect rect = getRectDiwne();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Max.y);
 		ImGui::GetForegroundDrawList()->AddText(
-		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+		    m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		    fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", rect.Min.x, rect.Min.y, rect.Max.x, rect.Max.y,
 		                diwne.canvas().diwne2workArea(rect.Min).x, diwne.canvas().diwne2workArea(rect.Min).y,
 		                diwne.canvas().diwne2workArea(rect.Max).x, diwne.canvas().diwne2workArea(rect.Max).y,
-		                diwne.canvas().diwne2screen(rect.Min).x, diwne.canvas().diwne2screen(rect.Min).y, diwne.canvas().diwne2screen(rect.Max).x,
-		                diwne.canvas().diwne2screen(rect.Max).y)
+		                diwne.canvas().diwne2screen(rect.Min).x, diwne.canvas().diwne2screen(rect.Min).y,
+		                diwne.canvas().diwne2screen(rect.Max).x, diwne.canvas().diwne2screen(rect.Max).y)
 		        .c_str());
 	});
 	ImGui::EndGroup();
 	ImGui::PopID();
 }
 
+void Node::updateLayout(DrawInfo& context)
+{
+	m_rect.Min = diwne.canvas().screen2diwne(ImGui::GetItemRectMin());
+	m_rect.Max = diwne.canvas().screen2diwne(ImGui::GetItemRectMax());
+}
+
 void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
 	// This needs to be done BEFORE processing interactions as we check if this button is hovered.
-	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getNodePositionDiwne())); // TODO: Use m_rect instead
+	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
 	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getZoom());
 	m_internalHover = ImGui::IsItemHovered();
 	DiwneObject::afterDrawDiwne(context);
@@ -119,9 +113,9 @@ bool Node::processSelectDiwne(DrawInfo& context)
 	if (m_selected)
 	{
 		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-		                               diwne.mp_settingsDiwne->itemSelectedBorderColor,
-		                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-		                               diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 	}
 	return false;
 }
@@ -142,9 +136,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		std::vector<Node*> nodes;
 		if (m_selected)
 		{ // If the node is selected, it and all other selected nodes are dragged together
-			// TODO: (DR) Avoid the new list as getSelectedNodes should just return a plain Node* pointer.
-			for (auto&& node : diwne.getSelectedNodes())
-				nodes.push_back(static_cast<Node*>(node.get()));
+			nodes = diwne.getSelectedNodes().collectRaw();
 		}
 		else
 		{ // If the node isn't selected, dragging it selects it and deselects all others
@@ -176,8 +168,21 @@ void Node::onDestroy(bool logEvent)
 	auto lastActiveNode = diwne.getLastActiveNode<DIWNE::Node>();
 	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
 	{
-		diwne.setLastActiveNode<DIWNE::Node>(nullptr);
+		diwne.setLastActiveNode(nullptr);
 	}
+}
+
+bool Node::getFlag(char index) const
+{
+	return m_flag & (1 << index);
+}
+
+void Node::setFlag(char index, bool value)
+{
+	if (value)
+		m_flag |= 1 << index;
+	else
+		m_flag &= ~(1 << index);
 }
 
 } /* namespace DIWNE */

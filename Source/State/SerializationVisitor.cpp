@@ -215,7 +215,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
 	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
 
-	JSON::addVector(target, "position", node->getNodePositionDiwne(), m_memento.GetAllocator());
+	JSON::addVector(target, "position", node->getPosition(), m_memento.GetAllocator());
 }
 
 void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node)
@@ -232,10 +232,11 @@ void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiS
 
 	sequence.AddMember("transforms", rapidjson::Value(kArrayType), alloc);
 
-	for (const auto& transform : node->getInnerWorkspaceNodes())
+	auto innerNodes = node->getInnerWorkspaceNodes();
+	for (auto innerNode = innerNodes.begin(); innerNode != innerNodes.end(); ++innerNode)
 	{
 		dumpTransform(sequence["transforms"].GetArray(),
-		              std::static_pointer_cast<Workspace::TransformationBase>(transform));
+		              std::static_pointer_cast<Workspace::TransformationBase>(innerNode.sharedPtr()));
 	}
 
 	sequences.PushBack(sequence, alloc);

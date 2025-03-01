@@ -42,6 +42,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//  Also we should react to actions on a per frame basis using if(trigger) syntax
 	//  rather than using bindings as its a more suitable approach in immediate mode UI
 
+	// TODO: Workspace should be itself a module, so we don't fetch workspace nodes through the bloody window manager
+	//  (viz NodeDeserializer) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback
@@ -114,17 +116,11 @@ void WorkspaceWindow::render()
 			ImGui::EndMenuBar();
 		}
 
-		DIWNE::DrawMode drawMode = DIWNE::DrawMode::JustDraw;
+		DIWNE::DrawMode drawMode = DIWNE::DrawMode_JustDraw;
 		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
 		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
-			drawMode = DIWNE::DrawMode::Interacting;
-		}
-		static bool firstFrame = false;
-		if (!firstFrame)
-		{
-			firstFrame = true;
-			g_diwne->addNodeToPosition<Model>(ImVec2(200, 200));
+			drawMode = DIWNE::DrawMode_Interactive;
 		}
 		g_diwne->draw(drawMode);
 	}
@@ -180,7 +176,7 @@ Memento WorkspaceWindow::saveScene(Scene* scene)
 	rapidjson::Value::AllocatorType& a = memento.GetAllocator();
 
 	SerializationVisitor visitor(memento);
-	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
+	visitor.dump(getNodeEditor().getAllCoreNodes().collect());
 
 	JSON::addFloat(memento["workspace"], "zoom", g_diwne->canvas().getZoom(), a);
 	JSON::addRect(memento["workspace"], "workArea", g_diwne->canvas().getViewportRectDiwne(), a);

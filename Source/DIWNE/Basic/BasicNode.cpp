@@ -1,6 +1,8 @@
 #include "BasicNode.h"
 
+#include "DIWNE/Core/DiwneStyle.h"
 #include "DIWNE/Core/Layout/Gravity.h"
+#include "DIWNE/Core/NodeEditor.h"
 
 namespace DIWNE
 {
@@ -99,8 +101,6 @@ void BasicNode::updateLayout(DrawInfo& context)
 	if (ImGui::IsKeyDown(ImGuiKey_E))
 		int x = 5;
 
-	/* \todo can use ImGui::ItemMax/Min */
-	setPosition(m_nodePositionDiwne);
 	/* ItemSpacing is already scaled, node rects are using unscaled coordinates, thus the divison */
 	ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.canvas().getZoom();
 
@@ -170,7 +170,7 @@ void BasicNode::translate(const ImVec2& vec)
 void BasicNode::drawHeader()
 {
 	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, m_headerBackground, m_rounding,
-	                                   ImDrawFlags_RoundCornersTop);
+	                                  ImDrawFlags_RoundCornersTop);
 }
 
 void BasicNode::drawBody()

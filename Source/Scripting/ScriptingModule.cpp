@@ -189,8 +189,8 @@ void ScriptingModule::onInit()
 		"type", [](Ptr<GuiNode> self) {
 			return self->getNodebase()->getOperation()->keyWord;
 		},
-		"get_position", &GuiNode::getNodePositionDiwne,
-		"set_position", &GuiNode::setNodePositionDiwne
+		"get_position", &GuiNode::getPosition,
+		"set_position", &GuiNode::setPosition
 	);
 
 	m_Lua.new_usertype<GuiOperator>(
@@ -230,7 +230,7 @@ void ScriptingModule::onInit()
 				    return;
 			    }
 
-			    const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
+			    const auto& nodes = getNodeEditor().getAllCoreNodes().collect();
 			    std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
 			    for (const auto& outputPin : self->getNodebase()->getOutputPins())
 			    {
@@ -383,7 +383,7 @@ void ScriptingModule::onInit()
 	//
 
 	m_Lua.set_function("get_all_nodes", []() -> std::vector<Ptr<GuiNode>> {
-	  	return getNodeEditor().m_workspaceCoreNodes;
+	  	return getNodeEditor().getAllCoreNodes().collect();
 	});
 
 	m_Lua.set_function("get_node", [this](Core::ID id) -> Ptr<GuiNode> {
@@ -484,7 +484,7 @@ void ScriptingModule::onInit()
 	});
 
 	m_Lua.set_function("print_workspace", [this]() {
-		const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
+		const auto& nodes = getNodeEditor().getAllCoreNodes().collect();
 		for (const auto& node : nodes)
 		{
 			const auto& coreNode = node->getNodebase();

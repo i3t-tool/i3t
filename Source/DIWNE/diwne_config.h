@@ -1,6 +1,8 @@
 #pragma once
 /**
- * Application specific DIWNE config
+ * Application specific DIWNE configuration file
+ * Much like ImGui's imconfig.h, this file can be edited directly
+ * or the '#define DIWNE_USER_CONFIG "my_diwne_config.h"' macro can be defined before including the library.
  */
 
 #include "Logger/Logger.h"

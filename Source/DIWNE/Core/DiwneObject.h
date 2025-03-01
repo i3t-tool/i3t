@@ -30,11 +30,18 @@ class NodeEditor;
 
 // TODO JH: some attributes should be private/protected // Agreed
 
-/*! \brief Drawing mode of DiwneObject  */
-enum DrawMode
+/// Drawing mode flags of a DiwneObject, realized by the DrawMode_ enum containing bit flags.
+/// Is just an alias for an int to allow easy bit operations without explicit conversion.
+using DrawMode = int;
+enum DrawMode_ : int
 {
-	JustDraw,   /*!< Draw object only - block all (node editor's) interactions */
-	Interacting /*!< Usual mode - draw and allow interaction too */
+	DrawMode_Interactive = 0,    // Draw and react to input, the default behavior
+	DrawMode_JustDraw = 1 << 0,  // Draw only, interactions should be blocked
+	DrawMode_ForceDraw = 1 << 1, // Force the drawing of the object to obtain size information off screen
+
+	// TODO: Remove DrawAtPosition, cursor can be set manually before each draw, everything should be drawn at the
+	// cursor by default. This unique caveat of Node drawing was moved into NodeEditor drawing code
+	//  DrawMode_DrawAtPosition = 1 << 2, // Draw the object at it's last position rather than the ImGui cursor
 };
 
 class DrawInfo;
@@ -58,8 +65,19 @@ public:
 	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
 	std::string m_popupIDDiwne; /**< Used for identifying what element raise popup */
 
+	/**
+	 * Rectangle bounds of the object in diwne coordinates (editor canvas coordinates).
+	 * The top left corner of the rectangle (.Min) represents the objects position.
+	 * Dimensions are the differences between the .Min and .Max (bottom right corner) coordinates.
+	 * <br>
+	 * The objects rectangle gets updated every frame by the updateLayout() method.
+	 * DiwneObjects are drawn at the position of the ImGui cursor, but the position of the object can be set
+	 * and then used to manually set the ImGui cursor position, which is how Nodes are drawn by the NodeEditor.
+	 * @see updateLayout()
+	 */
 	ImRect m_rect;
-	bool m_destroy{false}; ///< Indicates the object is to be deleted
+	bool m_destroy{false};  ///< Indicates the object is to be deleted
+	bool m_deletable{true}; ///< Whether the object can be deleted by the user
 
 	std::string m_parentLabel; ///< Sets the parent object of object, relevant in hover hierarchy.
 
@@ -162,7 +180,7 @@ public:
 	 * @param drawMode Drawing mode
 	 * @see drawDiwne()
 	 */
-	virtual void draw(DrawMode drawMode = DrawMode::Interacting);
+	virtual void draw(DrawMode drawMode = DrawMode_Interactive);
 
 	/**
 	 * Decide whether the object should be drawn (when outside the window for example)
@@ -175,10 +193,10 @@ public:
 	 * @param drawMode The drawing mode of this draw.
 	 * @see @ref diwne_lifecycle
 	 */
-	virtual void drawDiwne(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
+	virtual void drawDiwne(DrawInfo& context, DrawMode drawMode = DrawMode_Interactive);
 
 	// TODO: Docs
-	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode::Interacting);
+	DrawInfo drawDiwneEx(DrawInfo& context, DrawMode drawMode = DrawMode_Interactive);
 
 	// Frame lifecycle/Content methods
 	// ============================================================================================================
@@ -220,7 +238,8 @@ public:
 	/**
 	 * Update objects m_rect and any other object size variables.
 	 * In other words this method is responsible for keeping track of the objects size.
-	 * This method is called before the afterDraw() method which can use the calculated size values for final drawing.
+	 * This method is called after end() and before the afterDraw() method which can use the calculated size values
+	 * for final drawing.
 	 */
 	virtual void updateLayout(DrawInfo& context) = 0;
 

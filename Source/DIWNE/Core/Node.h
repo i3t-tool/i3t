@@ -12,11 +12,11 @@
  */
 #pragma once
 
-#include "NodeEditor.h"
+#include "DiwneObject.h"
 
 namespace DIWNE
 {
-
+class NodeEditor;
 /*! \brief Used when one node is inside of another -> the inner node is drawn
  * OnCursorPosition when outer node is drawn
  */
@@ -26,22 +26,23 @@ enum DrawModeNodePosition
 	OnItsPosition     ///< node position in Diwne coordinates
 };
 
+using NodeFlag = uint64_t;
+
 /**
  * TODO: Docs
  */
 class Node : public DiwneObject
 {
 protected:
-	// TODO: (DR) Use m_rect instead <<<<<<<<<<<<<<<<<<<<<<<<<<
-	ImVec2 m_nodePositionDiwne; /* cursor position or a stored node position - can be public */
-
 	DrawModeNodePosition m_nodePosMode{OnItsPosition};
+
+	NodeFlag m_flag{0}; ///< The node flag bit field @see Node::getFlag()
 
 public:
 	// TODO: (DR) This should probably be a DiwneObject property
-	bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
-	                         For example in the first frame after you created it
-	                         -> to obtain its real size */
+	// bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
+	//                         For example in the first frame after you created it
+	//                         -> to obtain its real size */
 	// todo (PF) rename to something like m_forceToDraw, m_forceFirstTimeDraw, or m_forceToDrawFirstTime
 	// This variable is
 	// - set to true in the Node constructor only
@@ -79,57 +80,26 @@ protected:
 public:
 	bool allowDrawing() override;
 
-	// TODO: Do we really need a "special" method for drawing nodes? Kinda makes inheritance pointless
-	//  Why not move the handling into the NodeEditor content method?
-	//  What does a node care about last diwneAction, that should be part of the editor context!
-	//  DiwneActions will probably be reworked anyway so take that into account
-
-	// TODO: The reason is we want to set last active node if a logical update occurred.
-	//  We can probably handle that in the NodeEditor content method rather than using a special method (to avoid
-	//  confusion of what this seemingly generic method is for, it is not generic, its specifcally for rendering nodes
-	//  by the node editor
-	// TODO: Move this into the nodes drawDiwne() method
-	//  It should be possible to eliminate posMode alltogether by just always setting the position before drawing
-	//  Or call a setPosMode method before drawing, again, no need for a specialized drawing method
-	template <typename T>
-	void drawNodeDiwne(DrawInfo& context, DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
-	                   DrawMode drawMode = DrawMode::Interacting)
-	{
-		m_nodePosMode = nodePosMode;
-
-		if (!isRendered())
-			return;
-
-		DrawInfo drawResult = drawDiwneEx(context);
-
-		if (drawResult.logicalUpdates && !m_destroy)
-		{
-			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-		}
-	}
-
 	// Interaction
 	// =============================================================================================================
 	void onSelection(bool selected) override;
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 	void onDestroy(bool logEvent) override;
+	void updateLayout(DrawInfo& context) override;
 
+	// Getters and setters
 	// =============================================================================================================
-
-	void setNodePositionDiwne(ImVec2 const& position)
-	{
-		m_nodePositionDiwne = position;
-		setPosition(position);
-	};
-	ImVec2 getNodePositionDiwne() const
-	{
-		return m_nodePositionDiwne;
-	};
-	void move(ImVec2 const amount)
-	{
-		m_nodePositionDiwne += amount;
-		translate(amount);
-	}
+	/**
+	 * Get the node bit flag value at index.
+	 *
+	 * The node flag is a simple 64 bit integer used as a bit field to hold 64 user defined boolean flags.
+	 * As of right now DIWNE does not use any of the flags by itself, so their meaning and usage is entirely arbitrary.
+	 * The intended purpose is to use flags to identify particular node subclasses and avoid any dynamic_casts when
+	 * casting to a derived type for specific functionality.
+	 * @see setFlag()
+	 */
+	bool getFlag(char index) const;
+	void setFlag(char index, bool value); ///< Set the node bit flag value at index @see getFlag()
 };
 
 } /* namespace DIWNE */

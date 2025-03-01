@@ -36,6 +36,8 @@ protected:
 	const Ptr<Core::Node> m_nodebase;
 
 public:
+	constexpr static char CORE_NODE_FLAG = 16; // Index of the CoreNode DIWNE flag (16th bit from the right)
+
 	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
 
@@ -57,10 +59,6 @@ public:
 
 	float getDataItemsWidth();
 	virtual float updateDataItemsWidth();
-	bool getIsLabelBeingEdited()
-	{
-		return m_isLabelBeingEdited;
-	};
 
 	LevelOfDetail setLevelOfDetail(LevelOfDetail levelOfDetail);
 	LevelOfDetail getLevelOfDetail();
@@ -78,9 +76,9 @@ public:
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-//	bool processDrag() override;
-//	bool processSelect() override;
-//	bool processUnselect() override;
+	//	bool processDrag() override;
+	//	bool processSelect() override;
+	//	bool processUnselect() override;
 
 	// TODO: (DR) Figure out what this was about
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was

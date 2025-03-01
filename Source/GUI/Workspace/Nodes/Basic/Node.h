@@ -32,8 +32,9 @@
 #include "GUI/Elements/IWindow.h"
 #include "I3T.h"
 
-#include "DIWNE/Basic/BasicNode.h"
 #include "DIWNE/diwne_include.h"
+
+#include "DIWNE/Basic/BasicNode.h"
 
 namespace Workspace
 {

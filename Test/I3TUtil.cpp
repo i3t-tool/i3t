@@ -14,8 +14,9 @@
 
 #include "I3T.h"
 
-std::unique_ptr<I3TApplication> initI3T()
+std::unique_ptr<I3TApplication> initI3T(spdlog::level::level_enum logLevel)
 {
+	Logger::getInstance().getAppLogger()->set_level(logLevel);
 	std::unique_ptr<I3TApplication> app = std::make_unique<I3TApplication>();
 	app->init();
 	return app;

@@ -71,4 +71,7 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>
 
+#ifdef DIWNE_USER_CONFIG
+#include DIWNE_USER_CONFIG
+#endif
 #include "DIWNE/diwne_config.h"

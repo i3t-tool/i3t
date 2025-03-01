@@ -18,12 +18,8 @@
 
 using namespace Workspace;
 
-Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase /*= Core::GraphManager::createSequence()*/,
-                   /* bool drawPins, - (PF) was not used, remove */ /*=true*/
-                   bool isCameraSequence /*=false*/)
-    : CoreNodeWithPins(diwne, nodebase, false),
-      /* m_drawPinsNOT_USED(drawPins), \todo (PF) was not used - remove*/
-      m_isCameraSequence(isCameraSequence)
+Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCameraSequence /*=false*/)
+    : CoreNodeWithPins(diwne, nodebase, false), m_isCameraSequence(isCameraSequence)
 {
 	updateDataItemsWidth();
 	m_headerMinWidth = 120;
@@ -65,9 +61,9 @@ int Sequence::getInnerPosition(std::vector<ImVec2> points)
 	rect.Max.x = rect.Min.x; /* squeeze rect at begin -> then in cycle shift rect
 	                            and check point position */
 	int i = 0;
-	for (auto const& innerNode : getInnerWorkspaceNodes())
+	for (const auto& innerNode : getInnerWorkspaceNodes())
 	{
-		rect.Max.x = innerNode->getRectDiwne().GetCenter().x;
+		rect.Max.x = innerNode.getRectDiwne().GetCenter().x;
 		if (rect.Contains(in_point))
 		{
 			return i;
@@ -78,23 +74,15 @@ int Sequence::getInnerPosition(std::vector<ImVec2> points)
 	return i;
 }
 
-void Sequence::popNode(Ptr<CoreNode> node)
+void Sequence::popNode(int index)
 {
-	auto node_iter = std::find_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
-	                              [node](auto innerNode) -> bool {
-		                              return node == innerNode;
-	                              });
-
-	if (node_iter != m_workspaceInnerTransformations.end())
-	{
-		int index = node_iter - m_workspaceInnerTransformations.begin();
-		std::shared_ptr<TransformationBase> transformation = std::dynamic_pointer_cast<TransformationBase>(*node_iter);
-		transformation->setRemoveFromSequence(true);
-		transformation->m_parentSequence.reset();
-		// is done in next frame based on setRemoveFromSequence(true)
-		// m_workspaceInnerTransformations.erase(node_iter);
-		m_nodebase->as<Core::Sequence>()->popMatrix(index);
-	}
+	std::shared_ptr<TransformationBase> transformation =
+	    std::dynamic_pointer_cast<TransformationBase>(m_workspaceInnerTransformations[index]);
+	transformation->setRemoveFromSequence(true);
+	transformation->m_parentSequence.reset();
+	// is done in next frame based on setRemoveFromSequence(true)
+	// m_workspaceInnerTransformations.erase(node_iter);
+	m_nodebase->as<Core::Sequence>()->popMatrix(index);
 }
 
 void Sequence::pushNode(Ptr<CoreNode> node, int index)
@@ -122,21 +110,18 @@ void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node)
 	node->setRemoveFromWorkspace(false);
 	dynamic_pointer_cast<TransformationBase>(node)->setRemoveFromSequence(true);
 	//	node->m_selectable = true;
-	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
+	diwne.addNode(node);
+	//	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
 	//	popNode(node);
 }
 
-std::vector<Ptr<CoreNode>> const& Sequence::getInnerWorkspaceNodes() const
-{
-	return m_workspaceInnerTransformations;
-}
 
 std::optional<Ptr<CoreNode>> Sequence::getTransform(int index) const
 {
 	if (index >= m_workspaceInnerTransformations.size())
 		return std::nullopt;
 
-	return m_workspaceInnerTransformations[index];
+	return std::static_pointer_cast<CoreNode>(m_workspaceInnerTransformations[index]);
 }
 
 void Sequence::setPostionOfDummyData(int positionOfDummyData)
@@ -284,7 +269,8 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 			bool removeFromSeq = std::dynamic_pointer_cast<TransformationBase>(*it)->getRemoveFromSequence();
 			if (removeFromSeq)
 			{
-				popNode(*it);
+				std::size_t idx = std::distance(m_workspaceInnerTransformations.begin(), it);
+				popNode(idx);
 				it = m_workspaceInnerTransformations.erase(it);
 			}
 			else
@@ -320,13 +306,9 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
 		 * action to do and in WorkspaceDiwne react to this action  */
 		// interaction_with_transformation_happen |=
-		transformation->drawNodeDiwne<TransformationBase>(context, DIWNE::DrawModeNodePosition::OnCursorPosition,
-		                                                  m_isPressed || m_drawMode2 == DIWNE::DrawMode::JustDraw
-		                                                      ? DIWNE::DrawMode::JustDraw
-		                                                      : DIWNE::DrawMode::Interacting);
-
+		DIWNE::DrawInfo result =
+		    transformation->drawDiwneEx(context, m_drawMode2 | (m_isPressed ? DIWNE::DrawMode_JustDraw : 0));
 		ImGui::SameLine();
-
 		i++;
 	}
 	if (interaction_with_transformation_happen)
@@ -354,7 +336,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 
 	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	/* pop NodeFrom Sequence */
-	//	if (m_drawMode2 == DIWNE::DrawMode::Interacting && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+	//	if (m_drawMode2 == DIWNE::DrawMode_Interactive && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
 	//	{
 	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
 	//		if (dragedNode != nullptr) /* only transformation can be in Sequence*/
@@ -381,9 +363,9 @@ void Sequence::setNumberOfVisibleDecimal(int value)
 	}
 	else
 	{
-		for (auto const& transformation : m_workspaceInnerTransformations)
+		for (auto& transformation : getInnerWorkspaceNodes())
 		{
-			transformation->setNumberOfVisibleDecimal(value);
+			transformation.setNumberOfVisibleDecimal(value);
 		}
 	}
 }
@@ -396,4 +378,26 @@ int Sequence::maxLengthOfData()
 		return DataRenderer::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
 	}
 	return 0;
+}
+
+// TODO: Rename to get core nodes or get workspace nodes
+DIWNE::NodeRange<CoreNode> Sequence::getInnerWorkspaceNodes()
+{
+	return DIWNE::NodeRange<CoreNode>(&m_workspaceInnerTransformations);
+}
+DIWNE::ConstNodeRange<CoreNode> Sequence::getInnerWorkspaceNodes() const
+{
+	return DIWNE::ConstNodeRange<CoreNode>(&m_workspaceInnerTransformations);
+}
+DIWNE::NodeRange<> Sequence::getNodes() const
+{
+	return DIWNE::NodeRange<DIWNE::Node>(&m_workspaceInnerTransformations);
+}
+void Sequence::onDestroy(bool logEvent)
+{
+	CoreNodeWithPins::onDestroy(logEvent);
+	for (auto& node : m_workspaceInnerTransformations)
+	{
+		node->destroy(logEvent);
+	}
 }

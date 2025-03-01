@@ -22,8 +22,7 @@
 
 #include "glm/glm.hpp"
 
-#include "DIWNE/diwne_include.h"
-#include "diwne_config.h" // Some DIWNE trickery to use I3T logger
+#include "DIWNE/Core/NodeEditor.h"
 
 #include "Config.h"
 #include "Core/Result.h"
@@ -117,17 +116,43 @@ public:
 	 */
 	//	bool processCreateAndPlugTypeConstructor();
 
-	// Node/Object management
+	// Object management
 	// =============================================================================================================
+	// TODO: Rename to getCoreNode()
 	/**
 	 * O(N) where N is workspace nodes count.
-	 *
 	 * @tparam T
 	 * @param id
 	 * @return
 	 */
 	template <typename T>
-	Result<Ptr<T>, Error> getNode(Core::ID id) const;
+	Result<Ptr<T>, Error> getNode(Core::ID id) const
+	{
+		Ptr<GuiNode> node{};
+		auto allCoreNodes = getAllCoreNodes();
+		for (auto it = allCoreNodes.begin(); it != allCoreNodes.end(); ++it)
+		{
+			std::shared_ptr<CoreNode> n = it.sharedPtr();
+			if (n->getNodebase()->getId() == id)
+			{
+				node = std::move(n);
+			}
+		}
+
+		if (node == nullptr)
+		{
+			return Err("cannot find node #" + std::to_string(id));
+		}
+
+		auto result = std::dynamic_pointer_cast<T>(node);
+
+		if (result == nullptr)
+		{
+			return Err("node #" + std::to_string(id) + " is not of given type");
+		}
+
+		return result;
+	}
 
 	template <typename T>
 	void addTypeConstructorNode()
@@ -149,8 +174,8 @@ public:
 
 		m_takeSnap = true; /* JH maybe better in place where this function is called*/
 
-		//TODO: This call makes no sense here, there should be another way
-		// I'm thinking this should be handled by the respective Transformation subclasses
+		// TODO: This call makes no sense here, there should be another way
+		//  I'm thinking this should be handled by the respective Transformation subclasses
 		detectRotationTransformAndSetFloatMode(node);
 
 		return node;
@@ -168,16 +193,6 @@ public:
 
 	void manipulatorStartCheck3D();
 
-	void processDragAllSelectedNodes();
-
-	// TODO: Move to DIWNE::NodeEditor
-	void selectAll();
-	void invertSelection();
-	void zoomToAll();
-	void zoomToSelected();
-	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<CoreNode>> nodes);
-	void zoomToRectangle(ImRect const& rect);
-
 	void trackingSmoothLeft();
 	void trackingSmoothRight();
 	void trackingJaggedLeft();
@@ -192,28 +207,66 @@ public:
 	void trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft);
 	void trackingSwitchOff();
 	void toggleSelectedNodesVisibility();
-	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
 
 	void processTrackingMove();
 
 	void deleteCallback();
+
+	// TODO: (DR) Move to DIWNE::NodeEditor
+	void selectAll();
+	void invertSelection();
+
+	void zoomToAll();
+	void zoomToSelected();
+	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
+	void zoomToRectangle(ImRect const& rect);
+
+	void deleteSelectedNodes();
 	void copySelectedNodes();
 	void pasteSelectedNodes();
 	void cutSelectedNodes();
 	void duplicateClickedNode();
 	void duplicateSelectedNodes();
-	bool isNodeLabelBeingEdited();
 
-	std::vector<Ptr<CoreNode>> getSelectedNodesInnerIncluded() override;
-	std::vector<Ptr<CoreNode>> getAllNodesInnerIncluded() override;
+	void deselectSequenceTransformations();
+	void deselectAllChildNodes();
 
-	// TODO: (DR) Move to DIWNE::NodeEditor
+	DIWNE::FilteredNodeRange<CoreNode> getCoreNodes() const
+	{
+		return DIWNE::FilteredNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+		    },
+		    &m_nodes);
+	}
+
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllCoreNodes() const
+	{
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+		    },
+		    &m_nodes);
+	}
+
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllSelectedCoreNodes() const
+	{
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && node->getSelected();
+		    },
+		    &m_nodes);
+	}
+
+	// TODO: (DR) Rewrite to use iterators
 	std::vector<Ptr<CoreNode>> getAllCameras();
 	std::vector<Ptr<Model>> getAllModels();
+	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
 	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();
 	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
 
-//	bool isZoomingDiwne() override;
+	// TODO: (DR) Reimplement
+	//	bool isZoomingDiwne() override;
 
 	bool processZoom() override;
 
@@ -230,33 +283,6 @@ public:
 		}
 	}
 };
-
-template <typename T>
-Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id) const
-{
-	Ptr<GuiNode> node{};
-	for (const auto& n : getAllNodes())
-	{
-		if (n->getNodebase()->getId() == id)
-		{
-			node = n;
-		}
-	}
-
-	if (node == nullptr)
-	{
-		return Err("cannot find node #" + std::to_string(id));
-	}
-
-	auto result = std::dynamic_pointer_cast<T>(node);
-
-	if (result == nullptr)
-	{
-		return Err("node #" + std::to_string(id) + " is not of given type");
-	}
-
-	return result;
-}
 
 /// This function takes snapshot of current state.
 template <typename T>

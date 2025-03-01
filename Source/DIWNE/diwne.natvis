@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--A natvis file to ease DIWNE debugging in VS/CLion-->
+<!--https://learn.microsoft.com/en-us/visualstudio/debugger/create-custom-views-of-native-objects?view=vs-2022-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="DIWNE::DiwneObject">
+        <DisplayString>DiwneObject (label={m_labelDiwne})</DisplayString>
+    </Type>
+    <Type Name="DIWNE::ForwardNodeIterator&lt;*,*,*&gt;">
+        <DisplayString>DiwneIterator (idx={_idx})</DisplayString>
+    </Type>
+</AutoVisualizer>

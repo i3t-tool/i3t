@@ -14,16 +14,14 @@
 
 #include <functional>
 
-#include "Canvas.h"
 #include "DiwneObject.h"
+
+#include "Canvas.h"
 #include "DiwneStyle.h"
 #include "Input/NodeEditorInputAdapter.h"
+#include "diwne_iterators.h"
 
 // TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-namespace Workspace
-{
-class CoreNode;
-}
 
 // DIWNE Refactoring todos:
 // TODO: (DR) Refactor and revise the whole bypass/input/action trigger system thats going on here
@@ -111,7 +109,7 @@ class NodeEditor : public DiwneObject
 public:
 	SettingsDiwne* mp_settingsDiwne;
 
-	std::vector<std::shared_ptr<Workspace::CoreNode>> m_workspaceCoreNodes;
+	std::vector<std::shared_ptr<Node>> m_nodes;
 	std::vector<std::shared_ptr<Link>> m_links;
 
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
@@ -158,7 +156,7 @@ public:
 
 	// Lifecycle
 	// =============================================================================================================
-	void draw(DrawMode drawMode = DrawMode::Interacting) override;
+	void draw(DrawMode drawMode = DrawMode_Interactive) override;
 
 	void initializeDiwne(DrawInfo& context) override;
 
@@ -228,29 +226,64 @@ public:
 		return *m_style;
 	}
 
-	// Node/Object management
+	// Object management
 	// =============================================================================================================
 	/** Clear all nodes from the node editor */
 	virtual void clear();
 
-	const std::vector<std::shared_ptr<Workspace::CoreNode>>& getAllNodes() const
+	/// Get a reference to the underlying owning vector of all nodes in the node editor.
+	std::vector<std::shared_ptr<Node>>& getNodeList()
 	{
-		return m_workspaceCoreNodes;
+		return m_nodes;
+	}
+
+	// TODO: I probably need const versions of node ranges <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  Non-mutable Iterators now take a const pointer to the node vector meaning they can be created in const methods
+	/**
+	 * Get a view of all nodes in the node editor which can be iterated over.
+	 * The object returned is a trivial container wrapper around a node iterator.
+	 * TODO: Better docs with an example
+	 */
+	NodeRange<> getNodes()
+	{
+		return NodeRange(&m_nodes);
 	};
 
-	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getAllNodesInnerIncluded();
+	ConstNodeRange<> getNodes() const
+	{
+		return ConstNodeRange(&m_nodes);
+	};
 
-	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getSelectedNodes();
+	virtual RecursiveNodeRange<> getAllNodesInnerIncluded() const
+	{
+		return RecursiveNodeRange<>(&m_nodes);
+	}
 
-	virtual std::vector<std::shared_ptr<Workspace::CoreNode>> getSelectedNodesInnerIncluded();
+	virtual FilteredNodeRange<> getSelectedNodes() const
+	{
+		return FilteredNodeRange<>(
+		    [](const Node* node) -> bool {
+			    return node->getSelected();
+		    },
+		    &m_nodes);
+	}
+
+	virtual FilteredRecursiveNodeRange<> getSelectedNodesInnerIncluded() const
+	{
+		return FilteredRecursiveNodeRange<>(
+		    [](const Node* node) -> bool {
+			    return node->getSelected();
+		    },
+		    &m_nodes);
+	}
 
 	virtual void deselectNodes();
 
-	void addNode(std::shared_ptr<Workspace::CoreNode> node, const ImVec2 position = ImVec2(0, 0),
-	             bool shiftToLeftByNodeWidth = false);
+	void addNode(std::shared_ptr<Node> node);
+	void addNode(std::shared_ptr<Node> node, const ImVec2 position, bool shiftToLeftByNodeWidth = false);
 
 	// TODO: Do we really need a template function for this?
-	// TOOD: This method doesn't allow to create nodes with arbitrary constructors (no args passthrough)
+	// TODO: This method doesn't allow to create nodes with arbitrary constructors (no args passthrough)
 	template <class T>
 	auto inline createNode(const ImVec2 position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
@@ -285,8 +318,8 @@ public:
 	// Node shifting
 	// =============================================================================================================
 
-	void shiftNodesToBegin(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift);
-	void shiftNodesToEnd(std::vector<std::shared_ptr<Workspace::CoreNode>> const& nodesToShift);
+	void shiftNodesToBegin(const std::vector<std::shared_ptr<Node>>& nodesToShift);
+	void shiftNodesToEnd(const std::vector<std::shared_ptr<Node>>& nodesToShift);
 	void shiftInteractingNodeToEnd();
 
 	// TODO: Perhaps use this utility getter functions in multiple places
@@ -305,12 +338,8 @@ public:
 		return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
 	}
 
-	template <typename T>
-	void setLastActiveNode(std::shared_ptr<T> node)
+	void setLastActiveNode(std::shared_ptr<Node> node)
 	{
-		static_assert(
-		    // std::is_same<T, std::nullptr_t>::value ||
-		    std::is_base_of_v<Node, T>, "Node must be derived from DIWNE::Node class.");
 		mp_lastActiveNode = node;
 	}
 

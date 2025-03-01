@@ -27,7 +27,7 @@ TEST(UndoRedoTest, Basic)
 
 	const auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
-	const auto& nodes = workspace->getNodeEditor().getAllNodes();
+	const auto nodes = workspace->getNodeEditor().getCoreNodes().collect();
 	ASSERT_TRUE(nodes.empty());
 
 	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();

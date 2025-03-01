@@ -19,9 +19,9 @@
 #include "Generator.h"
 #include "I3TUtil.h"
 
-const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
+const auto getNodes(Ptr<WorkspaceWindow> workspaceWindow)
 {
-	return workspaceWindow->getNodeEditor().getAllNodes();
+	return workspaceWindow->getNodeEditor().getAllCoreNodes().collect();
 }
 
 class StateTest : public ::testing::Test
@@ -142,7 +142,7 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
-		const std::vector<Ptr<Workspace::CoreNode>>& nodes = workspace->getNodeEditor().getAllNodes();
+		const std::vector<Ptr<Workspace::CoreNode>>& nodes = getNodes(workspace);
 		ASSERT_TRUE(nodes.size() == 4);
 		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
 	}
@@ -162,7 +162,7 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 		ASSERT_TRUE(stateManager.getCurrentScene() != nullptr);
 		ASSERT_TRUE(stateManager.getCurrentScene()->m_path.filename() == newSceneName);
 
-		const std::vector<Ptr<Workspace::CoreNode>>& nodes = workspace->getNodeEditor().getAllNodes();
+		const std::vector<Ptr<Workspace::CoreNode>>& nodes = getNodes(workspace);
 		ASSERT_TRUE(nodes.size() == 4);
 		ASSERT_TRUE(nodes[0]->getTopLabel().contains("float"));
 

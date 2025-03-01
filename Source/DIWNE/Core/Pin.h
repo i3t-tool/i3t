@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include <type_traits>
 #include <vector>
 
 #include "DiwneObject.h"
@@ -151,7 +152,7 @@ public:
 	template <typename T = Node>
 	T* getNode()
 	{
-		static_assert(std::is_base_of_v<DIWNE::Node, T>);
+		static_assert(std::is_base_of<DIWNE::Node, T>::value);
 		return static_cast<T*>(m_node);
 	}
 	Node* getNode();
