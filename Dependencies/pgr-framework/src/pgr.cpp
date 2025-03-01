@@ -4,6 +4,8 @@
 
 #include "pgr.h"
 
+#include "GLFW/glfw3.h"
+
 namespace pgr {
 
 static void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei, const GLchar* message, void* userParam) {
@@ -19,13 +21,17 @@ static void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum
 }
 
 bool initialize(int glVerMajor, int glVerMinor, DebugLevel debugLevel) {
-#if USE_GLLOADGEN
-  if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+#if USE_GLAD
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cerr << "cannot initialize opengl" << std::endl;
     return false;
   }
-  if(ogl_IsVersionGEQ(glVerMajor, glVerMinor - 1) == 1) {
-    std::cerr << "OpenGL " << glVerMajor << "." << glVerMinor << " or higher not available" << std::endl;
+  int major = 0, minor = 0;
+  glGetIntegerv(GL_MAJOR_VERSION, &major);
+  glGetIntegerv(GL_MINOR_VERSION, &minor);
+  if (major < glVerMajor || (major == glVerMajor && minor < glVerMinor)) {
+    std::cerr << "OpenGL " << glVerMajor << "." << glVerMinor
+              << " or higher not available" << std::endl;
     return false;
   }
 #else
@@ -52,7 +58,7 @@ bool initialize(int glVerMajor, int glVerMinor, DebugLevel debugLevel) {
   bool debugEnabled = false;
   if(debugLevel > 0 && glDebugMessageCallback != NULL) {
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(debugCallback, &std::cerr);
+    glDebugMessageCallback((GLDEBUGPROC)debugCallback, &std::cerr);
     debugEnabled = true;
     if(glDebugMessageControl) {
       // enable various severity levels according to debugLevel

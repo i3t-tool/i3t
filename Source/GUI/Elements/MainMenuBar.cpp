@@ -25,6 +25,7 @@
 #include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StatisticsWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
@@ -381,7 +382,10 @@ void MainMenuBar::showHelpMenu()
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 			ImGui::MenuItem("Show test window", nullptr, &App::getModule<TestModule>().getShowTestWindow());
-
+			if (ImGui::MenuItem(ICON_I3T_DEBUG " Statistics"))
+			{
+				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
+			}
 			ImGui::EndMenu();
 		}
 
