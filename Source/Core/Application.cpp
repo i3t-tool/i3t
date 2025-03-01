@@ -23,6 +23,8 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "Utils/Statistics.h"
+#include "Utils/Timers.h"
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
@@ -107,6 +109,7 @@ int Application::run()
 
 	while (!m_shouldClose)
 	{
+
 		glfwPollEvents();
 
 		CommandDispatcher::get().execute();
@@ -115,6 +118,7 @@ int Application::run()
 			// Do not run the rest of the loop if the application is closing.
 			break;
 		}
+		Statistics::update();
 
 		beginFrame();
 
@@ -149,7 +153,6 @@ void Application::endFrame()
 	InputManager::endFrame();
 
 	onEndFrame();
-
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

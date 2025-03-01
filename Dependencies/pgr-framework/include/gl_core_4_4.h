@@ -1452,6 +1452,21 @@ extern "C" {
 #define GL_TRANSFORM_FEEDBACK_BUFFER_INDEX 0x934B
 #define GL_TRANSFORM_FEEDBACK_BUFFER_STRIDE 0x934C
 
+	/* ------------------------- GL_NVX_gpu_memory_info ------------------------ */
+
+#ifndef GL_NVX_gpu_memory_info
+#define GL_NVX_gpu_memory_info 1
+
+#define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
+#define GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX 0x9048
+#define GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX 0x9049
+#define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX 0x904A
+#define GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX 0x904B
+
+#define GLEW_NVX_gpu_memory_info GLEW_GET_VAR(__GLEW_NVX_gpu_memory_info)
+
+#endif /* GL_NVX_gpu_memory_info */
+
 extern void (CODEGEN_FUNCPTR *_ptrc_glBlendFunc)(GLenum, GLenum);
 #define glBlendFunc _ptrc_glBlendFunc
 extern void (CODEGEN_FUNCPTR *_ptrc_glClear)(GLbitfield);
