@@ -47,11 +47,13 @@ bool Canvas::applyZoomScaling()
 
 	// Scale the whole ImGui style, will be restored later
 	m_zoomOriginalStyle = ImGui::GetStyle();
+	m_zoomOriginalDiwneStyle = editor.style();
 
 	//	ImGui::GetStyle().ScaleAllSizes(m_zoom);
 	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_zoom : 1.0f);
 	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_zoom : 1.0f);
 	ScaleAllSizes(ImGui::GetStyle(), m_zoom);
+	editor.style().scale(m_zoom);
 
 	// TODO: We do not round styles, ImGui does round them, this introduces an issue with the cursor position not being
 	//  rounded when starting a new imgui item, once the cursor is moved to the next item ImGui automatically rounds it.
@@ -69,6 +71,7 @@ bool Canvas::stopZoomScaling()
 		return false;
 
 	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
+	editor.style() = m_zoomOriginalDiwneStyle;
 
 	// Need to reset default font BEFORE popping font
 	stopZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
@@ -176,9 +179,9 @@ void Canvas::updateViewportRects()
 
 	m_viewRectDiwne.Max = m_viewRectDiwne.Min + windowSize / m_zoom;
 
-	DIWNE_INFO("waScreen: {}:{}, {}:{}, waDiwne: {}:{}, {}:{}", m_viewRectScreen.Min.x, m_viewRectScreen.Min.y,
-	           m_viewRectScreen.Max.x, m_viewRectScreen.Max.y, m_viewRectDiwne.Min.x, m_viewRectDiwne.Min.y,
-	           m_viewRectDiwne.Max.x, m_viewRectDiwne.Max.y)
+	//	DIWNE_INFO("waScreen: {}:{}, {}:{}, waDiwne: {}:{}, {}:{}", m_viewRectScreen.Min.x, m_viewRectScreen.Min.y,
+	//	           m_viewRectScreen.Max.x, m_viewRectScreen.Max.y, m_viewRectDiwne.Min.x, m_viewRectDiwne.Min.y,
+	//	           m_viewRectDiwne.Max.x, m_viewRectDiwne.Max.y)
 }
 
 ImVec2 Canvas::transformFromImGuiToDiwne(const ImVec2& point) const

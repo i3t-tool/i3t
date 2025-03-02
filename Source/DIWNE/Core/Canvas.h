@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "DiwneStyle.h"
 #include "diwne_imgui.h"
 
 namespace DIWNE
@@ -30,8 +31,9 @@ public:
 
 	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
 protected:
-	float m_zoomOriginalFontScale;  ///< Original font scale
-	ImGuiStyle m_zoomOriginalStyle; ///< Original ImGui style
+	float m_zoomOriginalFontScale;       ///< Original font scale
+	ImGuiStyle m_zoomOriginalStyle;      ///< Original ImGui style
+	DiwneStyle m_zoomOriginalDiwneStyle; ///< Original DIWNE style
 
 public:
 	Canvas(NodeEditor& editor);

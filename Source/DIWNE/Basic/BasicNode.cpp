@@ -3,6 +3,7 @@
 #include "DIWNE/Core/DiwneStyle.h"
 #include "DIWNE/Core/Layout/Gravity.h"
 #include "DIWNE/Core/NodeEditor.h"
+#include "DIWNE/Core/diwne_utils.h"
 
 namespace DIWNE
 {
@@ -73,14 +74,21 @@ void BasicNode::end(DrawInfo& context)
 void BasicNode::topContent(DrawInfo& context)
 {
 	drawHeader();
-	ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1));
-	ImGui::SameLine();
-	ImGui::TextUnformatted(m_topLabel.c_str());
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + diwne.style().nodePadding.y);
+	ImGui::Dummy(ImVec2(diwne.style().nodePadding.x, 0));
+	ImGui::SameLine(0, 0);
+	ImGui::TextUnformatted(m_topLabel.c_str()); ImGui::SameLine();
+	DGui::NewLine();
+	ImGui::Dummy(ImVec2(diwne.style().nodePadding.x, diwne.style().nodePadding.y));
 }
 
 void BasicNode::leftContent(DrawInfo& context) {}
 void BasicNode::rightContent(DrawInfo& context) {}
-void BasicNode::centerContent(DrawInfo& context) {}
+void BasicNode::centerContent(DrawInfo& context)
+{
+	ImGui::Text("Content");
+	ImGui::Spacing();
+}
 void BasicNode::bottomContent(DrawInfo& context) {}
 
 void BasicNode::updateLayout(DrawInfo& context)
@@ -169,7 +177,7 @@ void BasicNode::translate(const ImVec2& vec)
 
 void BasicNode::drawHeader()
 {
-	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, m_headerBackground, m_rounding,
+	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), m_headerBackground, m_rounding,
 	                                  ImDrawFlags_RoundCornersTop);
 }
 

@@ -314,6 +314,10 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 	}
 }
 
+// TODO: Test recursed containers
+// S2 (N3, S1 (N2), N1)
+// S2 (S1 (N2))
+
 // TODO: Improvements
 // ASSERT_EQ vs ASSERT_TRUE
 // Wrap node editor init in a method

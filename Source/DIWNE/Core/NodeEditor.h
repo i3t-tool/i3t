@@ -13,6 +13,7 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
 #include "DiwneObject.h"
 
@@ -309,10 +310,8 @@ public:
 	void addLink(std::shared_ptr<Link> link);
 
 protected:
-	/**
-	 * Removes objects marked for deletion from the editor.
-	 */
-	void destroyObjects();
+	/// Erases objects marked for deletion or removal from the editor.
+	void purgeObjects();
 
 public:
 	// Node shifting
@@ -333,8 +332,7 @@ public:
 	template <typename T>
 	std::shared_ptr<T> getLastActiveNode()
 	{
-		static_assert(std::is_base_of_v<Node, T> /* || std::is_same<T, std::nullptr_t>::value*/,
-		              "Node must be derived from DIWNE::Node class.");
+		static_assert(std::is_base_of<Node, T>::value, "Node must be derived from DIWNE::Node class.");
 		return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
 	}
 

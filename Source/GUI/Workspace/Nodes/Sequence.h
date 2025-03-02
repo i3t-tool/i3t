@@ -23,7 +23,7 @@ class Sequence : public CoreNodeWithPins, public DIWNE::NodeContainer
 {
 private:
 	bool m_isCameraSequence;
-	ImVec4 m_tint = ImVec4(1, 1, 1, 1);
+	ImVec4 m_tint = ImVec4(1, 1, 1, 1); // TODO: (DR) Remove unused
 
 protected:
 	int m_position_of_dummy_data = -1;
@@ -51,8 +51,6 @@ public:
 
 	void popupContentTracking();
 	void popupContent(DIWNE::DrawInfo& context) override;
-
-	bool isSequence();
 
 	int getInnerPosition(std::vector<ImVec2> points);
 

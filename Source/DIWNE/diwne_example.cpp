@@ -11,8 +11,8 @@
 #include <stdio.h>
 
 #include <chrono>
-#include <thread>
 #include <iostream>
+#include <thread>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -23,29 +23,33 @@
 
 #include <GLFW/glfw3.h>
 
-//#include "Core/NodeEditor.h"
-//#include "Basic/BasicNode.h"
+#include "Basic/BasicNode.h"
+#include "Basic/SequenceNodeContainer.h"
+#include "Core/NodeEditor.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-//DIWNE::SettingsDiwne settings;
-//std::shared_ptr<DIWNE::NodeEditor> editor;
-//std::shared_ptr<DIWNE::BasicNode> node;
+DIWNE::SettingsDiwne settings;
+std::shared_ptr<DIWNE::NodeEditor> editor;
 
 void diwneInit()
 {
-//	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
-//	node = std::make_shared<DIWNE::BasicNode>(*editor, "Node 1");
-//	editor->addNode(node, ImVec2(200, 200));
+	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
+	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 1"), ImVec2(20, 20));
+	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 2"), ImVec2(150, 20));
+	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 3"), ImVec2(300, 20));
+	auto sequence1 = std::make_shared<DIWNE::SequenceNodeContainer>(*editor, "Sequence 1");
+	editor->addNode(sequence1, ImVec2(20, 100));
+	auto sequence2 = std::make_shared<DIWNE::SequenceNodeContainer>(*editor, "Sequence 2");
+	editor->addNode(sequence2, ImVec2(200, 100));
+	editor->addNode(std::make_shared<DIWNE::SequenceNodeContainer>(*editor, "Sequence 3"), ImVec2(200, 300));
 }
 
 void buttonHoverTest()
 {
-	if (ImGui::IsKeyDown(ImGuiKey_E))
-		int x = 5;
 	ImGui::Dummy(ImVec2(50, 50));
 	std::cout << ImGui::IsItemHovered() << ",";
 	ImGui::Button("test", ImVec2(50, 50));
@@ -62,11 +66,25 @@ void buttonHoverTest()
 
 void diwneWindow()
 {
-	ImGui::Begin("DIWNE example");
+	ImGui::Begin("DIWNE example", NULL, ImGuiWindowFlags_MenuBar);
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("Debug"))
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+			ImGui::MenuItem("Enable", nullptr, &editor->m_diwneDebug);
+			ImGui::MenuItem("Layout", nullptr, &editor->m_diwneDebugLayout);
+			ImGui::MenuItem("Interaction", nullptr, &editor->m_diwneDebugInteractions);
+			ImGui::MenuItem("Objects", nullptr, &editor->m_diwneDebugObjects);
+			ImGui::PopItemFlag();
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
 
-	buttonHoverTest();
+	//	buttonHoverTest();
+	editor->draw();
 
-//	editor->draw();
 	ImGui::End();
 }
 
@@ -165,7 +183,8 @@ int main(int, char**)
 {
 	GLFWwindow* window = nullptr;
 	int ret = setupWindow(window);
-	if (ret) return ret;
+	if (ret)
+		return ret;
 
 	// Load Fonts
 	// TODO: Load an enlarged node editor font

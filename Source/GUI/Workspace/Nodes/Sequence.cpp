@@ -30,11 +30,6 @@ bool Sequence::allowDrawing()
 	return m_isCameraSequence || CoreNode::allowDrawing();
 }
 
-bool Sequence::isSequence()
-{
-	return true;
-}
-
 void Sequence::drawMenuLevelOfDetail()
 {
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
@@ -241,25 +236,24 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	}
 
 	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
-	//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
-	//	{
-	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-	//		if (dragedNode != nullptr &&
-	//		    (dragedNode->aboveSequence == 0 ||
-	//		     dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
-	//		                                                    && not above other sequence */
-	//		{
-	//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
-	//			if (position_of_draged_node_in_sequence >= 0)
-	//			{
-	//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
-	//			}
-	// #ifdef WORKSPACE_DEBUG
-	//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
-	// #endif // WORKSPACE_DEBUG
-	//		}
-	//	}
+//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
+//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
+//	{
+//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
+//		if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 ||
+//		                              dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
+//		                                                                             && not above other sequence */
+//		{
+//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
+//			if (position_of_draged_node_in_sequence >= 0)
+//			{
+//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
+//			}
+//#ifdef WORKSPACE_DEBUG
+//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
+//#endif // WORKSPACE_DEBUG
+//		}
+//	}
 
 	// Check if transform is marked for removal.
 	{

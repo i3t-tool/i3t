@@ -68,7 +68,7 @@ void Node::end(DrawInfo& context)
 		        .c_str());
 	});
 	ImGui::EndGroup();
-	ImGui::PopID();
+	// Node ImGui ID gets popped later in afterDrawDiwne, see explanation there.
 }
 
 void Node::updateLayout(DrawInfo& context)
@@ -80,10 +80,15 @@ void Node::updateLayout(DrawInfo& context)
 void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
-	// This needs to be done BEFORE processing interactions as we check if this button is hovered.
+	// This is done after updateLayout() in order to know the current node size (otherwise it would be done in end())
+	// This needs to be done BEFORE processing interactions as we determine if the node is hovered using it.
+	// The blocking button uses the NoHoldingActiveId flag in order to avoid setting active id when dragging the node.
 	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
-	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getZoom());
+	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getZoom(),
+	                       ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_NoHoldingActiveId);
 	m_internalHover = ImGui::IsItemHovered();
+	ImGui::PopID();
+
 	DiwneObject::afterDrawDiwne(context);
 }
 
@@ -135,11 +140,20 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	{
 		std::vector<Node*> nodes;
 		if (m_selected)
-		{ // If the node is selected, it and all other selected nodes are dragged together
-			nodes = diwne.getSelectedNodes().collectRaw();
+		{
+			// If the node is selected, it and all other selected nodes are dragged together
+			// Other selected nodes are filtered out if their parent is also selected
+			auto selectedNodes = diwne.getSelectedNodesInnerIncluded();
+			for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
+			{
+				if (!node->isAnyParentSelected())
+					nodes.push_back(node.ptr());
+			}
 		}
 		else
-		{ // If the node isn't selected, dragging it selects it and deselects all others
+		{
+			// If the node isn't selected, dragging it selects it and deselects all others
+			// or only the node is dragged
 			if (diwne.mp_settingsDiwne->selectNodeOnDrag)
 			{
 				diwne.deselectNodes();
@@ -184,5 +198,4 @@ void Node::setFlag(char index, bool value)
 	else
 		m_flag &= ~(1 << index);
 }
-
 } /* namespace DIWNE */

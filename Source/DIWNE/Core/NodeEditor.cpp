@@ -46,9 +46,9 @@ void NodeEditor::draw(DrawMode drawMode)
 
 void NodeEditor::initializeDiwne(DrawInfo& context)
 {
-	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
+	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false; // TODO: (DR) Remove some of these
 
-	destroyObjects(); // Delete objects marked for destruction in the previous frame
+	purgeObjects(); // Erase objects marked for destruction or removal in the previous frame
 
 	DiwneObject::initializeDiwne(context);
 }
@@ -144,8 +144,9 @@ void NodeEditor::content(DrawInfo& context)
 		// And one channel is for all the links below everything
 		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 2 /*+1 for links channel on top */);
 
-		/* draw nodes from back to begin (front to back) to catch interactions in
-		 * correct order */
+		// Draw nodes in reverse order (front to back) to process interactions in correct "bubble down" order.
+		// Any nodes added during drawing should be added at the end of the vector and thus not iterated over.
+		// Any nodes removed should be removed in a lazy manner using either Node::destroy() or remove().
 		int prev_size = m_nodes.size();
 		bool takeSnap = false;
 		for (auto it = m_nodes.rbegin(); it != m_nodes.rend(); ++it)
@@ -500,7 +501,7 @@ void NodeEditor::addNode(std::shared_ptr<Node> node, const ImVec2 position, bool
 
 	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
 	m_nodes.push_back(node);
-	node->m_parentLabel = m_labelDiwne;                // Set the editor as the node's parent
+	node->setParentObject(this);                       // Set the editor as the node's parent
 	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 }
 
@@ -509,18 +510,32 @@ void NodeEditor::addLink(std::shared_ptr<Link> link)
 	m_links.push_back(link);
 }
 
-void NodeEditor::destroyObjects()
+void NodeEditor::purgeObjects()
 {
-	m_nodes.erase(std::remove_if(m_nodes.begin(), m_nodes.end(),
-	                             [](const auto& node) -> bool {
-		                             return node->m_destroy;
-	                             }),
-	              m_nodes.end());
-	m_links.erase(std::remove_if(m_links.begin(), m_links.end(),
-	                             [](const auto& link) -> bool {
-		                             return link->m_destroy;
-	                             }),
-	              m_links.end());
+	{
+		auto endIt = std::remove_if(m_nodes.begin(), m_nodes.end(), [](const auto& node) -> bool {
+			return node->m_destroy || node->m_remove;
+		});
+		auto endItCopy = endIt;
+		while (endItCopy != m_nodes.end())
+		{
+			(*endItCopy)->m_remove = false;
+			++endItCopy;
+		}
+		m_nodes.erase(endIt, m_nodes.end());
+	}
+	{
+		auto endIt = std::remove_if(m_links.begin(), m_links.end(), [](const auto& link) -> bool {
+			return link->m_destroy || link->m_remove;
+		});
+		auto endItCopy = endIt;
+		while (endItCopy != m_links.end())
+		{
+			(*endItCopy)->m_remove = false;
+			++endItCopy;
+		}
+		m_links.erase(endIt, m_links.end());
+	}
 }
 
 ImVec2 const& NodeEditor::getPopupPosition() const

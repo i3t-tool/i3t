@@ -197,6 +197,9 @@ target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
 
+# DIWNE config file
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
+
 # =============================================================
 
 # ===== Create target executable from I3T source files. =======
@@ -212,6 +215,9 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+
+# DIWNE config file
+target_compile_definitions(${PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
 
 # Link I3T with following binaries.
 target_link_libraries(

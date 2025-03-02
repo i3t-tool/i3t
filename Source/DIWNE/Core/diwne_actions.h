@@ -38,9 +38,9 @@ struct DiwneAction
 
 struct EditorAction : public DiwneAction
 {
-	DIWNE::NodeEditor& editor;
+	NodeEditor& editor;
 
-	EditorAction(DIWNE::NodeEditor& editor, const std::string& name, const std::string& source)
+	EditorAction(NodeEditor& editor, const std::string& name, const std::string& source)
 	    : editor(editor), DiwneAction(name, source)
 	{}
 };
@@ -74,9 +74,9 @@ struct SelectionRectAction : public DiwneAction
 
 struct DragNodeAction : public EditorAction
 {
-	std::vector<DIWNE::Node*> nodes;
+	std::vector<Node*> nodes;
 
-	DragNodeAction(DIWNE::NodeEditor& editor, const std::string& source, std::vector<DIWNE::Node*> nodes)
+	DragNodeAction(NodeEditor& editor, const std::string& source, std::vector<Node*> nodes)
 	    : nodes(std::move(nodes)), EditorAction(editor, dragNode, source)
 	{}
 

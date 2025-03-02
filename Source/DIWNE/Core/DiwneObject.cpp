@@ -35,7 +35,7 @@ DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne)
       m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
 {}
 
-unsigned long long DiwneObject::g_diwneIDCounter = 0;
+unsigned long long DiwneObject::g_diwneIDCounter = 1; // 0 is reserved for no/invalid ID
 
 void DiwneObject::draw(DrawMode drawMode)
 {
@@ -88,20 +88,26 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			ImGui::GetForegroundDrawList()->AddText(
 			    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
 			    (std::string() + m_labelDiwne +
-			     (m_parentLabel.empty() ? " (no parent)\n" : " (" + m_parentLabel + ")\n") +
+			     (!m_parentObject ? " (no parent)\n" : " (" + m_parentObject->m_labelDiwne + ")\n") +
 			     (m_hovered ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
 			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""))
 			        .c_str());
 			if (dynamic_cast<NodeEditor*>(this))
 			{
 				InteractionState& state = context.state;
-				ImGui::GetForegroundDrawList()->AddText(
-				    diwne.canvas().diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.3, 0), IM_COL32_WHITE,
-				    (std::string() + (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "") +
-				     (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "") +
-				     (state.action ? "[" + state.action->name + " (" + state.action->source + ")]" : "") +
-				     (context.inputConsumed ? " [Input Consumed]" : ""))
-				        .c_str());
+				std::string dbgMsg = std::string() + (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "");
+				dbgMsg += (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "");
+				dbgMsg += (context.inputConsumed ? " [Input Consumed]" : "");
+				if (state.action)
+				{
+					dbgMsg += " [" + state.action->name + " (" + state.action->source;
+					if (auto action = state.getActiveAction<Actions::DragNodeAction>())
+						dbgMsg += ", count: " + std::to_string(action->nodes.size());
+					dbgMsg += ")]";
+				}
+				ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) +
+				                                            ImVec2(getRectDiwne().GetWidth() * 0.3, 0),
+				                                        IM_COL32_WHITE, dbgMsg.c_str());
 			}
 		});
 	}
@@ -154,7 +160,7 @@ void DiwneObject::finalizeDiwne(DrawInfo& context)
 
 bool DiwneObject::allowDrawing()
 {
-	return true;
+	return m_rendered;
 }
 
 bool DiwneObject::allowInteraction() const
@@ -167,20 +173,6 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	if (m_drawMode2 != DrawMode_Interactive)
 		return;
 
-	if (ImGui::IsKeyDown(ImGuiKey_T))
-		int x = 5;
-
-	if (dynamic_cast<DIWNE::Pin*>(this) && diwne.input().bypassIsMouseDragging0())
-	{
-		int x = 5;
-	}
-	if (diwne.input().bypassIsMouseDragging0())
-		int x = 5;
-	if (diwne.input().bypassIsMouseDragging2())
-		int x = 5;
-	if (ImGui::IsMouseClicked(0))
-		int x = 5;
-
 	if (!allowInteraction())
 		return;
 
@@ -189,67 +181,8 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	processDragDiwne(context);
 	processSelectDiwne(context);
 	processPopupDiwne(context);
-	processInteractions(context); // Process other user interactions
 
-	//	bool interaction_happen = false;
-	//
-	//	// Logger::getInstance().getAppLogger()->info("MouseDown: "
-	//	// +std::to_string(ImGui::IsMouseDown(0)));
-	//	// Logger::getInstance().getAppLogger()->info("MouseReleased: " +
-	//	// std::to_string(ImGui::IsMouseReleased(0)));
-	//	// Logger::getInstance().getAppLogger()->info("MouseDragging: " +
-	//	// std::to_string(ImGui::IsMouseDragging(0)));
-	//	// Logger::getInstance().getAppLogger()->info("MouseClicked: " +
-	//	// std::to_string(ImGui::IsMouseClicked(0, false)));
-	//	// Logger::getInstance().getAppLogger()->info("MouseClickedRepeat: " +
-	//	// std::to_string(ImGui::IsMouseClicked(0, true)));
-	//
-	//	if (context.drawMode == Interacting && !m_inner_interaction_happen)
-	//	{
-	//		if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
-	//		{
-	//			processFocusedDiwne(context);
-	//			processFocusedForInteractionDiwne(context);
-	//
-	//			if (m_hovered) /* diwne.m_objectFocused is checked in
-	//			                  allowFocusedForInteraction() too */
-	//			{
-	//				diwne.m_objectFocused = true;
-	//				if (diwne.getDiwneActionActive() == None || diwne.getDiwneActionActive() == FocusOnObject)
-	//					diwne.setDiwneAction(FocusOnObject);
-	//			}
-	//
-	//			if (allowInteraction())
-	//			{
-	//				processRaisePopupDiwne(context);
-	//				if (m_selectable)
-	//				{
-	//					m_selected ? processUnselectDiwne(context) : processSelectDiwne(context);
-	//				}
-	//				m_isPressed ? processUnholdDiwne(context) : processHoldDiwne(context);
-	//				if (m_isPressed)
-	//				{
-	//					interaction_happen |= m_isPressed; /* holding (not only change in hold
-	//					                                   state) is interaction */
-	//					diwne.setDiwneAction(getHoldActionType());
-	//				}
-	//				processDragDiwne(context);
-	//				processInteractions(context);
-	//			}
-	//		}
-	//		processShowPopupDiwne(context);
-	//	}
-	//	if (m_inner_interaction_happen && diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink)
-	//	{
-	//		diwne.m_objectFocused = true;
-	//	} /* any inner interaction (imgui too) block other DiwneObject to focus */
-	//	DIWNE_DEBUG_OBJECTS((diwne), {
-	//		if (m_isActive)
-	//		{
-	//			diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 255, 255), 0,
-	//			                   ImDrawFlags_RoundCornersNone, 1, true);
-	//		};
-	//	});
+	processInteractions(context); // Process other user interactions
 }
 
 void DiwneObject::processHoverDiwne(DrawInfo& context)
@@ -263,7 +196,7 @@ void DiwneObject::processHoverDiwne(DrawInfo& context)
 		if (m_hoverRoot)
 			context.hoverConsumed++;
 		else
-			context.state.hoverTarget = m_parentLabel;
+			context.state.hoverTarget = m_parentObject ? m_parentObject->m_labelDiwne : std::string();
 	}
 }
 
@@ -300,12 +233,12 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	// TODO: [Low priority] Since we separated stopDrag into a method
 	//  the logic below seems a little too nested and complicated, simplify
 	bool isDragged = isDraggedDiwne();
-	bool dragStart = false;
 	bool weAreDragSource = context.state.dragSource == m_labelDiwne;
 	if (context.state.dragging) // Check if something is being dragged
 	{
 		if (weAreDragSource) // This object is being dragged
 		{
+			context.state.dragStart = false; // End drag start flag
 			if (isDragged)
 			{
 				// Continue drag
@@ -329,14 +262,14 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 		                                             // allowStartDrag, yeah <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if (m_isDragged)
 		{
-			dragStart = true;
+			context.state.dragStart = true;
 			context.state.dragging = true;
 			context.state.dragSource = m_labelDiwne;
 		}
 	}
 	if (m_isDragged) // Dispatch user method
 	{
-		onDrag(context, dragStart, false);
+		onDrag(context, context.state.dragStart, false);
 	}
 }
 
@@ -396,6 +329,16 @@ void DiwneObject::destroy(bool logEvent)
 
 void DiwneObject::onDestroy(bool logEvent) {}
 
+void DiwneObject::remove(bool logEvent)
+{
+	if (m_remove)
+		return;
+	m_remove = true;
+
+	onRemove(logEvent);
+}
+void DiwneObject::onRemove(bool logEvent) {}
+
 void DiwneObject::setPosition(const ImVec2& position)
 {
 	translate(position - m_rect.Min);
@@ -411,9 +354,9 @@ bool DiwneObject::isRendered() const
 	return m_rendered;
 }
 
-void DiwneObject::setRendered(bool mRendered)
+void DiwneObject::setRendered(bool val)
 {
-	m_rendered = mRendered;
+	m_rendered = val;
 }
 
 bool DiwneObject::setSelected(bool selected)
@@ -500,6 +443,7 @@ void InteractionState::nextFrame()
 
 	// Reset non-persistent variables
 	dragEnd = false;
+	dragStart = false;
 	hoverTarget.clear();
 }
 
@@ -693,13 +637,14 @@ bool DiwneObject::processSelectDiwne(DrawInfo& context)
 	if (!m_selectable)
 		return true;
 
-	if (m_justReleased && allowSelectOnClick(context))
+	if (m_justReleased && !context.inputConsumed && allowSelectOnClick(context))
 	{
 		bool wasSelected = m_selected;
 		bool multiSelect = diwne.input().multiSelectionActive();
 		if (!multiSelect)
 			diwne.deselectNodes();
 		setSelected(!wasSelected);
+		context.consumeInput(); // Only one item is selected per click
 	}
 	return false;
 }
@@ -762,6 +707,26 @@ void DiwneObject::stopDrag(DrawInfo& context)
 		context.state.dragEnd = true;
 		onDrag(context, false, true);
 	}
+}
+bool DiwneObject::isFixed() const
+{
+	return m_fixed;
+}
+void DiwneObject::setFixed(bool val)
+{
+	m_fixed = val;
+}
+DiwneObject* DiwneObject::getParentObject() const
+{
+	return m_parentObject;
+}
+void DiwneObject::setParentObject(DiwneObject* parent)
+{
+	m_parentObject = parent;
+}
+bool DiwneObject::isChildObject() const
+{
+	return getParentObject() != nullptr && getParentObject() != &diwne;
 }
 
 

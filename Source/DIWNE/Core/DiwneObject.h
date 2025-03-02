@@ -18,6 +18,7 @@
 #include <any>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include "diwne_actions.h"
 #include "diwne_common.h"
@@ -76,10 +77,13 @@ public:
 	 * @see updateLayout()
 	 */
 	ImRect m_rect;
-	bool m_destroy{false};  ///< Indicates the object is to be deleted
+	bool m_destroy{false};  ///< Indicates the object is to be deleted (and deallocated)
 	bool m_deletable{true}; ///< Whether the object can be deleted by the user
+	bool m_remove{false};   ///< Indicates the object is to be removed from the node editor, but not destroyed
 
-	std::string m_parentLabel; ///< Sets the parent object of object, relevant in hover hierarchy.
+	// TODO: (DR) Implement (true for most inner nodes, like in sequences)
+	//  In theory drag operations could affect sequences but ONLY when only same sequence ndoes are selected
+	bool m_fixed{false}; ///< Whether the object can be moved by user operations @see isFixed()
 
 	//
 
@@ -99,7 +103,9 @@ public:
 	//  rather big.
 	//  As for the m_rendered flag below, it could be replaced with a LOD level like "Hidden" or "DoNotRender".
 	//  Although that might be unnecessary as a basic rendered boolean flag is probably useful anyway.
-	bool m_rendered{true}; ///< Whether the object should be rendered
+
+	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
+	bool m_rendered{true};
 
 	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode) <<<<<<<<<<<<<<<<<<<<<<<
 	bool m_drawnThisFrame{false};
@@ -110,6 +116,9 @@ public:
 protected:
 	bool m_selectable{true}; ///< Should not be accessed directly. @see setSelectable()
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
+
+	/// Sets the parent object of object, relevant in node container and hover hierarchy.$
+	DiwneObject* m_parentObject{nullptr};
 
 public:
 	/**
@@ -147,6 +156,11 @@ public:
 	bool m_hovered{false};
 	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
 
+protected:
+	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
+	                      ///< Can be set in the end() method to determine if object is hovered if applicable
+
+public:
 	//
 	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
 	//  Rework so that DrawInfo context.inputConsumed is used instead
@@ -158,14 +172,10 @@ public:
 	 */
 	bool m_inner_interaction_happen{false};
 
+	// TODO: (DR) Review if this flag is used, it got kinda overtaken by the DrawInfo::logical/focusUpdate thing
 	// TODO: Active is marked true if this is the FIRST object that had m_inner_interaction_happen be true
 	bool m_isActive{false}; /**< Something happen with object */
 
-protected:
-	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
-	                      ///< Can be set in the end() method to determine if object is hovered if applicable
-
-public:
 	/**
 	 * \param diwne is node editor object that this object belongs to
 	 * \param id used to identification
@@ -303,6 +313,16 @@ public:
 	//  Probably when marking as thats what the old Node::deleteAction() method did.
 	virtual void onDestroy(bool logEvent);
 
+	// TODO: Finish implementation
+	/**
+	 * Marks the object from removal from the node editor, but not destruction.
+	 * Meaning the object can be moved to a different container as a child object (like child nodes).
+	 * @param logEvent The boolean flag passed to onRemove(), can be used to determine where was remove() called from.
+	 */
+	virtual void remove(bool logEvent = true);
+	// TODO: Maybe onAdd analog, talking about onAdd of the actual top level node editor
+	virtual void onRemove(bool logEvent);
+
 	// TODO: Rename to just getRect()
 	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	inline virtual ImRect getRectDiwne() const
@@ -315,9 +335,6 @@ public:
 	}
 	virtual void setPosition(const ImVec2& position);
 	virtual void translate(const ImVec2& vec);
-
-	bool isRendered() const;
-	void setRendered(bool mRendered);
 
 	/**
 	 * Set the selection state of the object.
@@ -338,7 +355,19 @@ public:
 	virtual void setSelectable(bool selectable);
 	virtual bool getSelectable();
 
-	// INTERACTIONS
+	bool isRendered() const;
+	void setRendered(bool val);
+
+	/**
+	 * Fixed objects are ones rendered at a position determined by some other object.
+	 * In such a case their position is "read only" as it will get overwritten.
+	 * Top level nodes aren't fixed, as the editor adjust the ImGui cursor to their position before drawing.
+	 * Objects drawn inside other objects will usually be fixed.
+	 */
+	bool isFixed() const;
+	void setFixed(bool val);
+
+	// Interactions
 	// =============================================================================================================
 	/// @page DIWNE Interactions
 	/// DiwneObject has a few built-in interactions that derived classes can react to.
@@ -549,6 +578,50 @@ public:
 		return m_idDiwne;
 	};
 
+
+	DiwneObject* getParentObject() const;
+	void setParentObject(DiwneObject* parent);
+
+	bool isChildObject() const;
+
+	bool isChildOfObject(DiwneObject* parent)
+	{
+		for (DiwneObject* o = this->m_parentObject; o; o = o->m_parentObject)
+		{
+			if (o == parent)
+				return true;
+		}
+		return false;
+	}
+
+	bool isAnyParentSelected()
+	{
+		for (DiwneObject* o = this->m_parentObject; o; o = o->m_parentObject)
+		{
+			if (o->getSelected())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns a shared pointer to this object.
+	 * All DiwneObjects are assumed to be stored somewhere as a shared pointer.
+	 * This can be used to retrieve an owning shared pointer from a "weak" raw pointer to a DiwneObject.
+	 * @tparam T The pointer will be statically cast to this type. Ensure the cast won't fail.
+	 */
+	template <typename T = DiwneObject>
+	std::shared_ptr<T> sharedPtr()
+	{
+		static_assert(std::is_base_of<DiwneObject, T>::value, "T must be derived from DIWNE::DiwneObject!");
+		std::shared_ptr<DiwneObject> sharedPtr = shared_from_this();
+#ifndef NDEBUG
+		if (std::dynamic_pointer_cast<T>(shared_from_this()) == nullptr)
+			assert(!"Invalid static pointer cast!");
+#endif
+		return std::static_pointer_cast<T>(sharedPtr);
+	}
+
 	// TODO: Should probably be moved into some util class to keep the DiwneObject concise
 	/** \brief Show a colored text for example for immediate hints
 	 * \param label is the text to show
@@ -583,13 +656,13 @@ public:
 
 	std::unique_ptr<Actions::DiwneAction> action;
 
-	// TODO: Maybe rename to createAction
+	// TODO: Maybe rename to createAction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	template <typename T, typename... Args>
 	T* startAction(Args&&... args)
 	{
-		Actions::DiwneAction* action = startAction(std::make_unique<T>(std::forward<Args>(args)...));
-		if (action)
-			return static_cast<T*>(action);
+		Actions::DiwneAction* a = startAction(std::make_unique<T>(std::forward<Args>(args)...));
+		if (a)
+			return static_cast<T*>(a);
 		return nullptr;
 	}
 
@@ -600,7 +673,7 @@ public:
 
 	// TODO: (DR) Resolve the dual access to actions via <T> and std::string name
 	//  Querying via type is cleaner as we can create actions that way
-	//  But it then requires a dynamic cast or something
+	//  But it then might require a dynamic cast or something
 	bool isActionActive(const std::string& name);
 	/// Checks whether an action is active and its source is the passed source diwne label
 	bool isActionActive(const std::string& name, const std::string& source);
@@ -613,7 +686,7 @@ public:
 	template <typename T>
 	T* getAction()
 	{
-		static_assert(std::is_base_of_v<DIWNE::Actions::DiwneAction, T>,
+		static_assert(std::is_base_of<DIWNE::Actions::DiwneAction, T>::value,
 		              "T must be derived from DIWNE::DiwneAction class.");
 #ifndef NDEBUG
 		if (action && dynamic_cast<T*>(action.get()) == nullptr)
@@ -629,9 +702,9 @@ public:
 	template <typename T>
 	T* getActiveAction(const std::string& name = "", const std::string& source = "")
 	{
-		static_assert(std::is_base_of_v<DIWNE::Actions::DiwneAction, T>,
+		static_assert(std::is_base_of<DIWNE::Actions::DiwneAction, T>::value,
 		              "T must be derived from DIWNE::DiwneAction class.");
-		T* ret = dynamic_cast<T*>(action.get());
+		T* ret = dynamic_cast<T*>(action.get()); // TODO: Avoid this dyn cast, see TODO above in action access duality
 		if (ret != nullptr)
 		{
 			if (!name.empty() && ret->name != name)
@@ -643,6 +716,7 @@ public:
 	}
 
 	bool dragging{false};
+	bool dragStart{false};
 	bool dragEnd{false};
 	std::string dragSource; // TODO: If the above was changed, then this can be the source of the action
 	                        // TODO: Question then arises what if there are multiple active actions? Do we make those

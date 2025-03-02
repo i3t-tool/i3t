@@ -27,10 +27,11 @@ static constexpr ImVec4 DIWNE_MAGENTA_50 = ImVec4(1.f, 0.f, 1.f, .5f);
 static constexpr ImVec4 DIWNE_GREEN = ImVec4(0.f, 1.f, 0.f, 1.f);
 static constexpr ImVec4 DIWNE_GREEN_50 = ImVec4(0.f, 1.f, 0.f, .5f);
 static constexpr ImVec4 DIWNE_BLUE = ImVec4(0.f, 0.f, 1.f, 1.f);
+static constexpr ImVec4 DIWNE_BLUE_50 = ImVec4(0.f, 0.f, 1.f, .5f);
 static constexpr ImVec4 DIWNE_YELLOW = ImVec4(1.f, 1.f, 0.f, 1.f);
 static constexpr ImVec4 DIWNE_YELLOW_50 = ImVec4(1.f, 1.f, 0.f, .5f);
 static constexpr ImVec4 DIWNE_CYAN = ImVec4(0.f, 1.f, 1.f, 1.f);
-static constexpr ImVec4 DIWNE_CYAN_50 = ImVec4(0.f, 1.f, 1.f, 1.f);
+static constexpr ImVec4 DIWNE_CYAN_50 = ImVec4(0.f, 1.f, 1.f, .5f);
 static constexpr ImVec4 DIWNE_ORANGE = ImVec4(1.f, 0.5f, 0.f, 1.f);
 static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
