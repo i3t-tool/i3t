@@ -12,14 +12,15 @@
  */
 #pragma once
 
-#include "DIWNE/Core/NodeContainer.h"
+#include "DIWNE/Core/Elements/Containers/INodeContainer.h"
 
+#include "DIWNE/Core/Elements/Containers/NodeDropZone.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "TransformationBase.h"
 
 namespace Workspace
 {
-class Sequence : public CoreNodeWithPins, public DIWNE::NodeContainer
+class Sequence : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
 private:
 	bool m_isCameraSequence;
@@ -74,6 +75,7 @@ public:
 	DIWNE::ConstNodeRange<CoreNode> getInnerWorkspaceNodes() const;
 
 	DIWNE::NodeRange<> getNodes() const override;
+	std::vector<std::shared_ptr<DIWNE::Node>>& getNodeList() override;
 
 	std::optional<Ptr<CoreNode>> getTransform(int index) const;
 

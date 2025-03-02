@@ -5,8 +5,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "Node.h"
-#include "NodeContainer.h"
+#include "Elements/Containers/INodeContainer.h"
+#include "Elements/Node.h"
 
 // Node iterators
 // ============================================================================================================
@@ -358,7 +358,7 @@ public:
 			current = _stack.top().operator->();
 
 		// TODO: Diwne node flags could be used to mark NodeContainers instead of using dynamic cast.
-		if (auto container = dynamic_cast<const NodeContainer*>(current))
+		if (auto container = dynamic_cast<const INodeContainer*>(current))
 		{
 			// If the node is a node container we dive deeper and iterate over child nodes
 			// Note: If dynamic_cast proves to be a performance issue some sort of a tagging system can be used
@@ -403,7 +403,7 @@ public:
 
 /**
  * A complex iterator that iterates over all top level nodes as well as any child nodes that individual nodes contain.
- * Child nodes of a node are specified by the NodeContainer::getNodes() method which container nodes must implement.
+ * Child nodes of a node are specified by the INodeContainer::getNodes() method which container nodes must implement.
  * For simplicity this iterator can only go forward and does not provide random access.
  *
  * @tparam NodeType The node type returned nodes are casted to. It <b>must be ensured</b> that the passed node list

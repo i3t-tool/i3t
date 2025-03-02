@@ -13,7 +13,7 @@
  */
 #pragma once
 
-#include "DiwneObject.h"
+#include "DIWNE/Core/Elements/DiwneObject.h"
 
 namespace DIWNE
 {

@@ -14,8 +14,8 @@
 
 #include "Logger/Logger.h"
 
-#include "NodeEditor.h"
-#include "diwne_actions.h"
+#include "DIWNE/Core/NodeEditor.h"
+#include "DIWNE/Core/diwne_actions.h"
 
 // TODO: (DR) Remove these imports <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"

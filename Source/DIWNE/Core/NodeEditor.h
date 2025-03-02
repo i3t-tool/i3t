@@ -15,7 +15,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "DiwneObject.h"
+#include "Elements/DiwneObject.h"
 
 #include "Canvas.h"
 #include "DiwneStyle.h"

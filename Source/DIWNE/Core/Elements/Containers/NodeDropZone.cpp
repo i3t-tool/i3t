@@ -13,11 +13,6 @@ NodeDropZone::NodeDropZone(NodeEditor& diwne, DiwneObject* parent) : DiwneObject
 	setFixed(true);
 }
 
-NodeRange<> NodeDropZone::getNodes() const
-{
-	return NodeRange<>(&m_nodes);
-}
-
 void NodeDropZone::begin(DrawInfo& context)
 {
 	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, diwne.style().dropZoneBackground);

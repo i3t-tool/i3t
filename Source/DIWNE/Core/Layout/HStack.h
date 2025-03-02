@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../DiwnePanel.h"
+#include "DiwnePanel.h"
 
 namespace DIWNE
 {

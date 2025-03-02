@@ -20,8 +20,8 @@
 #include <string>
 #include <type_traits>
 
-#include "diwne_actions.h"
-#include "diwne_common.h"
+#include "DIWNE/Core/diwne_actions.h"
+#include "DIWNE/Core/diwne_common.h"
 
 namespace DIWNE
 {

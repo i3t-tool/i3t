@@ -4,9 +4,9 @@
 
 #include "NodeEditor.h"
 
-#include "Link.h"
-#include "Node.h"
-#include "Pin.h"
+#include "Elements/Link.h"
+#include "Elements/Node.h"
+#include "Elements/Pin.h"
 
 namespace DIWNE
 {

@@ -15,8 +15,8 @@
 // TODO: REMOVE THIS IMPORT, move the functionality to the concrete Workspace implementation
 #include "Core/Input/InputManager.h"
 
-#include "NodeEditor.h"
-#include "diwne_actions.h"
+#include "DIWNE/Core/NodeEditor.h"
+#include "DIWNE/Core/diwne_actions.h"
 
 #if DIWNE_DEBUG_ENABLED
 #include "Pin.h"

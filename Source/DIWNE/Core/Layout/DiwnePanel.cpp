@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-#include "NodeEditor.h"
+#include "DIWNE/Core/NodeEditor.h"
 
 namespace DIWNE
 {
@@ -46,13 +46,14 @@ void DiwnePanel::end(DiwnePanel* parent)
 		if (m_rect.GetArea() > 0.0f)
 		{
 			m_editor.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(0, 0, 255, 100), 0,
-			                                  ImDrawFlags_RoundCornersNone, 1);
+			                               ImDrawFlags_RoundCornersNone, 1);
 			ImVec2 originPos = ImVec2(m_rect.Min.x, m_rect.Max.y);
-			ImGui::GetForegroundDrawList()->AddText(
-			    m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
-			    (std::string() + m_label)
-			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
-			        .c_str());
+			ImGui::GetForegroundDrawList()->AddText(m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+			                                        IM_COL32_WHITE,
+			                                        (std::string() + m_label)
+			                                            //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" :
+			                                            //"") + (m_isDragged ? "Dragged\n" : "")
+			                                            .c_str());
 		}
 	});
 }
@@ -60,23 +61,24 @@ void DiwnePanel::end(DiwnePanel* parent)
 void DiwnePanel::layout()
 {
 	m_availableSpringWidth = m_rect.GetWidth() - m_submittedFixedWidth;
-//	if (m_availableSpringWidth < 0.0f)
-//	{
-//		std::cout << "[WARNING] DiwnePanel: Available spring width is negative! " << m_availableSpringWidth
-//		          << std::endl;
-//	}
+	//	if (m_availableSpringWidth < 0.0f)
+	//	{
+	//		std::cout << "[WARNING] DiwnePanel: Available spring width is negative! " << m_availableSpringWidth
+	//		          << std::endl;
+	//	}
 	m_availableSpringWidth = std::max(0.0f, m_availableSpringWidth);
 	DIWNE_DEBUG_LAYOUT((m_editor), {
 		if (m_rect.GetArea() > 0.0f)
 		{
 			m_editor.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, ImColor(255, 0, 255, 100), 0,
-			                                  ImDrawFlags_RoundCornersNone, 2);
+			                               ImDrawFlags_RoundCornersNone, 2);
 			ImVec2 originPos = ImVec2(m_rect.Min.x, m_rect.Max.y);
-			ImGui::GetForegroundDrawList()->AddText(
-			    m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
-			    (std::string() + m_label)
-			        //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "")
-			        .c_str());
+			ImGui::GetForegroundDrawList()->AddText(m_editor.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+			                                        IM_COL32_WHITE,
+			                                        (std::string() + m_label)
+			                                            //		     (m_ ? "Hovered\n" : "") + (m_isPressed ? "Held\n" :
+			                                            //"") + (m_isDragged ? "Dragged\n" : "")
+			                                            .c_str());
 		}
 	});
 }
@@ -123,7 +125,8 @@ void DiwnePanel::applyQueuedWidth()
 void DiwnePanel::spring(float relSize)
 {
 	float springWidth = m_availableSpringWidth * relSize;
-	if (springWidth > 0.0f) {
+	if (springWidth > 0.0f)
+	{
 		ImGui::Dummy(ImVec2(springWidth * m_editor.getZoom(), 0));
 		ImGui::SameLine(0, 0);
 		applyQueuedWidth();

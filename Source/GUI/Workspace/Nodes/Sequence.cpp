@@ -236,24 +236,25 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	}
 
 	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
-//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
-//	{
-//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-//		if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 ||
-//		                              dragedNode->aboveSequence == getId())) /* only transformation can be in Sequence
-//		                                                                             && not above other sequence */
-//		{
-//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
-//			if (position_of_draged_node_in_sequence >= 0)
-//			{
-//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
-//			}
-//#ifdef WORKSPACE_DEBUG
-//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
-//#endif // WORKSPACE_DEBUG
-//		}
-//	}
+	//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
+	//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
+	//	{
+	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
+	//		if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 ||
+	//		                              dragedNode->aboveSequence == getId())) /* only transformation can be in
+	// Sequence
+	//		                                                                             && not above other sequence */
+	//		{
+	//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
+	//			if (position_of_draged_node_in_sequence >= 0)
+	//			{
+	//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
+	//			}
+	// #ifdef WORKSPACE_DEBUG
+	//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
+	// #endif // WORKSPACE_DEBUG
+	//		}
+	//	}
 
 	// Check if transform is marked for removal.
 	{
@@ -394,4 +395,8 @@ void Sequence::onDestroy(bool logEvent)
 	{
 		node->destroy(logEvent);
 	}
+}
+std::vector<std::shared_ptr<DIWNE::Node>>& Sequence::getNodeList()
+{
+	return m_workspaceInnerTransformations;
 }

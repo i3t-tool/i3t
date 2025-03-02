@@ -12,7 +12,7 @@
  */
 #include "Link.h"
 
-#include "NodeEditor.h"
+#include "DIWNE/Core/NodeEditor.h"
 #include "Pin.h"
 
 namespace DIWNE
@@ -70,11 +70,12 @@ void Link::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
 		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
-		ImGui::GetForegroundDrawList()->AddText(
-		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
-		    (std::string() + m_labelDiwne + "\nstart: " + (m_startPin ? m_startPin->m_labelDiwne : "null") +
-		     "\nend: " + (m_endPin ? m_endPin->m_labelDiwne : "null"))
-		        .c_str());
+		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		                                        (std::string() + m_labelDiwne +
+		                                         "\nstart: " + (m_startPin ? m_startPin->m_labelDiwne : "null") +
+		                                         "\nend: " + (m_endPin ? m_endPin->m_labelDiwne : "null"))
+		                                            .c_str());
 	});
 }
 
@@ -101,8 +102,8 @@ void Link::onHover(DrawInfo& context)
 	//		diwne.setDiwneAction(getTouchActionType());
 	//	}
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                      diwne.mp_settingsDiwne->objectHoverBorderColor,
-	                                      diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+	                                   diwne.mp_settingsDiwne->objectHoverBorderColor,
+	                                   diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 }
 // bool Link::processFocusedForInteraction()
 //{
@@ -116,14 +117,13 @@ void Link::content(DrawInfo& context)
 {
 	if (m_selected)
 	{
-		diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
-		                                      m_endDiwne, diwne.mp_settingsDiwne->linkColorSelected,
-		                                      diwne.mp_settingsDiwne->linkThicknessDiwne +
-		                                          diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne);
+		diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+		                                   diwne.mp_settingsDiwne->linkColorSelected,
+		                                   diwne.mp_settingsDiwne->linkThicknessDiwne +
+		                                       diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne);
 	}
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                      diwne.mp_settingsDiwne->linkColor,
-	                                      diwne.mp_settingsDiwne->linkThicknessDiwne);
+	                                   diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
 	DIWNE_DEBUG(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);

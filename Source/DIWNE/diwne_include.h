@@ -43,6 +43,6 @@
 
 #include "Core/NodeEditor.h"
 
-#include "Core/Link.h"
-#include "Core/Node.h"
-#include "Core/Pin.h"
+#include "Core/Elements/Link.h"
+#include "Core/Elements/Node.h"
+#include "Core/Elements/Pin.h"

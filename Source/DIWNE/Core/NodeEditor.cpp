@@ -14,14 +14,11 @@
 
 #include "Logger/Logger.h"
 
-#include "Link.h"
-#include "Node.h"
-#include "Pin.h"
+#include "Elements/Link.h"
+#include "Elements/Node.h"
+#include "Elements/Pin.h"
 
 #include "diwne_actions.h"
-
-// TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 
 namespace DIWNE
 {

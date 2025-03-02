@@ -1,20 +1,17 @@
 #pragma once
 
-#include "DIWNE/Core/DiwneObject.h"
-#include "DIWNE/Core/NodeContainer.h"
+#include "DIWNE/Core/Elements/Containers/NodeContainer.h"
+#include "DIWNE/Core/Elements/DiwneObject.h"
 
 namespace DIWNE
 {
 class NodeDropZone : public DiwneObject, public NodeContainer
 {
 protected:
-	std::vector<std::shared_ptr<Node>> m_nodes;
 	int m_dropIndex = -1; ///< Insertion index of a dragged node that might get dropped in (invalid if negative)
 
 public:
 	NodeDropZone(DIWNE::NodeEditor& diwne, DiwneObject* parent);
-
-	NodeRange<> getNodes() const override;
 
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;

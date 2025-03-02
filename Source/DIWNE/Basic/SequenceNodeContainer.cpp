@@ -20,4 +20,8 @@ DIWNE::NodeRange<> SequenceNodeContainer::getNodes() const
 {
 	return m_dropZone->getNodes();
 }
+std::vector<std::shared_ptr<Node>>& SequenceNodeContainer::getNodeList()
+{
+	return m_dropZone->getNodeList();
+}
 } // namespace DIWNE

@@ -7,7 +7,7 @@
 #include "I3TUtil.h"
 
 #include "DIWNE/Basic/BasicNode.h"
-#include "DIWNE/Basic/BasicNodeContainer.h"
+#include "DIWNE/Basic/DummyContainerNode.h"
 #include "DIWNE/diwne_include.h"
 
 using namespace DIWNE;
@@ -95,11 +95,11 @@ TEST(IteratorsTest, RecursiveNodeRangeTest)
 	auto node5 = std::make_shared<DIWNE::BasicNode>(editor, "Node 5");
 	auto node6 = std::make_shared<DIWNE::BasicNode>(editor, "Node 6");
 
-	auto container1 = std::make_shared<DIWNE::BasicNodeContainer>(editor, "Container 1");
+	auto container1 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 1");
 	container1->addNode(node5);
 	editor.addNode(container1, ImVec2(100, 100));
 
-	auto container2 = std::make_shared<DIWNE::BasicNodeContainer>(editor, "Container 2");
+	auto container2 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 2");
 	container2->addNode(node6);
 	editor.addNode(container2, ImVec2(200, 100));
 
@@ -182,11 +182,11 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 	auto node5 = std::make_shared<DIWNE::BasicNode>(editor, "Node 5");
 	auto node6 = std::make_shared<DIWNE::BasicNode>(editor, "Node 6");
 
-	auto container1 = std::make_shared<DIWNE::BasicNodeContainer>(editor, "Container 1");
+	auto container1 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 1");
 	container1->addNode(node5);
 	editor.addNode(container1, ImVec2(100, 100));
 
-	auto container2 = std::make_shared<DIWNE::BasicNodeContainer>(editor, "Container 2");
+	auto container2 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 2");
 	container2->addNode(node6);
 	editor.addNode(container2, ImVec2(200, 100));
 
@@ -261,7 +261,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 		nodePtrs.clear();
 		nodeSharedPtrs.clear();
 
-		auto container3 = std::make_shared<DIWNE::BasicNodeContainer>(editor, "Container 3");
+		auto container3 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 3");
 		editor.addNode(container3, ImVec2(200, 200));
 
 		auto node7 = std::make_shared<DIWNE::BasicNode>(editor, "Node 7");

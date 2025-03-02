@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DIWNE/Core/DiwnePanel.h"
-#include "DIWNE/Core/Node.h"
+#include "DIWNE/Core/Layout/DiwnePanel.h"
+#include "DIWNE/Core/Elements/Node.h"
 
 namespace DIWNE
 {

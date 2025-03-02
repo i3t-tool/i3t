@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "../DiwnePanel.h"
+#include "DiwnePanel.h"
 
 namespace DIWNE
 {
