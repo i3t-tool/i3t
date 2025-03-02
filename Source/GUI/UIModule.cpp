@@ -326,6 +326,8 @@ void UIModule::loadFonts()
 	    0x007F, // Basic Latin
 	    0x0080,
 	    0x017F, // Czech mini (Latin-1 Supplement + Latin extended A)
+	    0x0400,
+	    0x04FF, // Cyrillic
 	    // 0x0080, 0x07FF, // Czech + lot of right to left characters -- too many never used characters
 	    // 0x25FC, 0x2BC8, // Geometric shapes media buttons stop and play - are not in our fonts
 	    // - this is a too long range instead of two characters
