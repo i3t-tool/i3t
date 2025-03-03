@@ -13,6 +13,17 @@ protected:
 public:
 	NodeDropZone(DIWNE::NodeEditor& diwne, DiwneObject* parent);
 
+	/**
+	 * Decides whether the passed node should be allowed to be added to this drop zone.
+	 */
+	virtual bool acceptNode(Node* node)
+	{
+		return true;
+	}
+
+	void addNodeAt(const std::shared_ptr<Node>& node, int index = 0) override;
+	bool removeNodeAt(int index) override;
+
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
@@ -22,13 +33,6 @@ public:
 
 	void afterDraw(DrawInfo& context) override;
 
-	/**
-	 * Decides whether the passed node should be allowed to be added to this drop zone.
-	 */
-	virtual bool acceptNode(Node* node)
-	{
-		return true;
-	}
 	bool allowDragStart() const override;
 
 protected:
@@ -47,6 +51,9 @@ protected:
 	 * @return The index at which the new node should be added, -1 for failure.
 	 */
 	virtual int acceptNodeDiwne(Node* node);
+
+	/// Content drawn where there are no nodes in the drop zone
+	virtual void drawEmptyContent(DrawInfo& context);
 };
 
 } // namespace DIWNE

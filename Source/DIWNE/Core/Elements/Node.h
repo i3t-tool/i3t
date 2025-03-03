@@ -17,14 +17,6 @@
 namespace DIWNE
 {
 class NodeEditor;
-/*! \brief Used when one node is inside of another -> the inner node is drawn
- * OnCursorPosition when outer node is drawn
- */
-enum DrawModeNodePosition
-{
-	OnCursorPosition, ///< cursor position in screen coordinates
-	OnItsPosition     ///< node position in Diwne coordinates
-};
 
 using NodeFlag = uint64_t;
 
@@ -34,21 +26,9 @@ using NodeFlag = uint64_t;
 class Node : public DiwneObject
 {
 protected:
-	DrawModeNodePosition m_nodePosMode{OnItsPosition};
-
 	NodeFlag m_flag{0}; ///< The node flag bit field @see Node::getFlag()
 
 public:
-	// TODO: (DR) This should probably be a DiwneObject property
-	// bool m_drawAnyway = true; /*!< you have to draw the node anyway. // (PF) was float!?!?
-	//                         For example in the first frame after you created it
-	//                         -> to obtain its real size */
-	// todo (PF) rename to something like m_forceToDraw, m_forceFirstTimeDraw, or m_forceToDrawFirstTime
-	// This variable is
-	// - set to true in the Node constructor only
-	// - dropped to false in Node::beforeBeginDiwne()
-	// - used to force drawing the node for the first time
-
 	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
 
 	~Node() override;
@@ -71,22 +51,25 @@ public:
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
-	//	void updateLayout() override;
+	void updateLayout(DrawInfo& context) override;
 
 protected:
 	void afterDrawDiwne(DrawInfo& context) override;
-	bool processSelectDiwne(DrawInfo& context) override;
 
 public:
 	bool allowDrawing() override;
+
 
 	// Interaction
 	// =============================================================================================================
 	void onSelection(bool selected) override;
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
 	void onDestroy(bool logEvent) override;
-	void updateLayout(DrawInfo& context) override;
 
+protected:
+	bool processSelectDiwne(DrawInfo& context) override;
+
+public:
 	// Getters and setters
 	// =============================================================================================================
 	/**
@@ -100,6 +83,10 @@ public:
 	 */
 	bool getFlag(char index) const;
 	void setFlag(char index, bool value); ///< Set the node bit flag value at index @see getFlag()
+
+	// Internal stuff
+	// =============================================================================================================
+	virtual void drawSelectionIndicator(DrawInfo& context);
 };
 
 } /* namespace DIWNE */

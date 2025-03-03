@@ -14,11 +14,29 @@ std::vector<std::shared_ptr<Node>>& NodeContainer::getNodeList()
 }
 void NodeContainer::addNode(const std::shared_ptr<Node>& node)
 {
-	m_nodes.push_back(node);
+	addNodeAt(node, m_nodes.size());
 }
-void NodeContainer::removeNode(const std::shared_ptr<Node>& node)
+bool NodeContainer::removeNode(const std::shared_ptr<Node>& node)
 {
-	m_nodes.erase(std::remove(m_nodes.begin(), m_nodes.end(), node), m_nodes.end());
+	auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
+	if (it == m_nodes.end())
+		return false;
+	int index = std::distance(m_nodes.begin(), it);
+	return removeNodeAt(index);
+}
+void NodeContainer::addNodeAt(const std::shared_ptr<Node>& node, int index)
+{
+	assert(node != nullptr);
+	assert(index >= 0 && index <= m_nodes.size());
+	m_nodes.insert(m_nodes.begin() + index, node);
+	onNodeAdd(node.get(), index);
+}
+bool NodeContainer::removeNodeAt(int index)
+{
+	assert(index >= 0 && index < m_nodes.size());
+	onNodeRemove(m_nodes.at(index).get(), index);
+	m_nodes.erase(m_nodes.begin() + index);
+	return true;
 }
 
 } // namespace DIWNE

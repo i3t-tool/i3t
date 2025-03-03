@@ -25,103 +25,154 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 	m_headerMinWidth = 120;
 }
 
-bool Sequence::allowDrawing()
-{
-	return m_isCameraSequence || CoreNode::allowDrawing();
-}
-
-void Sequence::drawMenuLevelOfDetail()
-{
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
-	                              {LevelOfDetail::Full, LevelOfDetail::Label});
-}
-
-int Sequence::getInnerPosition(std::vector<ImVec2> points)
-{
-	ImRect rect = getRectDiwne();
-	bool any_in = false;
-	ImVec2 in_point;
-	for (auto const& point : points)
-	{
-		if (rect.Contains(point))
-		{
-			in_point = point;
-			any_in = true;
-		}
-	}
-
-	if (!any_in)
-		return -1;
-
-	rect.Max.x = rect.Min.x; /* squeeze rect at begin -> then in cycle shift rect
-	                            and check point position */
-	int i = 0;
-	for (const auto& innerNode : getInnerWorkspaceNodes())
-	{
-		rect.Max.x = innerNode.getRectDiwne().GetCenter().x;
-		if (rect.Contains(in_point))
-		{
-			return i;
-		}
-		rect.Min.x = rect.Max.x;
-		i++;
-	}
-	return i;
-}
-
-void Sequence::popNode(int index)
-{
-	std::shared_ptr<TransformationBase> transformation =
-	    std::dynamic_pointer_cast<TransformationBase>(m_workspaceInnerTransformations[index]);
-	transformation->setRemoveFromSequence(true);
-	transformation->m_parentSequence.reset();
-	// is done in next frame based on setRemoveFromSequence(true)
-	// m_workspaceInnerTransformations.erase(node_iter);
-	m_nodebase->as<Core::Sequence>()->popMatrix(index);
-}
-
-void Sequence::pushNode(Ptr<CoreNode> node, int index)
-{
-	Ptr<TransformationBase> node_t = std::dynamic_pointer_cast<TransformationBase>(node);
-	if (node_t != nullptr && 0 <= index && index <= m_workspaceInnerTransformations.size())
-	{
-		node_t->setRemoveFromSequence(false);
-		m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin() + index, node_t);
-		m_nodebase->as<Core::Sequence>()->pushMatrix(node_t->getNodebase()->as<Core::Transform>(), index);
-		node_t->m_parentSequence = std::static_pointer_cast<Sequence>(shared_from_this());
-	}
-}
-
 void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)
 {
-	pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not
-	                                remove node from vector in window*/
-	dragedNode->setRemoveFromWorkspace(true);
+	m_dropZone->addNodeAt(dragedNode, index);
 }
 
 void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node)
 {
-	// TODO: What the actual x is this?
-	node->setRemoveFromWorkspace(false);
-	dynamic_pointer_cast<TransformationBase>(node)->setRemoveFromSequence(true);
-	//	node->m_selectable = true;
-	diwne.addNode(node);
-	//	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
-	//	popNode(node);
+	m_dropZone->removeNode(node);
 }
 
-
+DIWNE::NodeRange<> Sequence::getNodes() const
+{
+	return m_dropZone->getNodes();
+}
+std::vector<std::shared_ptr<DIWNE::Node>>& Sequence::getNodeList()
+{
+	return m_dropZone->getNodeList();
+}
+// TODO: Rename to get core nodes or get workspace nodes
+DIWNE::NodeRange<CoreNode> Sequence::getInnerWorkspaceNodes()
+{
+	return DIWNE::NodeRange<CoreNode>(&getNodeList());
+}
 std::optional<Ptr<CoreNode>> Sequence::getTransform(int index) const
 {
-	if (index >= m_workspaceInnerTransformations.size())
+	if (index >= m_dropZone->getNodeList().size())
 		return std::nullopt;
 
-	return std::static_pointer_cast<CoreNode>(m_workspaceInnerTransformations[index]);
+	return std::static_pointer_cast<CoreNode>(m_dropZone->getNodeList()[index]);
 }
 
-void Sequence::setPostionOfDummyData(int positionOfDummyData)
+bool Sequence::allowDrawing()
 {
-	m_position_of_dummy_data = positionOfDummyData;
+	// TODO: Why do we care if we're a Camera sequence? What's the reason?
+	return m_isCameraSequence || CoreNode::allowDrawing();
+}
+
+// TODO: Rewrite
+// bool Sequence::beforeContent()
+//{
+//	// TODO: Remove
+//	/* whole node background */
+//	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+//	                         I3T::getTheme().get(EColor::NodeBgTransformation),
+//	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
+//	return false;
+//}
+
+void Sequence::centerContent(DIWNE::DrawInfo& context)
+{
+	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
+	Ptr<TransformationBase> dragedNode;
+
+	if (m_levelOfDetail == LevelOfDetail::Label)
+	{
+		return;
+	}
+
+	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
+	if (matrixInput->isConnected())
+	{
+		if (matrixInput->connectionChanged())
+		{
+			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
+			updateDataItemsWidth();
+		}
+		bool valueChanged = false;
+		int rowOfChange, columnOfChange;
+		float valueOfChange;
+		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
+
+		// TODO: Pass context to draw data
+		if (DataRenderer::drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
+		                              inputMatrix,
+		                              {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                               Core::EValueState::Locked},
+		                              valueChanged, rowOfChange, columnOfChange, valueOfChange))
+		{
+			context.update(true, true, true);
+		}
+		return;
+	}
+	else
+	{
+		m_dropZone->drawDiwne(context, m_drawMode2);
+		ImGui::Spacing();
+	}
+}
+
+void Sequence::setNumberOfVisibleDecimal(int value)
+{
+	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
+	{
+		m_numberOfVisibleDecimal = value;
+		updateDataItemsWidth();
+	}
+	else
+	{
+		for (auto& transformation : getInnerWorkspaceNodes())
+		{
+			transformation.setNumberOfVisibleDecimal(value);
+		}
+	}
+}
+
+int Sequence::maxLengthOfData()
+{
+	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
+	{
+		/*\todo JM HM better selection (index) of data*/
+		return DataRenderer::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
+	}
+	return 0;
+}
+
+void Sequence::onDestroy(bool logEvent)
+{
+	CoreNodeWithPins::onDestroy(logEvent);
+	for (auto& node : m_dropZone->getNodeList())
+	{
+		node->destroy(logEvent);
+	}
+}
+
+void Sequence::popupContent(DIWNE::DrawInfo& context)
+{
+	CoreNodeWithPins::drawMenuSetEditable();
+
+	ImGui::Separator();
+
+	popupContentTracking();
+
+	ImGui::Separator();
+
+	drawMenuSetPrecision();
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	CoreNode::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	Node::popupContent(context);
 }
 
 void Sequence::popupContentTracking()
@@ -162,241 +213,44 @@ void Sequence::popupContentTracking()
 	}
 }
 
-void Sequence::popupContent(DIWNE::DrawInfo& context)
+void Sequence::drawMenuLevelOfDetail()
 {
-	CoreNodeWithPins::drawMenuSetEditable();
-
-	ImGui::Separator();
-
-	popupContentTracking();
-
-	ImGui::Separator();
-
-	drawMenuSetPrecision();
-	drawMenuLevelOfDetail();
-
-	ImGui::Separator();
-
-	CoreNode::drawMenuDuplicate();
-
-	ImGui::Separator();
-
-	Node::popupContent(context);
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
+	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
 
-// TODO: Rewrite
-// bool Sequence::beforeContent()
-//{
-//	// TODO: Remove
-//	/* whole node background */
-//	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
-//	                         I3T::getTheme().get(EColor::NodeBgTransformation),
-//	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
-//	return false;
-//}
-
-void Sequence::centerContent(DIWNE::DrawInfo& context)
+Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)
+    : m_sequence(sequence), NodeDropZone(diwne, sequence)
+{}
+void Sequence::SequenceDropZone::onNodeAdd(DIWNE::Node* node, int index)
 {
-	bool inner_interaction_happen = false;
-	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
-	Ptr<TransformationBase> dragedNode;
-
-	if (m_levelOfDetail == LevelOfDetail::Label)
-	{
-		return;
-	}
-
-	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
-	if (matrixInput->isConnected())
-	{
-		if (matrixInput->connectionChanged())
-		{
-			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
-			updateDataItemsWidth();
-		}
-		bool valueChanged = false;
-		int rowOfChange, columnOfChange;
-		float valueOfChange;
-		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
-
-		// TODO: Pass context to draw data
-		if (DataRenderer::drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-		                              inputMatrix,
-		                              {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		                               Core::EValueState::Locked},
-		                              valueChanged, rowOfChange, columnOfChange, valueOfChange))
-		{
-			context.update(true, true, true);
-		}
-		return;
-	}
-
-	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
-	//	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
-	//	{
-	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-	//		if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 ||
-	//		                              dragedNode->aboveSequence == getId())) /* only transformation can be in
-	// Sequence
-	//		                                                                             && not above other sequence */
-	//		{
-	//			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
-	//			if (position_of_draged_node_in_sequence >= 0)
-	//			{
-	//				dragedNode->aboveSequence = getId(); /* reset in transformation beforeBegin */
-	//			}
-	// #ifdef WORKSPACE_DEBUG
-	//			ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
-	// #endif // WORKSPACE_DEBUG
-	//		}
-	//	}
-
-	// Check if transform is marked for removal.
-	{
-		auto it = m_workspaceInnerTransformations.begin();
-		while (it != m_workspaceInnerTransformations.end())
-		{
-			bool removeFromSeq = std::dynamic_pointer_cast<TransformationBase>(*it)->getRemoveFromSequence();
-			if (removeFromSeq)
-			{
-				std::size_t idx = std::distance(m_workspaceInnerTransformations.begin(), it);
-				popNode(idx);
-				it = m_workspaceInnerTransformations.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
-	}
-
-	//
-	int i = 0, push_index = -1;
-	bool interaction_with_transformation_happen = false;
-	for (auto const& transformation : m_workspaceInnerTransformations)
-	{
-		if (position_of_draged_node_in_sequence == i)
-		{
-			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom());
-			ImGui::SameLine();
-			// TODO: (DR) Can we implement this without calling bypassReleaseAction? (Could then make those protected)
-			if (dragedNode->bypassReleaseAction())
-			{
-				push_index = i;
-			}
-		}
-		/* with no selection manipulator not work
-		    transformation->m_selectable = false;
-		    transformation->setSelected(false);
-		*/
-
-		// TODO: Adapt to new context <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-		/* \todo some better selected transformation/nodes politic (when dragging,
-		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
-		 * action to do and in WorkspaceDiwne react to this action  */
-		// interaction_with_transformation_happen |=
-		DIWNE::DrawInfo result =
-		    transformation->drawDiwneEx(context, m_drawMode2 | (m_isPressed ? DIWNE::DrawMode_JustDraw : 0));
-		ImGui::SameLine();
-		i++;
-	}
-	if (interaction_with_transformation_happen)
-	{
-		inner_interaction_happen = false; /* do not set sequence as interacting node
-		              -> selected transformation should be only interacting */
-	}
-	if (i == 0 || position_of_draged_node_in_sequence == i) /* add dummy after last inner or if empty */
-	{
-		ImGui::Dummy(position_of_draged_node_in_sequence == i
-		                 ? I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom()
-		                 : I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) * diwne.getZoom() /
-		                       2); /* smaller dummy if dragged node is not over Sequence */
-		if (dragedNode && dragedNode->bypassReleaseAction() && position_of_draged_node_in_sequence >= 0)
-		{
-			push_index = i;
-		}
-	}
-
-	if (push_index >= 0)
-	{
-		moveNodeToSequence(std::dynamic_pointer_cast<CoreNode>(dragedNode), push_index);
-		inner_interaction_happen |= true;
-	}
-
-	// TODO: REIMPLEMENT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	/* pop NodeFrom Sequence */
-	//	if (m_drawMode2 == DIWNE::DrawMode_Interactive && diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
-	//	{
-	//		dragedNode = diwne.getLastActiveNode<TransformationBase>();
-	//		if (dragedNode != nullptr) /* only transformation can be in Sequence*/
-	//		{
-	//			if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
-	//			{
-	//				moveNodeToWorkspace(dragedNode);
-	//				inner_interaction_happen = false; /* do not set sequence as interacting node -> draged
-	//				                                     transformation should be only interacting */
-	//			}
-	//		}
-	//	}
-
-	if (inner_interaction_happen)
-		context.update(true, true, true);
+	auto transformation = static_cast<TransformationBase*>(node);
+	auto coreTransformation = transformation->getNodebase()->as<Core::Transform>();
+	m_sequence->m_nodebase->as<Core::Sequence>()->pushMatrix(coreTransformation, index);
+	transformation->m_parentSequence = std::static_pointer_cast<Sequence>(m_sequence->shared_from_this());
+	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
 }
-
-void Sequence::setNumberOfVisibleDecimal(int value)
+void Sequence::SequenceDropZone::onNodeRemove(DIWNE::Node* node, int index)
 {
-	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
-	{
-		m_numberOfVisibleDecimal = value;
-		updateDataItemsWidth();
-	}
-	else
-	{
-		for (auto& transformation : getInnerWorkspaceNodes())
-		{
-			transformation.setNumberOfVisibleDecimal(value);
-		}
-	}
+	auto transformation = static_cast<TransformationBase*>(node);
+	transformation->m_parentSequence.reset();
+	m_sequence->m_nodebase->as<Core::Sequence>()->popMatrix(index);
+	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
 }
-
-int Sequence::maxLengthOfData()
+bool Sequence::SequenceDropZone::acceptNode(DIWNE::Node* node)
 {
-	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
-	{
-		/*\todo JM HM better selection (index) of data*/
-		return DataRenderer::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
-	}
-	return 0;
+	// TODO: Remove dynamic_cast
+	return dynamic_cast<TransformationBase*>(node) != nullptr;
 }
-
-// TODO: Rename to get core nodes or get workspace nodes
-DIWNE::NodeRange<CoreNode> Sequence::getInnerWorkspaceNodes()
+void Sequence::SequenceDropZone::drawEmptyContent(DIWNE::DrawInfo& context)
 {
-	return DIWNE::NodeRange<CoreNode>(&m_workspaceInnerTransformations);
-}
-DIWNE::ConstNodeRange<CoreNode> Sequence::getInnerWorkspaceNodes() const
-{
-	return DIWNE::ConstNodeRange<CoreNode>(&m_workspaceInnerTransformations);
-}
-DIWNE::NodeRange<> Sequence::getNodes() const
-{
-	return DIWNE::NodeRange<DIWNE::Node>(&m_workspaceInnerTransformations);
-}
-void Sequence::onDestroy(bool logEvent)
-{
-	CoreNodeWithPins::onDestroy(logEvent);
-	for (auto& node : m_workspaceInnerTransformations)
-	{
-		node->destroy(logEvent);
-	}
-}
-std::vector<std::shared_ptr<DIWNE::Node>>& Sequence::getNodeList()
-{
-	return m_workspaceInnerTransformations;
+	float zoom = diwne.getZoom();
+	const ImVec2 defaultSize = ImVec2(160 * zoom, 120 * zoom);
+	ImVec2 origin = ImGui::GetCursorScreenPos();
+	const char* emptyLabel = "    Drag and drop\ntransformations here";
+	ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -
+	                          ImVec2(0, ImGui::GetStyle().ItemSpacing.y / 2.0f));
+	ImGui::TextDisabled("%s", emptyLabel);
+	ImGui::SetCursorScreenPos(origin);
+	ImGui::Dummy(defaultSize);
 }

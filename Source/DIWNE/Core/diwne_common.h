@@ -47,7 +47,7 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 	} while (0) // do-while to prevent issues with single line statements
 #define DIWNE_DEBUG_VARS()                                                                                             \
 	bool m_diwneDebug = false;                                                                                         \
-	bool m_diwneDebugLayout = true;                                                                                    \
+	bool m_diwneDebugLayout = false;                                                                                   \
 	bool m_diwneDebugObjects = false;                                                                                  \
 	bool m_diwneDebugInteractions = false;
 #define DIWNE_DEBUG(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebug)

@@ -25,14 +25,7 @@ void NodeDropZone::content(DrawInfo& context)
 	float zoom = diwne.getZoom();
 	if (m_nodes.empty())
 	{
-		const ImVec2 defaultSize = ImVec2(130 * zoom, 70 * zoom);
-		ImVec2 origin = ImGui::GetCursorScreenPos();
-		const char* emptyLabel = "Drag and drop\n nodes here";
-		ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -
-		                          ImVec2(0, ImGui::GetStyle().ItemSpacing.y / 2.0f));
-		ImGui::TextDisabled("%s", emptyLabel);
-		ImGui::SetCursorScreenPos(origin);
-		ImGui::Dummy(defaultSize);
+		drawEmptyContent(context);
 	}
 	else
 	{
@@ -61,6 +54,19 @@ void NodeDropZone::content(DrawInfo& context)
 		}
 		DGui::SameLineDummy(ImVec2(diwne.style().dropZoneMarginWidth * zoom, 0.0f)); // Right margin
 	}
+}
+
+void NodeDropZone::drawEmptyContent(DrawInfo& context)
+{
+	float zoom = diwne.getZoom();
+	const ImVec2 defaultSize = ImVec2(130 * zoom, 70 * zoom);
+	ImVec2 origin = ImGui::GetCursorScreenPos();
+	const char* emptyLabel = "Drag and drop\n nodes here";
+	ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -
+	                          ImVec2(0, ImGui::GetStyle().ItemSpacing.y / 2.0f));
+	ImGui::TextDisabled("%s", emptyLabel);
+	ImGui::SetCursorScreenPos(origin);
+	ImGui::Dummy(defaultSize);
 }
 
 void NodeDropZone::end(DrawInfo& context)
@@ -110,12 +116,7 @@ bool NodeDropZone::tryAddNode(DrawInfo& context)
 
 		if (context.state.dragEnd)
 		{
-			// We only accept nodes that are not already in another container
-			dropNode->remove(); // Mark the node for removal from the node editor
-			dropNode->setParentObject(this);
-			dropNode->setFixed(true); // Nodes are marked as fixed while inside the drop zone
-			m_nodes.insert(m_nodes.begin() + m_dropIndex, dropNode->sharedPtr<Node>());
-			m_dropIndex = -1; // Reset drop target index
+			addNodeAt(dropNode->sharedPtr<Node>(), m_dropIndex);
 			return true;
 		}
 	}
@@ -156,22 +157,39 @@ bool NodeDropZone::tryRemoveNode(DrawInfo& context)
 	if (dropNode != nullptr && dropNode->getParentObject() == this)
 	{
 		// The drop zone being the nodes parent should guarantee the node was contained in the drop zone
-		std::shared_ptr<Node> dropNodePtr = dropNode->sharedPtr<Node>();
-		auto it = std::find(m_nodes.begin(), m_nodes.end(), dropNodePtr);
-		if (it != m_nodes.end())
-		{
-			m_nodes.erase(it);
-			dropNodePtr->setFixed(false); // Make the node free to be dragged again
-			diwne.addNode(dropNodePtr);   // Reassigns parent to the node editor
-			return true;
-		}
-		else
+		if (!removeNode(dropNode->sharedPtr<Node>()))
 		{
 			DIWNE_ERROR("Attempted to remove a node from a drop zone it wasn't contained in!");
 			assert(false);
+			return false;
 		}
+		return true;
 	}
 	return false;
+}
+
+void NodeDropZone::addNodeAt(const std::shared_ptr<Node>& node, int index)
+{
+	node->remove(); // Mark the node for removal from the node editor
+	node->setParentObject(this);
+	node->setFixed(true); // Nodes are marked as fixed while inside the drop zone
+	NodeContainer::addNodeAt(node, index);
+	m_dropIndex = -1; // Reset drop target index
+}
+
+bool NodeDropZone::removeNodeAt(int index)
+{
+	if (index < 0 || index >= m_nodes.size())
+	{
+		return false;
+	}
+	auto it = m_nodes.begin() + index;
+	std::shared_ptr<Node> nodePtr = *it;
+
+	m_nodes.erase(it);
+	nodePtr->setFixed(false); // Make the node free to be dragged again
+	diwne.addNode(nodePtr);   // Reassigns parent to the node editor
+	onNodeRemove(nodePtr.get(), index);
 }
 
 int NodeDropZone::acceptNodeDiwne(Node* node)

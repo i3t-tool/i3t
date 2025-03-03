@@ -923,7 +923,7 @@ void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>
 		return std::make_unique<ModelProxy>(model);
 	});
 
-	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+	//	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint)); // TODO: (DR) This wasn't implemented
 	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
 	if (isRightToLeft)
 	{
@@ -943,7 +943,8 @@ void WorkspaceDiwne::trackingSwitchOff()
 	{
 		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
 		auto seq = Tools::findNodeById(getAllCoreNodes().collect(), tracking->getSequence()->getId()).value();
-		std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
+		// TODO: (DR) This was never implemented
+		// std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
 		tracking->getSequence()->stopTracking();
 	}
 }
@@ -1285,11 +1286,12 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	if (getNodesSelectionChanged())
 	{
 		I3T::getViewport()->getManipulators().clearManipulators();
-		
+
 		auto selectedCoreNodes = getAllSelectedCoreNodes();
 		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
 		{
-			Ptr<TransformationBase> selected_transformation = std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
+			Ptr<TransformationBase> selected_transformation =
+			    std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
 			if (selected_transformation != nullptr)
 			{
 				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());

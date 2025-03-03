@@ -89,6 +89,8 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	m_internalHover = ImGui::IsItemHovered();
 	ImGui::PopID();
 
+	drawSelectionIndicator(context);
+
 	DiwneObject::afterDrawDiwne(context);
 }
 
@@ -112,15 +114,6 @@ bool Node::processSelectDiwne(DrawInfo& context)
 			if (!multiSelect && !multiDeselect)
 				setSelected(false);
 		}
-	}
-
-	// Draw node selection indicator
-	if (m_selected)
-	{
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
-		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 	}
 	return false;
 }
@@ -197,5 +190,16 @@ void Node::setFlag(char index, bool value)
 		m_flag |= 1 << index;
 	else
 		m_flag &= ~(1 << index);
+}
+
+void Node::drawSelectionIndicator(DrawInfo& context)
+{
+	if (m_selected)
+	{
+		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
+		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+	}
 }
 } /* namespace DIWNE */

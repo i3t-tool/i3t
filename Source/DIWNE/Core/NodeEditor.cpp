@@ -141,14 +141,19 @@ void NodeEditor::content(DrawInfo& context)
 		// And one channel is for all the links below everything
 		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 2 /*+1 for links channel on top */);
 
+		bool takeSnap = false;
+
 		// Draw nodes in reverse order (front to back) to process interactions in correct "bubble down" order.
 		// Any nodes added during drawing should be added at the end of the vector and thus not iterated over.
 		// Any nodes removed should be removed in a lazy manner using either Node::destroy() or remove().
-		int prev_size = m_nodes.size();
-		bool takeSnap = false;
-		for (auto it = m_nodes.rbegin(); it != m_nodes.rend(); ++it)
+		// Index based iteration is used to avoid iterator invalidation when adding new elements.
+		int initialNodeCount = m_nodes.size();
+		for (int i = initialNodeCount - 1; i >= 0; --i)
+		//		for (auto it = m_nodes.rbegin(); it != m_nodes.rend(); ++it)
 		{
-			auto& node = *it;
+			// We must work with the underlying raw pointer to avoid invalidation when nodes are added to the vector
+			Node* node = m_nodes[i].get();
+			//			std::shared_ptr<Node> node = m_nodes[i];
 			//			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
 			//			{
 			//				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
@@ -165,18 +170,11 @@ void NodeEditor::content(DrawInfo& context)
 				// Set the ImGui cursor position to the position of the node
 				ImGui::SetCursorScreenPos(canvas().diwne2screen(node->getPosition()));
 				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode2);
-				if (drawResult.logicalUpdates && !node->m_destroy) // TODO: There was !m_destroy
+				if (drawResult.logicalUpdates && !node->m_destroy && !node->m_remove)
 				{
-					setLastActiveNode(std::static_pointer_cast<Node>(node));
+					setLastActiveNode(std::static_pointer_cast<Node>(node->shared_from_this()));
 				}
 			}
-
-			// TODO: This seems like a bit of a "hacky" solution here, we just don't draw the rest of nodes after a
-			//  sequence that just lost or gained a subnode? Investigate, the node list can simply just be copied
-			//  beforehand or the insertion/deletion deferred after rendering, no?
-			if (prev_size != m_nodes.size())
-				break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is
-				          affected and iterator is invalidated (at least with MVSC) */
 		}
 
 		auto connectPinAction = context.state.getActiveAction<DIWNE::Actions::ConnectPinAction>();
@@ -510,8 +508,8 @@ void NodeEditor::addLink(std::shared_ptr<Link> link)
 void NodeEditor::purgeObjects()
 {
 	{
-		auto endIt = std::remove_if(m_nodes.begin(), m_nodes.end(), [](const auto& node) -> bool {
-			return node->m_destroy || node->m_remove;
+		auto endIt = std::stable_partition(m_nodes.begin(), m_nodes.end(), [](const auto& node) -> bool {
+			return !node->m_destroy && !node->m_remove;
 		});
 		auto endItCopy = endIt;
 		while (endItCopy != m_nodes.end())
@@ -522,8 +520,8 @@ void NodeEditor::purgeObjects()
 		m_nodes.erase(endIt, m_nodes.end());
 	}
 	{
-		auto endIt = std::remove_if(m_links.begin(), m_links.end(), [](const auto& link) -> bool {
-			return link->m_destroy || link->m_remove;
+		auto endIt = std::stable_partition(m_links.begin(), m_links.end(), [](const auto& link) -> bool {
+			return !link->m_destroy && !link->m_remove;
 		});
 		auto endItCopy = endIt;
 		while (endItCopy != m_links.end())

@@ -90,6 +90,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 			    (std::string() + m_labelDiwne +
 			     (!m_parentObject ? " (no parent)\n" : " (" + m_parentObject->m_labelDiwne + ")\n") +
 			     (m_hovered ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
+			     (m_selected ? "Selected\n" : "") +
 			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""))
 			        .c_str());
 			if (dynamic_cast<NodeEditor*>(this))
