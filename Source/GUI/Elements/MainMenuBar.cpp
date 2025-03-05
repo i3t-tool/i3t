@@ -272,6 +272,16 @@ void MainMenuBar::showEditMenu()
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
 		}
+		if (ImGui::MenuItem(ICON_I3T_LANG " Change Language "))
+		{
+			// App::getModule<UIModule>().getWindowManager().showUniqueWindow<ChangeLanguageWindow>();
+			App::getModule<UIModule>().getWindowManager().openModal<ChangeLanguageModal>();
+		}
+		if (ImGui::BeginMenu(ICON_I3T_LANG " Change Language As Submenu"))
+		{
+			ChangeLanguageModal::showChangeLanguageMenu();
+			ImGui::EndMenu();
+		}
 		ImGui::EndMenu();
 	}
 }

@@ -12,6 +12,8 @@
  */
 #include "UserData.h"
 
+#include "Localization/Localization.h"
+
 #include <algorithm>
 
 #include "rttr/registration.h"
@@ -21,7 +23,8 @@ RTTR_REGISTRATION
 	rttr::registration::class_<UserData>("UserData")
 	    .property("themeName", &UserData::customThemeName)
 	    .property("recentFiles", &UserData::recentFiles)
-	    .property("recentCommands", &UserData::recentCommands);
+	    .property("recentCommands", &UserData::recentCommands)
+	    .property("language", &LOCALIZATION.currentLanguageID);
 }
 
 void UserData::pushRecentFile(const std::filesystem::path& file)
