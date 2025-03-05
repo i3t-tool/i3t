@@ -18,8 +18,8 @@
 #include "Elements/DiwneObject.h"
 
 #include "Canvas.h"
+#include "DIWNE/Core/Style/DiwneStyle.h"
 #include "DiwneSettings.h"
-#include "DiwneStyle.h"
 #include "Elements/Containers/NodeContainer.h"
 #include "Input/NodeEditorInputAdapter.h"
 #include "diwne_iterators.h"
@@ -240,7 +240,7 @@ public:
 
 	// TODO: (DR) Rename this to focused node. Adds docs relating it with DrawInfo logical updates.
 	//   Logical updates could maybe be called focusUpdate? As it in a way captures focus?
-	template <typename T>
+	template <typename T = Node>
 	std::shared_ptr<T> getLastActiveNode()
 	{
 		static_assert(std::is_base_of<Node, T>::value, "Node must be derived from DIWNE::Node class.");

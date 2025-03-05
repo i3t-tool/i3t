@@ -60,6 +60,9 @@ public:
 		// }
 
 		updateDataItemsWidth();
+
+		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgOperator));
+		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderOperator));
 	}
 
 	//===-- Double dispatch

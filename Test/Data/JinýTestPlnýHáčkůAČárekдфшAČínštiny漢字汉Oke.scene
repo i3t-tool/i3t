@@ -9,7 +9,7 @@
             "camera": {
                 "mode": "ORBIT",
                 "orbitCameraRotationX": -100.14999389648438,
-                "orbitCameraRotationY": 20.139982223510747,
+                "orbitCameraRotationY": 20.139982223510746,
                 "trackballCameraRotation": [
                     1.0,
                     0.0,
@@ -31,11 +31,11 @@
                 "iorbitCameraRadius": 1.357841730117798,
                 "iorbitCameraPivot": [
                     -0.11228122562170029,
-                    0.49221670627594,
+                    0.49221670627593994,
                     -0.008205779828131199
                 ],
                 "fov": 90.0,
-                "zNear": 0.20000000298023225,
+                "zNear": 0.20000000298023224,
                 "zFar": 270.0
             }
         }
@@ -72,7 +72,7 @@
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    5.5714192390441898,
+                    5.5714192390441895,
                     289.1427307128906
                 ],
                 "type": "FloatToFloat",
@@ -90,7 +90,7 @@
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    166.42860412597657,
+                    166.42860412597656,
                     405.7142333984375
                 ],
                 "model": "Bunny",

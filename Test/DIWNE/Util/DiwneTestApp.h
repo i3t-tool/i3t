@@ -141,6 +141,7 @@ public:
 
 		// Load Fonts
 		// TODO: Load an enlarged node editor font
+		return 0;
 	}
 
 	void destroy()

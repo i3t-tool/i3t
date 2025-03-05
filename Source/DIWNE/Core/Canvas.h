@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "DiwneStyle.h"
+#include "DIWNE/Core/Style/DiwneStyle.h"
 #include "diwne_imgui.h"
 
 namespace DIWNE

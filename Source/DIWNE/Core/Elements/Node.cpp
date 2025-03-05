@@ -175,6 +175,8 @@ void Node::onDestroy(bool logEvent)
 		diwne.setNodesSelectionChanged(true);
 	}
 
+	// TODO: (DR) This is unnecessary, we can just make last active node a weak ptr (I really don't know why it isnt)
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	auto lastActiveNode = diwne.getLastActiveNode<DIWNE::Node>();
 	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
 	{

@@ -85,31 +85,50 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 				originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
 			}
 			auto interactionCount = context.logicalUpdates - debug_logicalUpdate;
-			ImGui::GetForegroundDrawList()->AddText(
-			    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0), IM_COL32_WHITE,
+			std::string topLeftString =
 			    (std::string() + m_labelDiwne +
 			     (!m_parentObject ? " (no parent)\n" : " (" + m_parentObject->m_labelDiwne + ")\n") +
 			     (m_hovered ? "Hovered\n" : "") + (m_isPressed ? "Held\n" : "") + (m_isDragged ? "Dragged\n" : "") +
 			     (m_selected ? "Selected\n" : "") +
-			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""))
-			        .c_str());
-			if (dynamic_cast<NodeEditor*>(this))
+			     (interactionCount > 0 ? "Logic update (" + std::to_string(interactionCount) + ")\n" : ""));
+
+			if (auto editor = dynamic_cast<NodeEditor*>(this))
 			{
+				std::string dbgMsg1;
+				dbgMsg1 += "v: " + std::to_string(context.visualUpdates);
+				dbgMsg1 += " l: " + std::to_string(context.logicalUpdates);
+				dbgMsg1 += " ic: " + std::to_string(context.inputConsumed);
+				dbgMsg1 += " hc: " + std::to_string(context.hoverConsumed);
+				dbgMsg1 += " po: " + std::to_string(context.popupOpened);
+				ImGui::GetForegroundDrawList()->AddText(
+				    diwne.canvas().diwne2screen(originPos) +
+				        ImVec2(diwne.canvas().getViewportRectScreen().GetWidth() * 0.3, 0),
+				    IM_COL32(255, 255, 0, 255), dbgMsg1.c_str());
+
 				InteractionState& state = context.state;
-				std::string dbgMsg = std::string() + (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "");
-				dbgMsg += (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "");
-				dbgMsg += (context.inputConsumed ? " [Input Consumed]" : "");
+				std::string dbgMsg2;
+				dbgMsg2 += (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "");
+				dbgMsg2 += (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "");
+				dbgMsg2 += (context.inputConsumed ? " [Input Consumed]" : "");
 				if (state.action)
 				{
-					dbgMsg += " [" + state.action->name + " (" + state.action->source;
+					dbgMsg2 += " [" + state.action->name + " (" + state.action->source;
 					if (auto action = state.getActiveAction<Actions::DragNodeAction>())
-						dbgMsg += ", count: " + std::to_string(action->nodes.size());
-					dbgMsg += ")]";
+						dbgMsg2 += ", count: " + std::to_string(action->nodes.size());
+					dbgMsg2 += ")]";
 				}
-				ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) +
-				                                            ImVec2(getRectDiwne().GetWidth() * 0.3, 0),
-				                                        IM_COL32_WHITE, dbgMsg.c_str());
+				ImGui::GetForegroundDrawList()->AddText(
+				    diwne.canvas().diwne2screen(originPos) +
+				        ImVec2(diwne.canvas().getViewportRectScreen().GetWidth() * 0.25,
+				               ImGui::GetTextLineHeightWithSpacing()),
+				    IM_COL32(255, 0, 255, 255), dbgMsg2.c_str());
+
+				auto lastActiveNode = editor->getLastActiveNode<>();
+				if (lastActiveNode)
+					topLeftString += "\nLast active node: " + lastActiveNode->m_labelDiwne;
 			}
+			ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+			                                        IM_COL32(97, 239, 255, 255), topLeftString.c_str());
 		});
 	}
 	m_justHidden = wasDrawnLastFrame && !m_drawnThisFrame;

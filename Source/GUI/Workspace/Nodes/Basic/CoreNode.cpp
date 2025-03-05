@@ -38,6 +38,10 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.registerNodeCallbacks(m_nodebase.get());
 	// Set a bit flag identifying this node as a core node
 	setFlag(CORE_NODE_FLAG, true);
+	// I3T DIWNE styling
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBg));
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeader));
+	m_style.addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
 }
 
 // TODO: (DR) Commented out for now, more info in the header file
@@ -72,6 +76,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
 	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
 
+	drawHeader();
 	// TODO: This should again be responsibility of the DIWNE library
 
 	// adding a border

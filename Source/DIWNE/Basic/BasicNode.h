@@ -1,7 +1,8 @@
 #pragma once
 
-#include "DIWNE/Core/Layout/DiwnePanel.h"
 #include "DIWNE/Core/Elements/Node.h"
+#include "DIWNE/Core/Layout/DiwnePanel.h"
+#include "DIWNE/Core/Style/StyleOverride.h"
 
 namespace DIWNE
 {
@@ -52,11 +53,7 @@ public:
 
 	void translate(const ImVec2& vec) override;
 
-public:
-	// Styling
-	ImVec4 m_background;
-	ImVec4 m_headerBackground;
-	int m_rounding;
+	StyleOverride m_style;
 
 public:
 	// Getters / Setters

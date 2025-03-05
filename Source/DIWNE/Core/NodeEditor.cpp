@@ -416,8 +416,11 @@ void NodeEditor::shiftInteractingNodeToEnd()
 {
 	if (mp_lastActiveNode == nullptr || m_nodes.empty())
 		return;
+	if (mp_lastActiveNode->isChildObject()) // The last interacted node is in a child object and handled there
+		return;
 	if (mp_lastActiveNode.get() != m_nodes.back().get())
 	{
+		DIWNE_INFO("SHIFTING");
 		auto draged_node_it = std::find_if(m_nodes.begin(), m_nodes.end(), [this](const auto& node) -> bool {
 			return node.get() == this->mp_lastActiveNode.get();
 		});
