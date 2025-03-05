@@ -16,6 +16,8 @@ public:
 	void centerContent(DrawInfo& context) override;
 
 	NodeRange<> getNodes() const override;
-	std::vector<std::shared_ptr<Node>>& getNodeList() override;
+	NodeList& getNodeList() override;
+
+	NodeDropZone& getDropZone();
 };
 } // namespace DIWNE

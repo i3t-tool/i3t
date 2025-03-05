@@ -12,6 +12,8 @@
  */
 #pragma once
 
+#include "DIWNE/Core/Elements/Containers/INodeContainer.h"
+
 #include "Core/Nodes/GraphManager.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
@@ -24,12 +26,14 @@ class SceneCamera;
 
 namespace Workspace
 {
-class Camera : public CoreNodeWithPins
+class Camera : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
 protected:
-	// TODO: (DR) I think these pointers are unused
-	Ptr<Sequence> m_projection = nullptr;
-	Ptr<Sequence> m_view = nullptr;
+	// Projection and view are stored as two pointer kinds to support DIWNE::INodeContainer queries
+	// The projection and view getters could probably just use raw pointers
+	Ptr<Sequence> m_projection{nullptr};
+	Ptr<Sequence> m_view{nullptr};
+	DIWNE::NodeList m_projAndView;
 
 public:
 	bool m_axisOn{true};
@@ -44,6 +48,9 @@ public:
 	Camera(DIWNE::NodeEditor& diwne);
 	~Camera();
 
+	DIWNE::NodeRange<> getNodes() const override;
+	DIWNE::NodeList& getNodeList() override;
+
 	//===-- Double dispatch
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
@@ -52,11 +59,11 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	Ptr<Sequence> const& getProjection() const
+	const Ptr<Sequence>& getProjection() const
 	{
 		return m_projection;
 	};
-	Ptr<Sequence> const& getView() const
+	const Ptr<Sequence>& getView() const
 	{
 		return m_view;
 	};
@@ -75,8 +82,8 @@ public:
 	//	void rightContent(DIWNE::Diwne &diwne);
 
 	// TODO: Uncomment
-//	bool processSelect() override;
-//	bool processUnselect() override;
+	//	bool processSelect() override;
+	//	bool processUnselect() override;
 	float updateDataItemsWidth() override;
 
 private:

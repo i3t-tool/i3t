@@ -64,20 +64,10 @@ public:
 	~Node();
 
 	// TODO: Ideally delete this whole class <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-	void onDestroy(bool logEvent) override;
-
-	// TODO: Remove this
-	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	bool m_removeFromWorkspaceWindow{false};
-	bool getRemoveFromWorkspace() const
-	{
-		return m_removeFromWorkspaceWindow;
-	};
-	void setRemoveFromWorkspace(bool value)
-	{
-		m_removeFromWorkspaceWindow = value;
-	};
+	//  as, duplication could be a DIWNE feature
+	//  FloatPopup mode can be moved to CoreNode
+	//  LOD could be a part of DIWNE
+	//  If not, maybe rename to something like I3TNode to avoid name clash with DIWNE
 
 	bool m_duplicateNode = false;
 	bool getDuplicateNode() const

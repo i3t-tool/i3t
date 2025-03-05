@@ -79,7 +79,6 @@ public:
 	ImRect m_rect;
 	bool m_destroy{false};  ///< Indicates the object is to be deleted (and deallocated)
 	bool m_deletable{true}; ///< Whether the object can be deleted by the user
-	bool m_remove{false};   ///< Indicates the object is to be removed from the node editor, but not destroyed
 
 	// TODO: (DR) Implement (true for most inner nodes, like in sequences)
 	//  In theory drag operations could affect sequences but ONLY when only same sequence ndoes are selected
@@ -142,6 +141,7 @@ public:
 	bool m_justReleased{false}; ///< Is object just released? Eg. was the button released this frame.
 
 	bool m_isDragged{false}; /**< Is object dragged */
+	bool m_draggable{true}; ///< Whether dragging of the object is allowed by default
 
 	// TODO: This flag is oddly named, realistically this means whether we are hovered AND at the same time
 	//  hovered in some special area. This area is generally just the header of a node and this tells us when to
@@ -155,6 +155,7 @@ public:
 	                                                                                              // hover / Rework
 	bool m_hovered{false};
 	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
+	bool m_hoverable{true}; ///< Whether hovering is enabled by default
 
 protected:
 	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
@@ -312,24 +313,18 @@ public:
 	// TODO: Implement this, im still not sure if this should be called on the delete marking or the actual removal
 	//  Probably when marking as thats what the old Node::deleteAction() method did.
 	virtual void onDestroy(bool logEvent);
-
-	// TODO: Finish implementation
-	/**
-	 * Marks the object from removal from the node editor, but not destruction.
-	 * Meaning the object can be moved to a different container as a child object (like child nodes).
-	 * @param logEvent The boolean flag passed to onRemove(), can be used to determine where was remove() called from.
-	 */
-	virtual void remove(bool logEvent = true);
-	// TODO: Maybe onAdd analog, talking about onAdd of the actual top level node editor
-	virtual void onRemove(bool logEvent);
+	bool isDestroyed()
+	{
+		return m_destroy;
+	}
 
 	// TODO: Rename to just getRect()
 	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	inline virtual ImRect getRectDiwne() const
+	virtual ImRect getRectDiwne() const
 	{
 		return m_rect;
 	}
-	inline virtual ImVec2 getPosition() const
+	virtual ImVec2 getPosition() const
 	{
 		return m_rect.Min;
 	}
@@ -609,6 +604,7 @@ public:
 	 * All DiwneObjects are assumed to be stored somewhere as a shared pointer.
 	 * This can be used to retrieve an owning shared pointer from a "weak" raw pointer to a DiwneObject.
 	 * @tparam T The pointer will be statically cast to this type. Ensure the cast won't fail.
+	 * 			 There are runtime checks in debug mode.
 	 */
 	template <typename T = DiwneObject>
 	std::shared_ptr<T> sharedPtr()
@@ -622,12 +618,29 @@ public:
 		return std::static_pointer_cast<T>(sharedPtr);
 	}
 
+	/**
+	 * Returns a raw pointer to itself casted to a type.
+	 * Useful as a shorthand for casting to derived object type.
+	 * @tparam T The pointer will be statically cast to this type. Ensure the cast won't fail.
+	 * 			 There are runtime checks in debug mode.
+	 */
+	template <typename T = DiwneObject>
+	T* as()
+	{
+		static_assert(std::is_base_of<DiwneObject, T>::value, "T must be derived from DIWNE::DiwneObject!");
+#ifndef NDEBUG
+		if (dynamic_cast<T*>(this) == nullptr)
+			assert(!"Invalid static pointer cast!");
+#endif
+		return static_cast<T*>(this);
+	}
+
 	// TODO: Should probably be moved into some util class to keep the DiwneObject concise
 	/** \brief Show a colored text for example for immediate hints
 	 * \param label is the text to show
 	 * \param color is the color of the tooltip
 	 */
-	void showTooltipLabel(std::string const& label, ImColor const&& color);
+	void showTooltipLabel(const std::string& label, const ImColor&& color);
 };
 
 /*

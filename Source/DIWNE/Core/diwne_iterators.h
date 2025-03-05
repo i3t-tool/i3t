@@ -83,10 +83,11 @@ public:
  * Node iterators are mainly to be used for read only iteration in order to avoid costly construction of filtered
  * containers.
  *
- * Currently all the iterators wrap the default owning std::vector<std::shared_ptr<Node>>. Eg. a list of shared pointers
- * to nodes. A reference is kept to this list and dereferencing an iterator return a reference or raw pointer
- * to a single node.
- * //TODO: There is no way to get a new owning pointer to said node
+ * Currently all the iterators wrap the default owning NodeList (std::vector<std::shared_ptr<Node>>).
+ * Eg. a list of shared pointers to nodes.
+ * A reference is kept to this list and dereferencing an iterator return a reference or raw pointer to a single node.
+ * An owning shared pointer can be retrieved from the reference or raw pointer by calling the sharedPtr() method.
+ * Or by just calling shared_from_this() directly as all DiwneObjects are std::enable_shared_from_this objects.
  *
  * The iterator itself can be iterated over like a container using its begin() and end() methods.
  * This is to avoid having an intermediary container for each iterator type and to simplify range based for loops.
@@ -109,11 +110,11 @@ public:
 	INHERIT_ITERATOR_TRAITS_ALL(Super)
 
 	//	using Container =
-	//	    std::conditional<IsConst, const std::vector<std::shared_ptr<Node>>*,
-	// std::vector<std::shared_ptr<Node>>*>::type;
+	//	    std::conditional<IsConst, const NodeList*,
+	// NodeList*>::type;
 
 	// Non-const iterators are not mutable to allow usage in const methods
-	using Container = const std::vector<std::shared_ptr<Node>>*;
+	using Container = const NodeList*;
 	using shared_pointer = std::shared_ptr<typename Super::value_type>;
 
 protected:
@@ -473,7 +474,7 @@ public:
 //	INHERIT_ITERATOR_TRAITS_ALL(Super)
 //
 //	RNodeIterator() {}
-//	RNodeIterator(std::vector<std::shared_ptr<Node>>* nodes, std::size_t idx) : Super(nodes, idx) {}
+//	RNodeIterator(NodeList* nodes, std::size_t idx) : Super(nodes, idx) {}
 // };
 
 // Node ranges
@@ -580,7 +581,7 @@ template <typename NodeType>
 class NodeRange : public NodeRangeImpl<NodeRange<NodeType>, NodeIterator<NodeType>, NodeType, false>
 {
 public:
-	NodeRange(const std::vector<std::shared_ptr<Node>>* nodes)
+	NodeRange(const NodeList* nodes)
 	    : NodeRangeImpl<NodeRange<NodeType>, NodeIterator<NodeType>, NodeType, false>(nodes)
 	{}
 };
@@ -589,7 +590,7 @@ template <typename NodeType = Node>
 class ConstNodeRange : public NodeRangeImpl<ConstNodeRange<NodeType>, ConstNodeIterator<NodeType>, NodeType, true>
 {
 public:
-	ConstNodeRange(const std::vector<std::shared_ptr<Node>>* nodes)
+	ConstNodeRange(const NodeList* nodes)
 	    : NodeRangeImpl<ConstNodeRange<NodeType>, ConstNodeIterator<NodeType>, NodeType, true>(nodes)
 	{}
 };
@@ -601,7 +602,7 @@ class FilteredNodeRange
 	using Super = FilteredNodeRangeImpl<FilteredNodeRange<NodeType>, FilteredNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	FilteredNodeRange(Super::Predicate predicate, const std::vector<std::shared_ptr<Node>>* nodes)
+	FilteredNodeRange(Super::Predicate predicate, const NodeList* nodes)
 	    : Super(predicate, nodes)
 	{}
 };
@@ -614,7 +615,7 @@ public:
 //	    FilteredNodeRangeImpl<ConstFilteredNodeRange<NodeType>, ConstFilteredNodeIterator<NodeType>, NodeType, true>;
 //
 // public:
-//	ConstFilteredNodeRange(Super::Predicate predicate, const std::vector<std::shared_ptr<Node>>* nodes)
+//	ConstFilteredNodeRange(Super::Predicate predicate, const NodeList* nodes)
 //	    : Super(predicate, nodes)
 //	{}
 // };
@@ -626,7 +627,7 @@ class RecursiveNodeRange
 	using Super = NodeRangeImpl<RecursiveNodeRange<NodeType>, RecursiveNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	RecursiveNodeRange(const std::vector<std::shared_ptr<Node>>* nodes) : Super(nodes) {}
+	RecursiveNodeRange(const NodeList* nodes) : Super(nodes) {}
 };
 
 template <typename NodeType = Node>
@@ -638,7 +639,7 @@ class FilteredRecursiveNodeRange
 	                                    NodeType, false>;
 
 public:
-	FilteredRecursiveNodeRange(Super::Predicate predicate, const std::vector<std::shared_ptr<Node>>* nodes)
+	FilteredRecursiveNodeRange(Super::Predicate predicate, const NodeList* nodes)
 	    : Super(predicate, nodes)
 	{}
 };

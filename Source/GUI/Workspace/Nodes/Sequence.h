@@ -13,8 +13,8 @@
 #pragma once
 
 #include "DIWNE/Core/Elements/Containers/INodeContainer.h"
-
 #include "DIWNE/Core/Elements/Containers/NodeDropZone.h"
+
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "TransformationBase.h"
 
@@ -44,7 +44,7 @@ public:
 	//===----------------------------------------------------------------------===//
 
 	DIWNE::NodeRange<> getNodes() const override;
-	std::vector<std::shared_ptr<DIWNE::Node>>& getNodeList() override;
+	DIWNE::NodeList& getNodeList() override;
 
 	DIWNE::NodeRange<CoreNode> getInnerWorkspaceNodes();
 	std::optional<Ptr<CoreNode>> getTransform(int index) const;
@@ -58,6 +58,7 @@ public:
 	virtual bool allowDrawing() override;
 
 	void centerContent(DIWNE::DrawInfo& context) override;
+	void afterDraw(DIWNE::DrawInfo& context) override;
 	void onDestroy(bool logEvent) override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
@@ -77,7 +78,7 @@ protected:
 
 	public:
 		void onNodeAdd(DIWNE::Node* node, int index) override;
-		void onNodeRemove(DIWNE::Node* node, int index) override;
+		void onNodeRemove(std::shared_ptr<DIWNE::Node> node, int index) override;
 		bool acceptNode(DIWNE::Node* node) override;
 	};
 };

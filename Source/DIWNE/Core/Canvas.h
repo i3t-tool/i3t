@@ -38,8 +38,8 @@ protected:
 public:
 	Canvas(NodeEditor& editor);
 
-	void moveViewportZoomed(ImVec2 const& distance);
-	void moveViewport(ImVec2 const& distance);
+	void moveViewportZoomed(const ImVec2& distance);
+	void moveViewport(const ImVec2& distance);
 
 	/// Update screen and diwne positions and sizes of viewport.
 	void updateViewportRects();

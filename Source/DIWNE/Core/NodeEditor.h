@@ -18,83 +18,19 @@
 #include "Elements/DiwneObject.h"
 
 #include "Canvas.h"
+#include "DiwneSettings.h"
 #include "DiwneStyle.h"
+#include "Elements/Containers/NodeContainer.h"
 #include "Input/NodeEditorInputAdapter.h"
 #include "diwne_iterators.h"
-
-// TODO: REMOVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // DIWNE Refactoring todos:
 // TODO: (DR) Refactor and revise the whole bypass/input/action trigger system thats going on here
 
+// TODO: Eventually NodeEditor should inherit from NodeContainer (or equivalent with links)
+
 namespace DIWNE
 {
-/** \brief Storage of all values
- */
-struct SettingsDiwne
-{
-	// TODO: Unused? DiwneObject id should cover this? Remove since ids are generated automatically now.
-	DIWNE::ID const editorId = 0; /**< as well as all other DiwneObject, Diwne has to have id too */
-	std::string const editorlabel = "diwneBackground"; /**< as well as all other DiwneObject, Diwne has to
-	                                                      have identification label too */
-	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /**< workarea in Diwne coordinates (so what part of infinite space
-	                                                    of node editor is on window) only initial value - mostly based
-	                                                    on window size ( \see updateViewportRects() ) */
-
-	float minWorkAreaZoom = 0.25;          /**< minimal value of zoom */
-	float maxWorkAreaZoom = 4;             /**< maximal value of zoom */
-	float workAreaInitialZoom = 1;         /**< initial value of zoom */
-	float zoomWheelReverseSenzitivity = 8; /**< Higher number -> smaller change, can not be 0 */
-	float selectionRounding = 0;           /**< rounding od selection */
-	float mouseDragThreshold = 2.0f;       // 6.0 is ImGui default
-
-	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
-
-	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.1);
-	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.1);
-	float selectionRectBorderAlpha = 0.8f;
-
-	ImVec4 itemSelectedBorderColor = ImVec4(1.0, 0.9, 0.4, 0.6);
-	float itemSelectedBorderThicknessDiwne = 2.5;
-
-	ImVec4 objectHoverBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
-	float objectHoverBorderThicknessDiwne = 1.5;
-	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
-	float objectFocusForInteractionBorderThicknessDiwne = 1.5;
-
-	float middleAlign = 0.5; /**< value < 0 , 1 > where is horizontal position of
-	                            middle of nodes */
-
-	ImVec4 pinHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
-	float pinHoveredBorderThicknessDiwne = 2;
-	ImVec4 nodeHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
-	float nodeHoveredBorderThicknessDiwne = 2;
-	ImVec4 backgroundHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
-	float backgroundHoveredBorderThicknessDiwne = 2;
-
-	float linkInteractionWidthDiwne = 10;
-	float linkThicknessDiwne = 10;
-	float linkThicknessSelectedBorderDiwne = 4;
-	ImVec4 linkColor = ImVec4(0.6, 0.3, 0.35, 0.6);
-	ImVec4 linkColorSelected = ImVec4(0.6, 0.3, 0.35, 0.8);
-	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0);
-	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);
-	float linkAlphaHovered = 1;
-	float linkAlpha = 0.2;
-	float linkAlphaSelectedHovered = 1;
-	float linkAlphaSelected = 0.5;
-	// TODO: Font color is unused, was deleted, reimplement if needed
-	ImVec4 fontColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); ///< Color of the text in the node
-
-	// Some new flags that are yet to be truly finalized, subject to be moved to a different place
-	bool selectNodeOnDrag = false;
-};
-// \todo   void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
-// v;}; /* from 0==left to 1==right */
-//         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const
-//         ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart;
-//         m_endControlOffsetDiwne = controlEnd; };
-
 class Node;
 class Pin;
 class Link;
@@ -105,12 +41,11 @@ class Link;
  * It store inter-object interactions
  * Every DiwneObject has reference to this object
  */
-class NodeEditor : public DiwneObject
+class NodeEditor : public DiwneObject, public NodeContainer
 {
 public:
 	SettingsDiwne* mp_settingsDiwne;
 
-	std::vector<std::shared_ptr<Node>> m_nodes;
 	std::vector<std::shared_ptr<Link>> m_links;
 
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
@@ -174,7 +109,6 @@ public:
 
 	bool isPressedDiwne() override;
 	bool isJustPressedDiwne() override;
-	bool allowHover() const override;
 
 	void processInteractions(DrawInfo& context) override;
 
@@ -233,10 +167,7 @@ public:
 	virtual void clear();
 
 	/// Get a reference to the underlying owning vector of all nodes in the node editor.
-	std::vector<std::shared_ptr<Node>>& getNodeList()
-	{
-		return m_nodes;
-	}
+	NodeList& getNodeList() override;
 
 	// TODO: I probably need const versions of node ranges <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//  Non-mutable Iterators now take a const pointer to the node vector meaning they can be created in const methods
@@ -244,44 +175,24 @@ public:
 	 * Get a view of all nodes in the node editor which can be iterated over.
 	 * The object returned is a trivial container wrapper around a node iterator.
 	 * TODO: Better docs with an example
+	 * TODO: This can be const.
 	 */
-	NodeRange<> getNodes()
-	{
-		return NodeRange(&m_nodes);
-	};
+	NodeRange<> getNodes() const override;
+	// TODO: Docs and rename to getAllNodes()
+	virtual RecursiveNodeRange<> getAllNodesInnerIncluded() const;
+	// TODO: Docs
+	virtual FilteredNodeRange<> getSelectedNodes() const;
+	// TODO: Docs and rename to getAllSelectedNodes()
+	virtual FilteredRecursiveNodeRange<> getSelectedNodesInnerIncluded() const;
 
-	ConstNodeRange<> getNodes() const
-	{
-		return ConstNodeRange(&m_nodes);
-	};
-
-	virtual RecursiveNodeRange<> getAllNodesInnerIncluded() const
-	{
-		return RecursiveNodeRange<>(&m_nodes);
-	}
-
-	virtual FilteredNodeRange<> getSelectedNodes() const
-	{
-		return FilteredNodeRange<>(
-		    [](const Node* node) -> bool {
-			    return node->getSelected();
-		    },
-		    &m_nodes);
-	}
-
-	virtual FilteredRecursiveNodeRange<> getSelectedNodesInnerIncluded() const
-	{
-		return FilteredRecursiveNodeRange<>(
-		    [](const Node* node) -> bool {
-			    return node->getSelected();
-		    },
-		    &m_nodes);
-	}
-
+	// TODO: Docs and rename to deselectAllNodes?
 	virtual void deselectNodes();
 
-	void addNode(std::shared_ptr<Node> node);
-	void addNode(std::shared_ptr<Node> node, const ImVec2 position, bool shiftToLeftByNodeWidth = false);
+	// TODO: Docs
+	void addNode(const std::shared_ptr<Node>& node);
+
+	// TODO: Docs
+	void addNode(const std::shared_ptr<Node>& node, const ImVec2 position, bool shiftToLeftByNodeWidth = false);
 
 	// TODO: Do we really need a template function for this?
 	// TODO: This method doesn't allow to create nodes with arbitrary constructors (no args passthrough)
@@ -317,8 +228,8 @@ public:
 	// Node shifting
 	// =============================================================================================================
 
-	void shiftNodesToBegin(const std::vector<std::shared_ptr<Node>>& nodesToShift);
-	void shiftNodesToEnd(const std::vector<std::shared_ptr<Node>>& nodesToShift);
+	void shiftNodesToBegin(const NodeList& nodesToShift);
+	void shiftNodesToEnd(const NodeList& nodesToShift);
 	void shiftInteractingNodeToEnd();
 
 	// TODO: Perhaps use this utility getter functions in multiple places
@@ -343,7 +254,7 @@ public:
 
 	// =============================================================================================================
 
-	ImVec2 const& getPopupPosition() const;
+	const ImVec2& getPopupPosition() const;
 	void setPopupPosition(ImVec2 position);
 
 	void setNodesSelectionChanged(bool value);
@@ -378,7 +289,7 @@ static void expandPopupContent(T& object) /**< \brief used for popupContent() fu
  *
  */
 template <typename... Args>
-static bool popupDiwne(std::string const popupID, ImVec2 const& popupPos, void (*popupContent)(Args...), Args&&... args)
+static bool popupDiwne(std::string const popupID, const ImVec2& popupPos, void (*popupContent)(Args...), Args&&... args)
 {
 	bool interaction_happen = false;
 

@@ -6,11 +6,16 @@
 
 namespace DIWNE
 {
-NodeDropZone::NodeDropZone(NodeEditor& diwne, DiwneObject* parent) : DiwneObject(diwne, "DropZone")
+NodeDropZone::NodeDropZone(NodeEditor& diwne, DiwneObject* parent) : DiwneObject(diwne, "DropZone"), NodeContainer(this)
 {
 	setParentObject(parent);
 	setSelectable(false);
 	setFixed(true);
+}
+
+void NodeDropZone::initialize(DrawInfo& context)
+{
+	purgeNodes(); // Erase objects marked for destruction or removal in the previous frame
 }
 
 void NodeDropZone::begin(DrawInfo& context)
@@ -167,33 +172,22 @@ bool NodeDropZone::tryRemoveNode(DrawInfo& context)
 	}
 	return false;
 }
-
-void NodeDropZone::addNodeAt(const std::shared_ptr<Node>& node, int index)
+void NodeDropZone::onNodeAdd(Node* node, int index)
 {
-	node->remove(); // Mark the node for removal from the node editor
-	node->setParentObject(this);
 	node->setFixed(true); // Nodes are marked as fixed while inside the drop zone
-	NodeContainer::addNodeAt(node, index);
-	m_dropIndex = -1; // Reset drop target index
+	m_dropIndex = -1;     // Reset drop target index
 }
-
-bool NodeDropZone::removeNodeAt(int index)
+void NodeDropZone::onNodeRemove(std::shared_ptr<Node> node, int index)
 {
-	if (index < 0 || index >= m_nodes.size())
-	{
-		return false;
-	}
-	auto it = m_nodes.begin() + index;
-	std::shared_ptr<Node> nodePtr = *it;
-
-	m_nodes.erase(it);
-	nodePtr->setFixed(false); // Make the node free to be dragged again
-	diwne.addNode(nodePtr);   // Reassigns parent to the node editor
-	onNodeRemove(nodePtr.get(), index);
+	node->setFixed(false); // Make the node free to be dragged again
+	if (!node->isDestroyed())
+		diwne.addNode(node); // Reassigns parent to the node editor
 }
 
 int NodeDropZone::acceptNodeDiwne(Node* node)
 {
+	if (node->isDestroyed()) // Don't accept nodes marked for destruction
+		return -1;
 	if (this->isChildOfObject(node)) // Exclude any parent nodes
 		return -1;
 	if (node->isChildObject())
@@ -258,6 +252,10 @@ void NodeDropZone::drawDropIndicator(Node* newNode, int index)
 }
 
 bool NodeDropZone::allowDragStart() const
+{
+	return false;
+}
+bool NodeDropZone::allowHover() const
 {
 	return false;
 }

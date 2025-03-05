@@ -134,13 +134,17 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		std::vector<Node*> nodes;
 		if (m_selected)
 		{
-			// If the node is selected, it and all other selected nodes are dragged together
-			// Other selected nodes are filtered out if their parent is also selected
+			// When dragging a selected node we only drag other selected nodes on the same level
+			// Eg. those that are in the same container == those that have the same parent
+			DiwneObject* ourParent = this->getParentObject();
 			auto selectedNodes = diwne.getSelectedNodesInnerIncluded();
 			for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
 			{
-				if (!node->isAnyParentSelected())
-					nodes.push_back(node.ptr());
+				if (node->getParentObject() != ourParent)
+					continue;
+				if (node->isFixed() && node.ptr() != this) // Fixed nodes can be only dragged directly
+					continue;
+				nodes.push_back(node.ptr());
 			}
 		}
 		else
@@ -158,7 +162,6 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	}
 	if (auto action = context.state.getActiveAction<Actions::DragNodeAction>(Actions::dragNode, m_labelDiwne))
 	{
-		action->onUpdate();
 		if (dragEnd)
 			action->end();
 	}
@@ -201,5 +204,9 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 	}
+}
+bool Node::willBeRemovedFromContainer(const DiwneObject* container)
+{
+	return getParentObject() != container;
 }
 } /* namespace DIWNE */

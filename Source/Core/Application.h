@@ -57,6 +57,11 @@ public:
 	 */
 	void run();
 
+	/**
+	 * Single iteration of the game loop
+	 */
+	void frame();
+
 	void beginFrame();
 	void endFrame();
 

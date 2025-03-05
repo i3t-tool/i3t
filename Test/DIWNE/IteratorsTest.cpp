@@ -7,8 +7,8 @@
 #include "I3TUtil.h"
 
 #include "DIWNE/Basic/BasicNode.h"
-#include "DIWNE/Basic/DummyContainerNode.h"
 #include "DIWNE/diwne_include.h"
+#include "DummyContainerNode.h"
 
 using namespace DIWNE;
 
@@ -34,7 +34,7 @@ TEST(IteratorsTest, NodeRangeTest)
 	{
 		std::vector<std::reference_wrapper<Node>> nodeRefs;
 		std::vector<Node*> nodePtrs;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs;
+		NodeList nodeSharedPtrs;
 
 		for (auto& node : editor.getNodes())
 		{
@@ -65,7 +65,7 @@ TEST(IteratorsTest, NodeRangeTest)
 		ASSERT_TRUE(counter == nodeCount);
 
 		std::vector<Node*> nodePtrs2;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs2;
+		NodeList nodeSharedPtrs2;
 
 		nodeSharedPtrs2 = nodeRange.collect();
 		ASSERT_TRUE(nodeSharedPtrs.size() == nodeCount);
@@ -112,7 +112,7 @@ TEST(IteratorsTest, RecursiveNodeRangeTest)
 	{
 		std::vector<std::reference_wrapper<Node>> nodeRefs;
 		std::vector<Node*> nodePtrs;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs;
+		NodeList nodeSharedPtrs;
 
 		for (auto& node : editor.getNodes())
 		{
@@ -152,7 +152,7 @@ TEST(IteratorsTest, RecursiveNodeRangeTest)
 		ASSERT_TRUE(counter == allNodeCount);
 
 		std::vector<Node*> nodePtrs2;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs2;
+		NodeList nodeSharedPtrs2;
 
 		nodeSharedPtrs2 = nodeRange.collect();
 		ASSERT_TRUE(nodeSharedPtrs.size() == allNodeCount);
@@ -199,7 +199,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 	{
 		std::vector<std::reference_wrapper<Node>> nodeRefs;
 		std::vector<Node*> nodePtrs;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs;
+		NodeList nodeSharedPtrs;
 
 		for (auto& node : editor.getNodes())
 		{
@@ -302,7 +302,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 		ASSERT_TRUE(counter == 6);
 
 		std::vector<Node*> nodePtrs2;
-		std::vector<std::shared_ptr<Node>> nodeSharedPtrs2;
+		NodeList nodeSharedPtrs2;
 
 		nodeSharedPtrs2 = nodeRange.collect();
 		ASSERT_TRUE(nodeSharedPtrs.size() == 6);
@@ -350,7 +350,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 //
 //	std::vector<std::reference_wrapper<Node>> nodeRefs;
 //	std::vector<Node*> nodePtrs;
-//	std::vector<std::shared_ptr<Node>> nodeSharedPtrs;
+//	NodeList nodeSharedPtrs;
 //
 //	// Ensure only the expected nodes are in the filtered range
 //	for (auto node = nodeRange.begin(); node != nodeRange.end(); ++node)
@@ -385,7 +385,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 //	auto newPredicate = [](const Node& node) { return node.isSelected(); };
 //	FilteredNodeRange updatedRange(newPredicate, &editor.getNodeList());
 //
-//	std::vector<std::shared_ptr<Node>> updatedNodes = updatedRange.collect();
+//	NodeList updatedNodes = updatedRange.collect();
 //	ASSERT_EQ(updatedNodes.size(), 1);
 //	ASSERT_EQ(updatedNodes.front().get(), node4.get());
 //}

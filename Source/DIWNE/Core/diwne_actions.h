@@ -29,8 +29,8 @@ struct DiwneAction
 		endActionThisFrame = true;
 	}
 
-	/// Called on each frame during the action
-	virtual void onUpdate(){};
+	/// Called at the end of each frame the action is active for
+	virtual void onFrameEnd(){};
 
 	/// Callback called at the end of the frame the action was ended.
 	virtual void onEnd(){};
@@ -80,7 +80,7 @@ struct DragNodeAction : public EditorAction
 	    : nodes(std::move(nodes)), EditorAction(editor, dragNode, source)
 	{}
 
-	void onUpdate() override;
+	void onFrameEnd() override;
 };
 
 }; // namespace Actions

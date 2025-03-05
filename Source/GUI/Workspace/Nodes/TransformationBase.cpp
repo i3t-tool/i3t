@@ -27,6 +27,7 @@ TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node>
 
 bool TransformationBase::allowDrawing()
 {
+	// TODO: (DR) Why is drawing strictly allowed when in sequence?
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
@@ -58,15 +59,14 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
 		GUI::startVerticalAlign(style.FramePadding.y);
-		diwne.canvas().DrawIcon(DIWNE::IconType::Circle,
-		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
-		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
-		                           /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
-		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
-		                           I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
-		                           ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
-		                               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
-		                           false);
+		diwne.canvas().DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
+		                        /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
+		                        ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
+		                            I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
+		                        false);
 		GUI::endVerticalAlign();
 
 		// 2x Frame padding x spacing gap at the end
@@ -101,7 +101,8 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 		I3T_ABORT("drawData: Unknown m_levelOfDetail");
 		inner_interaction_happen = drawDataFull();
 	}
-	if (inner_interaction_happen) {
+	if (inner_interaction_happen)
+	{
 		context.update(true, false, true); // TODO: Probably pass context to drawData methods too
 	}
 }
@@ -132,14 +133,14 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 		bottomright.x = topleft.x;
 		bottomright.x += (1 - inactiveMark) * size.x;
 		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
-		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 	else
 	{ // Left tracking, top left moving left
 		topleft.x = bottomright.x;
 		topleft.x -= (1 - inactiveMark) * size.x;
 		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
-		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 
 	auto maybeInterpolatedTransform =
@@ -158,7 +159,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
 		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-		                                     I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
 	}
 }
 
@@ -250,7 +251,6 @@ void TransformationBase::drawMenuSetDataMap()
 void TransformationBase::onDestroy(bool logEvent)
 {
 	CoreNode::onDestroy(logEvent);
-	m_removeFromSequence = true;
 	m_parentSequence.reset();
 }
 
@@ -326,8 +326,7 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
 	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom());
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	ImGui::TableNextRow();
 
@@ -369,10 +368,8 @@ bool TransformationBase::drawDataSetValuesTable_builder(std::string const corner
 	if (ImGui::BeginTable(fmt::format("##{}{}", cornerLabel, getId()).c_str(), columnLabels.size() + 1,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 		/* header labels */
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();

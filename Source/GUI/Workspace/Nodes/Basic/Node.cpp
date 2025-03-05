@@ -47,8 +47,3 @@ void Node::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuDelete();
 }
-
-void Node::onDestroy(bool logEvent)
-{
-	m_removeFromWorkspaceWindow = true;
-}

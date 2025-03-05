@@ -23,7 +23,7 @@
 namespace DIWNE
 {
 NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
-    : DiwneObject(*this, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
+    : DiwneObject(*this, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne), NodeContainer(this),
       m_popupPosition(settingsDiwne->initPopupPosition)
 {
 	setSelectable(false);
@@ -167,10 +167,12 @@ void NodeEditor::content(DrawInfo& context)
 
 			if (node != nullptr && node->isRendered())
 			{
-				// Set the ImGui cursor position to the position of the node
+				// Set the ImGui cursor position to the position of the node and draw it
 				ImGui::SetCursorScreenPos(canvas().diwne2screen(node->getPosition()));
 				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode2);
-				if (drawResult.logicalUpdates && !node->m_destroy && !node->m_remove)
+
+				// If the node requests focus, bring it to front (unless it's going to be destroyed or removed)
+				if (drawResult.logicalUpdates && !node->isDestroyed() && !node->willBeRemovedFromContainer(this))
 				{
 					setLastActiveNode(std::static_pointer_cast<Node>(node->shared_from_this()));
 				}
@@ -252,19 +254,6 @@ void NodeEditor::afterDraw(DrawInfo& context)
 	ImGui::EndChild();
 }
 
-bool NodeEditor::allowHover() const
-{
-	return true; // TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<
-	             //	return m_isActive /* object is active from previous frame */
-	             //	       ||
-	//	       (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
-	//||
-	//	       (!diwne.m_objectFocused /* only one object can be focused */
-	//	        && (diwne.getDiwneAction() == None ||
-	//	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
-}
-
-//
 void NodeEditor::processInteractions(DrawInfo& context)
 {
 	// Stop any action on ESC
@@ -387,7 +376,7 @@ bool NodeEditor::processDiwneZoom()
 	return false;
 }
 
-void NodeEditor::shiftNodesToBegin(const std::vector<std::shared_ptr<Node>>& nodesToShift)
+void NodeEditor::shiftNodesToBegin(const NodeList& nodesToShift)
 {
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
@@ -403,7 +392,7 @@ void NodeEditor::shiftNodesToBegin(const std::vector<std::shared_ptr<Node>>& nod
 	}
 }
 
-void NodeEditor::shiftNodesToEnd(const std::vector<std::shared_ptr<Node>>& nodesToShift)
+void NodeEditor::shiftNodesToEnd(const NodeList& nodesToShift)
 {
 	int node_num = nodesToShift.size();
 	//    str2.erase(std::remove_if(str2.begin(),
@@ -465,6 +454,35 @@ void NodeEditor::clear()
 	setLastActiveNode(nullptr);
 }
 
+NodeList& NodeEditor::getNodeList()
+{
+	return NodeContainer::getNodeList();
+}
+NodeRange<> NodeEditor::getNodes() const
+{
+	return NodeContainer::getNodes();
+};
+RecursiveNodeRange<> NodeEditor::getAllNodesInnerIncluded() const
+{
+	return RecursiveNodeRange<>(&m_nodes);
+}
+FilteredNodeRange<> NodeEditor::getSelectedNodes() const
+{
+	return FilteredNodeRange<>(
+	    [](const Node* node) -> bool {
+		    return node->getSelected();
+	    },
+	    &m_nodes);
+}
+FilteredRecursiveNodeRange<> NodeEditor::getSelectedNodesInnerIncluded() const
+{
+	return FilteredRecursiveNodeRange<>(
+	    [](const Node* node) -> bool {
+		    return node->getSelected();
+	    },
+	    &m_nodes);
+}
+
 void NodeEditor::deselectNodes()
 {
 	for (auto& node : getAllNodesInnerIncluded())
@@ -473,12 +491,12 @@ void NodeEditor::deselectNodes()
 	}
 }
 
-void NodeEditor::addNode(std::shared_ptr<Node> node)
+void NodeEditor::addNode(const std::shared_ptr<Node>& node)
 {
-	addNode(node, node->getPosition(), false);
+	NodeContainer::addNode(node);
 }
 
-void NodeEditor::addNode(std::shared_ptr<Node> node, const ImVec2 position, bool shiftToLeftByNodeWidth)
+void NodeEditor::addNode(const std::shared_ptr<Node>& node, const ImVec2 position, bool shiftToLeftByNodeWidth)
 {
 	// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
 	// size, padding etc.)
@@ -493,11 +511,9 @@ void NodeEditor::addNode(std::shared_ptr<Node> node, const ImVec2 position, bool
 		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw); /* to obtain size */
 		node->translate(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
 	}
-
-	// TODO: A subclass node editor might keep its own storage, we could add internal callbacks to add node
-	m_nodes.push_back(node);
-	node->setParentObject(this);                       // Set the editor as the node's parent
 	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+
+	NodeContainer::addNode(node);
 }
 
 void NodeEditor::addLink(std::shared_ptr<Link> link)
@@ -507,33 +523,15 @@ void NodeEditor::addLink(std::shared_ptr<Link> link)
 
 void NodeEditor::purgeObjects()
 {
-	{
-		auto endIt = std::stable_partition(m_nodes.begin(), m_nodes.end(), [](const auto& node) -> bool {
-			return !node->m_destroy && !node->m_remove;
-		});
-		auto endItCopy = endIt;
-		while (endItCopy != m_nodes.end())
-		{
-			(*endItCopy)->m_remove = false;
-			++endItCopy;
-		}
-		m_nodes.erase(endIt, m_nodes.end());
-	}
-	{
-		auto endIt = std::stable_partition(m_links.begin(), m_links.end(), [](const auto& link) -> bool {
-			return !link->m_destroy && !link->m_remove;
-		});
-		auto endItCopy = endIt;
-		while (endItCopy != m_links.end())
-		{
-			(*endItCopy)->m_remove = false;
-			++endItCopy;
-		}
-		m_links.erase(endIt, m_links.end());
-	}
+	purgeNodes();
+
+	auto endIt = std::remove_if(m_links.begin(), m_links.end(), [this](const auto& e) -> bool {
+		return e->m_destroy;
+	});
+	m_links.erase(endIt, m_links.end());
 }
 
-ImVec2 const& NodeEditor::getPopupPosition() const
+const ImVec2& NodeEditor::getPopupPosition() const
 {
 	return m_popupPosition;
 };
@@ -549,6 +547,6 @@ void NodeEditor::setNodesSelectionChanged(bool value)
 bool NodeEditor::getNodesSelectionChanged()
 {
 	return m_nodesSelectionChanged;
-};
+}
 
 } /* namespace DIWNE */

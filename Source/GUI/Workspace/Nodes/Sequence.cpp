@@ -39,7 +39,7 @@ DIWNE::NodeRange<> Sequence::getNodes() const
 {
 	return m_dropZone->getNodes();
 }
-std::vector<std::shared_ptr<DIWNE::Node>>& Sequence::getNodeList()
+DIWNE::NodeList& Sequence::getNodeList()
 {
 	return m_dropZone->getNodeList();
 }
@@ -218,21 +218,35 @@ void Sequence::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
+void Sequence::afterDraw(DIWNE::DrawInfo& context)
+{
+	DiwneObject::afterDraw(context);
+	DIWNE_DEBUG_OBJECTS((diwne), {
+		ImRect rect = getRectDiwne();
+		ImVec2 originPos = ImVec2(rect.Min.x, rect.Min.y);
+		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) -
+		                                            ImVec2(0, ImGui::GetTextLineHeightWithSpacing()),
+		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		                                        fmt::format("Nodes: {}", m_dropZone->getNodeList().size()).c_str());
+	});
+}
 
 Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)
     : m_sequence(sequence), NodeDropZone(diwne, sequence)
 {}
 void Sequence::SequenceDropZone::onNodeAdd(DIWNE::Node* node, int index)
 {
+	NodeDropZone::onNodeAdd(node, index);
 	auto transformation = static_cast<TransformationBase*>(node);
 	auto coreTransformation = transformation->getNodebase()->as<Core::Transform>();
 	m_sequence->m_nodebase->as<Core::Sequence>()->pushMatrix(coreTransformation, index);
 	transformation->m_parentSequence = std::static_pointer_cast<Sequence>(m_sequence->shared_from_this());
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
 }
-void Sequence::SequenceDropZone::onNodeRemove(DIWNE::Node* node, int index)
+void Sequence::SequenceDropZone::onNodeRemove(std::shared_ptr<DIWNE::Node> node, int index)
 {
-	auto transformation = static_cast<TransformationBase*>(node);
+	NodeDropZone::onNodeRemove(node, index);
+	auto transformation = static_cast<TransformationBase*>(node.get());
 	transformation->m_parentSequence.reset();
 	m_sequence->m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());

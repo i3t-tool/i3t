@@ -24,13 +24,12 @@ using namespace Workspace;
 
 Camera::Camera(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCamera(), false),
-      m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(),
-                                              /* true, \todo (PF) was not used */
-                                              true)),
-      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(),
-                                        /* true, \todo (PF) was not used */
-                                        true))
+      m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true)),
+      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true))
 {
+	m_projAndView.push_back(m_projection);
+	m_projAndView.push_back(m_view);
+
 	// connect matrix P to matrix V internally
 	// TODO: Figure out how to draw this link manually and not from the editor
 	//  That way we can draw it at the right moment inside the actual camera node content
@@ -59,6 +58,9 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_projection->setTopLabel("projection");
+	m_projection->setFixed(true);
+	m_projection->setParentObject(this);
+	m_projection->m_draggable = false;
 	m_projection->m_deletable = false;
 
 	m_view->setSelectable(false);
@@ -73,6 +75,9 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_view->getNodebase()->getInputPins()[1].setRendered(true);
 	m_view->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_view->setTopLabel("view");
+	m_view->setFixed(true);
+	m_view->setParentObject(this);
+	m_view->m_draggable = false;
 	m_view->m_deletable = false;
 
 	// Hide multiplication output to discourage interaction
@@ -275,6 +280,15 @@ int Camera::maxLengthOfData()
 bool Camera::isCamera()
 {
 	return true;
+}
+
+DIWNE::NodeRange<> Camera::getNodes() const
+{
+	return DIWNE::NodeRange<>(&m_projAndView);
+}
+DIWNE::NodeList& Camera::getNodeList()
+{
+	return m_projAndView;
 }
 
 // bool Camera::processSelect()

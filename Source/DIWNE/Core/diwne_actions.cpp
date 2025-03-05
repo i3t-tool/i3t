@@ -20,7 +20,7 @@ void ConnectPinAction::onEnd()
 		draggedLink->destroy(false);
 }
 
-void DragNodeAction::onUpdate()
+void DragNodeAction::onFrameEnd()
 {
 	ImVec2 offset = editor.input().bypassGetMouseDelta() / editor.getZoom();
 	for (auto node : nodes)

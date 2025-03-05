@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BasicNode.h"
+#include "DIWNE/Basic/BasicNode.h"
 #include "DIWNE/Core/Elements/Containers/NodeContainer.h"
 
 namespace DIWNE
@@ -11,6 +11,7 @@ class NodeEditor;
  */
 class DummyContainerNode : public BasicNode, public NodeContainer
 {
-	DummyContainerNode(NodeEditor& editor, std::string label) : BasicNode(editor, label) {}
+public:
+	DummyContainerNode(NodeEditor& editor, std::string label) : BasicNode(editor, label), NodeContainer(this) {}
 };
 } // namespace DIWNE

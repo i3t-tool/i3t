@@ -276,26 +276,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 
 bool DiwneObject::allowHover() const
 {
-	// TODO: Rename, decode what we're doing here, note that his function is fully overriden in node editor which
-	//  duplicates this code but changes the SelectionRect behaviour (which should to be changed)
-	/* object is active from previous frame */
-	/* only one object can be focused */
-	/* not stole focus from selecting action */
-	/* we want focus of other object while new link */
-
-	// TODO: We don't really want to do any complicated logic here, for now lets just return true and see if we can
-	//  restrict
-	//  hovering in some other way
-
-	return true;
-	//	bool ret =
-	//	    m_isActive ||
-	//	    (!diwne.m_objectFocused &&
-	//	     !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
-	//&& 	     (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink)); 	LOG_INFO("{} FOCUSED
-	// active: {}, focused: {}, actionActive: {}, action: {}, source: {}", (ret ? "YES" : "NO "), 	         m_isActive,
-	// diwne.m_objectFocused, EnumUtils::name(diwne.getDiwneActionActive()), EnumUtils::name(diwne.getDiwneAction()),
-	// m_labelDiwne) 	return ret;
+	return m_hoverable;
 }
 
 bool DiwneObject::allowPress(const DrawInfo& context) const
@@ -312,7 +293,7 @@ bool DiwneObject::allowPress(const DrawInfo& context) const
 
 bool DiwneObject::allowDragStart() const
 {
-	return m_isPressed;
+	return m_isPressed && m_draggable;
 }
 
 void DiwneObject::destroy(bool logEvent)
@@ -329,16 +310,6 @@ void DiwneObject::destroy(bool logEvent)
 }
 
 void DiwneObject::onDestroy(bool logEvent) {}
-
-void DiwneObject::remove(bool logEvent)
-{
-	if (m_remove)
-		return;
-	m_remove = true;
-
-	onRemove(logEvent);
-}
-void DiwneObject::onRemove(bool logEvent) {}
 
 void DiwneObject::setPosition(const ImVec2& position)
 {
@@ -427,6 +398,23 @@ bool InteractionState::anyActionActive()
 
 void InteractionState::nextFrame()
 {
+	// TODO: Dragging and current action must be stopped when the source is destroyed
+	//  Good solution to safeguard all posibilities would be to use a weak ptr as source
+	//  When object is REMOVED, onDestroy is not called and cannot ensure drag end
+	// CONTINUE HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	if (action != nullptr)
+	{
+		action->onFrameEnd();
+
+		// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
+		// Hence the action reset is defered to the end of the frame here.
+		if (action->endActionThisFrame)
+		{
+			endAction(true);
+		}
+	}
+
 	// Set dragging to false on dragEnd
 	// In the frame when dragging ends, dragging and dragEnd are both true.
 	// dragEnd resets next frame (we're not infering it over)
@@ -434,12 +422,6 @@ void InteractionState::nextFrame()
 	if (dragEnd)
 	{
 		dragging = false;
-	}
-	// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
-	// Hence the action reset is defered to the end of the frame here.
-	if (action != nullptr && action->endActionThisFrame)
-	{
-		endAction(true);
 	}
 
 	// Reset non-persistent variables
@@ -682,7 +664,7 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 	}
 }
 
-void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
+void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& color)
 {
 	if (!diwne.m_tooltipDrawn)
 	{

@@ -101,20 +101,25 @@ void Application::run()
 
 	while (!m_shouldClose)
 	{
-		glfwPollEvents();
-
-		CommandDispatcher::get().execute();
-
-		beginFrame();
-
-		// Logic update
-		update();
-
-		// Render stuff
-		display();
-
-		endFrame();
+		frame();
 	}
+}
+
+void Application::frame()
+{
+	glfwPollEvents();
+
+	CommandDispatcher::get().execute();
+
+	beginFrame();
+
+	// Logic update
+	update();
+
+	// Render stuff
+	display();
+
+	endFrame();
 }
 
 void Application::beginFrame()

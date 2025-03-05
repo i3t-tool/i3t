@@ -21,9 +21,11 @@ public:
 		return true;
 	}
 
-	void addNodeAt(const std::shared_ptr<Node>& node, int index = 0) override;
-	bool removeNodeAt(int index) override;
+	void onNodeAdd(Node* node, int index) override;
+	// TODO: Docs, this moves the node back to the editor
+	void onNodeRemove(std::shared_ptr<Node> node, int index) override;
 
+	void initialize(DrawInfo& context) override;
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
@@ -34,6 +36,7 @@ public:
 	void afterDraw(DrawInfo& context) override;
 
 	bool allowDragStart() const override;
+	bool allowHover() const override;
 
 protected:
 	bool tryAddNode(DrawInfo& context);

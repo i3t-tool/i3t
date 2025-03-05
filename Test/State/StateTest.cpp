@@ -213,6 +213,7 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 		App::getModule<StateManager>().takeSnapshot();
 	}
 
+	// TODO: (DR) setRemoveFromWorkspace() was removed in favor of DiwneObject::remove(), probably still needed though
 	// due to WorkspaceSequence::setRemoveFromWorkspace
 	for (int i = 0; i < 2; ++i)
 		App::get().display();
@@ -229,6 +230,7 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 		ASSERT_TRUE(result);
 	}
 
+	// TODO: (DR) setRemoveFromWorkspace() was removed in favor of DiwneObject::remove(), probably still needed though
 	// due to WorkspaceSequence::setRemoveFromWorkspace
 	for (int i = 0; i < 2; ++i)
 		App::get().display();

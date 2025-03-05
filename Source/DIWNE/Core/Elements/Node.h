@@ -84,9 +84,11 @@ public:
 	bool getFlag(char index) const;
 	void setFlag(char index, bool value); ///< Set the node bit flag value at index @see getFlag()
 
-	// Internal stuff
 	// =============================================================================================================
+
 	virtual void drawSelectionIndicator(DrawInfo& context);
+
+	bool willBeRemovedFromContainer(const DiwneObject* container);
 };
 
 } /* namespace DIWNE */

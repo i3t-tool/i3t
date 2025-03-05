@@ -16,7 +16,16 @@
 #pragma once
 #define DIWNE_DEBUG_ENABLED 1
 
+#include <memory>
+#include <vector>
+
 #include "diwne_imgui.h"
+
+namespace DIWNE
+{
+class Node;
+using NodeList = std::vector<std::shared_ptr<DIWNE::Node>>;
+} // namespace DIWNE
 
 static constexpr ImVec4 DIWNE_WHITE = ImVec4(1.f, 1.f, 1.f, 1.f);
 static constexpr ImVec4 DIWNE_BLACK = ImVec4(0.f, 0.f, 0.f, 1.f);

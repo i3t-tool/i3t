@@ -208,12 +208,12 @@ ImVec4 Canvas::transformFromDiwneToImGui(const ImVec4& rect) const
 	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
 }
 
-void Canvas::moveViewportZoomed(ImVec2 const& distance)
+void Canvas::moveViewportZoomed(const ImVec2& distance)
 {
 	moveViewport(ImVec2(distance.x / m_zoom, distance.y / m_zoom));
 }
 
-void Canvas::moveViewport(ImVec2 const& distance)
+void Canvas::moveViewport(const ImVec2& distance)
 {
 	m_viewRectDiwne.Translate(distance);
 }

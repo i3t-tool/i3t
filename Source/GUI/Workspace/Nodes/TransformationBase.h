@@ -45,16 +45,6 @@ public:
 
 	void onDestroy(bool logEvent) override;
 
-	// TODO: REWORK sequence drag'n'drop <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	bool m_removeFromSequence;
-	bool getRemoveFromSequence() const
-	{
-		return m_removeFromSequence;
-	};
-	void setRemoveFromSequence(bool value)
-	{
-		m_removeFromSequence = value;
-	};
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
 
