@@ -141,7 +141,7 @@ public:
 	bool m_justReleased{false}; ///< Is object just released? Eg. was the button released this frame.
 
 	bool m_isDragged{false}; /**< Is object dragged */
-	bool m_draggable{true}; ///< Whether dragging of the object is allowed by default
+	bool m_draggable{true};  ///< Whether dragging of the object is allowed by default
 
 	// TODO: This flag is oddly named, realistically this means whether we are hovered AND at the same time
 	//  hovered in some special area. This area is generally just the header of a node and this tells us when to
@@ -155,7 +155,7 @@ public:
 	                                                                                              // hover / Rework
 	bool m_hovered{false};
 	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
-	bool m_hoverable{true}; ///< Whether hovering is enabled by default
+	bool m_hoverable{true};  ///< Whether hovering is enabled by default
 
 protected:
 	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
@@ -641,6 +641,9 @@ public:
 	 * \param color is the color of the tooltip
 	 */
 	void showTooltipLabel(const std::string& label, const ImColor&& color);
+
+private:
+	void debugDrawing(DrawInfo& context, int debug_logicalUpdate); ///< Debug drawing helper
 };
 
 /*
