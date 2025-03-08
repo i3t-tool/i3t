@@ -20,9 +20,10 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Theme/Theme.h"
 #include "I3T.h"
+#include "Localization/Localization.h"
 #include "Logger/Logger.h"
 
-LogWindow::LogWindow() : IWindow(ICON_I3T_LOG " Log View")
+LogWindow::LogWindow() : IWindow(ICON_T(ICON_I3T_LOG " ", "Log View"))
 {
 #ifdef I3T_DEBUG
 	m_input->bindAction("MyTestAction", EKeyState::Pressed, [] {
@@ -67,20 +68,20 @@ void LogWindow::render()
 	GUI::dockTabStylePop();
 	this->updateWindowInfo();
 
-	ImGui::Text("Log output");
+	ImGui::Text(_t("Log output"));
 
 	/// \todo MH test code, remove
 	static bool val = true;
 
-	ImGui::Text("Switch fire action key");
+	ImGui::Text(_t("Switch fire action key"));
 	ImGui::SameLine();
 	std::string s;
 	for (auto action : InputBindings::getActionMapping("fire"))
 	{
 		s += std::to_string(action.code);
 	}
-	ImGui::Text("Current keys: %s", s.c_str());
-	if (ImGui::Button("Switch"))
+	ImGui::Text(_t("Current keys: %s"), s.c_str());
+	if (ImGui::Button(_t("Switch")))
 	{
 #ifdef I3T_DEBUG
 		val = !val;

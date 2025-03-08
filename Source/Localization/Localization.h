@@ -18,8 +18,9 @@
 
 #define LOCALIZATION Localization::instance()
 
-#define _t(key) LOCALIZATION.translate(key).c_str()
-#define ICON_T(icon, key) (std::string(icon) + LOCALIZATION.translate(key)).c_str()
+#define _ts(key) LOCALIZATION.translate(key)
+#define _t(key) _ts(key).c_str()
+#define ICON_T(icon, key) (std::string(icon) + _ts(key)).c_str()
 
 
 struct AppLanguage
@@ -56,8 +57,8 @@ private:
 
 	std::unordered_map<std::string, std::string> m_translations;
 	std::vector<AppLanguage> m_languages{
-	    {.id = 0, .name = "English", .filePath = "Data/Localization/en"},
-	    {.id = 1, .name = "Čeština", .filePath = "Data/Localization/cz"},
-	    {.id = 2, .name = "Русский", .filePath = "Data/Localization/ru"},
+	    {.id = 0, .name = "English", .filePath = "Data/Localization/en.txt"},
+	    {.id = 1, .name = "Čeština", .filePath = "Data/Localization/cz.txt"},
+	    {.id = 2, .name = "Русский", .filePath = "Data/Localization/ru.txt"},
 	};
 };

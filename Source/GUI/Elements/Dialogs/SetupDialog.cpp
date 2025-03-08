@@ -20,10 +20,11 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/Toolkit.h"
+#include "Localization/Localization.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
-SetupDialog::SetupDialog() : IWindow(ICON_I3T_SETTINGS " Preferences") {}
+SetupDialog::SetupDialog() : IWindow(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")) {}
 
 void SetupDialog::render()
 {
@@ -42,7 +43,7 @@ void SetupDialog::render()
 		Vp::Viewport* viewport = I3T::getViewport();
 		Vp::ViewportSettings& stg = viewport->getSettings();
 
-		if (ImGui::Button("Reset to defaults"))
+		if (ImGui::Button(_t("Reset to defaults")))
 		{
 			App::getModule<StateManager>().resetGlobal();
 		}

@@ -43,6 +43,7 @@ void I3TApplication::onInit()
 	});
 
 	auto* stateManager = createModule<StateManager>();
+	// Call loading of the localization file after the state manager is created
 	LOCALIZATION.loadLanguage(LOCALIZATION.currentLanguageID);
 
 	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();

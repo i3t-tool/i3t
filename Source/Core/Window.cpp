@@ -79,7 +79,7 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 	stbi_image_free(pixels);
 
 	glfwMakeContextCurrent(m_mainWindow);
-	glfwSwapInterval(1); // Enable vsync.
+	glfwSwapInterval(0); // Enable vsync.
 
 	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) {
 		BeforeCloseCommand::dispatch();

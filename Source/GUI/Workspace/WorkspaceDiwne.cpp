@@ -20,6 +20,7 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
+#include "Localization/Localization.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -477,26 +478,26 @@ void WorkspaceDiwne::popupContent()
 	ImGui::PushFont(I3T::getFont(EFont::TutorialHint));
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getColor(EColor::AddMenuHeader));
 
-	ImGui::Text("Add...");
+	ImGui::Text(_t("Add..."));
 
 	ImGui::PopFont();
 	ImGui::PopStyleColor();
 
 	ImGui::Separator();
-	if (ImGui::BeginMenu("transformation"))
+	if (ImGui::BeginMenu(_t("transformation")))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
 		 * with group (transformation, operator, ...) and label*/
-		if (ImGui::MenuItem("free"))
+		if (ImGui::MenuItem(_t("free")))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Free>>();
 		}
-		if (ImGui::MenuItem("translate"))
+		if (ImGui::MenuItem(_t("translate")))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Translation>>();
 		}
 
-		if (ImGui::BeginMenu("rotate"))
+		if (ImGui::BeginMenu(_t("rotate")))
 		{
 
 			if (ImGui::MenuItem("eulerAngleX"))
@@ -521,7 +522,7 @@ void WorkspaceDiwne::popupContent()
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem("scale"))
+		if (ImGui::MenuItem(_t("scale")))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Scale>>();
 		}
@@ -534,17 +535,17 @@ void WorkspaceDiwne::popupContent()
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::LookAt>>();
 		}
-		if (ImGui::BeginMenu("projection"))
+		if (ImGui::BeginMenu(_t("projection")))
 		{
-			if (ImGui::MenuItem("ortho"))
+			if (ImGui::MenuItem(_t("ortho")))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Ortho>>();
 			}
-			if (ImGui::MenuItem("perspective"))
+			if (ImGui::MenuItem(_t("perspective")))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Perspective>>();
 			}
-			if (ImGui::MenuItem("frustum"))
+			if (ImGui::MenuItem(_t("frustum")))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Frustum>>();
 			}
@@ -552,11 +553,11 @@ void WorkspaceDiwne::popupContent()
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("operator"))
+	if (ImGui::BeginMenu(_t("operator")))
 	{
-		if (ImGui::BeginMenu("transformation"))
+		if (ImGui::BeginMenu(_t("transformation")))
 		{
-			if (ImGui::MenuItem("translate"))
+			if (ImGui::MenuItem(_t("translate")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeTranslation>>();
 			}
@@ -572,23 +573,23 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeEulerZ>>();
 			}
-			if (ImGui::MenuItem("rotate"))
+			if (ImGui::MenuItem(_t("rotate")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeAxisAngle>>();
 			}
-			if (ImGui::MenuItem("scale"))
+			if (ImGui::MenuItem(_t("scale")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeScale>>();
 			}
-			if (ImGui::MenuItem("ortho"))
+			if (ImGui::MenuItem(_t("ortho")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeOrtho>>();
 			}
-			if (ImGui::MenuItem("perspective"))
+			if (ImGui::MenuItem(_t("perspective")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakePerspective>>();
 			}
-			if (ImGui::MenuItem("frustum"))
+			if (ImGui::MenuItem(_t("frustum")))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeFrustum>>();
 			}
@@ -919,40 +920,40 @@ void WorkspaceDiwne::popupContent()
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::MenuItem("sequence"))
+	if (ImGui::MenuItem(_t("sequence")))
 	{
 		addNodeToPositionOfPopup<Sequence>();
 	}
-	if (ImGui::MenuItem("camera"))
+	if (ImGui::MenuItem(_t("camera")))
 	{
 		addNodeToPositionOfPopup<Camera>();
 	}
-	if (ImGui::MenuItem("model"))
+	if (ImGui::MenuItem(_t("model")))
 	{
 		addNodeToPositionOfPopup<Model>();
 	}
-	if (ImGui::MenuItem("pulse"))
+	if (ImGui::MenuItem(_t("pulse")))
 	{
 		addNodeToPositionOfPopup<Operator<Core::EOperatorType::PulseToPulse>>();
 	}
-	if (ImGui::MenuItem("screen"))
+	if (ImGui::MenuItem(_t("screen")))
 	{
 		addNodeToPositionOfPopup<Screen>();
 	}
-	if (ImGui::MenuItem("cycle"))
+	if (ImGui::MenuItem(_t("cycle")))
 	{
 		addNodeToPositionOfPopup<Cycle>();
 	}
-	if (ImGui::MenuItem("scripting node"))
+	if (ImGui::MenuItem(_t("scripting node")))
 	{
 		addNodeToPositionOfPopup<ScriptingNode>();
 	}
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu("Delete"))
+	if (ImGui::BeginMenu(_t("Delete")))
 	{
-		if (ImGui::MenuItem("Selected nodes"))
+		if (ImGui::MenuItem(_t("Selected nodes")))
 		{
 			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 			{
@@ -977,7 +978,7 @@ void WorkspaceDiwne::popupContent()
 			}
 		}
 
-		if (ImGui::MenuItem("Selected links"))
+		if (ImGui::MenuItem(_t("Selected links")))
 		{
 			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 			{
@@ -995,12 +996,12 @@ void WorkspaceDiwne::popupContent()
 			}
 		}
 
-		if (ImGui::MenuItem("All nodes"))
+		if (ImGui::MenuItem(_t("All nodes")))
 		{
 			clear();
 		}
 
-		if (ImGui::MenuItem("All links"))
+		if (ImGui::MenuItem(_t("All links")))
 		{
 			for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 			{
@@ -1019,25 +1020,25 @@ void WorkspaceDiwne::popupContent()
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu("Selection"))
+	if (ImGui::BeginMenu(_t("Selection")))
 	{
-		if (ImGui::MenuItem("select all", "Ctrl+A"))
+		if (ImGui::MenuItem(_t("select all"), "Ctrl+A"))
 		{
 			selectAll();
 		}
-		if (ImGui::MenuItem("invert", "Ctrl+I"))
+		if (ImGui::MenuItem(_t("invert"), "Ctrl+I"))
 		{
 			invertSelection();
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Zoom"))
+	if (ImGui::BeginMenu(_t("Zoom")))
 	{
-		if (ImGui::MenuItem("to all", "Ctrl+Alt+A"))
+		if (ImGui::MenuItem(_t("to all"), "Ctrl+Alt+A"))
 		{
 			zoomToAll();
 		}
-		if (ImGui::MenuItem("to selection", "Ctrl+Alt+S"))
+		if (ImGui::MenuItem(_t("to selection"), "Ctrl+Alt+S"))
 		{
 			zoomToSelected();
 		}

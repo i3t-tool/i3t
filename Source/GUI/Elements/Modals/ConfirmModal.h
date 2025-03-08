@@ -16,6 +16,7 @@
 #include <string>
 
 #include "GUI/Elements/IWindow.h"
+#include "Localization/Localization.h"
 
 
 static const std::string BEFORE_EXIT_MODAL_TITLE = "Save current scene?";
@@ -28,7 +29,7 @@ class ConfirmModalStrategy
 	friend class ConfirmModal;
 
 public:
-	ConfirmModalStrategy(std::string title, std::string message, std::string yesText = "Yes", std::string noText = "No")
+	ConfirmModalStrategy(std::string title, std::string message, std::string yesText = _t("Yes"), std::string noText = _t("No"))
 	    : m_title(title), m_message(message), m_yesText(yesText), m_noText(noText)
 	{}
 

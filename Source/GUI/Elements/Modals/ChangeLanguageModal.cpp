@@ -39,77 +39,19 @@ void ChangeLanguageModal::onImGui()
 		}
 		ImGui::EndListBox();
 	}
-	ImGui::TextDisabled("You need to restart the application for all changes to take effect.");
+	ImGui::TextWrapped(_t("You need to restart the application for all changes to take effect."));
 
-	if (ImGui::Button("Cancel"))
+	if (ImGui::Button(_t("Cancel")))
 	{
 		selectedLanguage = LOCALIZATION.currentLanguageID;
 		close();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("OK"))
+	if (ImGui::Button(_t("OK")))
 	{
 		LOCALIZATION.loadLanguage(selectedLanguage);
+		LOCALIZATION.currentLanguageID = selectedLanguage;
+		Application::getModule<StateManager>().saveUserData();
 		close();
 	}
-}
-
-// void ChangeLanguageWindow::render()
-// {
-// 	ImVec2 center = ImGui::GetMainViewport()->GetWorkCenter();
-// 	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 25, 0);
-// 	ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
-// 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-// 	ImGui::Begin(getName(), getShowPtr(), g_dialogFlags | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize);
-// 	{
-// 		this->updateWindowInfo();
-//
-// 		static auto availableLanguages = LOCALIZATION.getAvailableLanguages();
-// 		if (ImGui::BeginListBox("##LanguageListBox"))
-// 		{
-// 			for (const auto& language : availableLanguages)
-// 			{
-// 				if (ImGui::Selectable(language.c_str()))
-// 				{
-// 					LOCALIZATION.loadLanguage(language);
-// 				}
-// 			}
-// 			ImGui::EndListBox();
-// 		}
-//
-// 		if (ImGui::Button("Cancel"))
-// 		{
-// 			HideWindowCommand::dispatch(ID);
-// 		}
-// 		ImGui::SameLine();
-// 		if (ImGui::Button("OK"))
-// 		{
-//
-// 			HideWindowCommand::dispatch(ID);
-// 		}
-// 	}
-// 	ImGui::End();
-//
-// 	if (!isVisible())
-// 	{
-// 		HideWindowCommand::dispatch(ID);
-// 	}
-// }
-
-void ChangeLanguageModal::showChangeLanguageMenu()
-{
-	// static auto availableLanguages = LOCALIZATION.getAvailableLanguages();
-	//
-	// if (ImGui::BeginListBox("##LanguageListBox", ImVec2(100.0f, 80.0f)))
-	// {
-	// 	for (const auto& language : availableLanguages)
-	// 	{
-	// 		if (ImGui::Selectable(language.c_str()))
-	// 		{
-	// 			LOCALIZATION.loadLanguage(language);
-	// 			Application::getModule<StateManager>().saveUserData();
-	// 		}
-	// 	}
-	// 	ImGui::EndListBox();
-	// }
 }

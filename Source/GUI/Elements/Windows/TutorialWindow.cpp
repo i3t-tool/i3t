@@ -53,6 +53,7 @@
 #endif // unix
 
 #include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
+#include "Localization/Localization.h"
 #include "Scripting/Environment.h"
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
@@ -73,7 +74,7 @@ const int MIN_WIN_HEIGHT = 600;
 //---
 
 // INIT
-TutorialWindow::TutorialWindow(bool show) : IWindow("Tutorial", show)
+TutorialWindow::TutorialWindow(bool show) : IWindow(_t("Tutorial"), show)
 {
 	emptyTutorial();
 	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
@@ -232,7 +233,7 @@ void TutorialWindow::renderTutorialHeader()
 
 	if (tutorial == nullptr)
 	{
-		title = "No tutorial";
+		title = _t("No tutorial");
 	}
 	else if (tutorial->getStepCount() > 0)
 	{
@@ -240,7 +241,7 @@ void TutorialWindow::renderTutorialHeader()
 	}
 	else
 	{
-		title = "Empty tutorial";
+		title = _t("Empty tutorial");
 	}
 
 	// display title if not "undefined"
@@ -304,7 +305,7 @@ void TutorialWindow::renderTutorialContent()
 		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
-		if (ImGui::Button("Open Start Menu", ImVec2(-1, NEXT_BUTTON_SIZE_Y * 5)))
+		if (ImGui::Button(_t("Open Start Menu"), ImVec2(-1, NEXT_BUTTON_SIZE_Y * 5)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 			this->hide();
@@ -369,7 +370,7 @@ void TutorialWindow::renderTutorialControls()
 	// Back button
 	if (currentStep != 0)
 	{
-		if (ImGui::Button("< Back", ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth),
+		if (ImGui::Button(_t("< Back"), ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth),
 		                                   NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep - 1);
@@ -383,7 +384,7 @@ void TutorialWindow::renderTutorialControls()
 	else
 	{
 		if (ImGui::Button(
-		        "< Start Menu",
+		        _t("< Start Menu"),
 		        ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_MainMenuButtonWidth), NEXT_BUTTON_SIZE_Y)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
@@ -408,7 +409,7 @@ void TutorialWindow::renderTutorialControls()
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
 	if (currentStep < tutorial->getStepCount() - 1)
 	{
-		if (GUI::Button("Next", !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
+		if (GUI::Button(_t("Next"), !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep + 1);
 			// std::cout << m_currentStep << std::endl;
@@ -420,7 +421,7 @@ void TutorialWindow::renderTutorialControls()
 	}
 	else
 	{
-		if (GUI::Button("Finish", !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
+		if (GUI::Button(_t("Finish"), !completed, ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setTutorial(nullptr);
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
@@ -466,7 +467,7 @@ void TutorialWindow::renderHeadline(Headline* headline)
 
 static void renderTestQuestionControls(TestQuestion* task)
 {
-	if (ImGui::Button("Submit"))
+	if (ImGui::Button(_t("Submit")))
 	{
 		task->submit();
 	}
@@ -475,11 +476,11 @@ static void renderTestQuestionControls(TestQuestion* task)
 	{
 		if (!task->m_isCorrect)
 		{
-			ImGui::TextUnformatted("Incorrect!");
+			ImGui::TextUnformatted(_t("Incorrect!"));
 		}
 		else
 		{
-			ImGui::TextUnformatted("Correct!");
+			ImGui::TextUnformatted(_t("Correct!"));
 		}
 	}
 }

@@ -16,9 +16,7 @@
 #include "Logger/Logger.h"
 
 #include <fstream>
-#include <iostream>
 #include <ranges>
-#include <sstream>
 
 Localization& Localization::instance()
 {
@@ -71,6 +69,10 @@ bool Localization::loadFromFile(const std::string& filename)
 		{
 			std::string key = line.substr(0, delimiterPos);
 			std::string value = line.substr(delimiterPos + 1);
+			if (value.empty())
+			{
+				continue;
+			}
 			if (m_translations.contains(key))
 			{
 				LOG_ERROR("Duplicate key found in localization file: " + key);

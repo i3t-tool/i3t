@@ -33,7 +33,9 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Test/TestModule.h"
 #include "I3T.h"
+#include "Localization/Localization.h"
 #include "Logger/Logger.h"
+#include "Modals/ChangeLanguageModal.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
 
@@ -203,20 +205,19 @@ void MainMenuBar::render()
 
 void MainMenuBar::showFileMenu()
 {
-	if (ImGui::BeginMenu("File"))
+	if (ImGui::BeginMenu(_t("File")))
 	{
-		if (ImGui::MenuItem(ICON_I3T_NEW_FILE " New"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_NEW_FILE " ", "New")))
 		{
 			InputManager::triggerAction("new", EKeyState::Pressed);
 		}
 		ImGui::Separator();
-
-		if (ImGui::MenuItem(ICON_I3T_OPEN_FILE " Open", "Ctrl+O"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_OPEN_FILE " ", "Open"), "Ctrl+O"))
 		{
 			InputManager::triggerAction("open", EKeyState::Pressed);
 		}
 
-		if (ImGui::BeginMenu(ICON_I3T_CLOCK " Recent"))
+		if (ImGui::BeginMenu(ICON_T(ICON_I3T_CLOCK " ", "Recent")))
 		{
 			showRecentFiles();
 
@@ -224,27 +225,27 @@ void MainMenuBar::showFileMenu()
 		}
 		ImGui::Separator();
 
-		if (ImGui::MenuItem(ICON_I3T_SAVE " Save", "Ctrl+S", false,
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_SAVE " ", "Save"), "Ctrl+S", false,
 		                    !App::getModule<StateManager>().getCurrentScene()->m_readOnly))
 		{
 			save();
 		}
 
-		if (ImGui::MenuItem(ICON_I3T_SAVE " Save As"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_SAVE " ", "Save As")))
 		{
 			saveAs();
 		}
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem(ICON_I3T_MODELS " Manage Models"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_MODELS " ", "Manage Models")))
 		{
 			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
 		}
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem(ICON_I3T_EXIT " Exit"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_EXIT " ", "Exit")))
 		{
 			BeforeCloseCommand::dispatch();
 		}
@@ -256,31 +257,27 @@ void MainMenuBar::showFileMenu()
 void MainMenuBar::showEditMenu()
 {
 	// See #297
-	if (ImGui::BeginMenu("Edit"))
+	if (ImGui::BeginMenu(_t("Edit")))
 	{
-		if (ImGui::MenuItem("Undo", "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
+		if (ImGui::MenuItem(_t("Undo"), "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
 		{
 			InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem("Redo", "Ctrl+Y", false, App::getModule<StateManager>().canRedo()))
+		if (ImGui::MenuItem(_t("Redo"), "Ctrl+Y", false, App::getModule<StateManager>().canRedo()))
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem(ICON_I3T_STYLE " Style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_STYLE " ", "Style Editor"), nullptr,
+		                    I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
 		{}
-		if (ImGui::MenuItem(ICON_I3T_SETTINGS " Preferences"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
 		}
-		if (ImGui::MenuItem(ICON_I3T_LANG " Change Language "))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_LANG " ", "Change Language")))
 		{
 			// App::getModule<UIModule>().getWindowManager().showUniqueWindow<ChangeLanguageWindow>();
 			App::getModule<UIModule>().getWindowManager().openModal<ChangeLanguageModal>();
-		}
-		if (ImGui::BeginMenu(ICON_I3T_LANG " Change Language As Submenu"))
-		{
-			ChangeLanguageModal::showChangeLanguageMenu();
-			ImGui::EndMenu();
 		}
 		ImGui::EndMenu();
 	}
@@ -289,27 +286,29 @@ void MainMenuBar::showEditMenu()
 void MainMenuBar::showWindowsMenu()
 {
 
-	if (ImGui::BeginMenu("Windows"))
+	if (ImGui::BeginMenu(_t("Windows")))
 	{
-		ImGui::MenuItem(ICON_I3T_HOME " Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
-		ImGui::MenuItem(ICON_I3T_TUTORIAL " Tutorial window", nullptr,
+		ImGui::MenuItem(ICON_T(ICON_I3T_HOME " ", "Start window"), nullptr,
+		                I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_T(ICON_I3T_TUTORIAL " ", "Tutorial window"), nullptr,
 		                I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem(ICON_I3T_SCENE " Scene view window", nullptr,
+		ImGui::MenuItem(ICON_T(ICON_I3T_SCENE " ", "Scene view window"), nullptr,
 		                I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
-		ImGui::MenuItem(ICON_I3T_WORKSPACE " Workspace window", nullptr,
+		ImGui::MenuItem(ICON_T(ICON_I3T_WORKSPACE " ", "Workspace window"), nullptr,
 		                I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 #ifdef I3T_DEBUG
-		ImGui::MenuItem(ICON_I3T_CONSOLE " Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
-		ImGui::MenuItem(ICON_I3T_LOG " Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_T(ICON_I3T_CONSOLE " ", "Console window"), nullptr,
+		                I3T::getWindowPtr<Console>()->getShowPtr());
+		ImGui::MenuItem(ICON_T(ICON_I3T_LOG " ", "Log window"), nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 #endif
 
 		ImGui::Separator();
-		if (ImGui::MenuItem(ICON_I3T_GRID " Layouts"))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_GRID " ", "Layouts")))
 		{
 			App::getModule<UIModule>().getWindowManager().showUniqueWindow<SelectLayoutDialog>();
 		}
 #ifdef I3T_DEBUG
-		if (ImGui::BeginMenu(ICON_I3T_GRID " Layouts As Submenu"))
+		if (ImGui::BeginMenu(ICON_T(ICON_I3T_GRID " ", "Layouts As Submenu")))
 		{
 
 			SelectLayoutDialog::showSelectLayoutMenu();
@@ -323,11 +322,12 @@ void MainMenuBar::showWindowsMenu()
 
 void MainMenuBar::showTutorialMenu()
 {
-	if (ImGui::BeginMenu(ICON_I3T_TUTORIAL " Tutorials"))
+	if (ImGui::BeginMenu(ICON_T(ICON_I3T_TUTORIAL " ", "Tutorials")))
 	{
-		ImGui::MenuItem(ICON_I3T_HOME " Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem(ICON_T(ICON_I3T_HOME " ", "Start window"), nullptr,
+		                I3T::getWindowPtr<StartWindow>()->getShowPtr());
 
-		if (ImGui::MenuItem(ICON_I3T_REFRESH " Reload", nullptr))
+		if (ImGui::MenuItem(ICON_T(ICON_I3T_REFRESH " ", "Reload"), nullptr))
 		{
 			auto tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
 			if (tutorialWindow->hasTutorial())
@@ -342,26 +342,26 @@ void MainMenuBar::showTutorialMenu()
 
 void MainMenuBar::showHelpMenu()
 {
-	if (ImGui::BeginMenu(ICON_I3T_HELP " Help"))
+	if (ImGui::BeginMenu(ICON_T(ICON_I3T_HELP " ", "Help")))
 	{
 #ifdef I3T_DEBUG
-		if (ImGui::MenuItem("Description"))
+		if (ImGui::MenuItem(_t("Description")))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<DescriptionDialog>();
 		}
 #endif
-		ImGui::MenuItem("About", nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
+		ImGui::MenuItem(_t("About"), nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
 
 		ImGui::Separator();
 
 #ifdef I3T_DEBUG
-		if (ImGui::MenuItem("Show ImGui demo window", nullptr, &m_showDemoWindow))
+		if (ImGui::MenuItem((_t("Show ImGui demo window")), nullptr, &m_showDemoWindow))
 		{}
 #endif
 
 #ifdef I3T_DEBUG
 		ImGui::Separator();
-		if (ImGui::BeginMenu(ICON_I3T_DEBUG " Debug"))
+		if (ImGui::BeginMenu(ICON_T(ICON_I3T_DEBUG " ", "Debug")))
 		{
 			if (ImGui::BeginMenu("Log level"))
 			{
@@ -392,7 +392,7 @@ void MainMenuBar::showHelpMenu()
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 			ImGui::MenuItem("Show test window", nullptr, &App::getModule<TestModule>().getShowTestWindow());
-			if (ImGui::MenuItem(ICON_I3T_DEBUG " Statistics"))
+			if (ImGui::MenuItem(ICON_T(ICON_I3T_DEBUG " ", "Statistics")))
 			{
 				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
 			}
