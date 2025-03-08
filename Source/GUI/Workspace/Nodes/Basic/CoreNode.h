@@ -19,6 +19,7 @@ namespace Workspace
 {
 class CoreNode : public Node, public IVisitable
 {
+	using Super = Node;
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
@@ -94,6 +95,8 @@ public:
 	// bool bypassUnselectAction();
 	// bool bypassTouchAction();
 	void drawMenuDuplicate();
+
+	void onDestroy(bool logEvent) override;
 
 private:
 	const char* getButtonSymbolFromLOD(LevelOfDetail detail);

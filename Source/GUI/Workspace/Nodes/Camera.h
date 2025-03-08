@@ -86,6 +86,8 @@ public:
 	//	bool processUnselect() override;
 	float updateDataItemsWidth() override;
 
+	void onDestroy(bool logEvent) override;
+
 private:
 	glm::vec3 calculateFrustumColor(glm::vec3 color);
 };

@@ -10,7 +10,7 @@ Canvas::Canvas(NodeEditor& editor)
       m_zoom(editor.mp_settingsDiwne->workAreaInitialZoom)
 {}
 
-void Canvas::setZoom(float val /*=1*/)
+void Canvas::setZoom(float val)
 {
 	double old = m_zoom;
 	if (val < editor.mp_settingsDiwne->minWorkAreaZoom)

@@ -146,11 +146,8 @@ int Sequence::maxLengthOfData()
 
 void Sequence::onDestroy(bool logEvent)
 {
+	m_dropZone->destroy(logEvent);
 	CoreNodeWithPins::onDestroy(logEvent);
-	for (auto& node : m_dropZone->getNodeList())
-	{
-		node->destroy(logEvent);
-	}
 }
 
 void Sequence::popupContent(DIWNE::DrawInfo& context)

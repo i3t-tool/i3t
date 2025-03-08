@@ -116,7 +116,7 @@ protected:
 	bool m_selectable{true}; ///< Should not be accessed directly. @see setSelectable()
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
 
-	/// Sets the parent object of object, relevant in node container and hover hierarchy.$
+	/// Sets the parent object of object, relevant in node container and hover hierarchy.
 	DiwneObject* m_parentObject{nullptr};
 
 public:
@@ -183,7 +183,7 @@ public:
 	 * \param labelDiwne used to identification
 	 */
 	DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne);
-	virtual ~DiwneObject() = default;
+	virtual ~DiwneObject();
 
 	/**
 	 * Generic draw method meant to be used by external code.
@@ -304,15 +304,27 @@ public:
 	//  endDiwne method is the one that dispatches processInteractions AFTER the user end() method is called.
 
 	/**
-	 * Marks the object for lazy deletion.
-	 * When the object is deleted and what deletion even means depends on the particular use case.
+	 * Marks the object for lazy destruction/deallocation and removal from any containers (like the node editor).
+	 * An object can be destroyed only once, which will invoke the onDestroy() callback. Repeated calls have no effect.
+	 * When the actual deallocation and destruction occurs depends on the specific object.
 	 * For example deletion of nodes and links is handled by the NodeEditor in the next frame.
+	 * This methods needs to be called before the objects destructor. Internally DIWNE does not use RAII.
+	 * The node editor object is an exception in that it calls destroy on itself automatically in a RAII manner.
+	 * When an object gets destructed without being marked for destruction a warning message is printed.
 	 * @param logEvent The boolean flag passed to onDestroy(), can be used to determine where was destroy() called from.
+	 * @see onDestroy(), isDestroyed(), ~DiwneObject()
 	 */
 	virtual void destroy(bool logEvent = true);
-	// TODO: Implement this, im still not sure if this should be called on the delete marking or the actual removal
-	//  Probably when marking as thats what the old Node::deleteAction() method did.
+
+	/**
+	 * Gets called the moment the object is marked for deletion by destroy(). It is called only once per object.
+	 * \warning It is possible that the onDestroy() callback is never called when destroy() wasn't properly called.
+	 * DiwneObjects containing other DiwneObjects should always ensure to destroy their children in their onDestroy().
+	 * @see destroy()
+	 */
 	virtual void onDestroy(bool logEvent);
+
+	/// @see destroy()
 	bool isDestroyed()
 	{
 		return m_destroy;

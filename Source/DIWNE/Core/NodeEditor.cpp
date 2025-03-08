@@ -31,7 +31,11 @@ NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
 
 NodeEditor::~NodeEditor()
 {
-	clear();
+	// Generally DiwneObjects can have an empty destructor as they should be explictly destroyed beforehand
+	// using the destroy() method. NodeEditor is special case which destroys itself automatically.
+	// However this destroy() call below will not propagate to any NodeEditor subclasses which need their own destructor
+	// implementation. This is because of the order in which destructors are called by C++.
+	NodeEditor::destroy(true);
 }
 
 void NodeEditor::draw(DrawMode drawMode)
@@ -362,7 +366,11 @@ bool NodeEditor::isDraggedDiwne()
 bool NodeEditor::processZoom()
 {
 	ImVec2 mousePosDiwne = m_canvas->screen2diwne(m_input->bypassGetMousePos());
-	m_canvas->setZoom(m_canvas->getZoom() + m_input->getZoomDelta());
+
+	//	editor.mp_settingsDiwne->zoomWheelReverseSenzitivity;
+
+	//	m_canvas->setZoom(m_canvas->getZoom() + m_input->getZoomDelta());
+	m_canvas->setZoom(m_canvas->getZoom() * powf(1.0f + mp_settingsDiwne->zoomSensitivity, m_input->getZoomDelta()));
 	m_canvas->moveViewport(mousePosDiwne - m_canvas->screen2diwne(m_input->bypassGetMousePos()));
 	return true;
 }
@@ -414,15 +422,15 @@ void NodeEditor::shiftNodesToEnd(const NodeList& nodesToShift)
 
 void NodeEditor::shiftInteractingNodeToEnd()
 {
-	if (mp_lastActiveNode == nullptr || m_nodes.empty())
+	if (mp_lastActiveNode.expired() || m_nodes.empty())
 		return;
-	if (mp_lastActiveNode->isChildObject()) // The last interacted node is in a child object and handled there
+	std::shared_ptr<Node> lastActiveNode = mp_lastActiveNode.lock();
+	if (lastActiveNode->isChildObject()) // The last interacted node is in a child object and handled there
 		return;
-	if (mp_lastActiveNode.get() != m_nodes.back().get())
+	if (lastActiveNode.get() != m_nodes.back().get())
 	{
-		DIWNE_INFO("SHIFTING");
-		auto draged_node_it = std::find_if(m_nodes.begin(), m_nodes.end(), [this](const auto& node) -> bool {
-			return node.get() == this->mp_lastActiveNode.get();
+		auto draged_node_it = std::find_if(m_nodes.begin(), m_nodes.end(), [&lastActiveNode](const auto& node) -> bool {
+			return node == lastActiveNode;
 		});
 
 		if (draged_node_it != m_nodes.end() && draged_node_it != m_nodes.end() - 1)
@@ -550,6 +558,11 @@ void NodeEditor::setNodesSelectionChanged(bool value)
 bool NodeEditor::getNodesSelectionChanged()
 {
 	return m_nodesSelectionChanged;
+}
+void NodeEditor::onDestroy(bool logEvent)
+{
+	clear();
+	DiwneObject::onDestroy(logEvent);
 }
 
 } /* namespace DIWNE */

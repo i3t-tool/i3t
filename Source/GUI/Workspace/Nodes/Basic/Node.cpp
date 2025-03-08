@@ -21,11 +21,6 @@ std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDet
 
 Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label) {}
 
-Node::~Node()
-{
-	diwne.m_takeSnap = true;
-}
-
 bool Node::allowDragStart() const
 {
 	// TODO: I feel like in general we should allow nodes to be dragged anywhere, and restrict specific node areas where

@@ -252,8 +252,8 @@ void TransformationBase::drawMenuSetDataMap()
 
 void TransformationBase::onDestroy(bool logEvent)
 {
-	CoreNode::onDestroy(logEvent);
 	m_parentSequence.reset();
+	CoreNode::onDestroy(logEvent);
 }
 
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()

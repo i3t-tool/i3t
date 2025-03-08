@@ -72,13 +72,7 @@ protected:
 
 	ImDrawListSplitter m_channelSplitter;
 
-	// TODO: The dragged pin could be technically stored in the Context actionData, but I do have some concerns about
-	//  copying that info etc.
-	//  I am not sure if these concerns are valid, the mechanism for this is there and is nicer than using NodeEditor
-	//  member variables to store data
-	//	std::shared_ptr<DIWNE::Pin> mp_lastActivePin; ///< Used for storing which pin is being dragged //TODO: Maybe
-	// rename?
-	std::shared_ptr<Node> mp_lastActiveNode; ///< Last node that had a logical update
+	std::weak_ptr<Node> mp_lastActiveNode; ///< Last node that requested focus (had a logical update)
 
 	bool m_nodesSelectionChanged{false};
 
@@ -88,21 +82,20 @@ protected:
 
 public:
 	NodeEditor(SettingsDiwne* settingsDiwne);
-	virtual ~NodeEditor();
+	~NodeEditor();
 
 	// Lifecycle
 	// =============================================================================================================
 	void draw(DrawMode drawMode = DrawMode_Interactive) override;
 
 	void initializeDiwne(DrawInfo& context) override;
-
 	void begin(DrawInfo& context) override;
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
-
 	void afterDraw(DrawInfo& context) override;
-
 	void updateLayout(DrawInfo& context) override;
+
+	void onDestroy(bool logEvent) override;
 
 	// Interaction
 	// =============================================================================================================
@@ -244,7 +237,9 @@ public:
 	std::shared_ptr<T> getLastActiveNode()
 	{
 		static_assert(std::is_base_of<Node, T>::value, "Node must be derived from DIWNE::Node class.");
-		return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
+		if (mp_lastActiveNode.expired())
+			return {};
+		return std::dynamic_pointer_cast<T>(mp_lastActiveNode.lock());
 	}
 
 	void setLastActiveNode(std::shared_ptr<Node> node)

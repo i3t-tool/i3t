@@ -58,7 +58,6 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 
 CoreNode::~CoreNode()
 {
-	m_nodebase->finalize();
 	// Unregister connection between core node and gui node
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
 }
@@ -379,4 +378,10 @@ const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 		return "."; // was a lightcycle error
 
 	return "missingLOD";
+}
+
+void CoreNode::onDestroy(bool logEvent)
+{
+	m_nodebase->finalize();
+	Super::onDestroy(logEvent);
 }

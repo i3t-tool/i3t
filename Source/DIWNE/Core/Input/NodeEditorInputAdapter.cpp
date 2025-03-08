@@ -52,7 +52,7 @@ bool NodeEditorInputAdapter::multiDeselectionActive()
 
 float NodeEditorInputAdapter::getZoomDelta()
 {
-	return bypassGetMouseWheel() / editor.mp_settingsDiwne->zoomWheelReverseSenzitivity;
+	return bypassGetMouseWheel() * editor.mp_settingsDiwne->zoomSpeed;
 }
 
 bool NodeEditorInputAdapter::bypassIsMouseDragging0()

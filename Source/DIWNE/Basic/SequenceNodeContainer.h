@@ -19,5 +19,7 @@ public:
 	NodeList& getNodeList() override;
 
 	NodeDropZone& getDropZone();
+
+	void onDestroy(bool logEvent) override;
 };
 } // namespace DIWNE

@@ -19,26 +19,26 @@ struct DiwneStyle
 	//	std::vector<std::pair<int, std::shared_ptr<void>>> registry;
 	std::vector<std::shared_ptr<void>> registry;
 
-	static const short nodeBg; // ImVec4
+	static const short nodeBg;       // ImVec4
 	static const short nodeHeaderBg; // ImVec4
 
 	static const short nodeRounding; // int
-	static const short nodePadding; // float
+	static const short nodePadding;  // float
 
-	static const short dropZoneBg; // ImVec4
-	static const short dropIndicatorColor; // ImVec4
-	static const short dropZoneDropGap; // ImVec2
+	static const short dropZoneBg;          // ImVec4
+	static const short dropIndicatorColor;  // ImVec4
+	static const short dropZoneDropGap;     // ImVec2
 	static const short dropZoneMarginWidth; // float
 
 	DiwneStyle()
 	{
-		set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 1.000});
-		set<ImVec4>(nodeHeaderBg, {0.020, 0.341, 0.012, 1.000});
+		set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 0.6});
+		set<ImVec4>(nodeHeaderBg, {0.020, 0.341, 0.012, 0.9});
 
 		set<float>(nodeRounding, 0);
 		set<ImVec2>(nodePadding, {8.0f, 4.0f});
 
-		set<ImVec4>(dropZoneBg, {0.14, 0.14, 0.14, 1.000});
+		set<ImVec4>(dropZoneBg, {0.1, 0.1, 0.1, 0.4});
 		set<ImVec4>(dropIndicatorColor, {0.26, 0.59, 0.98, 0.67});
 		set<ImVec2>(dropZoneDropGap, {10.0f, 10.0f});
 		set<float>(dropZoneMarginWidth, 10.0f);

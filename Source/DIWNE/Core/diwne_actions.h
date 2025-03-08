@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,7 @@ struct DiwneAction
 	bool endActionThisFrame{false};
 
 	DiwneAction(const std::string& name, const std::string& source) : name(name), source(source) {}
+	virtual ~DiwneAction() = default;
 
 	void end()
 	{
@@ -74,9 +76,9 @@ struct SelectionRectAction : public DiwneAction
 
 struct DragNodeAction : public EditorAction
 {
-	std::vector<Node*> nodes;
+	std::vector<std::shared_ptr<Node>> nodes; // Using shared ptrs here to avoid weak ptr locking
 
-	DragNodeAction(NodeEditor& editor, const std::string& source, std::vector<Node*> nodes)
+	DragNodeAction(NodeEditor& editor, const std::string& source, std::vector<std::shared_ptr<Node>> nodes)
 	    : nodes(std::move(nodes)), EditorAction(editor, dragNode, source)
 	{}
 

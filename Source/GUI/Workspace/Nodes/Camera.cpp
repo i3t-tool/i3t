@@ -290,6 +290,12 @@ DIWNE::NodeList& Camera::getNodeList()
 {
 	return m_projAndView;
 }
+void Camera::onDestroy(bool logEvent)
+{
+	m_projection->destroy(logEvent);
+	m_view->destroy(logEvent);
+	CoreNodeWithPins::onDestroy(logEvent);
+}
 
 // bool Camera::processSelect()
 //{

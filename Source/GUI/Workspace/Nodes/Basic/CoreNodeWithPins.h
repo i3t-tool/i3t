@@ -21,6 +21,7 @@ namespace Workspace
 {
 class CoreNodeWithPins : public CoreNode
 {
+	using Super = CoreNode;
 private:
 	float m_minRightAlignOfRightPins;
 

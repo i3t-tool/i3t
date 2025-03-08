@@ -35,6 +35,8 @@ public:
 
 	void afterDraw(DrawInfo& context) override;
 
+	void onDestroy(bool logEvent) override;
+
 	bool allowDragStart() const override;
 	bool allowHover() const override;
 
@@ -48,6 +50,7 @@ protected:
 	/// Returns at which index a the new node should be added, -1 for invalid position.
 	virtual int isNodeAboveDropZone(Node* newNode);
 
+	// TODO: Maybe different name, isAcceptable?
 	/**
 	 * Decide whether the node should be placed in the drop zone if at all.
 	 * Calls the user defined acceptNode() function.

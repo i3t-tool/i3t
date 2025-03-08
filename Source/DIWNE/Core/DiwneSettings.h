@@ -7,18 +7,19 @@ namespace DIWNE
 struct SettingsDiwne
 {
 	// TODO: Unused? DiwneObject id should cover this? Remove since ids are generated automatically now.
-	std::string const editorlabel = "diwneBackground"; /**< as well as all other DiwneObject, Diwne has to
-	                                                      have identification label too */
+	std::string const editorlabel = "NodeEditor";    /**< as well as all other DiwneObject, Diwne has to
+	                                                         have identification label too */
 	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /**< workarea in Diwne coordinates (so what part of infinite space
 	                                                      of node editor is on window) only initial value - mostly based
 	                                                      on window size ( \see updateViewportRects() ) */
 
-	float minWorkAreaZoom = 0.25;          /**< minimal value of zoom */
-	float maxWorkAreaZoom = 4;             /**< maximal value of zoom */
-	float workAreaInitialZoom = 1;         /**< initial value of zoom */
-	float zoomWheelReverseSenzitivity = 8; /**< Higher number -> smaller change, can not be 0 */
-	float selectionRounding = 0;           /**< rounding od selection */
-	float mouseDragThreshold = 2.0f;       // 6.0 is ImGui default
+	float minWorkAreaZoom = 0.25;  /**< minimal value of zoom */
+	float maxWorkAreaZoom = 4;     /**< maximal value of zoom */
+	float workAreaInitialZoom = 1; /**< initial value of zoom */
+	float zoomSpeed = 0.5f;
+	float zoomSensitivity = 0.5f;
+	float selectionRounding = 0;     /**< rounding od selection */
+	float mouseDragThreshold = 2.0f; // 6.0 is ImGui default
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
 

@@ -219,6 +219,9 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
 # DIWNE config file
 target_compile_definitions(${PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
 
+# I3T NO-TEST flag, used to differentiate between test and normal runs
+target_compile_definitions(${PROJECT_NAME} PUBLIC I3T_NTEST=1)
+
 # Link I3T with following binaries.
 target_link_libraries(
         ${PROJECT_NAME}

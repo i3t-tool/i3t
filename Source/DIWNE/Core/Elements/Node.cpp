@@ -131,7 +131,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	// Handle node dragging
 	if (dragStart)
 	{
-		std::vector<Node*> nodes;
+		std::vector<std::shared_ptr<Node>> nodes;
 		if (m_selected)
 		{
 			// When dragging a selected node we only drag other selected nodes on the same level
@@ -144,7 +144,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 					continue;
 				if (node->isFixed() && node.ptr() != this) // Fixed nodes can be only dragged directly
 					continue;
-				nodes.push_back(node.ptr());
+				nodes.push_back(node.sharedPtr());
 			}
 		}
 		else
@@ -156,7 +156,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 				diwne.deselectNodes();
 				setSelected(true);
 			}
-			nodes.push_back(this);
+			nodes.push_back(this->sharedPtr<Node>());
 		}
 		context.state.startAction<Actions::DragNodeAction>(diwne, m_labelDiwne, std::move(nodes));
 	}
@@ -169,19 +169,12 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 
 void Node::onDestroy(bool logEvent)
 {
-	DiwneObject::onDestroy(logEvent);
 	if (m_selected)
 	{
 		diwne.setNodesSelectionChanged(true);
 	}
-
-	// TODO: (DR) This is unnecessary, we can just make last active node a weak ptr (I really don't know why it isnt)
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	auto lastActiveNode = diwne.getLastActiveNode<DIWNE::Node>();
-	if (lastActiveNode != nullptr && lastActiveNode.get() == this)
-	{
-		diwne.setLastActiveNode(nullptr);
-	}
+	diwne.m_takeSnap = true;
+	DiwneObject::onDestroy(logEvent);
 }
 
 bool Node::getFlag(char index) const

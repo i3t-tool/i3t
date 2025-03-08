@@ -28,4 +28,9 @@ NodeDropZone& SequenceNodeContainer::getDropZone()
 {
 	return *m_dropZone;
 }
+void SequenceNodeContainer::onDestroy(bool logEvent)
+{
+	m_dropZone->destroy(logEvent);
+	Node::onDestroy(logEvent);
+}
 } // namespace DIWNE

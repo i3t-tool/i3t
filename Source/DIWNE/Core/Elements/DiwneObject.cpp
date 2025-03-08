@@ -30,12 +30,20 @@
 
 namespace DIWNE
 {
+unsigned long long DiwneObject::g_diwneIDCounter = 1; // 0 is reserved for no/invalid ID
+
 DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne)
     : diwne(diwne), m_idDiwne(g_diwneIDCounter++), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
       m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
 {}
 
-unsigned long long DiwneObject::g_diwneIDCounter = 1; // 0 is reserved for no/invalid ID
+DiwneObject::~DiwneObject()
+{
+	if (!m_destroy)
+	{
+		DIWNE_WARN("Improper DiwneObject destruction! Destroy method wasn't called on '" + m_labelDiwne + "'.");
+	}
+}
 
 void DiwneObject::draw(DrawMode drawMode)
 {
@@ -133,8 +141,6 @@ bool DiwneObject::allowInteraction() const
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
-	if (ImGui::IsKeyDown(ImGuiKey_E))
-		int x = 5;
 	if (m_drawMode2 != DrawMode_Interactive)
 		return;
 
@@ -741,7 +747,8 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 				topLeftString +=
 				    "\nLast active node: " + lastActiveNode->m_labelDiwne +
 				    (lastActiveNode->getParentObject() ? "(" + lastActiveNode->getParentObject()->m_labelDiwne + ")"
-				                                       : "(no parent)");
+				                                       : "(no parent)") +
+				    " [" + std::to_string(lastActiveNode.use_count() - 1) + " refs]";
 			}
 		}
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
@@ -750,6 +757,4 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 		                                        topLeftString.c_str());
 	});
 }
-
-
 } /* namespace DIWNE */

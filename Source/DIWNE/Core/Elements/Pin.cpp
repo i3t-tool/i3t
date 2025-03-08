@@ -268,9 +268,9 @@ void Pin::initialize(DrawInfo& context)
 
 void Pin::onDestroy(bool logEvent)
 {
-	DiwneObject::onDestroy(logEvent);
 	for (auto link : m_links)
 		link->destroy(logEvent);
+	DiwneObject::onDestroy(logEvent);
 }
 
 } /* namespace DIWNE */

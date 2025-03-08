@@ -154,9 +154,9 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 
 void CoreNodeWithPins::onDestroy(bool logEvent)
 {
-	Node::onDestroy(logEvent);
 	for (auto pin : m_workspaceInputs)
 		pin->destroy(logEvent);
 	for (auto pin : m_workspaceOutputs)
 		pin->destroy(logEvent);
+	Super::onDestroy(logEvent);
 }

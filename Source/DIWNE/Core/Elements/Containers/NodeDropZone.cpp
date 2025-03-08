@@ -110,18 +110,18 @@ bool NodeDropZone::tryAddNode(DrawInfo& context)
 	if (!action || action->nodes.size() != 1)
 		return false;
 
-	Node* dropNode = action->nodes[0];
-	m_dropIndex = acceptNodeDiwne(dropNode);
+	std::shared_ptr<Node>& dropNode = action->nodes[0];
+	m_dropIndex = acceptNodeDiwne(dropNode.get());
 	if (m_dropIndex >= 0)
 	{
 		context.consumeInput(); // Prevents other drop zones from trying to accept this node
 
 		// Draw the drop indicator
-		drawDropIndicator(dropNode, m_dropIndex);
+		drawDropIndicator(dropNode.get(), m_dropIndex);
 
 		if (context.state.dragEnd)
 		{
-			addNodeAt(dropNode->sharedPtr<Node>(), m_dropIndex);
+			addNodeAt(dropNode, m_dropIndex);
 			return true;
 		}
 	}
@@ -138,7 +138,7 @@ bool NodeDropZone::tryRemoveNode(DrawInfo& context)
 		return false;
 
 	// Currently only one node at a time can be added or removed
-	Node* dropNode = nullptr;
+	std::shared_ptr<Node>* dropNodePtr = nullptr;
 	if (action->nodes.size() != 1)
 	{
 		// When multiple nodes are dragged we want to only remove a node from the drop zone that is right under
@@ -148,15 +148,16 @@ bool NodeDropZone::tryRemoveNode(DrawInfo& context)
 		{
 			if (node->m_labelDiwne == action->source)
 			{
-				dropNode = node;
+				dropNodePtr = &node;
 				break;
 			}
 		}
 	}
 	else
 	{
-		dropNode = action->nodes[0];
+		dropNodePtr = &action->nodes[0];
 	}
+	std::shared_ptr<Node>& dropNode = *dropNodePtr;
 
 	// If node that being dragged is in this drop zone, we remove it from it
 	if (dropNode != nullptr && dropNode->getParentObject() == this)
@@ -259,6 +260,14 @@ bool NodeDropZone::allowDragStart() const
 bool NodeDropZone::allowHover() const
 {
 	return false;
+}
+void NodeDropZone::onDestroy(bool logEvent)
+{
+	for (auto& node : m_nodes)
+	{
+		node->destroy(logEvent);
+	}
+	DiwneObject::onDestroy(logEvent);
 }
 
 } // namespace DIWNE
