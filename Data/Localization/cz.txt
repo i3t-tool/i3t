@@ -360,7 +360,7 @@ new layout...=nové rozložení...
 ###############################################################################################################
 ############################################## Before exit modal ##############################################
 ###############################################################################################################
-Save current scene?=Uložit aktuální scénu?
-Any unsaved content will be discarded, do you want to save it?=Jakýkoli neuložený obsah bude zahozen, chcete ho uložit?
+#Save current scene?=Uložit aktuální scénu?
+#Any unsaved content will be discarded, do you want to save it?=Jakýkoli neuložený obsah bude zahozen, chcete ho uložit?
 Yes=Ano
 No=Ne
