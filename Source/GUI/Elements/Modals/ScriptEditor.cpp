@@ -43,7 +43,7 @@ std::unique_ptr<TextEditor> createEditor()
 	return editor;
 }
 
-ScriptEditorModal::ScriptEditorModal(Workspace::ScriptingNode* node) : ModalWindow("Edit script"), m_node(node)
+ScriptEditorModal::ScriptEditorModal(Workspace::ScriptingNode* node) : ModalWindow(_t("Edit script")), m_node(node)
 {
 	m_editor = createEditor();
 	auto script = node->getScript();
@@ -59,7 +59,7 @@ void ScriptEditorModal::onImGui()
 {
 	ImGui::PushFont(I3T::getFont(EFont::Mono));
 
-	m_editor->Render("Script Editor", ImVec2(600, 800), false);
+	m_editor->Render(_t("Script Editor"), ImVec2(600, 800), false);
 
 	ImGui::PopFont();
 
@@ -68,19 +68,19 @@ void ScriptEditorModal::onImGui()
 		ImGui::TextColored(ImVec4(0.8f, 0.0f, 0.0f, 1.0f), m_message.c_str());
 	}
 
-	if (ImGui::Button("Cancel"))
+	if (ImGui::Button(_t("Cancel")))
 	{
 		close();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Save"))
+	if (ImGui::Button(_t("Save")))
 	{
 		onSave();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Save and close"))
+	if (ImGui::Button(_t("Save and close")))
 	{
 		onSave();
 		close();

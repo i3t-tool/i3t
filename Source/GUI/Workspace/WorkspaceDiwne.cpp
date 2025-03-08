@@ -484,20 +484,20 @@ void WorkspaceDiwne::popupContent()
 	ImGui::PopStyleColor();
 
 	ImGui::Separator();
-	if (ImGui::BeginMenu(_t("transformation")))
+	if (ImGui::BeginMenu("transformation"))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
 		 * with group (transformation, operator, ...) and label*/
-		if (ImGui::MenuItem(_t("free")))
+		if (ImGui::MenuItem("free"))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Free>>();
 		}
-		if (ImGui::MenuItem(_t("translate")))
+		if (ImGui::MenuItem("translate"))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Translation>>();
 		}
 
-		if (ImGui::BeginMenu(_t("rotate")))
+		if (ImGui::BeginMenu("rotate"))
 		{
 
 			if (ImGui::MenuItem("eulerAngleX"))
@@ -522,7 +522,7 @@ void WorkspaceDiwne::popupContent()
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem(_t("scale")))
+		if (ImGui::MenuItem("scale"))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Scale>>();
 		}
@@ -535,17 +535,17 @@ void WorkspaceDiwne::popupContent()
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::LookAt>>();
 		}
-		if (ImGui::BeginMenu(_t("projection")))
+		if (ImGui::BeginMenu("projection"))
 		{
-			if (ImGui::MenuItem(_t("ortho")))
+			if (ImGui::MenuItem("ortho"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Ortho>>();
 			}
-			if (ImGui::MenuItem(_t("perspective")))
+			if (ImGui::MenuItem("perspective"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Perspective>>();
 			}
-			if (ImGui::MenuItem(_t("frustum")))
+			if (ImGui::MenuItem("frustum"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Frustum>>();
 			}
@@ -553,11 +553,11 @@ void WorkspaceDiwne::popupContent()
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu(_t("operator")))
+	if (ImGui::BeginMenu("operator"))
 	{
-		if (ImGui::BeginMenu(_t("transformation")))
+		if (ImGui::BeginMenu("transformation"))
 		{
-			if (ImGui::MenuItem(_t("translate")))
+			if (ImGui::MenuItem("translate"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeTranslation>>();
 			}
@@ -573,23 +573,23 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeEulerZ>>();
 			}
-			if (ImGui::MenuItem(_t("rotate")))
+			if (ImGui::MenuItem("rotate"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeAxisAngle>>();
 			}
-			if (ImGui::MenuItem(_t("scale")))
+			if (ImGui::MenuItem("scale"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeScale>>();
 			}
-			if (ImGui::MenuItem(_t("ortho")))
+			if (ImGui::MenuItem("ortho"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeOrtho>>();
 			}
-			if (ImGui::MenuItem(_t("perspective")))
+			if (ImGui::MenuItem("perspective"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakePerspective>>();
 			}
-			if (ImGui::MenuItem(_t("frustum")))
+			if (ImGui::MenuItem("frustum"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeFrustum>>();
 			}
@@ -920,31 +920,31 @@ void WorkspaceDiwne::popupContent()
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::MenuItem(_t("sequence")))
+	if (ImGui::MenuItem("sequence"))
 	{
 		addNodeToPositionOfPopup<Sequence>();
 	}
-	if (ImGui::MenuItem(_t("camera")))
+	if (ImGui::MenuItem("camera"))
 	{
 		addNodeToPositionOfPopup<Camera>();
 	}
-	if (ImGui::MenuItem(_t("model")))
+	if (ImGui::MenuItem("model"))
 	{
 		addNodeToPositionOfPopup<Model>();
 	}
-	if (ImGui::MenuItem(_t("pulse")))
+	if (ImGui::MenuItem("pulse"))
 	{
 		addNodeToPositionOfPopup<Operator<Core::EOperatorType::PulseToPulse>>();
 	}
-	if (ImGui::MenuItem(_t("screen")))
+	if (ImGui::MenuItem("screen"))
 	{
 		addNodeToPositionOfPopup<Screen>();
 	}
-	if (ImGui::MenuItem(_t("cycle")))
+	if (ImGui::MenuItem("cycle"))
 	{
 		addNodeToPositionOfPopup<Cycle>();
 	}
-	if (ImGui::MenuItem(_t("scripting node")))
+	if (ImGui::MenuItem("scripting node"))
 	{
 		addNodeToPositionOfPopup<ScriptingNode>();
 	}

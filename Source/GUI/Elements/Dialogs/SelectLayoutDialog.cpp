@@ -20,7 +20,7 @@
 #include "GUI/WindowManager.h"
 
 
-SelectLayoutDialog::SelectLayoutDialog() : IWindow(ICON_I3T_GRID " Select Layout") {}
+SelectLayoutDialog::SelectLayoutDialog() : IWindow(ICON_T(ICON_I3T_GRID " ", "Select Layout")) {}
 
 void SelectLayoutDialog::render()
 {
@@ -84,7 +84,7 @@ void SelectLayoutDialog::showSelectLayoutMenu()
 	if (userLayouts.find(selectedFile) != userLayouts.end()) // show delete button only for removable userLayouts
 	{
 		ImGui::SameLine();
-		if (ImGui::Button("Delete"))
+		if (ImGui::Button(_t("Delete")))
 		{
 			if (!selectedFile.empty() && userLayouts.find(selectedFile) != userLayouts.end())
 			{
@@ -97,14 +97,14 @@ void SelectLayoutDialog::showSelectLayoutMenu()
 	ImGui::Dummy(ImVec2(0.0f, 10.0f));
 	static char str1[128] = "";
 	bool enterPressed = false;
-	if (ImGui::InputTextWithHint("##input text", "new layout...", str1, IM_ARRAYSIZE(str1),
+	if (ImGui::InputTextWithHint("##input text", _t("new layout..."), str1, IM_ARRAYSIZE(str1),
 	                             ImGuiInputTextFlags_EnterReturnsTrue))
 	{
 		enterPressed = true;
 	}
 
 	ImGui::SameLine();
-	if ((ImGui::Button("Save") || enterPressed) && str1[0] != '\0')
+	if ((ImGui::Button(_t("Save")) || enterPressed) && str1[0] != '\0')
 	{
 		ImGui::SaveIniSettingsToDisk(("Data/Layouts/" + std::string(str1) + ".ini").c_str());
 		userLayouts.insert(str1);

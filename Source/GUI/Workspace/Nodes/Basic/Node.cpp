@@ -84,7 +84,7 @@ void Node::deleteAction()
 
 void Node::drawMenuDelete()
 {
-	if (ImGui::MenuItem("Delete", "Delete"))
+	if (ImGui::MenuItem(_t("Delete"), "Delete"))
 	{
 		deleteActionDiwne();
 	}

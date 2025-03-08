@@ -113,103 +113,103 @@ void Camera::popupContent()
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem("Show axes", NULL, m_axisOn))
+	if (ImGui::MenuItem(_t("Show axes"), NULL, m_axisOn))
 	{
 		m_axisOn = !m_axisOn;
 		m_viewportCamera.lock()->m_showAxes = m_axisOn;
 	}
-	if (ImGui::MenuItem("Show camera", NULL, m_showCamera))
+	if (ImGui::MenuItem(_t("Show camera"), NULL, m_showCamera))
 	{
 		m_showCamera = !m_showCamera;
 		m_viewportCamera.lock()->m_visible = m_showCamera;
 	}
-	if (ImGui::MenuItem("Show frustum", NULL, m_showFrustum))
+	if (ImGui::MenuItem(_t("Show frustum"), NULL, m_showFrustum))
 	{
 		m_showFrustum = !m_showFrustum;
 		m_viewportCamera.lock()->m_showFrustum = m_showFrustum;
 	}
-	if (ImGui::MenuItem("Fill frustum", NULL, m_fillFrustum))
+	if (ImGui::MenuItem(_t("Fill frustum"), NULL, m_fillFrustum))
 	{
 		m_fillFrustum = !m_fillFrustum;
 		m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
 	}
-	if (ImGui::BeginMenu("Frustum fill color"))
+	if (ImGui::BeginMenu(_t("Frustum fill color")))
 	{
-		if (ImGui::MenuItem("Default"))
+		if (ImGui::MenuItem(_t("Default")))
 		{
 			m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Red"))
+		if (ImGui::MenuItem(_t("Red")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::RED);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Blue"))
+		if (ImGui::MenuItem(_t("Blue")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::BLUE);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Green"))
+		if (ImGui::MenuItem(_t("Green")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::GREEN);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Yellow"))
+		if (ImGui::MenuItem(_t("Yellow")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::YELLOW);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Orange"))
+		if (ImGui::MenuItem(_t("Orange")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::ORANGE);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Magenta"))
+		if (ImGui::MenuItem(_t("Magenta")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::MAGENTA);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem("Teal"))
+		if (ImGui::MenuItem(_t("Teal")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::TEAL);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Frustum outline color"))
+	if (ImGui::BeginMenu(_t("Frustum outline color")))
 	{
-		if (ImGui::MenuItem("Red"))
+		if (ImGui::MenuItem(_t("Red")))
 		{
 			m_frustumOutlineColor = Color::RED;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Blue"))
+		if (ImGui::MenuItem(_t("Blue")))
 		{
 			m_frustumOutlineColor = Color::BLUE;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Green"))
+		if (ImGui::MenuItem(_t("Green")))
 		{
 			m_frustumOutlineColor = Color::GREEN;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Yellow"))
+		if (ImGui::MenuItem(_t("Yellow")))
 		{
 			m_frustumOutlineColor = Color::YELLOW;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Orange"))
+		if (ImGui::MenuItem(_t("Orange")))
 		{
 			m_frustumOutlineColor = Color::ORANGE;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Magenta"))
+		if (ImGui::MenuItem(_t("Magenta")))
 		{
 			m_frustumOutlineColor = Color::MAGENTA;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
 		}
-		if (ImGui::MenuItem("Teal"))
+		if (ImGui::MenuItem(_t("Teal")))
 		{
 			m_frustumOutlineColor = Color::TEAL;
 			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;

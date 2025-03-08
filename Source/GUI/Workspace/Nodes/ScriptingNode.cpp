@@ -190,13 +190,13 @@ void ScriptingNode::popupContent()
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem("Edit script"))
+	if (ImGui::MenuItem(_t("Edit script")))
 	{
 		auto modal = std::make_unique<ScriptEditorModal>((Workspace::ScriptingNode*) shared_from_this().get());
 		I3T::getUI()->getWindowManager().openModal(std::move(modal));
 	}
 
-	if (ImGui::MenuItem("Reload script"))
+	if (ImGui::MenuItem(_t("Reload script")))
 	{
 		reloadScript();
 	}
