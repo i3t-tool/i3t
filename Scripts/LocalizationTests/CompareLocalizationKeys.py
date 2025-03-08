@@ -46,6 +46,9 @@ def compare_localization_keys(localization_dir):
     # Read the keys for each localization file
     keys_by_lang = {}
     for lang, file_path in localization_files.items():
+        if not CHECK_ENGLISH and lang == "en.txt":
+            print("Validation for en.txt is disabled!")
+            continue
         keys_by_lang[lang] = load_keys_from_file(file_path)
 
     languages = list(keys_by_lang.keys())
@@ -56,9 +59,6 @@ def compare_localization_keys(localization_dir):
     differences = {}
 
     for lang in languages[1:]:
-        if not CHECK_ENGLISH and lang == "en.txt":
-            print("Validation for en.txt is disabled!")
-            continue
         current_keys = keys_by_lang[lang]
         missing_in_current = { key: base_keys[key] for key in base_keys if key not in current_keys }    # keys that are in the base but not in the current one
         extra_in_current = { key: current_keys[key] for key in current_keys if key not in base_keys }     # keys that are present in the current one, but not in the base one
