@@ -160,9 +160,9 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 			nodes.push_back(this->sharedPtr<Node>());
 			this->setBringToFront(true);
 		}
-		context.state.startAction<Actions::DragNodeAction>(diwne, m_labelDiwne, std::move(nodes));
+		context.state.startAction<Actions::DragNodeAction>(diwne, shared_from_this(), std::move(nodes));
 	}
-	if (auto action = context.state.getActiveAction<Actions::DragNodeAction>(Actions::dragNode, m_labelDiwne))
+	if (auto action = context.state.getActiveAction<Actions::DragNodeAction>(Actions::dragNode, this))
 	{
 		if (dragEnd)
 			action->end();

@@ -13,13 +13,13 @@ class ContainerTest : public ::testing::Test
 {
 public:
 	DIWNE::SettingsDiwne settings;
-	std::unique_ptr<NodeEditor> editor;
+	std::shared_ptr<NodeEditor> editor;
 
 	std::unique_ptr<DiwneTestApp> app;
 
 	void SetUp() override
 	{
-		editor = std::make_unique<NodeEditor>(&settings);
+		editor = std::make_shared<NodeEditor>(&settings);
 		app = std::make_unique<DiwneTestApp>();
 		app->create(editor.get());
 	}

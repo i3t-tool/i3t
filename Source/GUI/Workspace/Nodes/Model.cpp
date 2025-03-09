@@ -14,7 +14,8 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/Workspace/WorkspaceDiwne.h"
+#include "DIWNE/Core/NodeEditor.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
 #include "Viewport/Viewport.h"
@@ -213,8 +214,7 @@ void Model::centerContent(DIWNE::DrawInfo& context)
 	int height = m_textureSize.y * diwne.getZoom();
 
 #define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
-	ImVec2 zoomedTextureSize =
-	    FLOOR_VEC2(m_textureSize * diwne.getZoom()); // floored position - same as in ImGui
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getZoom()); // floored position - same as in ImGui
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
@@ -244,16 +244,16 @@ void Model::drawMenuLevelOfDetail() // todo
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
 
-//bool Model::processSelect()
+// bool Model::processSelect()
 //{
 //	auto model = m_viewportModel.lock();
 //	model->m_highlight = true;
 //	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
 //
 //	return CoreNodeWithPins::processSelect();
-//}
+// }
 //
-//bool Model::processUnselect()
+// bool Model::processUnselect()
 //{
 //	auto model = m_viewportModel.lock();
 //	if (m_influenceHighlight)
@@ -267,11 +267,11 @@ void Model::drawMenuLevelOfDetail() // todo
 //	}
 //
 //	return CoreNodeWithPins::processUnselect();
-//}
+// }
 
 ModelProxy::ModelProxy(Ptr<Model> model)
 {
-	m_model = std::make_shared<Model>(*g_diwne);
+	m_model = std::make_shared<Model>(*WorkspaceWindow::g_editor);
 	const auto alias = model->viewportModel().lock()->getModel();
 	m_model->viewportModel().lock()->setModel(alias);
 }

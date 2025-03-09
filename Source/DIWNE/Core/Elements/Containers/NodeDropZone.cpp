@@ -146,7 +146,7 @@ bool NodeDropZone::tryRemoveNode(DrawInfo& context)
 		// This way we don't have to deal with nodes outside of the screen for example.
 		for (auto& node : action->nodes)
 		{
-			if (node->m_labelDiwne == action->source)
+			if (*node == *action->source.lock())
 			{
 				dropNodePtr = &node;
 				break;

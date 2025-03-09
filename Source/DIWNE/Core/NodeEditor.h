@@ -82,6 +82,13 @@ protected:
 	ImDrawListSplitter m_splitter; ///< Every nodes should be draw to its own channel
 
 public:
+	/**
+	 * Create a node editor instance.
+	 * @note NodeEditor must MUST be instantiated as a shared pointer using std::make_shared! It cannot be defined
+	 * as a local stack variable or static value variable or even manually using the new operator.
+	 * @param settingsDiwne
+	 * @return
+	 */
 	NodeEditor(SettingsDiwne* settingsDiwne);
 	~NodeEditor();
 

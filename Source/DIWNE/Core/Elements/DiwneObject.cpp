@@ -210,7 +210,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	// TODO: [Low priority] Since we separated stopDrag into a method
 	//  the logic below seems a little too nested and complicated, simplify
 	bool isDragged = isDraggedDiwne();
-	bool weAreDragSource = context.state.dragSource == m_labelDiwne;
+	bool weAreDragSource = context.state.isDragSource(this);
 	if (context.state.dragging) // Check if something is being dragged
 	{
 		if (weAreDragSource) // This object is being dragged
@@ -241,7 +241,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 		{
 			context.state.dragStart = true;
 			context.state.dragging = true;
-			context.state.dragSource = m_labelDiwne;
+			context.state.dragSource = shared_from_this();
 		}
 	}
 	if (m_isDragged) // Dispatch user method
@@ -262,7 +262,7 @@ bool DiwneObject::allowPress(const DrawInfo& context) const
 	if (context.inputConsumed) // Can't be pressed when input is consumed
 		return false;
 	// Can't be pressed when some other object is being dragged
-	if (context.state.dragging && context.state.dragSource != m_labelDiwne)
+	if (context.state.dragging && !context.state.isDragSource(this))
 		return false;
 	return true;
 }
@@ -362,9 +362,9 @@ bool InteractionState::isActionActive(const std::string& name)
 	return action != nullptr && action->name == name;
 }
 
-bool InteractionState::isActionActive(const std::string& name, const std::string& source)
+bool InteractionState::isActionActive(const std::string& name, const DiwneObject* source)
 {
-	return isActionActive(name) && action->source == source;
+	return isActionActive(name) && action->isSource(source);
 }
 
 bool InteractionState::anyActionActive()
@@ -381,6 +381,12 @@ void InteractionState::nextFrame()
 
 	if (action != nullptr)
 	{
+		// End the action prematurely if it's source was destroyed
+		if (action->source.expired())
+		{
+			endAction(false);
+		}
+
 		action->onFrameEnd();
 
 		// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
@@ -391,6 +397,10 @@ void InteractionState::nextFrame()
 		}
 	}
 
+	// End dragging prematurely if it's source was destroyed
+	if (dragging && dragSource.expired())
+		dragEnd = true;
+
 	// Set dragging to false on dragEnd
 	// In the frame when dragging ends, dragging and dragEnd are both true.
 	// dragEnd resets next frame (we're not infering it over)
@@ -398,6 +408,7 @@ void InteractionState::nextFrame()
 	if (dragEnd)
 	{
 		dragging = false;
+		dragSource.reset();
 	}
 
 	// Reset non-persistent variables
@@ -651,7 +662,7 @@ void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& col
 
 bool DiwneObject::isDragging(DrawInfo& context)
 {
-	return context.state.dragging && context.state.dragSource == m_labelDiwne;
+	return context.state.dragging && context.state.isDragSource(this);
 }
 
 void DiwneObject::stopDrag(DrawInfo& context)
@@ -724,12 +735,15 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 
 			InteractionState& state = context.state;
 			std::string dbgMsg2;
-			dbgMsg2 += (state.dragging ? "[Dragging (" + state.dragSource + ")]" : "");
-			dbgMsg2 += (state.dragEnd ? "[DragEnd (" + state.dragSource + ")]" : "");
+			std::string dragSource = (state.dragSource.expired() ? "no source" : state.dragSource.lock()->m_labelDiwne);
+			dbgMsg2 += (state.dragging ? "[Dragging (" + dragSource + ")]" : "");
+			dbgMsg2 += (state.dragEnd ? "[DragEnd (" + dragSource + ")]" : "");
 			dbgMsg2 += (context.inputConsumed ? " [Input Consumed]" : "");
 			if (state.action)
 			{
-				dbgMsg2 += " [" + state.action->name + " (" + state.action->source;
+				dbgMsg2 += " [" + state.action->name;
+				dbgMsg2 +=
+				    " (" + (state.action->source.expired() ? "no source" : state.action->source.lock()->m_labelDiwne);
 				if (auto action = state.getActiveAction<Actions::DragNodeAction>())
 					dbgMsg2 += ", count: " + std::to_string(action->nodes.size());
 				dbgMsg2 += ")]";

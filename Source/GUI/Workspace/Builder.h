@@ -23,7 +23,6 @@
 #include "GUI/Workspace/Nodes/Operator.h"
 #include "GUI/Workspace/Nodes/Transformation.h"
 #include "GUI/Workspace/Nodes/TransformationBase.h"
-#include "WorkspaceDiwne.h"
 
 namespace Workspace
 {

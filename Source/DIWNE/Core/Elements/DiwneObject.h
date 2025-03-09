@@ -653,6 +653,18 @@ public:
 
 private:
 	void debugDrawing(DrawInfo& context, int debug_logicalUpdate); ///< Debug drawing helper
+
+public:
+	// Operators
+	// =============================================================================================================
+	bool operator==(const DiwneObject& rhs) const
+	{
+		return m_idDiwne == rhs.m_idDiwne;
+	}
+	bool operator!=(const DiwneObject& rhs) const
+	{
+		return !(rhs == *this);
+	}
 };
 
 /*
@@ -701,7 +713,7 @@ public:
 	//  But it then might require a dynamic cast or something
 	bool isActionActive(const std::string& name);
 	/// Checks whether an action is active and its source is the passed source diwne label
-	bool isActionActive(const std::string& name, const std::string& source);
+	bool isActionActive(const std::string& name, const DiwneObject* source);
 	bool anyActionActive();
 
 	/**
@@ -725,7 +737,7 @@ public:
 	 * @return Returns the specified action IF if it currently active. Otherwise null.
 	 */
 	template <typename T>
-	T* getActiveAction(const std::string& name = "", const std::string& source = "")
+	T* getActiveAction(const std::string& name = "", const DiwneObject* source = nullptr)
 	{
 		static_assert(std::is_base_of<DIWNE::Actions::DiwneAction, T>::value,
 		              "T must be derived from DIWNE::DiwneAction class.");
@@ -734,7 +746,7 @@ public:
 		{
 			if (!name.empty() && ret->name != name)
 				return nullptr;
-			if (!source.empty() && ret->source != source)
+			if (source && !ret->isSource(source))
 				return nullptr;
 		}
 		return ret;
@@ -743,9 +755,12 @@ public:
 	bool dragging{false};
 	bool dragStart{false};
 	bool dragEnd{false};
-	std::string dragSource; // TODO: If the above was changed, then this can be the source of the action
-	                        // TODO: Question then arises what if there are multiple active actions? Do we make those
-	                        // two above arrays? vectors?
+	std::weak_ptr<DiwneObject> dragSource;
+
+	bool isDragSource(const DiwneObject* object) const
+	{
+		return !dragSource.expired() && dragSource.lock().get() == object;
+	}
 
 	// TODO: Docs to explain hover root and object parent references
 	/**

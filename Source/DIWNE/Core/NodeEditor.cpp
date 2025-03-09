@@ -47,6 +47,11 @@ void NodeEditor::draw(DrawMode drawMode)
 
 void NodeEditor::initializeDiwne(DrawInfo& context)
 {
+	// clang-format off
+	assert("DIWNE::NodeEditor cannot be created on the stack, using the new operator or as a unique_ptr. It MUST be managed by a shared pointer! Use std::make_shared or std::shared_ptr to define it." &&
+	       !this->weak_from_this().expired());
+	// clang-format on
+
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false; // TODO: (DR) Remove some of these
 
 	// TODO: Unify bringToFront/shifting behavior across pasting, dragging and last active node
@@ -314,10 +319,10 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	{
 		if (dragStart && !context.state.action)
 		{
-			context.state.startAction<SelectionRectAction>(m_labelDiwne);
+			context.state.startAction<SelectionRectAction>(shared_from_this());
 		}
 	}
-	if (context.state.isActionActive(Actions::selectionRect, m_labelDiwne))
+	if (context.state.isActionActive(Actions::selectionRect, this))
 	{
 		ImVec2 startPos = m_input->selectionRectangleStartPosition();
 		ImVec2 dragDelta = m_input->selectionRectangleSize();

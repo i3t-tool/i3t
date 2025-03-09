@@ -43,27 +43,24 @@
 
 namespace Workspace
 {
-extern WorkspaceDiwne* g_diwne;
-
 class WorkspaceDiwne : public DIWNE::NodeEditor
 {
 	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node); // TODO: Friend stuff would be nice to avoid
 public:
 	ImDrawListSplitter m_channelSplitter;
 	Memento* copiedNodes = nullptr;
-	Core::MatrixTracker* tracking;
+	Core::MatrixTracker* tracking{nullptr};
 	float timeUntilNextTrack = 0;
-	bool smoothTracking;
+	bool smoothTracking{true};
 
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
 
 	ViewportHighlightResolver m_viewportHighlightResolver;
 
-	bool m_updateDataItemsWidth;      ///< Indicates a change in zoom level this frame
-	bool m_reconnectCameraToSequence; // TODO: Unused probably
+	bool m_updateDataItemsWidth{false}; ///< Indicates a change in zoom level this frame
 
-	bool m_trackingFromLeft;
+	bool m_trackingFromLeft{false};
 
 	// TODO: The nodes should be mainly stored in the DIWNE::NodeEditor not in a subclass
 	//  Or a system where the storage can be specified by subclasses should be created
@@ -302,28 +299,4 @@ public:
 		}
 	}
 };
-
-/// This function takes snapshot of current state.
-template <typename T>
-auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
-{
-	auto result = g_diwne->addNodeToPosition<T>(position);
-
-	App::getModule<StateManager>().takeSnapshot();
-
-	return result;
-}
-
-template <typename T>
-auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
-{
-	return g_diwne->addNodeToPosition<T>(position);
-}
-
-//
-
-bool connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin);
-
-bool connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin);
-
 } // namespace Workspace

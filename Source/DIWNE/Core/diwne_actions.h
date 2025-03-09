@@ -12,6 +12,7 @@ class NodeEditor;
 class Pin;
 class Link;
 class Node;
+class DiwneObject;
 
 namespace Actions
 {
@@ -20,10 +21,10 @@ namespace Actions
 struct DiwneAction
 {
 	std::string name;
-	std::string source;
+	std::weak_ptr<DiwneObject> source;
 	bool endActionThisFrame{false};
 
-	DiwneAction(const std::string& name, const std::string& source) : name(name), source(source) {}
+	DiwneAction(const std::string& name, const std::shared_ptr<DiwneObject>& source) : name(name), source(source) {}
 	virtual ~DiwneAction() = default;
 
 	void end()
@@ -36,13 +37,30 @@ struct DiwneAction
 
 	/// Callback called at the end of the frame the action was ended.
 	virtual void onEnd(){};
+
+	bool isSource(const DiwneObject* object) const
+	{
+		if (this->source.expired())
+			return false;
+		if (this->source.lock().get() != object)
+			return false;
+		return true;
+	}
+	bool hasSameSource(const DiwneAction& action) const
+	{
+		if (this->source.expired() || action.source.expired())
+			return false;
+		if (this->source.lock() != action.source.lock())
+			return false;
+		return true;
+	}
 };
 
 struct EditorAction : public DiwneAction
 {
 	NodeEditor& editor;
 
-	EditorAction(NodeEditor& editor, const std::string& name, const std::string& source)
+	EditorAction(NodeEditor& editor, const std::string& name, const std::shared_ptr<DiwneObject>& source)
 	    : editor(editor), DiwneAction(name, source)
 	{}
 };
@@ -61,7 +79,7 @@ struct ConnectPinAction : public DiwneAction
 	Pin* startPin{nullptr};
 	Link* draggedLink{nullptr};
 
-	ConnectPinAction(const std::string& source) : DiwneAction(connectPin, source) {}
+	ConnectPinAction(const std::shared_ptr<DiwneObject>& source) : DiwneAction(connectPin, source) {}
 
 	void onEnd() override;
 };
@@ -71,14 +89,15 @@ struct SelectionRectAction : public DiwneAction
 	bool touch = false;
 	ImRect rect{0, 0, 0, 0};
 
-	SelectionRectAction(const std::string& source) : DiwneAction(selectionRect, source) {}
+	SelectionRectAction(const std::shared_ptr<DiwneObject>& source) : DiwneAction(selectionRect, source) {}
 };
 
 struct DragNodeAction : public EditorAction
 {
 	std::vector<std::shared_ptr<Node>> nodes; // Using shared ptrs here to avoid weak ptr locking
 
-	DragNodeAction(NodeEditor& editor, const std::string& source, std::vector<std::shared_ptr<Node>> nodes)
+	DragNodeAction(NodeEditor& editor, const std::shared_ptr<DiwneObject>& source,
+	               std::vector<std::shared_ptr<Node>> nodes)
 	    : nodes(std::move(nodes)), EditorAction(editor, dragNode, source)
 	{}
 

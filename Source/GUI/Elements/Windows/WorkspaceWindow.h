@@ -33,6 +33,7 @@
 
 #include "GUI/Elements/IWindow.h"
 
+#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 
 /**
@@ -43,8 +44,10 @@ class WorkspaceWindow : public IWindow, public IStateful
 public:
 	I3T_WINDOW(WorkspaceWindow)
 
+	// TODO: (DR) Make this a member variable eventually
+	static Ptr<Workspace::WorkspaceDiwne> g_editor;
+
 	explicit WorkspaceWindow(bool show);
-	~WorkspaceWindow() override;
 
 private:
 	Memento saveScene(Scene* scene) override;
@@ -66,8 +69,32 @@ public:
 
 	Application& m_wholeApplication;
 
-	void render();
+	void render() override;
 
 private:
 	void showEditMenu();
 };
+
+namespace Workspace
+{
+/// This function takes snapshot of current state.
+template <typename T>
+auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
+{
+	auto result = WorkspaceWindow::g_editor->addNodeToPosition<T>(position);
+
+	App::getModule<StateManager>().takeSnapshot();
+
+	return result;
+}
+
+template <typename T>
+auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
+{
+	return WorkspaceWindow::g_editor->addNodeToPosition<T>(position);
+}
+
+bool connectNodesNoSave(Ptr<Workspace::CoreNode> lhs, Ptr<Workspace::CoreNode> rhs, int lhsPin, int rhsPin);
+
+bool connectNodes(Ptr<Workspace::CoreNode> lhs, Ptr<Workspace::CoreNode> rhs, int lhsPin, int rhsPin);
+} // namespace Workspace

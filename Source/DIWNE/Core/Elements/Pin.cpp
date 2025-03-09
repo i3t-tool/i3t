@@ -88,7 +88,7 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	DiwneObject::onDrag(context, dragStart, dragEnd);
 	if (dragStart)
 	{
-		Actions::ConnectPinAction* action = context.state.startAction<Actions::ConnectPinAction>(m_labelDiwne);
+		Actions::ConnectPinAction* action = context.state.startAction<Actions::ConnectPinAction>(shared_from_this());
 		if (action)
 		{
 			action->startPin = this;
@@ -110,7 +110,7 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 			}
 		}
 	}
-	if (context.state.isActionActive(Actions::connectPin, m_labelDiwne))
+	if (context.state.isActionActive(Actions::connectPin, this))
 	{
 		Actions::ConnectPinAction* action = context.state.getAction<Actions::ConnectPinAction>();
 

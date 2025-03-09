@@ -17,7 +17,7 @@
 
 #include "Core/Defs.h"
 
-#include "GUI/Workspace/WorkspaceDiwne.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 
 #include "Viewport/GfxUtils.h"
 #include "Viewport/entity/nodes/SceneCamera.h"
@@ -144,7 +144,7 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 	//  selected objects. This feature is important but I don't have time to refine it right now. Fix is to keep a list
 	//  of selected objects in the scene which we have access to here.
 	std::vector<const GameObject*> selectedObjects;
-	for (const auto& modelNode : Workspace::g_diwne->getAllModels())
+	for (const auto& modelNode : WorkspaceWindow::g_editor->getAllModels())
 	{
 		if (!modelNode->getSelected())
 		{
@@ -158,7 +158,7 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 		}
 		selectedObjects.push_back(model.get());
 	}
-	for (const auto& cameraNode : Workspace::g_diwne->getAllCameras())
+	for (const auto& cameraNode : WorkspaceWindow::g_editor->getAllCameras())
 	{
 		if (!cameraNode->getSelected())
 		{

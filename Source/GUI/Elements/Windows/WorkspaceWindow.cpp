@@ -27,12 +27,14 @@ static DIWNE::SettingsDiwne settingsDiwne;
 
 using namespace Workspace;
 
+Ptr<WorkspaceDiwne> WorkspaceWindow::g_editor;
+
 WorkspaceWindow::WorkspaceWindow(bool show)
     : IWindow(ICON_I3T_WORKSPACE " Workspace", show), m_wholeApplication(App::get())
 {
 	m_autoFocus = true;
 	initDiwneFromTheme();
-	g_diwne = new WorkspaceDiwne(&settingsDiwne);
+	g_editor = std::make_shared<WorkspaceDiwne>(&settingsDiwne);
 
 	// TODO: These actions should be handled by the WorkspaceNodeEditor instance
 	//  in its processInteractions() method so it can react to input blocking properly
@@ -50,14 +52,9 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	I3T::getViewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
 		// Save information about this callback and perform actions based on it later while in workspace window context.
 		// This is a workaround due to viewport selection occurring in unknown order at unknown time.
-		g_diwne->m_viewportSelectionChanged = true;
-		g_diwne->m_viewportLastSelectedEntity = newlySelectedEntity;
+		g_editor->m_viewportSelectionChanged = true;
+		g_editor->m_viewportLastSelectedEntity = newlySelectedEntity;
 	});
-}
-
-WorkspaceWindow::~WorkspaceWindow()
-{
-	delete g_diwne;
 }
 
 // TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
@@ -82,7 +79,7 @@ void WorkspaceWindow::initDiwneFromTheme()
 
 WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
 {
-	return *g_diwne;
+	return *g_editor;
 }
 
 void WorkspaceWindow::render()
@@ -105,10 +102,10 @@ void WorkspaceWindow::render()
 			if (ImGui::BeginMenu("Debug"))
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-				ImGui::MenuItem("Enable", nullptr, &(Workspace::g_diwne->m_diwneDebug));
-				ImGui::MenuItem("Layout", nullptr, &(Workspace::g_diwne->m_diwneDebugLayout));
-				ImGui::MenuItem("Interaction", nullptr, &(Workspace::g_diwne->m_diwneDebugInteractions));
-				ImGui::MenuItem("Objects", nullptr, &(Workspace::g_diwne->m_diwneDebugObjects));
+				ImGui::MenuItem("Enable", nullptr, &(g_editor->m_diwneDebug));
+				ImGui::MenuItem("Layout", nullptr, &(g_editor->m_diwneDebugLayout));
+				ImGui::MenuItem("Interaction", nullptr, &(g_editor->m_diwneDebugInteractions));
+				ImGui::MenuItem("Objects", nullptr, &(g_editor->m_diwneDebugObjects));
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}
@@ -122,7 +119,7 @@ void WorkspaceWindow::render()
 		{
 			drawMode = DIWNE::DrawMode_Interactive;
 		}
-		g_diwne->draw(drawMode);
+		g_editor->draw(drawMode);
 	}
 	else
 	{
@@ -154,12 +151,12 @@ void WorkspaceWindow::showEditMenu()
 
 		if (ImGui::MenuItem("Select all"))
 		{
-			g_diwne->selectAll();
+			g_editor->selectAll();
 		}
 
 		if (ImGui::MenuItem("Zoom all"))
 		{
-			g_diwne->zoomToAll();
+			g_editor->zoomToAll();
 		}
 
 		ImGui::EndMenu();
@@ -178,8 +175,8 @@ Memento WorkspaceWindow::saveScene(Scene* scene)
 	SerializationVisitor visitor(memento);
 	visitor.dump(getNodeEditor().getAllCoreNodes().collect());
 
-	JSON::addFloat(memento["workspace"], "zoom", g_diwne->canvas().getZoom(), a);
-	JSON::addRect(memento["workspace"], "workArea", g_diwne->canvas().getViewportRectDiwne(), a);
+	JSON::addFloat(memento["workspace"], "zoom", g_editor->canvas().getZoom(), a);
+	JSON::addRect(memento["workspace"], "workArea", g_editor->canvas().getViewportRectDiwne(), a);
 
 	return memento;
 }
@@ -197,10 +194,10 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 	NodeDeserializer::createFrom(memento);
 
 	if (memento["workspace"].HasMember("zoom"))
-		g_diwne->setZoom(memento["workspace"]["zoom"].GetFloat());
+		g_editor->setZoom(memento["workspace"]["zoom"].GetFloat());
 
 	if (memento["workspace"].HasMember("workArea"))
-		g_diwne->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
+		g_editor->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
 }
 
 void WorkspaceWindow::clearScene()
@@ -216,3 +213,32 @@ Memento WorkspaceWindow::saveGlobal()
 void WorkspaceWindow::loadGlobal(const Memento& memento) {}
 
 void WorkspaceWindow::clearGlobal() {}
+
+/////////////////////////////////////////
+// NodeEditor management
+/////////////////////////////////////////
+
+bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
+{
+	bool success = std::static_pointer_cast<CoreNodeWithPins>(rhs)->getInputs().at(rhsPin)->plug(
+	    std::static_pointer_cast<CoreNodeWithPins>(lhs)->getOutputs().at(lhsPin).get(), false);
+	if (!success)
+	{
+		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
+		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
+	}
+	rhs->updateDataItemsWidth();
+	lhs->updateDataItemsWidth();
+	return success;
+}
+
+bool Workspace::connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
+{
+	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+	if (result)
+	{
+		App::getModule<StateManager>().takeSnapshot();
+	}
+
+	return result;
+}

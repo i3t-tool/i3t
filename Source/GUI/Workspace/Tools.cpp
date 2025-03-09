@@ -16,6 +16,7 @@
 
 #include "Core/Nodes/Id.h"
 
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "GUI/Workspace/Nodes/Model.h"
 #include "State/NodeDeserializer.h"
@@ -57,7 +58,7 @@ void Tools::pasteNodes(const Memento& memento)
 	{
 		node->setSelected(true);
 	}
-	g_diwne->shiftNodesToEnd(newNodes);
+	WorkspaceWindow::g_editor->shiftNodesToEnd(newNodes);
 }
 
 int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)

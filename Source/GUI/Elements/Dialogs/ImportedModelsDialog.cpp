@@ -25,7 +25,7 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "GUI/Workspace/Nodes/Model.h"
-#include "GUI/Workspace/WorkspaceDiwne.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/StateManager.h"
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -198,7 +198,7 @@ bool ImportedModelsDialog::importContentDialog(std::vector<fs::path>& result, co
 
 void ImportedModelsDialog::maybeRemoveModel(const std::string& alias)
 {
-	std::vector<Ptr<Workspace::Model>> models = Workspace::g_diwne->getAllModels();
+	std::vector<Ptr<Workspace::Model>> models = WorkspaceWindow::g_editor->getAllModels();
 	int usedCount = 0;
 	for (const auto& model : models)
 	{

@@ -27,24 +27,12 @@
 
 using namespace Workspace;
 
-WorkspaceDiwne* Workspace::g_diwne = nullptr;
-
-// std::vector<Ptr<WorkspaceNodeWithCoreData>>
-// WorkspaceWindow::m_workspaceDiwne::m_workspaceCoreNodes;
-
-// using namespace Core;
-
 /* ======================================== */
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
-    : NodeEditor(settingsDiwne), m_updateDataItemsWidth(false), m_trackingFromLeft(false), tracking(nullptr),
-      smoothTracking(true), m_viewportHighlightResolver(this)
-
-{
-	//	m_helperLink = std::make_unique<CoreLink>(diwne);
-	// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-}
+    : NodeEditor(settingsDiwne), m_viewportHighlightResolver(this)
+{}
 
 WorkspaceDiwne::~WorkspaceDiwne()
 {
@@ -55,7 +43,6 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 {
 	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
 
-	m_reconnectCameraToSequence = false;
 	// TODO: This system is tbh kinda stupid, why can't the nodes update themselves before drawing?
 	//  Why iterate over everything again? What am I missing?
 	//  On another node I think data items width could be updated every frame, its not that deep
@@ -1230,11 +1217,11 @@ void WorkspaceDiwne::processTrackingMove()
 	{
 		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
 		{
-			g_diwne->trackingSmoothLeft();
+			this->trackingSmoothLeft();
 		}
 		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
 		{
-			g_diwne->trackingSmoothRight();
+			this->trackingSmoothRight();
 		}
 	}
 }
@@ -1246,43 +1233,43 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 	if (!context.logicalUpdates && !context.inputConsumed)
 	{
 		if (InputManager::isActionTriggered("selectAll", EKeyState::Pressed))
-			g_diwne->selectAll();
+			this->selectAll();
 		if (InputManager::isActionTriggered("invertSelection", EKeyState::Pressed))
-			g_diwne->invertSelection();
+			this->invertSelection();
 		if (InputManager::isActionTriggered("zoomToAll", EKeyState::Pressed))
-			g_diwne->zoomToAll();
+			this->zoomToAll();
 		if (InputManager::isActionTriggered("zoomToSelected", EKeyState::Pressed))
-			g_diwne->zoomToSelected();
+			this->zoomToSelected();
 		if (InputManager::isActionTriggered("delete", EKeyState::Pressed))
-			g_diwne->deleteCallback();
+			this->deleteCallback();
 		if (InputManager::isActionTriggered("copy", EKeyState::Pressed))
-			g_diwne->copySelectedNodes();
+			this->copySelectedNodes();
 		if (InputManager::isActionTriggered("paste", EKeyState::Pressed))
-			g_diwne->pasteSelectedNodes();
+			this->pasteSelectedNodes();
 		if (InputManager::isActionTriggered("cut", EKeyState::Pressed))
-			g_diwne->cutSelectedNodes();
+			this->cutSelectedNodes();
 		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
-			g_diwne->duplicateSelectedNodes();
+			this->duplicateSelectedNodes();
 		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
-			g_diwne->trackingSwitchOff();
+			this->trackingSwitchOff();
 		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
-			g_diwne->trackingSmoothLeft();
+			this->trackingSmoothLeft();
 		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
-			g_diwne->trackingSmoothRight();
+			this->trackingSmoothRight();
 		if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
-			g_diwne->trackingJaggedLeft();
+			this->trackingJaggedLeft();
 		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
-			g_diwne->trackingJaggedRight();
+			this->trackingJaggedRight();
 		if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
-			g_diwne->trackingModeSwitch();
+			this->trackingModeSwitch();
 		if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
-			g_diwne->trackingSwitch();
+			this->trackingSwitch();
 		if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
-			g_diwne->trackingSwitchOn();
+			this->trackingSwitchOn();
 		if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
-			g_diwne->trackingSwitchOff();
+			this->trackingSwitchOff();
 		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
-			g_diwne->toggleSelectedNodesVisibility();
+			this->toggleSelectedNodesVisibility();
 	}
 }
 
@@ -1301,29 +1288,4 @@ bool WorkspaceDiwne::processZoom()
 {
 	m_updateDataItemsWidth = true;
 	return NodeEditor::processZoom();
-}
-
-bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
-{
-	bool success = std::static_pointer_cast<CoreNodeWithPins>(rhs)->getInputs().at(rhsPin)->plug(
-	    std::static_pointer_cast<CoreNodeWithPins>(lhs)->getOutputs().at(lhsPin).get(), false);
-	if (!success)
-	{
-		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
-		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
-	}
-	rhs->updateDataItemsWidth();
-	lhs->updateDataItemsWidth();
-	return success;
-}
-
-bool Workspace::connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
-{
-	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
-	if (result)
-	{
-		App::getModule<StateManager>().takeSnapshot();
-	}
-
-	return result;
 }
