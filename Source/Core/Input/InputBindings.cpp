@@ -25,7 +25,6 @@ void InputBindings::init()
 	InputManager::setInputAction("paste", Keys::v, {Keys::ctrll});
 	InputManager::setInputAction("cut", Keys::x, {Keys::ctrll});
 	InputManager::setInputAction("duplicateSelected", Keys::d, {Keys::ctrll});
-	InputManager::setInputAction("duplicate", Keys::mouseLeft, {Keys::ctrll});
 	InputManager::setInputAction("delete", Keys::del);
 	// InputManager::setInputAction("delete", Keys::backspace);
 

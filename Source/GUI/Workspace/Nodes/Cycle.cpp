@@ -415,7 +415,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 	{
 		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_STEP})
 		{
-			m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode2);
+			m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
 		}
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
@@ -455,7 +455,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// From: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->drawDiwne(context, m_drawMode2); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		const float fromWidth = ImGui::GetItemRectSize().x; // length of the icon + label (from is the longest text)
 		// ImGui::DebugDrawItemRect(ImColor(255, 127, 0, 127));
@@ -493,7 +493,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// To: -------- v| > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->drawDiwne(context, m_drawMode2); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float toWidth = ImGui::GetItemRectSize().x;
 
@@ -530,7 +530,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// Step: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->drawDiwne(context, m_drawMode2); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float stepWidth = ImGui::GetItemRectSize().x;
 
@@ -575,7 +575,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 			                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 			{
 				// inner_interaction_happen |= m_workspaceInputs.at(i)->m_iconType
-				m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode2);
+				m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
 			}
 		}
 		else if (m_levelOfDetail == LevelOfDetail::SetValues)

@@ -84,17 +84,9 @@ public:
 	//  In theory drag operations could affect sequences but ONLY when only same sequence ndoes are selected
 	bool m_fixed{false}; ///< Whether the object can be moved by user operations @see isFixed()
 
-	//
-
-	// TODO: Not sure if its needed to keep this as a local variable
-	//  maybe its enough to pass around the frame context instead
-	//	DrawMode m_drawMode; /**< \see enum DrawMode */
-
-	/// Experimental, read-only flag thats updated on each drawDiwne() call.
-	/// Essentially just a way to avoid passing this along everywhere as it should be mostly constant
-	DrawMode m_drawMode2; // TODO: Rename, experimental (!)
-
-	//
+	/// Read-only flag thats updated on each drawDiwne().
+	/// Essentially just a way to avoid passing this along everywhere as it should stay constant for each object.
+	DrawMode m_drawMode;
 
 	// TODO: Workspace nodes use a LOD system, it might be a good idea to generalize that system into the DIWNE library
 	//  itself. The LOD system is also, coincidentally, useful as a true LOD system to improve performance (despite the
@@ -110,11 +102,11 @@ public:
 	bool m_drawnThisFrame{false};
 	bool m_justHidden{false};
 
-	//
-
 protected:
 	bool m_selectable{true}; ///< Should not be accessed directly. @see setSelectable()
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
+
+	bool m_bringToFront{false}; ///< Request the object's rendering order to be moved to the front above other objects
 
 	/// Sets the parent object of object, relevant in node container and hover hierarchy.
 	DiwneObject* m_parentObject{nullptr};
@@ -575,6 +567,11 @@ public:
 public:
 	bool isDragging(DrawInfo& context);
 	void stopDrag(DrawInfo& context);
+
+	///< Marks the object to be brought to front (be drawn first). Is handled by the object's parent / container.
+	///< For nodes, they are brought forward in rendering order next frame by the NodeEditor / NodeContainer.
+	void setBringToFront(bool val);
+	bool isToBeBroughtToFront();
 
 	// =============================================================================================================
 	// END OF INTERACTION

@@ -84,7 +84,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 
 	// TODO: Use some flag to make it not interactive
-	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
+//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
 
 	m_viewportCamera = I3T::getViewport()->createCamera(getId());
 	auto cameraPtr = m_viewportCamera.lock();
@@ -232,7 +232,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	}
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
@@ -255,9 +255,9 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
 	// Label LOD
 	{
-		m_projection->drawDiwne(context, m_drawMode2);
+		m_projection->drawDiwne(context, m_drawMode);
 		ImGui::SameLine();
-		m_view->drawDiwne(context, m_drawMode2);
+		m_view->drawDiwne(context, m_drawMode);
 	}
 }
 

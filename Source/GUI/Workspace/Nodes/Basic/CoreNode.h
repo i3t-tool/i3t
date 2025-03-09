@@ -1,8 +1,8 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -20,6 +20,7 @@ namespace Workspace
 class CoreNode : public Node, public IVisitable
 {
 	using Super = Node;
+
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
@@ -30,9 +31,12 @@ protected:
 	LevelOfDetail m_levelOfDetail;
 
 	/**
-	 * \brief reference to Core
-	 *
-	 * WorkspaceNodeWithCoreData is owner
+	 * @brief Reference to the I3T Core node
+	 * @description Each Workspace GUI node represents a single I3T Core node.
+	 * It also manages its lifetime and destruction. The UI and Core representations are not implicitly synced.
+	 * Right now the idea is that any changes to the Core nodes is made through Workspace nodes,
+	 * which sync the UI and Core state explicitly in the moments of immediate change + some continual asserts.
+	 * Workspace is however not ready to react to external changes to the Core node graph and would result in sync fail.
 	 */
 	const Ptr<Core::Node> m_nodebase;
 
@@ -42,40 +46,49 @@ public:
 	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
 
+	/// Returns the managed I3T Core node
 	Ptr<Core::Node> getNodebase() const;
+
+	// Lifecycle
+	// =============================================================================================================
+	void topContent(DIWNE::DrawInfo& context) override;
+
+	void popupContent(DIWNE::DrawInfo& context) override;
+
+	void onDestroy(bool logEvent) override;
+
+	// Number format / precision
+	// =============================================================================================================
+	bool drawDataLabel();
+	void drawMenuSetEditable();
+	void drawMenuSetPrecision();
 
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);
 
-	FloatPopupMode& getFloatPopupMode()
-	{
-		return m_floatPopupMode;
-	};
-	void setFloatPopupMode(FloatPopupMode mode)
-	{
-		m_floatPopupMode = mode;
-	};
+	FloatPopupMode& getFloatPopupMode();
+	void setFloatPopupMode(FloatPopupMode mode);
 
 	virtual int maxLengthOfData() = 0;
 
 	float getDataItemsWidth();
 	virtual float updateDataItemsWidth();
 
-	LevelOfDetail setLevelOfDetail(LevelOfDetail levelOfDetail);
-	LevelOfDetail getLevelOfDetail();
-
-	bool drawDataLabel();
-	void drawMenuSetEditable();
-
-	/* DIWNE function */
-	void topContent(DIWNE::DrawInfo& context) override;
-
+	// Level of detail
+	// =============================================================================================================
 	virtual void drawMenuLevelOfDetail() = 0;
 	static void drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, std::vector<LevelOfDetail> const& levels_of_detail);
 
-	void drawMenuSetPrecision();
+	LevelOfDetail setLevelOfDetail(LevelOfDetail levelOfDetail);
+	LevelOfDetail getLevelOfDetail();
 
-	void popupContent(DIWNE::DrawInfo& context) override;
+	// Duplication
+	// =============================================================================================================
+	void drawMenuDuplicate(DIWNE::DrawInfo& context);
+	void duplicate(DIWNE::DrawInfo& context, bool multiDuplication);
+	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
+
+	// =============================================================================================================
 
 	//	bool processDrag() override;
 	//	bool processSelect() override;
@@ -94,9 +107,6 @@ public:
 	// bool bypassSelectAction();
 	// bool bypassUnselectAction();
 	// bool bypassTouchAction();
-	void drawMenuDuplicate();
-
-	void onDestroy(bool logEvent) override;
 
 private:
 	const char* getButtonSymbolFromLOD(LevelOfDetail detail);

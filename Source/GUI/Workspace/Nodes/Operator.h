@@ -128,8 +128,8 @@ public:
 			}
 		}
 
-		m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne(context, m_drawMode2);
-		m_workspaceInputs.at(2)->drawDiwne(context, m_drawMode2);
+		m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne(context, m_drawMode);
+		m_workspaceInputs.at(2)->drawDiwne(context, m_drawMode);
 	}
 };
 } // namespace Workspace

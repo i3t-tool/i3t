@@ -16,13 +16,15 @@
 
 #include "rapidjson/document.h"
 
+#include "DIWNE/Core/Elements/Node.h"
 #include "NodeVisitor.h"
 #include "Stateful.h"
 
 namespace NodeDeserializer
 {
 /// @pre DIWNE and WorkspaceWindow are initialized.
-std::vector<Ptr<GuiNode>> createFrom(const Memento& memento);
+/// @return Vector of Workspace::CoreNodes (casted to base type DIWNE::Node for perf reasons)
+std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento);
 
 std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value);
 Ptr<GuiSequence> createSequence(const rapidjson::Value& value);

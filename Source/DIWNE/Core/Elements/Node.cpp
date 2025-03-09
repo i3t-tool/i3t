@@ -145,6 +145,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 				if (node->isFixed() && node.ptr() != this) // Fixed nodes can be only dragged directly
 					continue;
 				nodes.push_back(node.sharedPtr());
+				node->setBringToFront(true);
 			}
 		}
 		else
@@ -157,6 +158,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 				setSelected(true);
 			}
 			nodes.push_back(this->sharedPtr<Node>());
+			this->setBringToFront(true);
 		}
 		context.state.startAction<Actions::DragNodeAction>(diwne, m_labelDiwne, std::move(nodes));
 	}

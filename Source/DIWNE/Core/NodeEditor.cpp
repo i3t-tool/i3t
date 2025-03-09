@@ -49,6 +49,19 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 {
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false; // TODO: (DR) Remove some of these
 
+	// TODO: Unify bringToFront/shifting behavior across pasting, dragging and last active node
+	//   - Last active node should use the bringToFront marking system same as any others
+	//   - Pasting should use marking as well, does pasting even need it? shouldn't it append to the end of the list?
+	//   - Dragged nodes use the setBringToFront() marking
+
+	if (m_lastActiveNodeChanged)
+	{
+		bringLastActiveNodeToFront();
+		m_lastActiveNodeChanged = false;
+	}
+	// TODO: (Dr) This requires an extra O(n) pass, could be merged with object purging
+	bringMarkedNodesToFront();
+
 	purgeObjects(); // Erase objects marked for destruction or removal in the previous frame
 
 	DiwneObject::initializeDiwne(context);
@@ -173,7 +186,7 @@ void NodeEditor::content(DrawInfo& context)
 			{
 				// Set the ImGui cursor position to the position of the node and draw it
 				ImGui::SetCursorScreenPos(canvas().diwne2screen(node->getPosition()));
-				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode2);
+				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode);
 
 				// If the node requests focus, bring it to front (unless it's going to be destroyed or removed)
 				if (drawResult.logicalUpdates && !node->isDestroyed() && !node->willBeRemovedFromContainer(this))
@@ -245,7 +258,6 @@ void NodeEditor::updateLayout(DrawInfo& context)
 
 void NodeEditor::afterDraw(DrawInfo& context)
 {
-	shiftInteractingNodeToEnd();
 	DIWNE_DEBUG_LAYOUT(diwne, {
 		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
 		ImGui::GetForegroundDrawList()->AddText(
@@ -386,6 +398,7 @@ bool NodeEditor::processDiwneZoom()
 
 void NodeEditor::shiftNodesToBegin(const NodeList& nodesToShift)
 {
+	// TODO: (DR) Performance concerns see shiftNodesToEnd()
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
 		auto ith_selected_node =
@@ -402,11 +415,14 @@ void NodeEditor::shiftNodesToBegin(const NodeList& nodesToShift)
 
 void NodeEditor::shiftNodesToEnd(const NodeList& nodesToShift)
 {
+	// TODO: (Dr) This is O(n * m), m being size of nodesToShift
+	//  Worst case we're doing n^2 unnecessarily (dragging all nodes?)
+	//  Also it is NOT stable (order of other nodes may get modified)
+	//  Better to use partition + rotate but that wouldn't preserve order either
+	//  Thus stable partition could be used which is potentially O(n) + memory overhead (or O(n log n))
+	//  --> Best to decide based on some actual performance metrics
+
 	int node_num = nodesToShift.size();
-	//    str2.erase(std::remove_if(str2.begin(),
-	//                              str2.end(),
-	//                              [](unsigned char x){return std::isspace(x);})
-	//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
 	for (int i = 0; i < node_num; i++)
 	{
 		auto ith_selected_node =
@@ -420,7 +436,7 @@ void NodeEditor::shiftNodesToEnd(const NodeList& nodesToShift)
 	}
 }
 
-void NodeEditor::shiftInteractingNodeToEnd()
+void NodeEditor::bringLastActiveNodeToFront()
 {
 	if (mp_lastActiveNode.expired() || m_nodes.empty())
 		return;
@@ -438,6 +454,22 @@ void NodeEditor::shiftInteractingNodeToEnd()
 			std::rotate(draged_node_it, draged_node_it + 1, m_nodes.end());
 		}
 	}
+}
+
+void NodeEditor::bringMarkedNodesToFront()
+{
+	// TODO: (DR) Optimize
+	NodeList shift;
+	for (auto& node : this->getNodeList())
+	{
+		if (node->isToBeBroughtToFront())
+		{
+			shift.push_back(node);
+			node->setBringToFront(false);
+		}
+	}
+	if (!shift.empty())
+		shiftNodesToEnd(shift);
 }
 
 bool NodeEditor::allowProcessZoom()

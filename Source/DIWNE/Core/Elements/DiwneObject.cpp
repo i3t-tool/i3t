@@ -64,7 +64,7 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 #if DIWNE_DEBUG_ENABLED
 	auto debug_logicalUpdate = context.logicalUpdates;
 #endif
-	m_drawMode2 = mode;
+	m_drawMode = mode;
 	bool wasDrawnLastFrame = m_drawnThisFrame;
 	m_drawnThisFrame = false;
 
@@ -141,7 +141,7 @@ bool DiwneObject::allowInteraction() const
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
-	if (m_drawMode2 != DrawMode_Interactive)
+	if (m_drawMode != DrawMode_Interactive)
 		return;
 
 	if (!allowInteraction())
@@ -539,7 +539,6 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 			                                  DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
-	//	Debug::debugRect(this->m_rect, ImColor(0, 255, 0, 50), diwne);
 }
 void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 {
@@ -553,7 +552,6 @@ void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 			                                  DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
-	//	Debug::debugRect(this->m_rect, ImColor(255, 0, 0, 50), diwne);
 }
 void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
@@ -752,9 +750,17 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 			}
 		}
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
-		                                        m_drawMode2 & DrawMode_JustDraw ? IM_COL32(224, 96, 116, 255)
-		                                                                        : IM_COL32(97, 239, 255, 255),
+		                                        m_drawMode & DrawMode_JustDraw ? IM_COL32(224, 96, 116, 255)
+		                                                                       : IM_COL32(97, 239, 255, 255),
 		                                        topLeftString.c_str());
 	});
+}
+void DiwneObject::setBringToFront(bool val)
+{
+	m_bringToFront = val;
+}
+bool DiwneObject::isToBeBroughtToFront()
+{
+	return m_bringToFront;
 }
 } /* namespace DIWNE */

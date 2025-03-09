@@ -173,7 +173,7 @@ void Model::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 

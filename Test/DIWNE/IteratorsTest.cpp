@@ -314,6 +314,188 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 	}
 }
 
+TEST(IteratorsTest, FilteredRecursiveNodeRangeWithDivePredicateTest)
+{
+	auto app = initI3T(spdlog::level::warn);
+
+	DIWNE::SettingsDiwne settings;
+	NodeEditor editor(&settings);
+	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
+	editor.addNode(node1, ImVec2(0, 0));
+	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");
+	editor.addNode(node2, ImVec2(100, 0));
+	auto node3 = std::make_shared<DIWNE::BasicNode>(editor, "Node 3");
+	editor.addNode(node3, ImVec2(200, 0));
+	auto node4 = std::make_shared<DIWNE::BasicNode>(editor, "Node 4");
+	editor.addNode(node4, ImVec2(0, 100));
+
+	auto node5 = std::make_shared<DIWNE::BasicNode>(editor, "Node 5");
+	auto node6 = std::make_shared<DIWNE::BasicNode>(editor, "Node 6");
+
+	auto container1 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 1");
+	container1->addNode(node5);
+	editor.addNode(container1, ImVec2(100, 100));
+
+	auto container2 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 2");
+	container2->addNode(node6);
+	editor.addNode(container2, ImVec2(200, 100));
+
+	const int nodeCount = 6;
+	const int allNodeCount = 8;
+
+	ASSERT_TRUE(editor.getNodeList().size() == nodeCount);
+	ASSERT_TRUE(container1->getNodes().collectRaw().size() == 1);
+	ASSERT_TRUE(container2->getNodes().collect().size() == 1);
+	{
+		std::vector<std::reference_wrapper<Node>> nodeRefs;
+		std::vector<Node*> nodePtrs;
+		NodeList nodeSharedPtrs;
+
+		for (auto& node : editor.getNodes())
+		{
+			nodeRefs.push_back(node);
+		}
+		ASSERT_TRUE(nodeRefs.size() == nodeCount);
+		nodeRefs.clear();
+
+		for (auto& node : editor.getAllNodesInnerIncluded())
+		{
+			nodeRefs.push_back(node);
+		}
+		ASSERT_TRUE(nodeRefs.size() == allNodeCount);
+		nodeRefs.clear();
+
+		for (auto& node : editor.getSelectedNodesInnerIncluded())
+		{
+			GTEST_FAIL(); // No nodes are selected, expecting no iteration
+		}
+
+		FilteredRecursiveNodeRange<> nodeRange(
+		    [](const Node* node) -> bool {
+			    return node->getSelected();
+		    },
+		    [](const Node* node) -> bool {
+			    return !node->getSelected();
+		    },
+		    &editor.getNodeList());
+
+		for (auto node = nodeRange.begin(); node != nodeRange.end(); node++)
+		{
+			GTEST_FAIL(); // No nodes are selected, expecting no iteration
+		}
+
+		node5->setSelected(true);
+
+		for (auto node = nodeRange.begin(); node != nodeRange.end(); node++)
+		{
+			ASSERT_TRUE(node.ptr() == node.operator->());
+			nodePtrs.push_back(node.ptr());
+			ASSERT_TRUE(&node.dereference() == &node.operator*());
+			nodeRefs.push_back(node.dereference());
+			nodeSharedPtrs.push_back(node.sharedPtr());
+		}
+		ASSERT_TRUE(nodeRefs.size() == nodePtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == nodeSharedPtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == 1);
+		nodeRefs.clear();
+		nodePtrs.clear();
+		nodeSharedPtrs.clear();
+
+		node2->setSelected(true);
+		node6->setSelected(true);
+
+		for (auto node = nodeRange.begin(); node != nodeRange.end(); ++node)
+		{
+			ASSERT_TRUE(node.ptr() == node.operator->());
+			nodePtrs.push_back(node.ptr());
+			ASSERT_TRUE(&node.dereference() == &node.operator*());
+			nodeRefs.push_back(node.dereference());
+			nodeSharedPtrs.push_back(node.sharedPtr());
+		}
+		ASSERT_TRUE(nodeRefs.size() == nodePtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == nodeSharedPtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == 3);
+		nodeRefs.clear();
+		nodePtrs.clear();
+		nodeSharedPtrs.clear();
+
+		auto container3 = std::make_shared<DIWNE::DummyContainerNode>(editor, "Container 3");
+		editor.addNode(container3, ImVec2(200, 200));
+
+		auto node7 = std::make_shared<DIWNE::BasicNode>(editor, "Node 7");
+		auto node8 = std::make_shared<DIWNE::BasicNode>(editor, "Node 8");
+		node8->setSelected(true);
+		auto node9 = std::make_shared<DIWNE::BasicNode>(editor, "Node 9");
+		container3->addNode(node7);
+		container3->addNode(node8);
+		container3->addNode(node9);
+
+		node1->setSelected(true);
+		container3->setSelected(true);
+		container1->setSelected(true);
+		node5->setSelected(false);
+
+		for (auto node = nodeRange.begin(); node != nodeRange.end(); ++node)
+		{
+			ASSERT_TRUE(node.ptr() == node.operator->());
+			nodePtrs.push_back(node.ptr());
+			ASSERT_TRUE(&node.dereference() == &node.operator*());
+			nodeRefs.push_back(node.dereference());
+			nodeSharedPtrs.push_back(node.sharedPtr());
+		}
+		ASSERT_TRUE(nodeRefs.size() == nodePtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == nodeSharedPtrs.size());
+		ASSERT_TRUE(nodeRefs.size() == 5); // N8 is selected inside selected C3 and thus not included
+
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node1.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node2.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node6.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), container1.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), container3.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node8.get()) == nodePtrs.end()); // Not included
+
+		nodeRefs.clear();
+		nodePtrs.clear();
+		nodeSharedPtrs.clear();
+
+		int counter = 0;
+		for (auto& node : editor.getSelectedNodesInnerIncluded())
+			counter++;
+		ASSERT_TRUE(counter == 6);
+
+		// Move C1 and C3 inside C2
+		editor.removeNode(container1);
+		editor.removeNode(container3);
+		container2->addNode(container1);
+		container2->addNode(container3);
+
+		container3->setSelected(false);
+		node5->setSelected(true);
+		node9->setSelected(true);
+
+		ASSERT_EQ(editor.getAllNodesInnerIncluded().collectRaw().size(), 12);
+
+		for (auto node = nodeRange.begin(); node != nodeRange.end(); ++node)
+		{
+			ASSERT_TRUE(node.ptr() == node.operator->());
+			nodePtrs.push_back(node.ptr());
+			ASSERT_TRUE(&node.dereference() == &node.operator*());
+			nodeRefs.push_back(node.dereference());
+			nodeSharedPtrs.push_back(node.sharedPtr());
+		}
+		ASSERT_EQ(nodeRefs.size(), nodePtrs.size());
+		ASSERT_EQ(nodeRefs.size(), nodeSharedPtrs.size());
+		ASSERT_EQ(nodeRefs.size(), 6);
+
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node1.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node2.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node6.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), container1.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node8.get()) != nodePtrs.end());
+		ASSERT_TRUE(std::find(nodePtrs.begin(), nodePtrs.end(), node9.get()) != nodePtrs.end());
+	}
+}
+
 // TODO: Test recursed containers
 // S2 (N3, S1 (N2), N1)
 // S2 (S1 (N2))

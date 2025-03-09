@@ -113,7 +113,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	}
 	else
 	{
-		m_dropZone->drawDiwne(context, m_drawMode2);
+		m_dropZone->drawDiwne(context, m_drawMode);
 		ImGui::Spacing();
 	}
 }
@@ -165,7 +165,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 

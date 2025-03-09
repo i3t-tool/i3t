@@ -105,10 +105,6 @@ public:
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	// Interaction
-	// =============================================================================================================
-	void onZoom() override;
-
 	// TODO: Restore functionality
 	/**
 	 * \brief For a given input, create appropriate constructor box and plug it to this input
@@ -118,6 +114,94 @@ public:
 
 	// Object management
 	// =============================================================================================================
+	template <typename T>
+	void addTypeConstructorNode()
+	{
+		// TODO: Rework <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		//		CorePin* pin = getLastActivePin<CorePin>().get();
+		//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
+		//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
+		//		              ->getOutputs()
+		//		              .at(0)
+		//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
+	}
+
+	// TODO: Replace with DIWNE::NodeEditor functionality
+	template <class T>
+	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
+	{
+		auto node = NodeEditor::createNode<T>(position, shiftToLeftByNodeWidth);
+
+		m_takeSnap = true; /* JH maybe better in place where this function is called*/
+
+		// TODO: This call makes no sense here, there should be another way
+		//  I'm thinking this should be handled by the respective Transformation subclasses
+		detectRotationTransformAndSetFloatMode(node);
+
+		return node;
+	}
+
+	// TODO: Replace with DIWNE::NodeEditor functionality
+	template <class T>
+	auto inline addNodeToPositionOfPopup()
+	{
+		auto result = addNodeToPosition<T>(canvas().screen2diwne(diwne.getPopupPosition()));
+		return result;
+	}
+
+	/**
+	 * Duplicates nodes marked for duplication using Workspace::Node::setDuplicateNode()
+	 */
+	void performLazyDuplication();
+
+	// Interaction
+	// =============================================================================================================
+	void processInteractions(DIWNE::DrawInfo& context) override;
+
+	void onZoom() override;
+	// TODO: (DR) Reimplement
+	//    bool isZoomingDiwne() override;
+	bool processZoom() override;
+
+	void manipulatorStartCheck3D();
+
+	void trackingSmoothLeft();
+	void trackingSmoothRight();
+	void trackingJaggedLeft();
+	void trackingJaggedRight();
+	void trackingModeSwitch();
+	void trackingSwitch();
+	void trackingSwitchOn(Ptr<Sequence> sequence = nullptr, bool isRightToLeft = true);
+
+	/**
+	 * @pre @p sequence is not null.
+	 */
+	void trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft);
+	void trackingSwitchOff();
+	void toggleSelectedNodesVisibility();
+
+	void processTrackingMove();
+
+	void deleteCallback();
+
+	// TODO: (DR) Move to DIWNE::NodeEditor
+	void selectAll();
+	void invertSelection();
+
+	void zoomToAll();
+	void zoomToSelected();
+	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
+	void zoomToRectangle(ImRect const& rect);
+
+	void deleteSelectedNodes();
+	void copySelectedNodes();
+	void pasteSelectedNodes();
+	void cutSelectedNodes();
+	void duplicateSelectedNodes();
+
+	// Node getters
+	// =============================================================================================================
+
 	// TODO: Rename to getCoreNode()
 	/**
 	 * O(N) where N is workspace nodes count.
@@ -154,83 +238,6 @@ public:
 		return result;
 	}
 
-	template <typename T>
-	void addTypeConstructorNode()
-	{
-		// TODO: Rework <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-		//		CorePin* pin = getLastActivePin<CorePin>().get();
-		//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
-		//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
-		//		              ->getOutputs()
-		//		              .at(0)
-		//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
-	}
-
-	// TODO: Replace with DIWNE::NodeEditor functionality
-	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
-	{
-		auto node = NodeEditor::createNode<T>(position, shiftToLeftByNodeWidth);
-
-		m_takeSnap = true; /* JH maybe better in place where this function is called*/
-
-		// TODO: This call makes no sense here, there should be another way
-		//  I'm thinking this should be handled by the respective Transformation subclasses
-		detectRotationTransformAndSetFloatMode(node);
-
-		return node;
-	}
-
-	// TODO: Replace with DIWNE::NodeEditor functionality
-	template <class T>
-	auto inline addNodeToPositionOfPopup()
-	{
-		auto result = addNodeToPosition<T>(canvas().screen2diwne(diwne.getPopupPosition()));
-		return result;
-	}
-
-	void processInteractions(DIWNE::DrawInfo& context) override;
-
-	void manipulatorStartCheck3D();
-
-	void trackingSmoothLeft();
-	void trackingSmoothRight();
-	void trackingJaggedLeft();
-	void trackingJaggedRight();
-	void trackingModeSwitch();
-	void trackingSwitch();
-	void trackingSwitchOn(Ptr<Sequence> sequence = nullptr, bool isRightToLeft = true);
-
-	/**
-	 * @pre @p sequence is not null.
-	 */
-	void trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft);
-	void trackingSwitchOff();
-	void toggleSelectedNodesVisibility();
-
-	void processTrackingMove();
-
-	void deleteCallback();
-
-	// TODO: (DR) Move to DIWNE::NodeEditor
-	void selectAll();
-	void invertSelection();
-
-	void zoomToAll();
-	void zoomToSelected();
-	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
-	void zoomToRectangle(ImRect const& rect);
-
-	void deleteSelectedNodes();
-	void copySelectedNodes();
-	void pasteSelectedNodes();
-	void cutSelectedNodes();
-	void duplicateClickedNode();
-	void duplicateSelectedNodes();
-
-	void deselectSequenceTransformations();
-	void deselectAllChildNodes();
-
 	DIWNE::FilteredNodeRange<CoreNode> getCoreNodes() const
 	{
 		return DIWNE::FilteredNodeRange<CoreNode>(
@@ -240,6 +247,7 @@ public:
 		    &m_nodes);
 	}
 
+	/// Gets all I3T Core nodes
 	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllCoreNodes() const
 	{
 		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
@@ -249,11 +257,25 @@ public:
 		    &m_nodes);
 	}
 
+	/// Gets all I3T Core nodes that are selected
 	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllSelectedCoreNodes() const
 	{
 		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
 		    [](const DIWNE::Node* node) -> bool {
 			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && node->getSelected();
+		    },
+		    &m_nodes);
+	}
+
+	// Gets all I3T Core nodes that are selected and aren't a child of an already selected node
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllSelectedCoreNodesWithoutNesting() const
+	{
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && node->getSelected();
+		    },
+		    [](const DIWNE::Node* node) -> bool {
+			    return !node->getSelected();
 		    },
 		    &m_nodes);
 	}
@@ -265,10 +287,7 @@ public:
 	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();
 	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
 
-	// TODO: (DR) Reimplement
-	//	bool isZoomingDiwne() override;
-
-	bool processZoom() override;
+	// =============================================================================================================
 
 	// TODO: (DR) Move somewhere else
 	void detectRotationTransformAndSetFloatMode(auto node)

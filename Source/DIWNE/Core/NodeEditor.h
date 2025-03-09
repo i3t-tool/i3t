@@ -73,6 +73,7 @@ protected:
 	ImDrawListSplitter m_channelSplitter;
 
 	std::weak_ptr<Node> mp_lastActiveNode; ///< Last node that requested focus (had a logical update)
+	bool m_lastActiveNodeChanged{false};
 
 	bool m_nodesSelectionChanged{false};
 
@@ -223,7 +224,11 @@ public:
 
 	void shiftNodesToBegin(const NodeList& nodesToShift);
 	void shiftNodesToEnd(const NodeList& nodesToShift);
-	void shiftInteractingNodeToEnd();
+	void bringLastActiveNodeToFront(); // TODO: (Dr) Eventually replace with bringMarkedNodesToFront
+	void bringMarkedNodesToFront();
+
+	// =============================================================================================================
+
 
 	// TODO: Perhaps use this utility getter functions in multiple places
 	//  might make the code cleaner, avoiding manual static_casts
@@ -245,9 +250,8 @@ public:
 	void setLastActiveNode(std::shared_ptr<Node> node)
 	{
 		mp_lastActiveNode = node;
+		m_lastActiveNodeChanged = true;
 	}
-
-	// =============================================================================================================
 
 	const ImVec2& getPopupPosition() const;
 	void setPopupPosition(ImVec2 position);

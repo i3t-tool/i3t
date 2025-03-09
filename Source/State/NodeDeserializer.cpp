@@ -30,7 +30,7 @@ static Workspace::TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
-std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
+std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 {
 	std::map<Core::ID, Ptr<Workspace::CoreNode>> createdNodes;
 
@@ -234,11 +234,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	}
 
-	std::vector<Ptr<Workspace::CoreNode>> result;
+	std::vector<Ptr<DIWNE::Node>> result;
 	std::transform(createdNodes.begin(), createdNodes.end(), std::back_inserter(result), [](auto& pair) {
 		return pair.second;
 	});
-
 	return result;
 }
 

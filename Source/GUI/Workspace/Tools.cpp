@@ -37,16 +37,15 @@ std::optional<Ptr<GuiNode>> Tools::findNodeById(const std::vector<Ptr<GuiNode>>&
 Memento* Tools::copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 {
 	Memento* memento = new Memento();
-
-	SerializationVisitor serializer(*memento);
-	for (auto node : nodes)
-	{
-		node->translate(ImVec2(-offset, -offset));
-	}
-	serializer.dump(nodes);
 	for (auto node : nodes)
 	{
 		node->translate(ImVec2(offset, offset));
+	}
+	SerializationVisitor serializer(*memento);
+	serializer.dump(nodes);
+	for (auto node : nodes)
+	{
+		node->translate(ImVec2(-offset, -offset));
 	}
 	return memento;
 }
@@ -58,12 +57,7 @@ void Tools::pasteNodes(const Memento& memento)
 	{
 		node->setSelected(true);
 	}
-}
-
-void Tools::duplicateNode(const Ptr<GuiNode>& node, float offset)
-{
-	// TODO - DUPLICATES BEHIND NODE INSTEAD OF INFRONT
-	pasteNodes(*copyNodes({node}, offset));
+	g_diwne->shiftNodesToEnd(newNodes);
 }
 
 int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)

@@ -78,7 +78,7 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					pin->drawDiwne(context, m_drawMode2); // pin + register the wire
+					pin->drawDiwne(context, m_drawMode); // pin + register the wire
 				}
 			}
 		}

@@ -15,6 +15,7 @@
 #include "imgui_internal.h"        // for ImGui::ActivateItemByID()
 #include "misc/cpp/imgui_stdlib.h" // for changable text
 
+#include "Core/Input/InputManager.h"
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Tools.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
@@ -209,6 +210,15 @@ void CoreNode::setNumberOfVisibleDecimal(int value)
 	updateDataItemsWidth();
 }
 
+FloatPopupMode& CoreNode::getFloatPopupMode()
+{
+	return m_floatPopupMode;
+};
+void CoreNode::setFloatPopupMode(FloatPopupMode mode)
+{
+	m_floatPopupMode = mode;
+};
+
 float CoreNode::getDataItemsWidth()
 {
 	return m_dataItemsWidth;
@@ -252,17 +262,11 @@ void CoreNode::drawMenuSetEditable()
 	}
 }
 
-void CoreNode::drawMenuDuplicate()
+void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 {
 	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
 	{
-		WorkspaceDiwne& workspace = static_cast<WorkspaceDiwne&>(diwne);
-		// duplicate
-		workspace.deselectNodes();
-		Tools::duplicateNode(std::static_pointer_cast<CoreNode>(shared_from_this()),
-		                     I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-		// move original node behind the new one
-		workspace.shiftNodesToBegin(workspace.getSelectedNodes().collect());
+		duplicate(context, false);
 	}
 }
 
@@ -337,11 +341,22 @@ void CoreNode::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	drawMenuDuplicate();
+	drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
 	Node::popupContent(context);
+}
+
+void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
+{
+	// Handle quick node duplication
+	if (justReleased && !context.inputConsumed && !context.state.dragging && ImGui::IsKeyDown(ImGuiKey_LeftAlt))
+	{
+		duplicate(context, true);
+		context.consumeInput();
+	}
+	DiwneObject::onReleased(justReleased, context);
 }
 
 // TODO: Uncomment
@@ -384,4 +399,21 @@ void CoreNode::onDestroy(bool logEvent)
 {
 	m_nodebase->finalize();
 	Super::onDestroy(logEvent);
+}
+
+void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)
+{
+	if (m_selected && multiDuplication)
+	{ // If selected and multi duplication is allowed, duplicate this and any other selected nodes
+		for (auto& node : static_cast<WorkspaceDiwne&>(diwne).getAllSelectedCoreNodesWithoutNesting())
+		{
+			node.setDuplicateNode(true);
+		}
+	}
+	else
+	{ // Otherwise we duplicate this single node
+		setDuplicateNode(true);
+	}
+	diwne.deselectNodes();
+	context.consumeInput();
 }

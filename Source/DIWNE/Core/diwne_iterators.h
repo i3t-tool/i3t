@@ -295,12 +295,19 @@ protected:
 	/// A stack of child container node iterators, they store their own position at each depth level
 	std::stack<ChildNodeIterator, std::vector<ChildNodeIterator>> _stack;
 
+	using Predicate = bool (*)(const Node*);
+	/// Dive predicate, an additional condition required to consider diving inside node's children
+	Predicate _divePredicate{nullptr};
+
 public:
 	INHERIT_ITERATOR_TRAITS_ALL(Super)
 	using shared_pointer = Super::shared_pointer;
 
 	RecursiveNodeIteratorImpl() {}
 	RecursiveNodeIteratorImpl(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	RecursiveNodeIteratorImpl(Predicate divePredicate, Super::Container nodes, std::size_t idx)
+	    : _divePredicate(divePredicate), Super(nodes, idx)
+	{}
 
 	// Recursive access
 	reference dereference() const
@@ -358,19 +365,23 @@ public:
 		else
 			current = _stack.top().operator->();
 
-		// TODO: Diwne node flags could be used to mark NodeContainers instead of using dynamic cast.
-		if (auto container = dynamic_cast<const INodeContainer*>(current))
+		// Test whether this node meets conditions for diving in
+		if (_divePredicate == nullptr || _divePredicate(current))
 		{
-			// If the node is a node container we dive deeper and iterate over child nodes
-			// Note: If dynamic_cast proves to be a performance issue some sort of a tagging system can be used
-			ChildNodeRange range = container->getNodes();
-			auto it = range.begin();
-			if (it.valid())
+			// TODO: Diwne node flags could be used to mark NodeContainers instead of using dynamic cast.
+			if (auto container = dynamic_cast<const INodeContainer*>(current))
 			{
-				// Pushing the container node iterator on the stack
-				_stack.push(it);
-				// When the iterator is pushed it should point at its first node so no need to advance
-				return;
+				// If the node is a node container we dive deeper and iterate over child nodes
+				// Note: If dynamic_cast proves to be a performance issue some sort of a tagging system can be used
+				ChildNodeRange range = container->getNodes();
+				auto it = range.begin();
+				if (it.valid())
+				{
+					// Pushing the container node iterator on the stack
+					_stack.push(it);
+					// When the iterator is pushed it should point at its first node so no need to advance
+					return;
+				}
 			}
 		}
 
@@ -454,7 +465,10 @@ public:
 
 	FilteredRecursiveNodeIterator() {}
 	FilteredRecursiveNodeIterator(Predicate predicate, Super::Container nodes, std::size_t idx)
-	    : _predicate(predicate), Super(nodes, idx)
+	    : FilteredRecursiveNodeIterator(predicate, nullptr, nodes, idx)
+	{}
+	FilteredRecursiveNodeIterator(Predicate predicate, Predicate divePredicate, Super::Container nodes, std::size_t idx)
+	    : _predicate(predicate), Super(divePredicate, nodes, idx)
 	{
 		if (this->_idx < this->_nodes->size() && !valid())
 			next(); // The iterator must ensure that it's initial position is valid
@@ -576,6 +590,24 @@ public:
 	// clang-format on
 };
 
+template <typename Range, typename Iterator, typename NodeType, bool IsConst>
+class FilteredRecursiveNodeRangeImpl : public FilteredNodeRangeImpl<Range, Iterator, NodeType, IsConst>
+{
+protected:
+	using Super = FilteredNodeRangeImpl<Range, Iterator, NodeType, IsConst>;
+	Super::Predicate _divePredicate{nullptr};
+
+public:
+	FilteredRecursiveNodeRangeImpl(Super::Predicate predicate, Super::Container nodes) : Super(predicate, nodes) {}
+	FilteredRecursiveNodeRangeImpl(Super::Predicate predicate, Super::Predicate divePredicate, Super::Container nodes)
+	    : _divePredicate(divePredicate), Super(predicate, nodes)
+	{}
+	// clang-format off
+	Iterator begin() { return Iterator(this->_predicate, _divePredicate, this->_nodes, 0); }
+	Iterator end() { return Iterator(this->_predicate, _divePredicate, this->_nodes, this->_nodes->size()); }
+	// clang-format on
+};
+
 // TODO: Move or copy the iterator docs over here too
 template <typename NodeType>
 class NodeRange : public NodeRangeImpl<NodeRange<NodeType>, NodeIterator<NodeType>, NodeType, false>
@@ -602,23 +634,8 @@ class FilteredNodeRange
 	using Super = FilteredNodeRangeImpl<FilteredNodeRange<NodeType>, FilteredNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	FilteredNodeRange(Super::Predicate predicate, const NodeList* nodes)
-	    : Super(predicate, nodes)
-	{}
+	FilteredNodeRange(Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
 };
-
-// template <typename NodeType = Node>
-// class ConstFilteredNodeRange : public FilteredNodeRangeImpl<ConstFilteredNodeRange<NodeType>,
-//                                                             ConstFilteredNodeIterator<NodeType>, NodeType, true>
-//{
-//	using Super =
-//	    FilteredNodeRangeImpl<ConstFilteredNodeRange<NodeType>, ConstFilteredNodeIterator<NodeType>, NodeType, true>;
-//
-// public:
-//	ConstFilteredNodeRange(Super::Predicate predicate, const NodeList* nodes)
-//	    : Super(predicate, nodes)
-//	{}
-// };
 
 template <typename NodeType = Node>
 class RecursiveNodeRange
@@ -632,15 +649,16 @@ public:
 
 template <typename NodeType = Node>
 class FilteredRecursiveNodeRange
-    : public FilteredNodeRangeImpl<FilteredRecursiveNodeRange<NodeType>, FilteredRecursiveNodeIterator<NodeType>,
-                                   NodeType, false>
+    : public FilteredRecursiveNodeRangeImpl<FilteredRecursiveNodeRange<NodeType>,
+                                            FilteredRecursiveNodeIterator<NodeType>, NodeType, false>
 {
-	using Super = FilteredNodeRangeImpl<FilteredRecursiveNodeRange<NodeType>, FilteredRecursiveNodeIterator<NodeType>,
-	                                    NodeType, false>;
+	using Super = FilteredRecursiveNodeRangeImpl<FilteredRecursiveNodeRange<NodeType>,
+	                                             FilteredRecursiveNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	FilteredRecursiveNodeRange(Super::Predicate predicate, const NodeList* nodes)
-	    : Super(predicate, nodes)
+	FilteredRecursiveNodeRange(Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
+	FilteredRecursiveNodeRange(Super::Predicate predicate, Super::Predicate divePredicate, const NodeList* nodes)
+	    : Super(predicate, divePredicate, nodes)
 	{}
 };
 

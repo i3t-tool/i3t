@@ -41,7 +41,7 @@ void NodeDropZone::content(DrawInfo& context)
 				DGui::SameLineDummy(diwne.style().size(DiwneStyle::dropZoneDropGap) * ImVec2(zoom, zoom));
 
 			Node& node = *m_nodes[i];
-			node.drawDiwne(context, m_drawMode2);
+			node.drawDiwne(context, m_drawMode);
 
 			if (i == m_nodes.size() - 1)
 			{

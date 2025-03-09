@@ -73,25 +73,7 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 
 void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 {
-	// duplication of blocks
-	std::vector<Ptr<CoreNode>> duplicatedNodes;
-	bool shouldDuplicate = false;
-	// TODO: Only core nodes can be duplicated? Why?
-	auto allCoreNodes = getAllCoreNodes();
-	for (auto node = allCoreNodes.begin(); node != allCoreNodes.end(); ++node)
-	{
-		if (node->getDuplicateNode())
-		{
-			duplicatedNodes.push_back(node.sharedPtr());
-			node->setDuplicateNode(false);
-			shouldDuplicate = true;
-		}
-	}
-	if (shouldDuplicate)
-	{
-		Tools::pasteNodes(
-		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
-	}
+	performLazyDuplication();
 
 	NodeEditor::content(context);
 
@@ -788,6 +770,28 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	}
 }
 
+void WorkspaceDiwne::performLazyDuplication()
+{
+	std::vector<Ptr<CoreNode>> duplicatedNodes;
+	bool shouldDuplicate = false;
+	// TODO: Only core nodes can be duplicated? Why?
+	auto allCoreNodes = getAllCoreNodes();
+	for (auto node = allCoreNodes.begin(); node != allCoreNodes.end(); ++node)
+	{
+		if (node->getDuplicateNode())
+		{
+			duplicatedNodes.push_back(node.sharedPtr());
+			node->setDuplicateNode(false);
+			shouldDuplicate = true;
+		}
+	}
+	if (shouldDuplicate)
+	{
+		Tools::pasteNodes(
+		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+	}
+}
+
 void WorkspaceDiwne::toggleSelectedNodesVisibility()
 {
 	auto selected = getSelectedNodesInnerIncluded().collectRaw();
@@ -988,11 +992,8 @@ void WorkspaceDiwne::deleteCallback()
 
 void WorkspaceDiwne::copySelectedNodes()
 {
-	// TODO: (DR) Review and rewrite using new iterators
 	LOG_INFO("Copying nodes");
-	// Preventing double duplication of selected transformations in a sequence
-	deselectAllChildNodes();
-	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodes().collect(),
+	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodesWithoutNesting().collect(),
 	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
@@ -1005,40 +1006,10 @@ void WorkspaceDiwne::pasteSelectedNodes()
 	Tools::pasteNodes(*copiedNodes);
 }
 
-void WorkspaceDiwne::deselectSequenceTransformations()
-{
-	auto selectedNodes = getSelectedNodesInnerIncluded();
-	for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
-	{
-		Sequence* seq = dynamic_cast<Sequence*>(node.ptr());
-		if (seq)
-		{
-			for (auto& transform : seq->getInnerWorkspaceNodes())
-				transform.setSelected(false);
-		}
-	}
-}
-
-void WorkspaceDiwne::deselectAllChildNodes()
-{
-	auto selectedNodes = getSelectedNodesInnerIncluded();
-	for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
-	{
-		Sequence* seq = dynamic_cast<Sequence*>(node.ptr());
-		if (seq)
-		{
-			for (auto& transform : seq->getInnerWorkspaceNodes())
-				transform.setSelected(false);
-		}
-	}
-}
-
 void WorkspaceDiwne::cutSelectedNodes()
 {
-	// Prevent double duplication of inner nodes
-	deselectAllChildNodes();
-
-	auto nodes = getAllSelectedCoreNodes().collect();
+	LOG_INFO("Cutting nodes");
+	auto nodes = getAllSelectedCoreNodesWithoutNesting().collect();
 	copiedNodes = Tools::copyNodes(nodes);
 
 	// Delete copied nodes
@@ -1048,61 +1019,14 @@ void WorkspaceDiwne::cutSelectedNodes()
 	}
 }
 
-void WorkspaceDiwne::duplicateClickedNode()
-{
-	LOG_INFO("Duplicating")
-	// Preventing double duplication of selected transformations in a sequence
-	// TODO: Isn't this stupid? I mean if we don't want to copy inner nodes just iterate over the top level nodes?
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  This pattern repeats like 4 times in other duplication related methods.
-	deselectAllChildNodes();
-
-	// TODO: The code below makes absolutely no sense? Why ~n^2 iteration?
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-	// Duplicating either focused node or all selected nodes
-	auto selectedNodes = getAllSelectedCoreNodes();
-
-	for (auto& node : getAllCoreNodes())
-	//	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
-	{
-		//		if (node->m_focusedForInteraction)
-		//		{
-		if (node.getSelected())
-		{
-			deselectNodes();
-			// copy and paste to ensure connections
-			for (auto& selectedNode : selectedNodes)
-			{
-				selectedNode.setDuplicateNode(true);
-			}
-			// pasteNodes(copyNodes(selectedNodes, 5));
-		}
-		else
-		{
-			deselectNodes();
-			node.setDuplicateNode(true);
-			// duplicateNode(node, 5);
-		}
-		//		}
-	}
-}
-
 void WorkspaceDiwne::duplicateSelectedNodes()
 {
-	LOG_INFO("Duplicating")
-	// Preventing double duplication of selected transformations in a sequence
-	deselectAllChildNodes();
-
-	auto selectedNodes = getAllSelectedCoreNodes().collect();
-
-	// copy and paste to ensure connections
-	Tools::pasteNodes(*Tools::copyNodes(selectedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
-
-	for (auto node : selectedNodes)
+	LOG_INFO("Duplicating nodes")
+	for (auto& node : getAllSelectedCoreNodesWithoutNesting())
 	{
-		node->setSelected(false);
+		node.setDuplicateNode(true);
 	}
+	deselectNodes();
 }
 
 void WorkspaceDiwne::deleteSelectedNodes()
@@ -1315,23 +1239,6 @@ void WorkspaceDiwne::processTrackingMove()
 	}
 }
 
-// TODO: This is inconsistent with the getZoomDelta method!
-// bool WorkspaceDiwne::isZoomingDiwne()
-//{
-//	return InputManager::isAxisActive("scroll") != 0;
-//}
-
-bool WorkspaceDiwne::processZoom()
-{
-	m_updateDataItemsWidth = true;
-	return NodeEditor::processZoom();
-}
-
-void WorkspaceDiwne::onZoom()
-{
-	m_updateDataItemsWidth = true;
-}
-
 void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 {
 	NodeEditor::processInteractions(context);
@@ -1354,10 +1261,8 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 			g_diwne->pasteSelectedNodes();
 		if (InputManager::isActionTriggered("cut", EKeyState::Pressed))
 			g_diwne->cutSelectedNodes();
-		//	if (InputManager::isActionTriggered("duplicate", EKeyState::Pressed))
-		//		g_diwne->duplicateClickedNode();
-		//	if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
-		//		g_diwne->duplicateSelectedNodes();
+		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
+			g_diwne->duplicateSelectedNodes();
 		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
 			g_diwne->trackingSwitchOff();
 		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
@@ -1379,6 +1284,23 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
 			g_diwne->toggleSelectedNodesVisibility();
 	}
+}
+
+void WorkspaceDiwne::onZoom()
+{
+	m_updateDataItemsWidth = true;
+}
+
+// TODO: This is inconsistent with the getZoomDelta method!
+// bool WorkspaceDiwne::isZoomingDiwne()
+//{
+//	return InputManager::isAxisActive("scroll") != 0;
+//}
+
+bool WorkspaceDiwne::processZoom()
+{
+	m_updateDataItemsWidth = true;
+	return NodeEditor::processZoom();
 }
 
 bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)

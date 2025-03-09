@@ -12,7 +12,7 @@ SequenceNodeContainer::SequenceNodeContainer(NodeEditor& editor, std::string lab
 void SequenceNodeContainer::centerContent(DrawInfo& context)
 {
 	ImGui::Text("Content");
-	m_dropZone->drawDiwne(context, m_drawMode2);
+	m_dropZone->drawDiwne(context, m_drawMode);
 	ImGui::Spacing();
 }
 
