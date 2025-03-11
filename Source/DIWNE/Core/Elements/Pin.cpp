@@ -207,7 +207,6 @@ bool Pin::isPlugged() const
 	return !m_links.empty();
 }
 
-// TODO: Rename to getConnectionChanged
 bool Pin::connectionChanged() const
 {
 	return m_connectionChanged;

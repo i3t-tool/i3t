@@ -111,38 +111,11 @@ public:
 
 	// Object management
 	// =============================================================================================================
-	template <typename T>
-	void addTypeConstructorNode()
-	{
-		// TODO: Rework <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-		//		CorePin* pin = getLastActivePin<CorePin>().get();
-		//		auto newNode = addNodeToPosition<T>(pin->getConnectionPoint(), true);
-		//		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
-		//		              ->getOutputs()
-		//		              .at(0)
-		//		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
-	}
-
-	// TODO: Replace with DIWNE::NodeEditor functionality
-	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
-	{
-		auto node = NodeEditor::createNode<T>(position, shiftToLeftByNodeWidth);
-
-		m_takeSnap = true; /* JH maybe better in place where this function is called*/
-
-		// TODO: This call makes no sense here, there should be another way
-		//  I'm thinking this should be handled by the respective Transformation subclasses
-		detectRotationTransformAndSetFloatMode(node);
-
-		return node;
-	}
-
 	// TODO: Replace with DIWNE::NodeEditor functionality
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
-		auto result = addNodeToPosition<T>(canvas().screen2diwne(diwne.getPopupPosition()));
+		auto result = createNode<T>(canvas().screen2diwne(diwne.getPopupPosition()));
 		return result;
 	}
 
@@ -278,19 +251,6 @@ public:
 	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
 
 	// =============================================================================================================
-
-	// TODO: (DR) Move somewhere else
-	void detectRotationTransformAndSetFloatMode(auto node)
-	{
-		if (std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerX>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerY>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerZ>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::Quat>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::AxisAngle>>(node) != nullptr)
-		{
-			std::dynamic_pointer_cast<CoreNode>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
-		}
-	}
 };
 
 class WorkspaceEditorInputAdapter : public DIWNE::NodeEditorInputAdapter

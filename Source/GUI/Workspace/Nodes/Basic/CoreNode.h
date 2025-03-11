@@ -27,8 +27,8 @@ protected:
 	float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
 	bool m_isLabelBeingEdited = false;
 	bool m_isFirstDraw = true;
-	FloatPopupMode m_floatPopupMode;
-	LevelOfDetail m_levelOfDetail;
+	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};
+	LevelOfDetail m_levelOfDetail{LevelOfDetail::Full};
 
 	/**
 	 * @brief Reference to the I3T Core node
@@ -89,6 +89,8 @@ public:
 	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
 
 	// =============================================================================================================
+
+	void onSelection(bool selected) override;
 
 private:
 	const char* getButtonSymbolFromLOD(LevelOfDetail detail);

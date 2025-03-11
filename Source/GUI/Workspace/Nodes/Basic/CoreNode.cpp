@@ -30,8 +30,6 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
                        diwne.getZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
                                                    child class... */
-      ,
-      m_levelOfDetail(LevelOfDetail::Full), m_floatPopupMode(Value)
 {
 	// Register connection between core node and gui node
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
@@ -338,29 +336,17 @@ void CoreNode::popupContent(DIWNE::DrawInfo& context)
 
 void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 {
+	// TODO: Hookup I3T input bindings
 	// Handle quick node duplication
 	if (justReleased && !context.inputConsumed && !context.state.dragging && ImGui::IsKeyDown(ImGuiKey_LeftAlt))
 	{
 		duplicate(context, true);
 		context.consumeInput();
 	}
+
+
 	DiwneObject::onReleased(justReleased, context);
 }
-
-// TODO: Reimplement in onSelect and onDeselect() <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//}
-//
-// bool CoreNode::processSelect()
-//{
-//	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-//	return Node::processSelect();
-//}
-//
-// bool CoreNode::processUnselect()
-//{
-//	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-//	return Node::processUnselect();
-//}
 
 const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 {
@@ -397,4 +383,9 @@ void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)
 	}
 	diwne.deselectAllNodes();
 	context.consumeInput();
+}
+void CoreNode::onSelection(bool selected)
+{
+	Node::onSelection(selected);
+	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
 }

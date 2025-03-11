@@ -183,7 +183,7 @@ void Model::popupContent(DIWNE::DrawInfo& context)
 
 void Model::init()
 {
-	m_viewportModel = I3T::getViewport()->createModel(getId());
+	m_viewportModel = I3T::getViewport()->createModel(getNodebase()->getId());
 	auto modelPtr = m_viewportModel.lock();
 	modelPtr->m_showAxes = true;
 	modelPtr->m_visible = true;
@@ -243,31 +243,28 @@ void Model::drawMenuLevelOfDetail() // todo
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
-
-// bool Model::processSelect()
-//{
-//	auto model = m_viewportModel.lock();
-//	model->m_highlight = true;
-//	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-//
-//	return CoreNodeWithPins::processSelect();
-// }
-//
-// bool Model::processUnselect()
-//{
-//	auto model = m_viewportModel.lock();
-//	if (m_influenceHighlight)
-//	{
-//		model->m_highlight = true;
-//		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
-//	}
-//	else
-//	{
-//		model->m_highlight = false;
-//	}
-//
-//	return CoreNodeWithPins::processUnselect();
-// }
+void Model::onSelection(bool selected)
+{
+	CoreNode::onSelection(selected);
+	auto model = m_viewportModel.lock();
+	if (selected)
+	{
+		model->m_highlight = true;
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+	}
+	else
+	{
+		if (m_influenceHighlight)
+		{
+			model->m_highlight = true;
+			model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
+		}
+		else
+		{
+			model->m_highlight = false;
+		}
+	}
+}
 
 ModelProxy::ModelProxy(Ptr<Model> model)
 {
@@ -278,6 +275,7 @@ ModelProxy::ModelProxy(Ptr<Model> model)
 
 ModelProxy::~ModelProxy()
 {
+	m_model->destroy(false);
 	m_model = nullptr;
 }
 

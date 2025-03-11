@@ -564,13 +564,12 @@ void NodeEditor::addNode(const std::shared_ptr<Node>& node, const ImVec2 positio
 	node->setPosition(position);
 	if (shiftToLeftByNodeWidth)
 	{
-		// TODO: Is the call below a noop? It shouldnt be implemented in node (-> drawDiwne()), investigate
-		//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw); /* to obtain size */
-		node->translate(ImVec2(-node->getRectDiwne().GetSize().x - 10, 0));
+		// We draw the node out of context to obtain its initial size
+		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw);
+		node->translate(ImVec2(-node->getRectDiwne().GetSize().x - ImGui::GetFontSize() * 2, 0));
 	}
 	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
-
+	m_takeSnap = true;
 	NodeContainer::addNode(node);
 }
 

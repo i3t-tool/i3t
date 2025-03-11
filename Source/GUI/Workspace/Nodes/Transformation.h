@@ -23,13 +23,12 @@ class Transformation : public TransformationBase
 public:
 	Transformation(DIWNE::NodeEditor& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
 	{
-		if (Core::ETransformType::Quat == T)
-		{
-			setLevelOfDetail(LevelOfDetail::SetValues);
-			CoreNode::setNumberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
-		}
+		init();
 		updateDataItemsWidth();
 	}
+
+	/// Called in the constructor.
+	void init() {}
 
 	/**
 	 * \brief helper function used for decision about showing the corrupted
@@ -221,6 +220,14 @@ inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Quat>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+	setLevelOfDetail(LevelOfDetail::SetValues);
+	CoreNode::setNumberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
 }
 
 template <>
@@ -435,5 +442,26 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
 	}
 
 	return inner_interaction_happen;
+}
+
+template <>
+inline void Transformation<Core::ETransformType::EulerX>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::EulerY>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::EulerZ>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::AxisAngle>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
 }
 } // namespace Workspace

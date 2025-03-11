@@ -82,9 +82,9 @@ public:
 	//	void rightContent(DIWNE::Diwne &diwne);
 
 	// TODO: Uncomment
+	void onSelection(bool selected) override;
 	//	bool processSelect() override;
 	//	bool processUnselect() override;
-	float updateDataItemsWidth() override;
 
 	void onDestroy(bool logEvent) override;
 

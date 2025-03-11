@@ -91,14 +91,13 @@ public:
 
 	std::shared_ptr<DIWNE::Link> createLink() override;
 
-	//	virtual bool processCreateAndPlugConstrutorNode();
-	//	bool processUnplug();
-	//
-	//	bool bypassUnplugAction();
-	//	bool allowCreateAndPlugConstructorNodeAction();
-	//	bool bypassCreateAndPlugConstructorNodeAction()
+	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
 
 private:
+	void createNodeFromPin();
+	template <typename T>
+	void createNodeFromPinImpl();
+
 	void drawBasicPinData(DIWNE::DrawInfo& context);
 	void drawPulsePinData(DIWNE::DrawInfo& context);
 };

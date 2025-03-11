@@ -84,9 +84,9 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 
 	// TODO: Use some flag to make it not interactive
-//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
+	//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
 
-	m_viewportCamera = I3T::getViewport()->createCamera(getId());
+	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
 	auto cameraPtr = m_viewportCamera.lock();
 	cameraPtr->m_showAxes = m_axisOn;
 	cameraPtr->m_visible = m_showCamera;
@@ -111,14 +111,6 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 Camera::~Camera()
 {
 	I3T::getViewport()->removeEntity(m_viewportCamera);
-}
-
-float Camera::updateDataItemsWidth()
-{
-	// TODO: (DR) This is (hopefully) just a temporary fix, see TODO in WorkspaceDiwne::getAllNodesInnerIncluded()
-	m_view->updateDataItemsWidth();
-	m_projection->updateDataItemsWidth();
-	return CoreNode::updateDataItemsWidth();
 }
 
 void Camera::popupContent(DIWNE::DrawInfo& context)
@@ -296,20 +288,17 @@ void Camera::onDestroy(bool logEvent)
 	m_view->destroy(logEvent);
 	CoreNodeWithPins::onDestroy(logEvent);
 }
-
-// bool Camera::processSelect()
-//{
-//	auto model = m_viewportCamera.lock();
-//	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-//	model->m_highlight = true;
-//
-//	return CoreNodeWithPins::processSelect();
-// }
-//
-// bool Camera::processUnselect()
-//{
-//	auto model = m_viewportCamera.lock();
-//	model->m_highlight = false;
-//
-//	return CoreNodeWithPins::processUnselect();
-// }
+void Camera::onSelection(bool selected)
+{
+	Node::onSelection(selected);
+	auto model = m_viewportCamera.lock();
+	if (selected)
+	{
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+		model->m_highlight = true;
+	}
+	else
+	{
+		model->m_highlight = false;
+	}
+}

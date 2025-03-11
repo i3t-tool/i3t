@@ -19,8 +19,8 @@
 #include "DIWNE/Core/diwne_actions.h"
 
 #if DIWNE_DEBUG_ENABLED
-#include "Pin.h"
 #include "Link.h"
+#include "Pin.h"
 #endif
 
 /*
@@ -50,7 +50,10 @@ void DiwneObject::draw(DrawMode drawMode)
 {
 	// DiwneObjects should be drawn by an overarching NodeEditor or similar class
 	// They are then drawn using the drawDiwne() method that passes along the drawing context created by the NodeEditor.
-	throw std::runtime_error("Not implemented");
+	// The code below draws them with a single use default constructed state and context.
+	InteractionState state;
+	DrawInfo context(state);
+	drawDiwne(context, drawMode);
 };
 
 DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)

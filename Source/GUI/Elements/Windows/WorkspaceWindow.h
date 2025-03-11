@@ -81,7 +81,7 @@ namespace Workspace
 template <typename T>
 auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 {
-	auto result = WorkspaceWindow::g_editor->addNodeToPosition<T>(position);
+	auto result = WorkspaceWindow::g_editor->createNode<T>(position);
 
 	App::getModule<StateManager>().takeSnapshot();
 
@@ -91,7 +91,7 @@ auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 template <typename T>
 auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
 {
-	return WorkspaceWindow::g_editor->addNodeToPosition<T>(position);
+	return WorkspaceWindow::g_editor->createNode<T>(position);
 }
 
 bool connectNodesNoSave(Ptr<Workspace::CoreNode> lhs, Ptr<Workspace::CoreNode> rhs, int lhsPin, int rhsPin);

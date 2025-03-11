@@ -17,10 +17,6 @@
 #include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/diwne_actions.h"
 
-// TODO: (DR) Remove these imports <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
-#include "GUI/Workspace/WorkspaceDiwne.h"
-
 namespace DIWNE
 {
 Node::Node(DIWNE::NodeEditor& diwne, std::string labelDiwne) : DiwneObject(diwne, labelDiwne) {}

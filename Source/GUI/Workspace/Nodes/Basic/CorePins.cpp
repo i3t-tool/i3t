@@ -468,48 +468,57 @@ std::shared_ptr<DIWNE::Link> CorePin::createLink()
 	return diwne.createLink<CoreLink>();
 }
 
-// TODO: Uncomment
-// bool CorePin::bypassCreateAndPlugConstructorNodeAction()
-//{
-//	return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);
-//}
-// bool CorePin::allowCreateAndPlugConstructorNodeAction()
-//{
-//	return true;
-//	// TODO: Uncomment
-//	// return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;
-//}
-// bool CorePin::processCreateAndPlugConstrutorNode()
-//{
-//	if (allowCreateAndPlugConstructorNodeAction() && bypassCreateAndPlugConstructorNodeAction())
-//	{
-//		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction =
-//		    WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
-//		diwne.setLastActivePin<CorePin>(std::static_pointer_cast<CorePin>(shared_from_this()));
-//		diwne.m_takeSnap = true;
-//		return true;
-//	}
-//	return false;
-//}
+void CorePin::onReleased(bool justReleased, DIWNE::DrawInfo& context)
+{
+	// TODO: Hookup I3T input bindings
+	// Create a new appropriate node for this pin when it is Ctrl clicked.
+	if (justReleased && !context.inputConsumed && !context.state.dragging && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	{
+		if (isInput() && !isPlugged())
+		{
+			createNodeFromPin();
+			context.consumeInput();
+		}
+	}
+	DiwneObject::onReleased(justReleased, context);
+}
 
-// bool CorePin::bypassUnplugAction()
-//{
-//	return InputManager::isActionTriggered("unplugInput", EKeyState::Pressed);
-// }
-// bool CorePin::processUnplug()
-//{
-//	if (isConnected() && bypassUnplugAction())
-//	{
-//		unplug();
-//		return true;
-//	}
-//	return false;
-// }
-//  TODO: Uncomment
-//  bool CorePin::processInteractions()
-//{
-//	bool interaction_happen = CorePin::processInteractions();
-//	interaction_happen |= processUnplug();
-//	interaction_happen |= processCreateAndPlugConstrutorNode();
-//	return interaction_happen;
-// }
+
+void CorePin::createNodeFromPin()
+{
+	switch (getType())
+	{
+	case Core::EValueType::Pulse:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::PulseToPulse>>();
+		break;
+	case Core::EValueType::Float:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::FloatToFloat>>();
+		break;
+	case Core::EValueType::Vec3:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector3ToVector3>>();
+		break;
+	case Core::EValueType::Vec4:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector4ToVector4>>();
+		break;
+	case Core::EValueType::Matrix:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::MatrixToMatrix>>();
+		break;
+	case Core::EValueType::Quat:
+		createNodeFromPinImpl<Operator<Core::EOperatorType::QuatToQuat>>();
+		break;
+	case Core::EValueType::MatrixMul:
+		createNodeFromPinImpl<Sequence>();
+		break;
+	case Core::EValueType::Screen:
+		createNodeFromPinImpl<Camera>();
+		break;
+	}
+}
+
+template <typename T>
+void CorePin::createNodeFromPinImpl()
+{
+	std::shared_ptr<T> node;
+	node = diwne.createNode<T>(this->getConnectionPoint(), true);
+	this->plug(node->getOutputs().at(0).get());
+}

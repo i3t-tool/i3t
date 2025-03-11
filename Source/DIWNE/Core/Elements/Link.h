@@ -16,7 +16,6 @@
 #include <limits>
 
 #include "DiwneObject.h"
-#include "DIWNE/Core/Style/StyleOverride.h"
 
 namespace DIWNE
 {

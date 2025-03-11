@@ -32,11 +32,10 @@ public:
 	Node* m_node;               ///< Node this pin belongs to
 	std::vector<Link*> m_links; ///< Links connected to this pin
 
-	// TODO: Sort this out <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  might be related to that updateDataWidth issue with sequence matrix inputs
 	bool m_connectionChanged; ///< Flag indicating that the pin has been plugged or unplugged this frame
-	                          ///< Note: This flag gets reset the moment the pin is drawn, which is kinda dumb,
-	                          ///< don't rely on this too much, it is currently used for a rather specific purpose
+	                          ///< Note: This flag gets reset the moment the pin is drawn. Meaning if the node owning
+	                          ///< this pin needs that information AFTER the pin is drawn, it is a good idea to save
+	                          ///< or react to this flag during initialize() or begin().
 
 protected:
 	ImVec2 m_connectionPoint{ImVec2(0, 0)}; ///< Point where a link connects to this pin

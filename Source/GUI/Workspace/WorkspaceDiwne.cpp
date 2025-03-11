@@ -115,66 +115,6 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 	//		}
 }
 
-// TODO: THIS STUFF IS ESSENTIALLY INTERACTION (move to process interactions)
-//  Still gotta reimplement:
-//  1. CreateAndPlugConstructor
-//  2. Tracking
-//  3. Selection bring to front (maybe create focus flag that gets toggled onSelection())
-//  4. Viewport selection update
-//  5. Manipulators
-//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-// bool WorkspaceDiwne::afterContent()
-//{
-//  // 1. CreateAndPlugConstructor
-//	interaction_happen |= processCreateAndPlugTypeConstructor();
-//
-//  // 2. Tracking
-//	processTrackingMove();
-//
-//  // 3. Selection bring to front (maybe create focus flag that gets toggled onSelection())
-//	if (getNodesSelectionChanged())
-//	{
-//		shiftNodesToEnd(getSelectedNodes());
-//	}
-//
-//  // 4. Viewport selection update
-//	// Handle reaction to selection in viewport
-//	if (m_viewportSelectionChanged)
-//	{
-//		bool validSelection = false;
-//		if (m_viewportLastSelectedEntity != nullptr)
-//		{
-//			if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(m_viewportLastSelectedEntity))
-//			{
-//				auto nodeOpt = Tools::findNodeById(g_diwne->getAllNodesInnerIncluded(), sceneObject->m_guiNodeId);
-//				if (nodeOpt)
-//				{
-//					Ptr<GuiNode>& node = nodeOpt.value();
-//					bool selected = node->getSelected();
-//					g_diwne->deselectAllNodes();
-//					if (!selected)
-//					{
-//						if (!node->getSelected())
-//						{
-//							node->setSelected(true);
-//						}
-//					}
-//					validSelection = true;
-//				}
-//			}
-//		}
-//		if (!validSelection)
-//		{
-//			g_diwne->deselectAllNodes();
-//		}
-//	}
-//	m_viewportSelectionChanged = false;
-//
-//  // 5. Manipulators
-//	// Handle manipulators
-//	manipulatorStartCheck3D();
-//}
-
 void WorkspaceDiwne::end(DIWNE::DrawInfo& context)
 {
 	NodeEditor::end(context);
@@ -183,9 +123,120 @@ void WorkspaceDiwne::end(DIWNE::DrawInfo& context)
 
 void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 {
+	// Handle reaction to selection in viewport
+	if (m_viewportSelectionChanged)
+	{
+		bool validSelection = false;
+		if (m_viewportLastSelectedEntity != nullptr)
+		{
+			if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(m_viewportLastSelectedEntity))
+			{
+				auto nodeOpt = Tools::findNodeById(this->getAllCoreNodes().collect(), sceneObject->m_guiNodeId);
+				if (nodeOpt)
+				{
+					Ptr<GuiNode>& node = nodeOpt.value();
+					bool selected = node->getSelected();
+					this->deselectAllNodes();
+					if (!selected)
+					{
+						if (!node->getSelected())
+						{
+							node->setSelected(true);
+						}
+					}
+					validSelection = true;
+				}
+			}
+		}
+		if (!validSelection)
+		{
+			this->deselectAllNodes();
+		}
+	}
+	m_viewportSelectionChanged = false;
+
+	// Handle manipulators
+	manipulatorStartCheck3D();
+
 	if (m_takeSnap)
 	{
 		App::getModule<StateManager>().takeSnapshot();
+	}
+}
+
+void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
+{
+	NodeEditor::processInteractions(context);
+
+	if (!context.logicalUpdates && !context.inputConsumed)
+	{
+		if (InputManager::isActionTriggered("zoomToAll", EKeyState::Pressed))
+			this->zoomToAll();
+		if (InputManager::isActionTriggered("zoomToSelected", EKeyState::Pressed))
+			this->zoomToSelected();
+		if (InputManager::isActionTriggered("copy", EKeyState::Pressed))
+			this->copySelectedNodes();
+		if (InputManager::isActionTriggered("paste", EKeyState::Pressed))
+			this->pasteSelectedNodes();
+		if (InputManager::isActionTriggered("cut", EKeyState::Pressed))
+			this->cutSelectedNodes();
+		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
+			this->duplicateSelectedNodes();
+		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
+			this->trackingSwitchOff();
+		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+			this->trackingSmoothLeft();
+		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+			this->trackingSmoothRight();
+		if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
+			this->trackingJaggedLeft();
+		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+			this->trackingJaggedRight();
+		if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+			this->trackingModeSwitch();
+		if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+			this->trackingSwitch();
+		if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+			this->trackingSwitchOn();
+		if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+			this->trackingSwitchOff();
+		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
+			this->toggleSelectedNodesVisibility();
+		processTrackingMove();
+	}
+}
+
+void WorkspaceDiwne::manipulatorStartCheck3D()
+{
+	if (getNodesSelectionChanged())
+	{
+		I3T::getViewport()->getManipulators().clearManipulators();
+
+		auto selectedCoreNodes = getAllSelectedCoreNodes();
+		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
+		{
+			Ptr<TransformationBase> selected_transformation =
+			    std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
+			if (selected_transformation != nullptr)
+			{
+				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
+			}
+		}
+	}
+}
+
+void WorkspaceDiwne::processTrackingMove()
+{
+	if (Core::GraphManager::isTrackingEnabled())
+	{
+		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
+		{
+			this->trackingSmoothLeft();
+		}
+		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		{
+			this->trackingSmoothRight();
+		}
 	}
 }
 
@@ -199,6 +250,364 @@ void WorkspaceDiwne::zoomToSelected()
 {
 	auto allSelectedNodes = getSelectedNodesInnerIncluded();
 	zoomToRectangle(getOverNodesRectangleDiwne(allSelectedNodes.collect()));
+}
+
+void WorkspaceDiwne::performLazyDuplication()
+{
+	std::vector<Ptr<CoreNode>> duplicatedNodes;
+	bool shouldDuplicate = false;
+	// TODO: Only core nodes can be duplicated? Why?
+	auto allCoreNodes = getAllCoreNodes();
+	for (auto node = allCoreNodes.begin(); node != allCoreNodes.end(); ++node)
+	{
+		if (node->getDuplicateNode())
+		{
+			duplicatedNodes.push_back(node.sharedPtr());
+			node->setDuplicateNode(false);
+			shouldDuplicate = true;
+		}
+	}
+	if (shouldDuplicate)
+	{
+		Tools::pasteNodes(
+		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+	}
+}
+
+void WorkspaceDiwne::toggleSelectedNodesVisibility()
+{
+	auto selected = getSelectedNodesInnerIncluded().collectRaw();
+	if (selected.empty())
+	{
+		for (auto node : getAllNodesInnerIncluded())
+		{
+			node.setRendered(true);
+		}
+	}
+	else
+	{
+		for (auto node : selected)
+		{
+			node->setRendered(false);
+			node->setSelected(false);
+		}
+	}
+}
+void WorkspaceDiwne::trackingSmoothLeft()
+{
+	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
+	{
+		if (timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
+
+		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
+	}
+}
+
+void WorkspaceDiwne::trackingSmoothRight()
+{
+	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
+	{
+		if (timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
+
+		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
+	}
+}
+
+void WorkspaceDiwne::trackingJaggedLeft()
+{
+	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
+	{
+		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
+	}
+}
+
+void WorkspaceDiwne::trackingJaggedRight()
+{
+	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
+	{
+		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
+
+		if (m_trackingFromLeft)
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
+	}
+}
+
+void WorkspaceDiwne::trackingModeSwitch()
+{
+	smoothTracking = !smoothTracking;
+}
+
+void WorkspaceDiwne::trackingSwitch()
+{
+	LOG_INFO("TRACKING CALLED");
+	if (Core::GraphManager::isTrackingEnabled())
+		trackingSwitchOff();
+	else
+		trackingSwitchOn();
+}
+
+void WorkspaceDiwne::trackingSwitchOn(Ptr<Sequence> sequence, bool isRightToLeft)
+{
+	if (sequence == nullptr)
+	{
+		auto selectedNodes = getSelectedNodesInnerIncluded();
+		for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
+		{
+			sequence = std::dynamic_pointer_cast<Sequence>(node.sharedPtr());
+			if (sequence)
+			{
+				const auto models = getSequenceModels(sequence);
+				if (models.empty())
+					continue;
+
+				trackingInit(sequence, models, isRightToLeft);
+
+				break;
+			}
+		}
+	}
+	else
+	{
+		const auto models = getSequenceModels(sequence);
+		if (models.empty())
+			return;
+
+		trackingInit(sequence, models, isRightToLeft);
+	}
+}
+
+void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft)
+{
+	LOG_INFO("TRACKING ON");
+
+	std::vector<UPtr<Core::IModelProxy>> proxy(models.size());
+	std::transform(models.begin(), models.end(), proxy.begin(), [](Ptr<Model> model) {
+		return std::make_unique<ModelProxy>(model);
+	});
+
+	//	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint)); // TODO: (DR) This wasn't implemented
+	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
+	if (isRightToLeft)
+	{
+		tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::move(proxy));
+	}
+	else
+	{
+		tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight, std::move(proxy));
+	}
+	m_trackingFromLeft = !isRightToLeft;
+}
+
+void WorkspaceDiwne::trackingSwitchOff()
+{
+	LOG_INFO("TRACKING OFF CALLED");
+	if (Core::GraphManager::isTrackingEnabled())
+	{
+		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
+		auto seq = Tools::findNodeById(getAllCoreNodes().collect(), tracking->getSequence()->getId()).value();
+		// TODO: (DR) This was never implemented
+		// std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
+		tracking->getSequence()->stopTracking();
+	}
+}
+
+ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes)
+{
+	ImRect rect = ImRect(0, 0, 0, 0);
+	if (nodes.size() == 0)
+	{
+		return rect;
+	}
+	if (nodes.size() == 1)
+	{
+		return nodes.at(0)->getRectDiwne();
+	}
+
+	rect = nodes.at(0)->getRectDiwne();
+	for (auto& workspaceCoreNode : nodes)
+	{
+		rect.Add(workspaceCoreNode->getRectDiwne());
+	}
+	return rect;
+}
+
+void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
+{
+	if (rect.Min.x == 0 && rect.Min.y == 0 && rect.Max.x == 0 && rect.Max.y == 0)
+		return;
+
+	ImRect waScreen = canvas().getViewportRectScreen();
+	float heightZoom = waScreen.GetHeight() / rect.GetHeight(), widthZoom = waScreen.GetWidth() / rect.GetWidth();
+	setZoom(std::min(heightZoom, widthZoom));
+
+	canvas().moveViewport(rect.Min - canvas().getViewportRectDiwne().Min);
+}
+
+void WorkspaceDiwne::copySelectedNodes()
+{
+	LOG_INFO("Copying nodes");
+	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodesWithoutNesting().collect(),
+	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+}
+
+void WorkspaceDiwne::pasteSelectedNodes()
+{
+	LOG_INFO("Pasting nodes");
+	if (copiedNodes == nullptr)
+		return;
+	deselectAllNodes();
+	Tools::pasteNodes(*copiedNodes);
+}
+
+void WorkspaceDiwne::cutSelectedNodes()
+{
+	LOG_INFO("Cutting nodes");
+	auto nodes = getAllSelectedCoreNodesWithoutNesting().collect();
+	copiedNodes = Tools::copyNodes(nodes);
+
+	// Delete copied nodes
+	for (auto node : nodes)
+	{
+		node->destroy();
+	}
+}
+
+void WorkspaceDiwne::duplicateSelectedNodes()
+{
+	LOG_INFO("Duplicating nodes")
+	for (auto& node : getAllSelectedCoreNodesWithoutNesting())
+	{
+		node.setDuplicateNode(true);
+	}
+	deselectAllNodes();
+}
+
+// TODO: Rewrite with filtered iterator
+std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllCameras()
+{
+	std::vector<Ptr<CoreNode>> cameras;
+	for (auto const& node : m_nodes)
+	{
+		if (std::dynamic_pointer_cast<Camera>(node))
+		{
+			cameras.push_back(std::static_pointer_cast<CoreNode>(node));
+		};
+	}
+	return cameras;
+}
+
+// TODO: Rewrite with filtered iterator
+std::vector<Ptr<Model>> WorkspaceDiwne::getAllModels()
+{
+	std::vector<Ptr<Model>> models;
+	for (auto const& node : m_nodes)
+	{
+		if (auto model = std::dynamic_pointer_cast<Model>(node))
+		{
+			models.push_back(model);
+		};
+	}
+	return models;
+}
+
+// TODO: Rewrite with filtered iterator
+std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
+{
+	std::vector<Ptr<Model>> models;
+	for (const auto& node : m_nodes)
+	{
+		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
+		if (!model)
+			continue;
+		if (Core::GraphManager::getParent(model->getNodebase()) != seq->getNodebase())
+			continue;
+		models.push_back(model);
+	}
+	return models;
+}
+
+// TODO: Rewrite with filtered iterator
+std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeSequence()
+{
+	std::vector<Ptr<CoreNode>> sequences;
+	for (auto const& node : m_nodes)
+	{
+		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
+		if (seq && !seq->getInputs()[0]->isConnected())
+		{
+			sequences.push_back(std::static_pointer_cast<CoreNode>(node));
+		}; /* \todo JH  \todo MH Always 0? */
+	}
+	return sequences;
+}
+
+// TODO: Rewrite with filtered iterator
+std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeModel()
+{
+	std::vector<Ptr<CoreNode>> models;
+	for (auto const& node : m_nodes)
+	{
+		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
+		if (model && !model->getInputs()[0]->isConnected())
+		{
+			models.push_back(std::static_pointer_cast<CoreNode>(node));
+		}; /* \todo JH  \todo MH Always 0? */
+	}
+	return models;
+}
+
+void WorkspaceDiwne::onZoom()
+{
+	m_updateDataItemsWidth = true;
+}
+
+// TODO: This is inconsistent with the getZoomDelta method!
+// bool WorkspaceDiwne::isZoomingDiwne()
+//{
+//	return InputManager::isAxisActive("scroll") != 0;
+//}
+
+bool WorkspaceDiwne::processZoom()
+{
+	m_updateDataItemsWidth = true;
+	return NodeEditor::processZoom();
+}
+
+bool WorkspaceEditorInputAdapter::selectAllNodes()
+{
+	return InputManager::isActionTriggered("selectAll", EKeyState::Pressed);
+}
+bool WorkspaceEditorInputAdapter::invertSelection()
+{
+	return InputManager::isActionTriggered("invertSelection", EKeyState::Pressed);
+}
+bool WorkspaceEditorInputAdapter::deleteSelectedNodes()
+{
+	return InputManager::isActionTriggered("delete", EKeyState::Pressed);
 }
 
 void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
@@ -734,530 +1143,4 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
-}
-
-void WorkspaceDiwne::performLazyDuplication()
-{
-	std::vector<Ptr<CoreNode>> duplicatedNodes;
-	bool shouldDuplicate = false;
-	// TODO: Only core nodes can be duplicated? Why?
-	auto allCoreNodes = getAllCoreNodes();
-	for (auto node = allCoreNodes.begin(); node != allCoreNodes.end(); ++node)
-	{
-		if (node->getDuplicateNode())
-		{
-			duplicatedNodes.push_back(node.sharedPtr());
-			node->setDuplicateNode(false);
-			shouldDuplicate = true;
-		}
-	}
-	if (shouldDuplicate)
-	{
-		Tools::pasteNodes(
-		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
-	}
-}
-
-void WorkspaceDiwne::toggleSelectedNodesVisibility()
-{
-	auto selected = getSelectedNodesInnerIncluded().collectRaw();
-	if (selected.empty())
-	{
-		for (auto node : getAllNodesInnerIncluded())
-		{
-			node.setRendered(true);
-		}
-	}
-	else
-	{
-		for (auto node : selected)
-		{
-			node->setRendered(false);
-			node->setSelected(false);
-		}
-	}
-}
-void WorkspaceDiwne::trackingSmoothLeft()
-{
-	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
-	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
-
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() - step);
-		else
-			tracking->setParam(tracking->getParam() + step);
-	}
-}
-
-void WorkspaceDiwne::trackingSmoothRight()
-{
-	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
-	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
-
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() + step);
-		else
-			tracking->setParam(tracking->getParam() - step);
-	}
-}
-
-void WorkspaceDiwne::trackingJaggedLeft()
-{
-	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
-	{
-		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() - step);
-		else
-			tracking->setParam(tracking->getParam() + step);
-	}
-}
-
-void WorkspaceDiwne::trackingJaggedRight()
-{
-	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
-	{
-		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
-
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() + step);
-		else
-			tracking->setParam(tracking->getParam() - step);
-	}
-}
-
-void WorkspaceDiwne::trackingModeSwitch()
-{
-	smoothTracking = !smoothTracking;
-}
-
-void WorkspaceDiwne::trackingSwitch()
-{
-	LOG_INFO("TRACKING CALLED");
-	if (Core::GraphManager::isTrackingEnabled())
-		trackingSwitchOff();
-	else
-		trackingSwitchOn();
-}
-
-void WorkspaceDiwne::trackingSwitchOn(Ptr<Sequence> sequence, bool isRightToLeft)
-{
-	if (sequence == nullptr)
-	{
-		auto selectedNodes = getSelectedNodesInnerIncluded();
-		for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
-		{
-			sequence = std::dynamic_pointer_cast<Sequence>(node.sharedPtr());
-			if (sequence)
-			{
-				const auto models = getSequenceModels(sequence);
-				if (models.empty())
-					continue;
-
-				trackingInit(sequence, models, isRightToLeft);
-
-				break;
-			}
-		}
-	}
-	else
-	{
-		const auto models = getSequenceModels(sequence);
-		if (models.empty())
-			return;
-
-		trackingInit(sequence, models, isRightToLeft);
-	}
-}
-
-void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft)
-{
-	LOG_INFO("TRACKING ON");
-
-	std::vector<UPtr<Core::IModelProxy>> proxy(models.size());
-	std::transform(models.begin(), models.end(), proxy.begin(), [](Ptr<Model> model) {
-		return std::make_unique<ModelProxy>(model);
-	});
-
-	//	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint)); // TODO: (DR) This wasn't implemented
-	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
-	if (isRightToLeft)
-	{
-		tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::move(proxy));
-	}
-	else
-	{
-		tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight, std::move(proxy));
-	}
-	m_trackingFromLeft = !isRightToLeft;
-}
-
-void WorkspaceDiwne::trackingSwitchOff()
-{
-	LOG_INFO("TRACKING OFF CALLED");
-	if (Core::GraphManager::isTrackingEnabled())
-	{
-		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
-		auto seq = Tools::findNodeById(getAllCoreNodes().collect(), tracking->getSequence()->getId()).value();
-		// TODO: (DR) This was never implemented
-		// std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
-		tracking->getSequence()->stopTracking();
-	}
-}
-
-ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes)
-{
-	ImRect rect = ImRect(0, 0, 0, 0);
-	if (nodes.size() == 0)
-	{
-		return rect;
-	}
-	if (nodes.size() == 1)
-	{
-		return nodes.at(0)->getRectDiwne();
-	}
-
-	rect = nodes.at(0)->getRectDiwne();
-	for (auto& workspaceCoreNode : nodes)
-	{
-		rect.Add(workspaceCoreNode->getRectDiwne());
-	}
-	return rect;
-}
-
-void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
-{
-	if (rect.Min.x == 0 && rect.Min.y == 0 && rect.Max.x == 0 && rect.Max.y == 0)
-		return;
-
-	ImRect waScreen = canvas().getViewportRectScreen();
-	float heightZoom = waScreen.GetHeight() / rect.GetHeight(), widthZoom = waScreen.GetWidth() / rect.GetWidth();
-	setZoom(std::min(heightZoom, widthZoom));
-
-	canvas().moveViewport(rect.Min - canvas().getViewportRectDiwne().Min);
-}
-
-void WorkspaceDiwne::copySelectedNodes()
-{
-	LOG_INFO("Copying nodes");
-	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodesWithoutNesting().collect(),
-	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-}
-
-void WorkspaceDiwne::pasteSelectedNodes()
-{
-	LOG_INFO("Pasting nodes");
-	if (copiedNodes == nullptr)
-		return;
-	deselectAllNodes();
-	Tools::pasteNodes(*copiedNodes);
-}
-
-void WorkspaceDiwne::cutSelectedNodes()
-{
-	LOG_INFO("Cutting nodes");
-	auto nodes = getAllSelectedCoreNodesWithoutNesting().collect();
-	copiedNodes = Tools::copyNodes(nodes);
-
-	// Delete copied nodes
-	for (auto node : nodes)
-	{
-		node->destroy();
-	}
-}
-
-void WorkspaceDiwne::duplicateSelectedNodes()
-{
-	LOG_INFO("Duplicating nodes")
-	for (auto& node : getAllSelectedCoreNodesWithoutNesting())
-	{
-		node.setDuplicateNode(true);
-	}
-	deselectAllNodes();
-}
-
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllCameras()
-{
-	std::vector<Ptr<CoreNode>> cameras;
-	for (auto const& node : m_nodes)
-	{
-		if (std::dynamic_pointer_cast<Camera>(node))
-		{
-			cameras.push_back(std::static_pointer_cast<CoreNode>(node));
-		};
-	}
-	return cameras;
-}
-
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<Model>> WorkspaceDiwne::getAllModels()
-{
-	std::vector<Ptr<Model>> models;
-	for (auto const& node : m_nodes)
-	{
-		if (auto model = std::dynamic_pointer_cast<Model>(node))
-		{
-			models.push_back(model);
-		};
-	}
-	return models;
-}
-
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
-{
-	std::vector<Ptr<Model>> models;
-	for (const auto& node : m_nodes)
-	{
-		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
-		if (!model)
-			continue;
-		if (Core::GraphManager::getParent(model->getNodebase()) != seq->getNodebase())
-			continue;
-		models.push_back(model);
-	}
-	return models;
-}
-
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeSequence()
-{
-	std::vector<Ptr<CoreNode>> sequences;
-	for (auto const& node : m_nodes)
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq && !seq->getInputs()[0]->isConnected())
-		{
-			sequences.push_back(std::static_pointer_cast<CoreNode>(node));
-		}; /* \todo JH  \todo MH Always 0? */
-	}
-	return sequences;
-}
-
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeModel()
-{
-	std::vector<Ptr<CoreNode>> models;
-	for (auto const& node : m_nodes)
-	{
-		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
-		if (model && !model->getInputs()[0]->isConnected())
-		{
-			models.push_back(std::static_pointer_cast<CoreNode>(node));
-		}; /* \todo JH  \todo MH Always 0? */
-	}
-	return models;
-}
-
-// bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
-//{
-//	if (m_workspaceDiwneAction == WorkspaceDiwneAction::CreateAndPlugTypeConstructor)
-//	{
-//		switch (getLastActivePin<CoreInPin>()->getType())
-//		{
-//		case Core::EValueType::Pulse:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::PulseToPulse>>();
-//			break;
-//		case Core::EValueType::Float:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::FloatToFloat>>();
-//			break;
-//		case Core::EValueType::Vec3:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::Vector3ToVector3>>();
-//			break;
-//		case Core::EValueType::Vec4:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::Vector4ToVector4>>();
-//			break;
-//		case Core::EValueType::Matrix:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::MatrixToMatrix>>();
-//			break;
-//		case Core::EValueType::Quat:
-//			addTypeConstructorNode<Operator<Core::EOperatorType::QuatToQuat>>();
-//			break;
-//		case Core::EValueType::MatrixMul:
-//			addTypeConstructorNode<Sequence>();
-//			break;
-//		case Core::EValueType::Screen:
-//			addTypeConstructorNode<Camera>();
-//			break;
-//			// case Core::EValueType::Ptr:
-//			//	addTypeConstructorNode<XXXXXX>();
-//			//	break;
-//		}
-//		return true;
-//	}
-//	return false; // for Ptr and for a possible non-existent wire type in EValueType
-// }
-
-// std::vector<Ptr<CoreNode>> WorkspaceDiwne::getSelectedNodesInnerIncluded()
-//{
-//	std::vector<Ptr<CoreNode>> selected;
-//	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-//	{
-//		if (workspaceCoreNode->getSelected())
-//		{
-//			selected.push_back(workspaceCoreNode);
-//		}
-//	}
-//	return selected;
-// }
-
-// std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllNodesInnerIncluded()
-//{
-//	std::vector<Ptr<CoreNode>> allNodes;
-//	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-//	{
-//		allNodes.push_back(workspaceCoreNode);
-//
-//		/* inner of Sequence */
-//		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(workspaceCoreNode);
-//		if (seq != nullptr)
-//		{
-//			for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
-//			{
-//				allNodes.push_back(nodeInSequence);
-//			}
-//		}
-//
-//		/* inner of Sequences in Camera */
-//		// TODO: (DR) What about the sequence nodes inside the Camera? Those are omitted, that caused problems with for
-//		//   example these inner sequences not gettinng the proper zoom changed events. Overall its just an
-//		//   inconsistency that I elected to not fix yet as to not distrub other systems which may not account for this.
-//		//   Should be changed after a discussion. Namely I'm not sure how node duplication would handle this.
-//		//   WorkspaceCamera currently overrides the updateDataItemsWidth() to overcome this but that should be reverted
-//		//   if the above is fixed.
-//		Ptr<Camera> cam = std::dynamic_pointer_cast<Camera>(workspaceCoreNode);
-//		if (cam != nullptr)
-//		{
-//			for (auto&& nodeInSequence : cam->getProjection()->getInnerWorkspaceNodes())
-//			{
-//				allNodes.push_back(nodeInSequence);
-//			}
-//			for (auto&& nodeInSequence : cam->getView()->getInnerWorkspaceNodes())
-//			{
-//				allNodes.push_back(nodeInSequence);
-//			}
-//		}
-//	}
-//
-//	return allNodes;
-// }
-
-void WorkspaceDiwne::manipulatorStartCheck3D()
-{
-	if (getNodesSelectionChanged())
-	{
-		I3T::getViewport()->getManipulators().clearManipulators();
-
-		auto selectedCoreNodes = getAllSelectedCoreNodes();
-		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
-		{
-			Ptr<TransformationBase> selected_transformation =
-			    std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
-			if (selected_transformation != nullptr)
-			{
-				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
-			}
-		}
-	}
-}
-
-void WorkspaceDiwne::processTrackingMove()
-{
-	if (Core::GraphManager::isTrackingEnabled())
-	{
-		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
-		{
-			this->trackingSmoothLeft();
-		}
-		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
-		{
-			this->trackingSmoothRight();
-		}
-	}
-}
-
-void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
-{
-	NodeEditor::processInteractions(context);
-
-	if (!context.logicalUpdates && !context.inputConsumed)
-	{
-		if (InputManager::isActionTriggered("zoomToAll", EKeyState::Pressed))
-			this->zoomToAll();
-		if (InputManager::isActionTriggered("zoomToSelected", EKeyState::Pressed))
-			this->zoomToSelected();
-		if (InputManager::isActionTriggered("copy", EKeyState::Pressed))
-			this->copySelectedNodes();
-		if (InputManager::isActionTriggered("paste", EKeyState::Pressed))
-			this->pasteSelectedNodes();
-		if (InputManager::isActionTriggered("cut", EKeyState::Pressed))
-			this->cutSelectedNodes();
-		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
-			this->duplicateSelectedNodes();
-		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
-			this->trackingSwitchOff();
-		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
-			this->trackingSmoothLeft();
-		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
-			this->trackingSmoothRight();
-		if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
-			this->trackingJaggedLeft();
-		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
-			this->trackingJaggedRight();
-		if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
-			this->trackingModeSwitch();
-		if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
-			this->trackingSwitch();
-		if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
-			this->trackingSwitchOn();
-		if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
-			this->trackingSwitchOff();
-		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
-			this->toggleSelectedNodesVisibility();
-	}
-}
-
-void WorkspaceDiwne::onZoom()
-{
-	m_updateDataItemsWidth = true;
-}
-
-// TODO: This is inconsistent with the getZoomDelta method!
-// bool WorkspaceDiwne::isZoomingDiwne()
-//{
-//	return InputManager::isAxisActive("scroll") != 0;
-//}
-
-bool WorkspaceDiwne::processZoom()
-{
-	m_updateDataItemsWidth = true;
-	return NodeEditor::processZoom();
-}
-
-bool WorkspaceEditorInputAdapter::selectAllNodes()
-{
-	return InputManager::isActionTriggered("selectAll", EKeyState::Pressed);
-}
-bool WorkspaceEditorInputAdapter::invertSelection()
-{
-	return InputManager::isActionTriggered("invertSelection", EKeyState::Pressed);
-}
-bool WorkspaceEditorInputAdapter::deleteSelectedNodes()
-{
-	return InputManager::isActionTriggered("delete", EKeyState::Pressed);
 }
