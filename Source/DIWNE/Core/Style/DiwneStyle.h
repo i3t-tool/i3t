@@ -30,6 +30,22 @@ struct DiwneStyle
 	static const short dropZoneDropGap;     // ImVec2
 	static const short dropZoneMarginWidth; // float
 
+	static const short linkColor;               // ImVec4
+	static const short linkColorSelected;       // ImVec4
+	static const short linkWidth;               // float
+	static const short linkSelectedBorderWidth; // float
+
+	// TODO: I don't really like this system
+	// TODO: How do we allow components to have their own specific colors?
+	// TODO: But without storing another separate DiwneStyle
+	// TODO: Maybe each object type could have its own reduced DiwneStyle?
+	//   and then each hold an instance -> big memory usage wasted if most objects arent using custom overrides
+	// TODO: All defaults need to be easily modifiable at runtime
+	// TODO: The StyleOverride system adds 80 bytes to each object + small runtime cost for fetching (map lookup)
+	//   maybe the memory cost isn't that bad? Could be avoided by just holding a pointer to the map and allocating that
+	//   dynamically, kinda like PIMPL
+	// TODO: What about the runtime cost though?
+
 	DiwneStyle()
 	{
 		set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 0.6});
@@ -42,6 +58,11 @@ struct DiwneStyle
 		set<ImVec4>(dropIndicatorColor, {0.26, 0.59, 0.98, 0.67});
 		set<ImVec2>(dropZoneDropGap, {10.0f, 10.0f});
 		set<float>(dropZoneMarginWidth, 10.0f);
+
+		set<ImVec4>(linkColor, {0.6, 0.3, 0.35, 0.6});
+		set<ImVec4>(linkColorSelected, {0.6, 0.3, 0.35, 0.8});
+		set<float>(linkWidth, 5.0f);
+		set<float>(linkSelectedBorderWidth, 4.0f);
 	}
 
 	template <typename T>

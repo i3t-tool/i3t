@@ -73,6 +73,20 @@ bool Sequence::allowDrawing()
 //	return false;
 //}
 
+void Sequence::begin(DIWNE::DrawInfo& context)
+{
+	BasicNode::begin(context);
+	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
+	if (matrixInput->isConnected())
+	{
+		if (matrixInput->connectionChanged())
+		{
+			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
+			updateDataItemsWidth();
+		}
+	}
+}
+
 void Sequence::centerContent(DIWNE::DrawInfo& context)
 {
 	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
@@ -86,11 +100,6 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
 	if (matrixInput->isConnected())
 	{
-		if (matrixInput->connectionChanged())
-		{
-			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
-			updateDataItemsWidth();
-		}
 		bool valueChanged = false;
 		int rowOfChange, columnOfChange;
 		float valueOfChange;

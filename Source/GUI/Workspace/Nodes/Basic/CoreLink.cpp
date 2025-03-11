@@ -40,28 +40,20 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 {
 	updateControlPointsOffsets();
 
-	if (m_endPin)
-	{
-		diwne.mp_settingsDiwne->linkColor =
-		    I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(m_endPin)->getType()]);
+	ImVec4 color;
+	DIWNE::Pin* pin = getAnyPin();
+	if (pin) {
+		color = I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(pin)->getType()]);
+	} else {
+		color = ImColor(0.5f, 0.5f, 0.5f);
 	}
-	else
-	{
-		diwne.mp_settingsDiwne->linkColor = ImColor(0.5f, 0.5f, 0.5f);
-	}
+	m_color = color;
 
-	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
+	// TODO: Hookup link thickness
+//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
 	if (m_selected)
 	{
-		diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne =
-		    I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder);
-		diwne.mp_settingsDiwne->linkColorSelected = diwne.mp_settingsDiwne->linkColor;
-
-		diwne.mp_settingsDiwne->linkColorSelected.x += I3T::getColor(EColor::Links_selected_colorShift).x;
-		diwne.mp_settingsDiwne->linkColorSelected.y += I3T::getColor(EColor::Links_selected_colorShift).y;
-		diwne.mp_settingsDiwne->linkColorSelected.z += I3T::getColor(EColor::Links_selected_colorShift).z;
-
-		diwne.mp_settingsDiwne->linkColorSelected.w = I3T::getSize(ESize::Links_selected_alpha);
+		m_color = m_color + I3T::getColor(EColor::Links_selected_colorShift);
 	}
 }

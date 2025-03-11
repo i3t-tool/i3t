@@ -34,6 +34,8 @@ Pin::Pin(DIWNE::NodeEditor& diwne, Node* node, bool isInput, std::string labelDi
 
 void Pin::begin(DrawInfo& context)
 {
+	m_connectionChanged = false;
+
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup();
 }
@@ -68,17 +70,22 @@ void Pin::processInteractions(DrawInfo& context)
 		Actions::ConnectPinAction* action = context.state.getActiveAction<Actions::ConnectPinAction>();
 		if (action)
 		{
-			if (!action->startPin)
+			if (!action->sourcePin)
 			{
-				DIWNE_ERROR("[DIWNE] Start pin was not defined for the drag link action!");
+				DIWNE_FAIL("[DIWNE] Source pin was not defined for the drag link action!");
 				return;
 			}
 			if (!action->draggedLink)
 			{
-				DIWNE_ERROR("[DIWNE] Drag link action has no link set!");
+				DIWNE_FAIL("[DIWNE] Drag link action has no link set!");
 				return;
 			}
-			tryPlug(action->startPin, action->draggedLink, !context.state.dragEnd);
+			Pin* otherPin = action->draggedLink->getSinglePin();
+			if (!otherPin)
+			{
+				DIWNE_FAIL("[DIWNE] Dragged link both or no ends connected!")
+			}
+			preparePlug(otherPin, action->draggedLink, !context.state.dragEnd);
 		}
 	}
 }
@@ -91,8 +98,8 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		Actions::ConnectPinAction* action = context.state.startAction<Actions::ConnectPinAction>(shared_from_this());
 		if (action)
 		{
-			action->startPin = this;
-			if (false && m_isInput && !m_allowMultipleConnections && isPlugged())
+			action->sourcePin = this;
+			if (isInput() && !m_allowMultipleConnections && isPlugged())
 			{
 				// Link of inputs that don't allow multiple connections can be reconnected elsewhere
 				Link* link = getLink();
@@ -115,10 +122,10 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		Actions::ConnectPinAction* action = context.state.getAction<Actions::ConnectPinAction>();
 
 		// Update temporary link start/end point
-		if (isInput())
-			action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
-		else
+		if (action->draggedLink->getEndPin() == nullptr)
 			action->draggedLink->setEndPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+		else
+			action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 
 		if (dragEnd)
 		{
@@ -127,30 +134,37 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	}
 }
 
-bool Pin::tryPlug(Pin* startPin, Link* link, bool hovering)
+// TODO: (DR) Not tested standalone
+bool Pin::preparePlug(Pin* otherPin, Link* link, bool hovering)
 {
 	if (!hovering)
-		return plug(startPin, link);
+		return plugLink(otherPin, link);
 	return false;
 }
 
-bool Pin::plug(Pin* startPin, bool logEvent)
+// TODO: (DR) Not tested standalone
+bool Pin::plug(Pin* otherPin, bool logEvent)
 {
 	auto link = createLink();
-	return plugLink(startPin, link.get(), logEvent);
+	return plugLink(otherPin, link.get(), logEvent);
 }
 
-bool Pin::plugLink(Pin* startPin, Link* link, bool logEvent)
+bool Pin::plugLink(Pin* otherPin, Link* link, bool logEvent)
 {
+	assert(!isInput() || !otherPin->isInput() && "Both pins cannot be input pins!");
 	if (!m_allowMultipleConnections)
 	{
 		// Disconnect existing link(s)
 		unplug(logEvent);
 	}
 
+	Pin* startPin = otherPin;
+	Pin* endPin = this;
+	if (otherPin->isInput())
+		std::swap(startPin, endPin); // Other pin is input, this pin is output
+
 	// Connecting using an existing link
-	link->connect(startPin, this);
-	m_connectionChanged = true;
+	link->connect(startPin, endPin);
 	return true;
 }
 
@@ -170,13 +184,18 @@ bool Pin::unplug(bool logEvent, bool deleteLinks)
 	return true;
 }
 
-void Pin::onPlug(Pin* otherPin, bool logEvent)
+void Pin::onPlug(Pin* otherPin, Link* link, bool isStartPin, bool logEvent)
 {
 	if (logEvent)
 		diwne.m_takeSnap = true;
 	m_connectionChanged = true;
 }
-void Pin::onUnplug(bool logEvent) {}
+void Pin::onUnplug(Pin* otherPin, Link* link, bool wasStartPin, bool logEvent)
+{
+	if (logEvent)
+		diwne.m_takeSnap = true;
+	m_connectionChanged = true;
+}
 
 std::shared_ptr<Link> Pin::createLink()
 {

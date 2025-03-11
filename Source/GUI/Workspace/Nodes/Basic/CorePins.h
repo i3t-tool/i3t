@@ -65,7 +65,7 @@ public:
 
 	bool allowInteraction() const override;
 
-	bool tryPlug(DIWNE::Pin* startPin, DIWNE::Link* link, bool hovering) override;
+	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
 
 	Core::Pin const& getCorePin() const;
 
@@ -77,8 +77,8 @@ public:
 	bool allowConnection() const override;
 
 	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
-	void onPlug(DIWNE::Pin* otherPin, bool logEvent = true) override;
-	void onUnplug(bool logEvent = true) override;
+	void onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent = true) override;
+	void onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin, bool logEvent = true) override;
 
 	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	/**

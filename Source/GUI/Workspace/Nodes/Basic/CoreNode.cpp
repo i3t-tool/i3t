@@ -45,18 +45,6 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	m_style.addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
 }
 
-// TODO: (DR) Commented out for now, more info in the header file
-// bool WorkspaceNodeWithCoreData::bypassDragAction()
-// {
-// 	return InputManager::isAxisActive("drag") != 0 &&
-// 	       (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold
-// || 	        InputManager::m_mouseYDragDelta >
-// ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta >
-// 	            ImGui::GetIO().MouseDragThreshold ||
-// 	        -InputManager::m_mouseYDragDelta >
-// ImGui::GetIO().MouseDragThreshold);
-// }
-
 CoreNode::~CoreNode()
 {
 	// Unregister connection between core node and gui node
@@ -359,14 +347,7 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	DiwneObject::onReleased(justReleased, context);
 }
 
-// TODO: Uncomment
-// bool CoreNode::processDrag()
-//{
-//	if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
-//	{
-//		static_cast<WorkspaceDiwne&>(diwne).deselectAllNodes();
-//	}
-//	return Node::processDrag();
+// TODO: Reimplement in onSelect and onDeselect() <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //}
 //
 // bool CoreNode::processSelect()

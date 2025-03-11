@@ -19,7 +19,9 @@ namespace DIWNE
 {
 Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"*/)
     : DiwneObject(diwne, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0))
-{}
+{
+	m_color = diwne.style().color(DiwneStyle::linkColor);
+}
 
 void Link::updateSquareDistanceMouseFromLink()
 {
@@ -27,7 +29,7 @@ void Link::updateSquareDistanceMouseFromLink()
 	ImVec2 closestPointOnLink =
 	    ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                       mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
-	ImVec2 diff = (closestPointOnLink - mousePosDiwne) / diwne.getZoom();
+	ImVec2 diff = closestPointOnLink - mousePosDiwne;
 	m_squaredDistanceMouseFromLink = diff.x * diff.x + diff.y * diff.y;
 }
 
@@ -42,24 +44,9 @@ bool Link::isLinkOnWorkArea()
 	return diwne.canvas().getViewportRectDiwne().Overlaps(getRectDiwne());
 }
 
-bool Link::isPlugged()
-{
-	return m_startPin != nullptr && m_endPin != nullptr;
-}
-
 void Link::initialize(DrawInfo& context) {}
 void Link::initializeDiwne(DrawInfo& context)
 {
-	//	diwne.mp_settingsDiwne->linkColor.w =
-	//	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
-	//	diwne.mp_settingsDiwne->linkColorSelected.w = m_focusedForInteraction
-	//	                                                  ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
-	//	                                                  : diwne.mp_settingsDiwne->linkAlphaSelected;
-
-	// TODO: Review <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	diwne.mp_settingsDiwne->linkColor.w = diwne.mp_settingsDiwne->linkAlpha;
-	diwne.mp_settingsDiwne->linkColorSelected.w = diwne.mp_settingsDiwne->linkAlphaSelected;
-
 	initialize(context);
 	updateEndpoints();
 	updateControlPoints();
@@ -91,39 +78,27 @@ void Link::updateLayout(DrawInfo& context)
 bool Link::isHoveredDiwne()
 {
 	return m_squaredDistanceMouseFromLink <
-	       (diwne.mp_settingsDiwne->linkThicknessDiwne * diwne.mp_settingsDiwne->linkThicknessDiwne);
+	       (diwne.mp_settingsDiwne->linkInteractionWidthDiwne * diwne.mp_settingsDiwne->linkInteractionWidthDiwne) / 2;
 }
 
 void Link::onHover(DrawInfo& context)
 {
-	// TODO: Investigate what the touch action is for
-	//	if (bypassTouchAction())
-	//	{
-	//		diwne.setDiwneAction(getTouchActionType());
-	//	}
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                   diwne.mp_settingsDiwne->objectHoverBorderColor,
-	                                   diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+	                                   diwne.style().decimal(DiwneStyle::linkWidth) / 2);
 }
-// bool Link::processFocusedForInteraction()
-//{
-//	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-//	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
-//	                          diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
-//	return true;
-//}
 
 void Link::content(DrawInfo& context)
 {
 	if (m_selected)
 	{
 		diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-		                                   diwne.mp_settingsDiwne->linkColorSelected,
-		                                   diwne.mp_settingsDiwne->linkThicknessDiwne +
-		                                       diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne);
+		                                   diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		                                   diwne.style().decimal(DiwneStyle::linkWidth) +
+		                                       diwne.style().decimal(DiwneStyle::linkSelectedBorderWidth));
 	}
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
+	                                   m_color, diwne.style().decimal(DiwneStyle::linkWidth));
 	DIWNE_DEBUG(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
@@ -151,19 +126,15 @@ void Link::setEndPoint(const ImVec2& mEndDiwne)
 }
 bool Link::connect(Pin* startPin, Pin* endPin, bool logEvent)
 {
-	// Aside from special cases both ends of the link should be connected or not
-	// If both ends are already plugged and the ends differ from the new ones we must unplug them
-	if (isPlugged())
-	{
-		if (m_startPin != startPin)
-			disconnectPin(true, logEvent);
-		if (m_endPin != endPin)
-			disconnectPin(false, logEvent);
-	}
-
-	bool alreadyExisted = false;
 	assert(startPin != nullptr);
 	assert(endPin != nullptr);
+
+	if (m_startPin != startPin)
+		disconnectPin(true, logEvent);
+	if (m_endPin != endPin)
+		disconnectPin(false, logEvent);
+
+	bool alreadyExisted = false;
 
 	if (!startPin->registerLink(this))
 		alreadyExisted = true;
@@ -173,8 +144,8 @@ bool Link::connect(Pin* startPin, Pin* endPin, bool logEvent)
 	setStartPin(startPin);
 	setEndPin(endPin);
 
-	startPin->onPlug(endPin, logEvent);
-	endPin->onPlug(startPin, logEvent);
+	startPin->onPlug(endPin, this, true, logEvent);
+	endPin->onPlug(startPin, this, false, logEvent);
 	return alreadyExisted;
 }
 
@@ -210,13 +181,38 @@ bool Link::disconnectPin(bool startOrEndPin, bool logEvent)
 
 	// Call the onUnplug callback
 	if (pin != nullptr)
-		pin->onUnplug(logEvent);
+		pin->onUnplug(!startOrEndPin ? getStartPin() : getEndPin(), this, startOrEndPin, logEvent);
 	return true;
 }
 
 void Link::onDestroy(bool logEvent)
 {
 	disconnect(logEvent);
+}
+
+bool Link::isPlugged()
+{
+	return m_startPin != nullptr && m_endPin != nullptr;
+}
+bool Link::isOnePinPlugged()
+{
+	return (m_startPin == nullptr) != (m_endPin == nullptr);
+}
+Pin* Link::getSinglePin()
+{
+	if (!isOnePinPlugged())
+		return nullptr;
+	if (m_startPin)
+		return m_startPin;
+	return m_endPin;
+}
+Pin* Link::getAnyPin()
+{
+	if (m_startPin)
+		return m_startPin;
+	if (m_endPin)
+		return m_endPin;
+	return nullptr;
 }
 
 } /* namespace DIWNE */

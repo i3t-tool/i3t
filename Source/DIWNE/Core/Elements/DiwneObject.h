@@ -135,17 +135,7 @@ public:
 	bool m_isDragged{false}; /**< Is object dragged */
 	bool m_draggable{true};  ///< Whether dragging of the object is allowed by default
 
-	// TODO: This flag is oddly named, realistically this means whether we are hovered AND at the same time
-	//  hovered in some special area. This area is generally just the header of a node and this tells us when to
-	//  drag the node.
-	//  Eg we are hovered in some kind of an "active" / "interactable" area
-	/**< Is object focus on area that allow interaction with object */
-	//	bool m_focusedForInteraction{false};
-	// TODO: Reimplement focused for interaction (namely enable dragging by header only)
-
-	/**< Is object focused anywhere (and for example can not be focus other underlying object) */ // TODO: Rename to
-	                                                                                              // hover / Rework
-	bool m_hovered{false};
+	bool m_hovered{false}; ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
 	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
 	bool m_hoverable{true};  ///< Whether hovering is enabled by default
 
@@ -523,13 +513,16 @@ protected:
 	virtual bool processSelectDiwne(DrawInfo& context);
 
 public:
-	// Trigger methods (Formerly bypass methods)
+	// Input trigger methods (Formerly bypass methods)
 	// =============================================================================================================
-	// TODO: Rename to something clearer, keywords trigger or input.
-	//  isXXXTriggered might work, all these should be protected as well
-
-	virtual bool isHoveredDiwne(); ///< Is mouse hovering over the object? Prerequisite for further interaction.
-	virtual bool isDraggedDiwne(); ///< Is mouse dragging the object?
+	/**
+	 * Is the object being hovered? The default implementation mostly gets this information from ImGui::IsItemHovered()
+	 * but the behavior can be changed or restricted. It is possible the object is hovered but some other object
+	 * inside of it captured the hover beforehand and didn't propagate it towards this one.
+	 * Being hovered is used as a prerequisite for most interactions.
+	 */
+	virtual bool isHoveredDiwne();
+	virtual bool isDraggedDiwne(); ///< Is the object being dragged? (usually by mouse or some key combo)
 
 	// TODO: Maybe rename to isDownDiwne() or isKeyDownDiwne()
 	//  Begs the question which key, well that depends on the impl
@@ -554,13 +547,6 @@ public:
 	 * @see isPressedDiwne()
 	 */
 	virtual bool isJustPressedDiwne();
-
-	virtual bool bypassPressAction();    // TODO: Remove probably
-	virtual bool bypassReleaseAction();  // TODO: Remove probably
-	virtual bool bypassSelectAction();   /**< action used for selecting object */
-	virtual bool bypassUnselectAction(); /**< action used for unselecting object */
-	virtual bool bypassTouchAction();    /**< action used for touching object - not interact with
-	                                        it, just move it to front of other objects */
 
 	// Miscellaneous
 	// =============================================================================================================

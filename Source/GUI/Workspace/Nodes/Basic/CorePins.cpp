@@ -65,8 +65,6 @@ bool CorePin::allowInteraction() const
  */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
-	m_connectionChanged = false;
-
 	// TODO: The entire pin shouldn't be rendered when isRendered is false.
 	//  Either handle this here or in the Node with pins
 	// const bool interaction_happen = false; // no interaction in this function allowed
@@ -115,9 +113,10 @@ void CorePin::drawPin(DIWNE::DrawInfo& context)
 	// todo (PF) - I have temporally added the pi n border drawing of not-connected pins
 	// connected pins have no border now
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-	                           createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
-	                           ImVec4(padding, padding, padding, padding), isConnected());
-	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()), diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
+	                        createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
+	                        ImVec4(padding, padding, padding, padding), isConnected());
+	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
+	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 
 	ImGui::PopStyleVar();
 }
@@ -150,7 +149,7 @@ void CorePin::drawDataEx(DIWNE::DrawInfo& context)
 
 void CorePin::popupContent(DIWNE::DrawInfo& context) {}
 
-bool CorePin::tryPlug(DIWNE::Pin* startPin, DIWNE::Link* link, bool hovering)
+bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering)
 {
 	CorePin *input, *output;
 
@@ -158,11 +157,11 @@ bool CorePin::tryPlug(DIWNE::Pin* startPin, DIWNE::Link* link, bool hovering)
 	if (isInput())
 	{
 		input = this;
-		output = static_cast<CorePin*>(startPin);
+		output = static_cast<CorePin*>(otherPin);
 	}
 	else
 	{
-		input = static_cast<CorePin*>(startPin);
+		input = static_cast<CorePin*>(otherPin);
 		output = this;
 	}
 
@@ -205,13 +204,17 @@ bool CorePin::tryPlug(DIWNE::Pin* startPin, DIWNE::Link* link, bool hovering)
 	return false;
 }
 
-bool CorePin::plugLink(Pin* startPin, DIWNE::Link* link, bool logEvent)
+bool CorePin::plugLink(Pin* otherPin, DIWNE::Link* link, bool logEvent)
 {
-	I3T_ASSERT(isInput() && !startPin->isInput(),
-	           "The plug method must be called on the input pin with the output pin as an argument!");
+	I3T_ASSERT(!isInput() || !otherPin->isInput(), "Both pins cannot be input pins!");
 
-	Core::Pin const* coreInput = &(getCorePin());
-	Core::Pin const* coreOutput = &(static_cast<CorePin*>(startPin)->getCorePin());
+	Pin* startPin = otherPin;
+	Pin* endPin = this;
+	if (otherPin->isInput())
+		std::swap(startPin, endPin); // Other pin is input, this pin is output
+
+	const Core::Pin* coreOutput = &(static_cast<CorePin*>(startPin)->getCorePin());
+	const Core::Pin* coreInput = &(static_cast<CorePin*>(endPin)->getCorePin());
 
 	// Check if Core pins can be plugged
 	Core::ENodePlugResult plugResult = Core::GraphManager::isPlugCorrect(*coreInput, *coreOutput);
@@ -219,12 +222,13 @@ bool CorePin::plugLink(Pin* startPin, DIWNE::Link* link, bool logEvent)
 		return false;
 
 	// Then plug the UI
-	if (!Pin::plugLink(startPin, link, logEvent))
+	if (!Pin::plugLink(otherPin, link, logEvent))
 	{
 		LOG_ERROR("[WORKSPACE] Connected Core pins but failed to connect UI pins!");
 		return false;
 	}
 
+	// TODO: (DR) This can actually be moved to onPlug, it should never fail as we check isPlugCorrect() above
 	// And finally plug the Core pins, after UI unplug callbacks were already called
 	plugResult =
 	    Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(), coreOutput->Index, coreInput->Index);
@@ -236,33 +240,35 @@ bool CorePin::plugLink(Pin* startPin, DIWNE::Link* link, bool logEvent)
 	return true;
 }
 
-void CorePin::onPlug(DIWNE::Pin* startPin, bool logEvent)
+void CorePin::onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent)
 {
-	Pin::onPlug(startPin, logEvent);
-	if (logEvent)
+	Pin::onPlug(otherPin, link, isStartPin, logEvent);
+	if (isInput())
 	{
-		Core::Pin const* coreInput = &(getCorePin());
-		Core::Pin const* coreOutput = &(static_cast<CorePin*>(startPin)->getCorePin());
-		LOG_EVENT_CONNECT(coreOutput, coreInput);
+		if (logEvent)
+		{
+			Core::Pin const* coreInput = &(getCorePin());
+			Core::Pin const* coreOutput = &(static_cast<CorePin*>(otherPin)->getCorePin());
+			LOG_EVENT_CONNECT(coreOutput, coreInput);
+		}
 	}
 }
 
-void CorePin::onUnplug(bool logEvent)
+void CorePin::onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin, bool logEvent)
 {
-	if (m_isInput)
+	Pin::onUnplug(otherPin, link, wasStartPin, logEvent);
+	if (isInput())
 	{
-		const auto rightNode = getNode<CoreNode>()->getNodebase();
-		const auto* inputPin = &rightNode->getInputPins()[getCoreIndex()];
+		const Core::Pin* corePin = &getCorePin();
+		assert(getNode<CoreNode>()->getNodebase() == corePin->getOwner());
+		const auto* inputPin = corePin;
 		const auto* outputPin = inputPin->getParentPin();
-
+		Core::GraphManager::unplugInput(corePin->getOwner(), getCoreIndex());
 		if (logEvent)
 		{
 			LOG_EVENT_DISCONNECT(outputPin, inputPin);
 			diwne.m_takeSnap = true;
 		}
-
-		Core::GraphManager::unplugInput(getNode<CoreNode>()->getNodebase(), getCoreIndex());
-		m_connectionChanged = true;
 	}
 }
 

@@ -16,6 +16,7 @@
 #include <limits>
 
 #include "DiwneObject.h"
+#include "DIWNE/Core/Style/StyleOverride.h"
 
 namespace DIWNE
 {
@@ -31,13 +32,14 @@ protected:
 	ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
 	float m_squaredDistanceMouseFromLink{std::numeric_limits<float>::max()};
 
+	ImVec4 m_color;
 public:
 	Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwneLink");
 
 	/**
 	 * Connect the two pins using this link.
 	 * On success this method calls onPlug() on both pins.
-	 * If the link has both ends plugged in already, the corresponding pins get unplugged.
+	 * If the link has different pins plugged in already, the corresponding pins get unplugged.
 	 * @param startPin
 	 * @param endPin
 	 * @param logEvent The boolean flag passed to onPlug() on successful connect
@@ -65,7 +67,7 @@ public:
 	// Lifecycle
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
-	void begin(DrawInfo& context) override{}; /*!< link is not an ImGui element - it is just a drawn line */
+	void begin(DrawInfo& context) override {}; /*!< link is not an ImGui element - it is just a drawn line */
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
 	void updateLayout(DrawInfo& context) override;
@@ -88,10 +90,15 @@ public:
 	{
 		return m_startPin;
 	};
-	Pin* const getEndPin() const
+	Pin* getEndPin() const
 	{
 		return m_endPin;
 	};
+	/// Get the pin on either end in cases when only one pin is plugged in.
+	/// Returns nullptr no pins are connected or if both ends are connected.
+	Pin* getSinglePin();
+	Pin* getAnyPin(); ///< Get any of the two pins or nullptr if neither are connected
+
 	void setStartPin(Pin* pin)
 	{
 		m_startPin = pin;
@@ -125,6 +132,7 @@ public:
 	                            is not visible */
 
 	bool isPlugged(); ///< Whether the link is connected on both ends
+	bool isOnePinPlugged(); ///< Whether the link has exactly one pin plugged in at either end
 
 protected:
 	void updateSquareDistanceMouseFromLink();

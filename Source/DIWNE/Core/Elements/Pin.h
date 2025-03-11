@@ -25,9 +25,9 @@ class Node;
 class Pin : public DiwneObject
 {
 public:
-	bool m_isInput{true};                   ///< Whether this is an input or output pin
-	bool m_allowMultipleConnections{false}; ///< Only allow one link to be connected, set to true for input pins
-	ImRect m_pinRect;                       ///< Rect of the actual pin that can be dragged
+	bool m_isInput{false};                 ///< Whether this is an input or output pin, @see isInput()
+	bool m_allowMultipleConnections{true}; ///< Only allow one link to be connected, set to false for input pins
+	ImRect m_pinRect;                      ///< Rect of the actual pin that can be dragged
 
 	Node* m_node;               ///< Node this pin belongs to
 	std::vector<Link*> m_links; ///< Links connected to this pin
@@ -48,7 +48,7 @@ public:
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
 	void begin(DrawInfo& context) override;
-	void content(DrawInfo& context) override{};
+	void content(DrawInfo& context) override {};
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
 
@@ -66,18 +66,42 @@ public:
 	// =============================================================================================================
 
 	/**
-	 * Called when the mouse is hovering over the pin and when it is actually released over the pin.
+	 * Called when the mouse is dragging a new link and is hovering over this pin as well as when it is released.
+	 * When the hovering argument is false, the mouse was released and the link should be connected.
 	 * The method is responsible for the underlying plug in logic and determining whether the connection is valid.
-	 * @param hovering True when the mouse is only hovering and the pin shouldn't be plugged in yet.
+	 * @param otherPin The other pin, usually the starting pin of the link, but it can be the end pin as well.
+	 * @param link The link that's being prepared for plugging
+	 * @param hovering True when the mouse is only hovering over the pin and it shouldn't be plugged in yet.
+	 * @return
 	 */
-	virtual bool tryPlug(Pin* startPin, Link* link, bool hovering);
+	virtual bool preparePlug(Pin* otherPin, Link* link, bool hovering);
 
 	/**
-	 * Create and plug in a link between the startNode and this node.
+	 * Create a new link between this pin and the other pin.
+	 * The other pin is considered the start of the link, except when it is an input pin.
+	 * Both pins cannot be input pins.
+	 * @param otherPin The other pin on the other side of the new link.
 	 * @param logEvent The boolean flag passed to onPlug() on successful connect
 	 * @return True on success, false otherwise
 	 */
-	virtual bool plug(Pin* startPin, bool logEvent = true);
+	virtual bool plug(Pin* otherPin, bool logEvent = true);
+
+	// Just a trick to avoid accidental use of plug instead of plugLink
+	template <typename T>
+	bool plug(Pin* otherPin, T logEvent) = delete;
+
+	// TODO: Wrong assertion, the link can have anything on either end!
+	/**
+	 * Connect this and some other pin together using an existing link.
+	 * The other pin is considered the start of the link, except when it is an input pin.
+	 * Both pins cannot be input pins.
+	 * The link will get unplugged from other pins if necessary.
+	 * @param otherPin The other pin on the other side of the link.
+	 * @param link
+	 * @param logEvent The boolean flag passed to onUnplug() on successful disconnect
+	 * @return true
+	 */
+	virtual bool plugLink(Pin* otherPin, Link* link, bool logEvent = true);
 
 	// TODO: Unplug specific links
 	/**
@@ -90,12 +114,22 @@ public:
 
 	// Callbacks
 	/**
-	 * Called when a link is plugged into the pin.
-	 * @param otherPin The pin on the other side of the link.
+	 * Called after the pin has been connected to another pin using a link.
+	 * @param otherPin The pin on the other side of the link. Cannot be null.
+	 * @param link The link of the new connection with both ends plugged.
+	 * @param isStartPin Whether this pin is the start of the connection (otherwise it's the end).
+	 * @param logEvent The flag passed to the origin of the action.
 	 */
-	virtual void onPlug(Pin* otherPin, bool logEvent = true);
-	// TODO: Which link was unplugged?
-	virtual void onUnplug(bool logEvent = true); ///< Called when the pin is unplugged.
+	virtual void onPlug(Pin* otherPin, Link* link, bool isStartPin, bool logEvent = true);
+
+	/**
+	 * Called after the link connecting this pin to another is disconnected.
+	 * @param otherPin The pin on the other side of the link. Can be null.
+	 * @param link The link of the disconnected connection.
+	 * @param wasStartPin Whether this pin was the start of the connection (otherwise it was the end).
+	 * @param logEvent The flag passed to the origin of the action.
+	 */
+	virtual void onUnplug(Pin* otherPin, Link* link, bool wasStartPin, bool logEvent = true);
 
 	/**
 	 * Method responsible for constructing a new link for this pin.
@@ -104,16 +138,6 @@ public:
 	 * @return The new Link instance, it is already registered with the current editor and has no connections yet.
 	 */
 	virtual std::shared_ptr<Link> createLink();
-
-	/**
-	 * Plug two pins together using an existing link.
-	 * The link will get unplugged from other pins if necessary.
-	 * @param startPin
-	 * @param link
-	 * @param logEvent The boolean flag passed to onUnplug() on successful disconnect
-	 * @return true
-	 */
-	virtual bool plugLink(Pin* startPin, Link* link, bool logEvent);
 
 	Link* getLink(size_t index = 0);
 
@@ -147,6 +171,14 @@ protected:
 public:
 	// Getters
 	// =============================================================================================================
+	/**
+	 * Whether this is an input or output pin.
+	 * Input pins are restricted to only accept at most one connection.
+	 * They also force links to always end in them, meaning a link can't begin in an input pin.
+	 * Output pins have no such restrictions. They can be on either end of a link and have any amount of connections,
+	 * when m_allowMultipleConnections is enabled. For input pins that flag is forced to false.
+	 * @return
+	 */
 	bool isInput() const;
 
 	template <typename T = Node>

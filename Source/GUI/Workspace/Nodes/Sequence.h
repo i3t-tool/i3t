@@ -57,6 +57,7 @@ public:
 
 	virtual bool allowDrawing() override;
 
+	void begin(DIWNE::DrawInfo& context) override;
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void afterDraw(DIWNE::DrawInfo& context) override;
 	void onDestroy(bool logEvent) override;

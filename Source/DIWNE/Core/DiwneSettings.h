@@ -45,11 +45,7 @@ struct SettingsDiwne
 	ImVec4 backgroundHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
 	float backgroundHoveredBorderThicknessDiwne = 2;
 
-	float linkInteractionWidthDiwne = 10;
-	float linkThicknessDiwne = 10;
-	float linkThicknessSelectedBorderDiwne = 4;
-	ImVec4 linkColor = ImVec4(0.6, 0.3, 0.35, 0.6);
-	ImVec4 linkColorSelected = ImVec4(0.6, 0.3, 0.35, 0.8);
+	float linkInteractionWidthDiwne = 7;
 	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0);
 	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);
 	float linkAlphaHovered = 1;

@@ -78,6 +78,11 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #define DIWNE_WARN(...)
 #define DIWNE_ERROR(...)
 
+// Logs error via DIWNE_ERROR and also triggers an assertion failure in debug mode
+#define DIWNE_FAIL(...)                                                                                                \
+	DIWNE_ERROR(__VA_ARGS__);                                                                                          \
+	assert(false && "DIWNE assertion failure");
+
 #include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>
 

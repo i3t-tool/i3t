@@ -20,6 +20,7 @@
 
 #if DIWNE_DEBUG_ENABLED
 #include "Pin.h"
+#include "Link.h"
 #endif
 
 /*
@@ -484,24 +485,10 @@ bool DiwneObject::isJustPressedDiwne()
 	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
 	return diwne.input().bypassIsMouseClicked0();
 }
-
-bool DiwneObject::bypassSelectAction()
-{
-	return diwne.input().bypassIsMouseReleased0();
-}
-bool DiwneObject::bypassUnselectAction()
-{
-	return diwne.input().bypassIsMouseReleased0();
-}
 bool DiwneObject::isDraggedDiwne()
 {
 	return diwne.input().bypassIsMouseDragging0();
 }
-bool DiwneObject::bypassTouchAction()
-{
-	return diwne.input().bypassIsMouseClicked0();
-}
-
 void DiwneObject::popupContent(DrawInfo& context)
 {
 	ImGui::MenuItem("Override this method with content of popup menu of your object");
@@ -580,15 +567,6 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 }
 
 void DiwneObject::onSelection(bool selected) {}
-
-bool DiwneObject::bypassPressAction()
-{
-	return false;
-}
-bool DiwneObject::bypassReleaseAction()
-{
-	return false;
-}
 
 bool DiwneObject::allowSelectOnClick(const DrawInfo& context) const
 {
@@ -706,6 +684,10 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 		else if (dynamic_cast<DIWNE::Pin*>(this))
 		{
 			originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
+		}
+		else if (dynamic_cast<DIWNE::Link*>(this))
+		{
+			originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
 		}
 		auto interactionCount = context.logicalUpdates - debug_logicalUpdate;
 		std::string topLeftString =
