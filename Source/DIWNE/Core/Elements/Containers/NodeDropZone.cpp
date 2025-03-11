@@ -203,11 +203,11 @@ int NodeDropZone::acceptNodeDiwne(Node* node)
 
 int NodeDropZone::isNodeAboveDropZone(Node* newNode)
 {
-	ImRect newNodeRect = newNode->getRectDiwne();
+	ImRect newNodeRect = newNode->getRect();
 	//	newNodeRect.Expand(ImVec2(-newNodeRect.GetWidth() / 2.0f * 0.8f, 0.0f));
 
 	// Coarse test
-	if (!this->getRectDiwne().Overlaps(newNodeRect))
+	if (!this->getRect().Overlaps(newNodeRect))
 		return -1;
 
 	float centerX = newNodeRect.GetCenter().x;
@@ -215,7 +215,7 @@ int NodeDropZone::isNodeAboveDropZone(Node* newNode)
 	//	float rightX = newNodeRect.Max.x;
 	for (int i = 0; i < m_nodes.size(); ++i)
 	{
-		ImRect nodeRect = m_nodes[i]->getRectDiwne();
+		ImRect nodeRect = m_nodes[i]->getRect();
 		if (centerX < nodeRect.GetCenter().x)
 			return i;
 	}
@@ -245,8 +245,8 @@ void NodeDropZone::drawDropIndicator(Node* newNode, int index)
 	}
 	else
 	{
-		ImRect rect1 = m_nodes[index - 1]->getRectDiwne();
-		ImRect rect2 = m_nodes[index]->getRectDiwne();
+		ImRect rect1 = m_nodes[index - 1]->getRect();
+		ImRect rect2 = m_nodes[index]->getRect();
 		ImVec2 min = rect1.GetTR();
 		ImVec2 max = rect2.GetBL();
 		diwne.canvas().AddRectFilledDiwne(min, max, dstyle.color(DiwneStyle::dropIndicatorColor));

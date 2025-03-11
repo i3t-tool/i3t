@@ -444,13 +444,13 @@ ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> 
 	}
 	if (nodes.size() == 1)
 	{
-		return nodes.at(0)->getRectDiwne();
+		return nodes.at(0)->getRect();
 	}
 
-	rect = nodes.at(0)->getRectDiwne();
+	rect = nodes.at(0)->getRect();
 	for (auto& workspaceCoreNode : nodes)
 	{
-		rect.Add(workspaceCoreNode->getRectDiwne());
+		rect.Add(workspaceCoreNode->getRect());
 	}
 	return rect;
 }
@@ -506,35 +506,29 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	deselectAllNodes();
 }
 
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllCameras()
+// TODO: Could avoid dynamic_cast using node flags
+DIWNE::FilteredNodeRange<Camera> WorkspaceDiwne::getAllCameras()
 {
-	std::vector<Ptr<CoreNode>> cameras;
-	for (auto const& node : m_nodes)
-	{
-		if (std::dynamic_pointer_cast<Camera>(node))
-		{
-			cameras.push_back(std::static_pointer_cast<CoreNode>(node));
-		};
-	}
-	return cameras;
+	return DIWNE::FilteredNodeRange<Camera>(
+	    [](const DIWNE::Node* node) -> bool {
+		    return dynamic_cast<const Camera*>(node);
+	    },
+	    &m_nodes);
+}
+
+// TODO: Could avoid dynamic_cast using node flags
+DIWNE::FilteredNodeRange<Model> WorkspaceDiwne::getAllModels()
+{
+	return DIWNE::FilteredNodeRange<Model>(
+	    [](const DIWNE::Node* node) -> bool {
+		    return dynamic_cast<const Model*>(node);
+	    },
+	    &m_nodes);
 }
 
 // TODO: Rewrite with filtered iterator
-std::vector<Ptr<Model>> WorkspaceDiwne::getAllModels()
-{
-	std::vector<Ptr<Model>> models;
-	for (auto const& node : m_nodes)
-	{
-		if (auto model = std::dynamic_pointer_cast<Model>(node))
-		{
-			models.push_back(model);
-		};
-	}
-	return models;
-}
-
-// TODO: Rewrite with filtered iterator
+//  This cannot really be done as seq passed here would need a capturing lambda as a predicate
+//  I could add a void user pointer or similar to the predicate function to allow passing additional data
 std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
 {
 	std::vector<Ptr<Model>> models;
@@ -550,34 +544,28 @@ std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
 	return models;
 }
 
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeSequence()
+// TODO: Could avoid dynamic_cast using node flags
+DIWNE::FilteredNodeRange<Sequence> WorkspaceDiwne::getAllInputFreeSequence()
 {
-	std::vector<Ptr<CoreNode>> sequences;
-	for (auto const& node : m_nodes)
-	{
-		Ptr<Sequence> seq = std::dynamic_pointer_cast<Sequence>(node);
-		if (seq && !seq->getInputs()[0]->isConnected())
-		{
-			sequences.push_back(std::static_pointer_cast<CoreNode>(node));
-		}; /* \todo JH  \todo MH Always 0? */
-	}
-	return sequences;
+	return DIWNE::FilteredNodeRange<Sequence>(
+	    [](const DIWNE::Node* node) -> bool {
+		    const Sequence* seq = dynamic_cast<const Sequence*>(node);
+		    return seq && !seq->getInputs()[0]->isConnected();
+		    /* \todo JH  \todo MH Always 0? */
+	    },
+	    &m_nodes);
 }
 
-// TODO: Rewrite with filtered iterator
-std::vector<Ptr<CoreNode>> WorkspaceDiwne::getAllInputFreeModel()
+// TODO: Could avoid dynamic_cast using node flags
+DIWNE::FilteredNodeRange<Model> WorkspaceDiwne::getAllInputFreeModel()
 {
-	std::vector<Ptr<CoreNode>> models;
-	for (auto const& node : m_nodes)
-	{
-		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
-		if (model && !model->getInputs()[0]->isConnected())
-		{
-			models.push_back(std::static_pointer_cast<CoreNode>(node));
-		}; /* \todo JH  \todo MH Always 0? */
-	}
-	return models;
+	return DIWNE::FilteredNodeRange<Model>(
+	    [](const DIWNE::Node* node) -> bool {
+		    const Model* model = dynamic_cast<const Model*>(node);
+		    return model && !model->getInputs()[0]->isConnected();
+		    /* \todo JH  \todo MH Always 0? */
+	    },
+	    &m_nodes);
 }
 
 void WorkspaceDiwne::onZoom()

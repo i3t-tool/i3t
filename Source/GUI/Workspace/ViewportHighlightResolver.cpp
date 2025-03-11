@@ -39,14 +39,13 @@ void ViewportHighlightResolver::resolve()
 	}
 
 	// For each model, run bfs until a selected node is found.
-	std::vector<Ptr<Model>> models = m_diwne->getAllModels();
-	for (auto& model : models)
+	for (auto& model : m_diwne->getAllModels())
 	{
 		if (searchForSelectedNode(model))
 		{
-			model->m_influenceHighlight = true;
-			auto viewportModel = model->m_viewportModel.lock();
-			if (!model->getSelected())
+			model.m_influenceHighlight = true;
+			auto viewportModel = model.m_viewportModel.lock();
+			if (!model.getSelected())
 			{
 				viewportModel->m_highlight = true;
 				viewportModel->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
@@ -54,9 +53,9 @@ void ViewportHighlightResolver::resolve()
 		}
 		else
 		{
-			model->m_influenceHighlight = false;
-			auto viewportModel = model->m_viewportModel.lock();
-			if (!model->getSelected())
+			model.m_influenceHighlight = false;
+			auto viewportModel = model.m_viewportModel.lock();
+			if (!model.getSelected())
 			{
 				viewportModel->m_highlight = false;
 			}
@@ -66,9 +65,9 @@ void ViewportHighlightResolver::resolve()
 	m_runResolveThisFrame = false;
 }
 
-bool ViewportHighlightResolver::searchForSelectedNode(Ptr<Model>& rootGuiModel)
+bool ViewportHighlightResolver::searchForSelectedNode(Model& rootGuiModel)
 {
-	if (rootGuiModel->getSelected())
+	if (rootGuiModel.getSelected())
 	{
 		// Model itself is selected so it should be highlighted anyway
 		return true;
@@ -79,7 +78,7 @@ bool ViewportHighlightResolver::searchForSelectedNode(Ptr<Model>& rootGuiModel)
 	std::unordered_set<Core::ID> visited;
 	std::list<Ptr<Core::Node>> queue;
 
-	Ptr<Core::Node> rootModel = rootGuiModel->getNodebase();
+	Ptr<Core::Node> rootModel = rootGuiModel.getNodebase();
 	visited.insert(rootModel->getId());
 	queue.push_back(rootModel);
 

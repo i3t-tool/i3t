@@ -119,32 +119,9 @@ void NodeEditor::content(DrawInfo& context)
 	ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
 	                                    ImColor(255, 0, 0, 255));
 
-	// TODO: DiwneObjects (Nodes, links) marked to be destroyed need to be deleted, likely here or maybe even better
-	//  in the initialize() method (as this is not related to drawing) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 	// TODO: [Performance] Could the channel splitter with its channel for each node be causing performance issues?
 	//  I haven't investigated too deep but presumably all draw commands (which are many) are being reordered in
 	//  an array every frame.
-
-	// TODO: A better approach imo is to treat links like nodes
-	// Simply keep a persistent list of them and delete / modify them as needed during the draw
-	// The way it is now, where each link is actually a member variable of a pin seems a little odd to me
-	// Like it works I suppose, no real issue with it, but just seems confusing for no good reason
-	// Admittedly links are more dynamic this way, more "immediate"
-	// If I were to keep a persistent list then I need to ensure their state is correct
-	// But isn't that what we're already doing with nodes? kinda the whole way how dinwe works
-	// The code just seems unreadable to me because of this, pin is a pin and it shouldn't handle its own link
-	// It should just create and delete the link based on whether two links are connected
-	// Also when handling link visibility we are actually checking if links
-	// are visible in the processInteractionsAlways method of the pin which seems dumb
-	// Another perhaps unnecessary thing is, why make a distinction between input and output pins
-	// I feel like it might be clearer if its a property of a pin rather than a different class
-	// Right now only the output pins drawData and there are subclasses for each data type
-	// Again seems like that could be handled with some kind of a switch and just free floating draw methods
-	// Rather than complicated polymorphism that doesn't have much of a meaning. I don't know.
-
-	// TODO: Generally in other node editors it seems links are ALWAYS drawn BELOW nodes, simply because having a
-	//  node overlaid with a link is disruptive and a link popping in front or behind a node suddenly is not desirable.
 
 	// NOTE: Nodes are "constructed" front to back, eg. the first UI code to run is from the TOP node, however the nodes
 	//  are then later drawn by ImGui back to front because we reorder the ImGui draw commands using a channel splitter.
@@ -264,9 +241,9 @@ void NodeEditor::updateLayout(DrawInfo& context)
 void NodeEditor::afterDraw(DrawInfo& context)
 {
 	DIWNE_DEBUG_LAYOUT(diwne, {
-		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
 		ImGui::GetForegroundDrawList()->AddText(
-		    m_canvas->diwne2screen(originPos) + ImVec2(getRectDiwne().GetWidth() * 0.2, 0), IM_COL32_WHITE,
+		    m_canvas->diwne2screen(originPos) + ImVec2(getRect().GetWidth() * 0.2, 0), IM_COL32_WHITE,
 		    (std::string() + "zoom: " + std::to_string(m_canvas->getZoom()) + ", " + "workArea: " +
 		     std::to_string(m_canvas->m_viewRectDiwne.Min.x) + ", " + std::to_string(m_canvas->m_viewRectDiwne.Min.y))
 		        .c_str());
@@ -566,7 +543,7 @@ void NodeEditor::addNode(const std::shared_ptr<Node>& node, const ImVec2 positio
 	{
 		// We draw the node out of context to obtain its initial size
 		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw);
-		node->translate(ImVec2(-node->getRectDiwne().GetSize().x - ImGui::GetFontSize() * 2, 0));
+		node->translate(ImVec2(-node->getRect().GetSize().x - ImGui::GetFontSize() * 2, 0));
 	}
 	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	m_takeSnap = true;

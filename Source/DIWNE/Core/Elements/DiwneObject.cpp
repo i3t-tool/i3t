@@ -507,17 +507,17 @@ void DiwneObject::onHover(DrawInfo& context)
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
 	//  Maybe move this impl into node and make it purely virtual?
-	//	diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+	//	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max,
 	//	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
 	//	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	//	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 	// TODO: Remove later, temporarily use a bright color for hover
-	diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255, 0, 0, 150),
+	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
 	                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 	                            diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 
 	DIWNE_DEBUG(diwne, {
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1),
 		                            DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
 	});
 }
@@ -527,11 +527,11 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 	if (justPressed)
 		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2),
 		                            DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
 		if (justPressed)
 		{
-			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2),
 			                                  DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
@@ -544,7 +544,7 @@ void DiwneObject::onReleased(bool justReleased, DrawInfo& context)
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (justReleased)
 		{
-			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(2, 2), getRectDiwne().Max - ImVec2(2, 2),
+			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2),
 			                                  DIWNE_ORANGE_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 	});
@@ -556,15 +556,15 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		if (dragStart)
 		{
-			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1),
 			                                  DIWNE_GREEN_50, 0, ImDrawFlags_RoundCornersNone);
 		}
 		if (dragEnd)
 		{
-			diwne.canvas().AddRectFilledDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1),
+			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1),
 			                                  DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
 		}
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min + ImVec2(1, 1), getRectDiwne().Max - ImVec2(1, 1), DIWNE_CYAN_50,
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_CYAN_50,
 		                            0, ImDrawFlags_RoundCornersNone, 2);
 	});
 }
@@ -675,22 +675,22 @@ bool DiwneObject::isChildObject() const
 void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 {
 	DIWNE_DEBUG((diwne), {
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, DIWNE_YELLOW_50, 0,
+		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0,
 		                            ImDrawFlags_RoundCornersNone, 1, true);
 	});
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
-		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Max.y);
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Max.y);
 		if (dynamic_cast<DIWNE::NodeEditor*>(this))
 		{
-			originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+			originPos = ImVec2(getRect().Min.x, getRect().Min.y);
 		}
 		else if (dynamic_cast<DIWNE::Pin*>(this))
 		{
-			originPos = ImVec2(getRectDiwne().Max.x, getRectDiwne().Min.y);
+			originPos = ImVec2(getRect().Max.x, getRect().Min.y);
 		}
 		else if (dynamic_cast<DIWNE::Link*>(this))
 		{
-			originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+			originPos = ImVec2(getRect().Min.x, getRect().Min.y);
 		}
 		auto interactionCount = context.logicalUpdates - debug_logicalUpdate;
 		std::string topLeftString =

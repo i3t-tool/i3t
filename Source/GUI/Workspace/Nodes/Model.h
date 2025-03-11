@@ -39,7 +39,7 @@ public:
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.
 
-	WPtr<Vp::SceneModel> viewportModel()
+	WPtr<Vp::SceneModel> viewportModel() const
 	{
 		return m_viewportModel;
 	}

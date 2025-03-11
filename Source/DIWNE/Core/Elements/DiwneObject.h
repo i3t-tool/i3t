@@ -312,9 +312,7 @@ public:
 		return m_destroy;
 	}
 
-	// TODO: Rename to just getRect()
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	virtual ImRect getRectDiwne() const
+	virtual ImRect getRect() const
 	{
 		return m_rect;
 	}

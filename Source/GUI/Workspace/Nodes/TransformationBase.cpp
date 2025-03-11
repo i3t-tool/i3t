@@ -55,7 +55,7 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		//    WorkspaceNodeWithCoreData::topContent() */
 		//    /* right align */
 		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f,
-		//    getRectDiwne().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
+		//    getRect().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
 		//    /*actual free space*/ - iconSize.x -
 		//    m_topOversizeSpace)*diwne.getZoom());
 
@@ -259,7 +259,7 @@ void TransformationBase::onDestroy(bool logEvent)
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()
 {
 	ImVec2 position = getPosition();
-	ImVec2 size = getRectDiwne().GetSize();
+	ImVec2 size = getRect().GetSize();
 	ImVec2 topMiddle = position;
 	topMiddle.x += size.x / 2;
 	ImVec2 middle = position + size / 2;

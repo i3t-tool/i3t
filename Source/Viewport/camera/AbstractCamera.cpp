@@ -146,11 +146,11 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 	std::vector<const GameObject*> selectedObjects;
 	for (const auto& modelNode : WorkspaceWindow::g_editor->getAllModels())
 	{
-		if (!modelNode->getSelected())
+		if (!modelNode.getSelected())
 		{
 			continue;
 		}
-		Ptr<SceneModel> model = modelNode->m_viewportModel.lock();
+		Ptr<SceneModel> model = modelNode.m_viewportModel.lock();
 		DisplayType type = model->getDisplayType();
 		if (type != DisplayType::Default && type != DisplayType::Camera)
 		{
@@ -160,12 +160,11 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 	}
 	for (const auto& cameraNode : WorkspaceWindow::g_editor->getAllCameras())
 	{
-		if (!cameraNode->getSelected())
+		if (!cameraNode.getSelected())
 		{
 			continue;
 		}
-		Ptr<Workspace::Camera> cameraPtr = std::static_pointer_cast<Workspace::Camera>(cameraNode);
-		Ptr<SceneCamera> camera = cameraPtr->m_viewportCamera.lock();
+		Ptr<SceneCamera> camera = cameraNode.m_viewportCamera.lock();
 		DisplayType type = camera->getDisplayType();
 		if (type != DisplayType::Default && type != DisplayType::Camera)
 		{

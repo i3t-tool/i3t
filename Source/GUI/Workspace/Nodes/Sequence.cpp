@@ -228,7 +228,7 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
 	DiwneObject::afterDraw(context);
 	DIWNE_DEBUG_OBJECTS((diwne), {
-		ImRect rect = getRectDiwne();
+		ImRect rect = getRect();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Min.y);
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) -
 		                                            ImVec2(0, ImGui::GetTextLineHeightWithSpacing()),

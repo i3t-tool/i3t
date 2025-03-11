@@ -34,7 +34,7 @@ Node& Node::operator=(const Node& rhs)
 bool Node::allowDrawing()
 {
 	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
-	return DiwneObject::allowDrawing() || getRectDiwne().Overlaps(viewportRect) || m_isDragged;
+	return DiwneObject::allowDrawing() || getRect().Overlaps(viewportRect) || m_isDragged;
 }
 
 void Node::begin(DrawInfo& context)
@@ -51,7 +51,7 @@ void Node::content(DrawInfo& context)
 void Node::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
-		ImRect rect = getRectDiwne();
+		ImRect rect = getRect();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Max.y);
 		ImGui::GetForegroundDrawList()->AddText(
 		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
@@ -80,7 +80,7 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	// This needs to be done BEFORE processing interactions as we determine if the node is hovered using it.
 	// The blocking button uses the NoHoldingActiveId flag in order to avoid setting active id when dragging the node.
 	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
-	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRectDiwne().GetSize() * diwne.getZoom(),
+	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRect().GetSize() * diwne.getZoom(),
 	                       ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_NoHoldingActiveId);
 	m_internalHover = ImGui::IsItemHovered();
 	ImGui::PopID();
@@ -98,7 +98,7 @@ bool Node::processSelectDiwne(DrawInfo& context)
 	// Check if the node is inside a selection rectangle
 	if (auto action = context.state.getActiveAction<Actions::SelectionRectAction>())
 	{
-		bool inRect = action->touch ? action->rect.Overlaps(getRectDiwne()) : action->rect.Contains(getRectDiwne());
+		bool inRect = action->touch ? action->rect.Overlaps(getRect()) : action->rect.Contains(getRect());
 		bool multiSelect = diwne.input().multiSelectionActive();
 		bool multiDeselect = diwne.input().multiDeselectionActive();
 		if (inRect)
@@ -192,7 +192,7 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 {
 	if (m_selected)
 	{
-		diwne.canvas().AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
+		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max,
 		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);

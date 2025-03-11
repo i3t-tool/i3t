@@ -242,13 +242,12 @@ public:
 		    },
 		    &m_nodes);
 	}
-
-	// TODO: (DR) Rewrite to use iterators
-	std::vector<Ptr<CoreNode>> getAllCameras();
-	std::vector<Ptr<Model>> getAllModels();
+	
+	DIWNE::FilteredNodeRange<Camera> getAllCameras();
+	DIWNE::FilteredNodeRange<Model> getAllModels();
 	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
-	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();
-	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
+	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence();
+	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();
 
 	// =============================================================================================================
 };

@@ -61,7 +61,7 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 		{
 			// register the connected wires only.
 			// Connect them to the middle of the box left side (showing just the label)
-			ImRect nodeRect = getRectDiwne();
+			ImRect nodeRect = getRect();
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
 			{
@@ -108,7 +108,7 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			// register the connected wires only.
 			// Connect them to the middle of the box right side (showing just the label)
 
-			const ImRect nodeRect = getRectDiwne();
+			const ImRect nodeRect = getRect();
 			// todo (PF) pinConnectionPoint is wrong when output pulse pins are not drawn
 			const ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
@@ -131,7 +131,7 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRectDiwne().GetWidth()) *
+					float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) *
 					                                     diwne.getZoom()); /* no shift to the left */
 					m_minRightAlignOfRightPins =
 					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching

@@ -419,7 +419,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		}
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
-		ImRect nodeRect = getRectDiwne();
+		ImRect nodeRect = getRect();
 		ImVec2 pinConnectionPoint =
 		    ImVec2(nodeRect.Min.x, (diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
@@ -582,7 +582,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		{
 			// the remaining pins are hidden, draw the wires only
 			WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
-			const ImRect nodeRect = getRectDiwne();
+			const ImRect nodeRect = getRect();
 			const ImVec2 pinConnectionPoint =
 			    ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2.0f + 30.0f); // (PF) The Piscvejc constant
 			for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP,

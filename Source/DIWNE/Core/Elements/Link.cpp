@@ -41,7 +41,7 @@ void Link::updateControlPoints()
 
 bool Link::isLinkOnWorkArea()
 {
-	return diwne.canvas().getViewportRectDiwne().Overlaps(getRectDiwne());
+	return diwne.canvas().getViewportRectDiwne().Overlaps(getRect());
 }
 
 void Link::initialize(DrawInfo& context) {}
@@ -56,7 +56,7 @@ void Link::initializeDiwne(DrawInfo& context)
 void Link::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
-		ImVec2 originPos = ImVec2(getRectDiwne().Min.x, getRectDiwne().Min.y);
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
 		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		                                        (std::string() + m_labelDiwne +
