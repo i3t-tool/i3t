@@ -154,7 +154,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 			// or only the node is dragged
 			if (diwne.mp_settingsDiwne->selectNodeOnDrag)
 			{
-				diwne.deselectNodes();
+				diwne.deselectAllNodes();
 				setSelected(true);
 			}
 			nodes.push_back(this->sharedPtr<Node>());

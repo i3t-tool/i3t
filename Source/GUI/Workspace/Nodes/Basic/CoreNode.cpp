@@ -364,7 +364,7 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 //{
 //	if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
 //	{
-//		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+//		static_cast<WorkspaceDiwne&>(diwne).deselectAllNodes();
 //	}
 //	return Node::processDrag();
 //}
@@ -414,6 +414,6 @@ void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)
 	{ // Otherwise we duplicate this single node
 		setDuplicateNode(true);
 	}
-	diwne.deselectNodes();
+	diwne.deselectAllNodes();
 	context.consumeInput();
 }

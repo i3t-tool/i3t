@@ -289,6 +289,16 @@ void NodeEditor::processInteractions(DrawInfo& context)
 		// Handle zooming
 		if (m_hovered)
 			processDiwneZoom();
+
+		if (!context.logicalUpdates)
+		{
+			if (input().selectAllNodes())
+				this->selectAllNodes(true);
+			if (input().invertSelection())
+				this->invertSelection();
+			if (input().deleteSelectedNodes())
+				this->deleteSelectedNodes();
+		}
 	}
 }
 
@@ -299,7 +309,7 @@ void NodeEditor::onReleased(bool justReleased, DrawInfo& context)
 	{
 		if (!context.logicalUpdates && !context.state.dragging && !m_input->multiSelectionActive())
 		{
-			deselectNodes();
+			deselectAllNodes();
 		}
 	}
 	DiwneObject::onReleased(justReleased, context);
@@ -360,7 +370,7 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 
 		if (dragEnd)
 		{
-			context.state.endAction();
+			action->end();
 		}
 	}
 }
@@ -531,7 +541,7 @@ FilteredRecursiveNodeRange<> NodeEditor::getSelectedNodesInnerIncluded() const
 	    &m_nodes);
 }
 
-void NodeEditor::deselectNodes()
+void NodeEditor::deselectAllNodes()
 {
 	for (auto& node : getAllNodesInnerIncluded())
 	{
@@ -567,6 +577,42 @@ void NodeEditor::addNode(const std::shared_ptr<Node>& node, const ImVec2 positio
 void NodeEditor::addLink(std::shared_ptr<Link> link)
 {
 	m_links.push_back(link);
+}
+
+void NodeEditor::selectAllNodes(bool deselectIfAllAreSelected)
+{
+	bool allSelected = true;
+	for (auto& node : getAllNodesInnerIncluded())
+	{
+		if (!node.getSelected() && node.getSelectable())
+		{
+			allSelected = false;
+			node.setSelected(true);
+		}
+	}
+	if (allSelected && deselectIfAllAreSelected)
+		deselectAllNodes();
+}
+
+void NodeEditor::invertSelection()
+{
+	for (auto& node : getAllNodesInnerIncluded())
+	{
+		bool selected = !node.getSelected();
+		if (node.getSelected() != selected)
+		{
+			node.setSelected(selected);
+		}
+	}
+}
+
+void NodeEditor::deleteSelectedNodes()
+{
+	for (Node& node : getSelectedNodesInnerIncluded())
+	{
+		if (node.m_deletable)
+			node.destroy();
+	}
 }
 
 void NodeEditor::purgeObjects()

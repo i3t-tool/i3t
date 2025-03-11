@@ -179,18 +179,11 @@ public:
 
 	void processTrackingMove();
 
-	void deleteCallback();
-
-	// TODO: (DR) Move to DIWNE::NodeEditor
-	void selectAll();
-	void invertSelection();
-
 	void zoomToAll();
 	void zoomToSelected();
 	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
 	void zoomToRectangle(ImRect const& rect);
 
-	void deleteSelectedNodes();
 	void copySelectedNodes();
 	void pasteSelectedNodes();
 	void cutSelectedNodes();
@@ -298,5 +291,15 @@ public:
 			std::dynamic_pointer_cast<CoreNode>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
 		}
 	}
+};
+
+class WorkspaceEditorInputAdapter : public DIWNE::NodeEditorInputAdapter
+{
+public:
+	WorkspaceEditorInputAdapter(DIWNE::NodeEditor& editor) : NodeEditorInputAdapter(editor) {}
+
+	bool selectAllNodes() override;
+	bool invertSelection() override;
+	bool deleteSelectedNodes() override;
 };
 } // namespace Workspace

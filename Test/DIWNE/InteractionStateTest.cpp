@@ -11,9 +11,13 @@ TEST(InteractionStateTest, ActionTest)
 {
 	// TODO: Test that onFrameEnd and onEnd is called properly
 	// TODO: Test that action is ended automatically when its source gets deleted/destroyed
+	//    - Test when an object is destroyed and unallocated
+	//    - But also when its just destroyed, removed from container but still has a hanging reference
 }
 
 TEST(InteractionStateTest, DragTest)
 {
 	// TODO: Test that drag is ended automatically when its source gets deleted/destroyed (much like action)
+	//    - Test when an object is destroyed and unallocated
+	//    - But also when its just destroyed, removed from container but still has a hanging reference
 }

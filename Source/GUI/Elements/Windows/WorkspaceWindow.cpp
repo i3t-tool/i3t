@@ -151,7 +151,7 @@ void WorkspaceWindow::showEditMenu()
 
 		if (ImGui::MenuItem("Select all"))
 		{
-			g_editor->selectAll();
+			g_editor->selectAllNodes();
 		}
 
 		if (ImGui::MenuItem("Zoom all"))

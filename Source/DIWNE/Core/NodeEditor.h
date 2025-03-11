@@ -131,7 +131,7 @@ public:
 	/**
 	 * Called by Canvas::setZoom() when the zoom level changes.
 	 */
-	virtual void onZoom(){};
+	virtual void onZoom() {};
 
 	// Subsystems
 	// =============================================================================================================
@@ -153,6 +153,10 @@ public:
 	{
 		return *m_input;
 	}
+
+	template <class T, typename... Args>
+	void setInputAdapter(Args&&... args);
+
 	// TODO: Migrate style settings from legacy DiwneSettings into style, add a way to change styles and some defaults
 	/**
 	 * Get a reference to the editors style settings, which specify various colors and sizes much like ImStyle.
@@ -187,7 +191,7 @@ public:
 	virtual FilteredRecursiveNodeRange<> getSelectedNodesInnerIncluded() const;
 
 	// TODO: Docs and rename to deselectAllNodes?
-	virtual void deselectNodes();
+	virtual void deselectAllNodes();
 
 	// TODO: Docs
 	void addNode(const std::shared_ptr<Node>& node);
@@ -220,6 +224,14 @@ public:
 	}
 
 	void addLink(std::shared_ptr<Link> link);
+
+	/**
+	 * Selects all nodes
+	 * @param deselectIfAllAreSelected If true and all nodes were already selected, deselect them all.
+	 */
+	void selectAllNodes(bool deselectIfAllAreSelected = false);
+	void invertSelection();
+	void deleteSelectedNodes();
 
 protected:
 	/// Erases objects marked for deletion or removal from the editor.
@@ -315,6 +327,12 @@ static bool popupDiwne(std::string const popupID, const ImVec2& popupPos, void (
 		}
 	}
 	return interaction_happen;
+}
+
+template <class T, typename... Args>
+void NodeEditor::setInputAdapter(Args&&... args)
+{
+	m_input = std::make_unique<T>(*this, std::forward<Args>(args)...);
 }
 
 } /* namespace DIWNE */

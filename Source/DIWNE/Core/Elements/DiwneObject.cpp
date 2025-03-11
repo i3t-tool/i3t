@@ -49,7 +49,7 @@ void DiwneObject::draw(DrawMode drawMode)
 {
 	// DiwneObjects should be drawn by an overarching NodeEditor or similar class
 	// They are then drawn using the drawDiwne() method that passes along the drawing context created by the NodeEditor.
-	throw std::exception("Not implemented");
+	throw std::runtime_error("Not implemented");
 };
 
 DrawInfo DiwneObject::drawDiwneEx(DrawInfo& context, DrawMode drawMode)
@@ -114,7 +114,7 @@ void DiwneObject::afterDrawDiwne(DrawInfo& context)
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
-void DiwneObject::afterDraw(DrawInfo& context){};
+void DiwneObject::afterDraw(DrawInfo& context) {};
 
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
@@ -374,15 +374,10 @@ bool InteractionState::anyActionActive()
 
 void InteractionState::nextFrame()
 {
-	// TODO: Dragging and current action must be stopped when the source is destroyed
-	//  Good solution to safeguard all posibilities would be to use a weak ptr as source
-	//  When object is REMOVED, onDestroy is not called and cannot ensure drag end
-	// CONTINUE HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 	if (action != nullptr)
 	{
 		// End the action prematurely if it's source was destroyed
-		if (action->source.expired())
+		if (action->source.expired() || action->source.lock()->isDestroyed())
 		{
 			endAction(false);
 		}
@@ -398,7 +393,7 @@ void InteractionState::nextFrame()
 	}
 
 	// End dragging prematurely if it's source was destroyed
-	if (dragging && dragSource.expired())
+	if (dragging && (dragSource.expired() || dragSource.lock()->isDestroyed()))
 		dragEnd = true;
 
 	// Set dragging to false on dragEnd
@@ -610,7 +605,7 @@ bool DiwneObject::processSelectDiwne(DrawInfo& context)
 		bool wasSelected = m_selected;
 		bool multiSelect = diwne.input().multiSelectionActive();
 		if (!multiSelect)
-			diwne.deselectNodes();
+			diwne.deselectAllNodes();
 		setSelected(!wasSelected);
 		context.consumeInput(); // Only one item is selected per click
 	}

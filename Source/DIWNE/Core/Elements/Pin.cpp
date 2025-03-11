@@ -122,7 +122,7 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 
 		if (dragEnd)
 		{
-			context.state.endAction();
+			action->end();
 		}
 	}
 }

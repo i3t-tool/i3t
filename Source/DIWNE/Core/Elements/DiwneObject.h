@@ -667,6 +667,7 @@ public:
 	}
 };
 
+// TODO: (DR) Should be moved to NodeEditor or to a separate class
 /*
  * A persistent state storage holding information about multi-frame interactions.
  * Each NodeEditor holds an instance of this state and sets a reference to it in the non-persistent DrawInfo context.
@@ -675,22 +676,6 @@ public:
 class InteractionState
 {
 public:
-	// TODO: Stuff below this is more persistent than above, and cannot really be "versioned" with the short counter.
-	//  Meaning finding the difference between two DrawInfos becomes a little meaningless
-	//  Thus it would be a good argument to wrap the stuff below into a different struct and keep that as a NodeEditor
-	//  member or keep a pointer to it in the context and just pass that along
-	//  (would help with copying performance as well)(although I don't particularly consider that to be an issue anyway)
-
-	// TODO: Write docs <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// Active action idea, we have a descriptor for the current "action", it has a source
-	// The basic handling would be, if I am not the source of the action, ignore it / restrict functionality
-	// If I am the source, then I know this action is mind and I am later responsible for ending it (ex. drag n drop)
-
-	//	std::string action;
-	//	std::string actionSource;
-	//	std::any actionData;
-	//	bool clearActionThisFrame{false};
-
 	std::unique_ptr<Actions::DiwneAction> action;
 
 	// TODO: Maybe rename to createAction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -770,7 +755,8 @@ public:
 
 	/**
 	 * Some operations in the context are queued to be performed at the end of the frame / beginning of the next one.
-	 * This method performs those actions.
+	 * This method performs those actions as well as some general checks ensuring the state will be valid in the next
+	 * frame.
 	 */
 	void nextFrame();
 };

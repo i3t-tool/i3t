@@ -40,6 +40,19 @@ bool NodeEditorInputAdapter::panDragging()
 	return bypassIsMouseDragging2();
 }
 
+bool NodeEditorInputAdapter::selectAllNodes()
+{
+	return ImGui::IsKeyDown(ImGuiKey_ModCtrl) && ImGui::IsKeyPressed(ImGuiKey_A, false);
+}
+bool NodeEditorInputAdapter::invertSelection()
+{
+	return ImGui::IsKeyDown(ImGuiKey_ModCtrl) && ImGui::IsKeyPressed(ImGuiKey_I, false);
+}
+bool NodeEditorInputAdapter::deleteSelectedNodes()
+{
+	return ImGui::IsKeyPressed(ImGuiKey_Delete, false);
+}
+
 bool NodeEditorInputAdapter::multiSelectionActive()
 {
 	return ImGui::IsKeyDown(ImGuiMod_Shift);

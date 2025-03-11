@@ -32,7 +32,9 @@ using namespace Workspace;
 /* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     : NodeEditor(settingsDiwne), m_viewportHighlightResolver(this)
-{}
+{
+	setInputAdapter<WorkspaceEditorInputAdapter>();
+}
 
 WorkspaceDiwne::~WorkspaceDiwne()
 {
@@ -149,7 +151,7 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 //				{
 //					Ptr<GuiNode>& node = nodeOpt.value();
 //					bool selected = node->getSelected();
-//					g_diwne->deselectNodes();
+//					g_diwne->deselectAllNodes();
 //					if (!selected)
 //					{
 //						if (!node->getSelected())
@@ -163,7 +165,7 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 //		}
 //		if (!validSelection)
 //		{
-//			g_diwne->deselectNodes();
+//			g_diwne->deselectAllNodes();
 //		}
 //	}
 //	m_viewportSelectionChanged = false;
@@ -184,29 +186,6 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 	if (m_takeSnap)
 	{
 		App::getModule<StateManager>().takeSnapshot();
-	}
-}
-
-void WorkspaceDiwne::selectAll()
-{
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		if (!workspaceCoreNode.getSelected())
-		{
-			workspaceCoreNode.setSelected(true);
-		}
-	}
-}
-
-void WorkspaceDiwne::invertSelection()
-{
-	for (auto& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		bool selected = !workspaceCoreNode.getSelected();
-		if (workspaceCoreNode.getSelected() != selected)
-		{
-			workspaceCoreNode.setSelected(selected);
-		}
 	}
 }
 
@@ -735,7 +714,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	{
 		if (ImGui::MenuItem("select all", "Ctrl+A"))
 		{
-			selectAll();
+			selectAllNodes();
 		}
 		if (ImGui::MenuItem("invert", "Ctrl+I"))
 		{
@@ -972,11 +951,6 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 	canvas().moveViewport(rect.Min - canvas().getViewportRectDiwne().Min);
 }
 
-void WorkspaceDiwne::deleteCallback()
-{
-	deleteSelectedNodes();
-}
-
 void WorkspaceDiwne::copySelectedNodes()
 {
 	LOG_INFO("Copying nodes");
@@ -989,7 +963,7 @@ void WorkspaceDiwne::pasteSelectedNodes()
 	LOG_INFO("Pasting nodes");
 	if (copiedNodes == nullptr)
 		return;
-	deselectNodes();
+	deselectAllNodes();
 	Tools::pasteNodes(*copiedNodes);
 }
 
@@ -1013,16 +987,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	{
 		node.setDuplicateNode(true);
 	}
-	deselectNodes();
-}
-
-void WorkspaceDiwne::deleteSelectedNodes()
-{
-	for (DIWNE::Node& node : getSelectedNodesInnerIncluded())
-	{
-		if (node.m_deletable)
-			node.destroy();
-	}
+	deselectAllNodes();
 }
 
 // TODO: Rewrite with filtered iterator
@@ -1232,16 +1197,10 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 
 	if (!context.logicalUpdates && !context.inputConsumed)
 	{
-		if (InputManager::isActionTriggered("selectAll", EKeyState::Pressed))
-			this->selectAll();
-		if (InputManager::isActionTriggered("invertSelection", EKeyState::Pressed))
-			this->invertSelection();
 		if (InputManager::isActionTriggered("zoomToAll", EKeyState::Pressed))
 			this->zoomToAll();
 		if (InputManager::isActionTriggered("zoomToSelected", EKeyState::Pressed))
 			this->zoomToSelected();
-		if (InputManager::isActionTriggered("delete", EKeyState::Pressed))
-			this->deleteCallback();
 		if (InputManager::isActionTriggered("copy", EKeyState::Pressed))
 			this->copySelectedNodes();
 		if (InputManager::isActionTriggered("paste", EKeyState::Pressed))
@@ -1288,4 +1247,17 @@ bool WorkspaceDiwne::processZoom()
 {
 	m_updateDataItemsWidth = true;
 	return NodeEditor::processZoom();
+}
+
+bool WorkspaceEditorInputAdapter::selectAllNodes()
+{
+	return InputManager::isActionTriggered("selectAll", EKeyState::Pressed);
+}
+bool WorkspaceEditorInputAdapter::invertSelection()
+{
+	return InputManager::isActionTriggered("invertSelection", EKeyState::Pressed);
+}
+bool WorkspaceEditorInputAdapter::deleteSelectedNodes()
+{
+	return InputManager::isActionTriggered("delete", EKeyState::Pressed);
 }
