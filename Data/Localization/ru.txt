@@ -274,7 +274,8 @@ Step for manual Next/Prev=Шаг для ручного управления Да
 ############################################## Start window ##############################################
 ##########################################################################################################
 Welcome=Добро пожаловать
-I3T is an educational application that allows the study of 3D transformations and their hierarchy in an illustrative way.=I3T - это учебное приложение, которое позволяет изучать 3D-трансформации и их иерархию наглядным образом.
+I3T is an educational application that allows the study of 3D transformations and=I3T - это учебное приложение, которое позволяет изучать 3D-трансформации и
+ their hierarchy in an illustrative way.= их иерархию наглядным образом.
 Learn=Изучение
 Transformations=Трансформации
 Your scene=Ваша Сцена

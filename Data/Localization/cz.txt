@@ -274,7 +274,8 @@ Step for manual Next/Prev=Krok pro ruční Další/Předchozí
 ############################################## Start window ##############################################
 ##########################################################################################################
 Welcome=Vítejte
-I3T is an educational application that allows the study of 3D transformations and their hierarchy in an illustrative way.=I3T je výuková aplikace, která umožňuje názorným způsobem studovat 3D transformace a jejich hierarchii.
+I3T is an educational application that allows the study of 3D transformations and=I3T je výuková aplikace, která umožňuje názorným způsobem studovat 3D transformace a
+ their hierarchy in an illustrative way.= jejich hierarchii.
 Learn=Studium
 Transformations=Transformace
 Your scene=Vaše scéna

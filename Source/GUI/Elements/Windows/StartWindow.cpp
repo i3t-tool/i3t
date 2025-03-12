@@ -108,8 +108,9 @@ void StartWindow::renderLeftPanel() const
 		// DESCRIPTION
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeDescription));
 		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
-		ImGui::TextWrapped(_t("I3T is an educational application that allows the study of 3D transformations and their "
-		                      "hierarchy in an illustrative way."));
+		ImGui::TextWrapped((_ts("I3T is an educational application that allows the study of 3D transformations and") +
+		                    _ts(" their hierarchy in an illustrative way."))
+		                       .c_str());
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
 
