@@ -83,6 +83,8 @@ def find_unused_keys(folder_with_source, localization_files):
 if __name__ == '__main__':
     ret = 0
 
+    print("This script might not be required to pass.\n")
+
     localization_files = find_localization_files(LOCALIZATION_DIR)
     if not localization_files:
         print(f"No localization files found in {LOCALIZATION_DIR}.")
