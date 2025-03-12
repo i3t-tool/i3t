@@ -22,6 +22,7 @@ namespace Workspace
 class CoreNodeWithPins : public CoreNode
 {
 	using Super = CoreNode;
+
 private:
 	float m_minRightAlignOfRightPins;
 
@@ -35,7 +36,7 @@ public:
 	 * \brief get vector of input pins
 	 * \return m_workspaceInputs
 	 */
-	std::vector<Ptr<CorePin>> const& getInputs() const
+	const std::vector<Ptr<CorePin>>& getInputs() const
 	{
 		return m_workspaceInputs;
 	};
@@ -43,7 +44,7 @@ public:
 	 * \brief get vector of output pins
 	 * \return m_workspaceOutputs
 	 */
-	std::vector<Ptr<CorePin>> const& getOutputs() const
+	const std::vector<Ptr<CorePin>>& getOutputs() const
 	{
 		return m_workspaceOutputs;
 	};

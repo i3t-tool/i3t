@@ -507,6 +507,73 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	deselectAllNodes();
 }
 
+bool WorkspaceDiwne::replaceAndReplugNode(Ptr<CoreNodeWithPins> oldNode, Ptr<CoreNodeWithPins> newNode)
+{
+	bool success = true;
+
+	std::vector<DIWNE::Pin*> inputConnections;
+	std::vector<DIWNE::Pin*> outputConnections;
+
+	// Fetch old connection state (associate external pins with local pin indices)
+	fetchConnectionStateForPins(oldNode->getInputs(), inputConnections);
+	fetchConnectionStateForPins(oldNode->getOutputs(), outputConnections);
+
+	// Unplug old node
+	for (auto& input : oldNode->getInputs())
+		input->unplug(false);
+	for (auto& input : oldNode->getOutputs())
+		input->unplug(false);
+
+	// Replug new node from old state
+	success &= restoreConnectionStateForPins(newNode->getInputs(), inputConnections);
+	success &= restoreConnectionStateForPins(newNode->getOutputs(), outputConnections);
+
+	return success & replaceNode(oldNode, newNode);
+}
+
+void WorkspaceDiwne::fetchConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins,
+                                                 std::vector<DIWNE::Pin*>& connections)
+{
+	for (int i = 0; i < pins.size(); i++)
+	{
+		auto& pin = pins.at(i);
+		if (pin->isPlugged())
+		{
+			DIWNE::Pin* output = pin->getLink()->getOtherPin(pin.get());
+			if (output)
+			{
+				connections.push_back(output);
+				continue;
+			}
+			else
+			{
+				LOG_ERROR(
+				    "Encountered a pin whose link isn't connected to it while replacing a node! Pin: '{}', Link: '{}'",
+				    pin->m_labelDiwne, pin->getLink()->m_labelDiwne);
+				assert(false);
+			}
+		}
+		connections.push_back(nullptr);
+	}
+}
+
+bool WorkspaceDiwne::restoreConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins,
+                                                   const std::vector<DIWNE::Pin*>& connections)
+{
+	bool success = true;
+	for (int i = 0; i < pins.size(); i++)
+	{
+		if (i >= connections.size())
+			break;
+		auto& pin = pins.at(i);
+		if (auto otherPin = connections[i])
+		{
+			success &= pin->plug(otherPin, false);
+		}
+	}
+	return success;
+}
+
 // TODO: Could avoid dynamic_cast using node flags
 DIWNE::FilteredNodeRange<Camera> WorkspaceDiwne::getAllCameras()
 {

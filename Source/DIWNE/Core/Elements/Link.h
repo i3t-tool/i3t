@@ -32,6 +32,7 @@ protected:
 	float m_squaredDistanceMouseFromLink{std::numeric_limits<float>::max()};
 
 	ImVec4 m_color;
+
 public:
 	Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwneLink");
 
@@ -97,6 +98,10 @@ public:
 	/// Returns nullptr no pins are connected or if both ends are connected.
 	Pin* getSinglePin();
 	Pin* getAnyPin(); ///< Get any of the two pins or nullptr if neither are connected
+	/// Get the other pin that this link connects with the specified pin.
+	/// Assumes the link is connected on both ends
+	/// Returns nullptr when neither of the two pins are the passed one.
+	Pin* getOtherPin(Pin* pin);
 
 	void setStartPin(Pin* pin)
 	{
@@ -130,7 +135,7 @@ public:
 	                            endPoint) check - so could return true while Link
 	                            is not visible */
 
-	bool isPlugged(); ///< Whether the link is connected on both ends
+	bool isPlugged();       ///< Whether the link is connected on both ends
 	bool isOnePinPlugged(); ///< Whether the link has exactly one pin plugged in at either end
 
 protected:

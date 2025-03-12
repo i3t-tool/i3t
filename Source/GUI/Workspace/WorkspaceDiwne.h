@@ -195,6 +195,20 @@ public:
 		return result;
 	}
 
+	/**
+	 * Replaces existing old node with a specified new node.
+	 * Old node is destroyed and its link connections are replugged into the new node if possible.
+	 * Attempts to reconnect input and output pins at corresponsing indices.
+	 * @return True on complete sucess, false on failure or when some pins couldn't be reconnected.
+	 */
+	bool replaceAndReplugNode(Ptr<CoreNodeWithPins> oldNode, Ptr<CoreNodeWithPins> newNode);
+
+private:
+	void fetchConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins, std::vector<DIWNE::Pin*>& connections);
+	bool restoreConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins,
+	                                   const std::vector<DIWNE::Pin*>& connections);
+
+public:
 	DIWNE::FilteredNodeRange<CoreNode> getCoreNodes() const
 	{
 		return DIWNE::FilteredNodeRange<CoreNode>(

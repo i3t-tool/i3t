@@ -29,17 +29,55 @@ public:
 	/// Constructs the node container for a specific DiwneObject that it represents.
 	NodeContainer(DiwneObject* owner);
 
+	/// Returns a iterable range to the nodes of this container.
 	NodeRange<> getNodes() const override;
+	/// Returns the underlying std::vector node list of the container.
 	NodeList& getNodeList() override;
 
-	/// Adds a node to the end of the list
+	/**
+	 * Adds a node to the end of the list (O(1))
+	 * The new node has this container set as its parent.
+	 * Triggers onNodeAdd() with the new node.
+	 */
 	void addNode(const std::shared_ptr<Node>& node);
-	void replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode);
+
+	/**
+	 * Replaces an existing node with a new one. Must first find the old node (O(n)).
+	 * The new node has this container set as its parent. The old node is destroyed.
+	 * Triggers onNodeRemove() callback with a pointer to the old node
+	 * and then onNodeAdd() with the new node.
+	 * @return false if the node isn't found
+	 */
+	bool replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode);
+
+	/**
+	 * Removes a node from the container. Must first find it (O(n)).
+	 * This operation triggers shifting of all subsequent nodes by one position (O(n) worst case).
+	 * Triggers onNodeRemove() callback with a pointer to the removed node.
+	 * @return false if the node isn't found
+	 */
 	bool removeNode(const std::shared_ptr<Node>& node);
 
-	/// Adds a node at an index
+	/**
+	 * Adds a node at a specified index.
+	 * The new node has this container set as its parent.
+	 * This operation triggers shifting of all subsequent nodes by one position (O(n) worst case) and reallocation.
+	 * Triggers onNodeAdd() with the new node.
+	 */
 	virtual void addNodeAt(const std::shared_ptr<Node>& node, int index);
+	/**
+	 * Replaces node at a specified index with a different one. An O(1) operation.
+	 * The new node has this container set as its parent.
+	 * The old node is destroyed.
+	 * Triggers onNodeRemove() callback with a pointer to the old node
+	 * and then onNodeAdd() with the new node.
+	 */
 	virtual void replaceNodeAt(const std::shared_ptr<Node>& node, int index);
+	/**
+	 * Removes a node at a specified index from the container.
+	 * This operation triggers shifting of all subsequent nodes by one position (O(n) worst case).
+	 * Triggers onNodeRemove() callback with a pointer to the removed node.
+	 */
 	virtual void removeNodeAt(int index);
 
 	/// Erases objects marked for deletion or removal from the container.

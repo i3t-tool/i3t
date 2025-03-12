@@ -17,13 +17,13 @@ void NodeContainer::addNode(const std::shared_ptr<Node>& node)
 {
 	addNodeAt(node, m_nodes.size());
 }
-void NodeContainer::replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode)
+bool NodeContainer::replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode)
 {
 	auto it = std::find(m_nodes.begin(), m_nodes.end(), oldNode);
-	if (it != m_nodes.end())
-	{
-		replaceNodeAt(newNode, std::distance(m_nodes.begin(), it));
-	}
+	if (it == m_nodes.end())
+		return false;
+	replaceNodeAt(newNode, std::distance(m_nodes.begin(), it));
+	return true;
 }
 bool NodeContainer::removeNode(const std::shared_ptr<Node>& node)
 {
@@ -69,8 +69,6 @@ void NodeContainer::removeNodeAt(int index)
 
 	auto it = m_nodes.begin() + index;
 	std::shared_ptr<Node> nodeBckup = *it;
-	if (!nodeBckup->isDestroyed())
-		nodeBckup->destroy(false);
 	m_nodes.erase(it);
 
 	onNodeRemove(nodeBckup, index);

@@ -15,5 +15,5 @@ target_link_libraries(
         ${OPENGL_LIBRARIES}
         glfw
         spdlog
-        ImGuizmo
+        ImGui
 )

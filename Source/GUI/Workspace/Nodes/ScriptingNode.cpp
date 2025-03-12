@@ -242,22 +242,15 @@ Ptr<ScriptingNode> ScriptingNode::reloadScript()
 
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
-	nodeEditor.replaceNode(self, newNode);
+
+	bool success = nodeEditor.replaceAndReplugNode(self, newNode);
+	if (!success)
+		LOG_INFO("Replugging of scripting node didn't replug all pins perfectly. Perhaps there was a pin mismatch.");
+
 	self->m_interface = nullptr;
 
 	newNode->getNodebase()->as<::ScriptingNode>()->performInit();
-
-	// All connections are lost, so we need to reconnect the node.
-	auto connections = collectNeighbours(newNode->getId());
-	for (const auto& [fromId, fromIndex, toId, toIndex] : connections)
-	{
-		if (!Tools::plug(fromId, fromIndex, toId, toIndex))
-		{
-			LOG_ERROR("Failed to reconnect node: Node#{}[{}] -> Node#{}[{}]", fromId, fromIndex, toId, toIndex);
-		}
-	}
 	newNode->setPosition(getPosition());
-
 	return newNode;
 }
 

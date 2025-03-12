@@ -214,5 +214,14 @@ Pin* Link::getAnyPin()
 		return m_endPin;
 	return nullptr;
 }
+Pin* Link::getOtherPin(Pin* pin)
+{
+	assert(isPlugged());
+	if (m_startPin == pin)
+		return m_endPin;
+	if (m_endPin == pin)
+		return m_startPin;
+	return nullptr;
+}
 
 } /* namespace DIWNE */
