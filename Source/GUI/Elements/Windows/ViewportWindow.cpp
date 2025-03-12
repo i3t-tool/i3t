@@ -29,7 +29,8 @@ using namespace UI;
 
 using CameraMode = Vp::AggregateCamera::CameraMode;
 
-ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(ICON_T(ICON_I3T_SCENE " " , "Scene View"), show)
+ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
+    : IWindow(ICON_T(ICON_I3T_SCENE " ", "Scene View"), show)
 {
 	m_autoFocus = true;
 	m_viewport = viewport;
@@ -453,7 +454,8 @@ bool ViewportWindow::showViewportMenu()
 				stg.scene().mainScene.camera.mode = CameraMode::ORBIT;
 			}
 		}
-		if (ImGui::MenuItem(_t("Trackball camera"), nullptr, stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
+		if (ImGui::MenuItem(_t("Trackball camera"), nullptr,
+		                    stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{

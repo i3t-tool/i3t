@@ -371,7 +371,7 @@ void TutorialWindow::renderTutorialControls()
 	if (currentStep != 0)
 	{
 		if (ImGui::Button(_t("< Back"), ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth),
-		                                   NEXT_BUTTON_SIZE_Y)))
+		                                       NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep - 1);
 			// std::cout << m_currentStep << std::endl;

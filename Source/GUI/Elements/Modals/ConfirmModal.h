@@ -29,7 +29,8 @@ class ConfirmModalStrategy
 	friend class ConfirmModal;
 
 public:
-	ConfirmModalStrategy(std::string title, std::string message, std::string yesText = _t("Yes"), std::string noText = _t("No"))
+	ConfirmModalStrategy(std::string title, std::string message, std::string yesText = _t("Yes"),
+	                     std::string noText = _t("No"))
 	    : m_title(title), m_message(message), m_yesText(yesText), m_noText(noText)
 	{}
 

@@ -108,7 +108,8 @@ void StartWindow::renderLeftPanel() const
 		// DESCRIPTION
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeDescription));
 		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
-		ImGui::TextWrapped(_t("I3T is an educational application that allows the study of 3D transformations and their hierarchy in an illustrative way."));
+		ImGui::TextWrapped(_t("I3T is an educational application that allows the study of 3D transformations and their "
+		                      "hierarchy in an illustrative way."));
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
 
@@ -252,7 +253,7 @@ void StartWindow::renderRightPanel()
 			ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle)); // Use a larger font for the headline
 			ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(
 			                                         EColor::StartWindow_DescriptionFont)); // Depending on the theme
-			ImGui::Text(_t("Recent"));                                                          // Headline text
+			ImGui::Text(_t("Recent"));                                                      // Headline text
 			ImGui::PopStyleColor();
 			ImGui::PopFont();
 
