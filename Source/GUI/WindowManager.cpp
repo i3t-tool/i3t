@@ -198,11 +198,11 @@ void WindowManager::updateWindowFocus()
 	if (window != nullptr)
 	{
 		hoveredWindow = window;
-		LOG_DEBUG("Found hovered window: {}", window->getID());
+		// LOG_DEBUG("Found hovered window: {}", window->getID());
 	}
 	else
 	{
-		LOG_DEBUG("Failed to find hovered window: {}", hoveredWindowID);
+		// LOG_DEBUG("Failed to find hovered window: {}", hoveredWindowID);
 	}
 
 	if (!allowFocusSwitchToHoveredWindow)

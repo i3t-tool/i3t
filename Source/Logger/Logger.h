@@ -29,7 +29,9 @@
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
 
-#ifdef _DEBUG
+// Omit trace from release builds in case of any perf issues
+#define LOG_TRACE(...) Logger::getInstance().getAppLogger()->trace(__VA_ARGS__)
+#ifndef NDEBUG
 #define LOG_DEBUG(...) Logger::getInstance().getAppLogger()->debug(__VA_ARGS__)
 #else
 #define LOG_DEBUG(...)

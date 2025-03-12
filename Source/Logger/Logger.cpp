@@ -63,7 +63,26 @@ void Logger::initLogger(int argc, char* argv[])
 {
 	loadStrings();
 
-	spdlog::set_level(spdlog::level::info);
+	spdlog::level::level_enum defaultLogLevel = spdlog::level::info;
+
+	// Very essential argument parsing to set log level
+	char** end = argv + argc;
+	if (std::find(argv, end, std::string("off")) != end)
+		defaultLogLevel = spdlog::level::off;
+	if (std::find(argv, end, std::string("critical")) != end)
+		defaultLogLevel = spdlog::level::critical;
+	if (std::find(argv, end, std::string("err")) != end)
+		defaultLogLevel = spdlog::level::err;
+	if (std::find(argv, end, std::string("warn")) != end)
+		defaultLogLevel = spdlog::level::warn;
+	if (std::find(argv, end, std::string("info")) != end)
+		defaultLogLevel = spdlog::level::info;
+	if (std::find(argv, end, std::string("debug")) != end)
+		defaultLogLevel = spdlog::level::debug;
+	if (std::find(argv, end, std::string("trace")) != end)
+		defaultLogLevel = spdlog::level::trace;
+
+	spdlog::set_level(defaultLogLevel);
 	spdlog::set_pattern(DEFAULT_LOG_PATTERN);
 
 	// Console sink.
@@ -78,6 +97,7 @@ void Logger::initLogger(int argc, char* argv[])
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::appLog.string(),
 	                                                                                    maxLogSize, maxFileCount));
+	appLogger->set_level(defaultLogLevel);
 	spdlog::register_logger(appLogger);
 
 	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
