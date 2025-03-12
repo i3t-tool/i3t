@@ -124,7 +124,7 @@ Center camera on scene=Vycentrovat kameru na scénu
 Show objects=Zobrazit objekty
 Show axes=Zobrazit osy
 Show cameras=Zobrazit kamery
-Show frustums=Zobrazit frustumy
+Show frustums=Zobrazit frusta
 
 
 Object visibility toggle=Přepínač viditelnosti objektu
@@ -133,7 +133,7 @@ Objects=Objekty
 Axes=Osy
 Grid=Mřížka
 Cameras=Kamery
-Frustums=Frustumy
+Frustums=Frusta
 
 Toggle world lighting=Přepnout světové osvětlení
 
