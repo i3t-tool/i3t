@@ -27,6 +27,10 @@ stages:
         - CMakeLists.txt
         - "**/*.{h,cpp}"
         - "**/*.{h,cpp}"
+  localization:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Data/Localization/*"
 
 # Linting phase
 
@@ -56,6 +60,22 @@ cppcheck:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
     - bash Scripts/RunCppCheck.sh
+
+localization-check-keys-coverage-in-lang:
+  stage: lint
+  rules:
+    - !reference [ .changes-rules, cpp ]
+    - !reference [ .changes-rules, localization ]
+  script:
+    - python Scripts/LocalizationTests/CheckLangFilesKeyCoverage.py
+
+localization-check-unused-keys-in-lang:
+  stage: lint
+  rules:
+    - !reference [ .changes-rules, cpp ]
+    - !reference [ .changes-rules, localization ]
+  script:
+    - python Scripts/LocalizationTests/CheckUnusedKeysInLocalization.py
 
 ###
 
