@@ -281,10 +281,10 @@ void Theme::initClassicProperties()
 
 	set(EColor::Cycle_RadioButton, createColor(33, 33, 33, 255));
 	set(EColor::Cycle_RadioButtonActive, createColor(158, 220, 213, 255));
-	set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 337, 255));
+	set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 37, 255));
 	set(EColor::Cycle_RadioButtonText, createColor(89, 89, 89, 255));
 	set(EColor::Cycle_RadioButtonSelected, createColor(140, 190, 186, 255));
-	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(345, 195, 186, 255));
+	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(145, 195, 186, 255));
 	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
 	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
 

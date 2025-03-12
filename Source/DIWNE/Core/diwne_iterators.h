@@ -289,8 +289,8 @@ class RecursiveNodeIteratorImpl : public ForwardNodeIterator<Iterator, NodeType,
 {
 protected:
 	using Super = ForwardNodeIterator<Iterator, NodeType, false>;
-	using ChildNodeRange = NodeRange<Node>;
-	using ChildNodeIterator = NodeIterator<Node>;
+	using ChildNodeRange = NodeRange<>;
+	using ChildNodeIterator = NodeIterator<>;
 
 	/// A stack of child container node iterators, they store their own position at each depth level
 	std::stack<ChildNodeIterator, std::vector<ChildNodeIterator>> _stack;
@@ -356,61 +356,7 @@ public:
 		}
 	}
 
-	void next()
-	{
-		bool topLevel = _stack.empty(); // Whether iterating over the top level nodes or not
-		Node* current;
-		if (topLevel)
-			current = this->basePtr();
-		else
-			current = _stack.top().operator->();
-
-		// Test whether this node meets conditions for diving in
-		if (_divePredicate == nullptr || _divePredicate(current))
-		{
-			// TODO: Diwne node flags could be used to mark NodeContainers instead of using dynamic cast.
-			if (auto container = dynamic_cast<const INodeContainer*>(current))
-			{
-				// If the node is a node container we dive deeper and iterate over child nodes
-				// Note: If dynamic_cast proves to be a performance issue some sort of a tagging system can be used
-				ChildNodeRange range = container->getNodes();
-				auto it = range.begin();
-				if (it.valid())
-				{
-					// Pushing the container node iterator on the stack
-					_stack.push(it);
-					// When the iterator is pushed it should point at its first node so no need to advance
-					return;
-				}
-			}
-		}
-
-		// Not a container, just keep iterating over the current depth level
-		if (topLevel)
-		{
-			Super::next();
-		}
-		else
-		{
-			ChildNodeIterator* top = &_stack.top();
-			top->next();
-			// When a child iterator ends, we ascend back up to the next first valid iterator
-			// (either another iterator in the stack or the top level)
-			while (!top->valid() && !_stack.empty())
-			{
-				_stack.pop();
-				if (_stack.empty())
-				{ // We've resurfaced to the top level
-					Super::next();
-				}
-				else
-				{ // We iterate the parent child iterator
-					top = &_stack.top();
-					top->next();
-				}
-			}
-		}
-	}
+	void next();
 };
 
 /**
@@ -661,5 +607,63 @@ public:
 	    : Super(predicate, divePredicate, nodes)
 	{}
 };
+
+// RecursiveNodeIteratorImpl next() impl must be here for NodeRange to not be incomplete
+template <typename Iterator, typename NodeType>
+void RecursiveNodeIteratorImpl<Iterator, NodeType>::next()
+{
+	bool topLevel = _stack.empty(); // Whether iterating over the top level nodes or not
+	Node* current;
+	if (topLevel)
+		current = this->basePtr();
+	else
+		current = _stack.top().operator->();
+
+	// Test whether this node meets conditions for diving in
+	if (_divePredicate == nullptr || _divePredicate(current))
+	{
+		// TODO: Diwne node flags could be used to mark NodeContainers instead of using dynamic cast.
+		if (auto container = dynamic_cast<const INodeContainer*>(current))
+		{
+			// If the node is a node container we dive deeper and iterate over child nodes
+			// Note: If dynamic_cast proves to be a performance issue some sort of a tagging system can be used
+			ChildNodeRange range = container->getNodes();
+			auto it = range.begin();
+			if (it.valid())
+			{
+				// Pushing the container node iterator on the stack
+				_stack.push(it);
+				// When the iterator is pushed it should point at its first node so no need to advance
+				return;
+			}
+		}
+	}
+
+	// Not a container, just keep iterating over the current depth level
+	if (topLevel)
+	{
+		Super::next();
+	}
+	else
+	{
+		ChildNodeIterator* top = &_stack.top();
+		top->next();
+		// When a child iterator ends, we ascend back up to the next first valid iterator
+		// (either another iterator in the stack or the top level)
+		while (!top->valid() && !_stack.empty())
+		{
+			_stack.pop();
+			if (_stack.empty())
+			{ // We've resurfaced to the top level
+				Super::next();
+			}
+			else
+			{ // We iterate the parent child iterator
+				top = &_stack.top();
+				top->next();
+			}
+		}
+	}
+}
 
 } // namespace DIWNE

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "diwne_actions.h"
 
 #include "NodeEditor.h"

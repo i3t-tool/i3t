@@ -4,6 +4,7 @@
 
 namespace DIWNE
 {
+class Node;
 template <typename NodeType = Node>
 class NodeRange;
 

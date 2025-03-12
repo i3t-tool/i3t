@@ -181,7 +181,7 @@ public:
 	[[nodiscard]] SetValueResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] SetValueResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] SetValueResult setValue(float val, glm::ivec2 coords) override;
-	[[nodiscard]] void setDefaultUniformScale(float val);
+	void setDefaultUniformScale(float val);
 
 	void resetMatrixFromDefaults() override;
 };
