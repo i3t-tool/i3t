@@ -15,13 +15,14 @@
 #include "Commands/ApplicationCommands.h"
 #include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
 #include "GUI/WindowManager.h"
+#include "Localization/Localization.h"
 #include "Utils/Statistics.h"
 #include "imgui.h"
 
 /**
  * \brief Constructs a StatisticsWindow and initializes its title.
  */
-StatisticsWindow::StatisticsWindow() : IWindow("Statistics") {}
+StatisticsWindow::StatisticsWindow() : IWindow(ICON_T(ICON_I3T_DEBUG " ", "Statistics")) {}
 
 /**
  * \brief Renders the statistics window with performance and GPU data.
@@ -58,9 +59,9 @@ void StatisticsWindow::render()
 void StatisticsWindow::drawContent()
 {
 	// Display frame ID and FPS
-	ImGui::Text("Frame %d, FPS %.1f", Statistics::Frame::ID, Statistics::FPS);
+	ImGui::Text(_t("Frame %d, FPS %.1f"), Statistics::Frame::ID, Statistics::FPS);
 
-	char overlay[32];
+	char overlay[64];
 
 	// Display and update the framerate plot
 	static float framerates[500] = {};
@@ -76,7 +77,7 @@ void StatisticsWindow::drawContent()
 	}
 	framerates[frameratesOffset] = Statistics::FPS;
 	frameratesOffset = (frameratesOffset + 1) % IM_ARRAYSIZE(framerates);
-	sprintf(overlay, "Framerate: %.3f", Statistics::FPS);
+	sprintf(overlay, _t("Framerate: %.3f"), Statistics::FPS);
 	ImGui::PlotLines("", framerates, IM_ARRAYSIZE(framerates), frameratesOffset, overlay, 0.0f, maxFramerate * 2,
 	                 ImVec2(-1.0f, 80.0f));
 
@@ -94,14 +95,14 @@ void StatisticsWindow::drawContent()
 	}
 	deltaTimes[deltaTimesOffset] = Statistics::DeltaTime;
 	deltaTimesOffset = (deltaTimesOffset + 1) % IM_ARRAYSIZE(deltaTimes);
-	sprintf(overlay, "Frametime: %.3f", Statistics::DeltaTime);
+	sprintf(overlay, _t("Frametime: %.3f"), Statistics::DeltaTime);
 	ImGui::PlotLines("", deltaTimes, IM_ARRAYSIZE(deltaTimes), deltaTimesOffset, overlay, 0.0f, deltaMaxTime * 2,
 	                 ImVec2(-1.0f, 80.0f));
 
 	// Display and update custom timers
 	if (!Statistics::CPUTimers.empty())
 	{
-		ImGui::Text("CPU Timers:");
+		ImGui::Text(_t("CPU Timers:"));
 		for (auto& [name, timer] : Statistics::CPUTimers)
 		{
 			ImGui::Text("%f %s", timer->get(), name.c_str());
@@ -111,7 +112,7 @@ void StatisticsWindow::drawContent()
 
 	if (!Statistics::GPUTimers.empty())
 	{
-		ImGui::Text("GPU Timers:");
+		ImGui::Text(_t("GPU Timers:"));
 		for (auto& [name, timer] : Statistics::GPUTimers)
 		{
 			ImGui::Text("%f %s", timer->get(), name.c_str());
@@ -120,13 +121,13 @@ void StatisticsWindow::drawContent()
 	}
 
 	// Display GPU memory statistics
-	ImGui::Text("Total GPU memory %d MB", Statistics::GPU::TotalMemory / 1024);
+	ImGui::Text(_t("Total GPU memory %d MB"), Statistics::GPU::TotalMemory / 1024);
 	ImGui::ProgressBar(Statistics::GPU::AllocatedMemory / static_cast<float>(Statistics::GPU::TotalMemory),
 	                   ImVec2(80.0f, 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-	ImGui::Text("%u MB alloc.", static_cast<unsigned int>(Statistics::GPU::AllocatedMemory / 1024));
+	ImGui::Text(_t("%u MB alloc."), static_cast<unsigned int>(Statistics::GPU::AllocatedMemory / 1024));
 	ImGui::ProgressBar(Statistics::GPU::FreeMemory / static_cast<float>(Statistics::GPU::TotalMemory),
 	                   ImVec2(80.0f, 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-	ImGui::Text("%u MB free", static_cast<unsigned int>(Statistics::GPU::FreeMemory / 1024));
+	ImGui::Text(_t("%u MB free."), static_cast<unsigned int>(Statistics::GPU::FreeMemory / 1024));
 }

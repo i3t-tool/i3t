@@ -210,18 +210,18 @@ void TransformationBase::popupContent()
 
 void TransformationBase::drawMenuStorevalues()
 {
-	if (ImGui::BeginMenu("Value"))
+	if (ImGui::BeginMenu(_t("Value")))
 	{
-		if (ImGui::MenuItem("Reset"))
+		if (ImGui::MenuItem(_t("Reset")))
 		{
 			m_nodebase->as<Core::Transform>()->initDefaults();
 			m_nodebase->as<Core::Transform>()->resetMatrixFromDefaults();
 		}
-		if (ImGui::MenuItem("Store"))
+		if (ImGui::MenuItem(_t("Store")))
 		{
 			m_nodebase->as<Core::Transform>()->saveValue();
 		}
-		if (ImGui::MenuItem("Restore", nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
+		if (ImGui::MenuItem(_t("Restore"), nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
 		{
 			m_nodebase->as<Core::Transform>()->reloadValue();
 		}
@@ -241,14 +241,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem("Unlock", NULL, false, enableLockMenuItem))
+		if (ImGui::MenuItem(_t("Unlock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem("Lock", NULL, false, enableLockMenuItem))
+		if (ImGui::MenuItem(_t("Lock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -256,14 +256,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem("Disable synergies", NULL, false, enableSynergiesMenuItem))
+		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem("Enable synergies", NULL, false, enableSynergiesMenuItem))
+		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
@@ -279,7 +279,7 @@ void TransformationBase::deleteAction()
 
 void TransformationBase::drawMenuDelete()
 {
-	if (ImGui::MenuItem("Delete"))
+	if (ImGui::MenuItem(_t("Delete")))
 	{
 		deleteActionDiwne();
 	}

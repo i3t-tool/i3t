@@ -1,0 +1,367 @@
+###########################################################################################################
+############################################## Main Menu Bar ##############################################
+###########################################################################################################
+
+#####################################################
+##################### File Menu #####################
+#####################################################
+File=Soubor
+New=Nová scéna
+Open=Otevřít
+Recent=Nedávné
+Save=Uložit
+Save As=Uložit jako
+Manage Models=Správa modelů
+Exit=Ukončení
+
+#####################################################
+##################### Edit Menu #####################
+#####################################################
+Edit=Úpravy
+Undo=Zpět
+Redo=Vpřed
+Style Editor=Editor stylu
+Preferences=Nastavení
+Change Language=Změnit jazyk
+
+########################################################
+##################### Windows Menu #####################
+########################################################
+Windows=Okna
+Start window=Úvodní okno
+Tutorial window=Výukové okno
+Scene view window=Okno prohlížení scény
+Workspace window=Okno pracovní plochy
+Console window=Konzolové okno
+Log window=Logovácí okno
+Layouts=Rozložení
+Layouts As Submenu=Rozložení jako podnabídku
+
+#########################################################
+##################### Tutorial Menu #####################
+#########################################################
+Tutorials=Tutoriály
+Reload=Znovu načíst
+
+#####################################################
+##################### Help Menu #####################
+#####################################################
+Help=Nápověda
+Description=Popis
+About=O programu
+Show ImGui demo window=Zobrazit ukázkové okno ImGui
+Debug=Ladění
+
+#############################################################################################################
+############################################## Tutorial window ##############################################
+#############################################################################################################
+Tutorial=Tutoriál
+No tutorial=Žádný tutoriál
+Empty tutorial=Prázdný tutoriál
+Open Start Menu=Otevřít úvodní menu
+< Back=< Zpět
+< Start Menu= < Úvodní menu
+Next=Dále
+Finish=Dokončit
+Submit=Odeslat
+Incorrect!=Nesprávně!
+Correct!=Správně!
+
+###############################################################################################################
+############################################## Scene view window ##############################################
+###############################################################################################################
+Scene View=Prohlížení scény
+
+#########################################################
+##################### Settings Menu #####################
+#########################################################
+Settings=Nastavení
+
+Scene=Scéna
+World space lighting=Světové osvětlení
+
+Manipulators=Manipulátory
+Show manipulators=Zobrazit manipulátory
+Size=Velikost
+
+MSAA=MSAA
+OFF=Vypnuto
+
+Highlight=Zvýraznění
+Ultra=Ultra
+High=Vysoké
+Medium=Střední
+Low=Nízké
+Lowest=Minimální
+
+Transparency=Průhlednost
+Use WBOIT=Použít WBOIT
+WBOIT weight function=Váhová funkce WBOIT
+
+Reload shaders=Znovu načíst shadery
+
+#####################################################
+##################### View Menu #####################
+#####################################################
+View=Zobrazení
+
+Orbit camera=Orbitální kamera
+Trackball camera=Trackball kamera
+Smooth scroll=Plynulé posouvání
+Camera fov=Fov kamery
+Show grid=Zobrazit mřížku
+
+Viewpoint right=Pohled zprava
+Viewpoint left=Pohled zleva
+Viewpoint top=Pohled shora
+Viewpoint bottom=Pohled zdola
+Viewpoint front=Pohled zepředu
+Viewpoint back=Pohled zezadu
+
+Center camera on selection=Vycentrovat kameru na výběr
+Center camera on scene=Vycentrovat kameru na scénu
+
+Show objects=Zobrazit objekty
+Show axes=Zobrazit osy
+Show cameras=Zobrazit kamery
+Show frustums=Zobrazit frusta
+
+
+Object visibility toggle=Přepínač viditelnosti objektu
+Object visibility=Viditelnost objektu
+Objects=Objekty
+Axes=Osy
+Grid=Mřížka
+Cameras=Kamery
+Frustums=Frusta
+
+Toggle world lighting=Přepnout světové osvětlení
+
+Toggle manipulators=Přepnout manipulátory
+
+##############################################################################################################
+############################################## Workspace window ##############################################
+##############################################################################################################
+Workspace=Pracovní plocha
+
+#####################################################
+##################### Edit Menu #####################
+#####################################################
+Select all=Vybrat vše
+Zoom all=Přiblížit vše
+
+#################################################
+##################### Add new nodes #####################
+#################################################
+Add...=Přidat...
+
+#transformation=transformace
+#free=volná
+#translate=posun
+#rotate=otáčení
+#scale=škálování
+#projection=projekce
+#ortho=ortogonální
+#perspective=perspektivní
+#frustum=frustum
+
+#operator=operátor
+
+#sequence=sekvence
+
+#camera=kamera
+
+#model=model
+
+#pulse=puls
+
+#screen=obrazovka
+
+#cycle=cyklus
+
+#scripting node=skriptovací uzel
+
+#######################################################
+##################### Common node #####################
+#######################################################
+#Full=Celý
+#Set values=Nastavit hodnoty
+#Label=Označení
+#Light cycle=
+
+Choose value...=Zvolte hodnotu...
+Angle=Úhel
+
+Delete=Odstranit
+Selected nodes=Vybrané uzly
+Selected links=Vybrané spoje
+All nodes=Všechny uzly
+All links=Všechny spoje
+
+Selection=Výběr
+select all=vybrat vše
+invert=invertovat
+
+Zoom=Přiblížit
+to all=ke všem
+to selection=k výběru
+
+Rename=Přejmenovat
+Lock=Zamknout
+Unlock=Odemknout
+Enable synergies=Povolit synergii
+Disable synergies=Zakázat synergii
+Value=Hodnoty
+Reset=Resetovat
+Store=Uložit
+Restore=Obnovit
+Decimal digits=Desetinné číslice
+Level of detail=Úroveň detailů
+Duplicate=Duplikovat
+
+#######################################################
+##################### Camera node #####################
+#######################################################
+Show camera=Zobrazit kameru
+Show frustum=Zobrazit frustum
+Fill frustum=Naplnit frustum
+Frustum fill color=Barva výplně frustumu
+Default=Výchozí
+Red=Červený
+Blue=Modrý
+Green=Zelený
+Yellow=Žlutý
+Orange=Oranžový
+Magenta=Magenta
+Teal=Tyrkysový
+
+Frustum outline color=Barva obrysu frustumu
+
+######################################################
+##################### Model node #####################
+######################################################
+Show model=Zobrazit model
+Opaque=Neprůhledný
+Back-face culling=Back-face culling
+Opacity=Neprůhlednost
+Set tint=Nastavit odstín
+Color=Barva
+None=Žádná
+Brown=Hnědý
+Light Blue=Světle modrý
+Strength=Síla
+Change model=Změnit model
+
+
+Stop tracking=Zastavit sledování
+Smooth tracking=Plynulé sledování
+Start tracking from right=Začít sledovat zprava
+Start tracking from left=Začít sledovat zleva
+
+######################################################
+##################### Cycle node #####################
+######################################################
+   once   =jednou
+   repeat   =opakovat
+   ping-pong   =ping-pong
+  smooth step: = plynulý krok:
+     step duration: =      trvání kroku:
+Automatic step duration=Automatické trvání kroku
+             single step: =              jeden krok:
+Step for manual Next/Prev=Krok pro ruční Další/Předchozí
+
+##########################################################################################################
+############################################## Start window ##############################################
+##########################################################################################################
+Welcome=Vítejte
+I3T is an educational application that allows the study of 3D transformations and=I3T je výuková aplikace, která umožňuje názorným způsobem studovat 3D transformace a
+ their hierarchy in an illustrative way.= jejich hierarchii.
+Learn=Studium
+Transformations=Transformace
+Your scene=Vaše scéna
+Start with an empty scene or open your previous work.=Začněte s prázdnou scénou nebo otevřete svou předchozí práci.
+No recent files=Žádné nedávné soubory
+Start=Začít
+
+###################################################################################################################
+############################################## Change Language modal ##############################################
+###################################################################################################################
+Cancel=Storno
+OK=OK
+You need to restart the application for all changes to take effect.=Pro uplatnění všech změn je třeba restartovat aplikaci.
+
+########################################################################################################
+############################################## Log window ##############################################
+########################################################################################################
+Log View=Logovácí okno
+Log output=Výstup logu
+Switch fire action key=Přepnout akční klávesu
+Current keys: %s=Aktuální klávesy: %s
+Switch=Přepnout
+
+############################################################################################################
+############################################## Console window ##############################################
+############################################################################################################
+Console=Konzolové okno
+
+###############################################################################################################
+############################################## Statistics window ##############################################
+###############################################################################################################
+Statistics=Statistiky
+Frame %d, FPS %.1f=Snímek %d, FPS %.1f
+Framerate: %.3f=Framerate: %.3f
+Frametime: %.3f=Frametime: %.3f
+CPU Timers:=Časovače CPU
+GPU Timers:=Časovače GPU
+Total GPU memory %d MB=Celková paměť GPU %d MB
+%u MB alloc.=%u MB alokováno.
+%u MB free.=%u MB volné.
+
+#################################################################################################################
+############################################## Manage model window ##############################################
+#################################################################################################################
+No models imported=Žádné modely nejsou importovány
+Import=Importovat
+Remove=Odstranit
+Normalize model size=Normalizovat velikost modelu
+Model details:=Detail modelu:
+No model selected=Žádný model není vybrán
+Import model(s)=Importovat model(y)
+
+#################################################################################################################
+############################################## Style Editor window ##############################################
+#################################################################################################################
+Custom theme=Vlastní téma
+Use default theme=Použít výchozí téma
+Revert changes=Vrátit změny
+Reload all Themes=Znovu načíst všechna témata
+(Discards all unsaved changes)=(Odstraní všechny neuložené změny)
+Save current modifications to file (discards unsaved changes on other Themes)=Uložit aktuální úpravy do souboru (odstraní neuložené změny na jiných tématech)
+Overwrite=Přepsat
+Save as=Uložit jako
+New theme name=Nový název tématu
+
+Reset to defaults=Resetovat na výchozí hodnoty
+
+################################################################################################################
+############################################## Edit script window ##############################################
+################################################################################################################
+Edit script=Upravit skript
+Script Editor=Editor Skriptu
+Save and close=Uložit a zavřít
+
+Reload script=Znovu načíst skript
+
+###################################################################################################################
+############################################### Select Layout window ##############################################
+###################################################################################################################
+Select Layout=Vybrat rozložení
+new layout...=nové rozložení...
+
+###############################################################################################################
+############################################## Before exit modal ##############################################
+###############################################################################################################
+#Save current scene?=Uložit aktuální scénu?
+#Any unsaved content will be discarded, do you want to save it?=Jakýkoli neuložený obsah bude zahozen, chcete ho uložit?
+Yes=Ano
+No=Ne

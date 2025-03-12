@@ -18,6 +18,7 @@
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Tools.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
+#include "Localization/Localization.h"
 #include "State/StateManager.h"
 
 using namespace Workspace;
@@ -254,7 +255,7 @@ bool CoreNode::drawDataLabel()
 
 void CoreNode::drawMenuSetEditable()
 {
-	if (ImGui::MenuItem("Rename", nullptr, m_isLabelBeingEdited))
+	if (ImGui::MenuItem(_t("Rename"), nullptr, m_isLabelBeingEdited))
 	{
 		m_isLabelBeingEdited = !m_isLabelBeingEdited;
 	}
@@ -262,7 +263,7 @@ void CoreNode::drawMenuSetEditable()
 
 void CoreNode::drawMenuDuplicate()
 {
-	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+	if (ImGui::MenuItem(_t("Duplicate"), "Ctrl+D"))
 	{
 		// duplicate
 		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
@@ -275,7 +276,7 @@ void CoreNode::drawMenuDuplicate()
 
 void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vector<LevelOfDetail>& levels_of_detail)
 {
-	if (ImGui::BeginMenu("Level of detail"))
+	if (ImGui::BeginMenu(_t("Level of detail")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual level: {}",
 		// LevelOfDetailName[node->getLevelOfDetail()]).c_str());
@@ -295,7 +296,7 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 
 void CoreNode::drawMenuSetPrecision()
 {
-	if (ImGui::BeginMenu("Decimal digits"))
+	if (ImGui::BeginMenu(_t("Decimal digits")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}",
 		// getNumberOfVisibleDecimal()).c_str()); ImGui::Separator();
@@ -313,13 +314,13 @@ void CoreNode::drawMenuSetPrecision()
 
 static void drawMenuStoreValues(Ptr<Core::Node> node)
 {
-	if (ImGui::BeginMenu("Value"))
+	if (ImGui::BeginMenu(_t("Value")))
 	{
-		if (ImGui::MenuItem("Store"))
+		if (ImGui::MenuItem(_t("Store")))
 		{
 			node->dataMut(0).saveValue();
 		}
-		if (ImGui::MenuItem("Restore", nullptr, false, node->data(0).hasSavedValue()))
+		if (ImGui::MenuItem(_t("Restore"), nullptr, false, node->data(0).hasSavedValue()))
 		{
 			node->dataMut(0).reloadValue();
 		}

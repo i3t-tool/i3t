@@ -54,7 +54,7 @@ void ConfirmModal::onImGui()
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Cancel", ImVec2(100, 0)))
+	if (ImGui::Button(_t("Cancel"), ImVec2(100, 0)))
 	{
 		hide();
 	}

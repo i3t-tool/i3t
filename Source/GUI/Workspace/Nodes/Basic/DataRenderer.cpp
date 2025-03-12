@@ -93,15 +93,15 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const nu
 
 void DataRenderer::popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& valueSelected)
 {
-	ImGui::Text("Choose value...                ");
+	ImGui::Text(_t("Choose value..."));
 	ImGui::Separator();
 
-	if (ImGui::RadioButton("Angle", popupMode == FloatPopupMode::Angle))
+	if (ImGui::RadioButton(_t("Angle"), popupMode == FloatPopupMode::Angle))
 	{
 		popupMode = FloatPopupMode::Angle;
 	}
 	ImGui::SameLine();
-	if (ImGui::RadioButton("Value", popupMode == FloatPopupMode::Value))
+	if (ImGui::RadioButton(_t("Value"), popupMode == FloatPopupMode::Value))
 	{
 		popupMode = FloatPopupMode::Value;
 	}

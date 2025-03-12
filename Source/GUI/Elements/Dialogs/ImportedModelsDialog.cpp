@@ -26,7 +26,7 @@
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
-ImportedModelsDialog::ImportedModelsDialog() : IWindow(ICON_I3T_MODELS " Manage Models") {}
+ImportedModelsDialog::ImportedModelsDialog() : IWindow(ICON_T(ICON_I3T_MODELS " ", "Manage Models")) {}
 
 void ImportedModelsDialog::render()
 {
@@ -78,7 +78,7 @@ void ImportedModelsDialog::render()
 		else
 		{
 			ImGui::BeginDisabled(true);
-			ImGui::Selectable("No models imported");
+			ImGui::Selectable(_t("No models imported"));
 			ImGui::EndDisabled();
 		}
 
@@ -89,13 +89,13 @@ void ImportedModelsDialog::render()
 
 		ImGui::BeginChild("ModelRightPane", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
 
-		if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0)))
+		if (ImGui::Button(_t("Import"), ImVec2(-FLT_MIN, 0)))
 		{
 			importModel(m_normalizeImportedModels);
 		}
 		ImGui::SetItemDefaultFocus();
 
-		if (ImGui::Button("Remove", ImVec2(-FLT_MIN, 0)))
+		if (ImGui::Button(_t("Remove"), ImVec2(-FLT_MIN, 0)))
 		{
 			if (m_selectedModelIndex >= 0)
 			{
@@ -106,11 +106,11 @@ void ImportedModelsDialog::render()
 				LOG_INFO("No model selected!");
 			}
 		}
-		ImGui::Checkbox("Normalize model size", &m_normalizeImportedModels);
+		ImGui::Checkbox(_t("Normalize model size"), &m_normalizeImportedModels);
 
 		ImGui::Separator();
 
-		ImGui::Text("Model details:");
+		ImGui::Text(_t("Model details:"));
 		if (!m_selectedModelAlias.empty())
 		{
 			if (ImGui::BeginTabBar("##Tabs",
@@ -143,7 +143,7 @@ void ImportedModelsDialog::render()
 		}
 		else
 		{
-			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(IM_COL32(200, 200, 200, 255)), "No model selected");
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(IM_COL32(200, 200, 200, 255)), _t("No model selected"));
 		}
 		ImGui::EndChild();
 	}
@@ -163,7 +163,7 @@ void ImportedModelsDialog::importModel(bool normalize)
 	int counter = 0;
 	int failCounter = 0;
 	std::vector<fs::path> modelFiles;
-	if (importContentDialog(modelFiles, "Import model(s)"))
+	if (importContentDialog(modelFiles, _t("Import model(s)")))
 	{
 		StateManager& stateManager = Application::getModule<StateManager>();
 		for (const auto& modelFile : modelFiles)
