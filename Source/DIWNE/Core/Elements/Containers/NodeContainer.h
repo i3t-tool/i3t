@@ -34,12 +34,17 @@ public:
 
 	/// Adds a node to the end of the list
 	void addNode(const std::shared_ptr<Node>& node);
+	void replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode);
 	bool removeNode(const std::shared_ptr<Node>& node);
 
 	/// Adds a node at an index
 	virtual void addNodeAt(const std::shared_ptr<Node>& node, int index);
+	virtual void replaceNodeAt(const std::shared_ptr<Node>& node, int index);
 	virtual void removeNodeAt(int index);
 
+	/// Erases objects marked for deletion or removal from the container.
+	/// This method needs to be called every frame by the container owner.
+	void purgeNodes();
 protected:
 	/**
 	 * Called after a node is inserted into the container.
@@ -55,10 +60,6 @@ protected:
 	 * @param index Index the node was removed from (potentially invalid).
 	 */
 	virtual void onNodeRemove(std::shared_ptr<Node> node, int index){};
-
-	/// Erases objects marked for deletion or removal from the container.
-	/// This method needs to be called every frame by the container owner.
-	void purgeNodes();
 };
 
 } // namespace DIWNE

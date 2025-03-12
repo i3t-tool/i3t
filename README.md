@@ -37,6 +37,16 @@ You will need C++23 compiler with support for `std::expected`,
 see [compiler support](https://en.cppreference.com/w/cpp/compiler_support) for more information
 about compiler versions.
 
+Supported platforms:
+
+| Platform | Compiler      | Status |
+|----------|---------------|--------|
+| Windows  | MSVC          | ✔️     |
+| Linux    | GCC           | ✔️     |
+| Linux    | Clang         | ❌️     |
+| MacOS    | GCC           | ❌️     |
+| MacOS    | Clang (Xcode) | ❌️     |
+
 For more information about building the project, see [build instructions](Docs/developer-guide/build.md).
 
 ### Build documentation
@@ -47,7 +57,7 @@ npm run docs:dev
 ```
 
 ## Project structure
-````
+```
 Data/                       All Assets (fonts, models, scenes, textures, tutorials,...)
 Dependencies/               Directory with external dependencies.
 Docs/
@@ -65,7 +75,7 @@ Source/
             - Windows/      
         - ImGui/            Implementation of ImGui backend.
 Test/                       Unit tests, copies structure of the Source/ directory.
-````
+```
 
 ## Contributing
 Please make sure, that you include only source code and files needed for building 
@@ -87,6 +97,8 @@ Manual is available [here](Docs/manual.md).
 - [gtest](https://github.com/google/googletest) (BSD-3-Clause)
 - [ImGui](https://github.com/ocornut/imgui) (MIT)
 - [imgui_markdown](https://github.com/juliettef/imgui_markdown) (Zlib)
+- [imgui_test_engine](https://github.com/ocornut/imgui_test_engine) ([Dear ImGui Test Engine License](https://github.com/ocornut/imgui_test_engine/blob/main/imgui_test_engine/LICENSE.txt))
+- [ImGuiColorTextEdit](https://github.com/BalazsJako/ImGuiColorTextEdit) (MIT)
 - [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) (MIT)
 - [lua](https://github.com/lua/lua) (MIT)
 - [magic_enum](https://github.com/Neargye/magic_enum) (MIT)

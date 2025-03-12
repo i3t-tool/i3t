@@ -12,25 +12,26 @@
  */
 #include "MainMenuBar.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
-#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
+#include "GUI/Elements/Dialogs/SelectLayoutDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/ConfirmModal.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StatisticsWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/IconFonts/Icons.h"
+#include "GUI/Test/TestModule.h"
 #include "I3T.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
@@ -292,6 +293,20 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem(ICON_I3T_LOG " Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 #endif
 
+		ImGui::Separator();
+		if (ImGui::MenuItem(ICON_I3T_GRID " Layouts"))
+		{
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<SelectLayoutDialog>();
+		}
+#ifdef I3T_DEBUG
+		if (ImGui::BeginMenu(ICON_I3T_GRID " Layouts As Submenu"))
+		{
+
+			SelectLayoutDialog::showSelectLayoutMenu();
+
+			ImGui::EndMenu();
+		}
+#endif
 		ImGui::EndMenu();
 	}
 }
@@ -363,6 +378,11 @@ void MainMenuBar::showHelpMenu()
 			}
 			ImGui::MenuItem("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			ImGui::MenuItem("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
+			ImGui::MenuItem("Show test window", nullptr, &App::getModule<TestModule>().getShowTestWindow());
+			if (ImGui::MenuItem(ICON_I3T_DEBUG " Statistics"))
+			{
+				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
+			}
 			ImGui::EndMenu();
 		}
 

@@ -66,7 +66,7 @@ void Sequence::Storage::swap(int from, int to)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : Node(&g_sequence), m_storage(*this), m_tracker(tracker) {}
+Sequence::Sequence(MatrixTracker* tracker) : Node(g_sequence), m_storage(*this), m_tracker(tracker) {}
 
 Sequence::~Sequence()
 {

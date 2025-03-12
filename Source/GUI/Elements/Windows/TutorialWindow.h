@@ -12,7 +12,6 @@
  */
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 // temporary
 #include "imgui_markdown.h" // tmeporary
@@ -29,7 +28,7 @@ class TutorialWindow : public IWindow, private ITutorialRenderer
 public:
 	I3T_WINDOW(TutorialWindow)
 
-	TutorialWindow(bool show);
+	explicit TutorialWindow(bool show);
 
 	bool hasTutorial() const;
 
@@ -48,27 +47,9 @@ public:
 	 */
 	void setTutorial(std::shared_ptr<TutorialHeader>& header);
 
-	/**
-	 * \brief Calls load and parse for a tutorial from file and sets it as the
-	 * current one to be shown. \param path Path to the .tut file to be loaded.
-	 * All dependent files (such as pictures) should lie in the same folder.
-	 */
-	void setTutorial(std::string path);
-
-	/**
-	 * \brief Sets which step of currently set tutorial should be shown.
-	 * \param step_number A step number counted from 0.
-	 * \return true if successful, false if number out of range or no currently
-	 * set tutorial
-	 */
-	void setStep(int step_number);
-
 	void reloadTutorial();
 
-	Ptr<Tutorial> getTutorial()
-	{
-		return m_tutorial;
-	}
+	Ptr<Tutorial> getTutorial();
 
 	/**
 	 * \brief Renders the tutorial window using ImGui.
@@ -76,9 +57,8 @@ public:
 	void render() override;
 
 private:
-	static std::shared_ptr<Tutorial> m_tutorial; // todo temporarily static because of img callback
-	int m_currentStep;
 	float m_progressBarAnimationPosition;
+
 	ImGui::MarkdownConfig m_mdConfig; // todo temporary
 
 	void renderTutorialHeader();

@@ -26,7 +26,8 @@ class NewProjectCommand : public Command<NewProjectCommand>
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
 {};
 
-class CloseCommand : public Command<CloseCommand>
+/// int - exit code
+class CloseCommand : public Command<CloseCommand, int>
 {};
 
 class HideWindowCommand : public Command<HideWindowCommand, std::string>
@@ -39,4 +40,13 @@ class SetFocusedWindowCommand : public Command<SetFocusedWindowCommand, Ptr<IWin
 {};
 
 class SetTutorialCommand : public Command<SetTutorialCommand, std::shared_ptr<Tutorial>>
+{};
+
+class SetTutorialStepCommand : public Command<SetTutorialStepCommand, int>
+{};
+
+class LoadWindowLayoutFromFileCommand : public Command<LoadWindowLayoutFromFileCommand, std::string>
+{};
+
+class LoadWindowLayoutFromStringCommand : public Command<LoadWindowLayoutFromStringCommand, std::string>
 {};

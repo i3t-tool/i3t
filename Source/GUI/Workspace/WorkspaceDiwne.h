@@ -43,6 +43,8 @@
 
 namespace Workspace
 {
+class ScriptingNode;
+
 class WorkspaceDiwne : public DIWNE::NodeEditor
 {
 	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node); // TODO: Friend stuff would be nice to avoid
@@ -102,16 +104,8 @@ public:
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	// TODO: Restore functionality
-	/**
-	 * \brief For a given input, create appropriate constructor box and plug it to this input
-	 * \return true if successful (input was not a Ptr)
-	 */
-	//	bool processCreateAndPlugTypeConstructor();
-
 	// Object management
 	// =============================================================================================================
-	// TODO: Replace with DIWNE::NodeEditor functionality
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
@@ -242,12 +236,13 @@ public:
 		    },
 		    &m_nodes);
 	}
-	
+
 	DIWNE::FilteredNodeRange<Camera> getAllCameras();
 	DIWNE::FilteredNodeRange<Model> getAllModels();
 	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
 	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence();
 	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();
+	DIWNE::FilteredRecursiveNodeRange<ScriptingNode> getAllScriptingNodes();
 
 	// =============================================================================================================
 };

@@ -18,6 +18,7 @@
 #include "GUI/Workspace/Nodes/Model.h"
 #include "GUI/Workspace/Nodes/Operator.h"
 #include "GUI/Workspace/Nodes/Screen.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/Nodes/Sequence.h"
 #include "GUI/Workspace/Nodes/TransformationBase.h"
 #include "Logger/Logger.h"
@@ -52,6 +53,11 @@ void SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 
 	rapidjson::Value transforms(rapidjson::kArrayType);
 	workspace.AddMember("transforms", std::move(transforms), m_memento.GetAllocator());
+
+	rapidjson::Value scriptingNodes(rapidjson::kArrayType);
+	workspace.AddMember("scriptingNodes", std::move(scriptingNodes), m_memento.GetAllocator());
+
+	//
 
 	rapidjson::Value edges(rapidjson::kArrayType);
 	workspace.AddMember("edges", std::move(edges), m_memento.GetAllocator());
@@ -115,14 +121,14 @@ void SerializationVisitor::visit(const Ptr<GuiOperator>& node)
 	auto& operators = m_memento["workspace"]["operators"];
 	auto& edges = m_memento["workspace"]["edges"];
 
-	const auto* props = coreNode->getOperation();
+	const auto props = coreNode->getOperation();
 
 	rapidjson::Value op(rapidjson::kObjectType);
 	dumpCommon(op, node);
 
-	op.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+	op.AddMember("type", rapidjson::Value(props.keyWord.c_str(), alloc).Move(), alloc);
 
-	if (props->isConstructor)
+	if (props.isConstructor)
 	{
 		auto data = coreNode->data(0);
 		addData(op, "value", data);
@@ -197,6 +203,24 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	addEdges(edges, coreNode);
 }
 
+void SerializationVisitor::visit(const Ptr<Workspace::ScriptingNode>& node)
+{
+	const auto& coreNode = node->getNodebase();
+	auto& alloc = m_memento.GetAllocator();
+	auto& scriptingNodes = m_memento["workspace"]["scriptingNodes"];
+	auto& edges = m_memento["workspace"]["edges"];
+
+	rapidjson::Value model(rapidjson::kObjectType);
+	dumpCommon(model, node);
+
+	const auto script = node->getScript();
+	model.AddMember("script", rapidjson::Value(script.c_str(), alloc), alloc);
+
+	scriptingNodes.PushBack(model, alloc);
+
+	addEdges(edges, coreNode);
+}
+
 //
 
 void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNode>& node)
@@ -251,12 +275,12 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 	const auto& coreNode = node->getNodebase()->as<Core::Transform>();
 	auto& alloc = m_memento.GetAllocator();
 
-	const auto* props = coreNode->getOperation();
+	const auto props = coreNode->getOperation();
 
 	rapidjson::Value transform(rapidjson::kObjectType);
 	dumpCommon(transform, node);
 
-	transform.AddMember("type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
+	transform.AddMember("type", rapidjson::Value(props.keyWord.c_str(), alloc).Move(), alloc);
 
 	if (!coreNode->getDefaultValues().empty())
 	{

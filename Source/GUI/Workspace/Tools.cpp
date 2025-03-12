@@ -18,14 +18,13 @@
 
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
-#include "GUI/Workspace/Nodes/Model.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 #include "WorkspaceDiwne.h"
 
-using namespace Workspace;
-
+namespace Workspace
+{
 std::optional<Ptr<GuiNode>> Tools::findNodeById(const std::vector<Ptr<GuiNode>>& nodes, Core::ID id)
 {
 	for (const auto& node : nodes)
@@ -81,3 +80,24 @@ int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
 
 	return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal + 1 : 0); /* +1 for decimal point */
 }
+
+static auto findNode(Core::ID id) -> Result<Ptr<Workspace::CoreNode>, Error>
+{
+	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
+	auto& nodeEditor = workspace->getNodeEditor();
+	return nodeEditor.getNode<GuiNode>(id);
+};
+
+bool Tools::plug(Core::ID from, int fromIdx, Core::ID to, int toIdx)
+{
+	auto fromNode = findNode(from);
+	auto toNode = findNode(to);
+
+	if (!fromNode || !toNode)
+	{
+		return false;
+	}
+
+	return Workspace::connectNodesNoSave(fromNode.value(), toNode.value(), fromIdx, toIdx);
+}
+} // namespace Workspace

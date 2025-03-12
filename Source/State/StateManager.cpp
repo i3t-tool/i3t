@@ -459,7 +459,6 @@ void StateManager::loadUserData()
 		LOG_ERROR("[STATE MANAGER] Failed to load UserData/Global.json: {}", result.error());
 	}
 
-	// TODO: (DR) There should be a limit of how many recent files there can be
 	// Prune non-existing recent files.
 	for (auto it = data.recentFiles.begin(); it != data.recentFiles.end();)
 	{
@@ -474,6 +473,8 @@ void StateManager::loadUserData()
 			++it;
 		}
 	}
+
+	data.trimRecentFiles();
 }
 
 void StateManager::reset()

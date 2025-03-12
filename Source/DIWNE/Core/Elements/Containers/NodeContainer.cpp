@@ -17,6 +17,14 @@ void NodeContainer::addNode(const std::shared_ptr<Node>& node)
 {
 	addNodeAt(node, m_nodes.size());
 }
+void NodeContainer::replaceNode(const std::shared_ptr<Node>& oldNode, const std::shared_ptr<Node>& newNode)
+{
+	auto it = std::find(m_nodes.begin(), m_nodes.end(), oldNode);
+	if (it != m_nodes.end())
+	{
+		replaceNodeAt(newNode, std::distance(m_nodes.begin(), it));
+	}
+}
 bool NodeContainer::removeNode(const std::shared_ptr<Node>& node)
 {
 	auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
@@ -38,12 +46,31 @@ void NodeContainer::addNodeAt(const std::shared_ptr<Node>& node, int index)
 
 	onNodeAdd(node.get(), index);
 }
+void NodeContainer::replaceNodeAt(const std::shared_ptr<Node>& node, int index)
+{
+	assert(node != nullptr);
+	assert(index >= 0 && index <= m_nodes.size());
+
+	// Change nodes parent to this container, its original container will remove it as it will no longer be its parent.
+	node->setParentObject(m_owner);
+
+	auto it = m_nodes.begin() + index;
+	std::shared_ptr<Node> nodeBckup = *it;
+	if (!nodeBckup->isDestroyed())
+		nodeBckup->destroy(false);
+	*it = node;
+
+	onNodeRemove(nodeBckup, index);
+	onNodeAdd(node.get(), index);
+}
 void NodeContainer::removeNodeAt(int index)
 {
 	assert(index >= 0 && index < m_nodes.size());
 
 	auto it = m_nodes.begin() + index;
 	std::shared_ptr<Node> nodeBckup = *it;
+	if (!nodeBckup->isDestroyed())
+		nodeBckup->destroy(false);
 	m_nodes.erase(it);
 
 	onNodeRemove(nodeBckup, index);

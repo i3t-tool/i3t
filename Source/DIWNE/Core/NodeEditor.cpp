@@ -601,6 +601,19 @@ void NodeEditor::purgeObjects()
 	m_links.erase(endIt, m_links.end());
 }
 
+void NodeEditor::purgeAllNodes()
+{
+	for (auto& node : getAllNodesInnerIncluded())
+	{
+		// TODO: Avoid dynamic cast using node flags
+		if (auto container = dynamic_cast<NodeContainer*>(&node))
+		{
+			container->purgeNodes();
+		}
+	}
+	purgeNodes();
+}
+
 const ImVec2& NodeEditor::getPopupPosition() const
 {
 	return m_popupPosition;

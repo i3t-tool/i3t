@@ -21,11 +21,11 @@
 #ifndef PGR_H
 #define PGR_H
 
-/// how do we include opengl, do we use glloadgen or glew?
-#define USE_GLLOADGEN 1
+/// how do we include opengl, do we use glad or glew?
+#define USE_GLAD 1
 
-#if USE_GLLOADGEN
-#include "gl_core_4_4.h"
+#if USE_GLAD
+#include <glad/glad.h>
 #else
 #include <GL/glew.h>
 #endif
@@ -75,12 +75,12 @@ enum DebugLevel {
  *
  * Use this constant as a first argument of glutInitContextVersion and pgr::initialize.
  */
-const int OGL_VER_MAJOR = 3;
+const int OGL_VER_MAJOR = 4;
 /** required opengl version - minor number
  *
  * Use this constant as a second argument of glutInitContextVersion and pgr::initialize.
  */
-const int OGL_VER_MINOR = 1;
+const int OGL_VER_MINOR = 3;
 
 /** intializes gl functions, DevIL and checks opengl version
  *

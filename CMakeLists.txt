@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.15) # 3.13 for target_link_options and add_compile_definitions
+# 3.13 for target_link_options and add_compile_definitions
 # 3.15 to fix a "overriding /W3 with /W4" bug
+# 3.20 for EXPORT_COMPILE_COMMANDS target property
+cmake_minimum_required(VERSION 3.20)
 
 # Set project name.
 project(I3T VERSION 2.1.0)
@@ -28,6 +30,7 @@ include_directories(Dependencies/rttr-generated/src)
 include_directories(Dependencies/sol2/include)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
+include_directories(Dependencies/ImGuiColorTextEdit)
 include_directories(Dependencies/ImGuizmo/ImGuizmo)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
@@ -49,19 +52,25 @@ if (MSVC)
 
     set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
     add_definitions(-DUNICODE -D_UNICODE)
-endif ()
+endif()
 
 # Link C++17 filesystem library.
 if (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
-endif ()
+    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # TODO: Temporary disable warnings for Clang to get the build on macOS working.
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+    endif ()
+endif()
 
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/")
-else ()
+else()
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/${CMAKE_BUILD_TYPE}/")
-endif ()
+endif()
 
 # ---------- Setup output directories and compiler params. -----
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -105,6 +114,8 @@ set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW should not build docs.")
 
 #  Project dependencies which should be compiled.
+include(CMake/ImGui.cmake)
+
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
 add_subdirectory(Dependencies/lua)
@@ -123,26 +134,20 @@ set(BUILD_DOCUMENTATION OFF CACHE BOOL "Build documentation.")
 set(BUILD_INSTALLER OFF CACHE BOOL "Build installer.")
 set(BUILD_PACKAGE OFF CACHE BOOL "Build package.")
 add_subdirectory(Dependencies/rttr)
+
+add_compile_definitions(
+        MAGIC_ENUM_RANGE_MIN=0
+        MAGIC_ENUM_RANGE_MAX=256
+)
 # =============================================================
 
 # ======== Source groups ======================================
-# Add ImGui source files.
-set(I3T_IMGUI_SOURCE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/backends/imgui_impl_opengl3.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
-
 file(GLOB_RECURSE I3T_SOURCE
-        "Source/*.h"
-        "Source/*.hpp"
-        "Source/*.cpp"
-        "Dependencies/pgr-framework/src/*"
-        "Dependencies/pgr-framework/include/*"
+    "Source/*.h"
+    "Source/*.hpp"
+    "Source/*.cpp"
+    "Dependencies/pgr-framework/src/*"
+    "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/DIWNE/diwne_example.cpp")
@@ -188,6 +193,7 @@ target_link_libraries(
         RTTR::Core_Lib
         sol2
         yaml-cpp
+        ImGui
         ImGuizmo
 )
 
@@ -195,7 +201,9 @@ target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
 
 # Allow rapidjson to use std::string as it'll be always present
-target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
+        IMGUI_DEFINE_MATH_OPERATORS
+        RAPIDJSON_HAS_STDSTRING=1)
 
 # DIWNE config file
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
@@ -208,13 +216,16 @@ add_executable(${PROJECT_NAME} ${I3T_SOURCE} Source/Main.cpp)
 # Set VS_DEBUGGER_WORKING_DIRECTORY
 set_target_properties(
         ${PROJECT_NAME} PROPERTIES
+        EXPORT_COMPILE_COMMANDS ON
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
 
 # Allow rapidjson to use std::string as it'll be always present
-target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+        IMGUI_DEFINE_MATH_OPERATORS
+        RAPIDJSON_HAS_STDSTRING=1)
 
 # DIWNE config file
 target_compile_definitions(${PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
@@ -234,6 +245,7 @@ target_link_libraries(
         sol2
         spdlog
         yaml-cpp
+        ImGui
         ImGuizmo
 )
 

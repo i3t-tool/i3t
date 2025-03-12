@@ -44,25 +44,25 @@ void Node::init()
 	m_id = generator.next();
 
 	// Create input pins.
-	for (auto i = 0; i < m_operation->inputTypes.size(); i++)
+	for (auto i = 0; i < m_operation.inputTypes.size(); i++)
 	{
-		m_inputs.emplace_back(m_operation->inputTypes[i], true, *this, i);
+		m_inputs.emplace_back(m_operation.inputTypes[i], true, *this, i);
 	}
 
 	// Create output pins and data storage for each output.
-	for (auto i = 0; i < m_operation->outputTypes.size(); i++)
+	for (auto i = 0; i < m_operation.outputTypes.size(); i++)
 	{
-		m_outputs.emplace_back(m_operation->outputTypes[i], false, *this, i);
-		m_internalData.emplace_back(m_operation->outputTypes[i]);
+		m_outputs.emplace_back(m_operation.outputTypes[i], false, *this, i);
+		m_internalData.emplace_back(m_operation.outputTypes[i]);
 	}
 
 	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has
 	// no outputs. \todo MH How to create nodes which have no outputs?
-	if (m_operation->outputTypes.empty())
+	if (m_operation.outputTypes.empty())
 	{
-		if (!m_operation->inputTypes.empty())
+		if (!m_operation.inputTypes.empty())
 		{
-			m_internalData.emplace_back(m_operation->inputTypes[0]);
+			m_internalData.emplace_back(m_operation.inputTypes[0]);
 		}
 		else
 		{
@@ -70,11 +70,11 @@ void Node::init()
 		}
 	}
 
-	if (m_operation->isConstructor)
-		for (int i = 0; i < m_operation->outputTypes.size(); i++)
+	if (m_operation.isConstructor)
+		for (int i = 0; i < m_operation.outputTypes.size(); i++)
 			m_OperatorState.push_back(EValueState::Editable);
 	else
-		for (int i = 0; i < m_operation->outputTypes.size(); i++)
+		for (int i = 0; i < m_operation.outputTypes.size(); i++)
 			m_OperatorState.push_back(EValueState::Locked);
 
 	onInit();
@@ -266,7 +266,7 @@ bool Node::areInputsPlugged(int numInputs)
 
 bool Node::areAllInputsPlugged()
 {
-	return areInputsPlugged(m_operation->inputTypes.size());
+	return areInputsPlugged(m_operation.inputTypes.size());
 }
 
 bool Node::areAllInputsUnplugged() const

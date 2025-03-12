@@ -30,7 +30,7 @@ out/
 # cmake
 # ----------------------------------------------------------------------
 /build/
-*.cmake
+/build-*
 cmake-*
 cmake_install.cmake
 CMakeFiles/
@@ -48,6 +48,7 @@ CMakeSettings.json
 
 # system and other generated files
 # ----------------------------------------------------------------------
+*.gcov
 *.bak
 *.lnk
 *.swp
@@ -56,6 +57,9 @@ CMakeSettings.json
 *.exe
 *.obj
 /*.zip
+*.json.gz
+
+ReportCppCheck.txt
 
 # Files used during development - to be preserved, but not put to release
 # ----------------------------------------------------------------------

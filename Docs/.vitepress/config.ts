@@ -61,8 +61,16 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Lua API Reference',
+        collapsed: true,
+        items: [
+          { text: 'Common', link: '/lua-api-reference/common' },
+          { text: 'Tutorial', link: '/lua-api-reference/tutorial' },
+          { text: 'Workspace', link: '/lua-api-reference/workspace' },
+        ]
+      },
+      {
         text: 'C++ API Reference',
-        link: '/cpp-api-reference/',
         collapsed: true,
         items: [
           ...autogenerate('Classes', 'classes'),

@@ -1,3 +1,4 @@
+mode: "light"
 colors:
   glob_Primary Color (tabs, tiles, ...): [0.716, 0.716, 0.716, 1.000]
   glob_Active Color: [0.757, 0.757, 0.757, 1.000]

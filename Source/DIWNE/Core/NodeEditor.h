@@ -171,6 +171,15 @@ public:
 	/** Clear all nodes from the node editor */
 	virtual void clear();
 
+	/// Erases objects marked for deletion or removal from the editor.
+	/// Also iterates through all NodeContainers in the editor and purges their nodes.
+	void purgeAllNodes();
+
+protected:
+	/// Erases objects marked for deletion or removal from the editor.
+	void purgeObjects();
+
+public:
 	/// Get a reference to the underlying owning vector of all nodes in the node editor.
 	NodeList& getNodeList() override;
 
@@ -232,10 +241,6 @@ public:
 	void selectAllNodes(bool deselectIfAllAreSelected = false);
 	void invertSelection();
 	void deleteSelectedNodes();
-
-protected:
-	/// Erases objects marked for deletion or removal from the editor.
-	void purgeObjects();
 
 public:
 	// Node shifting

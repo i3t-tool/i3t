@@ -55,12 +55,13 @@ public:
 	/**
 	 * Enter main loop.
 	 */
-	void run();
+	int run();
 
 	/**
 	 * Single iteration of the game loop
+	 * @return Whether the game loop should continue
 	 */
-	void frame();
+	bool frame();
 
 	void beginFrame();
 	void endFrame();

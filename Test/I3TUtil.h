@@ -1,7 +1,7 @@
 /**
  * \file I3TUtil.h
  * \brief
- * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \author Dan Rakušan <rakusan.dan@gmail.com>, Martin Herich
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -14,8 +14,21 @@
 
 #include <memory>
 
+#include "gtest/gtest.h"
+
 #include "spdlog/spdlog.h"
 
 class I3TApplication;
 
 std::unique_ptr<I3TApplication> initI3T(spdlog::level::level_enum logLevel = spdlog::level::info);
+
+class ApplicationTest : public ::testing::Test
+{
+public:
+	void SetUp() override;
+
+	void TearDown() override;
+
+private:
+	std::shared_ptr<I3TApplication> app;
+};

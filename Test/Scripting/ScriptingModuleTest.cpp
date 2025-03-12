@@ -14,20 +14,30 @@
 
 #include "Scripting/ScriptingModule.h"
 
+TEST(ScriptingModuleTest, FalseOnFail)
+{
+	const auto scripting = std::make_unique<ScriptingModule>();
+	((Module*) scripting.get())->onInit();
+
+	auto maybeErr = scripting->runScript("assert(false)");
+	EXPECT_TRUE(maybeErr);
+}
+
 TEST(ScriptingModuleTest, VariablesArePerservedBetweenScripts)
 {
 	const auto scripting = std::make_unique<ScriptingModule>();
 	((Module*) scripting.get())->onInit();
 
-	scripting->runScript(R"(
+	auto maybeErr = scripting->runScript(R"(
 		number = 24
 		number2 = 24.5
 		important_string = "woof woof"
 		a_function = function () return 100 end
 		some_table = { value = 24 }
 	)");
+	EXPECT_FALSE(maybeErr);
 
-	scripting->runScript(R"(
+	maybeErr = scripting->runScript(R"(
 		t = {
 			number = 24,
 			number2 = 24.5,
@@ -36,12 +46,26 @@ TEST(ScriptingModuleTest, VariablesArePerservedBetweenScripts)
 			some_table = { value = 24 }
 		}
 	)");
+	EXPECT_FALSE(maybeErr);
 
-	scripting->runScript(R"(
+	maybeErr = scripting->runScript(R"(
 		assert(t.number == number)
 		assert(t.number2 == number2)
 		assert(t.important_string == important_string)
 		assert(t.a_function() == a_function())
 		assert(t.some_table.value == some_table.value)
 	)");
+	EXPECT_FALSE(maybeErr);
+}
+
+TEST(ScriptingModuleTest, MathFunctions)
+{
+	const auto scripting = std::make_unique<ScriptingModule>();
+	((Module*) scripting.get())->onInit();
+
+	auto maybeErr = scripting->runScript(R"(
+		assert(Math.equals(1.0002, 1.0001))
+		assert(Math.equals(Vec3.new(1, 1, 1), Vec3.new(1, 1, 1)))
+	)");
+	EXPECT_FALSE(maybeErr);
 }

@@ -21,3 +21,13 @@ std::unique_ptr<I3TApplication> initI3T(spdlog::level::level_enum logLevel)
 	app->init();
 	return app;
 }
+
+void ApplicationTest::SetUp()
+{
+	app = std::move(initI3T());
+}
+
+void ApplicationTest::TearDown()
+{
+	// app->close();
+}

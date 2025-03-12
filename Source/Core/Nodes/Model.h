@@ -21,7 +21,7 @@ namespace Core
 class Model : public Node
 {
 public:
-	Model() : Node(&g_modelProperties){};
+	Model() : Node(g_modelProperties){};
 
 	/// Latest model matrix value
 	glm::mat4 m_modelMatrix{};

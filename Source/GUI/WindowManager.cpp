@@ -447,3 +447,8 @@ std::string WindowManager::makeIDNice(const char* ID)
 
 	return std::string(currID);
 }
+
+void WindowManager::loadLayout(std::string path)
+{
+	ImGui::LoadIniSettingsFromDisk(path.c_str());
+}

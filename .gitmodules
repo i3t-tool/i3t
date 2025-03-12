@@ -50,3 +50,9 @@
 	path = Dependencies/rttr
 	url = https://github.com/i3t-tool/rttr.git
 
+[submodule "Dependencies/ImGuiColorTextEdit"]
+	path = Dependencies/ImGuiColorTextEdit
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
+[submodule "Dependencies/imgui_test_engine"]
+	path = Dependencies/imgui_test_engine
+	url = https://github.com/ocornut/imgui_test_engine

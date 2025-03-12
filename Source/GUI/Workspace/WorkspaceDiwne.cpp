@@ -21,6 +21,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -568,6 +569,15 @@ DIWNE::FilteredNodeRange<Model> WorkspaceDiwne::getAllInputFreeModel()
 	    &m_nodes);
 }
 
+DIWNE::FilteredRecursiveNodeRange<ScriptingNode> WorkspaceDiwne::getAllScriptingNodes()
+{
+	return DIWNE::FilteredRecursiveNodeRange<ScriptingNode>(
+	    [](const DIWNE::Node* node) -> bool {
+		    return dynamic_cast<const Workspace::ScriptingNode*>(node);
+	    },
+	    &m_nodes);
+}
+
 void WorkspaceDiwne::onZoom()
 {
 	m_updateDataItemsWidth = true;
@@ -1068,6 +1078,10 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	if (ImGui::MenuItem("cycle"))
 	{
 		addNodeToPositionOfPopup<Cycle>();
+	}
+	if (ImGui::MenuItem("scripting node"))
+	{
+		addNodeToPositionOfPopup<ScriptingNode>();
 	}
 
 	ImGui::Separator();

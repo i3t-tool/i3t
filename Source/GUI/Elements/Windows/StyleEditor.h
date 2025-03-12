@@ -20,9 +20,6 @@ class Theme;
 
 namespace UI
 {
-void showColors();
-void showDimensions();
-
 class StyleEditor : public IWindow
 {
 public:

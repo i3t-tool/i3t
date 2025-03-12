@@ -1,3 +1,4 @@
+mode: "dark"
 colors:
   glob_Primary Color (tabs, tiles, ...): [0.278, 0.278, 0.286, 1.000]
   glob_Active Color: [0.308, 0.308, 0.316, 1.000]

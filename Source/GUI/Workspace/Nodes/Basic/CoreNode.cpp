@@ -185,6 +185,11 @@ Ptr<Core::Node> CoreNode::getNodebase() const
 	return m_nodebase;
 }
 
+const std::string& CoreNode::getKeyword() const
+{
+	return m_nodebase->getOperation().keyWord;
+}
+
 int CoreNode::getNumberOfVisibleDecimal()
 {
 	return m_numberOfVisibleDecimal;
@@ -315,7 +320,7 @@ void CoreNode::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuSetEditable();
 
-	if (m_nodebase->getOperation()->isConstructor)
+	if (m_nodebase->getOperation().isConstructor)
 	{
 		drawMenuStoreValues(getNodebase());
 	}

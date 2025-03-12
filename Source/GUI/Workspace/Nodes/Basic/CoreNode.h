@@ -48,6 +48,7 @@ public:
 
 	/// Returns the managed I3T Core node
 	Ptr<Core::Node> getNodebase() const;
+	const std::string& getKeyword() const;
 
 	// Lifecycle
 	// =============================================================================================================

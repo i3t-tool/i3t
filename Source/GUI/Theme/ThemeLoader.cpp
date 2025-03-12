@@ -33,30 +33,12 @@ std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 	return std::nullopt;
 }
 
-void dumpVec2(YAML::Emitter& out, const float* vec)
-{
-	out << YAML::BeginMap;
-	out << YAML::Key << "x" << YAML::Value << vec[0];
-	out << YAML::Key << "y" << YAML::Value << vec[1];
-	out << YAML::EndMap;
-}
-
 void dumpVec2Seq(YAML::Emitter& out, const float* vec)
 {
 	out << YAML::Flow << YAML::BeginSeq;
 	out << vec[0];
 	out << vec[1];
 	out << YAML::EndSeq << YAML::Block;
-}
-
-void dumpVec4(YAML::Emitter& out, const float* vec)
-{
-	out << YAML::BeginMap;
-	out << YAML::Key << "x" << YAML::Value << vec[0];
-	out << YAML::Key << "y" << YAML::Value << vec[1];
-	out << YAML::Key << "z" << YAML::Value << vec[2];
-	out << YAML::Key << "w" << YAML::Value << vec[3];
-	out << YAML::EndMap;
 }
 
 void dumpVec4SeqRound(YAML::Emitter& out, const float* vec, int precision)
@@ -69,39 +51,35 @@ void dumpVec4SeqRound(YAML::Emitter& out, const float* vec, int precision)
 	out << YAML::EndSeq << YAML::Block;
 }
 
-ImVec2 parseVec2(YAML::Node& node)
+Result<ImVec2, Error> parseVec2Seq(YAML::Node& node)
 {
-	ImVec2 vec;
-	vec.x = node["x"].as<float>();
-	vec.y = node["y"].as<float>();
-	return vec;
-}
+	if (!node.IsSequence() || node.size() != 2)
+	{
+		return Err("invalid sequence");
+	}
 
-ImVec2 parseVec2Seq(YAML::Node& node)
-{
 	ImVec2 vec;
+
 	vec.x = node[0].as<float>();
 	vec.y = node[1].as<float>();
+
 	return vec;
 }
 
-ImVec4 parseVec4(YAML::Node& node)
+Result<ImVec4, Error> parseVec4Seq(YAML::Node& node)
 {
-	ImVec4 vec;
-	vec.x = node["x"].as<float>();
-	vec.y = node["y"].as<float>();
-	vec.z = node["z"].as<float>();
-	vec.w = node["w"].as<float>();
-	return vec;
-}
+	if (!node.IsSequence() || node.size() != 4)
+	{
+		return Err("invalid sequence");
+	}
 
-ImVec4 parseVec4Seq(YAML::Node& node)
-{
 	ImVec4 vec;
+
 	vec.x = node[0].as<float>();
 	vec.y = node[1].as<float>();
 	vec.z = node[2].as<float>();
 	vec.w = node[3].as<float>();
+
 	return vec;
 }
 
@@ -137,6 +115,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 	YAML::Emitter out;
 	out << YAML::BeginMap;
+
+	out << YAML::Key << "mode";
+	out << YAML::Value << (theme.isDark() ? "dark" : "light");
 
 	out << YAML::Key << "colors";
 	out << YAML::Value << YAML::BeginMap;
@@ -183,71 +164,139 @@ void saveTheme(const fs::path& path, Theme& theme)
 	outfile.close();
 }
 
+//--------------------------------------------------------------------------------------------------------------------//
+
+static bool isDark(YAML::Node& yaml)
+{
+	if (!yaml["mode"] || !yaml["mode"].IsScalar())
+	{
+		return true;
+	}
+
+	auto shouldSetLight = yaml["mode"].as<std::string>() == "light";
+
+	return !shouldSetLight;
+}
+
+static Theme::Colors loadColors(YAML::Node& yaml)
+{
+	Theme::Colors colors;
+
+	if (!yaml["colors"])
+	{
+		return colors;
+	}
+
+	auto yamlColors = yaml["colors"];
+	for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end(); ++it)
+	{
+		auto node = it->second.as<YAML::Node>();
+
+		if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
+		{
+			auto result = parseVec4Seq(node);
+			if (result)
+			{
+				colors[*en] = *result;
+			}
+			else
+			{
+				LOG_ERROR("[loadTheme] Invalid value in file: {}", it->first.as<std::string>());
+			}
+		}
+		else
+		{
+			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+		}
+	}
+
+	return colors;
+}
+
+static Theme::Sizes loadSizes(YAML::Node& yaml)
+{
+	Theme::Sizes sizes;
+
+	if (!yaml["sizes"])
+	{
+		return sizes;
+	}
+
+	auto yamlSizes = yaml["sizes"];
+	for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
+	{
+		if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
+		{
+			sizes[*en] = it->second.as<float>();
+		}
+		else
+		{
+			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+		}
+	}
+
+	return sizes;
+}
+
+static Theme::SizesVec loadSizeVectors(YAML::Node& yaml)
+{
+	Theme::SizesVec sizesVec;
+
+	if (!yaml["size vectors"])
+	{
+		return sizesVec;
+	}
+
+	auto yamlSizeVec = yaml["size vectors"];
+	for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end(); ++it)
+	{
+		auto node = it->second.as<YAML::Node>();
+
+		if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
+		{
+			auto result = parseVec2Seq(node);
+			if (result)
+			{
+				sizesVec[*en] = *result;
+			}
+			else
+			{
+				LOG_ERROR("[loadTheme] Invalid value in file: {}", it->first.as<std::string>());
+			}
+		}
+		else
+		{
+			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+		}
+	}
+
+	return sizesVec;
+}
+
 std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
+	LOG_INFO("Loading theme from file: {}", path.string());
+
 	if (!fs::exists(path))
 	{
 		return Err("File does not exist");
 	}
 
 	YAML::Node yaml;
-	try
-	{
-		yaml = YAML::LoadFile(path.string());
-	}
-	catch (const std::exception& e)
-	{
-		return Err(std::string(e.what()));
-	}
 
 	auto name = path.stem().string();
 
-	Theme::Colors colors;
-	Theme::Sizes sizes;
-	Theme::SizesVec sizesVec;
-
-	if (yaml["colors"])
+	try
 	{
-		auto yamlColors = yaml["colors"];
-		for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end(); ++it)
-		{
-			auto node = it->second.as<YAML::Node>();
+		yaml = YAML::LoadFile(path.string());
 
-			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
-			{
-				colors[*en] = parseVec4Seq(node);
-			}
-			else
-				LOG_ERROR("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
-		}
+		auto theme = Theme(name, isDark(yaml), loadColors(yaml), loadSizes(yaml), loadSizeVectors(yaml));
+		theme.initFonts();
+
+		return theme;
 	}
-	if (yaml["sizes"])
+	catch (const std::exception& e)
 	{
-		auto yamlSizes = yaml["sizes"];
-		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
-		{
-			if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
-			{
-				sizes[*en] = it->second.as<float>();
-			}
-		}
+		return Err(fmt::format("Failed to parse theme file {}: {}", path.string(), e.what()));
 	}
-	if (yaml["size vectors"])
-	{
-		auto yamlSizeVec = yaml["size vectors"];
-		for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end(); ++it)
-		{
-			auto node = it->second.as<YAML::Node>();
-
-			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
-			{
-				sizesVec[*en] = parseVec2Seq(node);
-			}
-		}
-	}
-
-	auto theme = Theme(name, colors, sizes, sizesVec);
-	theme.initFonts();
-
-	return theme;
 }

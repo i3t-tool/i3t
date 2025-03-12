@@ -23,6 +23,54 @@ static std::map<EColor, const char*> g_ColorNames;
 static std::map<ESize, const char*> g_SizeNames;
 static std::map<ESizeVec2, const char*> g_SizeVecNames;
 
+template <typename T>
+concept Enumerable = std::is_enum_v<T>;
+
+template <Enumerable T>
+static void checkEnumProperties(const std::set<T> values)
+{
+	const auto size = magic_enum::enum_count<T>();
+	for (int i = 0; i < size; ++i)
+	{
+		const auto enumValue = T(i);
+		if (!values.contains(enumValue))
+		{
+			LOG_DEBUG("Description for {}::{} is missing.", magic_enum::enum_type_name<T>(),
+			          magic_enum::enum_name(enumValue));
+		}
+	}
+}
+
+static void checkThemeVariables()
+{
+	LOG_DEBUG("Checking for missing theme variables descriptions");
+
+	std::set<EColor> colors;
+	std::set<ESize> sizes;
+	std::set<ESizeVec2> sizeVecs;
+
+	for (const auto& group : Theme::getVariables())
+	{
+		for (const auto& var : group.variables)
+		{
+			std::visit(Detail::Overloaded{[&](EColor color) {
+				                              colors.insert(color);
+			                              },
+			                              [&](ESize size) {
+				                              sizes.insert(size);
+			                              },
+			                              [&](ESizeVec2 sizeVec) {
+				                              sizeVecs.insert(sizeVec);
+			                              }},
+			           var.key);
+		}
+	}
+
+	checkEnumProperties(colors);
+	checkEnumProperties(sizes);
+	checkEnumProperties(sizeVecs);
+}
+
 Theme Theme::createDefaultClassic()
 {
 	Theme theme;
@@ -35,11 +83,13 @@ Theme Theme::createDefaultClassic()
 	return theme;
 }
 
-Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
+Theme::Theme(std::string name, bool isDark, const Theme::Colors& colors, const Theme::Sizes& sizes,
+             const Theme::SizesVec& sizesVec)
 {
 	initClassicProperties();
 
 	m_name = std::move(name);
+	m_isDark = isDark;
 	copyProperties(m_colors, colors);
 	copyProperties(m_sizes, sizes);
 	copyProperties(m_sizesVec2, sizesVec);
@@ -52,6 +102,7 @@ void Theme::initFonts()
 	m_fontsAssoc.insert(std::pair(EFont::Regular, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::LargeBold, "RobotoBold20"));
 
+	m_fontsAssoc.insert({EFont::Mono, "RobotoMono14"});
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
@@ -383,7 +434,188 @@ void Theme::initClassicProperties()
 
 void Theme::initNames()
 {
+	group("Global")
+	    .add(EColor::PrimaryColor, "Primary Color (tabs, tiles, ...)")
+	    .add(EColor::ActiveColor, "Active Color")
+	    .add(EColor::SelectionColor, "Selection Color")
+	    .add(EColor::Text, "Text")
+	    .add(EColor::TextDisabled, "Disabled Text")
+	    .add(EColor::WindowBackground, "Window Background")
+	    .add(EColor::PopupBackground, "Popup Background")
+	    .add(EColor::MenuBarBackground, "Menu Bar Background")
+	    .add(EColor::SceneViewBackground, "Tab SceneView Background")
+	    // Frames and borders
+	    .add(EColor::Border, "Border")
+	    .add(EColor::FrameBg, "Frame Background")
+	    .add(EColor::FrameBgHovered, "Frame Background Hovered")
+	    .add(EColor::FrameBgActive, "Frame Background Active")
+	    // Tabs
+	    .add(EColor::Tab, "Tab Color")
+	    .add(EColor::TabHovered, "Tab Hovered")
+	    .add(EColor::TabActive, "Tab Active")
+	    // Dock tab options
+	    .add(EColor::DockTab, "Dock Tab")
+	    .add(EColor::DockTabActive, "Dock Active")
+	    .add(EColor::DockTabUnfocused, "Dock Unfocused")
+	    .add(EColor::DockTabUnfocusedActive, "Dock Unfocused Active")
+	    .add(EColor::DockTabHovered, "Dock Tab Hovered")
+	    .add(EColor::SelectionRectFull, "Selection rectangle full")
+	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
+	    .add(EColor::Workspace_SelectedBorder, "Selected node border")
+	    .add(ESize::Workspace_SelectedBorderThickness, "Selected node border thickness")
+	    .add(ESizeVec2::Window_FramePadding, "Windows Frame Padding");
+
+	group("Node Editor")
+	    .add(EColor::NodeBg, "General Node Background")
+	    .add(EColor::NodeHeader, "General Node Header")
+	    .add(EColor::NodeFont, "General Node Font (text)")
+	    .add(EColor::NodeBorder, "Node Border")
+	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
+	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
+	    .add(EColor::NodeLODButtonColorActive, "LOD Button Active Color")
+	    .add(EColor::NodeLODButtonColorHovered, "LOD Button Hover Color")
+	    .add(ESize::Float_inactive_alphaMultiplicator, "Float_inactive_alphaMultiplicator")
+	    .add(ESize::Nodes_Operators_Rounding, "Nodes Operators Rounding")
+	    .add(ESize::Nodes_Sequence_Rounding, "Nodes Sequence Rounding")
+	    .add(ESize::Nodes_LOD_Button_Rounding, "Nodes LOD Button Rounding")
+	    .add(ESize::Nodes_Border_Rounding, "Nodes Border Rounding")
+	    .add(ESize::Nodes_Border_Thickness, "Nodes Border Thickness")
+	    .add(ESize::Nodes_Rounding, "Nodes Rounding")
+	    .add(ESize::Nodes_FloatWidth, "Nodes Float Width")
+	    .add(ESize::Nodes_FloatMargin, "Nodes Float Margin")
+	    .add(ESize::Nodes_BorderWidth, "Nodes BorderWidth")
+	    .add(ESize::Nodes_LabelIndent, "Pin Label Indent")
+	    .add(ESize::Nodes_HeaderLabelIndent, "Header Label Indent")
+	    .add(ESize::Nodes_trackballButtonHeight, "Trackball Button Height")
+	    .add(ESize::Nodes_TrackBallSensitivity, "TrackBall Sensitivity")
+	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding")
+	    .add(ESize::Nodes_dragSpeedDefaulrRatio, "Drag Speed fo Float")
+	    .add(ESize::Nodes_CtrlMultiplicator, "CTRL Multiplicator")
+	    .add(ESize::Nodes_SHIFTMultiplicator, "SHIFT Multiplicator")
+	    .add(ESize::Nodes_ALTMultiplicator, "ALT Multiplicator")
+	    .add(ESize::Nodes_InputsAlignment, "Nodes Inputs Alignment")
+	    .add(ESize::Nodes_MiddleAlignment, "Nodes Middle Alignment")
+	    .add(ESize::Nodes_OutputsAlignment, "Nodes Outputs Alignment")
+	    .add(ESize::Nodes_leftSideSpacing, "Nodes Left Side spacing")
+	    .add(ESize::Nodes_rightSideSpacing, "Nodes Right Side spacing")
+	    .add(ESize::Nodes_Transformation_TrackingMarkSize, "Nodes Transformation TrackingMarkSize")
+	    .add(ESize::Default_VisiblePrecision, "Nodes Default Visible Precision")
+	    .add(ESize::Default_VisibleQuaternionPrecision, "Nodes Default Visible Precision For Quaternions")
+	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")
+	    .add(ESize::Links_ControlpointsPositionFraction, "Link x distance between controlpoint and start/end of link - "
+	                                                     "fraction of start to end x distance")
+	    .add(ESize::Links_ControlpointsPositionMin,
+	         "Link minimal x distance between controlpoint and start/end of link")
+	    .add(ESize::Links_Thickness, "Link Thickness")
+	    .add(ESize::Links_ThicknessSelectedBorder, "Link Additional thickness when selected")
+	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
+	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
+	    .add(ESizeVec2::Nodes_Screen_resizeButtonSize, "Screen Resize Button Size")
+	    .add(ESizeVec2::Nodes_Sequence_DummySpaceSize, "Sequence Dummy Space Size")
+	    .add(ESizeVec2::NewNode_positionShift, "New Node Position Shift")
+	    .add(ESizeVec2::Nodes_IconSize, "Nodes Icon Size")
+	    .add(ESizeVec2::Nodes_PivotAlignment, "Nodes Pivot Alignment")
+	    .add(ESizeVec2::Nodes_PinSpacing, "Nodes Pin Spacing")
+	    .add(ESizeVec2::Nodes_ItemsSpacing, "Nodes Items Spacing")
+	    .add(ESizeVec2::Nodes_FloatPadding, "Nodes Float Padding")
+	    .add(ESizeVec2::Nodes_PivotSize, "Nodes Pivot Size")
+	    .add(ESizeVec2::Nodes_InputsSize, "Nodes Inputs Size")
+	    .add(ESizeVec2::Nodes_MiddleSize, "Nodes Middle Size")
+	    .add(ESizeVec2::Nodes_OutputSize, "Nodes Output Size")
+	    .add(ESizeVec2::Nodes_LODButtonSize, "Nodes LOD Button Size")
+	    .add(ESizeVec2::Nodes_FloatCycleButtonSize, "Nodes Float Cycle Button Size")
+	    .add(ESizeVec2::Nodes_ScreenTextureSize, "Nodes Screen Texture Size")
+	    .add(ESizeVec2::Builder_ItemSpacing, "Builder Item Spacing");
+
+	group("Node Editor Pins")
+	    .add(EColor::PulsePin, "Pulse Pin")
+	    .add(EColor::FloatPin, "Float Pin")
+	    .add(EColor::MatrixPin, "Matrix Pin")
+	    .add(EColor::QuatPin, "Quaternion Pin")
+	    .add(EColor::Vec3Pin, "Vector 3 Pin")
+	    .add(EColor::Vec4Pin, "Vector 4 Pin")
+	    .add(EColor::ScreenPin, "Screen Pin")
+	    .add(EColor::MatrixMulPin, "MatrixMul Pin")
+	    .add(EColor::InnerPulsePin, "Inner Color Pulse")
+	    .add(EColor::InnerFloatPin, "Inner Color Float")
+	    .add(EColor::InnerMatrixPin, "Inner Color Matrix")
+	    .add(EColor::InnerQuatPin, "Inner Color Quat")
+	    .add(EColor::InnerVec3Pin, "Inner Color Vec3")
+	    .add(EColor::InnerVec4Pin, "Inner Color Vec4")
+	    .add(EColor::InnerScreenPin, "Inner Color Screen")
+	    .add(EColor::InnerMatrixMulPin, "Inner Color MatrixMul");
+
+	group("Node Editor Operators")
+	    .add(EColor::NodeBgOperator, "Operator Background")
+	    .add(EColor::NodeHeaderOperator, "Operator Header")
+	    .add(EColor::FloatBgOperator, "Operator Float Background")
+	    .add(EColor::FloatBgOperatorActive, "Operator Active Float Background")
+	    .add(EColor::FloatBgOperatorHovered, "Operator Hovered Float Background");
+
+	group("Node Editor Transformations")
+	    .add(EColor::NodeBgTransformation, "Transform Background")
+	    .add(EColor::NodeHeaderTranformation, "Transform Header")
+	    .add(EColor::FloatBgTransformation, "Transform Float Background")
+	    .add(EColor::FloatBgTransformationActive, "Transform Float Active")
+	    .add(EColor::FloatBgTransformationHovered, "Transform Float Hovered")
+	    .add(EColor::Nodes_Transformation_ValidIcon_bgShape, "Nodes Transformation ValidIcon bgShape")
+	    .add(EColor::Nodes_Transformation_ValidIcon_bgInner, "Nodes Transformation ValidIcon bgInner")
+	    .add(EColor::Nodes_Transformation_ValidIcon_fgShape, "Nodes Transformation ValidIcon fgShape")
+	    .add(EColor::Nodes_Transformation_ValidIcon_fgInner, "Nodes Transformation ValidIcon fgInner")
+	    .add(EColor::Nodes_Transformation_ValidIcon_padding, "Nodes Transformation ValidIcon padding")
+	    .add(EColor::Nodes_Transformation_TrackingColor, "Nodes Transformation TrackingColor")
+	    .add(EColor::Nodes_Transformation_TrackingMarkColor, "Nodes Transformation TrackingMarkColor");
+
+	group("Node Editor Popups")
+	    .add(EColor::Nodes_Screen_resizeBtn_bgShape, "Nodes Screen resizeBtn bgShape")
+	    .add(EColor::Nodes_Screen_resizeBtn_bgInner, "Nodes Screen resizeBtn bgInner")
+	    .add(EColor::Nodes_Screen_resizeBtn_fgShape, "Nodes Screen resizeBtn fgShape")
+	    .add(EColor::Nodes_Screen_resizeBtn_fgInner, "Nodes Screen resizeBtn fgInner")
+	    .add(EColor::Nodes_Screen_noInput_background, "Nodes Screen noInput background")
+	    .add(EColor::Nodes_Screen_noInput_text, "Nodes Screen noInput text");
+
+	group("Node Editor Floats")
+	    .add(EColor::Synergies_FloatBg, "Synergies FloatBg")
+	    .add(EColor::Synergies_FloatBgHovered, "Synergies FloatBgHovered")
+	    .add(EColor::Synergies_FloatBgActive, "Synergies FloatBgActive");
+
+	group("Node Editor ScreenNode")
+	    .add(EColor::Nodes_Screen_resizeBtn_bgShape, "Nodes Screen resizeBtn bgShape")
+	    .add(EColor::Nodes_Screen_resizeBtn_bgInner, "Nodes Screen resizeBtn bgInner")
+	    .add(EColor::Nodes_Screen_resizeBtn_fgShape, "Nodes Screen resizeBtn fgShape")
+	    .add(EColor::Nodes_Screen_resizeBtn_fgInner, "Nodes Screen resizeBtn fgInner")
+	    .add(EColor::Nodes_Screen_noInput_background, "Nodes_Screen_noInput_background")
+	    .add(EColor::Nodes_Screen_noInput_text, "Nodes_Screen_noInput_text");
+
+	group("Node Editor Cycle")
+	    // large button icons
+	    .add(EColor::Cycle_Button, "Button")
+	    .add(EColor::Cycle_ButtonHovered, "ButtonHovered")
+	    .add(EColor::Cycle_ButtonActive, "ButtonActive")
+	    .add(EColor::Cycle_ButtonForeground, "ButtonForeground")
+	    .add(ESize::Cycle_ButtonRounding, "ButtonRounding")
+	    .add(ESizeVec2::Cycle_ButtonSize, "ButtonSize")
+	    // radio buttons
+	    .add(EColor::Cycle_RadioButton, "RadioButton")
+	    .add(EColor::Cycle_RadioButtonActive, "RadioButtonActive")
+	    .add(EColor::Cycle_RadioButtonHovered, "RadioButtonHovered")
+	    .add(EColor::Cycle_RadioButtonText, "RadioButtonText")
+	    .add(EColor::Cycle_RadioButtonSelected, "RadioButtonSelected")
+	    .add(EColor::Cycle_RadioButtonSelectedHovered, "RadioButtonSelectedHovered")
+	    .add(EColor::Cycle_RadioButtonSelectedText, "RadioButtonSelectedText")
+	    .add(EColor::Cycle_RadioButtonBackground, "RadioButtonBackground")
+	    .add(ESize::Cycle_RadioButtonRounding, "RadioButtonRounding");
+
+	/*
+
+	 */
+
+	group("Node Editor Link").add(EColor::Links_selected_colorShift, "selected_colorShift");
+
+	checkThemeVariables();
+
 	// All category keys must be I3T_PROPERTY_NAME_OFFSET characters long.
+	/// \todo This will be removed.
 	g_CategoryNames["glob_"] = "Global";
 	g_CategoryNames["tuts_"] = "Tutorials";
 	g_CategoryNames["star_"] = "Start Window";
@@ -434,6 +666,7 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	// Tutorials
+	/// \todo This will be removed.
 	g_ColorNames[EColor::TutorialBgColor] = "tuts_Background";
 	g_ColorNames[EColor::TutorialText] = "tuts_Text";
 	g_ColorNames[EColor::TutorialBarBg] = "tuts_Bar Background";
@@ -451,6 +684,7 @@ void Theme::initNames()
 
 
 	// Start Window
+	/// \todo This will be removed.
 	g_ColorNames[EColor::StartWindow_DescriptionBackground] = "star_Description Background";
 	g_ColorNames[EColor::StartWindow_WindowBackground] = "star_Window Background";
 	g_ColorNames[EColor::StartWindow_ScrollbarBackground] = "star_Scrollbar Background";
@@ -465,6 +699,7 @@ void Theme::initNames()
 	g_ColorNames[EColor::StartWindow_DescriptionFont] = "star_Description Font Color";
 	g_ColorNames[EColor::StartWindow_YourSceneWinBackground] = "star_Your Scene Section Background";
 
+	/// \todo This will be removed.
 	g_SizeNames[ESize::StartWindow_WinWidth] = "star_Window Width";
 	g_SizeNames[ESize::StartWindow_WinHeight] = "star_Window Height";
 	g_SizeNames[ESize::StartWindow_WinRounding] = "star_Window Rounding";
@@ -481,6 +716,7 @@ void Theme::initNames()
 	g_SizeNames[ESize::StartWindow_DotSize] = "star_Dot Size";
 	g_SizeNames[ESize::StartWindow_DotSpacing] = "star_Dot Spacing";
 
+	/// \todo This will be removed.
 	g_SizeVecNames[ESizeVec2::StartWindow_WinSize] = "star_Window Size";
 	g_SizeVecNames[ESizeVec2::StartWindow_LogoOffset] = "star_Logo Offset";
 	g_SizeVecNames[ESizeVec2::StartWindow_WinPadding] = "star_Window Padding";
@@ -489,12 +725,14 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::StartWindow_RightWinInnerPadding] = "star_Right Window InnerPadding";
 
 	// About Window
+	/// \todo This will be removed.
 	g_ColorNames[EColor::AboutWindow_BackgroundLeft] = "abut_AboutWindow BackgroundLeft";
 	g_ColorNames[EColor::AboutWindow_BackgroundRight] = "abut_AboutWindow BackgroundRight";
 	g_ColorNames[EColor::AboutWindow_Text] = "abut_AboutWindow Text";
 
 	// Node editor colors
 	// ------------------
+	/// \todo This will be removed.
 
 	// 1. Pins
 	g_ColorNames[EColor::PulsePin] = "npin_Pulse Pin";
@@ -758,93 +996,11 @@ std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
 	return g_SizeVecNames;
 }
 
-// JH unused
-// void Theme::operatorColorTheme()
-//{
-//    /* \todo JH repaire
-//	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg]
-//= m_colors[EColor::NodeBgOperator];
-//
-//	ImGuiStyle& style = ImGui::GetStyle();
-//
-//	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgOperator];
-//	style.Colors[ImGuiCol_FrameBgHovered] =
-// m_colors[EColor::FloatBgOperatorHovered];
-// style.Colors[ImGuiCol_FrameBgActive] =
-// m_colors[EColor::FloatBgOperatorActive];
-//	*/
-//}
-//
-// void Theme::transformationColorTheme()
-//{
-//    /* \todo JH repaire
-//	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg]
-//= 			m_colors[EColor::NodeBgTransformation];
-//
-//	ImGuiStyle& style = ImGui::GetStyle();
-//
-//	style.Colors[ImGuiCol_FrameBg]				=
-// m_colors[EColor::FloatBgTransformation];
-// style.Colors[ImGuiCol_FrameBgHovered] =
-// m_colors[EColor::FloatBgTransformationHovered];
-//	style.Colors[ImGuiCol_FrameBgActive]	=
-// m_colors[EColor::FloatBgTransformationActive];
-//	*/
-//}
-
-bool isVectorsEqual(ImVec4 a, ImVec4 b)
+ThemeGroup& Theme::group(const char* name)
 {
-	/// \todo Comparing float values!
-	return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ? true : false;
-}
+	s_variables.emplace_back(name);
 
-// JH unused
-// ImVec4 Theme::getHeader()
-//{
-//    /* \todo JH repaire
-//	if
-//(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-//										 m_colors[EColor::NodeBgOperator]))
-//	{
-//		return m_colors[EColor::NodeHeaderOperator];
-//	}
-//	if
-//(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-//										 m_colors[EColor::NodeBgTransformation]))
-//	{
-//		return m_colors[EColor::NodeHeaderTranformation];
-//	}
-//	*/
-//	return m_colors[EColor::NodeHeaderTranformation];
-//	//return ImVec4(0, 0, 0, 0);
-//}
-//
-// ImVec4 Theme::getBg()
-//{
-//    /* \todo JH repaire
-//	if
-//(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-//										 m_colors[EColor::NodeBgOperator]))
-//	{
-//		return m_colors[EColor::NodeHeaderOperator];
-//	}
-//	if
-//(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-//										 m_colors[EColor::NodeBgTransformation]))
-//	{
-//		return m_colors[EColor::NodeHeaderTranformation];
-//	}
-//	*/
-//	return m_colors[EColor::NodeBgTransformation];
-//	//return ImVec4(0, 0, 0, 0);
-//}
-
-void Theme::returnFloatColorToDefault()
-{
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBg];
-	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgHovered];
-	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgHovered];
+	return s_variables.back();
 }
 
 bool Detail::isLightThemeSet()

@@ -257,7 +257,9 @@ FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
 	return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
 }
 
-FORCE_INLINE bool withinInterval(const float val, const float from, const float to)
+/// Inclusive interval
+template <typename T>
+FORCE_INLINE bool withinInterval(T val, T from, T to)
 {
 	return from <= val && val <= to;
 }

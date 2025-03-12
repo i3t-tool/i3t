@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <variant>
 
 using Void = std::monostate;

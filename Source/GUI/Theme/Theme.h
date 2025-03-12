@@ -12,7 +12,6 @@
  */
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include <array>
@@ -23,17 +22,13 @@
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 #include "Core/Result.h"
+#include "GUI/ThemeVariable.h"
 
 constexpr int I3T_PROPERTY_NAME_OFFSET = 5;
 
 constexpr auto I3T_CLASSIC_THEME_NAME = "Classic";
 constexpr auto I3T_DEFAULT_THEME_LIGHT_NAME = "LightMode";
 constexpr auto I3T_DEFAULT_THEME_DARK_NAME = "DarkMode";
-inline const std::set<std::string> I3T_DEFAULT_THEMES = {
-    I3T_CLASSIC_THEME_NAME,
-    I3T_DEFAULT_THEME_LIGHT_NAME,
-    I3T_DEFAULT_THEME_DARK_NAME,
-};
 
 enum class EColor
 {
@@ -210,6 +205,7 @@ enum class EColor
 
 enum class EFont
 {
+	Mono,
 	Regular,
 	LargeBold,
 	MenuLarge,
@@ -362,11 +358,6 @@ enum class ESizeVec2
 	Cycle_ButtonSize,
 };
 
-constexpr inline EColor asColor(Core::EValueType type)
-{
-	return EColor(type);
-}
-
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
@@ -402,20 +393,9 @@ public:
 	/// (std::unordered_map cannot be used).
 	using CategoryNames = std::map<std::string, const char*>;
 
-private:
-	std::string m_name = "default";
-
-	Colors m_colors;
-	Sizes m_sizes;
-	SizesVec m_sizesVec2;
-
-	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
-
-	std::map<EFont, std::string> m_fontsAssoc;
-
 public:
 	Theme() = default;
-	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
+	Theme(std::string name, bool isDark, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
 	static Theme createDefaultClassic();
 
@@ -473,42 +453,35 @@ public:
 		return m_name;
 	}
 
+	const bool isDark() const
+	{
+		return m_isDark;
+	}
+
 	void set(EColor color, ImVec4 value)
 	{
 		m_colors.insert(std::pair(color, value));
 	}
 
-	[[nodiscard]] const Colors& getColors() const
-	{
-		return m_colors;
-	}
 	Colors& getColorsRef()
 	{
 		return m_colors;
-	}
-	void setColors(const Colors& colors)
-	{
-		m_colors = colors;
 	}
 
 	Sizes& getSizesRef()
 	{
 		return m_sizes;
 	}
+
 	SizesVec& getSizesVecRef()
 	{
 		return m_sizesVec2;
 	}
 
-	// JH unused -> maybe for "InputItems" only - drag float etc... but probably
-	// not needed
-	//	void operatorColorTheme();
-	//	void transformationColorTheme();
-	void returnFloatColorToDefault();
-
-	// JH unused
-	//	ImVec4 getHeader();
-	//	ImVec4 getBg();
+	static const std::vector<ThemeGroup>& getVariables()
+	{
+		return s_variables;
+	}
 
 private:
 	template <typename E, typename T>
@@ -517,6 +490,21 @@ private:
 		for (const auto [key, val] : source)
 			target[key] = val;
 	}
+
+	static ThemeGroup& group(const char* name);
+
+	std::string m_name = "default";
+
+	bool m_isDark = true;
+	Colors m_colors;
+	Sizes m_sizes;
+	SizesVec m_sizesVec2;
+
+	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	std::map<EFont, std::string> m_fontsAssoc;
+
+	static inline std::vector<ThemeGroup> s_variables;
 };
 
 namespace Detail

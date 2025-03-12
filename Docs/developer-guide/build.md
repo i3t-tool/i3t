@@ -1,5 +1,6 @@
 # Build
-List of supported platforms is in [table](https://github.com/i3t-tool/i3t/blob/master/README.md) in README.md file.
+List of supported platforms is in [table](https://github.com/i3t-tool/i3t/blob/master/README.md#Build) 
+in README.md file.
 
 ## Get source code
 First, you need to download the source code. The `--recursive` switch ensures that
@@ -15,9 +16,12 @@ git submodule update --init --recursive
 ```
 
 ## Dependencies
+You will need `cmake` and a C++23 compiler with support for `std::expected`.
+
 ### Linux (apt)
 ```shell
-apt install libgl-dev libglx-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev -y
+apt install -y libgl-dev libglx-dev \
+    libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 ```
 
 ## CMake

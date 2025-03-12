@@ -14,7 +14,6 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 
 #include "Core/Input/InputBindings.h"
@@ -99,7 +98,12 @@ void LogWindow::render()
 	}
 
 	ImGui::BeginChild(ID);
+
+	ImGui::PushFont(I3T::getFont(EFont::Mono));
+
 	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
+
+	ImGui::PopFont();
 
 	// Set scroll to bottom of the child window.
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
