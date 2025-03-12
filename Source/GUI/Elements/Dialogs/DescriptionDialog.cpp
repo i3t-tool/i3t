@@ -16,6 +16,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "GUI/WindowManager.h"
+#include "Localization/Localization.h"
 
 DescriptionDialog::DescriptionDialog() : IWindow("Description")
 {
@@ -59,7 +60,7 @@ void DescriptionDialog::render()
 	if (!m_isEditState)
 	{
 		ImGui::SameLine();
-		if (ImGui::Button("Edit"))
+		if (ImGui::Button(_t("Edit")))
 		{
 			m_isEditState = true;
 		}

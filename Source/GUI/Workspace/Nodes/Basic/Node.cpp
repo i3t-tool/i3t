@@ -32,7 +32,7 @@ bool Node::allowDragStart() const
 
 void Node::drawMenuDelete()
 {
-	if (ImGui::MenuItem("Delete", "Delete"))
+	if (ImGui::MenuItem(_t("Delete"), "Delete"))
 	{
 		destroy();
 	}

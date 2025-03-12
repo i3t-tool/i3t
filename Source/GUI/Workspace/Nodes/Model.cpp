@@ -42,79 +42,79 @@ void Model::popupContent_axis_showmodel()
 {
 	auto model = m_viewportModel.lock();
 
-	if (ImGui::MenuItem("Show axes", NULL, model->m_showAxes))
+	if (ImGui::MenuItem(_t("Show axes"), NULL, model->m_showAxes))
 	{
 		model->m_showAxes = !model->m_showAxes;
 	}
-	if (ImGui::MenuItem("Show model", NULL, model->m_visible))
+	if (ImGui::MenuItem(_t("Show model"), NULL, model->m_visible))
 	{
 		model->m_visible = !model->m_visible;
 	}
-	if (ImGui::BeginMenu("Transparency"))
+	if (ImGui::BeginMenu(_t("Transparency")))
 	{
-		if (ImGui::Checkbox("Opaque", &model->m_opaque))
+		if (ImGui::Checkbox(_t("Opaque"), &model->m_opaque))
 		{
 			// model->m_opaque = !model->m_opaque;
 		}
-		ImGui::Checkbox("Back-face cull", &model->m_backFaceCull);
-		ImGui::SliderFloat("Opacity", &model->m_opacity, 0.0f, 1.0f, "%.2f");
+		ImGui::Checkbox(_t("Back-face culling"), &model->m_backFaceCull);
+		ImGui::SliderFloat(_t("Opacity"), &model->m_opacity, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-	if (ImGui::BeginMenu("Set tint"))
+	if (ImGui::BeginMenu(_t("Set tint")))
 	{
-		if (ImGui::BeginMenu("Color"))
+		if (ImGui::BeginMenu(_t("Color")))
 		{
-			if (ImGui::MenuItem("None"))
+			if (ImGui::MenuItem(_t("None")))
 			{
 				model->m_tint = glm::vec3(1.0f);
 			}
-			if (ImGui::MenuItem("Red"))
+			if (ImGui::MenuItem(_t("Red")))
 			{
 				model->m_tint = calculateTint(Color::RED, model);
 			}
-			if (ImGui::MenuItem("Green"))
+			if (ImGui::MenuItem(_t("Green")))
 			{
 				model->m_tint = calculateTint(Color::GREEN, model);
 			}
-			if (ImGui::MenuItem("Blue"))
+			if (ImGui::MenuItem(_t("Blue")))
 			{
 				model->m_tint = calculateTint(Color::BLUE, model);
 			}
-			if (ImGui::MenuItem("Yellow"))
+			if (ImGui::MenuItem(_t("Yellow")))
 			{
 				model->m_tint = calculateTint(Color::YELLOW, model);
 			}
-			if (ImGui::MenuItem("Teal"))
+			if (ImGui::MenuItem(_t("Teal")))
 			{
 				model->m_tint = calculateTint(Color::TEAL, model);
 			}
-			if (ImGui::MenuItem("Magenta"))
+			if (ImGui::MenuItem(_t("Magenta")))
 			{
 				model->m_tint = calculateTint(Color::MAGENTA, model);
 			}
-			if (ImGui::MenuItem("Light Blue"))
+			if (ImGui::MenuItem(_t("Light Blue")))
 			{
 				model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
 			}
-			if (ImGui::MenuItem("Orange"))
+			if (ImGui::MenuItem(_t("Orange")))
 			{
 				model->m_tint = calculateTint(Color::ORANGE, model);
 			}
-			if (ImGui::MenuItem("Brown"))
+			if (ImGui::MenuItem(_t("Brown")))
 			{
 				model->m_tint = calculateTint(Color::BROWN, model);
 			}
 			ImGui::EndMenu();
 		}
 		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-		ImGui::SliderFloat("Strength", &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
+		ImGui::SliderFloat(_t("Strength"), &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
 	ImGui::PopItemFlag();
 
-	if (ImGui::BeginMenu("Change model"))
+	if (ImGui::BeginMenu(_t("Change model")))
 	{
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{

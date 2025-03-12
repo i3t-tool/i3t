@@ -340,7 +340,7 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::TutorialWindow_ScrollbarRounding] = 5.0f;
 	m_sizes[ESize::TutorialWindow_ScrollbarSize] = 15.0f;
 	m_sizes[ESize::TutorialWindow_BackButtonWidth] = 40.0f;
-	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 80.0f;
+	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 120.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
 	m_sizes[ESize::Default_VisibleQuaternionPrecision] = 4.0f;

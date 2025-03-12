@@ -18,6 +18,7 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
+#include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
@@ -42,6 +43,8 @@ void I3TApplication::onInit()
 	});
 
 	auto* stateManager = createModule<StateManager>();
+	// Call loading of the localization file after the state manager is created
+	LOCALIZATION.loadLanguage(LOCALIZATION.currentLanguageID);
 
 	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();
 	JSON::parse(Configuration::configFile, *configDoc, "Data/Schemas/Config.schema.json");

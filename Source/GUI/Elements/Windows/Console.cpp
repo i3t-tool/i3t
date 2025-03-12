@@ -18,6 +18,7 @@
 #include "GUI/Elements/IWindow.h"
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
+#include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"
 #include "UserData.h"
@@ -31,8 +32,8 @@ static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 }
 
 Console::Console(bool show)
-    : IWindow(ICON_I3T_CONSOLE " Console", show), m_oss(App::get().getModule<ScriptingModule>().outputStream()),
-      m_History(getUserData().recentCommands)
+    : IWindow(ICON_T(ICON_I3T_CONSOLE " ", "Console"), show),
+      m_oss(App::get().getModule<ScriptingModule>().outputStream()), m_History(getUserData().recentCommands)
 {
 	m_oss << "I3T console\n";
 }

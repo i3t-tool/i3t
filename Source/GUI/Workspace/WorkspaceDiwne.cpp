@@ -22,6 +22,7 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
+#include "Localization/Localization.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -680,7 +681,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	ImGui::PushFont(I3T::getFont(EFont::TutorialHint));
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getColor(EColor::AddMenuHeader));
 
-	ImGui::Text("Add...");
+	ImGui::Text(_t("Add..."));
 
 	ImGui::PopFont();
 	ImGui::PopStyleColor();
@@ -1153,14 +1154,14 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu("Delete"))
+	if (ImGui::BeginMenu(_t("Delete")))
 	{
-		if (ImGui::MenuItem("Selected nodes"))
+		if (ImGui::MenuItem(_t("Selected nodes")))
 		{
 			deleteSelectedNodes();
 		}
 
-		if (ImGui::MenuItem("Selected links"))
+		if (ImGui::MenuItem(_t("Selected links")))
 		{
 			for (auto& link : m_links)
 			{
@@ -1171,12 +1172,12 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 		}
 
-		if (ImGui::MenuItem("All nodes"))
+		if (ImGui::MenuItem(_t("All nodes")))
 		{
 			clear();
 		}
 
-		if (ImGui::MenuItem("All links"))
+		if (ImGui::MenuItem(_t("All links")))
 		{
 			for (auto& link : m_links)
 			{
@@ -1188,25 +1189,25 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu("Selection"))
+	if (ImGui::BeginMenu(_t("Selection")))
 	{
-		if (ImGui::MenuItem("select all", "Ctrl+A"))
+		if (ImGui::MenuItem(_t("select all"), "Ctrl+A"))
 		{
 			selectAllNodes();
 		}
-		if (ImGui::MenuItem("invert", "Ctrl+I"))
+		if (ImGui::MenuItem(_t("invert"), "Ctrl+I"))
 		{
 			invertSelection();
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Zoom"))
+	if (ImGui::BeginMenu(_t("Zoom")))
 	{
-		if (ImGui::MenuItem("to all", "Ctrl+Alt+A"))
+		if (ImGui::MenuItem(_t("to all"), "Ctrl+Alt+A"))
 		{
 			zoomToAll();
 		}
-		if (ImGui::MenuItem("to selection", "Ctrl+Alt+S"))
+		if (ImGui::MenuItem(_t("to selection"), "Ctrl+Alt+S"))
 		{
 			zoomToSelected();
 		}

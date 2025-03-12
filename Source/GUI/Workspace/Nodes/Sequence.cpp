@@ -187,18 +187,18 @@ void Sequence::popupContentTracking()
 	if (Core::GraphManager::isTrackingEnabled() &&
 	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
-		if (ImGui::MenuItem("Stop tracking", ""))
+		if (ImGui::MenuItem(_t("Stop tracking"), ""))
 		{
 			workspaceDiwne.trackingSwitchOff();
 		}
-		if (ImGui::MenuItem("Smooth tracking", "", workspaceDiwne.smoothTracking, true))
+		if (ImGui::MenuItem(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
 		{
 			workspaceDiwne.trackingModeSwitch();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem("Start tracking from right", ""))
+		if (ImGui::MenuItem(_t("Start tracking from right"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{
@@ -207,7 +207,7 @@ void Sequence::popupContentTracking()
 
 			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
 		}
-		if (ImGui::MenuItem("Start tracking from left", ""))
+		if (ImGui::MenuItem(_t("Start tracking from left"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{

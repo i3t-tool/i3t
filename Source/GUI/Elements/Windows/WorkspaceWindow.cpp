@@ -17,6 +17,7 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "Localization/Localization.h"
 #include "Logger/Logger.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
@@ -30,7 +31,7 @@ using namespace Workspace;
 Ptr<WorkspaceDiwne> WorkspaceWindow::g_editor;
 
 WorkspaceWindow::WorkspaceWindow(bool show)
-    : IWindow(ICON_I3T_WORKSPACE " Workspace", show), m_wholeApplication(App::get())
+    : IWindow(ICON_T(ICON_I3T_WORKSPACE " ", "Workspace"), show), m_wholeApplication(App::get())
 {
 	m_autoFocus = true;
 	initDiwneFromTheme();
@@ -131,7 +132,7 @@ void WorkspaceWindow::render()
 
 void WorkspaceWindow::showEditMenu()
 {
-	if (ImGui::BeginMenu("Edit"))
+	if (ImGui::BeginMenu(_t("Edit")))
 	{
 		/*
 		if (ImGui::MenuItem("Undo"))
@@ -149,12 +150,12 @@ void WorkspaceWindow::showEditMenu()
 		}
 		 */
 
-		if (ImGui::MenuItem("Select all"))
+		if (ImGui::MenuItem(_t("Select all")))
 		{
 			g_editor->selectAllNodes();
 		}
 
-		if (ImGui::MenuItem("Zoom all"))
+		if (ImGui::MenuItem(_t("Zoom all")))
 		{
 			g_editor->zoomToAll();
 		}

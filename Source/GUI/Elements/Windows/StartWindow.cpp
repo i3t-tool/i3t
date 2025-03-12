@@ -27,6 +27,7 @@
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/UIModule.h"
 #include "I3T.h"
+#include "Localization/Localization.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
 #include "Tutorial/TutorialLoader.h"
@@ -34,7 +35,7 @@
 #include "UserData.h"
 #include "Utils/Other.h"
 
-StartWindow::StartWindow(bool show) : IWindow(ICON_I3T_HOME " Welcome", show)
+StartWindow::StartWindow(bool show) : IWindow(ICON_T(ICON_I3T_HOME " ", "Welcome"), show)
 {
 	// load images
 	try
@@ -81,7 +82,8 @@ void StartWindow::renderLeftPanel() const
 		// TITLE
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle));
 		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_TitleFont));
-		ImGui::Text("Learn\nTransformations");
+		ImGui::Text(_t("Learn"));
+		ImGui::Text(_t("Transformations"));
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
 
@@ -106,9 +108,9 @@ void StartWindow::renderLeftPanel() const
 		// DESCRIPTION
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeDescription));
 		ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
-		ImGui::TextWrapped("I3T is an educational application that allows the "
-		                   "study of 3D transformations and their "
-		                   "hierarchy in an illustrative way.");
+		ImGui::TextWrapped((_ts("I3T is an educational application that allows the study of 3D transformations and") +
+		                    _ts(" their hierarchy in an illustrative way."))
+		                       .c_str());
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
 
@@ -196,10 +198,10 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_Text,
 					                      I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemTitle));
-					ImGui::Text("Your scene");
+					ImGui::Text(_t("Your scene"));
 					ImGui::PopFont();
 					ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeItemDescription));
-					ImGui::Text("Start with an empty scene or open your previous work.");
+					ImGui::Text(_t("Start with an empty scene or open your previous work."));
 					ImGui::PopFont();
 					ImGui::PopStyleColor();
 				}
@@ -215,7 +217,7 @@ void StartWindow::renderRightPanel()
 					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
 					ImGui::PushStyleColor(ImGuiCol_Button,
 					                      I3T::getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
-					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
+					if (ImGui::Button(_t("New"), ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
 						InputManager::triggerAction("new", EKeyState::Pressed);
@@ -225,7 +227,7 @@ void StartWindow::renderRightPanel()
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::Dummy(ImVec2(0, 2));
-					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight)))
+					if (ImGui::Button(_t("Open"), ImVec2(loadBtnWidth, buttonHeight)))
 					{
 						if (MenuBarDialogs::open())
 						{
@@ -252,7 +254,7 @@ void StartWindow::renderRightPanel()
 			ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle)); // Use a larger font for the headline
 			ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(
 			                                         EColor::StartWindow_DescriptionFont)); // Depending on the theme
-			ImGui::Text("Recent");                                                          // Headline text
+			ImGui::Text(_t("Recent"));                                                      // Headline text
 			ImGui::PopStyleColor();
 			ImGui::PopFont();
 
@@ -264,7 +266,7 @@ void StartWindow::renderRightPanel()
 
 			if (recentFiles.empty())
 			{
-				ImGui::Text("No recent files");
+				ImGui::Text(_t("No recent files"));
 			}
 			else
 			{
@@ -318,7 +320,7 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive,
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 
-					if (ImGui::Button(("Open##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
+					if (ImGui::Button((_ts("Open") + "##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
 					{
 						this->hide(); // Close Welcome window
 						askBeforeExitScene([scenePath = *it]() {
@@ -341,7 +343,7 @@ void StartWindow::renderRightPanel()
 		ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::WelcomeTitle));
 		ImGui::PushStyleColor(
 		    ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::StartWindow_DescriptionFont)); // Depending on the theme
-		ImGui::Text("Tutorials");
+		ImGui::Text(_t("Tutorials"));
 		ImGui::PopStyleColor();
 		ImGui::PopFont();
 
@@ -431,7 +433,7 @@ void StartWindow::renderRightPanel()
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
 					                      I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
-					std::string buttonName = "Start##" + header->m_filename.string();
+					std::string buttonName = _ts("Start") + "##" + header->m_filename.string();
 					if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
 					{
 						auto tutorial = TutorialLoader::loadTutorial(header);

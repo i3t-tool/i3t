@@ -22,6 +22,7 @@
 #include "GUI/ThemeVariable.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "Localization/Localization.h"
 #include "UserData.h"
 #include "Utils/Other.h"
 #include "Utils/Variant.h"
@@ -32,7 +33,7 @@ static void renderVariables();
 
 constexpr float DRAG_FLOAT_WIDTH = 100.0f;
 
-StyleEditor::StyleEditor() : IWindow(ICON_I3T_STYLE " Style Editor") {}
+StyleEditor::StyleEditor() : IWindow(ICON_T(ICON_I3T_STYLE " ", "Style Editor")) {}
 
 void StyleEditor::render()
 {
@@ -44,7 +45,7 @@ void StyleEditor::render()
 
 	// Custom theme selector
 	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-	if (ImGui::BeginCombo("Custom theme", currThemeName.c_str()))
+	if (ImGui::BeginCombo(_t("Custom theme"), currThemeName.c_str()))
 	{
 		for (size_t n = 0; n < I3T::getThemes().size(); ++n)
 		{
@@ -72,7 +73,7 @@ void StyleEditor::render()
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Use default theme"))
+	if (ImGui::Button(_t("Use default theme")))
 	{
 		I3T::getUI()->setDefaultTheme();
 	}
@@ -168,29 +169,29 @@ void StyleEditor::renderSaveRevertField()
 {
 	auto& curr = I3T::getTheme();
 
-	if (ImGui::Button("Revert changes"))
+	if (ImGui::Button(_t("Revert changes")))
 	{
 		revertChangesOnCurrentTheme();
 	}
 	ImGui::SameLine();
 
-	if (GUI::Button("Reload all Themes"))
+	if (GUI::Button(_t("Reload all Themes")))
 	{
 		// Reload Themes from Data/Themes
 		I3T::getUI()->reloadThemes();
 	}
 	ImGui::SameLine();
-	ImGui::Text("(Discards all unsaved changes)");
+	ImGui::Text(_t("(Discards all unsaved changes)"));
 
 	ImGui::Separator();
 
-	ImGui::TextUnformatted("Save current modifications to file (discards unsaved changes on other Themes)");
+	ImGui::TextUnformatted(_t("Save current modifications to file (discards unsaved changes on other Themes)"));
 
 	// Classic theme cannot be overwritten.
 	/// \todo Add list of default themes (LightMode and DarkMode) when they be finished.
 	if (curr.getName() != I3T_CLASSIC_THEME_NAME)
 	{
-		if (ImGui::Button("Overwrite"))
+		if (ImGui::Button(_t("Overwrite")))
 		{
 			saveCurrentTheme(curr.getName());
 		}
@@ -198,7 +199,7 @@ void StyleEditor::renderSaveRevertField()
 	}
 
 	// Save current theme to file.
-	if (ImGui::Button("Save as"))
+	if (ImGui::Button(_t("Save as")))
 	{
 		auto path = std::string("Data/Themes/") + m_newThemeName + ".yml";
 		static std::regex invalidCharsRe(R"([\\\/\:\*\?\"\<\>\|])");
@@ -228,7 +229,7 @@ void StyleEditor::renderSaveRevertField()
 	ImGui::SameLine();
 
 	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-	ImGui::InputText("New theme name", &m_newThemeName);
+	ImGui::InputText(_t("New theme name"), &m_newThemeName);
 
 	ImGui::TextUnformatted(m_infoMessage.c_str());
 }

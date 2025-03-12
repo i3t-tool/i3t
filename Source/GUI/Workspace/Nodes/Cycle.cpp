@@ -767,15 +767,15 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getColor(EColor::Cycle_ButtonForeground));
 				ImGui::Text(" ");
 				ImGui::SameLine();
-				inner_interaction_happen |= myRadioButton("   once   ", &mode, 0);
+				inner_interaction_happen |= myRadioButton(_t("   once   "), &mode, 0);
 				ImGui::SameLine();
 				ImGui::Text("  |  ");
 				ImGui::SameLine();
-				inner_interaction_happen |= myRadioButton("   repeat   ", &mode, 1);
+				inner_interaction_happen |= myRadioButton(_t("   repeat   "), &mode, 1);
 				ImGui::SameLine();
 				ImGui::Text("  |  ");
 				ImGui::SameLine();
-				inner_interaction_happen |= myRadioButton("   ping-pong   ", &mode, 2);
+				inner_interaction_happen |= myRadioButton(_t("   ping-pong   "), &mode, 2);
 				ImGui::SameLine();
 				ImGui::Text(" ");
 				ImGui::PopStyleColor();
@@ -813,7 +813,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			// -----------------------------------------------------
 
 			// smooth checkbox
-			ImGui::Text("  smooth step: ");
+			ImGui::Text(_t("  smooth step: "));
 
 			//            GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive
 			//                        : hovered         ? ImGuiCol_FrameBgHovered
@@ -837,7 +837,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 
 			// step duration
 			ImGui::SameLine();
-			ImGui::Text("     step duration: ");
+			ImGui::Text(_t("     step duration: "));
 
 			ImGui::SameLine();
 			localData = m_nodebase->as<Core::Cycle>()->getStepDuration();
@@ -848,7 +848,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			    localData, Core::EValueState::Editable, valueChanged);
 			if (ImGui::IsItemHovered())
 			{
-				ImGui::SetTooltip("Automatic step duration");
+				ImGui::SetTooltip(_t("Automatic step duration"));
 			}
 			if (valueChanged)
 			{
@@ -860,7 +860,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			// -----------------------------------------------------
 			// line 4: Single step line
 			// -----------------------------------------------------
-			ImGui::Text("             single step: ");
+			ImGui::Text(_t("             single step: "));
 
 			ImGui::SameLine();
 
@@ -872,7 +872,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			    Core::EValueState::Editable, valueChanged);
 			if (ImGui::IsItemHovered())
 			{
-				ImGui::SetTooltip("Step for manual Next/Prev");
+				ImGui::SetTooltip(_t("Step for manual Next/Prev"));
 			}
 			if (valueChanged)
 			{

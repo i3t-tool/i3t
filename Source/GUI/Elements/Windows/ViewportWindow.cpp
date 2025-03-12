@@ -18,6 +18,7 @@
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "I3T.h"
+#include "Localization/Localization.h"
 
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
@@ -28,7 +29,8 @@ using namespace UI;
 
 using CameraMode = Vp::AggregateCamera::CameraMode;
 
-ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(ICON_I3T_SCENE " Scene View", show)
+ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
+    : IWindow(ICON_T(ICON_I3T_SCENE " ", "Scene View"), show)
 {
 	m_autoFocus = true;
 	m_viewport = viewport;
@@ -233,21 +235,21 @@ bool ViewportWindow::showViewportButtons()
 		if (ImGui::IsItemHovered())
 		{
 			interacted = true;
-			GUI::Tooltip("Object visibility toggle", "");
+			GUI::Tooltip(_t("Object visibility toggle"), "");
 		}
 	}
 
 	if (ImGui::BeginPopup(displayPopupId))
 	{
 		interacted = true;
-		ImGui::TextDisabled("Object visibility");
+		ImGui::TextDisabled(_t("Object visibility"));
 		ImGui::Dummy({0.0f, popupTitleDividerSize});
 
-		ImGui::MenuItem(ICON_I3T_MODEL " Objects", nullptr, &m_displayOptions.showDefault);
-		ImGui::MenuItem(ICON_I3T_MANIPULATOR " Axes", nullptr, &m_displayOptions.showAxes);
-		ImGui::MenuItem(ICON_I3T_GRID " Grid", nullptr, &m_displayOptions.showGrid);
-		ImGui::MenuItem(ICON_I3T_CAMERA " Cameras", nullptr, &m_displayOptions.showCamera);
-		ImGui::MenuItem(ICON_I3T_FRUSTUM " Frustums", nullptr, &m_displayOptions.showFrustum);
+		ImGui::MenuItem(ICON_T(ICON_I3T_MODEL " ", "Objects"), nullptr, &m_displayOptions.showDefault);
+		ImGui::MenuItem(ICON_T(ICON_I3T_MANIPULATOR " ", "Axes"), nullptr, &m_displayOptions.showAxes);
+		ImGui::MenuItem(ICON_T(ICON_I3T_GRID " ", "Grid"), nullptr, &m_displayOptions.showGrid);
+		ImGui::MenuItem(ICON_T(ICON_I3T_CAMERA " ", "Cameras"), nullptr, &m_displayOptions.showCamera);
+		ImGui::MenuItem(ICON_T(ICON_I3T_FRUSTUM " ", "Frustums"), nullptr, &m_displayOptions.showFrustum);
 
 		ImGui::EndPopup();
 	}
@@ -263,7 +265,7 @@ bool ViewportWindow::showViewportButtons()
 		if (ImGui::IsItemHovered())
 		{
 			interacted = true;
-			GUI::Tooltip("Toggle world lighting", "");
+			GUI::Tooltip(_t("Toggle world lighting"), "");
 		}
 	}
 
@@ -278,7 +280,7 @@ bool ViewportWindow::showViewportButtons()
 		if (ImGui::IsItemHovered())
 		{
 			interacted = true;
-			GUI::Tooltip("Toggle manipulators", "");
+			GUI::Tooltip(_t("Toggle manipulators"), "");
 		}
 	}
 
@@ -294,20 +296,20 @@ bool ViewportWindow::showViewportMenu()
 	Vp::ViewportSettings& stg = m_viewport->getSettings();
 
 	bool userInteractedWithMenus = false;
-	if (ImGui::BeginMenu("Settings"))
+	if (ImGui::BeginMenu(_t("Settings")))
 	{
 		userInteractedWithMenus = true;
 
-		if (ImGui::BeginMenu("Scene"))
+		if (ImGui::BeginMenu(_t("Scene")))
 		{
-			ImGui::Checkbox("World space lighting", &stg.scene().mainScene.lightFollowsCamera);
+			ImGui::Checkbox(_t("World space lighting"), &stg.scene().mainScene.lightFollowsCamera);
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Manipulators"))
+		if (ImGui::BeginMenu(_t("Manipulators")))
 		{
-			ImGui::Checkbox("Show manipulators", &stg.scene().manipulator_enabled);
-			ImGui::SliderFloat("Size", &stg.global().manipulator_size, 0.01f, 1.0f, "%.2f");
+			ImGui::Checkbox(_t("Show manipulators"), &stg.scene().manipulator_enabled);
+			ImGui::SliderFloat(_t("Size"), &stg.global().manipulator_size, 0.01f, 1.0f, "%.2f");
 			ImGui::EndMenu();
 		}
 
@@ -315,9 +317,9 @@ bool ViewportWindow::showViewportMenu()
 		bool msaa2x = m_renderOptions.multisample && m_renderOptions.samples == 2;
 		bool msaa4x = m_renderOptions.multisample && m_renderOptions.samples == 4;
 		bool msaa8x = m_renderOptions.multisample && m_renderOptions.samples == 8;
-		if (ImGui::BeginMenu("MSAA"))
+		if (ImGui::BeginMenu(_t("MSAA")))
 		{
-			if (ImGui::MenuItem("OFF", nullptr, &msaaOff))
+			if (ImGui::MenuItem(_t("OFF"), nullptr, &msaaOff))
 			{
 				m_renderOptions.multisample = false;
 			}
@@ -339,38 +341,38 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Highlight"))
+		if (ImGui::BeginMenu(_t("Highlight")))
 		{
 			userInteractedWithMenus = true;
-			if (ImGui::MenuItem("Ultra", nullptr, nullptr))
+			if (ImGui::MenuItem(_t("Ultra"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 1.0f;
 				stg.global().highlight.kernelSize = 4;
 				stg.global().highlight.outlineCutoff = 0.15f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem("High", nullptr, nullptr))
+			if (ImGui::MenuItem(_t("High"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.8f;
 				stg.global().highlight.kernelSize = 4;
 				stg.global().highlight.outlineCutoff = 0.18f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem("Medium", nullptr, nullptr))
+			if (ImGui::MenuItem(_t("Medium"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.5f;
 				stg.global().highlight.kernelSize = 2;
 				stg.global().highlight.outlineCutoff = 0.23f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem("Low", nullptr, nullptr))
+			if (ImGui::MenuItem(_t("Low"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 1.0f / 3;
 				stg.global().highlight.kernelSize = 2;
 				stg.global().highlight.outlineCutoff = 0.3f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem("Lowest", nullptr, nullptr))
+			if (ImGui::MenuItem(_t("Lowest"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.25;
 				stg.global().highlight.kernelSize = 2;
@@ -380,12 +382,12 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Transparency"))
+		if (ImGui::BeginMenu(_t("Transparency")))
 		{
-			ImGui::MenuItem("Use WBOIT", nullptr, &m_renderOptions.wboit);
-			if (ImGui::BeginMenu("WBOIT weight function"))
+			ImGui::MenuItem(_t("Use WBOIT"), nullptr, &m_renderOptions.wboit);
+			if (ImGui::BeginMenu(_t("WBOIT weight function")))
 			{
-				if (ImGui::MenuItem("OFF", nullptr, m_renderOptions.wboitFunc == 0))
+				if (ImGui::MenuItem(_t("OFF"), nullptr, m_renderOptions.wboitFunc == 0))
 				{
 					m_renderOptions.wboitFunc = 0;
 				}
@@ -428,7 +430,7 @@ bool ViewportWindow::showViewportMenu()
 		}
 
 		// TODO: (DR) Probably move to preferences or help/debug menu
-		if (ImGui::MenuItem("Reload shaders", nullptr, nullptr))
+		if (ImGui::MenuItem(_t("Reload shaders"), nullptr, nullptr))
 		{
 			bool ok = Vp::Shaders::instance().reload();
 			// Flash green if all shaders reloaded successfully, red otherwise
@@ -441,10 +443,10 @@ bool ViewportWindow::showViewportMenu()
 
 	// TODO: (DR) To follow the "unified api methodology", the UI here should only update the viewport settings and not
 	//  actually perform the changes. Although this is more "efficient" in a way. But cumbersome I suppose.
-	if (ImGui::BeginMenu("View"))
+	if (ImGui::BeginMenu(_t("View")))
 	{
 		userInteractedWithMenus = true;
-		if (ImGui::MenuItem("Orbit camera", nullptr, stg.scene().mainScene.camera.mode == CameraMode::ORBIT))
+		if (ImGui::MenuItem(_t("Orbit camera"), nullptr, stg.scene().mainScene.camera.mode == CameraMode::ORBIT))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -452,7 +454,8 @@ bool ViewportWindow::showViewportMenu()
 				stg.scene().mainScene.camera.mode = CameraMode::ORBIT;
 			}
 		}
-		if (ImGui::MenuItem("Trackball camera", nullptr, stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
+		if (ImGui::MenuItem(_t("Trackball camera"), nullptr,
+		                    stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -460,7 +463,7 @@ bool ViewportWindow::showViewportMenu()
 				stg.scene().mainScene.camera.mode = CameraMode::TRACKBALL;
 			}
 		}
-		if (ImGui::MenuItem("Smooth scroll", nullptr, stg.global().camera.smoothScroll))
+		if (ImGui::MenuItem(_t("Smooth scroll"), nullptr, stg.global().camera.smoothScroll))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -469,7 +472,7 @@ bool ViewportWindow::showViewportMenu()
 				camera->getTrackballCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
 			}
 		}
-		if (ImGui::SliderFloat("Camera fov", &stg.scene().mainScene.camera.fov, 1, 180, "%.1f"))
+		if (ImGui::SliderFloat(_t("Camera fov"), &stg.scene().mainScene.camera.fov, 1, 180, "%.1f"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -479,7 +482,7 @@ bool ViewportWindow::showViewportMenu()
 		}
 
 		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
-		ImGui::Checkbox("Show grid", &m_displayOptions.showGrid);
+		ImGui::Checkbox(_t("Show grid"), &m_displayOptions.showGrid);
 		ImGui::SameLine();
 		GUI::ToggleButton("XZ", m_displayOptions.showGridLines, false, gridButtonSize);
 		ImGui::SameLine();
@@ -493,42 +496,42 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Viewpoint right", "Num3"))
+		if (ImGui::MenuItem(_t("Viewpoint right"), "Num3"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 			}
 		}
-		if (ImGui::MenuItem("Viewpoint left", "Ctrl+Num3"))
+		if (ImGui::MenuItem(_t("Viewpoint left"), "Ctrl+Num3"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 			}
 		}
-		if (ImGui::MenuItem("Viewpoint top", "Num7"))
+		if (ImGui::MenuItem(_t("Viewpoint top"), "Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 			}
 		}
-		if (ImGui::MenuItem("Viewpoint bottom", "Ctrl+Num7"))
+		if (ImGui::MenuItem(_t("Viewpoint bottom"), "Ctrl+Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 			}
 		}
-		if (ImGui::MenuItem("Viewpoint front", "Num1"))
+		if (ImGui::MenuItem(_t("Viewpoint front"), "Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 			}
 		}
-		if (ImGui::MenuItem("Viewpoint back", "Ctrl+Num1"))
+		if (ImGui::MenuItem(_t("Viewpoint back"), "Ctrl+Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -538,7 +541,7 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Center camera on selection", "Num0"))
+		if (ImGui::MenuItem(_t("Center camera on selection"), "Num0"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -546,7 +549,7 @@ bool ViewportWindow::showViewportMenu()
 			}
 		}
 
-		if (ImGui::MenuItem("Center camera on scene", "Home"))
+		if (ImGui::MenuItem(_t("Center camera on scene"), "Home"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -556,11 +559,11 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		ImGui::MenuItem("Show objects", nullptr, &m_displayOptions.showDefault);
-		ImGui::MenuItem("Show axes", nullptr, &m_displayOptions.showAxes);
-		ImGui::MenuItem("Show grid", nullptr, &m_displayOptions.showGrid);
-		ImGui::MenuItem("Show cameras", nullptr, &m_displayOptions.showCamera);
-		ImGui::MenuItem("Show frustums", nullptr, &m_displayOptions.showFrustum);
+		ImGui::MenuItem(_t("Show objects"), nullptr, &m_displayOptions.showDefault);
+		ImGui::MenuItem(_t("Show axes"), nullptr, &m_displayOptions.showAxes);
+		ImGui::MenuItem(_t("Show grid"), nullptr, &m_displayOptions.showGrid);
+		ImGui::MenuItem(_t("Show cameras"), nullptr, &m_displayOptions.showCamera);
+		ImGui::MenuItem(_t("Show frustums"), nullptr, &m_displayOptions.showFrustum);
 
 		ImGui::EndMenu();
 	}
