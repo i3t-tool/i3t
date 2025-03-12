@@ -148,8 +148,8 @@ void Theme::initClassicProperties()
 	set(EColor::DockTabUnfocusedActive, ImVec4(0.263f, 0.291f, 0.325f, 1.f));
 	set(EColor::DockTabHovered, get(EColor::SelectionColor));
 
-	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150)); // TODO: Missing in DarkTheme
-	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50)); // TODO: Missing name!
+	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150));    // TODO: Missing in DarkTheme
+	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));             // TODO: Missing name!
 	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 100)); // TODO: Missing name!
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));

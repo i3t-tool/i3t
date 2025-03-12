@@ -6,5 +6,5 @@
 
 namespace DIWNE
 {
-HStack::HStack( std::vector<DiwnePanel>&& children) : children(children) {}
+HStack::HStack(std::vector<DiwnePanel>&& children) : children(children) {}
 } // namespace DIWNE

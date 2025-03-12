@@ -135,7 +135,7 @@ public:
 	bool m_isDragged{false}; /**< Is object dragged */
 	bool m_draggable{true};  ///< Whether dragging of the object is allowed by default
 
-	bool m_hovered{false}; ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
+	bool m_hovered{false};   ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
 	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
 	bool m_hoverable{true};  ///< Whether hovering is enabled by default
 

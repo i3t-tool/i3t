@@ -42,15 +42,18 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 
 	ImVec4 color;
 	DIWNE::Pin* pin = getAnyPin();
-	if (pin) {
+	if (pin)
+	{
 		color = I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(pin)->getType()]);
-	} else {
+	}
+	else
+	{
 		color = ImColor(0.5f, 0.5f, 0.5f);
 	}
 	m_color = color;
 
 	// TODO: Hookup link thickness
-//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
+	//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
 	if (m_selected)
 	{

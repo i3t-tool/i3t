@@ -47,7 +47,7 @@ public:
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
 	void begin(DrawInfo& context) override;
-	void content(DrawInfo& context) override {};
+	void content(DrawInfo& context) override{};
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
 

@@ -31,8 +31,8 @@ public:
 	 * \param valueOfChange is set to value setted by user if so - not touched if no
 	 * user change heppen \return whether some interaction happen
 	 */
-	static bool drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth,
-	                        FloatPopupMode& floatPopupMode, const glm::mat4& data,
+	static bool drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
+	                        float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data,
 	                        std::array<std::array<Core::EValueState, 4> const, 4> const& dataState, bool& valueChanged,
 	                        int& rowOfChange, int& columnOfChange, float& valueOfChange);
 	// static bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int

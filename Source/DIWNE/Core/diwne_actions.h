@@ -59,9 +59,9 @@ struct DiwneAction
 	}
 
 	/// Called at the end of each frame the action is active for, called before onEnd() on the last frame.
-	virtual void onFrameEnd() {};
+	virtual void onFrameEnd(){};
 	/// Callback called at the end of the frame the action was ended. Called after onFrameEnd().
-	virtual void onEnd() {};
+	virtual void onEnd(){};
 	/// Checks whether passed object is the source of this action (eg. the object that started it
 	bool isSource(const DiwneObject* object) const
 	{
@@ -105,7 +105,7 @@ inline static const std::string dragNode = "dragNode";
 // The actual action classes
 struct ConnectPinAction : public DiwneAction
 {
-	Pin* sourcePin{nullptr}; ///< The pin being dragged
+	Pin* sourcePin{nullptr};    ///< The pin being dragged
 	Link* draggedLink{nullptr}; ///< The link being dragged (source pin doesn't need to be connected to it necessarily)
 
 	ConnectPinAction(const std::shared_ptr<DiwneObject>& source) : DiwneAction(connectPin, source) {}

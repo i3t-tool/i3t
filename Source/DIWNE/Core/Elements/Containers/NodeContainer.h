@@ -83,6 +83,7 @@ public:
 	/// Erases objects marked for deletion or removal from the container.
 	/// This method needs to be called every frame by the container owner.
 	void purgeNodes();
+
 protected:
 	/**
 	 * Called after a node is inserted into the container.

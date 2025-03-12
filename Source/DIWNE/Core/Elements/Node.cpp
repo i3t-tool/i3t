@@ -192,8 +192,7 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 {
 	if (m_selected)
 	{
-		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max,
-		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
 		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 	}

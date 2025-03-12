@@ -67,7 +67,7 @@ public:
 	// Lifecycle
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
-	void begin(DrawInfo& context) override {}; /*!< link is not an ImGui element - it is just a drawn line */
+	void begin(DrawInfo& context) override{}; /*!< link is not an ImGui element - it is just a drawn line */
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
 	void updateLayout(DrawInfo& context) override;

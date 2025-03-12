@@ -118,7 +118,7 @@ void DiwneObject::afterDrawDiwne(DrawInfo& context)
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
-void DiwneObject::afterDraw(DrawInfo& context) {};
+void DiwneObject::afterDraw(DrawInfo& context){};
 
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
@@ -517,8 +517,8 @@ void DiwneObject::onHover(DrawInfo& context)
 	                            diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
 
 	DIWNE_DEBUG(diwne, {
-		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1),
-		                            DIWNE_MAGENTA_50, 0, ImDrawFlags_RoundCornersNone, 1);
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_MAGENTA_50, 0,
+		                            ImDrawFlags_RoundCornersNone, 1);
 	});
 }
 
@@ -527,8 +527,8 @@ void DiwneObject::onPressed(bool justPressed, DrawInfo& context)
 	if (justPressed)
 		context.logicalUpdate(false);
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
-		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2),
-		                            DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1);
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2), DIWNE_YELLOW_50, 0,
+		                            ImDrawFlags_RoundCornersNone, 1);
 		if (justPressed)
 		{
 			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(2, 2), getRect().Max - ImVec2(2, 2),
@@ -561,11 +561,11 @@ void DiwneObject::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		}
 		if (dragEnd)
 		{
-			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1),
-			                                  DIWNE_RED_50, 0, ImDrawFlags_RoundCornersNone);
+			diwne.canvas().AddRectFilledDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_RED_50,
+			                                  0, ImDrawFlags_RoundCornersNone);
 		}
-		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_CYAN_50,
-		                            0, ImDrawFlags_RoundCornersNone, 2);
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_CYAN_50, 0,
+		                            ImDrawFlags_RoundCornersNone, 2);
 	});
 }
 
@@ -675,8 +675,8 @@ bool DiwneObject::isChildObject() const
 void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 {
 	DIWNE_DEBUG((diwne), {
-		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0,
-		                            ImDrawFlags_RoundCornersNone, 1, true);
+		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1,
+		                            true);
 	});
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Max.y);

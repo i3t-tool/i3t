@@ -131,7 +131,7 @@ public:
 	/**
 	 * Called by Canvas::setZoom() when the zoom level changes.
 	 */
-	virtual void onZoom() {};
+	virtual void onZoom(){};
 
 	// Subsystems
 	// =============================================================================================================

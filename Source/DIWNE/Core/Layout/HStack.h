@@ -15,13 +15,6 @@ class HStack
 
 	void begin();
 	void end();
-
-
-
-
-
-
-
 };
 
 } // namespace DIWNE

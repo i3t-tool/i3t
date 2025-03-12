@@ -102,7 +102,7 @@ bool Cycle::buttonPlayPause()
 		padding = ImVec4(9 * zoom, 6 * zoom, 7 * zoom, 6 * zoom); // todo I3T::getSize(ESizeVec2::Cycle_ButtonPadding)
 	}
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed)
 	{
@@ -200,7 +200,7 @@ bool Cycle::buttonStopAndReset()
 	ImGui::SetCursorPos(position);
 
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed)
 	{
@@ -247,7 +247,7 @@ bool Cycle::buttonStepBack()
 	ImGui::SetCursorPos(position);
 
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("SB"))
 	{
@@ -305,7 +305,7 @@ bool Cycle::buttonStepNext()
 	ImGui::SetCursorPos(position);
 
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("SN"))
 	{
@@ -345,7 +345,7 @@ bool Cycle::buttonRewind()
 	ImGui::SetCursorPos(position);
 
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("RR"))
 	{
@@ -384,7 +384,7 @@ bool Cycle::buttonWind()
 	ImGui::SetCursorPos(position);
 
 	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	                           padding, true, ImVec2(1, 1), rounding);
+	                        padding, true, ImVec2(1, 1), rounding);
 
 	if (button_pressed) // if (ImGui::SmallButton("WW"))
 	{
@@ -507,8 +507,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
@@ -543,8 +542,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		valueChanged = false;
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		// TODO: drawDragFloat should take the context parameter
 		bool interaction = DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
@@ -674,10 +672,8 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 	float localData;
 	bool valueChanged;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	switch (m_levelOfDetail)
 	{
@@ -758,7 +754,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			{
 				ImGui::SetCursorPos(position - borderWidth);
 				diwne.canvas().EmptyButton(radio_buttons_rect.GetSize(),
-				                              (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
+				                           (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
 				ImGui::SetCursorPos(position + borderWidth);
 			}
 
