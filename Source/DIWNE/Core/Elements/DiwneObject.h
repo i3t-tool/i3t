@@ -660,6 +660,11 @@ public:
 class InteractionState
 {
 public:
+	/**
+	 * The current active action.
+	 * Only one action can be started at a time.
+	 * When action is ended, it remains "active" until the end of the NEXT frame to allow all objects to react to it.
+	 */
 	std::unique_ptr<Actions::DiwneAction> action;
 
 	// TODO: Maybe rename to createAction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -721,9 +726,57 @@ public:
 		return ret;
 	}
 
+	/**
+	 * Indicates that an object is being dragged this frame.
+	 * This flag flips to true mid-frame during the drawing of the dragged object.
+	 * The flag flips to false at the end of the frame in which the dragging stopped.
+	 * It is true for many frames, including the frame dragging has stopped.
+	 * \n
+	 * Below is a table visualizing state of all the drag flags and drag source during dragging of an object
+	 * spanning 3 frames. Dragging of object '3' begins on frame 0 and ends on frame 2.
+	 * No object can be dragged on frame 3 to allow objects '1' and '2' to react to dragging in special cases.
+	 *
+	 * \verbatim
+	 *           Frame: ... -1  |     *0      |      1      |     *2      |      3      |  4 ...
+	 * Object ID drawn:   3 4 5 | 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2
+	 *  dragging value:   - - - | - - T T T T | T T T T T T | T T T T T T | - - - - - - | - -
+	 * dragStart value:   - - - | - - T T T T | - - - - - - | - - - - - - | - - - - - - | - -
+	 *   dragEnd value:   - - - | - - - - - - | - - - - - - | - - T T T T | - - - - - - | - -
+	 * dragEndLF value:   - - - | - - - - - - | - - - - - - | - - - - - - | T T T T T T | - -
+	 *  dragSource ptr:   - - - | - - O O O O | O O O O O O | O O O O O O | O O O O O O | - -
+	 *                          |     ^       |             |     ^       |             | - -
+	 *                         dragging started                 ended
+	 *   Legend: 'T' = true, '-' = false or null, 'O' = valid pointer
+	 *           dragEndLF = dragEndedLastFrame
+	 * \endverbatim
+	 */
 	bool dragging{false};
+	/**
+	 * Indicates that an object has started being dragged this frame.
+	 * This flag flips to true mid-frame during the drawing of the newly dragged object.
+	 * The flag flips to false at the end of the frame in which the dragging started.
+	 * It is true for only a single frame (a portion of it after drawing of the dragged object).
+	 * The dragging flag is always true when this one is true.
+	 * @see dragging
+	 */
 	bool dragStart{false};
+	/**
+	 * Indicates that an object has stopped being dragged this frame.
+	 * This flag flips to true mid-frame during the drawing of the object that stopped being dragged.
+	 * It is true for only a single frame (a portion of it after drawing of the previously dragged object).
+	 * The dragging flag is always true when this one is true.
+	 * @see dragging
+	 */
 	bool dragEnd{false};
+	/**
+	 * Indicates that the dragEnd flag has been true the PREVIOUS frame.
+	 * When true, dragging, dragStart and dragEnd are all false.
+	 * Another object cannot start being dragged when this flag is true.
+	 * Is is true for the entirety of a single frame following the frame in which dragging ended.
+	 * @see dragging
+	 */
+	bool dragEndedLastFrame{false};
+	/// Weak pointer to the object that initiated the drag @see dragging
 	std::weak_ptr<DiwneObject> dragSource;
 
 	bool isDragSource(const DiwneObject* object) const

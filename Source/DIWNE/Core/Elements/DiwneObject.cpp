@@ -239,8 +239,7 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 	}
 	else // Nothing is being dragged, try start drag
 	{
-		m_isDragged = isDragged && allowDragStart(); // TODO: Rename allowDrag to isDragAllowed? isDragStartAllowed?
-		                                             // allowStartDrag, yeah <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		m_isDragged = isDragged && allowDragStart() && !context.state.dragEndedLastFrame;
 		if (m_isDragged)
 		{
 			context.state.dragStart = true;
@@ -384,13 +383,19 @@ void InteractionState::nextFrame()
 		if (action->source.expired() || action->source.lock()->isDestroyed())
 		{
 			endAction(false);
+			action->endActionNextFrame = 2; // End it immediately
 		}
 
 		action->onFrameEnd();
 
-		// When action ends we want to keep it active for the remainder of the frame (so we can react to it ending)
-		// Hence the action reset is defered to the end of the frame here.
-		if (action->endActionThisFrame)
+		// When action ends we want to keep it active for the remainder of the frame as well as the entirety of the
+		// next frame. So any objects, even those rendered before the action was ended, can react to it ending.
+		// Hence the action reset is deferred to the end of the next frame here.
+		if (action->endActionNextFrame == 1)
+		{
+			action->endActionNextFrame++;
+		}
+		else if (action->endActionNextFrame >= 2)
 		{
 			endAction(true);
 		}
@@ -400,14 +405,20 @@ void InteractionState::nextFrame()
 	if (dragging && (dragSource.expired() || dragSource.lock()->isDestroyed()))
 		dragEnd = true;
 
-	// Set dragging to false on dragEnd
+	// Set dragging to false on dragEnd and enable dragEndedLastFrame for a frame.
 	// In the frame when dragging ends, dragging and dragEnd are both true.
 	// dragEnd resets next frame (we're not infering it over)
 	// But dragging needs to be set to false here at the end of frame.
+	// Drag source is retained for one more frame.
+	if (dragEndedLastFrame)
+	{
+		dragEndedLastFrame = false;
+		dragSource.reset();
+	}
 	if (dragEnd)
 	{
 		dragging = false;
-		dragSource.reset();
+		dragEndedLastFrame = true;
 	}
 
 	// Reset non-persistent variables

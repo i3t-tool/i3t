@@ -13,6 +13,7 @@ TEST(InteractionStateTest, ActionTest)
 	// TODO: Test that action is ended automatically when its source gets deleted/destroyed
 	//    - Test when an object is destroyed and unallocated
 	//    - But also when its just destroyed, removed from container but still has a hanging reference
+	// TODO: Test that action ends at the end of the NEXT frame, not the one it was ended in.
 }
 
 TEST(InteractionStateTest, DragTest)

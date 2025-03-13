@@ -34,8 +34,6 @@ Pin::Pin(DIWNE::NodeEditor& diwne, Node* node, bool isInput, std::string labelDi
 
 void Pin::begin(DrawInfo& context)
 {
-	m_connectionChanged = false;
-
 	ImGui::PushID(m_labelDiwne.c_str());
 	ImGui::BeginGroup();
 }
@@ -64,9 +62,16 @@ void Pin::processInteractions(DrawInfo& context)
 {
 	DiwneObject::processInteractions(context);
 
-	// Check if another pin was dragged over this one
-	if (m_hovered && context.state.dragging && allowConnection())
+	bool connectionChangedLastFrame = m_connectionChanged;
+	m_connectionChanged = false;
+
+	// Check if a link was dragged over this one this frame and released
+	// To allow connecting pins of the same Node, we must also check if the dragged pin was released the previous frame.
+	bool draggingThisOrPrevFrame = (context.state.dragging || context.state.dragEndedLastFrame);
+	if (m_hovered && draggingThisOrPrevFrame && allowConnection() && !connectionChangedLastFrame)
 	{
+		// The connect pin action is active during the frame the drag has ended,
+		// but also the one frame right after that, so we can still react to it's end with a one frame delay.
 		Actions::ConnectPinAction* action = context.state.getActiveAction<Actions::ConnectPinAction>();
 		if (action)
 		{
@@ -83,9 +88,14 @@ void Pin::processInteractions(DrawInfo& context)
 			Pin* otherPin = action->draggedLink->getSinglePin();
 			if (!otherPin)
 			{
-				DIWNE_FAIL("[DIWNE] Dragged link both or no ends connected!")
+				DIWNE_FAIL("[DIWNE] Dragged link both or no ends connected!");
 			}
-			preparePlug(otherPin, action->draggedLink, !context.state.dragEnd);
+			// The link is released when the drag ends this frame
+			// It is possible that this pin has missed the initial drag end event and so we also check whether
+			// the drag has ended the previous frame, but we MUST avoid plugging the link twice, hence on the next frame
+			// we must ensure the link wasn't plugged in already by inspecting our m_connectionChanged flag.
+			bool linkReleased = context.state.dragEnd || context.state.dragEndedLastFrame;
+			preparePlug(otherPin, action->draggedLink, !linkReleased);
 		}
 	}
 }

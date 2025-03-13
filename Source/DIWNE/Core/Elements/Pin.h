@@ -32,10 +32,13 @@ public:
 	Node* m_node;               ///< Node this pin belongs to
 	std::vector<Link*> m_links; ///< Links connected to this pin
 
-	bool m_connectionChanged; ///< Flag indicating that the pin has been plugged or unplugged this frame
-	                          ///< Note: This flag gets reset the moment the pin is drawn. Meaning if the node owning
-	                          ///< this pin needs that information AFTER the pin is drawn, it is a good idea to save
-	                          ///< or react to this flag during initialize() or begin().
+	/**
+	 * Flag indicating that the pin has been plugged or unplugged last time the pin was drawn.
+	 * \note This flag gets reset the moment the pin is drawn.
+	 * Meaning if the node owning this pin needs that information AFTER the pin is drawn,
+	 * it is a good idea to save or react to this flag during initialize() or begin().
+	 */
+	bool m_connectionChanged;
 
 protected:
 	ImVec2 m_connectionPoint{ImVec2(0, 0)}; ///< Point where a link connects to this pin

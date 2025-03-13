@@ -13,6 +13,7 @@ class Pin;
 class Link;
 class Node;
 class DiwneObject;
+class InteractionState;
 
 namespace Actions
 {
@@ -25,9 +26,9 @@ namespace Actions
  */
 struct DiwneAction
 {
+	friend class InteractionState;
 	std::string name;
 	std::weak_ptr<DiwneObject> source;
-	bool endActionThisFrame{false};
 
 	/**
 	 * @param name String identifier of the action
@@ -38,7 +39,7 @@ struct DiwneAction
 	virtual ~DiwneAction() = default;
 
 	/**
-	 * Marks the action to end at the end of this frame (or beginning of the next one).
+	 * Marks the action to end at the end of the next frame.
 	 * At the same time onFrameEnd() and onEnd() callbacks will be called in that order.
 	 * \warning Ending the action is usually the responsibility of the object that started it. If this object fails to
 	 * end it, it will simply be active forever.
@@ -55,12 +56,12 @@ struct DiwneAction
 	 */
 	void end()
 	{
-		endActionThisFrame = true;
+		++endActionNextFrame;
 	}
 
 	/// Called at the end of each frame the action is active for, called before onEnd() on the last frame.
 	virtual void onFrameEnd(){};
-	/// Callback called at the end of the frame the action was ended. Called after onFrameEnd().
+	/// Called at the end of the frame after the frame in which the action has ended. Called after onFrameEnd().
 	virtual void onEnd(){};
 	/// Checks whether passed object is the source of this action (eg. the object that started it
 	bool isSource(const DiwneObject* object) const
@@ -80,6 +81,9 @@ struct DiwneAction
 			return false;
 		return true;
 	}
+
+private:
+	short endActionNextFrame{0};
 };
 
 /// Helper class for actions that require an explicit reference to the NodeEditor they are active in.
