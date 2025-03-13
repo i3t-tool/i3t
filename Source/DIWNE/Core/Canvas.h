@@ -289,8 +289,7 @@ struct IconStyle
 
 	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,
 	          const ImColor& fgInnerColor)
-	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor),
-	      fgInnerColor(fgInnerColor)
+	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor), fgInnerColor(fgInnerColor)
 	{}
 
 	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,

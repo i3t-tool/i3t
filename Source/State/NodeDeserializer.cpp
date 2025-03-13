@@ -127,11 +127,9 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
-		createdNodes[viewValue["id"].GetInt()] = camera->getView();
 
 		const auto& projValue = value["sequences"].GetArray()[1];
 		NodeDeserializer::assignSequence(projValue, camera->getProjection());
-		createdNodes[projValue["id"].GetInt()] = camera->getProjection();
 	}
 
 	//
