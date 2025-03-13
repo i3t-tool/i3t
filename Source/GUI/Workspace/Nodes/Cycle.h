@@ -32,12 +32,14 @@ public:
 	      bool showDataOnPins = true);
 	bool isCycle();
 
-	bool buttonStepNext();
-	bool buttonStepBack();
-	bool buttonStopAndReset();
 	bool buttonPlayPause();
+	bool buttonStopAndReset();
 	bool buttonRewind(); ///< Set the current value to \a From
 	bool buttonWind();   ///< Set the current value to \a To
+	bool bigButton(const std::string& str, DIWNE::IconType iconTypeBg, DIWNE::IconType iconTypeFg);
+
+	bool buttonStepNext();
+	bool buttonStepBack();
 
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void leftContent(DIWNE::DrawInfo& context) override;

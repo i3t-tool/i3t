@@ -106,6 +106,8 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		// TODO: ^ What? Investigate
 		this->setSelected(!this->getSelected());
 	}
+	if (ImGui::IsItemActive())
+		context.consumeInput();
 	ImGui::PopStyleColor(4);
 	ImGui::PopStyleVar();
 

@@ -85,7 +85,8 @@ public:
 
 	virtual void inline centerContent(DIWNE::DrawInfo& context) override
 	{
-		// TODO: Why is this empty?
+		// Why is this empty?
+		// Because operators are essentially only made up of pins
 	}
 
 	void drawMenuLevelOfDetail() override

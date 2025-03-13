@@ -69,6 +69,7 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		                        ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
 		                            I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
 		                        false);
+		ImGui::Dummy(iconSize);
 		GUI::endVerticalAlign();
 
 		// 2x Frame padding x spacing gap at the end

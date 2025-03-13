@@ -112,9 +112,13 @@ void CorePin::drawPin(DIWNE::DrawInfo& context)
 	//   not visible anyway so we're just drawing stuff twice for no reason
 	// todo (PF) - I have temporally added the pi n border drawing of not-connected pins
 	// connected pins have no border now
-	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-	                        createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
-	                        ImVec4(padding, padding, padding, padding), isConnected());
+
+	// We're using a disabled IconButton, so that when its pressed / dragged it does not set an ActiveID in ImGui.
+	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
+	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
+	diwne.canvas().IconButton("PinIcon", true, iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
+	                          createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
+	                          ImVec4(padding, padding, padding, padding), isConnected());
 	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
 	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 
@@ -406,9 +410,10 @@ void CorePin::drawPulsePinData(DIWNE::DrawInfo& context)
 		if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", "Pulse", node->getId(), m_idDiwne).c_str()))
 		{
 			node->getNodebase()->pulse(getCoreIndex());
-			context.update(true, true, true);
-			return;
+			context.consumeInput();
 		}
+		if (ImGui::IsItemActive())
+			context.consumeInput();
 	}
 	else // Pulse with a connected Input. Cycle Pulse outputs.
 	{

@@ -118,7 +118,7 @@ void DiwneObject::afterDrawDiwne(DrawInfo& context)
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
-void DiwneObject::afterDraw(DrawInfo& context){};
+void DiwneObject::afterDraw(DrawInfo& context) {};
 
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)

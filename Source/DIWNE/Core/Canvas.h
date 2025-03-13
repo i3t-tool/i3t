@@ -9,6 +9,7 @@ namespace DIWNE
 {
 class NodeEditor;
 enum IconType : unsigned int;
+struct IconStyle;
 
 /**
  * Representation of the 2D infinite plane of a node editor.
@@ -157,6 +158,27 @@ public:
 	 */
 	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
 	                bool filled, std::string const id) const;
+
+	/**
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * @param disabled Disables the button, prevents presses and retaining of active id on drag, but still allows
+	 * querying of hover state when wrapped in a ImGui group or with appropriate IsItemHovered flags.
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton(std::string const id, bool disabled, IconType bgIconType, ImColor bgShapeColor,
+	                ImColor bgInnerColor, IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
+	                ImVec4 padding, bool filled) const;
+
+	/**
+	 * // TODO: (DR) Docs, new IconButton that allows various styles depening on the button state (hover, maybe press)
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * @param disabled Disables the button, prevents presses and retaining of active id on drag, but still allows
+	 * querying of hover state when wrapped in a ImGui group or with appropriate IsItemHovered flags.
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton2(const std::string& id, ImVec2 size, bool disabled, IconType bgIconType, IconType fgIconType,
+	                 const IconStyle& style, const IconStyle& hoveredStyle, const IconStyle& activeStyle) const;
+
 	/**
 	 * \brief Just the shape of the button, no interaction
 	 * \param size
@@ -165,22 +187,20 @@ public:
 	 */
 	void EmptyButton(ImVec2 size, ImColor color, float rounding);
 
-	/**
-	 * Add ImGui Button with icon on it \see DrawIcon()
-	 * \return true if interaction with button happen, false otherwise
-	 */
-	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
-	                ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
-	                std::string const id) const;
-
 	// padding - top, right, bottom, left
 
+	// TODO: (DR) This method needs a serious review (and all the icon drawing methods it calls)
+	//  Some initial issues:
+	//   - Arguments are passed by value for no reason
+	//   - way to many arguments, better to group them into some sort of IconStyle struct
 	/**
 	 * \brief Draw an Icon combined from two parts (foreground and background)
 	 * to the window \a ImDrawList filled with a \a ShapeColor.
 	 * When \a filled == true, both shapes have a border.
 	 * Then, the border color is the ShapeColor and the shape is filled with the
 	 * \a InnerColor
+	 *
+	 * The icon is drawn at the current ImGui cursor. This method does NOT advance the cursor.
 	 *
 	 * \param bgIconType background shape (typically a Rectangle)
 	 * \param bgShapeColor color of the background shape (or a border color if not filled)
@@ -254,6 +274,30 @@ public:
 
 	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+};
+
+struct IconStyle
+{
+	ImColor bgShapeColor;
+	ImColor bgInnerColor;
+	ImColor fgShapeColor;
+	ImColor fgInnerColor;
+	ImVec4 padding;
+	bool filled{false};
+	ImVec2 thickness{1, 1};
+	float rounding = 0;
+
+	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,
+	          const ImColor& fgInnerColor)
+	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor),
+	      fgInnerColor(fgInnerColor)
+	{}
+
+	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,
+	          const ImColor& fgInnerColor, const ImVec4& padding, bool filled, const ImVec2& thickness, float rounding)
+	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor),
+	      fgInnerColor(fgInnerColor), padding(padding), filled(filled), thickness(thickness), rounding(rounding)
+	{}
 };
 
 /**
