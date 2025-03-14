@@ -102,8 +102,6 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		{
 			setLevelOfDetail(LevelOfDetail::Full);
 		}
-		// TODO: replace with a layer that blocks interaction
-		// TODO: ^ What? Investigate
 		this->setSelected(!this->getSelected());
 	}
 	if (ImGui::IsItemActive())

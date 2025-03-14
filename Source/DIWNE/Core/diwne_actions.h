@@ -26,7 +26,7 @@ namespace Actions
  */
 struct DiwneAction
 {
-	friend class InteractionState;
+	friend class DIWNE::InteractionState;
 	std::string name;
 	std::weak_ptr<DiwneObject> source;
 

@@ -70,9 +70,19 @@ void CorePin::content(DIWNE::DrawInfo& context)
 	// const bool interaction_happen = false; // no interaction in this function allowed
 	if (getCorePin().isRendered())
 	{
-		drawDataEx(context);
-		drawLabel(context);
-		drawPin(context);
+		if (isInput())
+		{
+			drawPin(context);
+			ImGui::SameLine();
+			drawLabel(context);
+			drawDataEx(context);
+		}
+		else
+		{
+			drawDataEx(context);
+			drawLabel(context);
+			drawPin(context);
+		}
 	}
 }
 
@@ -397,7 +407,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 		node.updateDataItemsWidth();
 	}
 	if (interaction_happen)
-		context.update(true, true, true);
+		context.consumeInput();
 }
 
 void CorePin::drawPulsePinData(DIWNE::DrawInfo& context)

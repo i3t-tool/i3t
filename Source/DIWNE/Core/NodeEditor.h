@@ -48,15 +48,12 @@ public:
 
 	std::vector<std::shared_ptr<Link>> m_links;
 
+	// TODO: (DR) Replace fully with context popup flag
 	/// not draw popup two times \todo maybe unused when every object is drawn just one time
 	bool m_popupDrawn{false};
+	// TODO: (DR) Replace fully with mew context flag or something (isn't this a popup anyway?)
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
 	bool m_tooltipDrawn{false};
-	/// only one object can be focused
-	/// TODO: A flag indicating that an object has been focused that frame?
-	///  Review this flag, its hard to track, why not keep track of the "focused" object instead
-	///  Also still yet to exactly estabilish what "focused" really means
-	bool m_objectFocused{false}; // TODO: Remove?
 
 	InteractionState interactionState;
 

@@ -144,21 +144,6 @@ protected:
 	                      ///< Can be set in the end() method to determine if object is hovered if applicable
 
 public:
-	//
-	// TODO: Review if these flags are needed (they shouldnt be with the new context impl)
-	//  Rework so that DrawInfo context.inputConsumed is used instead
-	//  boolean returned from drawing code that is set as a member variable. Means that some part of the drawing code
-	//  returned true (eg. a button/slider was clicked) Related to m_isActive
-	/**
-	 * If some interaction happen with inner elements (DragFloat, Button, ...)
-	 * it block interaction with this object
-	 */
-	bool m_inner_interaction_happen{false};
-
-	// TODO: (DR) Review if this flag is used, it got kinda overtaken by the DrawInfo::logical/focusUpdate thing
-	// TODO: Active is marked true if this is the FIRST object that had m_inner_interaction_happen be true
-	bool m_isActive{false}; /**< Something happen with object */
-
 	/**
 	 * \param diwne is node editor object that this object belongs to
 	 * \param id used to identification

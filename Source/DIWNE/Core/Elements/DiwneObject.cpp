@@ -72,8 +72,6 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	bool wasDrawnLastFrame = m_drawnThisFrame;
 	m_drawnThisFrame = false;
 
-	bool other_object_focused = diwne.m_objectFocused; // TODO: Figure out what this is about
-
 	initializeDiwne(context);
 	if (allowDrawing() || mode & DrawMode_ForceDraw)
 	{
@@ -88,9 +86,6 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	}
 	m_justHidden = wasDrawnLastFrame && !m_drawnThisFrame;
 	finalizeDiwne(context);
-
-	// TODO: Remove
-	m_isActive = other_object_focused ? false : m_inner_interaction_happen;
 }
 
 void DiwneObject::initialize(DrawInfo& context) {}

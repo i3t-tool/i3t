@@ -68,7 +68,6 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
 					pin->setConnectionPointDiwne(pinConnectionPoint);
-					pin->setRendered(false);
 				}
 			}
 		}
@@ -119,6 +118,9 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 					int i = 7; // NOOP
 			}
 		}
+
+		// TODO: (DR) Rewrite this with DiwnePanel layout system!
+
 		// else - include SetValues
 		// uses getOutputsToShow()) = subset of outputs, based of the level. Override function in the WorkspaceCycle
 		if (m_levelOfDetail != LevelOfDetail::Label) // SetValues must draw the value pin

@@ -1,5 +1,8 @@
 # DIWNE - Dear Imgui Wrapper Node Editor
 
+# THESE DOCS ARE OUTDATED, SURPASSED BY NEW DIWNE (VERSION 2 if you will)
+## Parts of these docs are relevant but some parts are not anymore
+
 ## Reasons, Background and Story
 
 DIWNE was written as one part of the I3T user interface. On the other hand, DIWNE was intended as an independent general-purpose tool/library that is (only) used in I3T. The graphical part of I3T is based on the DearImgui library, so DIWNE is also based on DearImgui.
