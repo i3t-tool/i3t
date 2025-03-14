@@ -38,7 +38,7 @@ private:
 	Vp::RenderOptions m_renderOptions;
 
 public:
-	Screen(DIWNE::Diwne& diwne);
+	Screen(DIWNE::NodeEditor& diwne);
 	~Screen();
 
 	//===-- Double dispatch
@@ -52,13 +52,12 @@ public:
 	/////////////////////////////////////////////////////////////
 
 	// bool drawDataFull(, int index);
-	int maxLengthOfData() override;        // todo
-	bool middleContent() override;         // the most important function
-	bool topContent() override;            // rendering header part
-	void drawMenuLevelOfDetail() override; // todo
-	void popupContent() override;
+	int maxLengthOfData() override;                        // todo
+	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	void drawMenuLevelOfDetail() override;                 // todo
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const override
+	std::vector<Ptr<CorePin>> const getOutputsToShow() const override
 	{
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */

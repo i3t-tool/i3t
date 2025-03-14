@@ -15,6 +15,7 @@
 #include "imgui_internal.h"        // for ImGui::ActivateItemByID()
 #include "misc/cpp/imgui_stdlib.h" // for changable text
 
+#include "Core/Input/InputManager.h"
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Tools.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
@@ -23,78 +24,55 @@
 
 using namespace Workspace;
 
-CoreNode::CoreNode(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
-    : Node(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation().defaultLabel), m_nodebase(nodebase),
+CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
+    : Node(diwne, nodebase->getLabel()), m_nodebase(nodebase),
       m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
       m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
-                       diwne.getWorkAreaZoom()) /* just for safe if someone not call
+                       diwne.getZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
                                                    child class... */
-      ,
-      m_levelOfDetail(LevelOfDetail::Full), m_floatPopupMode(Value)
 {
 	// Register connection between core node and gui node
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
 	// Register core node calbacks
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.registerNodeCallbacks(m_nodebase.get());
+	// Set a bit flag identifying this node as a core node
+	setFlag(CORE_NODE_FLAG, true);
+	// I3T DIWNE styling
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBg));
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeader));
+	m_style.addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
 }
-
-// TODO: (DR) Commented out for now, more info in the header file
-// bool WorkspaceNodeWithCoreData::bypassDragAction()
-// {
-// 	return InputManager::isAxisActive("drag") != 0 &&
-// 	       (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold
-// || 	        InputManager::m_mouseYDragDelta >
-// ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta >
-// 	            ImGui::GetIO().MouseDragThreshold ||
-// 	        -InputManager::m_mouseYDragDelta >
-// ImGui::GetIO().MouseDragThreshold);
-// }
-// bool WorkspaceNodeWithCoreData::bypassHoldAction()
-// {
-// 	return InputManager::isActionTriggered("hold", EKeyState::Pressed);
-// }
-// bool WorkspaceNodeWithCoreData::bypassUnholdAction()
-// {
-// 	return InputManager::isActionTriggered("hold", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassSelectAction()
-// {
-// 	return InputManager::isActionTriggered("select", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassUnselectAction()
-// {
-// 	return InputManager::isActionTriggered("select", EKeyState::Released);
-// }
-// bool WorkspaceNodeWithCoreData::bypassTouchAction()
-// {
-// 	return InputManager::isActionTriggered("touch", EKeyState::Released);
-// }
 
 CoreNode::~CoreNode()
 {
-	m_nodebase->finalize();
 	// Unregister connection between core node and gui node
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
 }
 
-bool CoreNode::topContent()
+void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
+	// Note: This method does not call superclass topContent!
+	// TODO: But it should :|
+
 	bool interaction_happen = false;
 
-	float zoom = diwne.getWorkAreaZoom();
+	float zoom = diwne.getZoom();
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
 	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
 
+	drawHeader();
+	// TODO: This should again be responsibility of the DIWNE library
+
 	// adding a border
-	diwne.AddRectDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBorder),
-	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
-	                   I3T::getTheme().get(ESize::Nodes_Border_Thickness));
+	diwne.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
+	                            I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
+	                            I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
-	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getWorkAreaZoom());
+	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
 	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
@@ -102,7 +80,7 @@ bool CoreNode::topContent()
 
 	LevelOfDetail detail = getLevelOfDetail();
 	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), ImDrawFlags_RoundCornersTopLeft,
-	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getWorkAreaZoom()))
+	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
 	{
 		if (detail == LevelOfDetail::Full)
 		{
@@ -124,9 +102,10 @@ bool CoreNode::topContent()
 		{
 			setLevelOfDetail(LevelOfDetail::Full);
 		}
-		// TODO: replace with a layer that blocks interaction
 		this->setSelected(!this->getSelected());
 	}
+	if (ImGui::IsItemActive())
+		context.consumeInput();
 	ImGui::PopStyleColor(4);
 	ImGui::PopStyleVar();
 
@@ -181,6 +160,8 @@ bool CoreNode::topContent()
 	const float widthSoFar =
 	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
+	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
+
 	// Header extra space
 	float trailingDummyWidth = style.FramePadding.x / zoom;
 	if (m_headerMinWidth > 0)
@@ -194,10 +175,13 @@ bool CoreNode::topContent()
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	return interaction_happen;
+	if (interaction_happen)
+	{
+		context.update(true, true, true);
+	}
 }
 
-Ptr<Core::Node> const CoreNode::getNodebase() const
+Ptr<Core::Node> CoreNode::getNodebase() const
 {
 	return m_nodebase;
 }
@@ -218,6 +202,15 @@ void CoreNode::setNumberOfVisibleDecimal(int value)
 	updateDataItemsWidth();
 }
 
+FloatPopupMode& CoreNode::getFloatPopupMode()
+{
+	return m_floatPopupMode;
+};
+void CoreNode::setFloatPopupMode(FloatPopupMode mode)
+{
+	m_floatPopupMode = mode;
+};
+
 float CoreNode::getDataItemsWidth()
 {
 	return m_dataItemsWidth;
@@ -225,15 +218,15 @@ float CoreNode::getDataItemsWidth()
 
 float CoreNode::updateDataItemsWidth()
 {
-	const bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+	const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(true);
 	const float fontSize = ImGui::GetFontSize();
 	const float oneCharWidth = fontSize / 2;
-	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getWorkAreaZoom();
+	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getZoom();
 	const float maxLength = static_cast<float>(maxLengthOfData());
 	m_dataItemsWidth = maxLength * oneCharWidth + 2 * padding;
 	// LOG_INFO("SetDataItemsWidth() in node: '{}'\nfS: {}, oCW: {}, mLOD: {}, dataWidth: {}",
 	//         this->getNodebase()->getLabel(), fontSize, oneCharWidth, maxLengthOfData, m_dataItemsWidth);
-	diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+	diwne.canvas().ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	return m_dataItemsWidth;
 }
 
@@ -261,16 +254,11 @@ void CoreNode::drawMenuSetEditable()
 	}
 }
 
-void CoreNode::drawMenuDuplicate()
+void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 {
 	if (ImGui::MenuItem(_t("Duplicate"), "Ctrl+D"))
 	{
-		// duplicate
-		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
-		Tools::duplicateNode(std::static_pointer_cast<CoreNode>(shared_from_this()),
-		                     I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-		// move original node behind the new one
-		static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
+		duplicate(context, false);
 	}
 }
 
@@ -329,7 +317,7 @@ static void drawMenuStoreValues(Ptr<Core::Node> node)
 	}
 }
 
-void CoreNode::popupContent()
+void CoreNode::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuSetEditable();
 
@@ -345,32 +333,25 @@ void CoreNode::popupContent()
 
 	ImGui::Separator();
 
-	drawMenuDuplicate();
+	drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
-bool CoreNode::processDrag()
+void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 {
-	if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
+	// TODO: Hookup I3T input bindings
+	// Handle quick node duplication
+	if (justReleased && !context.inputConsumed && !context.state.dragging && ImGui::IsKeyDown(ImGuiKey_LeftAlt))
 	{
-		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+		duplicate(context, true);
+		context.consumeInput();
 	}
-	return Node::processDrag();
-}
 
-bool CoreNode::processSelect()
-{
-	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-	return Node::processSelect();
-}
 
-bool CoreNode::processUnselect()
-{
-	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
-	return Node::processUnselect();
+	DiwneObject::onReleased(justReleased, context);
 }
 
 const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
@@ -385,4 +366,32 @@ const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 		return "."; // was a lightcycle error
 
 	return "missingLOD";
+}
+
+void CoreNode::onDestroy(bool logEvent)
+{
+	m_nodebase->finalize();
+	Super::onDestroy(logEvent);
+}
+
+void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)
+{
+	if (m_selected && multiDuplication)
+	{ // If selected and multi duplication is allowed, duplicate this and any other selected nodes
+		for (auto& node : static_cast<WorkspaceDiwne&>(diwne).getAllSelectedCoreNodesWithoutNesting())
+		{
+			node.setDuplicateNode(true);
+		}
+	}
+	else
+	{ // Otherwise we duplicate this single node
+		setDuplicateNode(true);
+	}
+	diwne.deselectAllNodes();
+	context.consumeInput();
+}
+void CoreNode::onSelection(bool selected)
+{
+	Node::onSelection(selected);
+	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
 }

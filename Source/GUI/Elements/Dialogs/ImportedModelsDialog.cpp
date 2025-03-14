@@ -18,10 +18,10 @@
 #include "Core/Defs.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/RemoveModelModal.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/IconFonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "GUI/Workspace/Nodes/Model.h"
-#include "GUI/Workspace/WorkspaceDiwne.h"
 #include "State/StateManager.h"
 #include "SystemDialogs.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -194,11 +194,10 @@ bool ImportedModelsDialog::importContentDialog(std::vector<fs::path>& result, co
 
 void ImportedModelsDialog::maybeRemoveModel(const std::string& alias)
 {
-	std::vector<Ptr<Workspace::Model>> models = Workspace::g_diwne->getAllModels();
 	int usedCount = 0;
-	for (const auto& model : models)
+	for (const auto& model : WorkspaceWindow::g_editor->getAllModels())
 	{
-		if (model->viewportModel().lock()->m_modelAlias == alias)
+		if (model.viewportModel().lock()->m_modelAlias == alias)
 		{
 			usedCount++;
 		}

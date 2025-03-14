@@ -38,10 +38,11 @@ void removeScript(Core::ID id);
 class ScriptingNode : public CoreNodeWithPins
 {
 public:
-	ScriptingNode(DIWNE::Diwne& diwne);
+	ScriptingNode(DIWNE::NodeEditor& diwne);
+	~ScriptingNode();
 
 	/// Constructor for swapping the script
-	ScriptingNode(DIWNE::Diwne& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface);
+	ScriptingNode(DIWNE::NodeEditor& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface);
 
 public:
 	void accept(NodeVisitor& visitor) override
@@ -49,7 +50,7 @@ public:
 		visitor.visit(std::static_pointer_cast<ScriptingNode>(shared_from_this()));
 	}
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	int maxLengthOfData() override;
 	void drawMenuLevelOfDetail() override;
 

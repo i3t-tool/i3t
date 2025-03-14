@@ -57,6 +57,12 @@ public:
 	 */
 	int run();
 
+	/**
+	 * Single iteration of the game loop
+	 * @return Whether the game loop should continue
+	 */
+	bool frame();
+
 	void beginFrame();
 	void endFrame();
 

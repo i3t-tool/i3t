@@ -1,0 +1,330 @@
+#pragma once
+
+#include <string>
+
+#include "DIWNE/Core/Style/DiwneStyle.h"
+#include "diwne_imgui.h"
+
+namespace DIWNE
+{
+class NodeEditor;
+enum IconType : unsigned int;
+struct IconStyle;
+
+/**
+ * Representation of the 2D infinite plane of a node editor.
+ *
+ * // TODO: Coordinate systems docs (screen space, viewport coordinates, canvas/editor/diwne coordinates
+ */
+class Canvas
+{
+protected:
+	NodeEditor& editor;
+
+public:
+	/**
+	 * Bounds of the canvas viewport in canvas/editor's coordinates (diwne coordinates).
+	 * The top left corner (.Min) can be set manually, the bottom right corner (.Max) is determined by available space.
+	 */
+	ImRect m_viewRectDiwne;
+	ImRect m_viewRectScreen; ///< Viewport bounds in screen space coordinates.
+	float m_zoom;            ///< Viewport zoom factor (scale ratio between diwne and screen coordinates).
+
+	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
+protected:
+	float m_zoomOriginalFontScale;       ///< Original font scale
+	ImGuiStyle m_zoomOriginalStyle;      ///< Original ImGui style
+	DiwneStyle m_zoomOriginalDiwneStyle; ///< Original DIWNE style
+
+public:
+	Canvas(NodeEditor& editor);
+
+	void moveViewportZoomed(const ImVec2& distance);
+	void moveViewport(const ImVec2& distance);
+
+	/// Update screen and diwne positions and sizes of viewport.
+	void updateViewportRects();
+
+	ImRect getViewportRectDiwne() const;
+	void setViewportRectDiwne(ImRect rect);
+
+	ImRect getViewportRectScreen() const;
+
+	// Zoom scaling
+	// =============================================================================================================
+
+	float getZoom() const;
+	virtual void setZoom(float val);
+
+	/**
+	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool applyZoomScaling();
+
+	/**
+	 * Restores the current ImGuiStyle and Font back to its state before applyZoomScaling() was last called.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool stopZoomScaling();
+
+	/**
+	 * Ensure that zoom scaling is active or not based on a passed parameter
+	 * @return Whether zoom scaling was active before making this call, can be later passed to this method again to
+	 * restore original state
+	 */
+	bool ensureZoomScaling(bool active);
+
+	/**
+	 * Modifies the current Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
+
+	/// @see applyZoomScalingToFont
+	void stopZoomScalingToFont(ImFont* font, float originalScale);
+
+protected:
+	void ScaleAllSizes(ImGuiStyle& style, float scale_factor);
+
+public:
+	// Coordinate conversion
+	// =============================================================================================================
+	ImVec2 transformFromImGuiToDiwne(const ImVec2& point) const;
+	ImVec2 transformFromDiwneToImGui(const ImVec2& point) const;
+	ImVec4 transformFromImGuiToDiwne(const ImVec4& point) const;
+	ImVec4 transformFromDiwneToImGui(const ImVec4& point) const;
+
+	// TODO: Rename workArea in the methods below to viewport
+	// Essentially, we have 3 coordinate systems:
+	// 1. Screen - Coordinates in screen space of the display device
+	// 2. Viewport - Coordinates in screen space, but with origin in the top left corner of the node editor component
+	// 3. Diwne - Coordinates in canvas (infinite plane) space, eg. of the node editor's contents affected by zoom.
+
+	ImVec2 screen2workArea(const ImVec2& point) const;
+	ImVec2 workArea2screen(const ImVec2& point) const;
+	ImVec2 diwne2workArea(const ImVec2& point) const;
+	ImVec2 workArea2diwne(const ImVec2& point) const;
+	ImVec2 screen2diwne(const ImVec2& point) const;
+	ImVec2 diwne2screen(const ImVec2& point) const;
+	ImVec2 diwne2workArea_noZoom(const ImVec2& point) const;
+	ImVec2 workArea2diwne_noZoom(const ImVec2& point) const;
+	ImVec2 screen2diwne_noZoom(const ImVec2& point) const;
+	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
+
+	// Basic drawing utilities
+	// =============================================================================================================
+	void AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness = 1.0f, bool ignoreZoom = false) const;
+
+	/**
+	 * Draw filled rectangle to window ImDrawlist
+	 * @param p_min bottom left corner in diwne coords
+	 * @param p_max top right corner in diwne coords
+	 * @param col
+	 * @param rounding
+	 * @param rounding_corners
+	 */
+	void AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
+	                        ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, bool ignoreZoom = false) const;
+
+	/**
+	 * Draw rectangle to window ImDrawlist
+	 * \see AddRectFilledDiwne
+	 */
+	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
+	                  ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
+	                  bool ignoreZoom = false) const;
+
+	/** \brief Draw Bezier (not Bezier really) curve to window ImDrawList
+	 *
+	 * \param p1 const ImVec2& start point in diwne coords
+	 * \param p2 const ImVec2& start control point in diwne coords
+	 * \param p3 const ImVec2& end control point in diwne coords
+	 * \param p4 const ImVec2& end point in diwne coords
+	 * \param col ImVec4
+	 * \param thickness float
+	 * \param 0 int num_segments with zero ImGui use some optimal? value
+	 * \return void
+	 *
+	 */
+	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
+	                         float thickness, int num_segments = 0) const;
+
+	// Icon drawing
+	// =============================================================================================================
+	/**
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
+	                bool filled, std::string const id) const;
+
+	/**
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * @param disabled Disables the button, prevents presses and retaining of active id on drag, but still allows
+	 * querying of hover state when wrapped in a ImGui group or with appropriate IsItemHovered flags.
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton(std::string const id, bool disabled, IconType bgIconType, ImColor bgShapeColor,
+	                ImColor bgInnerColor, IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
+	                ImVec4 padding, bool filled) const;
+
+	/**
+	 * // TODO: (DR) Docs, new IconButton that allows various styles depening on the button state (hover, maybe press)
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * @param disabled Disables the button, prevents presses and retaining of active id on drag, but still allows
+	 * querying of hover state when wrapped in a ImGui group or with appropriate IsItemHovered flags.
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton2(const std::string& id, ImVec2 size, bool disabled, IconType bgIconType, IconType fgIconType,
+	                 const IconStyle& style, const IconStyle& hoveredStyle, const IconStyle& activeStyle) const;
+
+	/**
+	 * \brief Just the shape of the button, no interaction
+	 * \param size
+	 * \param color
+	 * \param rounding
+	 */
+	void EmptyButton(ImVec2 size, ImColor color, float rounding);
+
+	// padding - top, right, bottom, left
+
+	// TODO: (DR) This method needs a serious review (and all the icon drawing methods it calls)
+	//  Some initial issues:
+	//   - Arguments are passed by value for no reason
+	//   - way to many arguments, better to group them into some sort of IconStyle struct
+	/**
+	 * \brief Draw an Icon combined from two parts (foreground and background)
+	 * to the window \a ImDrawList filled with a \a ShapeColor.
+	 * When \a filled == true, both shapes have a border.
+	 * Then, the border color is the ShapeColor and the shape is filled with the
+	 * \a InnerColor
+	 *
+	 * The icon is drawn at the current ImGui cursor. This method does NOT advance the cursor.
+	 *
+	 * \param bgIconType background shape (typically a Rectangle)
+	 * \param bgShapeColor color of the background shape (or a border color if not filled)
+	 * \param bgInnerColor color of the background shape interior if filled == false
+	 * \param fgIconType foreground shape (typically a Triangle or Cross)
+	 * \param fgShapeColor color of the foreground shape if filled == false
+	 * \param fgInnerColor color of foreground shape interior if filled == false
+	 * \param size of the icon in screen coordinates
+	 * \param padding of the fg shape (left, bottom, right, top)
+	 * \param filled means
+	 *  - true fill both shapes with their ShapeColor
+	 *  - false draw both shapes with a ShapeColor border and fill them with InnerColor
+	 * \return void
+	 */
+	void DrawIcon(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
+	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
+	              ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
+	/**
+	 * \brief Draw a circle icon
+	 * \param idl ImDrawList* where to draw
+	 * \param shapeColor color of the whole shape (border line if not filled)
+	 * \param innerColor color of the inner part (middle) of shape
+	 * \param topLeft position of the icon in screen coords
+	 * \param bottomRight of the icon in screen coords
+	 * \param filled false means use the InnerColor in the foreground Shape
+	 * \param thickness of the border for zoomFactor = 1.0
+	 */
+	void DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                    bool filled, float thickness = 1) const;
+
+	void DrawIconRectangle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                       bool filled, ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
+	void DrawIconPause(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                   bool filled, ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
+	void DrawIconTriangleLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
+	void DrawIconSkipBack(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                      bool filled, float thickness = 1) const;
+	void DrawIconSkipBack2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                       bool filled, float thickness = 1) const;
+	void DrawIconRewind(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                    bool filled, float thickness = 1) const;
+
+	void DrawIconTriangleRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconSkipForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                         ImVec2 bottomRight, bool filled, float thickness = 1) const;
+	void DrawIconSkipForward2(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
+	void DrawIconFastForward(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                         ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                   bool filled, float shapeThickness = 2, float innerThickness = 1) const;
+
+	void DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
+	                    bool filled, float thickness = 3.0f) const;
+
+	void DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                              ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconTriangleDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                               ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
+	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+};
+
+struct IconStyle
+{
+	ImColor bgShapeColor;
+	ImColor bgInnerColor;
+	ImColor fgShapeColor;
+	ImColor fgInnerColor;
+	ImVec4 padding;
+	bool filled{false};
+	ImVec2 thickness{1, 1};
+	float rounding = 0;
+
+	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,
+	          const ImColor& fgInnerColor)
+	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor), fgInnerColor(fgInnerColor)
+	{}
+
+	IconStyle(const ImColor& bgShapeColor, const ImColor& bgInnerColor, const ImColor& fgShapeColor,
+	          const ImColor& fgInnerColor, const ImVec4& padding, bool filled, const ImVec2& thickness, float rounding)
+	    : bgShapeColor(bgShapeColor), bgInnerColor(bgInnerColor), fgShapeColor(fgShapeColor),
+	      fgInnerColor(fgInnerColor), padding(padding), filled(filled), thickness(thickness), rounding(rounding)
+	{}
+};
+
+/**
+ * \brief Icon shape types
+ */
+enum IconType : unsigned int
+{
+	NoIcon,
+	Circle,
+	Rectangle,
+	TriangleLeft,
+	TriangleRight,
+	TriangleDownLeft,
+	TriangleDownRight,
+	GrabDownLeft,
+	GrabDownRight,
+	Cross,
+	Hyphen,
+	Stop,         ///< Black Square For Stop (U+23F9)
+	Pause,        ///< Double Vertical Bar (U+23F8)
+	SkipBack,     ///< |< vertical bar followed by the left arrow
+	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
+	SkipForward,  ///< ">|" right arrow followed by the vertical bar
+	SkipForward2, ///< |> vertical bar followed by the right arrow
+	Rewind,       ///< Black Left-Pointing Double Triangle (U+23EA)
+	FastForward,  ///< Black Right-Pointing Double Triangle (U+23E9)
+	AtFrom,       // todo, now a synonym to the FastForward
+	AtTo,         // todo, now a synonym to the Rewind
+};
+
+} // namespace DIWNE

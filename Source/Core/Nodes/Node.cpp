@@ -22,6 +22,13 @@ static IdGenerator generator;
 Node::~Node()
 {
 	LOG_DEBUG("~Node called on {}.", getSignature());
+	if (!finalized)
+	{
+		LOG_WARN("Core node not finalized before destruction! node {}.", getSignature());
+#ifdef I3T_NTEST
+		assert(false);
+#endif
+	}
 }
 
 void Node::finalize()
@@ -29,6 +36,7 @@ void Node::finalize()
 	LOG_DEBUG("Finalizing node {}.", getSignature());
 	unplugAll();
 	triggerDeleteCallback(this);
+	finalized = true;
 }
 
 void Node::init()

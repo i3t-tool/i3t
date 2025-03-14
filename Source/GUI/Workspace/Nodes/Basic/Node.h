@@ -33,6 +33,8 @@
 
 #include "DIWNE/diwne_include.h"
 
+#include "DIWNE/Basic/BasicNode.h"
+
 namespace Workspace
 {
 enum class LevelOfDetail
@@ -54,56 +56,16 @@ enum FloatPopupMode
 
 extern std::map<LevelOfDetail, std::string> LevelOfDetailName;
 
-class Node : public DIWNE::Node
+class Node : public DIWNE::BasicNode
 {
-protected:
-	std::string m_topLabel;
-	std::string m_middleLabel;
-
 public:
-	Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel = "Header",
-	     std::string const middleLabel = "Content");
-	~Node();
+	Node(DIWNE::NodeEditor& diwne, std::string label = "Header");
 
-	std::string getTopLabel()
-	{
-		return m_topLabel;
-	}
-
-	std::string getMiddleLabel()
-	{
-		return m_middleLabel;
-	}
-
-	void setTopLabel(std::string label)
-	{
-		m_topLabel = label;
-	}
-
-	void setMiddleLabel(std::string label)
-	{
-		m_middleLabel = label;
-	}
-
-	/* DIWNE function */
-	virtual bool bypassFocusForInteractionAction() override;
-	virtual bool beforeContent() override;
-	virtual bool topContent() override;
-	virtual bool middleContent() override;
-	virtual bool leftContent() override;
-	virtual bool rightContent() override;
-	virtual bool bottomContent() override;
-	virtual void deleteAction() override;
-
-	bool m_removeFromWorkspaceWindow;
-	bool getRemoveFromWorkspace() const
-	{
-		return m_removeFromWorkspaceWindow;
-	};
-	void setRemoveFromWorkspace(bool value)
-	{
-		m_removeFromWorkspaceWindow = value;
-	};
+	// TODO: Ideally delete this whole class <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  as, duplication could be a DIWNE feature
+	//  FloatPopup mode can be moved to CoreNode
+	//  LOD could be a part of DIWNE
+	//  If not, maybe rename to something like I3TNode to avoid name clash with DIWNE
 
 	bool m_duplicateNode = false;
 	bool getDuplicateNode() const
@@ -116,6 +78,7 @@ public:
 	};
 
 	virtual void drawMenuDelete();
-	virtual void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
+	bool allowDragStart() const override;
 };
 } // namespace Workspace

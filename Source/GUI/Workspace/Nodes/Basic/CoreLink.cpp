@@ -16,64 +16,47 @@
 
 using namespace Workspace;
 
-CoreLink::CoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, CoreInPin* endPin)
-    : DIWNE::Link(diwne, id), m_endPin(endPin), m_startPin(nullptr)
-{}
+CoreLink::CoreLink(DIWNE::NodeEditor& diwne) : DIWNE::Link(diwne) {}
 
-void CoreLink::unplug()
-{
-	m_endPin->unplug();
-	m_startPin = nullptr;
-}
-
-void CoreLink::popupContent()
+void CoreLink::popupContent(DIWNE::DrawInfo& context)
 {
 	if (ImGui::MenuItem("Delete"))
 	{
-		unplug();
+		destroy();
 	}
-}
-
-void CoreLink::updateEndpoints()
-{
-	ImVec2 start, end;
-	CoreOutPin* startPin = getStartPin();
-	CoreInPin* endPin = getEndPin();
-	if (startPin)
-		start = startPin->getLinkConnectionPointDiwne();
-	if (endPin)
-		end = endPin->getLinkConnectionPointDiwne();
-	setLinkEndpointsDiwne(start, end);
 }
 
 void CoreLink::updateControlPointsOffsets()
 {
 	float offset =
-	    (getEndpoint().x - getStartpoint().x) * I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
+	    (getEndPoint().x - getStartPoint().x) * I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
 	if (offset < I3T::getTheme().get(ESize::Links_ControlpointsPositionMin))
 		offset = I3T::getTheme().get(ESize::Links_ControlpointsPositionMin);
 	diwne.mp_settingsDiwne->linkStartControlOffsetDiwne = ImVec2(offset, 0);
 	diwne.mp_settingsDiwne->linkEndControlOffsetDiwne = ImVec2(-offset, 0);
 }
 
-bool CoreLink::initialize()
+void CoreLink::initialize(DIWNE::DrawInfo& context)
 {
 	updateControlPointsOffsets();
 
-	diwne.mp_settingsDiwne->linkColor = I3T::getTheme().get(PinColorBackground[m_endPin->getType()]);
-	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
+	ImVec4 color;
+	DIWNE::Pin* pin = getAnyPin();
+	if (pin)
+	{
+		color = I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(pin)->getType()]);
+	}
+	else
+	{
+		color = ImColor(0.5f, 0.5f, 0.5f);
+	}
+	m_color = color;
+
+	// TODO: Hookup link thickness
+	//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
 	if (m_selected)
 	{
-		diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne =
-		    I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder);
-		diwne.mp_settingsDiwne->linkColorSelected = diwne.mp_settingsDiwne->linkColor;
-
-		diwne.mp_settingsDiwne->linkColorSelected.x += I3T::getColor(EColor::Links_selected_colorShift).x;
-		diwne.mp_settingsDiwne->linkColorSelected.y += I3T::getColor(EColor::Links_selected_colorShift).y;
-		diwne.mp_settingsDiwne->linkColorSelected.z += I3T::getColor(EColor::Links_selected_colorShift).z;
-
-		diwne.mp_settingsDiwne->linkColorSelected.w = I3T::getSize(ESize::Links_selected_alpha);
+		m_color = m_color + I3T::getColor(EColor::Links_selected_colorShift);
 	}
-	return false;
 }

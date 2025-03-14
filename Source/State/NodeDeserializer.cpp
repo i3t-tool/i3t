@@ -31,7 +31,7 @@ static Workspace::TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
-std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
+std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 {
 	std::map<Core::ID, Ptr<Workspace::CoreNode>> createdNodes;
 
@@ -127,11 +127,9 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
-		createdNodes[viewValue["id"].GetInt()] = camera->getView();
 
 		const auto& projValue = value["sequences"].GetArray()[1];
 		NodeDeserializer::assignSequence(projValue, camera->getProjection());
-		createdNodes[projValue["id"].GetInt()] = camera->getProjection();
 	}
 
 	//
@@ -236,12 +234,6 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	// connect edges
 
 	const auto& edges = memento["workspace"]["edges"];
-	auto& workspaceNodes = App::getModule<UIModule>()
-	                           .getWindowManager()
-	                           .getWindowPtr<WorkspaceWindow>()
-	                           ->getNodeEditor()
-	                           .m_workspaceCoreNodes;
-
 	for (auto& edge : edges.GetArray())
 	{
 		if (!createdNodes.contains(edge[0].GetInt()) || !createdNodes.contains(edge[2].GetInt()))
@@ -260,11 +252,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	}
 
-	std::vector<Ptr<Workspace::CoreNode>> result;
+	std::vector<Ptr<DIWNE::Node>> result;
 	std::transform(createdNodes.begin(), createdNodes.end(), std::back_inserter(result), [](auto& pair) {
 		return pair.second;
 	});
-
 	return result;
 }
 
@@ -424,7 +415,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 
 	if (value.HasMember("render"))
 	{
-		node->setRender(value["render"].GetBool());
+		node->setRendered(value["render"].GetBool());
 	}
 
 	if (value.HasMember("numberOfDecimals"))
@@ -440,7 +431,7 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 	}
 
 	const auto position = JSON::getVec2(value["position"].GetArray());
-	node->setNodePositionDiwne(position);
+	node->setPosition(position);
 }
 
 void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)

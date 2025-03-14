@@ -37,16 +37,15 @@ std::optional<Ptr<GuiNode>> Tools::findNodeById(const std::vector<Ptr<GuiNode>>&
 Memento* Tools::copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 {
 	Memento* memento = new Memento();
-
-	SerializationVisitor serializer(*memento);
 	for (auto node : nodes)
 	{
-		node->translateNodePositionDiwne(ImVec2(-offset, -offset));
+		node->translate(ImVec2(offset, offset));
 	}
+	SerializationVisitor serializer(*memento);
 	serializer.dump(nodes);
 	for (auto node : nodes)
 	{
-		node->translateNodePositionDiwne(ImVec2(offset, offset));
+		node->translate(ImVec2(-offset, -offset));
 	}
 	return memento;
 }
@@ -58,12 +57,7 @@ void Tools::pasteNodes(const Memento& memento)
 	{
 		node->setSelected(true);
 	}
-}
-
-void Tools::duplicateNode(const Ptr<GuiNode>& node, float offset)
-{
-	// TODO - DUPLICATES BEHIND NODE INSTEAD OF INFRONT
-	pasteNodes(*copyNodes({node}, offset));
+	WorkspaceWindow::g_editor->shiftNodesToEnd(newNodes);
 }
 
 int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
@@ -91,10 +85,7 @@ static auto findNode(Core::ID id) -> Result<Ptr<Workspace::CoreNode>, Error>
 {
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
-
-	constexpr const bool searchInner = true;
-
-	return nodeEditor.getNode<GuiNode>(id, searchInner);
+	return nodeEditor.getNode<GuiNode>(id);
 };
 
 bool Tools::plug(Core::ID from, int fromIdx, Core::ID to, int toIdx)

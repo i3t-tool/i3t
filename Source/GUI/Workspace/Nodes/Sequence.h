@@ -12,28 +12,27 @@
  */
 #pragma once
 
-#include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "DIWNE/Core/Elements/Containers/INodeContainer.h"
+#include "DIWNE/Core/Elements/Containers/NodeDropZone.h"
 
+#include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "TransformationBase.h"
 
 namespace Workspace
 {
-class Sequence : public CoreNodeWithPins
+class Sequence : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
-private:
-	bool m_isCameraSequence;
-	ImVec4 m_tint = ImVec4(1, 1, 1, 1);
-
 protected:
-	int m_position_of_dummy_data = -1;
-	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
+	class SequenceDropZone;
 
-	// bool m_drawPins;  // \todo (PF) was not used - remove
-	std::vector<Ptr<CoreNode>> m_workspaceInnerTransformations;
+	bool m_isCameraSequence;
 
 public:
-	Sequence(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
-	         /* bool drawPins = true, \todo (PF) was not used - remove */
+	/// Custom DIWNE::NodeDropZone that only accepts TransformationBase nodes.
+	std::shared_ptr<SequenceDropZone> m_dropZone = std::make_shared<SequenceDropZone>(diwne, this);
+
+public:
+	Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
 	         bool isCameraSequence = false);
 
 	//===-- Double dispatch
@@ -44,44 +43,44 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	void setPostionOfDummyData(int positionOfDummyData = -1);
+	DIWNE::NodeRange<> getNodes() const override;
+	DIWNE::NodeList& getNodeList() override;
 
-	void popupContentTracking();
-	void popupContent() override;
-
-	bool isSequence();
-
-	int getInnerPosition(std::vector<ImVec2> points);
-
-	ImVec4 getTint()
-	{
-		return m_tint;
-	}
-	void setTint(ImVec4 tint)
-	{
-		m_tint = tint;
-	}
-
-	virtual bool allowDrawing() override;
-
-	void popNode(Ptr<CoreNode> node);
-	void pushNode(Ptr<CoreNode> node, int index = 0);
+	DIWNE::NodeRange<CoreNode> getInnerWorkspaceNodes();
+	std::optional<Ptr<CoreNode>> getTransform(int index) const;
 
 	void moveNodeToSequence(Ptr<CoreNode> dragedNode, int index = 0);
 	void moveNodeToWorkspace(Ptr<CoreNode> dragedNode);
 
 	void setNumberOfVisibleDecimal(int value) override;
+	int maxLengthOfData() override;
 
-	const std::vector<Ptr<CoreNode>>& getInnerWorkspaceNodes() const;
-	std::optional<Ptr<CoreNode>> getTransform(int index) const;
+	virtual bool allowDrawing() override;
 
-	bool beforeContent() override;
-	bool afterContent() override;
-	bool topContent() override;
-	bool middleContent() override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void afterDraw(DIWNE::DrawInfo& context) override;
+	void onDestroy(bool logEvent) override;
 
+	void popupContent(DIWNE::DrawInfo& context) override;
+	void popupContentTracking();
 	void drawMenuLevelOfDetail() override;
 
-	int maxLengthOfData() override;
+protected:
+	class SequenceDropZone : public DIWNE::NodeDropZone
+	{
+	public:
+		Sequence* m_sequence;
+
+		SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence);
+
+	protected:
+		void drawEmptyContent(DIWNE::DrawInfo& context) override;
+
+	public:
+		void onNodeAdd(DIWNE::Node* node, int index) override;
+		void onNodeRemove(std::shared_ptr<DIWNE::Node> node, int index) override;
+		bool acceptNode(DIWNE::Node* node) override;
+	};
 };
 } // namespace Workspace

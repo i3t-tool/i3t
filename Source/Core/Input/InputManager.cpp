@@ -315,10 +315,6 @@ void InputManager::beginFrame()
 		InputManager::setPressed(Keys::mouseScrlDown);
 		InputManager::setUnpressed(Keys::mouseScrlUp);
 	}
-	if (io.MouseWheel != 0)
-	{
-		int x = 5;
-	}
 	InputManager::m_mouseWheelOffset = io.MouseWheel;
 }
 

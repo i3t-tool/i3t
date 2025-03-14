@@ -66,7 +66,7 @@ private:
 	 * Check if a model is connected to any selected nodes.
 	 * @param model Model node to start search from
 	 */
-	bool searchForSelectedNode(Ptr<Model>& model);
+	bool searchForSelectedNode(Model& model);
 
 	/**
 	 * Check if any nodes within a sequence are selected.

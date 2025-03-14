@@ -16,7 +16,7 @@
 
 using namespace Workspace;
 
-Cycle::Cycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
+Cycle::Cycle(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
              bool showDataOnPins /*=true*/)
     : CoreNodeWithPins(diwne, nodebase, showDataOnPins)
 {
@@ -52,229 +52,83 @@ void Cycle::drawMenuLevelOfDetail()
 	    {LevelOfDetail::Full, LevelOfDetail::SetValues, LevelOfDetail::LightCycle, LevelOfDetail::Label});
 }
 
-//
-
 bool Cycle::buttonPlayPause()
 {
-	// setup - todo get from themes
-
-	// I3T::getColor(EColor::Cycle_ButtonHovered) I3T::getColor(EColor::Cycle_ButtonActive)
-
-
-	// const ImColor iconColorBg = ImColor(127, 127, 127, 255); // todo I3T::getColor(EColor::Cycle_ButtonBg);
-	// const ImColor iconColorFg = IM_COL32_BLACK;              // todo I3T::getColor(EColor::Cycle_ButtonFg);
-	// const ImVec2 iconSize = ImVec2(40.0f, 40.0f) * zoom; // todo use themes:
-	// const float rounding = 3.0f;
-
-	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
-	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
-
-	const float zoom = diwne.getWorkAreaZoom();
-	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-
-	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
-	ImVec4 padding;
-
-	// Invisible button
-	ImVec2 position = ImGui::GetCursorPos();
-
-	const bool button_pressed = ImGui::InvisibleButton("playPause1", iconSize);
-	// bool button_hovered = ImGui::IsItemHovered();
-	// ImGui::Text("Button 1: %s%s", button_hovered ? "hovered " : "", button_pressed ? "PRESSED " : "");
-	if (ImGui::IsItemHovered())
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
-
-	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
-	DIWNE::IconType iconTypeFg = DIWNE::IconType::TriangleRight;
-
-	ImGui::SetCursorPos(position);
+	DIWNE::IconType iconTypeFg;
 	if (m_nodebase->as<Core::Cycle>()->isRunning())
-	{
 		iconTypeFg = DIWNE::IconType::Pause;
-		padding = ImVec4(5 * zoom, 6 * zoom, 5 * zoom, 6 * zoom); // todo I3T::getSize(ESizeVec2::Cycle_ButtonPadding)
-	}
 	else
-	{
 		iconTypeFg = DIWNE::IconType::TriangleRight;
-		// (left, bottom, right, top)
-		padding = ImVec4(9 * zoom, 6 * zoom, 7 * zoom, 6 * zoom); // todo I3T::getSize(ESizeVec2::Cycle_ButtonPadding)
-	}
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
 
-	if (button_pressed)
+	bool pressed = bigButton("playPause", DIWNE::IconType::Rectangle, iconTypeFg);
+
+	if (pressed)
 	{
 		if (m_nodebase->as<Core::Cycle>()->isRunning())
-		{
 			m_nodebase->as<Core::Cycle>()->pause();
-		}
 		else
-		{
 			m_nodebase->as<Core::Cycle>()->play();
-		}
-		return true;
 	}
-	return false;
-
-
-	//-------------------------------------
-
-	// diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	//               ImVec4(padding, padding, padding, padding), true);
-
-
-	// m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()),
-	// diwne.screen2diwne(ImGui::GetItemRectMax()));
-
-
-	// if (ImGui::Button(fmt::format("{}", "⏩").c_str()))
-	//{
-	//	if (m_nodebase->as<Core::Cycle>()->isRunning())
-	//	{
-	//		m_nodebase->as<Core::Cycle>()->pause();
-	//	}
-	//	else
-	//	{
-	//		m_nodebase->as<Core::Cycle>()->play();
-	//	}
-	//	return true;
-	// }
-	//  ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialTitle));
-	//// std::u8string playCharacter = u8"⯈";
-	//// if (ImGui::SmallButton(reinterpret_cast<const char*>(playCharacter.c_str())))
-	//// if (ImGui::SmallButton("\u2BC8"))
-
-	// }
-	// ImGui::PopFont();
-	// return false;
+	return pressed || ImGui::IsItemActive();
 }
 
 bool Cycle::buttonStopAndReset()
 {
-	// if (ImGui::SmallButton("SaR"))
-	// {
-	//	m_nodebase->as<Core::Cycle>()->stopAndReset();
-	//	return true;
-	// }
-	// return false;
-	//  setup - todo get from themes
+	bool pressed = bigButton("Stop", DIWNE::IconType::Rectangle, DIWNE::IconType::Stop);
+	if (pressed)
+		m_nodebase->as<Core::Cycle>()->stopAndReset();
+	return pressed || ImGui::IsItemActive();
+}
 
-	// const ImColor iconColorBg = ImColor(127, 127, 127, 255); // todo I3T::getColor(EColor::Cycle_ButtonBg);
-	// const ImColor iconColorFg = IM_COL32_BLACK;              // todo I3T::getColor(EColor::Cycle_ButtonFg);
+bool Cycle::buttonRewind()
+{
+	bool pressed = bigButton("Rewind", DIWNE::IconType::Rectangle, DIWNE::IconType::Rewind);
+	if (pressed)
+		m_nodebase->as<Core::Cycle>()->rewind();
+	return pressed || ImGui::IsItemActive();
+}
 
-	// const float zoom = diwne.getWorkAreaZoom();
-	// const ImVec2 iconSize = ImVec2(40.0f, 40.0f) * zoom; // todo use themes:
-	// I3T::getSize(ESizeVec2::Cycle_ButtonSize)
+bool Cycle::buttonWind()
+{
+	bool pressed = bigButton("Wind", DIWNE::IconType::Rectangle, DIWNE::IconType::FastForward);
+	if (pressed)
+		m_nodebase->as<Core::Cycle>()->wind();
+	return pressed || ImGui::IsItemActive();
+}
 
-	// constexpr float rounding = 3.0f; //	ESize::Cycle_ButtonRounding
-
-
-	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
+bool Cycle::bigButton(const std::string& str, DIWNE::IconType iconTypeBg, DIWNE::IconType iconTypeFg)
+{
+	// Colors
+	const ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
+	const ImColor iconColorBgHovered = I3T::getColor(EColor::Cycle_ButtonHovered);
+	const ImColor iconColorBgActive = I3T::getColor(EColor::Cycle_ButtonActive);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
-
-	const float zoom = diwne.getWorkAreaZoom();
+	// Sizes
+	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-
 	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
-
-
 	const float p = 6.0f * zoom;
 	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
 
-	// Invisible button
-	const ImVec2 position = ImGui::GetCursorPos();
+	// Pack into styles
+	const DIWNE::IconStyle style(iconColorBg, iconColorBg, iconColorFg, iconColorFg, padding, true, ImVec2(1, 1),
+	                             rounding);
+	const DIWNE::IconStyle styleHovered(iconColorBgHovered, iconColorBgHovered, iconColorFg, iconColorFg, padding, true,
+	                                    ImVec2(1, 1), rounding);
+	const DIWNE::IconStyle styleActive(iconColorBgActive, iconColorBgActive, iconColorFg, iconColorFg, padding, true,
+	                                   ImVec2(1, 1), rounding);
 
-	const bool button_pressed = ImGui::InvisibleButton("stop", iconSize);
-	// bool button_hovered = ImGui::IsItemHovered();
-	// ImGui::Text("Button 1: %s%s", button_hovered ? "hovered " : "", button_pressed ? "PRESSED " : "");
-	if (ImGui::IsItemHovered())
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
-
-	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
-	DIWNE::IconType iconTypeFg = DIWNE::IconType::Stop;
-
-	ImGui::SetCursorPos(position);
-
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
-
-	if (button_pressed)
-	{
-		m_nodebase->as<Core::Cycle>()->stopAndReset();
-		return true;
-	}
-	return false;
+	return diwne.canvas().IconButton2(str.c_str(), iconSize, false, iconTypeBg, iconTypeFg, style, styleHovered,
+	                                  styleActive);
 }
 
-bool Cycle::buttonStepBack()
-{
-	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
-	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
-
-	const float zoom = diwne.getWorkAreaZoom();
-
-
-	ImGuiContext& g = *GImGui;
-	float font_size = g.FontSize;
-
-	// const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-	const ImVec2 iconSize = ImVec2(font_size * 1.1f, font_size);
-
-
-	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding);
-
-
-	const float p = 2.5f * zoom;
-	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
-
-	// Invisible button
-	const ImVec2 position = ImGui::GetCursorPos();
-
-	const bool button_pressed = ImGui::InvisibleButton("stepBack", iconSize);
-
-	if (ImGui::IsItemHovered())
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
-
-	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
-	DIWNE::IconType iconTypeFg = DIWNE::IconType::SkipBack;
-
-	ImGui::SetCursorPos(position);
-
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
-
-	if (button_pressed) // if (ImGui::SmallButton("SB"))
-	{
-		m_nodebase->as<Core::Cycle>()->stepBack();
-		return true;
-	}
-	return false;
-}
-
-//// Small buttons fits within text without additional vertical spacing.
-// bool ImGui::SmallButton(const char* label)
-//{
-//	ImGuiContext& g = *GImGui;
-//	float backup_padding_y = g.Style.FramePadding.y;
-//	g.Style.FramePadding.y = 0.0f;
-//	bool pressed = ButtonEx(label, ImVec2(0, 0), ImGuiButtonFlags_AlignTextBaseLine);
-//	g.Style.FramePadding.y = backup_padding_y;
-//	return pressed;
-// }
-
-
+// TODO: These two button methods below are still an absolute code duplication mess, we need to use general UI methods.
 bool Cycle::buttonStepNext()
 {
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
+	const float zoom = diwne.getZoom();
 
 
 	ImGuiContext& g = *GImGui;
@@ -293,110 +147,87 @@ bool Cycle::buttonStepNext()
 	// Invisible button
 	const ImVec2 position = ImGui::GetCursorPos();
 
+	bool active = false;
 	const bool button_pressed = ImGui::InvisibleButton("stepForward", iconSize);
 	if (ImGui::IsItemHovered())
 		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
+	if (button_pressed || ImGui::IsItemActive())
+	{
+		active = true;
 		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
+	}
 
 	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
 	DIWNE::IconType iconTypeFg = DIWNE::IconType::SkipForward;
 
 	ImGui::SetCursorPos(position);
-
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	                        padding, true, ImVec2(1, 1), rounding);
+	ImGui::Dummy(iconSize);
 
 	if (button_pressed) // if (ImGui::SmallButton("SN"))
 	{
 		m_nodebase->as<Core::Cycle>()->stepNext();
 		return true;
 	}
-	return false;
+	return active;
 }
 
-
-bool Cycle::buttonRewind()
+bool Cycle::buttonStepBack()
 {
 	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
 	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
 
-	const float zoom = diwne.getWorkAreaZoom();
-	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-
-	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
+	const float zoom = diwne.getZoom();
 
 
-	const float p = 6.0f * zoom;
+	ImGuiContext& g = *GImGui;
+	float font_size = g.FontSize;
+
+	// const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
+	const ImVec2 iconSize = ImVec2(font_size * 1.1f, font_size);
+
+
+	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding);
+
+
+	const float p = 2.5f * zoom;
 	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
 
 	// Invisible button
 	const ImVec2 position = ImGui::GetCursorPos();
 
-	const bool button_pressed = ImGui::InvisibleButton("rewind", iconSize);
-	if (ImGui::IsItemHovered())
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
+	bool active = false;
+	const bool button_pressed = ImGui::InvisibleButton("stepBack", iconSize);
+	if (ImGui::IsItemActive())
+		if (ImGui::IsItemHovered())
+			iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
+	if (button_pressed || ImGui::IsItemActive())
+	{
+		active = true;
 		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
-
+	}
 	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
-	DIWNE::IconType iconTypeFg = DIWNE::IconType::Rewind;
+	DIWNE::IconType iconTypeFg = DIWNE::IconType::SkipBack;
 
 	ImGui::SetCursorPos(position);
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+	                        padding, true, ImVec2(1, 1), rounding);
+	ImGui::Dummy(iconSize);
 
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
-
-	if (button_pressed) // if (ImGui::SmallButton("RR"))
+	if (button_pressed) // if (ImGui::SmallButton("SB"))
 	{
-		m_nodebase->as<Core::Cycle>()->rewind();
+		m_nodebase->as<Core::Cycle>()->stepBack();
 		return true;
 	}
-	return false;
+	return active;
 }
 
-bool Cycle::buttonWind()
+void Cycle::leftContent(DIWNE::DrawInfo& context)
 {
-	ImColor iconColorBg = I3T::getColor(EColor::Cycle_Button);
-	const ImColor iconColorFg = I3T::getColor(EColor::Cycle_ButtonForeground);
+	// TODO: The method seems very repetitive, investigate
+	// TODO: Review what interactions are input
 
-	const float zoom = diwne.getWorkAreaZoom();
-	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-
-	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
-
-
-	const float p = 6.0f * zoom;
-	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
-
-	// Invisible button
-	const ImVec2 position = ImGui::GetCursorPos();
-
-	const bool button_pressed = ImGui::InvisibleButton("Wind", iconSize);
-	if (ImGui::IsItemHovered())
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonHovered);
-	if (button_pressed)
-		iconColorBg = I3T::getColor(EColor::Cycle_ButtonActive);
-
-	const DIWNE::IconType iconTypeBg = DIWNE::IconType::Rectangle;
-	DIWNE::IconType iconTypeFg = DIWNE::IconType::FastForward;
-
-	ImGui::SetCursorPos(position);
-
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize, padding, true,
-	               ImVec2(1, 1), rounding);
-
-	if (button_pressed) // if (ImGui::SmallButton("WW"))
-	{
-		m_nodebase->as<Core::Cycle>()->wind();
-		return true;
-	}
-	return false;
-}
-
-
-bool Cycle::leftContent()
-{
 	// TODO
 	// - icons for input pins
 	// - no labels for pulse pins - put them to the hover
@@ -404,37 +235,38 @@ bool Cycle::leftContent()
 	bool inner_interaction_happen = false;
 
 	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	//                     I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	//                     I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 	// ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	//                     I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	//                     I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	if (m_levelOfDetail == LevelOfDetail::LightCycle)
 	{
 		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_STEP})
 		{
-			m_workspaceInputs.at(i)->drawDiwne();
+			m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
 		}
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
-		ImRect nodeRect = getNodeRectDiwne();
+		ImRect nodeRect = getRect();
 		ImVec2 pinConnectionPoint =
-		    ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
+		    ImVec2(nodeRect.Min.x, (diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
+		for (const auto& pin : m_workspaceInputs)
+		{
+			pin->setRendered(false);
+		}
 		for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP,
 		                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 		{
-			Ptr<CoreInPin> const pin = m_workspaceInputs.at(i);
+			Ptr<CorePin> const pin = m_workspaceInputs.at(i);
 			pin->setConnectionPointDiwne(pinConnectionPoint);
-			if (pin->isConnected())
-			{
-				wd.m_linksToDraw.push_back(&pin->getLink());
-			}
+			pin->setRendered(true);
 		}
 	}
 	else if (m_levelOfDetail == LevelOfDetail::Label)
 	{
 		// inner_interaction_happen |= WorkspaceNode::leftContent();
-		inner_interaction_happen |= CoreNodeWithPins::leftContent();
+		CoreNodeWithPins::leftContent(context);
 	}
 	else // setValues or Full  // todo (PF) missing wires to pulse input pins for setValues mode
 	{
@@ -451,7 +283,7 @@ bool Cycle::leftContent()
 		// From: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		inner_interaction_happen |= m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->drawDiwne(); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		const float fromWidth = ImGui::GetItemRectSize().x; // length of the icon + label (from is the longest text)
 		// ImGui::DebugDrawItemRect(ImColor(255, 127, 0, 127));
@@ -462,7 +294,7 @@ bool Cycle::leftContent()
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
 		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) *
-		                        diwne.getWorkAreaZoom()); // height of the float widget
+		                        diwne.getZoom()); // height of the float widget
 		ImGui::SameLine();
 		ImGui::Text(""); // probably adds the item separator
 		ImGui::SameLine();
@@ -481,16 +313,15 @@ bool Cycle::leftContent()
 		{
 			m_nodebase->as<Core::Cycle>()->setFrom(localData);
 			updateDataItemsWidth();
+
+			context.update(true, true, true);
 		}
-
-		inner_interaction_happen |= valueChanged;
-
 
 		//----------------
 		// To: -------- v| > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		inner_interaction_happen |= m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->drawDiwne(); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float toWidth = ImGui::GetItemRectSize().x;
 
@@ -504,8 +335,7 @@ bool Cycle::leftContent()
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
@@ -527,7 +357,7 @@ bool Cycle::leftContent()
 		// Step: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		inner_interaction_happen |= m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->drawDiwne(); // icon and label
+		m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float stepWidth = ImGui::GetItemRectSize().x;
 
@@ -540,13 +370,16 @@ bool Cycle::leftContent()
 		valueChanged = false;
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
-		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+		// TODO: drawDragFloat should take the context parameter
+		bool interaction = DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->isConnected() ? Core::EValueState::Locked
 		                                                                 : Core::EValueState::Editable,
 		    valueChanged);
+		if (interaction)
+			context.update(true, true, true);
+
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
 		// {
@@ -568,14 +401,14 @@ bool Cycle::leftContent()
 			                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 			{
 				// inner_interaction_happen |= m_workspaceInputs.at(i)->m_iconType
-				inner_interaction_happen |= m_workspaceInputs.at(i)->drawDiwne();
+				m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
 			}
 		}
 		else if (m_levelOfDetail == LevelOfDetail::SetValues)
 		{
 			// the remaining pins are hidden, draw the wires only
 			WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
-			const ImRect nodeRect = getNodeRectDiwne();
+			const ImRect nodeRect = getRect();
 			const ImVec2 pinConnectionPoint =
 			    ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2.0f + 30.0f); // (PF) The Piscvejc constant
 			for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP,
@@ -585,20 +418,14 @@ bool Cycle::leftContent()
 				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
 					pin->setConnectionPointDiwne(pinConnectionPoint);
-					if (pin->isConnected())
-					{
-						wd.m_linksToDraw.push_back(&pin->getLink());
-					}
 				}
 			}
 		}
 	}
 	// ImGui::PopStyleVar(1);
-
-	return inner_interaction_happen;
 }
 
-bool Cycle::rightContent()
+void Cycle::rightContent(DIWNE::DrawInfo& context)
 {
 	// TODO
 	// - icons for output pins DONE
@@ -606,17 +433,7 @@ bool Cycle::rightContent()
 	// - put labels to the hover - postponed - long hover text overlaps the box and distracts
 
 	bool inner_interaction_happen = false;
-	inner_interaction_happen |= CoreNodeWithPins::rightContent();
-
-	return inner_interaction_happen;
-}
-
-bool Cycle::topContent()
-{
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
+	CoreNodeWithPins::rightContent(context);
 }
 
 bool Cycle::myRadioButton(const char* label, int* v, int v_button)
@@ -657,7 +474,7 @@ bool Cycle::myRadioButton(const char* label, int* v, int v_button)
 		// std::cout << "button " << v_button << ", diwneID " << getId() << ", label >" << label << "<" << std::endl;
 	}
 	ImGui::PopStyleColor(4);
-	return pressed;
+	return pressed || ImGui::IsItemActive();
 }
 
 void DebugDrawItemRect(ImU32 col = IM_COL32(255, 0, 0, 255))
@@ -667,7 +484,7 @@ void DebugDrawItemRect(ImU32 col = IM_COL32(255, 0, 0, 255))
 	ImGui::GetForegroundDrawList(window)->AddRect(g.LastItemData.Rect.Min, g.LastItemData.Rect.Max, col);
 }
 
-bool Cycle::middleContent()
+void Cycle::centerContent(DIWNE::DrawInfo& context)
 {
 	// \todo Add icons to buttons
 	// std::u8string string = u8"ěščřžýáíé";
@@ -676,17 +493,15 @@ bool Cycle::middleContent()
 	// fmt::print("{}\n", "ф");
 	// std::cout << fmt::format("{}\n", "⏩") << std::endl;
 
-
 	bool inner_interaction_happen = false;
+
 	// ImVec2 button_sz =
-	// I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
+	// I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getZoom();
 	float localData;
 	bool valueChanged;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	switch (m_levelOfDetail)
 	{
@@ -714,14 +529,12 @@ bool Cycle::middleContent()
 
 			ImVec2 size = ImGui::GetItemRectSize();
 
-
 			// -----------------------------------------------------
 			// LINE SPACING
 			// -----------------------------------------------------
 
 			const ImVec2 itemSpacing = ImGui::GetStyle().ItemSpacing;
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, (ImVec2(2 * itemSpacing.x, 2.5f * itemSpacing.y)));
-
 
 			// -----------------------------------------------------
 			// line 1: BUTTONS - play, stop, rewind, wind
@@ -734,6 +547,7 @@ bool Cycle::middleContent()
 			                    I3T::getUI()->getTheme().get(ESize::StartWindow_FrameRounding));
 
 			inner_interaction_happen |= buttonPlayPause();
+
 			ImGui::SameLine();
 			inner_interaction_happen |= buttonStopAndReset();
 
@@ -766,8 +580,8 @@ bool Cycle::middleContent()
 			if (radio_buttons_rect.GetWidth() > 0.0f) // area behind
 			{
 				ImGui::SetCursorPos(position - borderWidth);
-				diwne.EmptyButton(radio_buttons_rect.GetSize(),
-				                  (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
+				diwne.canvas().EmptyButton(radio_buttons_rect.GetSize(),
+				                           (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
 				ImGui::SetCursorPos(position + borderWidth);
 			}
 
@@ -841,6 +655,8 @@ bool Cycle::middleContent()
 			{
 				m_nodebase->as<Core::Cycle>()->setSmoothStep(smooth);
 			}
+			if (ImGui::IsItemActive())
+				context.consumeInput();
 			ImGui::PopStyleColor(5);
 			ImGui::PopStyleVar();
 
@@ -913,7 +729,8 @@ bool Cycle::middleContent()
 
 	ImGui::PopStyleVar(2); // FramePadding, ItemSpacing
 
-	return inner_interaction_happen;
+	if (inner_interaction_happen)
+		context.consumeInput();
 }
 
 int Cycle::maxLengthOfData()

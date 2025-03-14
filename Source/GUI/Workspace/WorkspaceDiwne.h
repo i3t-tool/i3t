@@ -12,8 +12,6 @@
  */
 #pragma once
 
-#include "DIWNE/diwne_include.h"
-
 #include <algorithm>
 #include <map>
 #include <math.h>
@@ -23,6 +21,8 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+
+#include "DIWNE/Core/NodeEditor.h"
 
 #include "Config.h"
 #include "Core/Result.h"
@@ -43,73 +43,47 @@
 
 namespace Workspace
 {
-typedef std::vector<Ptr<CoreNode>>::iterator coreNodeIter;
+class ScriptingNode;
 
-enum WorkspaceDiwneAction
+class WorkspaceDiwne : public DIWNE::NodeEditor
 {
-	None,
-	CreateAndPlugTypeConstructor,
-	NOTunselectAllNodes
-};
-
-extern WorkspaceDiwne* g_diwne;
-
-class WorkspaceDiwne : public DIWNE::Diwne
-{
-	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node);
-
+	friend void Sequence::moveNodeToWorkspace(Ptr<CoreNode> node); // TODO: Friend stuff would be nice to avoid
 public:
-	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
-	~WorkspaceDiwne() override;
-
 	ImDrawListSplitter m_channelSplitter;
 	Memento* copiedNodes = nullptr;
-	Core::MatrixTracker* tracking;
+	Core::MatrixTracker* tracking{nullptr};
 	float timeUntilNextTrack = 0;
-	bool smoothTracking;
-
-	ViewportHighlightResolver m_viewportHighlightResolver;
+	bool smoothTracking{true};
 
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
 
-	void clear() override;
+	ViewportHighlightResolver m_viewportHighlightResolver;
 
-	void popupContent() override;
+	bool m_updateDataItemsWidth{false}; ///< Indicates a change in zoom level this frame
 
-	bool beforeBegin() override;
-	bool beforeContent() override;
-	bool content() override;
-	bool afterContent() override;
-	bool afterEnd() override;
-	bool finalize() override;
+	bool m_trackingFromLeft{false};
 
-	void setWorkAreaZoom(float val = 1) override;
-
-	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
-	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
-	{
-		m_workspaceDiwneAction = wda;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction()
-	{
-		return m_workspaceDiwneAction;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame()
-	{
-		return m_workspaceDiwneActionPreviousFrame;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
-	{
-		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
-		                                                            : m_workspaceDiwneAction;
-	}
-
-	/**
-	 * \brief All WorkspaceNodes
-	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
-	 **/
-	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
+	// TODO: The nodes should be mainly stored in the DIWNE::NodeEditor not in a subclass
+	//  Or a system where the storage can be specified by subclasses should be created
+	//  However this turns out to be very tricky since vectors of derived classes cannot be easily converted
+	//  into vectors of base class. There are hacky workarounds like reinterpret_cast but generally at least a shallow
+	//  O(n) copy and cast of pointers is required. That may be insignificant but I'm not sure (large node counts?)
+	//  - The simplest solution is to use a single base node vector in NodeEditor. Issue is that in subclasses everytime
+	//    a non base functionality is required the fetched node would need to be (pseudo-safely) static-casted.
+	//    That is a lot of boilerplate code though.
+	//  - More complicated but still clean solution is to create a generic getNodes method that subclasses override,
+	//  however its not clear what this method would return, it can't return a base class vector, it also can't return
+	//  a generic iterator since it is type specific. It could return a pair of pointers for read only access.
+	//
+	// TODO: I've moved the CoreNode vector to DIWNE::NodeEditor for the time being.
+	//  This way the code can be rewritten in DIWNE but still compile and be tested in Workspace
+	//  Will see how we go from there.
+	//	/**
+	//	 * \brief All WorkspaceNodes
+	//	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
+	//	 **/
+	//	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.
@@ -117,108 +91,43 @@ public:
 	 */
 	std::unordered_map<Core::ID, CoreNode*> m_coreIdMap;
 
-	const std::vector<Ptr<CoreNode>>& getAllNodes() const
-	{
-		return m_workspaceCoreNodes;
-	};
+	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+	~WorkspaceDiwne() override;
 
-	std::vector<Ptr<CoreNode>> getSelectedNodes();
+	// Lifecycle
+	// =============================================================================================================
+	//	void initialize(DIWNE::DrawInfo& context) override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void content(DIWNE::DrawInfo& context) override;
+	void end(DIWNE::DrawInfo& context) override;
+	void finalize(DIWNE::DrawInfo& context) override;
 
-	void replaceNode(Ptr<CoreNode> oldNode, Ptr<CoreNode> newNode);
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	std::vector<CoreLink*> m_linksToDraw;
-	std::vector<CoreLink> m_linksCameraToSequence;
-
-	/**
-	 * \brief For a given input, create appropriate constructor box and plug it to this input
-	 * \return true if successful (input was not a Ptr)
-	 */
-	bool processCreateAndPlugTypeConstructor();
-
-	/**
-	 * O(N) where N is workspace nodes count.
-	 *
-	 * @tparam T
-	 * @param id
-	 * @return
-	 */
-	template <typename T>
-	Result<Ptr<T>, Error> getNode(Core::ID id, bool searchInner = false) const;
-
-	template <typename T>
-	void addTypeConstructorNode()
-	{
-		CoreInPin* pin = getLastActivePin<CoreInPin>().get();
-		auto newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
-		pin->plug(std::static_pointer_cast<CoreNodeWithPins>(newNode)
-		              ->getOutputs()
-		              .at(0)
-		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
-	}
-
-	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
-	{
-		// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
-		// size, padding etc.)
-		// Hence scaling is applied here if not active, and then restored to its original state at the end of this
-		// method
-		bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
-
-		auto node = std::make_shared<T>(*this);
-
-		node->setNodePositionDiwne(position);
-
-		if (shiftToLeftByNodeWidth)
-		{
-			node->drawDiwne(); /* to obtain size */
-			node->translateNodePositionDiwne(
-			    ImVec2(-node->getNodeRectSizeDiwne().x - I3T::getSize(ESizeVec2::NewNode_positionShift).x,
-			           I3T::getSize(ESizeVec2::NewNode_positionShift).y));
-		}
-
-		m_workspaceCoreNodes.push_back(node);
-		m_takeSnap = true; /* JH maybe better in place where this function is called*/
-		detectRotationTransformAndSetFloatMode(node);
-
-		diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
-
-		return node;
-	}
-
-	void detectRotationTransformAndSetFloatMode(auto node)
-	{
-		if (std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerX>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerY>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::EulerZ>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::Quat>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<Transformation<Core::ETransformType::AxisAngle>>(node) != nullptr)
-		{
-			std::dynamic_pointer_cast<CoreNode>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
-		}
-	}
-
+	// Object management
+	// =============================================================================================================
 	template <class T>
 	auto inline addNodeToPositionOfPopup()
 	{
-		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+		auto result = createNode<T>(canvas().screen2diwne(diwne.getPopupPosition()));
 		return result;
 	}
 
+	/**
+	 * Duplicates nodes marked for duplication using Workspace::Node::setDuplicateNode()
+	 */
+	void performLazyDuplication();
+
+	// Interaction
+	// =============================================================================================================
+	void processInteractions(DIWNE::DrawInfo& context) override;
+
+	void onZoom() override;
+	// TODO: (DR) Reimplement
+	//    bool isZoomingDiwne() override;
+	bool processZoom() override;
+
 	void manipulatorStartCheck3D();
-
-	void shiftNodesToBegin(std::vector<Ptr<CoreNode>> const& nodesToShift);
-	void shiftNodesToEnd(std::vector<Ptr<CoreNode>> const& nodesToShift);
-	void shiftInteractingNodeToEnd();
-
-	void processDragAllSelectedNodes();
-
-	void selectAll();
-	void invertSelection();
-	void zoomToAll();
-	void zoomToSelected();
-	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<CoreNode>> nodes);
-	void zoomToRectangle(ImRect const& rect);
 
 	void trackingSmoothLeft();
 	void trackingSmoothRight();
@@ -234,112 +143,131 @@ public:
 	void trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft);
 	void trackingSwitchOff();
 	void toggleSelectedNodesVisibility();
-	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
 
 	void processTrackingMove();
 
-	void deleteCallback();
+	void zoomToAll();
+	void zoomToSelected();
+	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
+	void zoomToRectangle(ImRect const& rect);
+
 	void copySelectedNodes();
 	void pasteSelectedNodes();
 	void cutSelectedNodes();
-	void duplicateClickedNode();
 	void duplicateSelectedNodes();
-	void deselectNodes();
-	void deselectWorkspaceNode(Ptr<CoreNode> transform);
-	bool isNodeLabelBeingEdited();
 
-	// bool allowInteraction();
+	// Node getters
+	// =============================================================================================================
 
-	std::vector<Ptr<CoreNode>> getSelectedNodesInnerIncluded();
-	std::vector<Ptr<CoreNode>> getAllNodesInnerIncluded();
-
-	std::vector<Ptr<CoreNode>> getAllCameras();
-	std::vector<Ptr<Model>> getAllModels();
-	std::vector<Ptr<CoreNode>> getAllInputFreeSequence();
-	std::vector<Ptr<CoreNode>> getAllInputFreeModel();
-
-	bool bypassZoomAction() override;
-	bool bypassDragAction() override;
-	bool bypassHoldAction() override;
-	bool bypassUnholdAction() override;
-
-	bool processZoom() override;
-
-	bool bypassSelectionRectangleAction() override;
-	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
-	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
-
-	bool m_updateDataItemsWidth; ///< Indicates a change in zoom level this frame
-	bool m_reconnectCameraToSequence;
-
-	bool m_trackingFromLeft;
-};
-
-template <typename T>
-Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id, bool searchInner) const
-{
-	Ptr<GuiNode> node{};
-	for (const auto& n : getAllNodes())
+	// TODO: Rename to getCoreNode()
+	/**
+	 * O(N) where N is workspace nodes count.
+	 * @tparam T
+	 * @param id
+	 * @return
+	 */
+	template <typename T>
+	Result<Ptr<T>, Error> getNode(Core::ID id) const
 	{
-		if (n->getNodebase()->getId() == id)
+		Ptr<GuiNode> node{};
+		auto allCoreNodes = getAllCoreNodes();
+		for (auto it = allCoreNodes.begin(); it != allCoreNodes.end(); ++it)
 		{
-			node = n;
-			break;
-		}
-		else if (searchInner)
-		{
-			if (auto camera = std::dynamic_pointer_cast<Camera>(n))
+			std::shared_ptr<CoreNode> n = it.sharedPtr();
+			if (n->getNodebase()->getId() == id)
 			{
-				if (camera->getProjection()->getNodebase()->getId() == id)
-				{
-					node = camera->getProjection();
-					break;
-				}
-				else if (camera->getView()->getNodebase()->getId() == id)
-				{
-					node = camera->getView();
-					break;
-				}
+				node = std::move(n);
 			}
 		}
+
+		if (node == nullptr)
+		{
+			return Err("cannot find node #" + std::to_string(id));
+		}
+
+		auto result = std::dynamic_pointer_cast<T>(node);
+
+		if (result == nullptr)
+		{
+			return Err("node #" + std::to_string(id) + " is not of given type");
+		}
+
+		return result;
 	}
 
-	if (node == nullptr)
+	/**
+	 * Replaces existing old node with a specified new node.
+	 * Old node is destroyed and its link connections are replugged into the new node if possible.
+	 * Attempts to reconnect input and output pins at corresponsing indices.
+	 * @return True on complete sucess, false on failure or when some pins couldn't be reconnected.
+	 */
+	bool replaceAndReplugNode(Ptr<CoreNodeWithPins> oldNode, Ptr<CoreNodeWithPins> newNode);
+
+private:
+	void fetchConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins, std::vector<DIWNE::Pin*>& connections);
+	bool restoreConnectionStateForPins(const std::vector<Ptr<CorePin>>& pins,
+	                                   const std::vector<DIWNE::Pin*>& connections);
+
+public:
+	DIWNE::FilteredNodeRange<CoreNode> getCoreNodes() const
 	{
-		return Err("cannot find node #" + std::to_string(id));
+		return DIWNE::FilteredNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+		    },
+		    &m_nodes);
 	}
 
-	auto result = std::dynamic_pointer_cast<T>(node);
-
-	if (result == nullptr)
+	/// Gets all I3T Core nodes
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllCoreNodes() const
 	{
-		return Err("node #" + std::to_string(id) + " is not of given type");
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+		    },
+		    &m_nodes);
 	}
 
-	return result;
-}
+	/// Gets all I3T Core nodes that are selected
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllSelectedCoreNodes() const
+	{
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && node->getSelected();
+		    },
+		    &m_nodes);
+	}
 
-/// This function takes snapshot of current state.
-template <typename T>
-auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
+	// Gets all I3T Core nodes that are selected and aren't a child of an already selected node
+	DIWNE::FilteredRecursiveNodeRange<CoreNode> getAllSelectedCoreNodesWithoutNesting() const
+	{
+		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
+		    [](const DIWNE::Node* node) -> bool {
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && node->getSelected();
+		    },
+		    [](const DIWNE::Node* node) -> bool {
+			    return !node->getSelected();
+		    },
+		    &m_nodes);
+	}
+
+	DIWNE::FilteredNodeRange<Camera> getAllCameras();
+	DIWNE::FilteredNodeRange<Model> getAllModels();
+	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
+	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence();
+	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();
+	DIWNE::FilteredRecursiveNodeRange<ScriptingNode> getAllScriptingNodes();
+
+	// =============================================================================================================
+};
+
+class WorkspaceEditorInputAdapter : public DIWNE::NodeEditorInputAdapter
 {
-	auto result = g_diwne->addNodeToPosition<T>(position);
+public:
+	WorkspaceEditorInputAdapter(DIWNE::NodeEditor& editor) : NodeEditorInputAdapter(editor) {}
 
-	App::getModule<StateManager>().takeSnapshot();
-
-	return result;
-}
-
-template <typename T>
-auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
-{
-	return g_diwne->addNodeToPosition<T>(position);
-}
-
-//
-
-bool connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPinIndex, int rhsPinIndex);
-
-bool connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin);
-
+	bool selectAllNodes() override;
+	bool invertSelection() override;
+	bool deleteSelectedNodes() override;
+};
 } // namespace Workspace

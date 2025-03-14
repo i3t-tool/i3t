@@ -22,15 +22,14 @@ template <Core::ETransformType T>
 class Transformation : public TransformationBase
 {
 public:
-	Transformation(DIWNE::Diwne& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
+	Transformation(DIWNE::NodeEditor& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
 	{
-		if (Core::ETransformType::Quat == T)
-		{
-			setLevelOfDetail(LevelOfDetail::SetValues);
-			CoreNode::setNumberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
-		}
+		init();
 		updateDataItemsWidth();
 	}
+
+	/// Called in the constructor.
+	void init() {}
 
 	/**
 	 * \brief helper function used for decision about showing the corrupted
@@ -85,7 +84,7 @@ public:
 		//  m_nodebase->as<Core::Transformation>()->enableSynergies(); // ??? JH
 		//  should be here ?
 
-		if (ImGui::BeginTable(fmt::format("##LoD{}", getIdDiwne()).c_str(), 2 /* label, value */,
+		if (ImGui::BeginTable(fmt::format("##LoD{}", getId()).c_str(), 2 /* label, value */,
 		                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 		{
 			for (auto& [key, valueStore] : nodebase->getDefaultValues())
@@ -182,8 +181,6 @@ public:
 	} /* thus we can specify it for Core::ETransformType::Free  */
 };
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
@@ -191,8 +188,6 @@ inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 	ImGui::MenuItem(_t("Enable synergies"), NULL, false, false);
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 {
@@ -228,8 +223,14 @@ inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <>
+inline void Transformation<Core::ETransformType::Quat>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+	setLevelOfDetail(LevelOfDetail::SetValues);
+	CoreNode::setNumberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisibleQuaternionPrecision));
+}
+
 template <>
 inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 {
@@ -271,8 +272,6 @@ inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 {
@@ -314,8 +313,6 @@ inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 {
@@ -357,14 +354,12 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 	}
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::Scale>>();
-	if (ImGui::BeginTable(fmt::format("##LoD{}", getIdDiwne()).c_str(), 2 /* label, value */,
+	if (ImGui::BeginTable(fmt::format("##LoD{}", getId()).c_str(), 2 /* label, value */,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
 		for (auto& [key, valueStore] : nodebase->getDefaultValues())
@@ -416,8 +411,6 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 	return inner_interaction_happen;
 }
 
-// inline for ability to compile
-// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
 template <>
 inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
 {
@@ -450,5 +443,26 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
 	}
 
 	return inner_interaction_happen;
+}
+
+template <>
+inline void Transformation<Core::ETransformType::EulerX>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::EulerY>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::EulerZ>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
+}
+template <>
+inline void Transformation<Core::ETransformType::AxisAngle>::init()
+{
+	setFloatPopupMode(FloatPopupMode::Angle);
 }
 } // namespace Workspace

@@ -223,29 +223,18 @@ void ScriptingModule::onClose()
 	// This is a hack to remove all scripting nodes from the workspace.
 	// It must be done before destroying the Lua state, because the nodes are holding Lua objects.
 	auto& nodeEditor = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor();
-	auto& nodes = nodeEditor.m_workspaceCoreNodes;
-	for (auto& node : nodes)
+	for (auto& scriptingNode : nodeEditor.getAllScriptingNodes())
 	{
-		if (node->getNodebase()->getOperation().keyWord != "Script")
+		// Associated script must be removed here, because it holds shared_ptr reference to the workspace
+		// node and would prevent it from being destroyed.
+		if (auto id = scriptingNode.getScriptId())
 		{
-			continue;
+			Workspace::removeScript(id.value());
 		}
-		if (auto scriptingNode = std::dynamic_pointer_cast<Workspace::ScriptingNode>(node))
-		{
-			// Associated script must be removed here, because it holds shared_ptr reference to the workspace
-			// node and would prevent it from being destroyed.
-			if (auto id = scriptingNode->getScriptId())
-			{
-				Workspace::removeScript(id.value());
-			}
-		}
+		scriptingNode.destroy(false);
 	}
-	nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
-	                           [](auto node) {
-		                           return node->getNodebase()->getOperation().keyWord == "Script";
-	                           }),
-	            nodes.end());
-	nodeEditor.deselectNodes();
+	nodeEditor.purgeAllNodes(); // Manually deallocate objects marked for destruction
+	nodeEditor.deselectAllNodes();
 
 	// Destroy the Lua state to ensure that all workspace node will be destroyed along with their Lua objects.
 	m_Lua = {};

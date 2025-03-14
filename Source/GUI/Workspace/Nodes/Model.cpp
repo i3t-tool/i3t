@@ -14,7 +14,8 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/Workspace/WorkspaceDiwne.h"
+#include "DIWNE/Core/NodeEditor.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
 #include "Viewport/Viewport.h"
@@ -23,7 +24,7 @@
 
 using namespace Workspace;
 
-Model::Model(DIWNE::Diwne& diwne) : CoreNodeWithPins(diwne, Core::Builder::createModelNode())
+Model::Model(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createModelNode())
 {
 	init();
 	// setDataItemsWidth();
@@ -159,7 +160,7 @@ glm::vec3 Model::calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model)
 	return color;
 }
 
-void Model::popupContent()
+void Model::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -173,16 +174,16 @@ void Model::popupContent()
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
 void Model::init()
 {
-	m_viewportModel = I3T::getViewport()->createModel(getId());
+	m_viewportModel = I3T::getViewport()->createModel(getNodebase()->getId());
 	auto modelPtr = m_viewportModel.lock();
 	modelPtr->m_showAxes = true;
 	modelPtr->m_visible = true;
@@ -202,31 +203,18 @@ void Model::init()
 	});
 }
 
-bool Model::topContent()
+void Model::centerContent(DIWNE::DrawInfo& context)
 {
-	// TODO: (DR) This call might be unnecessary as the same call is made in WorkspaceNode, for color
-	//  override perhaps? Similarly in WorkspaceScreen. (Note sure, noting so I don't forget)
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
-}
-
-bool Model::middleContent()
-{
-	bool interaction_happen = false;
-
 	if (m_levelOfDetail == LevelOfDetail::Label)
 	{
-		return interaction_happen;
+		return;
 	}
 
-	int width = m_textureSize.x * diwne.getWorkAreaZoom();
-	int height = m_textureSize.y * diwne.getWorkAreaZoom();
+	int width = m_textureSize.x * diwne.getZoom();
+	int height = m_textureSize.y * diwne.getZoom();
 
 #define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
-	ImVec2 zoomedTextureSize =
-	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getZoom()); // floored position - same as in ImGui
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
@@ -243,8 +231,6 @@ bool Model::middleContent()
 	{
 		ImGui::Text("Failed to draw preview!");
 	}
-
-	return interaction_happen;
 }
 
 int Model::maxLengthOfData() // todo
@@ -257,41 +243,39 @@ void Model::drawMenuLevelOfDetail() // todo
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
-
-bool Model::processSelect()
+void Model::onSelection(bool selected)
 {
+	CoreNode::onSelection(selected);
 	auto model = m_viewportModel.lock();
-	model->m_highlight = true;
-	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-
-	return CoreNodeWithPins::processSelect();
-}
-
-bool Model::processUnselect()
-{
-	auto model = m_viewportModel.lock();
-	if (m_influenceHighlight)
+	if (selected)
 	{
 		model->m_highlight = true;
-		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
 	}
 	else
 	{
-		model->m_highlight = false;
+		if (m_influenceHighlight)
+		{
+			model->m_highlight = true;
+			model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.highlightColor;
+		}
+		else
+		{
+			model->m_highlight = false;
+		}
 	}
-
-	return CoreNodeWithPins::processUnselect();
 }
 
 ModelProxy::ModelProxy(Ptr<Model> model)
 {
-	m_model = std::make_shared<Model>(*g_diwne);
+	m_model = std::make_shared<Model>(*WorkspaceWindow::g_editor);
 	const auto alias = model->viewportModel().lock()->getModel();
 	m_model->viewportModel().lock()->setModel(alias);
 }
 
 ModelProxy::~ModelProxy()
 {
+	m_model->destroy(false);
 	m_model = nullptr;
 }
 

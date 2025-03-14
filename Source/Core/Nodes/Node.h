@@ -103,10 +103,14 @@ public:
 
 	void appendChildNode(Ptr<Node> node);
 
+	// \todo MH: Remove, use destructor directly.
+	//   DR: Finalize cannot be called in the destructor
+	//   Unplugging pins triggers callbacks which expect valid pin references (with valid node parents)
+	//   When unplugging a node during destruction, it is no longer a "valid" object as its underlying weak ptr
+	//   is expired by then -> bad_weak_ptr in unplugInput otherPin->getOwner()
 	/**
 	 * Prepares node for its destruction, after that the destructor can be called.
 	 */
-	/// \todo MH: Remove, use destructor directly.
 	void finalize();
 
 	/**
@@ -480,5 +484,7 @@ protected:
 
 	/// Nested nodes.
 	std::vector<Node*> m_children;
+
+	bool finalized = false;
 };
 } // namespace Core

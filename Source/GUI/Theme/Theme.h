@@ -115,8 +115,6 @@ enum class EColor
 	InnerMatrixMulPin,
 	InnerScreenPin,
 
-	Item_SelectedBorder,
-
 	// General unspecified node
 	NodeBg,
 	NodeHeader,

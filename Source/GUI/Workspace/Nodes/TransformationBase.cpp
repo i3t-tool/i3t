@@ -19,54 +19,30 @@
 
 using namespace Workspace;
 
-TransformationBase::TransformationBase(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
-    : CoreNode(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
+TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
+    : CoreNode(diwne, nodebase), aboveSequence(0)
 {
 	updateDataItemsWidth();
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
+	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
 }
 
 bool TransformationBase::allowDrawing()
 {
+	// TODO: (DR) Why is drawing strictly allowed when in sequence?
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
-void TransformationBase::updateSizes()
-{
-	/* right align - have to be computed before DIWNE::Node::updateSizes(),
-	 * because after that are sizes updated */
-	/* space is between left-middle and middle-right, spacing is scaled in begin of frame */
-	m_topOversizeSpace = std::max(0.0f, m_topRectDiwne.GetWidth() -
-	                                        std::max(m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() +
-	                                                     m_rightRectDiwne.GetWidth() +
-	                                                     ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom(),
-	                                                 m_bottomRectDiwne.GetWidth()));
-	CoreNode::updateSizes();
-}
-bool TransformationBase::beforeBegin()
+void TransformationBase::begin(DIWNE::DrawInfo& context)
 {
 	aboveSequence = 0; /* 0 is none */
-	return CoreNode::beforeBegin();
+	CoreNode::begin(context);
 }
 
-bool TransformationBase::beforeContent()
+void TransformationBase::topContent(DIWNE::DrawInfo& context)
 {
-	/* whole node background */
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-	                         I3T::getTheme().get(EColor::NodeBgTransformation), I3T::getSize(ESize::Nodes_Rounding),
-	                         ImDrawFlags_RoundCornersAll);
-	return false;
-}
-
-bool TransformationBase::topContent()
-{
-	bool interaction_happen = false;
 	ImGuiStyle& style = ImGui::GetStyle();
-
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-	                         I3T::getTheme().get(EColor::NodeHeaderTranformation), I3T::getSize(ESize::Nodes_Rounding),
-	                         ImDrawFlags_RoundCornersTop);
-
-	interaction_happen |= CoreNode::topContent();
+	CoreNode::topContent(context);
 	ImGui::SameLine(0, 0);
 
 	if (!isMatrixValid())
@@ -79,20 +55,21 @@ bool TransformationBase::topContent()
 		//    WorkspaceNodeWithCoreData::topContent() */
 		//    /* right align */
 		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f,
-		//    getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x
+		//    getRect().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
 		//    /*actual free space*/ - iconSize.x -
-		//    m_topOversizeSpace)*diwne.getWorkAreaZoom());
+		//    m_topOversizeSpace)*diwne.getZoom());
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
 		GUI::startVerticalAlign(style.FramePadding.y);
-		diwne.DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
-		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
-		               /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
-		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
-		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
-		               ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
-		                   I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
-		               false);
+		diwne.canvas().DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
+		                        /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
+		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
+		                        ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
+		                            I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
+		                        false);
+		ImGui::Dummy(iconSize);
 		GUI::endVerticalAlign();
 
 		// 2x Frame padding x spacing gap at the end
@@ -105,10 +82,9 @@ bool TransformationBase::topContent()
 		// 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
 		// false); /* \todo JH Icon setting from Theme? */
 	}
-	return interaction_happen;
 }
 
-bool TransformationBase::middleContent()
+void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 {
 	bool inner_interaction_happen = false;
 
@@ -128,64 +104,69 @@ bool TransformationBase::middleContent()
 		I3T_ABORT("drawData: Unknown m_levelOfDetail");
 		inner_interaction_happen = drawDataFull();
 	}
-
-	return inner_interaction_happen;
+	if (inner_interaction_happen)
+	{
+		context.update(true, false, true); // TODO: Probably pass context to drawData methods too
+	}
 }
 
-bool TransformationBase::afterContent()
+void TransformationBase::end(DIWNE::DrawInfo& context)
 {
+	CoreNode::end(context);
+
 	if (!Core::GraphManager::isTrackingEnabled())
 	{
-		return false;
+		return;
 	}
 
 	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
 
-	ImVec2 topleft = m_middleRectDiwne.Min;
-	ImVec2 bottomright = m_middleRectDiwne.Max;
+	ImVec2 topleft = m_middle.getMin();
+	ImVec2 bottomright = m_middle.getMax();
 	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
 
 	Core::TrackingResult t = workspaceDiwne.tracking->result();
 
 	ImVec2 size = bottomright - topleft;
-	float inactiveMark = t.trackingProgress[this->getId()];
+	// TODO: <<<<<<<< Test if this works properly (was just this->getId())
+	float inactiveMark = t.trackingProgress[this->getNodebase()->getId()];
 
 	if (!trackingFromLeft)
 	{
 		bottomright.x = topleft.x;
 		bottomright.x += (1 - inactiveMark) * size.x;
-		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 	else
 	{ // Left tracking, top left moving left
 		topleft.x = bottomright.x;
 		topleft.x -= (1 - inactiveMark) * size.x;
-		diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 
 	auto maybeInterpolatedTransform =
-	    Tools::findNodeById(workspaceDiwne.getAllNodesInnerIncluded(), t.interpolatedTransformID);
+	    Tools::findNodeById(workspaceDiwne.getAllCoreNodes().collect(), t.interpolatedTransformID);
 
 	if (!maybeInterpolatedTransform)
 	{
 		Core::GraphManager::stopTracking();
-		return false;
+		return;
 	}
 
 	auto interpolatedTransform = std::dynamic_pointer_cast<TransformationBase>(maybeInterpolatedTransform.value());
 	if (interpolatedTransform.get() == this)
 	{
-		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
+		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middle.getRect().GetCenter().y);
 		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
-		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-		                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
+		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
+		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
 	}
-
-	return false;
 }
 
-void TransformationBase::popupContent()
+void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -201,11 +182,11 @@ void TransformationBase::popupContent()
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
 void TransformationBase::drawMenuStorevalues()
@@ -270,25 +251,16 @@ void TransformationBase::drawMenuSetDataMap()
 	}
 }
 
-void TransformationBase::deleteAction()
+void TransformationBase::onDestroy(bool logEvent)
 {
-	Node::deleteAction();
-	m_removeFromSequence = true;
 	m_parentSequence.reset();
-}
-
-void TransformationBase::drawMenuDelete()
-{
-	if (ImGui::MenuItem(_t("Delete")))
-	{
-		deleteActionDiwne();
-	}
+	CoreNode::onDestroy(logEvent);
 }
 
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()
 {
-	ImVec2 position = getNodePositionDiwne();
-	ImVec2 size = getNodeRectSizeDiwne();
+	ImVec2 position = getPosition();
+	ImVec2 size = getRect().GetSize();
 	ImVec2 topMiddle = position;
 	topMiddle.x += size.x / 2;
 	ImVec2 middle = position + size / 2;
@@ -356,9 +328,8 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 
 	ImGui::TableNextRow();
 
@@ -397,13 +368,11 @@ bool TransformationBase::drawDataSetValuesTable_builder(std::string const corner
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
-	if (ImGui::BeginTable(fmt::format("##{}{}", cornerLabel, getIdDiwne()).c_str(), columnLabels.size() + 1,
+	if (ImGui::BeginTable(fmt::format("##{}{}", cornerLabel, getId()).c_str(), columnLabels.size() + 1,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getZoom());
 		/* header labels */
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();

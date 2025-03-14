@@ -21,12 +21,14 @@ namespace Workspace
 {
 class CoreNodeWithPins : public CoreNode
 {
+	using Super = CoreNode;
+
 private:
 	float m_minRightAlignOfRightPins;
 
 protected:
-	std::vector<Ptr<CoreInPin>> m_workspaceInputs;
-	std::vector<Ptr<CoreOutPin>> m_workspaceOutputs;
+	std::vector<Ptr<CorePin>> m_workspaceInputs;
+	std::vector<Ptr<CorePin>> m_workspaceOutputs;
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
 public:
@@ -34,7 +36,7 @@ public:
 	 * \brief get vector of input pins
 	 * \return m_workspaceInputs
 	 */
-	std::vector<Ptr<CoreInPin>> const& getInputs() const
+	const std::vector<Ptr<CorePin>>& getInputs() const
 	{
 		return m_workspaceInputs;
 	};
@@ -42,21 +44,21 @@ public:
 	 * \brief get vector of output pins
 	 * \return m_workspaceOutputs
 	 */
-	std::vector<Ptr<CoreOutPin>> const& getOutputs() const
+	const std::vector<Ptr<CorePin>>& getOutputs() const
 	{
 		return m_workspaceOutputs;
 	};
-	virtual std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const
+	virtual std::vector<Ptr<CorePin>> const getOutputsToShow() const
 	{
 		return getOutputs();
 	};
 
-	CoreNodeWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
+	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
-	bool leftContent() override;
-	bool rightContent() override;
+	void leftContent(DIWNE::DrawInfo& context) override;
+	void rightContent(DIWNE::DrawInfo& context) override;
 
-	bool finalize() override;
+	void onDestroy(bool logEvent) override;
 };
 } // namespace Workspace
 

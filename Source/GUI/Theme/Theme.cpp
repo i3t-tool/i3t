@@ -148,9 +148,9 @@ void Theme::initClassicProperties()
 	set(EColor::DockTabUnfocusedActive, ImVec4(0.263f, 0.291f, 0.325f, 1.f));
 	set(EColor::DockTabHovered, get(EColor::SelectionColor));
 
-	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150));
-	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 0));
-	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 75));
+	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150));    // TODO: Missing in DarkTheme
+	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));             // TODO: Missing name!
+	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 100)); // TODO: Missing name!
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
@@ -201,8 +201,6 @@ void Theme::initClassicProperties()
 	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
 	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
-
-	set(EColor::Item_SelectedBorder, createColor(100, 100, 0, 255));
 
 	// General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
@@ -283,10 +281,10 @@ void Theme::initClassicProperties()
 
 	set(EColor::Cycle_RadioButton, createColor(33, 33, 33, 255));
 	set(EColor::Cycle_RadioButtonActive, createColor(158, 220, 213, 255));
-	set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 337, 255));
+	set(EColor::Cycle_RadioButtonHovered, createColor(37, 37, 37, 255));
 	set(EColor::Cycle_RadioButtonText, createColor(89, 89, 89, 255));
 	set(EColor::Cycle_RadioButtonSelected, createColor(140, 190, 186, 255));
-	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(345, 195, 186, 255));
+	set(EColor::Cycle_RadioButtonSelectedHovered, createColor(145, 195, 186, 255));
 	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
 	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
 
@@ -471,7 +469,6 @@ void Theme::initNames()
 	    .add(EColor::NodeBg, "General Node Background")
 	    .add(EColor::NodeHeader, "General Node Header")
 	    .add(EColor::NodeFont, "General Node Font (text)")
-	    .add(EColor::Item_SelectedBorder, "Item Selected Border")
 	    .add(EColor::NodeBorder, "Node Border")
 	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
 	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
@@ -761,7 +758,6 @@ void Theme::initNames()
 	g_ColorNames[EColor::NodeBg] = "ngen_General Node Background";
 	g_ColorNames[EColor::NodeHeader] = "ngen_General Node Header";
 	g_ColorNames[EColor::NodeFont] = "ngen_General Node Font (text)";
-	g_ColorNames[EColor::Item_SelectedBorder] = "ngen_Item Selected Border";
 	g_ColorNames[EColor::NodeBorder] = "ngen_Node Border";
 	g_ColorNames[EColor::NodeLODButtonColorText] = "ngen_LOD Button Text";
 	g_ColorNames[EColor::NodeLODButtonColor] = "ngen_LOD Button Color";

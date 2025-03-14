@@ -165,28 +165,34 @@ void removeScript(Core::ID id)
 
 //------------------------------------------------------------------------------------------------//
 
-ScriptingNode::ScriptingNode(DIWNE::Diwne& diwne)
+ScriptingNode::ScriptingNode(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCustomNode<::ScriptingNode>())
 {}
 
-ScriptingNode::ScriptingNode(DIWNE::Diwne& diwne, const std::string& script, std::unique_ptr<ScriptInterface> interface)
+ScriptingNode::ScriptingNode(DIWNE::NodeEditor& diwne, const std::string& script,
+                             std::unique_ptr<ScriptInterface> interface)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCustomNode<::ScriptingNode>(std::move(interface), this)),
       m_script(script)
 {
 	m_interface = getNodebase()->as<::ScriptingNode>()->getInterface();
 }
 
-void ScriptingNode::popupContent()
+ScriptingNode::~ScriptingNode()
+{
+	// TODO: (DR) Cannot use onDestroy(), because the DIWNE node is stored in Lua context? i don't really know
+	m_nodebase->finalize();
+}
+
+void ScriptingNode::popupContent(DIWNE::DrawInfo& context)
 {
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
-	auto& nodes = nodeEditor.m_workspaceCoreNodes;
 
 	CoreNode::drawMenuSetEditable();
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
@@ -236,22 +242,15 @@ Ptr<ScriptingNode> ScriptingNode::reloadScript()
 
 	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	auto& nodeEditor = workspace->getNodeEditor();
-	nodeEditor.replaceNode(self, newNode);
+
+	bool success = nodeEditor.replaceAndReplugNode(self, newNode);
+	if (!success)
+		LOG_INFO("Replugging of scripting node didn't replug all pins perfectly. Perhaps there was a pin mismatch.");
+
 	self->m_interface = nullptr;
 
 	newNode->getNodebase()->as<::ScriptingNode>()->performInit();
-
-	// All connections are lost, so we need to reconnect the node.
-	auto connections = collectNeighbours(newNode->getId());
-	for (const auto& [fromId, fromIndex, toId, toIndex] : connections)
-	{
-		if (!Tools::plug(fromId, fromIndex, toId, toIndex))
-		{
-			LOG_ERROR("Failed to reconnect node: Node#{}[{}] -> Node#{}[{}]", fromId, fromIndex, toId, toIndex);
-		}
-	}
-	newNode->setNodePositionDiwne(getNodePositionDiwne());
-
+	newNode->setPosition(getPosition());
 	return newNode;
 }
 

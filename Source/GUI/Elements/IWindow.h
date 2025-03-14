@@ -46,7 +46,7 @@ public:
 	WindowManager* m_windowManager{nullptr}; ///< Weak reference to a WindowManager set when this window is added to it
 
 	// Window info (updated by updateWindowInfo())
-	bool m_autoFocus{false};         ///< When true the window will get focus immediately upon hovering over it
+	bool m_autoFocus{true};          ///< When true the window will get focus immediately upon hovering over it
 	bool m_windowInfoUpdated{false}; ///< A flag indicating the updateWindowInfo() method was called
 	glm::vec2 m_windowPos;           ///< Top-left corner of the window in screen coordinates
 	glm::ivec2 m_windowSize;         ///< Window width and height dimensions

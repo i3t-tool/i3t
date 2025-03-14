@@ -1,5 +1,8 @@
 # DIWNE - Dear Imgui Wrapper Node Editor
 
+# THESE DOCS ARE OUTDATED, SURPASSED BY NEW DIWNE (VERSION 2 if you will)
+## Parts of these docs are relevant but some parts are not anymore
+
 ## Reasons, Background and Story
 
 DIWNE was written as one part of the I3T user interface. On the other hand, DIWNE was intended as an independent general-purpose tool/library that is (only) used in I3T. The graphical part of I3T is based on the DearImgui library, so DIWNE is also based on DearImgui.
@@ -50,7 +53,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	- m_inner_interaction_happen, m_inner_interaction_happen_previous_draw : interaction information 
 
-	- m_drawMode, m_selectable, m_isHeld, m_isDragged, etc. : current  usage information
+	- m_drawMode, m_selectable, m_isPressed, m_isDragged, etc. : current  usage information
 
 
 
@@ -63,12 +66,19 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	It provides shared functions and information and workspace information:
 	- mp_settingsDiwne : stores setting information (colors, margins, sizes, etc.)
+      - TODO: Style variables should be split into DIWNE::Style
 	- m_diwneAction, m_diwneAction_previousFrame : current and previous user actions
+      - TODO: Reworked via DiwneAction, previous frame is not tracked
 	- mp_lastActivePin, mp_lastActiveNode : last active objects that the user recently used
-	- m_workAreaScreen, m_workAreaDiwne : what part of the workspace is visible on the screen. The m_workAreaScreen is basically just a window, m_workAreaDiwne depends on the user's translation of the space (m_workAreaDiwne.Min), the window size and the zoom. See Diwne::updateWorkAreaRectangles()
+      - TODO: Last pin removed, last active node still exists
+	- m_viewRectScreen, m_viewRectDiwne : what part of the workspace is visible on the screen. The m_viewRectScreen is basically just a window, m_viewRectDiwne depends on the user's translation of the space (m_viewRectDiwne.Min), the window size and the zoom. See Diwne::updateWorkAreaRectangles()
+      - TODO: Moved to Canvas
 	- transform coordinates between ImGui-screen-workareas
+      - TODO: Moved to Canvas
 	- draw some basic icons
-	- Bypass...() function: the name "bypass" is a bit confusing. It wraps the original ImGui functions, allowing you to change the default ImGui behavior by overriding it. 
+      - TODO: Moved to Canvas
+	- Bypass...() function: the name "bypass" is a bit confusing. It wraps the original ImGui functions, allowing you to change the default ImGui behavior by overriding it.
+      - TODO: Replaced with InputAdapters
 
 - Node (see Node.h)
 	
@@ -91,7 +101,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
    The content() function is already prepared (see Node::content()), so you don't need to override it (if you don't want to).
 
-   The size of the node and its parts is updated at the end of the node drawing (see Node::updateSizes()).
+   The size of the node and its parts is updated at the end of the node drawing (see Node::updateLayout()).
 
  
 
@@ -103,7 +113,7 @@ Functions with "Diwne" in the name ( drawDiwne(), xxxDiwne(), etc. ) are not mea
 
 	Main attributes:
 
-	- m_connectionPointDiwne : the point to/from which the link will be pulled (by default).
+	- m_connectionPoint : the point to/from which the link will be pulled (by default).
 	
 - Link (see Link.h)
 
@@ -115,7 +125,7 @@ Some parts of DIWNE are not well programmed and it would be great to improve the
 - Renaming the bypass() functions
 - Handling user actions and interactions between objects. 
 
-There is currently a big mess in various parts of the code and objects. It seems like a good idea to just store the information that an action/interaction is taking place in a given object, and leave the response to that (and any other interactions that may take place in a single frame) interaction/action for the end of the frame processing.  
+There is currently a big mess in various parts of the code and objects. It seems like a good idea to just store the information that an action/interaction is taking place in a given object, and leave the response to that (**and any other interactions that may take place in a single frame**) interaction/action for the end of the frame processing.  
 
 With this approach, it would be possible to create a clear and easily auditable (action to action) matrix. Using this matrix, it would be easy to deal with situations where two actions interfere. This goes against the ImGui philosophy, but in a complicated environment (many interacting objects) it is very complicated to react immediately after an action in each individual object, as this action may interfere with previous and/or subsequent events. 
 - The zooming of the node editor is now solved by increasing the size of the font and icons (and thus the whole nodes). This is not a well thought out approach as it could affect other parts of the application and could have unpredictable consequences. A better approach is offered by https://github.com/thedmd/imgui-node-editor, for example, but the resource requirements are unknown.    

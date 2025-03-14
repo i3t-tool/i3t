@@ -12,6 +12,8 @@
  */
 #pragma once
 
+#include "DIWNE/Core/Elements/Containers/INodeContainer.h"
+
 #include "Core/Nodes/GraphManager.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
@@ -24,12 +26,14 @@ class SceneCamera;
 
 namespace Workspace
 {
-class Camera : public CoreNodeWithPins
+class Camera : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
 protected:
-	// TODO: (DR) I think these pointers are unused
-	Ptr<Sequence> m_projection = nullptr;
-	Ptr<Sequence> m_view = nullptr;
+	// Projection and view are stored as two pointer kinds to support DIWNE::INodeContainer queries
+	// The projection and view getters could probably just use raw pointers
+	Ptr<Sequence> m_projection{nullptr};
+	Ptr<Sequence> m_view{nullptr};
+	DIWNE::NodeList m_projAndView;
 
 public:
 	bool m_axisOn{true};
@@ -41,8 +45,11 @@ public:
 
 	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
 
-	Camera(DIWNE::Diwne& diwne);
+	Camera(DIWNE::NodeEditor& diwne);
 	~Camera();
+
+	DIWNE::NodeRange<> getNodes() const override;
+	DIWNE::NodeList& getNodeList() override;
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -52,34 +59,34 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	Ptr<Sequence> const& getProjection() const
+	const Ptr<Sequence>& getProjection() const
 	{
 		return m_projection;
 	};
-	Ptr<Sequence> const& getView() const
+	const Ptr<Sequence>& getView() const
 	{
 		return m_view;
 	};
 
-	// bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no
-	// data */
-	bool topContent() override;
-	bool middleContent() override;
+	void centerContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	int maxLengthOfData() override;
 
 	bool isCamera();
 
-	//	bool leftContent(DIWNE::Diwne &diwne);
-	//	bool rightContent(DIWNE::Diwne &diwne);
+	//	void leftContent(DIWNE::Diwne &diwne);
+	//	void rightContent(DIWNE::Diwne &diwne);
 
-	bool processSelect() override;
-	bool processUnselect() override;
-	float updateDataItemsWidth() override;
+	// TODO: Uncomment
+	void onSelection(bool selected) override;
+	//	bool processSelect() override;
+	//	bool processUnselect() override;
+
+	void onDestroy(bool logEvent) override;
 
 private:
 	glm::vec3 calculateFrustumColor(glm::vec3 color);

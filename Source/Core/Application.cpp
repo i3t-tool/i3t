@@ -109,29 +109,34 @@ int Application::run()
 
 	while (!m_shouldClose)
 	{
-
-		glfwPollEvents();
-
-		CommandDispatcher::get().execute();
-		if (m_shouldClose)
-		{
-			// Do not run the rest of the loop if the application is closing.
+		if (!frame())
 			break;
-		}
-		Statistics::update();
-
-		beginFrame();
-
-		// Logic update
-		update();
-
-		// Render stuff
-		display();
-
-		endFrame();
 	}
-
 	return exitCode;
+}
+
+bool Application::frame()
+{
+	glfwPollEvents();
+
+	CommandDispatcher::get().execute();
+	if (m_shouldClose)
+	{
+		// Do not run the rest of the loop if the application is closing.
+		return false;
+	}
+	Statistics::update();
+
+	beginFrame();
+
+	// Logic update
+	update();
+
+	// Render stuff
+	display();
+
+	endFrame();
+	return true;
 }
 
 void Application::beginFrame()
@@ -153,6 +158,7 @@ void Application::endFrame()
 	InputManager::endFrame();
 
 	onEndFrame();
+
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

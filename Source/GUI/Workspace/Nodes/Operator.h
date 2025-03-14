@@ -21,7 +21,7 @@ template <Core::EOperatorType T>
 class Operator : public CoreNodeWithPins
 {
 public:
-	Operator(DIWNE::Diwne& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
+	Operator(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
 	{
 		// To avoid rounding-confusion, the operators with quaternion output should have more decimal places to
 		// distinguish small changes near zero or near one
@@ -60,6 +60,9 @@ public:
 		// }
 
 		updateDataItemsWidth();
+
+		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgOperator));
+		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderOperator));
 	}
 
 	//===-- Double dispatch
@@ -70,26 +73,20 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	virtual bool beforeContent() override
-	{
-		/* whole node background */
-		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgOperator),
-		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawFlags_RoundCornersAll);
-		return false;
-	}
+	// TODO: Uncomment
+	//	virtual bool beforeContent() override
+	//	{
+	//		// TODO: Refactor, remove method and merge into content / begin
+	//		/* whole node background */
+	//		diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
+	// I3T::getTheme().get(EColor::NodeBgOperator), I3T::getSize(ESize::Nodes_Operators_Rounding),
+	// ImDrawFlags_RoundCornersAll); 		return false;
+	//	}
 
-	virtual bool topContent() override
+	virtual void inline centerContent(DIWNE::DrawInfo& context) override
 	{
-		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-		                         I3T::getTheme().get(EColor::NodeHeaderOperator),
-		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawFlags_RoundCornersTop);
-
-		return CoreNode::topContent();
-	}
-
-	virtual bool inline middleContent() override
-	{
-		return false;
+		// Why is this empty?
+		// Because operators are essentially only made up of pins
 	}
 
 	void drawMenuLevelOfDetail() override
@@ -103,7 +100,7 @@ public:
 		int maxLen = 0;
 		for (auto const& pin : m_workspaceOutputs)
 		{
-			maxLen = std::max(maxLen, std::dynamic_pointer_cast<DataOutPin>(pin)->maxLengthOfData());
+			maxLen = std::max(maxLen, std::dynamic_pointer_cast<CorePin>(pin)->maxLengthOfData());
 		}
 		return maxLen;
 	}
@@ -113,33 +110,27 @@ class AngleAxisToQuatOperator : public Operator<Core::EOperatorType::AngleAxisTo
 {
 public:
 	bool m_halfAngle; ///< true == pin index 1, false == pin index 0 (full angle)
-	AngleAxisToQuatOperator(DIWNE::Diwne& diwne)
+	AngleAxisToQuatOperator(DIWNE::NodeEditor& diwne)
 	    : Operator<Core::EOperatorType::AngleAxisToQuat>(diwne),
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
 	{}
 
-	bool leftContent() override
+	void leftContent(DIWNE::DrawInfo& context) override
 	{
-		bool interaction_happen = false;
-
-		interaction_happen |= ImGui::Checkbox("/2", &m_halfAngle);
-
-		if (interaction_happen) /* mode changed */
+		if (ImGui::Checkbox("/2", &m_halfAngle)) /* mode changed */
 		{
+			context.update(true, true);
 			if (m_workspaceInputs.at(m_halfAngle ? 0 : 1)->isConnected()) /* previous mode pin is connected */
 			{
 				/* connect visible pin and unplug hidden one */
-				m_workspaceInputs.at(m_halfAngle ? 1 : 0)
-				    .get()
-				    ->plug(m_workspaceInputs.at(m_halfAngle ? 0 : 1)->getLink().getStartPin());
-				m_workspaceInputs.at(m_halfAngle ? 0 : 1)->unplug();
+				Ptr<DIWNE::Pin> visiblePin = m_workspaceInputs.at(m_halfAngle ? 1 : 0);
+				Ptr<DIWNE::Pin> hiddenPin = m_workspaceInputs.at(m_halfAngle ? 0 : 1);
+				visiblePin->plugLink(hiddenPin->getLink()->getStartPin(), hiddenPin->getLink(), false);
 			}
 		}
 
-		interaction_happen |= m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne();
-		interaction_happen |= m_workspaceInputs.at(2)->drawDiwne();
-
-		return interaction_happen;
+		m_workspaceInputs.at(m_halfAngle ? 1 : 0)->drawDiwne(context, m_drawMode);
+		m_workspaceInputs.at(2)->drawDiwne(context, m_drawMode);
 	}
 };
 } // namespace Workspace

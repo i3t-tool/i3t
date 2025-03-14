@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief
+ * \brief Main include of the DIWNE library.
  * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
  * \date 20.3.2022
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
@@ -11,6 +11,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  *
+ * \details
  * Including all libraries and declaration of objects in right order.
  *
  * All functions return true if some interaction happens inside (in a
@@ -40,100 +41,8 @@
  */
 #pragma once
 
-#include "spdlog/fmt/fmt.h"
-#include <limits>
+#include "Core/NodeEditor.h"
 
-#include "imgui.h"
-#include <imgui_internal.h>
-#define DIWNE_DEBUG(node_editor, debugCode)                                                                            \
-	do                                                                                                                 \
-	{                                                                                                                  \
-		if (node_editor.m_diwneDebug)                                                                                  \
-		{                                                                                                              \
-			debugCode                                                                                                  \
-		}                                                                                                              \
-	} while (0) // do-while only for code-technical reason
-namespace DIWNE
-{
-typedef unsigned int ID;
-
-/*! \brief Drawing mode of DiwneObject  */
-enum DrawMode
-{
-	JustDraw,   /*!< Draw object only - block all (node editor's) interactions */
-	Interacting /*!< Usual mode - draw and allow interaction too */
-};
-
-/**
- * \brief pin icon shape type
- * used in WorkspaceCorePin::content(), file WorkspaceElementWitCoreData.cpp::379
- * drawn by Diwne::DrawIcon, method Diwne::DrawIconXXXX, file Diwne.cpp
- */
-enum IconType
-{
-	NoIcon,
-	Circle,
-	Rectangle,
-	TriangleLeft,
-	TriangleRight,
-	TriangleDownLeft,
-	TriangleDownRight,
-	GrabDownLeft,
-	GrabDownRight,
-	Cross,
-	Hyphen,
-	Stop,         ///< Black Square For Stop (U+23F9)
-	Pause,        ///< Double Vertical Bar (U+23F8)
-	SkipBack,     ///< |< vertical bar followed by the left arrow
-	SkipBack2,    ///< "<|" left arrow followed by the vertical bar
-	SkipForward,  ///< ">|" right arrow followed by the vertical bar
-	SkipForward2, ///< |> vertical bar followed by the right arrow
-	Rewind,       ///< Black Left-Pointing Double Triangle (U+23EA)
-	FastForward,  ///< Black Right-Pointing Double Triangle (U+23E9)
-	AtFrom,       // todo, now a synonym to the FastForward
-	AtTo,         // todo, now a synonym to the Rewind
-};
-
-enum DiwneAction
-{
-	None,
-	FocusOnObject,
-	InteractingContent, /* for other unspecified interactions */
-	NewLink,
-
-	HoldNode,
-	HoldPin,
-	HoldLink,
-	HoldWorkarea,
-
-	DragNode,
-	DragPin,
-	DragLink, /* dragging already existing/connected link */
-	DragWorkarea,
-
-	TouchNode,
-	TouchPin,
-	TouchLink,
-	TouchWorkarea,
-
-	SelectionRectFull,
-	SelectionRectTouch
-};
-
-class DiwneObject;
-
-class Node;
-class Pin;
-class Link;
-
-class Diwne;
-
-} // namespace DIWNE
-
-#include "DiwneObject.h"
-
-#include "Link.h"
-#include "diwne.h"
-
-#include "Node.h"
-#include "Pin.h"
+#include "Core/Elements/Link.h"
+#include "Core/Elements/Node.h"
+#include "Core/Elements/Pin.h"

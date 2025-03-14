@@ -21,7 +21,7 @@ class TransformationBase : public CoreNode
 public:
 	WPtr<Sequence> m_parentSequence{};
 
-	TransformationBase(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
+	TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -31,36 +31,22 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	bool beforeBegin() override;
-	bool beforeContent() override;
-	bool topContent() override;
-	bool middleContent() override;
-	bool afterContent() override;
-	virtual void deleteAction() override;
+	void begin(DIWNE::DrawInfo& context) override;
+	void topContent(DIWNE::DrawInfo& context) override;
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void end(DIWNE::DrawInfo& context) override;
+
 	virtual bool allowDrawing() override;
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	virtual void drawMenuLevelOfDetail() override = 0;
-	void drawMenuDelete() override;
-
-	void updateSizes() override;
-
-	//
 
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 
-	bool m_removeFromSequence;
-	bool getRemoveFromSequence() const
-	{
-		return m_removeFromSequence;
-	};
-	void setRemoveFromSequence(bool value)
-	{
-		m_removeFromSequence = value;
-	};
+	void onDestroy(bool logEvent) override;
+
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
-	float m_topOversizeSpace;
 
 	Ptr<Core::Node> getNodebaseSequence();
 

@@ -24,8 +24,6 @@ std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes,
 
 Memento* copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset = 0);
 
-void duplicateNode(const Ptr<GuiNode>& node, float offset = 0);
-
 void pasteNodes(const Memento& memento);
 
 bool plug(Core::ID from, int fromIdx, Core::ID to, int toIdx);

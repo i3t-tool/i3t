@@ -39,12 +39,12 @@ public:
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.
 
-	WPtr<Vp::SceneModel> viewportModel()
+	WPtr<Vp::SceneModel> viewportModel() const
 	{
 		return m_viewportModel;
 	}
 
-	Model(DIWNE::Diwne& diwne);
+	Model(DIWNE::NodeEditor& diwne);
 	~Model();
 
 	// Double dispatch
@@ -54,23 +54,15 @@ public:
 	}
 
 	// bool drawDataFull(, int index);
-	int maxLengthOfData() override; // todo
-	bool middleContent() override;  // the most important function
-	bool topContent() override;
-	void drawMenuLevelOfDetail() override; // todo
+	int maxLengthOfData() override;                        // todo
+	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	void drawMenuLevelOfDetail() override;                 // todo
 
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContent_axis_showmodel();
 
-	/**
-	 * Overridden function for viewport model selection highlight.
-	 */
-	bool processSelect() override;
-
-	/**
-	 * Overridden function for viewport model selection highlight.
-	 */
-	bool processUnselect() override;
+	/// Overridden for viewport model selection highlight.
+	void onSelection(bool selected) override;
 
 private:
 	void init();

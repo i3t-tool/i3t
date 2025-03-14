@@ -25,7 +25,6 @@ void InputBindings::init()
 	InputManager::setInputAction("paste", Keys::v, {Keys::ctrll});
 	InputManager::setInputAction("cut", Keys::x, {Keys::ctrll});
 	InputManager::setInputAction("duplicateSelected", Keys::d, {Keys::ctrll});
-	InputManager::setInputAction("duplicate", Keys::mouseLeft, {Keys::ctrll});
 	InputManager::setInputAction("delete", Keys::del);
 	// InputManager::setInputAction("delete", Keys::backspace);
 
@@ -75,8 +74,6 @@ void InputBindings::init()
 	// Workspace window actions.
 	InputManager::setInputAction("selectAll", Keys::a, {Keys::ctrll});
 	InputManager::setInputAction("invertSelection", Keys::i, {Keys::ctrll});
-	// InputManager::setInputAction("center", Keys::d); /* \todo JH what is
-	// center? */
 
 	/* tracking */
 	InputManager::setInputAxis("trackingSmoothLeft", 1.0f, Keys::left);
@@ -87,31 +84,16 @@ void InputBindings::init()
 	// InputManager::setInputAction("trackingSwitch", Keys::t, {Keys::ctrll});
 	// InputManager::setInputAction("trackingModeSwitch", Keys::p);
 	// InputManager::setInputAction("trackingSwitchOn", Keys::p);
-	// InputManager::setInputAction("trackingSwitchOff", Keys::o); /* \todo JH maybe some different key when more than 2
-	//  																																tracking
-	//  direction? */
+	// \todo JH maybe some different key when more than 2 tracking directions
+	// InputManager::setInputAction("trackingSwitchOff", Keys::o);
 
-
-	InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
-
-	InputManager::setInputAction("unplugInputPin", Keys::mouseLeft);
-	InputManager::setInputAction("hold", Keys::mouseLeft);
-	InputManager::setInputAxis("drag", 1.0f, Keys::mouseLeft);
+	InputManager::setInputAxis("drag", 1.0f, Keys::mouseLeft); // TODO: (DR) Reimplement
 	InputManager::setInputAction("zoomToAll", Keys::a, {Keys::ctrll, Keys::altl});
 	InputManager::setInputAction("zoomToSelected", Keys::s, {Keys::ctrll, Keys::altl});
 
-	// InputManager::setInputAction("unselectAll", Keys::mouseLeft);
-	InputManager::setInputAction("unselectAll", Keys::esc);
-	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::ctrll);
-	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::shiftl);
-	InputManager::setInputAxis("DONTselect", 1.0f, Keys::ctrll);
-	InputManager::setInputAction("select", Keys::mouseLeft);
-
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});
-	InputManager::setInputAction("unplugInput", Keys::mouseLeft);
 
-	InputManager::setInputAction("touch", Keys::mouseLeft);
-
+	// TODO: (DR) Probably remove this, this is still used in legacy DataRenderer.h code
 	InputManager::setInputAction("raisePopup", Keys::mouseRight);
 
 	InputManager::setInputAction("viewport_select", Keys::mouseLeft);

@@ -71,7 +71,7 @@ static void LayoutStateReadLineFn(ImGuiContext*, ImGuiSettingsHandler*, void* en
 
 static void LayoutStateWriteAllFn(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf)
 {
-	LOG_INFO("Saving Layout information to file.");
+	LOG_TRACE("Saving Layout information to file.");
 	if (App::getModule<UIModule>().getWindowManager().getDockableWindows().empty())
 	{
 		LOG_INFO("But there are no windows to save(handler name \"{}\").", handler->TypeName);

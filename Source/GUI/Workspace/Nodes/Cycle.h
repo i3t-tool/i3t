@@ -28,21 +28,22 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	Cycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createCycle(),
+	Cycle(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createCycle(),
 	      bool showDataOnPins = true);
 	bool isCycle();
 
-	bool buttonStepNext();
-	bool buttonStepBack();
-	bool buttonStopAndReset();
 	bool buttonPlayPause();
+	bool buttonStopAndReset();
 	bool buttonRewind(); ///< Set the current value to \a From
 	bool buttonWind();   ///< Set the current value to \a To
+	bool bigButton(const std::string& str, DIWNE::IconType iconTypeBg, DIWNE::IconType iconTypeFg);
 
-	bool topContent() override;
-	bool middleContent() override;
-	bool leftContent() override;
-	bool rightContent() override;
+	bool buttonStepNext();
+	bool buttonStepBack();
+
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void leftContent(DIWNE::DrawInfo& context) override;
+	void rightContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 
@@ -57,7 +58,7 @@ public:
 	 */
 	bool myRadioButton(const char* label, int* v, int v_button);
 
-	std::vector<Ptr<CoreOutPin>> const getOutputsToShow() const override
+	std::vector<Ptr<CorePin>> const getOutputsToShow() const override
 	{
 		if (m_levelOfDetail == LevelOfDetail::SetValues || m_levelOfDetail == LevelOfDetail::LightCycle)
 			return {getOutputs()[0]}; // output value only

@@ -175,15 +175,16 @@ static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, 
 
 //----------------------------------------------------------------------------//
 
+/// Returns the list of the workspace's top level nodes (not including inne/child nodes)
 static auto getWorkspaceNodes()
 {
-	return getNodeEditor().m_workspaceCoreNodes;
+	// TODO: Workspace nodes list is not longer a CoreNode list, but a DIWNE::Node list, potential perf issue
+	return getNodeEditor().getCoreNodes().collect();
 }
 
 static auto findNode(Core::ID id) -> Ptr<GuiNode>
 {
-	constexpr const bool searchInner = true;
-	const auto result = getNodeEditor().getNode<GuiNode>(id, searchInner);
+	const auto result = getNodeEditor().getNode<GuiNode>(id);
 
 	if (!result)
 	{
@@ -257,7 +258,7 @@ static bool unplugOutput(Ptr<GuiNode> self, int outputIndex)
 			return false;
 		}
 
-		const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
+		const auto& nodes = getWorkspaceNodes();
 		std::vector<std::pair<Ptr<Workspace::CoreNodeWithPins>, int>> toUnplug;
 		for (const auto& outputPin : self->getNodebase()->getOutputPins())
 		{
@@ -403,7 +404,7 @@ public:
 private:
 	void dumpTransforms(const Ptr<Workspace::Sequence>& sequence)
 	{
-		auto transforms = sequence->getInnerWorkspaceNodes();
+		auto transforms = sequence->getInnerWorkspaceNodes().collect();
 		std::reverse(transforms.begin(), transforms.end());
 		for (const auto& transform : transforms)
 		{
@@ -420,12 +421,12 @@ private:
 		{
 			m_stream << fmt::format("node_{}:set_label(\"{}\")\n", node->getId(), node->getTopLabel());
 		}
-		m_stream << fmt::format("node_{}:set_render({})\n", node->getId(), node->getRender());
+		m_stream << fmt::format("node_{}:set_render({})\n", node->getId(), node->isRendered());
 		m_stream << fmt::format("node_{}:set_number_of_decimals({})\n", node->getId(),
 		                        node->getNumberOfVisibleDecimal());
 		m_stream << fmt::format("node_{}:set_lod({})\n", node->getId(), (int) node->getLevelOfDetail());
 		m_stream << fmt::format("node_{}:set_position({})\n", node->getId(),
-		                        LuaSerializer::toConstructor(node->getNodePositionDiwne()));
+		                        LuaSerializer::toConstructor(node->getPosition()));
 	}
 
 	void visit(const Ptr<GuiCamera>& node) override
@@ -609,12 +610,12 @@ LUA_REGISTRATION
 		sol::no_constructor,
 		"get_id", &GuiNode::getId,
 		"get_keyword", &GuiNode::getKeyword,
-		"get_position", &GuiNode::getNodePositionDiwne,
-		"set_position", &GuiNode::setNodePositionDiwne,
+		"get_position", &GuiNode::getPosition,
+		"set_position", &GuiNode::setPosition,
 		"get_label", &GuiNode::getTopLabel,
 		"set_label", &GuiNode::setTopLabel,
-		"get_render", &GuiNode::getRender,
-		"set_render", &GuiNode::setRender,
+		"get_render", &GuiNode::isRendered,
+		"set_render", &GuiNode::setRendered,
 		"get_number_of_decimals", &GuiNode::getNumberOfVisibleDecimal,
 		"set_number_of_decimals", &GuiNode::setNumberOfVisibleDecimal,
 		"get_lod", &GuiNode::getLevelOfDetail,
@@ -962,18 +963,15 @@ LUA_REGISTRATION
 	workspace["__scripts"] = L.create_table();
 
 	workspace["set_zoom"] = [](float value) {
-		getNodeEditor().diwne.setWorkAreaZoom(value);
+		getNodeEditor().diwne.setZoom(value);
 	};
 	workspace["set_work_area"] = [](const ImVec2& min, const ImVec2& max) {
 		ImRect area(min, max);
-		getNodeEditor().diwne.setWorkAreaDiwne(area);
+		getNodeEditor().diwne.canvas().setViewportRectDiwne(area);
 	};
 
 	workspace["clear"] = []() {
-		for (const auto& node : getWorkspaceNodes())
-		{
-			node->deleteActionDiwne();
-		}
+		getNodeEditor().clear();
 	};
 
 	api["to_script"] = []() -> std::string {
@@ -990,7 +988,7 @@ LUA_REGISTRATION
 	api["find_node_in"] = findNodePred;
 
 	api["delete_node"] = [](GuiNode& node) {
-		node.deleteActionDiwne();
+		node.destroy();
 	};
 
 	//
@@ -1048,10 +1046,9 @@ LUA_REGISTRATION
 	};
 
 	api["print_workspace"] = []() {
-		const auto& nodes = getNodeEditor().m_workspaceCoreNodes;
-		for (const auto& node : nodes)
+		for (const auto& node : getNodeEditor().getCoreNodes())
 		{
-			const auto& coreNode = node->getNodebase();
+			const auto& coreNode = node.getNodebase();
 			const auto& op = coreNode->getOperation();
 
 			print(fmt::format("node {}, type {}", coreNode->getId(), op.keyWord));

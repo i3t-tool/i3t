@@ -17,37 +17,16 @@
 namespace Workspace
 {
 
-class CoreOutPin;
-class CoreInPin;
+class CorePin;
 
-///*! \class WorkspaceCoreLink
 class CoreLink : public DIWNE::Link
 {
-protected:
-	CoreOutPin* m_startPin;
-	CoreInPin* const m_endPin;
-
 public:
-	CoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, CoreInPin* endPin);
+	CoreLink(DIWNE::NodeEditor& diwne);
 
-	CoreOutPin* getStartPin() const
-	{
-		return m_startPin;
-	};
-	CoreInPin* const getEndPin() const
-	{
-		return m_endPin;
-	};
-	void setStartPin(CoreOutPin* startPin)
-	{
-		m_startPin = startPin;
-	};
-	void unplug();
+	void popupContent(DIWNE::DrawInfo& context) override;
+	void initialize(DIWNE::DrawInfo& context) override;
 
-	void popupContent() override;
-	bool initialize() override;
-
-	void updateEndpoints() override;
 	void updateControlPointsOffsets();
 };
 } // namespace Workspace

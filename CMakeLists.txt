@@ -150,6 +150,7 @@ file(GLOB_RECURSE I3T_SOURCE
     "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
+list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/DIWNE/diwne_example.cpp")
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
 # =============================================================
@@ -204,6 +205,9 @@ target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
         IMGUI_DEFINE_MATH_OPERATORS
         RAPIDJSON_HAS_STDSTRING=1)
 
+# DIWNE config file
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
+
 # =============================================================
 
 # ===== Create target executable from I3T source files. =======
@@ -222,6 +226,12 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         IMGUI_DEFINE_MATH_OPERATORS
         RAPIDJSON_HAS_STDSTRING=1)
+
+# DIWNE config file
+target_compile_definitions(${PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
+
+# I3T NO-TEST flag, used to differentiate between test and normal runs
+target_compile_definitions(${PROJECT_NAME} PUBLIC I3T_NTEST=1)
 
 # Link I3T with following binaries.
 target_link_libraries(
@@ -244,3 +254,5 @@ set_target_properties(assimp PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}")
 
 # =============================================================
+
+add_subdirectory(Source/DIWNE) # DIWNE standalone example project

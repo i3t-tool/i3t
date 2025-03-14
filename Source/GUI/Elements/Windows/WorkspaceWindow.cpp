@@ -28,99 +28,46 @@ static DIWNE::SettingsDiwne settingsDiwne;
 
 using namespace Workspace;
 
+Ptr<WorkspaceDiwne> WorkspaceWindow::g_editor;
+
 WorkspaceWindow::WorkspaceWindow(bool show)
     : IWindow(ICON_T(ICON_I3T_WORKSPACE " ", "Workspace"), show), m_wholeApplication(App::get())
 {
 	m_autoFocus = true;
 	initDiwneFromTheme();
-	g_diwne = new WorkspaceDiwne(&settingsDiwne);
-	// Input actions for workspace window.
-	m_input->bindAction("selectAll", EKeyState::Pressed, [&]() {
-		g_diwne->selectAll();
-	});
-	m_input->bindAction("invertSelection", EKeyState::Pressed, [&]() {
-		g_diwne->invertSelection();
-	});
-	m_input->bindAction("zoomToAll", EKeyState::Pressed, [&]() {
-		g_diwne->zoomToAll();
-	});
-	m_input->bindAction("zoomToSelected", EKeyState::Pressed, [&]() {
-		g_diwne->zoomToSelected();
-	});
-	m_input->bindAction("delete", EKeyState::Pressed, [&]() {
-		g_diwne->deleteCallback();
-	});
-	m_input->bindAction("copy", EKeyState::Pressed, [&]() {
-		g_diwne->copySelectedNodes();
-	});
-	m_input->bindAction("paste", EKeyState::Pressed, [&]() {
-		g_diwne->pasteSelectedNodes();
-	});
-	m_input->bindAction("cut", EKeyState::Pressed, [&]() {
-		g_diwne->cutSelectedNodes();
-	});
-	m_input->bindAction("duplicate", EKeyState::Pressed, [&]() {
-		g_diwne->duplicateClickedNode();
-	});
-	m_input->bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
-		g_diwne->duplicateSelectedNodes();
-	});
-	m_input->bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOff();
-	});
-	m_input->bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSmoothLeft();
-	});
-	m_input->bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSmoothRight();
-	});
-	m_input->bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
-		g_diwne->trackingJaggedLeft();
-	});
-	m_input->bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
-		g_diwne->trackingJaggedRight();
-	});
-	m_input->bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() {
-		g_diwne->trackingModeSwitch();
-	});
-	m_input->bindAction("trackingSwitch", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitch();
-	});
-	m_input->bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOn();
-	});
-	m_input->bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() {
-		g_diwne->trackingSwitchOff();
-	});
-	m_input->bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() {
-		g_diwne->toggleSelectedNodesVisibility();
-	});
+	g_editor = std::make_shared<WorkspaceDiwne>(&settingsDiwne);
 
+	// TODO: These actions should be handled by the WorkspaceNodeEditor instance
+	//  in its processInteractions() method so it can react to input blocking properly
+	//  Eg. what if we press Ctrl+A in an ImGui text field? We're interacting with a
+	//  text field which should be flagged in the FrameContext object passed along to
+	//  processInteractions. Binding actions to the window ignores this outright.
+	//  Also we should react to actions on a per frame basis using if(trigger) syntax
+	//  rather than using bindings as its a more suitable approach in immediate mode UI
+
+	// TODO: Workspace should be itself a module, so we don't fetch workspace nodes through the bloody window manager
+	//  (viz NodeDeserializer) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback
 	I3T::getViewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
 		// Save information about this callback and perform actions based on it later while in workspace window context.
 		// This is a workaround due to viewport selection occurring in unknown order at unknown time.
-		g_diwne->m_viewportSelectionChanged = true;
-		g_diwne->m_viewportLastSelectedEntity = newlySelectedEntity;
+		g_editor->m_viewportSelectionChanged = true;
+		g_editor->m_viewportLastSelectedEntity = newlySelectedEntity;
 	});
-}
-
-WorkspaceWindow::~WorkspaceWindow()
-{
-	delete g_diwne;
 }
 
 // TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
 void WorkspaceWindow::initDiwneFromTheme()
 {
+	// TODO: (DR) Port to DiwneStyle or refactor DiwneSettings
 	settingsDiwne.selectionRounding = I3T::getUI()->getTheme().get(ESize::Nodes_Rounding);
 	settingsDiwne.itemSelectedBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
 	settingsDiwne.itemSelectedBorderThicknessDiwne =
 	    I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
-	settingsDiwne.objectFocusBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder);
-	settingsDiwne.objectFocusBorderThicknessDiwne = I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
+	settingsDiwne.objectHoverBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder);
+	settingsDiwne.objectHoverBorderThicknessDiwne = I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
 	settingsDiwne.objectFocusForInteractionBorderColor =
 	    I3T::getUI()->getTheme().get(EColor::Workspace_InteractionFocusBorder);
 	settingsDiwne.objectFocusForInteractionBorderThicknessDiwne =
@@ -133,7 +80,7 @@ void WorkspaceWindow::initDiwneFromTheme()
 
 WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
 {
-	return *g_diwne;
+	return *g_editor;
 }
 
 void WorkspaceWindow::render()
@@ -152,16 +99,28 @@ void WorkspaceWindow::render()
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
+#if DIWNE_DEBUG_ENABLED
+			if (ImGui::BeginMenu("Debug"))
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+				ImGui::MenuItem("Enable", nullptr, &(g_editor->m_diwneDebug));
+				ImGui::MenuItem("Layout", nullptr, &(g_editor->m_diwneDebugLayout));
+				ImGui::MenuItem("Interaction", nullptr, &(g_editor->m_diwneDebugInteractions));
+				ImGui::MenuItem("Objects", nullptr, &(g_editor->m_diwneDebugObjects));
+				ImGui::PopItemFlag();
+				ImGui::EndMenu();
+			}
+#endif
 			ImGui::EndMenuBar();
 		}
 
-		DIWNE::DrawMode drawMode = DIWNE::DrawMode::JustDraw;
+		DIWNE::DrawMode drawMode = DIWNE::DrawMode_JustDraw;
 		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
 		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
-			drawMode = DIWNE::DrawMode::Interacting;
+			drawMode = DIWNE::DrawMode_Interactive;
 		}
-		g_diwne->drawDiwne(drawMode);
+		g_editor->draw(drawMode);
 	}
 	else
 	{
@@ -193,12 +152,12 @@ void WorkspaceWindow::showEditMenu()
 
 		if (ImGui::MenuItem(_t("Select all")))
 		{
-			g_diwne->selectAll();
+			g_editor->selectAllNodes();
 		}
 
 		if (ImGui::MenuItem(_t("Zoom all")))
 		{
-			g_diwne->zoomToAll();
+			g_editor->zoomToAll();
 		}
 
 		ImGui::EndMenu();
@@ -215,10 +174,10 @@ Memento WorkspaceWindow::saveScene(Scene* scene)
 	rapidjson::Value::AllocatorType& a = memento.GetAllocator();
 
 	SerializationVisitor visitor(memento);
-	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
+	visitor.dump(getNodeEditor().getAllCoreNodes().collect());
 
-	JSON::addFloat(memento["workspace"], "zoom", g_diwne->getWorkAreaZoom(), a);
-	JSON::addRect(memento["workspace"], "workArea", g_diwne->getWorkAreaDiwne(), a);
+	JSON::addFloat(memento["workspace"], "zoom", g_editor->canvas().getZoom(), a);
+	JSON::addRect(memento["workspace"], "workArea", g_editor->canvas().getViewportRectDiwne(), a);
 
 	return memento;
 }
@@ -236,18 +195,14 @@ void WorkspaceWindow::loadScene(const Memento& memento, Scene* scene)
 	NodeDeserializer::createFrom(memento);
 
 	if (memento["workspace"].HasMember("zoom"))
-		g_diwne->setWorkAreaZoom(memento["workspace"]["zoom"].GetFloat());
+		g_editor->setZoom(memento["workspace"]["zoom"].GetFloat());
 
 	if (memento["workspace"].HasMember("workArea"))
-		g_diwne->setWorkAreaDiwne(JSON::getRect(memento["workspace"]["workArea"]));
+		g_editor->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
 }
 
 void WorkspaceWindow::clearScene()
 {
-	for (auto& node : getNodeEditor().m_workspaceCoreNodes)
-	{
-		node->deleteActionDiwne();
-	}
 	getNodeEditor().clear();
 }
 
@@ -259,3 +214,32 @@ Memento WorkspaceWindow::saveGlobal()
 void WorkspaceWindow::loadGlobal(const Memento& memento) {}
 
 void WorkspaceWindow::clearGlobal() {}
+
+/////////////////////////////////////////
+// NodeEditor management
+/////////////////////////////////////////
+
+bool Workspace::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
+{
+	bool success = std::static_pointer_cast<CoreNodeWithPins>(rhs)->getInputs().at(rhsPin)->plug(
+	    std::static_pointer_cast<CoreNodeWithPins>(lhs)->getOutputs().at(lhsPin).get(), false);
+	if (!success)
+	{
+		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
+		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
+	}
+	rhs->updateDataItemsWidth();
+	lhs->updateDataItemsWidth();
+	return success;
+}
+
+bool Workspace::connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhsPin, int rhsPin)
+{
+	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+	if (result)
+	{
+		App::getModule<StateManager>().takeSnapshot();
+	}
+
+	return result;
+}

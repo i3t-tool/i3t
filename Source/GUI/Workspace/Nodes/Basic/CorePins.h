@@ -48,209 +48,57 @@ class CorePin : public DIWNE::Pin
 {
 protected:
 	Core::Pin const& m_pin;
-	CoreNode& m_node;
-	ImRect m_iconRectDiwne;
 
 public:
 	// (PF) icon for the cycle box, Triangle elsewhere
 	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
+	bool m_showData{true};
 
+	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput);
 
-	CorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
+	void content(DIWNE::DrawInfo& context) override;
+	void drawPin(DIWNE::DrawInfo& context);
+	void drawLabel(DIWNE::DrawInfo& context);
+	void drawDataEx(DIWNE::DrawInfo& context);
+	void drawData(DIWNE::DrawInfo& context);
+	int maxLengthOfData();
 
-	//    bool allowInteraction() const override;
-	//    bool allowProcessFocused() const override;
+	bool allowInteraction() const override;
+
+	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
 
 	Core::Pin const& getCorePin() const;
 
-	CoreNode& getNode()
-	{
-		return m_node;
-	}
-	const CoreNode& getNode() const
-	{
-		return m_node;
-	};
-
-	int getIndex() const;
-	PinKind getKind() const;
+	int getCoreIndex() const;
 	Core::EValueType getType() const;
 	bool isConnected() const;
-	void popupContent() override;
+	void popupContent(DIWNE::DrawInfo& context) override;
 
-	/* DIWNE function */
-	bool content() override;
-	bool processDrag() override;
-	bool processConnectionPrepared() override;
+	bool allowConnection() const override;
 
-	bool bypassFocusForInteractionAction() override;
-};
+	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
+	void onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent = true) override;
+	void onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin, bool logEvent = true) override;
 
-class CoreOutPin;
-
-class CoreInPin : public CorePin
-{
-protected:
-	CoreLink m_link;
-	bool m_connectionChanged; ///< Flag indicating that the pin has been plugged or unplugged this frame
-	                          ///< Note: This flag gets reset the moment the pin is drawn, which is kinda dumb,
-	                          ///< don't rely on this too much, it is currently used for a rather specific purpose
-
-
-public:
-	CoreInPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
-
+	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	/**
-	 * \brief Draw pin icon + label and register the connected wire
-	 * \return interaction happened
+	 * This method ensures the state of this pin is synchronized with the core state.
+	 * Currently ONLY deletes links that should no longer exist.
+	 * As to create new links it would need to search for a GUI equivalent of a certain Core pin.
+	 * @return Whether a change was made.
 	 */
-	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting) override;
+	bool ensureLinkSyncWithCore();
 
-	CoreLink& getLink()
-	{
-		return m_link;
-	};
-	void updateConnectionPointDiwne() override
-	{
-		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
-	};
-	void setConnectedWorkspaceOutput(CoreOutPin* ou);
+	std::shared_ptr<DIWNE::Link> createLink() override;
 
-	/**
-	 * \pre Needs to be plugged
-	 */
-	void unplug(bool logEvent = true);
-	bool plug(CoreOutPin* ou, bool logEvent = true);
-	bool connectionChanged() const;
+	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
 
-	/* DIWNE function */
-	/**
-	 * \brief Draw icon and label, if defined
-	 * \return false - both icon and label do not allow interactions
-	 */
-	bool content() override;
-	bool processInteractions() override;
-	virtual bool processCreateAndPlugConstrutorNode();
-	bool processUnplug();
-
-	bool bypassUnplugAction();
-	bool allowCreateAndPlugConstructorNodeAction();
-	bool bypassCreateAndPlugConstructorNodeAction();
-};
-
-class CoreOutPin : public CorePin
-{
-protected:
-public:
-	CoreOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
-
-	void updateConnectionPointDiwne() override
-	{
-		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
-	};
-
-	bool content() override;
-};
-
-class DataOutPin : public CoreOutPin
-{
-public:
-	DataOutPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
-
-	bool content() override; ///< draw data, label, and pin
-
-	virtual bool drawData() = 0;
-	virtual int maxLengthOfData() = 0;
-};
-
-class DataOutPinMatrix : public DataOutPin
-{
-public:
-	DataOutPinMatrix(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinVector4 : public DataOutPin
-{
-public:
-	DataOutPinVector4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinVector3 : public DataOutPin
-{
-public:
-	DataOutPinVector3(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinFloat : public DataOutPin
-{
-public:
-	DataOutPinFloat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinQuat : public DataOutPin
-{
-public:
-	DataOutPinQuat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){};
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinPulse : public DataOutPin
-{
-public:
-	// std::string m_buttonText;
-	DataOutPinPulse(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : DataOutPin(diwne, id, pin, node){
-	          // m_buttonText = m_pin.getLabel();
-	      };
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-class DataOutPinScreen : public DataOutPin
-{
 private:
-	GLuint renderTexture;
+	void createNodeFromPin();
+	template <typename T>
+	void createNodeFromPinImpl();
 
-public:
-	DataOutPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node);
-
-	bool drawData() override;
-	int maxLengthOfData() override;
-};
-
-/* MatrixMulPin is Output and Input because of different
- * getLinkConnectionPointDiwne() function */
-class CoreOutPinMatrixMultiply : public CoreOutPin
-{
-public:
-	CoreOutPinMatrixMultiply(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : CoreOutPin(diwne, id, pin, node){};
-};
-
-class CoreInPinMatrixMultiply : public CoreInPin
-{
-public:
-	CoreInPinMatrixMultiply(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, CoreNode& node)
-	    : CoreInPin(diwne, id, pin, node){};
+	void drawBasicPinData(DIWNE::DrawInfo& context);
+	void drawPulsePinData(DIWNE::DrawInfo& context);
 };
 } // namespace Workspace

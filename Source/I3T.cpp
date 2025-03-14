@@ -16,7 +16,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/Elements/Modals/BeforeNewTutModal.h"
+#include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
@@ -65,6 +65,7 @@ void I3TApplication::onInit()
 
 	createModule<TestModule>();
 
+	// TODO: (DR)s Isn't this redundant? This is already called in StateManager
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
 	});

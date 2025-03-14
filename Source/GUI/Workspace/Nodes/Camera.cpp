@@ -22,17 +22,22 @@
 
 using namespace Workspace;
 
-Camera::Camera(DIWNE::Diwne& diwne)
+Camera::Camera(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCamera(), false),
-      m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(),
-                                              /* true, \todo (PF) was not used */
-                                              true)),
-      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(),
-                                        /* true, \todo (PF) was not used */
-                                        true))
+      m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true)),
+      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true))
 {
+	m_projAndView.push_back(m_projection);
+	m_projAndView.push_back(m_view);
+
 	// connect matrix P to matrix V internally
-	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+	// TODO: Figure out how to draw this link manually and not from the editor
+	//  That way we can draw it at the right moment inside the actual camera node content
+	//  Likely we'll add a flag to DiwneObject that indicates its drawing is handled custom and not by the editor
+	//  This mechanism could be also used for the dragged link instead of checking the active action
+	DIWNE::Pin* view0 = m_view->getInputs().at(0).get();
+	DIWNE::Pin* proj0 = m_projection->getOutputs().at(0).get();
+	view0->plug(proj0, false);
 
 	m_projection->setSelectable(false);
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
@@ -53,6 +58,10 @@ Camera::Camera(DIWNE::Diwne& diwne)
 	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_projection->setTopLabel("projection");
+	m_projection->setFixed(true);
+	m_projection->setParentObject(this);
+	m_projection->m_draggable = false;
+	m_projection->m_deletable = false;
 
 	m_view->setSelectable(false);
 	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
@@ -66,13 +75,18 @@ Camera::Camera(DIWNE::Diwne& diwne)
 	m_view->getNodebase()->getInputPins()[1].setRendered(true);
 	m_view->getNodebase()->getOutputPins()[1].setRendered(true);
 	m_view->setTopLabel("view");
+	m_view->setFixed(true);
+	m_view->setParentObject(this);
+	m_view->m_draggable = false;
+	m_view->m_deletable = false;
 
 	// Hide multiplication output to discourage interaction
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 
-	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
+	// TODO: Use some flag to make it not interactive
+	//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
 
-	m_viewportCamera = I3T::getViewport()->createCamera(getId());
+	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
 	auto cameraPtr = m_viewportCamera.lock();
 	cameraPtr->m_showAxes = m_axisOn;
 	cameraPtr->m_visible = m_showCamera;
@@ -99,15 +113,7 @@ Camera::~Camera()
 	I3T::getViewport()->removeEntity(m_viewportCamera);
 }
 
-float Camera::updateDataItemsWidth()
-{
-	// TODO: (DR) This is (hopefully) just a temporary fix, see TODO in WorkspaceDiwne::getAllNodesInnerIncluded()
-	m_view->updateDataItemsWidth();
-	m_projection->updateDataItemsWidth();
-	return CoreNode::updateDataItemsWidth();
-}
-
-void Camera::popupContent()
+void Camera::popupContent(DIWNE::DrawInfo& context)
 {
 	CoreNode::drawMenuSetEditable();
 
@@ -218,11 +224,11 @@ void Camera::popupContent()
 	}
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate();
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent();
+	Node::popupContent(context);
 }
 
 glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
@@ -234,28 +240,17 @@ glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
 	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
 	return color;
 }
-bool Camera::topContent()
+
+void Camera::centerContent(DIWNE::DrawInfo& context)
 {
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-
-	return CoreNode::topContent();
-}
-
-bool Camera::middleContent()
-{
-	bool inner_interaction_happen = false;
-
+	// TODO: (DR) Investigate LOD behavior of the camera node <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
 	// Label LOD
 	{
-		inner_interaction_happen |=
-		    m_projection->drawNodeDiwne<Sequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+		m_projection->drawDiwne(context, m_drawMode);
 		ImGui::SameLine();
-		inner_interaction_happen |=
-		    m_view->drawNodeDiwne<Sequence>(DIWNE::DrawModeNodePosition::OnCursorPosition, m_drawMode);
+		m_view->drawDiwne(context, m_drawMode);
 	}
-	return inner_interaction_happen;
 }
 
 void Camera::drawMenuLevelOfDetail()
@@ -279,19 +274,31 @@ bool Camera::isCamera()
 	return true;
 }
 
-bool Camera::processSelect()
+DIWNE::NodeRange<> Camera::getNodes() const
 {
-	auto model = m_viewportCamera.lock();
-	model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-	model->m_highlight = true;
-
-	return CoreNodeWithPins::processSelect();
+	return DIWNE::NodeRange<>(&m_projAndView);
 }
-
-bool Camera::processUnselect()
+DIWNE::NodeList& Camera::getNodeList()
 {
+	return m_projAndView;
+}
+void Camera::onDestroy(bool logEvent)
+{
+	m_projection->destroy(logEvent);
+	m_view->destroy(logEvent);
+	CoreNodeWithPins::onDestroy(logEvent);
+}
+void Camera::onSelection(bool selected)
+{
+	Node::onSelection(selected);
 	auto model = m_viewportCamera.lock();
-	model->m_highlight = false;
-
-	return CoreNodeWithPins::processUnselect();
+	if (selected)
+	{
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+		model->m_highlight = true;
+	}
+	else
+	{
+		model->m_highlight = false;
+	}
 }

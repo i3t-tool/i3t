@@ -37,7 +37,7 @@ TEST(NodeToolsTest, CopyNodes)
 	Workspace::Tools::pasteNodes(*snapshot);
 
 	const auto workspace = App::getModule<UIModule>().getWindowManager().getWindowPtr<WorkspaceWindow>();
-	const auto& workspaceNodes = workspace->getNodeEditor().m_workspaceCoreNodes;
+	const auto& workspaceNodes = workspace->getNodeEditor().getAllCoreNodes().collect();
 	ASSERT_TRUE(workspaceNodes.size() == 6);
 
 	const auto f5 = workspaceNodes[4];

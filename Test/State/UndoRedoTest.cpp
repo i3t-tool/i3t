@@ -25,14 +25,21 @@ TEST(UndoRedoTest, Basic)
 {
 	auto app = initI3T();
 
+	auto castNode = [](const std::shared_ptr<DIWNE::Node>& node) -> Workspace::CoreNode* {
+		return node->as<Workspace::CoreNode>();
+	};
+	auto castNodePtr = [](const std::shared_ptr<DIWNE::Node>& node) -> std::shared_ptr<Workspace::CoreNode> {
+		return node->sharedPtr<Workspace::CoreNode>();
+	};
+
 	const auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
-	const auto& nodes = workspace->getNodeEditor().getAllNodes();
+	const auto& nodes = workspace->getNodeEditor().getNodeList();
 	ASSERT_TRUE(nodes.empty());
 
 	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 	const float newValue = 10.0f;
-	setValue_expectOk(nodes[0]->getNodebase(), newValue);
+	setValue_expectOk(castNode(nodes[0])->getNodebase(), newValue);
 	App::getModule<StateManager>().takeSnapshot();
 	EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
@@ -50,23 +57,23 @@ TEST(UndoRedoTest, Basic)
 	App::getModule<StateManager>().redo();
 	EXPECT_TRUE(nodes.size() == 1);
 
-	setValue_expectOk(nodes[0]->getNodebase(), newValue);
+	setValue_expectOk(castNode(nodes[0])->getNodebase(), newValue);
 	App::getModule<StateManager>().takeSnapshot();
 	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
 	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 
-	connectNodes(nodes[0], nodes[1], 0, 0);
-	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), newValue);
-	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
+	connectNodes(castNodePtr(nodes[0]), castNodePtr(nodes[1]), 0, 0);
+	EXPECT_EQ(castNode(nodes[1])->getNodebase()->data().getFloat(), newValue);
+	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
 	App::getModule<StateManager>().undo();
-	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), 0.0f);
-	EXPECT_FALSE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
+	EXPECT_EQ(castNode(nodes[1])->getNodebase()->data().getFloat(), 0.0f);
+	EXPECT_FALSE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
 	App::getModule<StateManager>().redo();
-	EXPECT_EQ(nodes[1]->getNodebase()->data().getFloat(), newValue);
-	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
+	EXPECT_EQ(castNode(nodes[1])->getNodebase()->data().getFloat(), newValue);
+	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
 	//
 
@@ -89,15 +96,15 @@ TEST(UndoRedoTest, Basic)
 	}
 
 	EXPECT_TRUE(nodes.size() == 2);
-	EXPECT_TRUE(nodes[1]->getNodebase()->data().getFloat() == newValue);
-	EXPECT_TRUE(nodes[1]->getNodebase()->getInput(0).isPluggedIn());
+	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->data().getFloat() == newValue);
+	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
 	Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::MatrixToMatrix>>();
 	const auto mat = generateMat4();
-	setValue_expectOk(nodes[2]->getNodebase(), mat);
+	setValue_expectOk(castNode(nodes[2])->getNodebase(), mat);
 	App::getModule<StateManager>().takeSnapshot();
 
 	App::getModule<StateManager>().undo();
 	App::getModule<StateManager>().redo();
-	EXPECT_TRUE(Math::eq(mat, nodes[2]->getNodebase()->data().getMat4()));
+	EXPECT_TRUE(Math::eq(mat, castNode(nodes[2])->getNodebase()->data().getMat4()));
 }

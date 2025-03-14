@@ -19,78 +19,26 @@ std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDet
                                                                      {LevelOfDetail::Label, "Label"},
                                                                      {LevelOfDetail::LightCycle, "Light cycle"}};
 
-Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
-    : DIWNE::Node(diwne, id), m_topLabel(topLabel), m_middleLabel(middleLabel), m_removeFromWorkspaceWindow(false)
-{}
+Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label) {}
 
-Node::~Node()
+bool Node::allowDragStart() const
 {
-	diwne.m_takeSnap = true;
-}
-
-bool Node::beforeContent()
-{
-	/* whole node background */
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBg),
-	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersAll);
-	return false;
-}
-
-bool Node::topContent()
-{
-	bool interaction_happen = false;
-
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
-	                         I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawFlags_RoundCornersTop);
-	ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1));
-	ImGui::SameLine();
-	ImGui::TextUnformatted(m_topLabel.c_str());
-
-	return interaction_happen;
-}
-
-bool Node::middleContent()
-{
-	bool interaction_happen = false;
-
-	ImGui::TextUnformatted(m_middleLabel.c_str());
-
-	return interaction_happen;
-}
-
-bool Node::leftContent()
-{
-	return false;
-}
-bool Node::rightContent()
-{
-	return false;
-}
-bool Node::bottomContent()
-{
-	return false;
-}
-
-bool Node::bypassFocusForInteractionAction()
-{
-	return (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
-}
-
-void Node::deleteAction()
-{
-	// TODO: (DR) A little confused why we don't use the superclass m_toDelete boolean flag for this but whatever
-	m_removeFromWorkspaceWindow = true;
+	// TODO: I feel like in general we should allow nodes to be dragged anywhere, and restrict specific node areas where
+	//  it is not so appropriate. Eg. block dragging in matrix data content, but drag a model node anywhere.
+	// Restrict node dragging to only the top header (meaning it can only be moved by the header)
+	// && m_top.getRect().Contains(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+	return DiwneObject::allowDragStart();
 }
 
 void Node::drawMenuDelete()
 {
 	if (ImGui::MenuItem(_t("Delete"), "Delete"))
 	{
-		deleteActionDiwne();
+		destroy();
 	}
 }
 
-void Node::popupContent()
+void Node::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuDelete();
 }
