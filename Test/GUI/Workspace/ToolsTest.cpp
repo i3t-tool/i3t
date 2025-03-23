@@ -12,8 +12,8 @@
  */
 #include "gtest/gtest.h"
 
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Tools.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
 
 #include "I3TUtil.h"
@@ -24,20 +24,19 @@ TEST(NodeToolsTest, CopyNodes)
 {
 	auto app = initI3T();
 
-	const auto f1 = Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
-	const auto f2 = Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
-	const auto f3 = Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatAddFloat>>();
-	const auto f4 = Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	const auto f1 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	const auto f2 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	const auto f3 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatAddFloat>>();
+	const auto f4 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 
-	connectNodes(f1, f2, 0, 0);
-	connectNodes(f2, f3, 0, 0);
-	connectNodes(f3, f4, 0, 0);
+	WorkspaceModule::connectNodes(f1, f2, 0, 0);
+	WorkspaceModule::connectNodes(f2, f3, 0, 0);
+	WorkspaceModule::connectNodes(f3, f4, 0, 0);
 
 	const auto snapshot = Workspace::Tools::copyNodes({f2, f3});
 	Workspace::Tools::pasteNodes(*snapshot);
 
-	const auto workspace = App::getModule<UIModule>().getWindowManager().getWindowPtr<WorkspaceWindow>();
-	const auto& workspaceNodes = workspace->getNodeEditor().getAllCoreNodes().collect();
+	const auto& workspaceNodes = I3T::getWorkspace().getNodeEditor().getAllCoreNodes().collect();
 	ASSERT_TRUE(workspaceNodes.size() == 6);
 
 	const auto f5 = workspaceNodes[4];

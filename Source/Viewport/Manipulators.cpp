@@ -12,6 +12,7 @@
  */
 #include "Manipulators.h"
 
+#include "I3T.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "magic_enum.hpp"
 
@@ -54,8 +55,8 @@ bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize)
 	// ImGuizmo::DrawGrid(glm::value_ptr(view), glm::value_ptr(projection), glm::value_ptr(glm::mat4(1)), 100.f);
 	// ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(projection), &objectMatrix[0][0], 1);
 
-	int axesSize = 98;
-	int padding = 8;
+	int axesSize = 6.125f * ImGui::GetFontSize();
+	int padding = 0.5f * ImGui::GetFontSize();
 	ImVec2 axesPosition = ImVec2(windowPos.x + windowSize.x - axesSize - padding, windowPos.y + padding);
 
 	// ImGuizmo::ViewManipulate(glm::value_ptr(view), 9, GUI::glmToIm(windowPos), ImVec2(128, 128), 0x10101010);
@@ -97,10 +98,20 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 		// In ImGuizmo A * B is actually equivalent to B * A in GLM!
 		// It's important to keep that in mind when browsing ImGuizmo source code!
 
-		ImGuizmo::SetGizmoSizeClipSpace(m_viewport->getSettings().global().manipulator_size);
-		// ImGuizmo::GetStyle().RotationOuterLineThickness = 4.0f;
-		ImGuizmo::GetStyle().RotationLineThickness = 3.0f;
-		ImGuizmo::GetStyle().CircleSegmentCount = 48;
+		float uiScale = I3T::getUI()->getUiScale();
+		ImGuizmo::SetGizmoSizeClipSpace(m_viewport->getSettings().global().manipulator_size * uiScale);
+		ImGuizmo::Style& style = ImGuizmo::GetStyle();
+		style.RotationLineThickness = 3.0f * uiScale;
+		style.CircleSegmentCount = 48 * uiScale;
+		style.TranslationLineThickness = 3.0f * uiScale;
+		style.TranslationLineArrowSize = 6.0f * uiScale;
+		style.RotationLineThickness = 2.0f * uiScale;
+		style.RotationOuterLineThickness = 3.0f * uiScale;
+		style.ScaleLineThickness = 3.0f * uiScale;
+		style.ScaleLineCircleSize = 6.0f * uiScale;
+		style.HatchedAxisLineThickness = 6.0f * uiScale;
+		style.CenterCircleSize = 6.0f * uiScale;
+		style.ProjectionCircleRadius = 5.0f * uiScale;
 
 		if (type == ManipulatorType::LOOKAT)
 		{

@@ -14,8 +14,7 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
-#include "DIWNE/Core/NodeEditor.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
 #include "Viewport/Viewport.h"
@@ -210,15 +209,13 @@ void Model::centerContent(DIWNE::DrawInfo& context)
 		return;
 	}
 
-	int width = m_textureSize.x * diwne.getZoom();
-	int height = m_textureSize.y * diwne.getZoom();
-
 #define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
-	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getZoom()); // floored position - same as in ImGui
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * ImGui::GetFontSize()); // floored position - same as in ImGui
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
-	I3T::getViewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
+	I3T::getViewport()->drawPreview(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, m_viewportModel,
+	                                m_renderOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
@@ -268,7 +265,7 @@ void Model::onSelection(bool selected)
 
 ModelProxy::ModelProxy(Ptr<Model> model)
 {
-	m_model = std::make_shared<Model>(*WorkspaceWindow::g_editor);
+	m_model = std::make_shared<Model>(*WorkspaceModule::g_editor);
 	const auto alias = model->viewportModel().lock()->getModel();
 	m_model->viewportModel().lock()->setModel(alias);
 }

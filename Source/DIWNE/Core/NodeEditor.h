@@ -86,8 +86,8 @@ public:
 	 * @param settingsDiwne
 	 * @return
 	 */
-	NodeEditor(SettingsDiwne* settingsDiwne);
-	~NodeEditor();
+	explicit NodeEditor(SettingsDiwne* settingsDiwne);
+	~NodeEditor() override;
 
 	// Lifecycle
 	// =============================================================================================================
@@ -162,6 +162,10 @@ public:
 	{
 		return *m_style;
 	}
+	void setStyle(std::unique_ptr<DiwneStyle>&& ptr)
+	{
+		m_style = std::move(ptr);
+	}
 
 	// Object management
 	// =============================================================================================================
@@ -212,6 +216,22 @@ public:
 	{
 		auto node = std::make_shared<T>(*this);
 		addNode(node, position, shiftToLeftByNodeWidth);
+		return node;
+	}
+
+	/**
+	 * Creates a new node in the node editor of the specified type.
+	 * It is assumed that the first argument of the node's constructor is a NodeEditor reference and can be ommited.
+	 * @tparam T Node type
+	 * @param position Initial position of the node
+	 * @param args Node constructor arguments (except the first NodeEditor reference)
+	 * @return Shared pointer to the node.
+	 */
+	template <class T, typename... Args>
+	auto inline createNode(const ImVec2 position = ImVec2(0, 0), Args&&... args)
+	{
+		auto node = std::make_shared<T>(*this, std::forward<Args>(args)...);
+		addNode(node, position);
 		return node;
 	}
 
@@ -287,6 +307,14 @@ public:
 	float getZoom() const
 	{
 		return m_canvas->getZoom();
+	}
+	void setDpiScale(float dpiScale)
+	{
+		mp_settingsDiwne->dpiScale = dpiScale;
+	}
+	float getDpiScale() const
+	{
+		return mp_settingsDiwne->dpiScale;
 	}
 };
 

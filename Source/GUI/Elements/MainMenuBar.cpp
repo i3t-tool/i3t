@@ -30,7 +30,7 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Test/TestModule.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
@@ -184,8 +184,6 @@ void MainMenuBar::render()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		ImGui::PushFont(I3T::getFont(EFont::MenuLarge));
-
 		showFileMenu();
 		showEditMenu();
 		showWindowsMenu();
@@ -193,7 +191,6 @@ void MainMenuBar::render()
 		showHelpMenu();
 
 		ImGui::EndMenuBar();
-		ImGui::PopFont();
 	}
 	ImGui::End();
 

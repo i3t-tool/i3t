@@ -24,7 +24,7 @@ class CoreNodeWithPins : public CoreNode
 	using Super = CoreNode;
 
 private:
-	float m_minRightAlignOfRightPins;
+	float m_minRightAlignOfRightPins{0};
 
 protected:
 	std::vector<Ptr<CorePin>> m_workspaceInputs;

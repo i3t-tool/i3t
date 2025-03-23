@@ -513,17 +513,15 @@ void DiwneObject::onHover(DrawInfo& context)
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
 	//  Maybe move this impl into node and make it purely virtual?
-	//	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max,
-	//	                               diwne.mp_settingsDiwne->objectHoverBorderColor,
-	//	                               diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-	//	                               diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
-	// TODO: Remove later, temporarily use a bright color for hover
-	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
-	                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-	                            diwne.mp_settingsDiwne->objectHoverBorderThicknessDiwne);
+	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.style().color(DiwneStyle::objectHoverBorderColor),
+	                            diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
+	                            diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
+	// diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
+	//                             diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
+	//                             diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
 
 	DIWNE_DEBUG(diwne, {
-		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_MAGENTA_50, 0,
+		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_RED_50, 0,
 		                            ImDrawFlags_RoundCornersNone, 1);
 	});
 }

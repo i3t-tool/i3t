@@ -81,14 +81,15 @@ bool Application::init()
 	// Allocate path to the imgui ini file on heap.
 	io.IniFilename = "Data/I3T.ini";
 
-	// Call implementation of init() in derived class
-	onInit();
-
 	// Setup Platform/Renderer bindings
 	if (!ImGui_ImplGlfw_InitForOpenGL(m_window->get(), true))
 		return false;
 	if (!ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion))
 		return false;
+
+	// Call implementation of init() in derived class
+	onInit();
+
 	return true;
 }
 
@@ -141,6 +142,9 @@ bool Application::frame()
 
 void Application::beginFrame()
 {
+	for (auto& m : m_modules)
+		m->onBeforeFrame();
+
 	// Start the Dear ImGui frame ----------------------
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

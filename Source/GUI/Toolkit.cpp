@@ -12,6 +12,8 @@
  */
 #include "Toolkit.h"
 
+#include <math.h>
+
 #include "Utils/Format.h"
 
 namespace GUI
@@ -181,6 +183,21 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 		                          rounding, corners, border_size);
 		window->DrawList->AddRect(p_min, p_max, GetColorU32(ImGuiCol_Border), rounding, corners, border_size);
 	}
+}
+
+bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format)
+{
+	const int precisionInv = std::lround(1.0 / step);
+	int tmpIntVal = std::lroundf(*v * precisionInv);
+
+	if (ImGui::SliderInt(label, &tmpIntVal, std::lroundf(v_min * precisionInv), std::lroundf(v_max * precisionInv),
+	                     fmt::vformat(format, fmt::make_format_args(*v)).c_str(),
+	                     ImGuiSliderFlags_NoInput | ImGuiSliderFlags_NoRoundToFormat))
+	{
+		*v = static_cast<float>(tmpIntVal) / precisionInv;
+		return true;
+	}
+	return false;
 }
 
 void startVerticalAlign(float yOffset)

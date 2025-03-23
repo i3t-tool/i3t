@@ -203,6 +203,7 @@ target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
         IMGUI_DEFINE_MATH_OPERATORS
+        GLFW_INCLUDE_NONE # OpenGL is included by pgr framework
         RAPIDJSON_HAS_STDSTRING=1)
 
 # DIWNE config file
@@ -225,6 +226,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 # Allow rapidjson to use std::string as it'll be always present
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         IMGUI_DEFINE_MATH_OPERATORS
+        GLFW_INCLUDE_NONE # OpenGL is included by pgr framework
         RAPIDJSON_HAS_STDSTRING=1)
 
 # DIWNE config file

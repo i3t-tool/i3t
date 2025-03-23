@@ -22,6 +22,7 @@
 #include "GUI/Workspace/Nodes/Operator.h"
 #include "GUI/Workspace/Nodes/Transformation.h"
 #include "GUI/Workspace/Nodes/TransformationBase.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 
 namespace Workspace
 {
@@ -45,7 +46,7 @@ private:
 	constexpr void doFor() noexcept
 	{
 		constexpr auto enumValue = static_cast<Core::EOperatorType>(N);
-		m_createFns[magic_enum::enum_name(enumValue)] = addNodeToNodeEditorNoSave<Operator<enumValue>>;
+		m_createFns[magic_enum::enum_name(enumValue)] = WorkspaceModule::addNodeToNodeEditorNoSave<Operator<enumValue>>;
 
 		if constexpr (N < Max)
 		{
@@ -78,7 +79,8 @@ private:
 	constexpr void doFor() noexcept
 	{
 		constexpr auto enumValue = static_cast<Core::ETransformType>(N);
-		m_createFns[magic_enum::enum_name(enumValue)] = addNodeToNodeEditorNoSave<Transformation<enumValue>>;
+		m_createFns[magic_enum::enum_name(enumValue)] =
+		    WorkspaceModule::addNodeToNodeEditorNoSave<Transformation<enumValue>>;
 
 		if constexpr (N < Max)
 		{

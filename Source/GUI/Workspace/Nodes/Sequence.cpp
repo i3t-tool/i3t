@@ -265,7 +265,7 @@ bool Sequence::SequenceDropZone::acceptNode(DIWNE::Node* node)
 void Sequence::SequenceDropZone::drawEmptyContent(DIWNE::DrawInfo& context)
 {
 	float zoom = diwne.getZoom();
-	const ImVec2 defaultSize = ImVec2(160 * zoom, 120 * zoom);
+	const ImVec2 defaultSize = ImVec2(10 * ImGui::GetFontSize(), 7.5 * ImGui::GetFontSize());
 	ImVec2 origin = ImGui::GetCursorScreenPos();
 	const char* emptyLabel = "    Drag and drop\ntransformations here";
 	ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -

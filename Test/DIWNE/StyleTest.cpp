@@ -20,3 +20,7 @@ TEST(StyleTest, BasicStyleTest)
 	ASSERT_TRUE(imVec4Eq(test2, test3));
 	ASSERT_TRUE(imVec4Eq(test2, test));
 }
+
+// TODO: Add multiple Styles test and editor style assignment
+// TODO: Test Style copying (copy constr + copy assign operator)
+// TODO: Test Style moving (move constr + move operator)

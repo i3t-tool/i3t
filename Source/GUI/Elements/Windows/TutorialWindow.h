@@ -56,6 +56,8 @@ public:
 	 */
 	void render() override;
 
+	static ImGui::MarkdownConfig createMarkdownConfig();
+
 private:
 	float m_progressBarAnimationPosition;
 

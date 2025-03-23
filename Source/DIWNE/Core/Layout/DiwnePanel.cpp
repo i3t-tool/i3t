@@ -137,7 +137,7 @@ void DiwnePanel::spring(float relSize)
 void DiwnePanel::sameLine(float spacing)
 {
 	ImGui::SameLine(0.0, spacing);
-	queueFixedWidth(spacing == -1.0f ? ImGui::GetStyle().ItemSpacing.x / m_editor.getZoom() : spacing);
+	queueFixedWidth(spacing == -1.0f ? m_editor.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.x) : spacing);
 }
 
 } // namespace DIWNE

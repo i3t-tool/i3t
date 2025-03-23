@@ -20,7 +20,7 @@
 
 #include "../../../Localization/Localization.h"
 #include "../../../State/StateManager.h"
-#include "../../IconFonts/Bindings/BindingFontAwesome.h"
+#include "../../Fonts/Icons.h"
 
 ChangeLanguageModal::ChangeLanguageModal() : ModalWindow(ICON_T(ICON_I3T_LANG " ", "Change Language")) {}
 void ChangeLanguageModal::onImGui()

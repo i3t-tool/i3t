@@ -32,9 +32,8 @@ public:
 
 	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
 protected:
-	float m_zoomOriginalFontScale;       ///< Original font scale
-	ImGuiStyle m_zoomOriginalStyle;      ///< Original ImGui style
-	DiwneStyle m_zoomOriginalDiwneStyle; ///< Original DIWNE style
+	float m_zoomOriginalFontScale;  ///< Original font scale
+	ImGuiStyle m_zoomOriginalStyle; ///< Original ImGui style
 
 public:
 	Canvas(NodeEditor& editor);
@@ -79,7 +78,7 @@ public:
 	 * Modifies the current Font depending on the current diwne zoom level.
 	 * @return Whether zoom scaling was active before making this call
 	 */
-	float applyZoomScalingToFont(ImFont* font, ImFont* largeFont = nullptr);
+	float applyZoomScalingToFont(ImFont* font, float scaleMultiplier);
 
 	/// @see applyZoomScalingToFont
 	void stopZoomScalingToFont(ImFont* font, float originalScale);
@@ -90,16 +89,17 @@ protected:
 public:
 	// Coordinate conversion
 	// =============================================================================================================
-	ImVec2 transformFromImGuiToDiwne(const ImVec2& point) const;
-	ImVec2 transformFromDiwneToImGui(const ImVec2& point) const;
-	ImVec4 transformFromImGuiToDiwne(const ImVec4& point) const;
-	ImVec4 transformFromDiwneToImGui(const ImVec4& point) const;
+	// ImVec2 transformFromImGuiToDiwne(const ImVec2& point) const;
+	// ImVec2 transformFromDiwneToImGui(const ImVec2& point) const;
+	// ImVec4 transformFromImGuiToDiwne(const ImVec4& point) const;
+	// ImVec4 transformFromDiwneToImGui(const ImVec4& point) const;
 
 	// TODO: Rename workArea in the methods below to viewport
 	// Essentially, we have 3 coordinate systems:
 	// 1. Screen - Coordinates in screen space of the display device
 	// 2. Viewport - Coordinates in screen space, but with origin in the top left corner of the node editor component
 	// 3. Diwne - Coordinates in canvas (infinite plane) space, eg. of the node editor's contents affected by zoom.
+	//          - Conversion between Viewport and Diwne coordinates involves the monitor/window dpi scaling factor
 
 	ImVec2 screen2workArea(const ImVec2& point) const;
 	ImVec2 workArea2screen(const ImVec2& point) const;
@@ -107,10 +107,15 @@ public:
 	ImVec2 workArea2diwne(const ImVec2& point) const;
 	ImVec2 screen2diwne(const ImVec2& point) const;
 	ImVec2 diwne2screen(const ImVec2& point) const;
-	ImVec2 diwne2workArea_noZoom(const ImVec2& point) const;
-	ImVec2 workArea2diwne_noZoom(const ImVec2& point) const;
-	ImVec2 screen2diwne_noZoom(const ImVec2& point) const;
-	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
+
+	ImRect diwne2screen(const ImRect& rect) const; ///< Convert diwne rect to a screen rect
+	ImRect screen2diwne(const ImRect& rect) const; ///< Convert screen rect to a diwne rect
+
+	float diwne2screenSize(float size) const; ///< Apply diwne scaling factors to a float size
+	float screen2diwneSize(float size) const; ///< Revert diwne scaling factors from a float size
+
+	ImVec2 diwne2screenSize(const ImVec2& point) const; ///< Apply diwne scaling factors to an ImVec2 size
+	ImVec2 screen2diwneSize(const ImVec2& point) const; ///< Revert diwne scaling factors from a ImVec2 size
 
 	// Basic drawing utilities
 	// =============================================================================================================

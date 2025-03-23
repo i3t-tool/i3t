@@ -11,7 +11,7 @@
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #include "LogWindow.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Toolkit.h"
 
 #include "imgui.h"

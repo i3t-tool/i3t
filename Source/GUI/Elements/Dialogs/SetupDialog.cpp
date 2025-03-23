@@ -17,7 +17,7 @@
 #include "I3T.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/Toolkit.h"
 #include "Localization/Localization.h"
@@ -31,8 +31,6 @@ void SetupDialog::render()
 	static int cameraMode;
 	static int angleUnits;
 
-	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
-	// style.FramePadding.y = 4;
 	bool windowOpen = true;
 	GUI::dockTabStylePush();
 	if (ImGui::Begin(getName(), getShowPtr()))
@@ -40,13 +38,36 @@ void SetupDialog::render()
 		this->updateWindowInfo();
 		GUI::dockTabStylePop();
 
-		Vp::Viewport* viewport = I3T::getViewport();
-		Vp::ViewportSettings& stg = viewport->getSettings();
-
 		if (ImGui::Button(_t("Reset to defaults")))
 		{
 			App::getModule<StateManager>().resetGlobal();
 		}
+
+		if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Indent();
+
+			static float uiScaleTmp = 1.0f;
+			if (ImGui::IsWindowAppearing())
+			{
+				uiScaleTmp = I3T::getUI()->getUiScale();
+			}
+			ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+			GUI::SliderFloatStepped("UI Scale", &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
+			if (uiScaleTmp != I3T::getUI()->getUiScale())
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("Apply scale"))
+				{
+					I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
+				}
+			}
+			ImGui::Unindent();
+			ImGui::Spacing();
+		}
+
+		Vp::Viewport* viewport = I3T::getViewport();
+		Vp::ViewportSettings& stg = viewport->getSettings();
 
 		if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
 		{

@@ -106,8 +106,8 @@ bool Cycle::bigButton(const std::string& str, DIWNE::IconType iconTypeBg, DIWNE:
 	// Sizes
 	const float zoom = diwne.getZoom();
 	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
-	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding);
-	const float p = 6.0f * zoom;
+	const float rounding = I3T::getSize(ESize::Cycle_ButtonRounding) * zoom;
+	const float p = diwne.canvas().diwne2screenSize(6.0f);
 	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
 
 	// Pack into styles
@@ -130,18 +130,15 @@ bool Cycle::buttonStepNext()
 
 	const float zoom = diwne.getZoom();
 
-
 	ImGuiContext& g = *GImGui;
 	float font_size = g.FontSize;
 
 	// const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 	const ImVec2 iconSize = ImVec2(font_size * 1.1f, font_size);
 
+	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding) * zoom;
 
-	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding);
-
-
-	const float p = 2.0f * zoom;
+	const float p = diwne.canvas().diwne2screenSize(2.0f);
 	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
 
 	// Invisible button
@@ -180,18 +177,15 @@ bool Cycle::buttonStepBack()
 
 	const float zoom = diwne.getZoom();
 
-
 	ImGuiContext& g = *GImGui;
 	float font_size = g.FontSize;
 
 	// const ImVec2 iconSize = I3T::getSize(ESizeVec2::Cycle_ButtonSize) * zoom;
 	const ImVec2 iconSize = ImVec2(font_size * 1.1f, font_size);
 
+	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding) * zoom;
 
-	const float rounding = I3T::getSize(ESize::Cycle_RadioButtonRounding);
-
-
-	const float p = 2.5f * zoom;
+	const float p = diwne.canvas().diwne2screenSize(2.5f);
 	const ImVec4 padding = ImVec4(p, p, p, p); // // (left, bottom, right, top)
 
 	// Invisible button
@@ -544,7 +538,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			ImGui::SameLine();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
-			                    I3T::getUI()->getTheme().get(ESize::StartWindow_FrameRounding));
+			                    I3T::getUI()->getTheme().get(ESize::StartWindow_FrameRounding) * diwne.getZoom());
 
 			inner_interaction_happen |= buttonPlayPause();
 
@@ -643,7 +637,8 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			//                                          : ImGuiCol_FrameBg),
 			//            true, style.FrameRounding);
 			// ImU32 check_col = GetColorU32(ImGuiCol_CheckMark);
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getSize(ESize::Cycle_ButtonRounding));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+			                    I3T::getSize(ESize::Cycle_ButtonRounding) * diwne.getZoom());
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, I3T::getColor(EColor::Cycle_RadioButtonSelected));
 			ImGui::PushStyleColor(ImGuiCol_FrameBgActive, I3T::getColor(EColor::Cycle_RadioButtonSelected));
 			ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, I3T::getColor(EColor::Cycle_RadioButtonSelected));

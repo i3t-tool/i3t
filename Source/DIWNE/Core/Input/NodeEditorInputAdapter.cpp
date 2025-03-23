@@ -24,7 +24,7 @@ ImVec2 NodeEditorInputAdapter::selectionRectangleStartPosition()
 }
 ImVec2 NodeEditorInputAdapter::selectionRectangleSize()
 {
-	return editor.input().bypassGetMouseDragDelta0() / editor.canvas().getZoom();
+	return editor.canvas().screen2diwneSize(editor.input().bypassGetMouseDragDelta0());
 }
 
 bool NodeEditorInputAdapter::panKeyDown()
@@ -70,14 +70,14 @@ float NodeEditorInputAdapter::getZoomDelta()
 
 bool NodeEditorInputAdapter::bypassIsMouseDragging0()
 {
-	return ImGui::IsMouseDragging(0, editor.mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(0, editor.style().decimal(DiwneStyle::mouseDragThreshold));
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging1()
 {
-	return ImGui::IsMouseDragging(1, editor.mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(1, editor.style().decimal(DiwneStyle::mouseDragThreshold));
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging2()
 {
-	return ImGui::IsMouseDragging(2, editor.mp_settingsDiwne->mouseDragThreshold);
+	return ImGui::IsMouseDragging(2, editor.style().decimal(DiwneStyle::mouseDragThreshold));
 }
 } // namespace DIWNE

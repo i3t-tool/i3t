@@ -20,6 +20,7 @@ public:
 	Module() = default;
 	virtual ~Module() = default;
 	virtual void onInit() {}
+	virtual void onBeforeFrame() {}
 	virtual void onBeginFrame() {}
 	virtual void onEndFrame() {}
 	virtual void onUpdate(double deltaSeconds) {}

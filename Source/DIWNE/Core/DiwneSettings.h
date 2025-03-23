@@ -7,8 +7,9 @@ namespace DIWNE
 struct SettingsDiwne
 {
 	// TODO: Unused? DiwneObject id should cover this? Remove since ids are generated automatically now.
-	std::string const editorlabel = "NodeEditor";    /**< as well as all other DiwneObject, Diwne has to
-	                                                         have identification label too */
+	std::string const editorlabel = "NodeEditor"; /**< as well as all other DiwneObject, Diwne has to
+	                                                      have identification label too */
+	float dpiScale = 1.0f;
 	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /**< workarea in Diwne coordinates (so what part of infinite space
 	                                                      of node editor is on window) only initial value - mostly based
 	                                                      on window size ( \see updateViewportRects() ) */
@@ -18,22 +19,12 @@ struct SettingsDiwne
 	float workAreaInitialZoom = 1; /**< initial value of zoom */
 	float zoomSpeed = 0.5f;
 	float zoomSensitivity = 0.5f;
-	float selectionRounding = 0;     /**< rounding od selection */
-	float mouseDragThreshold = 2.0f; // 6.0 is ImGui default
-
-	ImVec2 initPopupPosition = ImVec2(0, 0); /**< where to show popup when not set later */
 
 	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.1);
 	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.1);
 	float selectionRectBorderAlpha = 0.8f;
 
 	ImVec4 itemSelectedBorderColor = ImVec4(1.0, 0.9, 0.4, 0.6);
-	float itemSelectedBorderThicknessDiwne = 2.5;
-
-	ImVec4 objectHoverBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
-	float objectHoverBorderThicknessDiwne = 1.5;
-	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
-	float objectFocusForInteractionBorderThicknessDiwne = 1.5;
 
 	float middleAlign = 0.5; /**< value < 0 , 1 > where is horizontal position of
 	                            middle of nodes */

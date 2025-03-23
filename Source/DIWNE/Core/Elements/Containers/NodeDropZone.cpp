@@ -64,7 +64,7 @@ void NodeDropZone::content(DrawInfo& context)
 void NodeDropZone::drawEmptyContent(DrawInfo& context)
 {
 	float zoom = diwne.getZoom();
-	const ImVec2 defaultSize = ImVec2(130 * zoom, 70 * zoom);
+	const ImVec2 defaultSize = ImVec2(8 * ImGui::GetFontSize(), 4 * ImGui::GetFontSize());
 	ImVec2 origin = ImGui::GetCursorScreenPos();
 	const char* emptyLabel = "Drag and drop\n nodes here";
 	ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -
