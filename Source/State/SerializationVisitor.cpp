@@ -238,6 +238,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	target.AddMember("render", node->isRendered(), alloc);
 	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
 	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
+	target.AddMember("selected", node->getSelected(), alloc);
 
 	JSON::addVector(target, "position", node->getPosition(), m_memento.GetAllocator());
 }

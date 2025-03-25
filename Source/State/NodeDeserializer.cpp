@@ -430,6 +430,11 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 		    EnumUtils::value<Workspace::LevelOfDetail>(LODName).value_or(Workspace::LevelOfDetail::Full));
 	}
 
+	if (value.HasMember("selected"))
+	{
+		node->setSelected(value["selected"].GetBool());
+	}
+
 	const auto position = JSON::getVec2(value["position"].GetArray());
 	node->setPosition(position);
 }
