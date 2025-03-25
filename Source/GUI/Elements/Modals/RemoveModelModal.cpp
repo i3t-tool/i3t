@@ -29,7 +29,7 @@ void RemoveModelModal::onImGui()
 
 	ImGui::Separator();
 
-	if (ImGui::Button("Yes", ImVec2(100, 0)))
+	if (ImGui::Button("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		m_onRemove();
 		hide();
@@ -37,7 +37,7 @@ void RemoveModelModal::onImGui()
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (ImGui::Button("No", ImVec2(100, 0)))
+	if (ImGui::Button("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 	}

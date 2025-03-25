@@ -52,13 +52,14 @@
 // todo
 #endif // unix
 
-#include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
+#include "GUI/Fonts/Icons.h"
 #include "Localization/Localization.h"
 #include "Scripting/Environment.h"
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
 //---
 
+// TODO: (DR) (DPI-FIX) Cannot be constant
 const int NEXT_BUTTON_SIZE_X = 120;
 const int NEXT_BUTTON_SIZE_Y = 30;
 const int TIP_BUTTON_SIZE_X = 50;
@@ -125,17 +126,71 @@ inline void DefaultLinkCallback(ImGui::MarkdownLinkCallbackData data_)
 	}
 }
 
+void I3TMarkdownFormatCallback(const ImGui::MarkdownFormatInfo& markdownFormatInfo_, bool start_)
+{
+	// Call the default first so any settings can be overwritten by our implementation.
+	// Alternatively could be called or not called in a switch statement on a case by case basis.
+	// See defaultMarkdownFormatCallback definition for furhter examples of how to use it.
+	ImGui::defaultMarkdownFormatCallback(markdownFormatInfo_, start_);
+
+	switch (markdownFormatInfo_.type)
+	{
+	case ImGui::MarkdownFormatType::EMPHASIS:
+	{
+		if (markdownFormatInfo_.level == 1)
+		{
+			// in I3T for some reason, we force normal (italicized) emphasis to be strong emphasis (bold text)
+			if (start_)
+			{
+				ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialBold));
+			}
+			else
+			{
+				ImGui::PopFont();
+			}
+		}
+		break;
+	}
+	case ImGui::MarkdownFormatType::HEADING:
+	{
+		// Increase H1 font size
+		if (markdownFormatInfo_.level == 1)
+		{
+			if (start_)
+			{
+				ImGui::SetWindowFontScale(1.14f);
+			}
+			else
+			{
+				ImGui::SetWindowFontScale(1.0f);
+			}
+		}
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+ImGui::MarkdownConfig TutorialWindow::createMarkdownConfig()
+{
+	ImFont* H1 = I3T::getUI()->getTheme().get(EFont::TutorialBold);
+	ImFont* H2 = H1;
+	ImFont* H3 = H2;
+	return ImGui::MarkdownConfig{DefaultLinkCallback,
+	                             TooltipCallback,
+	                             ImageCallback,
+	                             "link",
+	                             {{H1, true}, {H2, true}, {H3, false}},
+	                             nullptr,
+	                             I3TMarkdownFormatCallback};
+}
+
 void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
 	// MARKDOWN CONFIG - (temporarily?) moved here from constructor since
 	// exception at font loading
-	m_mdConfig = ImGui::MarkdownConfig{
-	    DefaultLinkCallback,
-	    TooltipCallback,
-	    ImageCallback,
-	    "link",
-	    {{I3T::getUI()->getTheme().get(EFont::TutorialAssignment), true}, {nullptr, true}, {nullptr, false}},
-	    nullptr};
+	m_mdConfig = createMarkdownConfig();
 
 	TutorialManager::instance().setTutorial(std::move(tutorial));
 
@@ -459,7 +514,7 @@ void TutorialWindow::renderHeadline(Headline* headline)
 {
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 	ImGui::SetWindowFontScale(1.1f);
-	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialBold));
 	ImGui::Markdown(headline->m_content.c_str(), headline->m_content.length(), m_mdConfig);
 	ImGui::SetWindowFontScale(1.f);
 	ImGui::PopFont();
@@ -603,7 +658,7 @@ void TutorialWindow::renderTask(Task* task)
 
 	// Load task font and color
 	ImGui::PushStyleColor(ImGuiCol_TextDisabled, I3T::getUI()->getTheme().get(EColor::TutorialHighlightText));
-	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialBold));
 
 	// Print text from markdown
 	ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
@@ -616,7 +671,7 @@ void TutorialWindow::renderHint(Hint* hint)
 {
 	ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
 
-	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::PushFont(I3T::getUI()->getTheme().get(EFont::TutorialBold));
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialButtonText));
 	if (!hint->m_expanded)
 	{

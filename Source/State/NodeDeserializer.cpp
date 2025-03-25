@@ -15,10 +15,10 @@
 #include <algorithm>
 
 #include "Core/Nodes/Transform.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/Tools.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -60,7 +60,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
-		const auto cycle = Workspace::addNodeToNodeEditorNoSave<Workspace::Cycle>();
+		const auto cycle = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Cycle>();
 		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
 		createdNodes[value["id"].GetInt()] = cycle;
 		NodeDeserializer::assignCommon(value, cycle);
@@ -121,7 +121,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
-		const auto camera = Workspace::addNodeToNodeEditorNoSave<Workspace::Camera>();
+		const auto camera = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Camera>();
 		NodeDeserializer::assignCommon(value, camera);
 		createdNodes[value["id"].GetInt()] = camera;
 
@@ -136,7 +136,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
-		const auto screen = Workspace::addNodeToNodeEditorNoSave<Workspace::Screen>();
+		const auto screen = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Screen>();
 		NodeDeserializer::assignCommon(value, screen);
 		createdNodes[value["id"].GetInt()] = screen;
 
@@ -151,7 +151,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
-		const auto model = Workspace::addNodeToNodeEditorNoSave<Workspace::Model>();
+		const auto model = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Model>();
 		NodeDeserializer::assignCommon(value, model);
 		createdNodes[value["id"].GetInt()] = model;
 
@@ -202,7 +202,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	{
 		for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
 		{
-			const auto node = Workspace::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
+			const auto node = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
 			NodeDeserializer::assignCommon(value, node);
 
 			/// \todo Assign script after the node is connected with the other nodes.
@@ -249,7 +249,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 		auto lhsPin = edge[1].GetInt();
 		auto rhsPin = edge[3].GetInt();
 
-		connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+		WorkspaceModule::connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	}
 
 	std::vector<Ptr<DIWNE::Node>> result;
@@ -268,7 +268,7 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 	// Workaround for #311
 	if (type == n(Core::EOperatorType::AngleAxisToQuat))
 	{
-		auto result = Workspace::addNodeToNodeEditorNoSave<Workspace::AngleAxisToQuatOperator>();
+		auto result = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::AngleAxisToQuatOperator>();
 		if (value.HasMember("halfAngle"))
 		{
 			const auto halfAngle = value["halfAngle"].GetBool();
@@ -312,7 +312,7 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 {
-	auto sequence = Workspace::addNodeToNodeEditorNoSave<Workspace::Sequence>();
+	auto sequence = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Sequence>();
 
 	assignCommon(value, sequence);
 	assignSequence(value, sequence);

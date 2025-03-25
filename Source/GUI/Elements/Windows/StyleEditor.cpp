@@ -17,7 +17,7 @@
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Theme/ThemeLoader.h"
 #include "GUI/ThemeVariable.h"
 #include "GUI/Toolkit.h"
@@ -115,7 +115,9 @@ void renderVariables()
 				               }
 			               },
 			               [&](const ESize& size) {
-				               auto& val = curr.getSizesRef()[size];
+				               auto& entry = curr.getSizesRef()[size];
+				               auto& val = entry.first;
+				               bool dpiScaled = entry.second;
 
 				               ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
 
@@ -135,9 +137,23 @@ void renderVariables()
 						               curr.apply();
 					               }
 				               }
+				               if (dpiScaled)
+				               {
+					               ImGui::SameLine();
+					               ImGui::TextDisabled("(?)");
+					               if (ImGui::BeginItemTooltip())
+					               {
+						               ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+						               ImGui::TextUnformatted("This variable is DPI scaled");
+						               ImGui::PopTextWrapPos();
+						               ImGui::EndTooltip();
+					               }
+				               }
 			               },
 			               [&](const ESizeVec2& sizeVec) {
-				               auto& val = curr.getSizesVecRef()[sizeVec];
+				               auto& entry = curr.getSizesVecRef()[sizeVec];
+				               auto& val = entry.first;
+				               bool dpiScaled = entry.second;
 
 				               ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
 
@@ -156,6 +172,18 @@ void renderVariables()
 					               if (ImGui::DragFloat2(var.name, &val[0], 1.0f, valueMin, valueMax, "%.0f"))
 					               {
 						               curr.apply();
+					               }
+				               }
+				               if (dpiScaled)
+				               {
+					               ImGui::SameLine();
+					               ImGui::TextDisabled("(?)");
+					               if (ImGui::BeginItemTooltip())
+					               {
+						               ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+						               ImGui::TextUnformatted("This variable is DPI scaled");
+						               ImGui::PopTextWrapPos();
+						               ImGui::EndTooltip();
 					               }
 				               }
 			               },

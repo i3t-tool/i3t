@@ -84,7 +84,7 @@ bool Link::isHoveredDiwne()
 void Link::onHover(DrawInfo& context)
 {
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   diwne.mp_settingsDiwne->objectHoverBorderColor,
+	                                   diwne.style().color(DiwneStyle::objectHoverBorderColor),
 	                                   diwne.style().decimal(DiwneStyle::linkWidth) / 2);
 }
 

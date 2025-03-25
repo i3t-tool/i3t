@@ -193,7 +193,7 @@ size vectors:
   ngen_Nodes Sequence DummySpaceSize: [100, 1]
   ngen_NewNode PositionShift: [10, 0]
   ngen_Builder Item Spacing: [0, 0]
-  star_Window Size: [1020, 600]
+  star_Window Size: [1020, 800]
   star_Logo Offset: [5, -20]
   star_Window Padding: [0, 0]
   star_Left Window Padding: [30, 30]

@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include "DIWNE/Core/Style/StyleOverride.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
 
@@ -21,7 +22,7 @@ template <Core::EOperatorType T>
 class Operator : public CoreNodeWithPins
 {
 public:
-	Operator(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
+	explicit Operator(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::createOperator<T>())
 	{
 		// To avoid rounding-confusion, the operators with quaternion output should have more decimal places to
 		// distinguish small changes near zero or near one
@@ -59,10 +60,10 @@ public:
 		//	WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(4);
 		// }
 
-		updateDataItemsWidth();
+		CoreNode::updateDataItemsWidth();
 
-		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgOperator));
-		m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderOperator));
+		m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgOperator));
+		m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderOperator));
 	}
 
 	//===-- Double dispatch

@@ -72,7 +72,6 @@ enum class EColor
 
 	Workspace_SelectedBorder,
 	Workspace_FocusBorder,
-	Workspace_InteractionFocusBorder,
 
 	TutorialBgColor,
 	TutorialText,
@@ -207,21 +206,14 @@ enum class EFont
 {
 	Mono,
 	Regular,
-	LargeBold,
-	MenuLarge,
-	MenuSmall,
 	Button,
-	Tab,
-	Node,
-	Header,
+
 	TutorialText,
 	TutorialTitle,
-	TutorialAssignment,
+	TutorialBold,
 	TutorialHint,
 	WelcomeTitle,
-	WelcomeDescription,
-	WelcomeItemTitle,
-	WelcomeItemDescription
+	WelcomeItemTitle
 };
 
 enum class ESize
@@ -251,7 +243,6 @@ enum class ESize
 
 	Workspace_SelectedBorderThickness,
 	Workspace_FocusBorderThickness,
-	Workspace_InteractionFocusBorderThickness,
 	Workspace_CopyPasteOffset,
 	Workspace_TrackingTimeBetweenTracks,
 
@@ -285,7 +276,7 @@ enum class ESize
 
 	Default_VisiblePrecision,
 	Default_VisibleQuaternionPrecision,
-	Default_InactiveMark,
+	Default_InactiveMark, // Unused
 
 	Tracking_SmoothScrollSpeed,
 	Tracking_JaggedScrollSpeed,
@@ -380,14 +371,26 @@ const char* enumToStr(const std::map<T, const char*>& map, T en)
 }
 
 /**
- * Global color scheme.
+ * Application Theme holding custom style variables that override the current ImGui style and/or are used separately by
+ * various parts of the I3T code.
+ * The Theme holds color information as well as general sizing information.
+ *
+ * Themes do have a UI/DPI scaling factor using which relevant sizing variables are scaled when fetched.
+ * Changes of the scaling factor are however handled elsewhere (in UIModule).
+ *
+ * Themes do hold an association between font keys and actual font names.
+ * But fonts are loaded and managed externally (by the FontManager).
+ * Currently the Theme cannot load new fonts, but it can change which fonts are used where.
+ * // Proposal: (Issue #432) Themes could tell FontManager which fonts to load
  */
 class Theme
 {
 public:
 	using Colors = std::unordered_map<EColor, ImVec4>;
-	using Sizes = std::unordered_map<ESize, float>;
-	using SizesVec = std::unordered_map<ESizeVec2, ImVec2>;
+	/// Map of ESizeVec2 and a pair of float and bool, bool specifies whether the float is dpi scaled.
+	using Sizes = std::unordered_map<ESize, std::pair<float, bool>>;
+	/// Map of ESizeVec2 and a pair of ImVec2 and bool, bool specifies whether the ImVec2 is dpi scaled.
+	using SizesVec = std::unordered_map<ESizeVec2, std::pair<ImVec2, bool>>;
 
 	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a
 	/// (std::unordered_map cannot be used).
@@ -417,7 +420,16 @@ public:
 	static void initNames();
 
 	/**
+	 * Initializes ImGuiStyle with default values. Rewrites all ImGuiStyle values.
+	 * The theme still needs to be applied after this call.
+	 */
+	static void initImGuiStyle();
+
+	void updateDiwneStyleFromTheme() const;
+
+	/**
 	 * Call this function whenever you change style settings.
+	 * Applies Theme settings to the current ImGuiStyle.
 	 */
 	void apply();
 
@@ -433,13 +445,15 @@ public:
 
 	float get(ESize size)
 	{
-		return m_sizes[size];
+		const auto entry = m_sizes[size];
+		return entry.second ? entry.first * m_dpiScale : entry.first;
 	}
 
-	const ImVec2& get(ESizeVec2 sizeVec)
+	ImVec2 get(ESizeVec2 sizeVec)
 	{
 		I3T_ASSERT(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
-		return m_sizesVec2[sizeVec];
+		const auto entry = m_sizesVec2[sizeVec];
+		return entry.second ? entry.first * m_dpiScale : entry.first;
 	}
 
 	static const char* getCategoryName(const std::string& key);
@@ -451,6 +465,15 @@ public:
 	const std::string& getName() const
 	{
 		return m_name;
+	}
+
+	void setDpiScale(float scale)
+	{
+		m_dpiScale = scale;
+	}
+	float getDpiScale() const
+	{
+		return m_dpiScale;
 	}
 
 	const bool isDark() const
@@ -485,16 +508,34 @@ public:
 
 private:
 	template <typename E, typename T>
-	void copyProperties(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
+	void copyColors(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
 	{
 		for (const auto [key, val] : source)
 			target[key] = val;
+	}
+
+	template <typename E, typename T>
+	void copySizes(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
+	{
+		for (const auto [key, val] : source)
+		{
+			auto it = target.find(key);
+			if (it != target.end())
+			{
+				it->second = {val.first, it->second.second};
+			}
+			else
+			{
+				target.emplace(key, val);
+			}
+		}
 	}
 
 	static ThemeGroup& group(const char* name);
 
 	std::string m_name = "default";
 
+	float m_dpiScale = 1.0f;
 	bool m_isDark = true;
 	Colors m_colors;
 	Sizes m_sizes;

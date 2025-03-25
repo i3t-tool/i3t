@@ -66,7 +66,8 @@ void TutorialManager::reloadTutorials()
 void TutorialManager::setTutorial(Ptr<Tutorial> tutorial)
 {
 	m_currentTutorial = tutorial;
-	setStep(0);
+	if (tutorial)
+		setStep(0);
 }
 
 void TutorialManager::setStep(int stepNumber)

@@ -40,6 +40,7 @@ namespace Core
 class ResourceManager;
 }
 class UIModule;
+class WorkspaceModule;
 
 // Static util methods
 namespace I3T
@@ -51,6 +52,7 @@ I3TApplication& app();
 UIModule* getUI();
 Vp::Viewport* getViewport();
 Core::ResourceManager& getResourceManager();
+WorkspaceModule& getWorkspace();
 
 // Theme
 std::vector<Theme>& getThemes();
@@ -58,7 +60,7 @@ Theme& getTheme();
 ImFont* getFont(EFont font);
 const ImVec4& getColor(EColor color);
 float getSize(ESize size);
-const ImVec2& getSize(ESizeVec2 size);
+ImVec2 getSize(ESizeVec2 size);
 
 /**
  * Change properties of the given theme.

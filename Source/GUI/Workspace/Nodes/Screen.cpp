@@ -69,10 +69,7 @@ void Screen::popupContent(DIWNE::DrawInfo& context)
 //  ----------
 void Screen::centerContent(DIWNE::DrawInfo& context)
 {
-	int width = m_textureSize.x * diwne.getZoom();
-	int height = m_textureSize.y * diwne.getZoom();
-
-	ImVec2 zoomedTextureSize = m_textureSize * diwne.getZoom();
+	ImVec2 zoomedTextureSize = diwne.canvas().diwne2screenSize(m_textureSize);
 	ImVec2 topLeftCursorPos = ImGui::GetCursorScreenPos();
 
 	if (getNodebase()->getInput(0).isPluggedIn())
@@ -82,8 +79,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 		Vp::Viewport* viewport = I3T::getViewport();
 		m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
-		viewport->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, m_renderOptions,
-		                     m_displayOptions);
+		viewport->drawScreen(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, screenValue.second,
+		                     screenValue.first, m_renderOptions, m_displayOptions);
 		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 		if (framebuffer)
@@ -109,10 +106,10 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 		// Draw no input text
 		ImGui::PushClipRect(rect.Min, rect.Max, true);
-		float origScale = diwne.canvas().applyZoomScalingToFont(I3T::getFont(EFont::LargeBold));
+		float origScale = diwne.canvas().applyZoomScalingToFont(I3T::getFont(EFont::TutorialBold), 1.25f);
 		GUI::TextCentered("NO INPUT", rect,
 		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
-		diwne.canvas().stopZoomScalingToFont(I3T::getFont(EFont::Header), origScale);
+		diwne.canvas().stopZoomScalingToFont(I3T::getFont(EFont::TutorialBold), origScale);
 		ImGui::PopClipRect();
 	}
 
@@ -137,8 +134,6 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 {
 	bool interaction_happen = false;
 
-	bool resize_texture = false; /// the screen size has changed -> update FBO
-	                             /// size too to avoid blurring
 	ImVec2 buttonSize = I3T::getSize(ESizeVec2::Nodes_Screen_resizeButtonSize);
 	buttonSize = ImMax(ImVec2(1, 1), buttonSize);
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getZoom();
@@ -175,13 +170,15 @@ bool Screen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize
 		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);
 		if (diwne.input().bypassIsMouseDragging0())
 		{
-			ImVec2 dragOrigin = ImGui::GetIO().MouseClickedPos[ImGuiMouseButton_Left];
 			ImVec2 mousePos = ImGui::GetIO().MousePos;
 			ImVec2 dragOffset = zoomedButtonSize - ImGui::GetCurrentContext()->ActiveIdClickOffset;
 			ImVec2 newTextureScreenSize = (mousePos - topLeftCursorPos + dragOffset) / diwne.getZoom();
 
-			m_textureSize.x = std::max(newTextureScreenSize.x, buttonSize.x + ImGui::GetStyle().ItemSpacing.x);
-			m_textureSize.y = std::max(newTextureScreenSize.y, buttonSize.y + ImGui::GetStyle().ItemSpacing.y);
+			float uiScale = I3T::getUI()->getUiScale();
+			m_textureSize.x =
+			    std::max(newTextureScreenSize.x, buttonSize.x + ImGui::GetStyle().ItemSpacing.x) / uiScale;
+			m_textureSize.y =
+			    std::max(newTextureScreenSize.y, buttonSize.y + ImGui::GetStyle().ItemSpacing.y) / uiScale;
 
 			// must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
 			getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);

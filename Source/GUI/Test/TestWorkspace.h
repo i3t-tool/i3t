@@ -15,6 +15,4 @@
 #include "imgui_te_context.h"
 #include "imgui_te_engine.h"
 
-#include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
-
 void registerWorkspaceTests(ImGuiTestEngine* engine);

@@ -16,8 +16,8 @@
 
 #include "Core/Nodes/Id.h"
 
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -57,7 +57,7 @@ void Tools::pasteNodes(const Memento& memento)
 	{
 		node->setSelected(true);
 	}
-	WorkspaceWindow::g_editor->shiftNodesToEnd(newNodes);
+	WorkspaceModule::g_editor->shiftNodesToEnd(newNodes);
 }
 
 int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
@@ -83,8 +83,7 @@ int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
 
 static auto findNode(Core::ID id) -> Result<Ptr<Workspace::CoreNode>, Error>
 {
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	auto& nodeEditor = workspace->getNodeEditor();
+	auto& nodeEditor = I3T::getWorkspace().getNodeEditor();
 	return nodeEditor.getNode<GuiNode>(id);
 };
 
@@ -98,6 +97,6 @@ bool Tools::plug(Core::ID from, int fromIdx, Core::ID to, int toIdx)
 		return false;
 	}
 
-	return Workspace::connectNodesNoSave(fromNode.value(), toNode.value(), fromIdx, toIdx);
+	return WorkspaceModule::connectNodesNoSave(fromNode.value(), toNode.value(), fromIdx, toIdx);
 }
 } // namespace Workspace

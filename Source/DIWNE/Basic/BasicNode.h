@@ -2,10 +2,11 @@
 
 #include "DIWNE/Core/Elements/Node.h"
 #include "DIWNE/Core/Layout/DiwnePanel.h"
-#include "DIWNE/Core/Style/StyleOverride.h"
 
 namespace DIWNE
 {
+class StyleOverride;
+
 /**
  * Parts of the node:
  *  -------------------
@@ -53,7 +54,7 @@ public:
 
 	void translate(const ImVec2& vec) override;
 
-	StyleOverride m_style;
+	std::shared_ptr<StyleOverride> m_style;
 
 public:
 	// Getters / Setters

@@ -42,18 +42,16 @@ bool Canvas::applyZoomScaling()
 		return false;
 	}
 
-	m_zoomOriginalFontScale = applyZoomScalingToFont(font);
+	m_zoomOriginalFontScale = applyZoomScalingToFont(font, 1.0f);
 	ImGui::PushFont(font);
 
 	// Scale the whole ImGui style, will be restored later
 	m_zoomOriginalStyle = ImGui::GetStyle();
-	m_zoomOriginalDiwneStyle = editor.style();
 
 	//	ImGui::GetStyle().ScaleAllSizes(m_zoom);
 	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_zoom : 1.0f);
 	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_zoom : 1.0f);
 	ScaleAllSizes(ImGui::GetStyle(), m_zoom);
-	editor.style().scale(m_zoom);
 
 	// TODO: We do not round styles, ImGui does round them, this introduces an issue with the cursor position not being
 	//  rounded when starting a new imgui item, once the cursor is moved to the next item ImGui automatically rounds it.
@@ -71,7 +69,6 @@ bool Canvas::stopZoomScaling()
 		return false;
 
 	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
-	editor.style() = m_zoomOriginalDiwneStyle;
 
 	// Need to reset default font BEFORE popping font
 	stopZoomScalingToFont(ImGui::GetFont(), m_zoomOriginalFontScale);
@@ -98,7 +95,7 @@ bool Canvas::ensureZoomScaling(bool active)
 	return activeBefore;
 }
 
-float Canvas::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
+float Canvas::applyZoomScalingToFont(ImFont* font, float scaleMultiplier)
 {
 	if (!font)
 	{
@@ -106,12 +103,12 @@ float Canvas::applyZoomScalingToFont(ImFont* font, ImFont* largeFont)
 	}
 
 	ImFont* f = font;
-	if (largeFont != nullptr)
-	{
-		f = largeFont;
-	}
+	// if (largeFont != nullptr)
+	// {
+	// 	f = largeFont;
+	// }
 	float originalScale = f->Scale;
-	f->Scale = m_zoom;
+	f->Scale = m_zoom * scaleMultiplier;
 	ImGui::PushFont(f);
 
 	return originalScale;
@@ -170,7 +167,6 @@ void Canvas::ScaleAllSizes(ImGuiStyle& style, float scale_factor)
 
 void Canvas::updateViewportRects()
 {
-	// \todo JH return negative number while sub-window can not move outside from aplication window
 	ImVec2 windowPos = ImGui::GetWindowPos();
 	ImVec2 windowSize = ImGui::GetWindowSize();
 
@@ -184,33 +180,33 @@ void Canvas::updateViewportRects()
 	//	           m_viewRectDiwne.Max.x, m_viewRectDiwne.Max.y)
 }
 
-ImVec2 Canvas::transformFromImGuiToDiwne(const ImVec2& point) const
-{
-	return workArea2screen(screen2workArea(point) / m_zoom); /* basically just zoom */
-}
-
-ImVec2 Canvas::transformFromDiwneToImGui(const ImVec2& point) const
-{
-	return workArea2screen(screen2workArea(point) * m_zoom); /* basically just zoom */
-}
-
-ImVec4 Canvas::transformFromImGuiToDiwne(const ImVec4& rect) const
-{
-	ImVec2 const topleft = transformFromImGuiToDiwne(ImVec2(rect.x, rect.y));
-	ImVec2 const bottomright = transformFromImGuiToDiwne(ImVec2(rect.z, rect.w));
-	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
-}
-
-ImVec4 Canvas::transformFromDiwneToImGui(const ImVec4& rect) const
-{
-	ImVec2 const topleft = transformFromDiwneToImGui(ImVec2(rect.x, rect.y));
-	ImVec2 const bottomright = transformFromDiwneToImGui(ImVec2(rect.z, rect.w));
-	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
-}
+// ImVec2 Canvas::transformFromImGuiToDiwne(const ImVec2& point) const
+// {
+// 	return workArea2screen(screen2workArea(point) / m_zoom); /* basically just zoom */
+// }
+//
+// ImVec2 Canvas::transformFromDiwneToImGui(const ImVec2& point) const
+// {
+// 	return workArea2screen(screen2workArea(point) * m_zoom); /* basically just zoom */
+// }
+//
+// ImVec4 Canvas::transformFromImGuiToDiwne(const ImVec4& rect) const
+// {
+// 	ImVec2 const topleft = transformFromImGuiToDiwne(ImVec2(rect.x, rect.y));
+// 	ImVec2 const bottomright = transformFromImGuiToDiwne(ImVec2(rect.z, rect.w));
+// 	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
+// }
+//
+// ImVec4 Canvas::transformFromDiwneToImGui(const ImVec4& rect) const
+// {
+// 	ImVec2 const topleft = transformFromDiwneToImGui(ImVec2(rect.x, rect.y));
+// 	ImVec2 const bottomright = transformFromDiwneToImGui(ImVec2(rect.z, rect.w));
+// 	return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
+// }
 
 void Canvas::moveViewportZoomed(const ImVec2& distance)
 {
-	moveViewport(ImVec2(distance.x / m_zoom, distance.y / m_zoom));
+	moveViewport(screen2diwneSize(distance));
 }
 
 void Canvas::moveViewport(const ImVec2& distance)
@@ -230,12 +226,14 @@ ImVec2 Canvas::workArea2screen(const ImVec2& point) const
 
 ImVec2 Canvas::diwne2workArea(const ImVec2& point) const
 {
-	return diwne2workArea_noZoom(point) * m_zoom;
+	float dpiScale = editor.mp_settingsDiwne->dpiScale;
+	return (point - m_viewRectDiwne.Min) * m_zoom * dpiScale;
 }
 
 ImVec2 Canvas::workArea2diwne(const ImVec2& point) const
 {
-	return workArea2diwne_noZoom(point / m_zoom);
+	float dpiScale = editor.mp_settingsDiwne->dpiScale;
+	return point / (m_zoom * dpiScale) + m_viewRectDiwne.Min;
 }
 
 ImVec2 Canvas::screen2diwne(const ImVec2& point) const
@@ -248,24 +246,29 @@ ImVec2 Canvas::diwne2screen(const ImVec2& point) const
 	return workArea2screen(diwne2workArea(point));
 }
 
-ImVec2 Canvas::diwne2workArea_noZoom(const ImVec2& point) const
+ImRect Canvas::diwne2screen(const ImRect& rect) const
 {
-	return point - m_viewRectDiwne.Min;
+	return ImRect(diwne2screen(rect.Min), diwne2screen(rect.Max));
 }
-
-ImVec2 Canvas::workArea2diwne_noZoom(const ImVec2& point) const
+ImRect Canvas::screen2diwne(const ImRect& rect) const
 {
-	return point + m_viewRectDiwne.Min;
+	return ImRect(screen2diwne(rect.Min), screen2diwne(rect.Max));
 }
-
-ImVec2 Canvas::screen2diwne_noZoom(const ImVec2& point) const
+float Canvas::diwne2screenSize(float size) const
 {
-	return workArea2diwne_noZoom(screen2workArea(point));
+	return size * editor.getZoom() * editor.getDpiScale();
 }
-
-ImVec2 Canvas::diwne2screen_noZoom(const ImVec2& point) const
+float Canvas::screen2diwneSize(float size) const
 {
-	return workArea2screen(diwne2workArea_noZoom(point));
+	return size / (editor.getZoom() * editor.getDpiScale());
+}
+ImVec2 Canvas::diwne2screenSize(const ImVec2& point) const
+{
+	return ImVec2(diwne2screenSize(point.x), diwne2screenSize(point.y));
+}
+ImVec2 Canvas::screen2diwneSize(const ImVec2& point) const
+{
+	return ImVec2(screen2diwneSize(point.x), screen2diwneSize(point.y));
 }
 
 float Canvas::getZoom() const
@@ -580,7 +583,7 @@ void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor i
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
 
 	int lineCount = 3;
-	float padding = 1.5f * m_zoom;
+	float padding = screen2diwneSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -602,7 +605,7 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
 
 	int lineCount = 3;
-	float padding = 1.5f * m_zoom;
+	float padding = screen2diwneSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -618,12 +621,12 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 }
 
 void Canvas::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
-                           bool filled, float shapeThickness /*=4*/, float innerThickness /*=2*/) const
+                           bool filled, float shapeThickness, float innerThickness) const
 {
 	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
-	innerThickness *= m_zoom;
-	shapeThickness *= m_zoom;
+	innerThickness = diwne2screenSize(shapeThickness);
+	shapeThickness = diwne2screenSize(shapeThickness);
 
 	ImVec2 pTL = topLeft;
 	ImVec2 pBR = bottomRight;
@@ -666,8 +669,7 @@ void Canvas::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerCo
 	ImVec2 start = ImVec2(topLeft.x, middleY);
 	ImVec2 end = ImVec2(bottomRight.x, middleY);
 
-
-	idl->AddLine(start, end, shapeColor, thickness * m_zoom);
+	idl->AddLine(start, end, shapeColor, diwne2screenSize(thickness));
 }
 
 bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,

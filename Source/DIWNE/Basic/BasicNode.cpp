@@ -3,14 +3,15 @@
 #include "DIWNE/Core/Layout/Gravity.h"
 #include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/Style/DiwneStyle.h"
+#include "DIWNE/Core/Style/StyleOverride.h"
 #include "DIWNE/Core/diwne_utils.h"
 
 namespace DIWNE
 {
 BasicNode::BasicNode(NodeEditor& editor, std::string label)
-    : Node(editor, label), m_topLabel(label), m_top(diwne, label + "_top"), m_left(diwne, label + "_left"),
+    : Node(editor, label), m_top(diwne, label + "_top"), m_left(diwne, label + "_left"),
       m_center(diwne, label + "_center"), m_right(diwne, label + "_right"), m_middle(diwne, label + "_middle"),
-      m_style(diwne.style())
+      m_topLabel(label), m_style(std::make_shared<StyleOverride>(diwne))
 {}
 
 void BasicNode::begin(DrawInfo& context)
@@ -71,7 +72,7 @@ void BasicNode::topContent(DrawInfo& context)
 {
 	drawHeader();
 	float zoom = diwne.getZoom();
-	ImVec2 padding = m_style.size(DiwneStyle::nodePadding);
+	ImVec2 padding = m_style->size(DiwneStyle::nodePadding);
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y * zoom);
 	ImGui::Dummy(ImVec2(padding.x * zoom, 0));
 	ImGui::SameLine(0, 0);
@@ -176,14 +177,14 @@ void BasicNode::translate(const ImVec2& vec)
 
 void BasicNode::drawHeader()
 {
-	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), m_style.color(DiwneStyle::nodeHeaderBg),
-	                                  m_style.decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersTop);
+	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), m_style->color(DiwneStyle::nodeHeaderBg),
+	                                  m_style->decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersTop);
 }
 
 void BasicNode::drawBody()
 {
-	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, m_style.color(DiwneStyle::nodeBg),
-	                                  m_style.decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersAll);
+	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, m_style->color(DiwneStyle::nodeBg),
+	                                  m_style->decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersAll);
 }
 
 const std::string& BasicNode::getTopLabel() const

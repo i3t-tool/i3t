@@ -102,10 +102,10 @@ void saveTheme(const fs::path& path, Theme& theme)
 		colors.emplace_back(key, val);
 	std::vector<std::pair<ESize, float>> sizes1;
 	for (const auto& [key, val] : theme.getSizesRef())
-		sizes1.emplace_back(key, val);
+		sizes1.emplace_back(key, val.first);
 	std::vector<std::pair<ESizeVec2, ImVec2>> sizes2;
 	for (const auto& [key, val] : theme.getSizesVecRef())
-		sizes2.emplace_back(key, val);
+		sizes2.emplace_back(key, val.first);
 
 	std::sort(colors.begin(), colors.end(), compareThemeEntry<std::pair<EColor, ImVec4>>);
 	std::sort(sizes1.begin(), sizes1.end(), compareThemeEntry<std::pair<ESize, float>>);
@@ -227,7 +227,7 @@ static Theme::Sizes loadSizes(YAML::Node& yaml)
 	{
 		if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
 		{
-			sizes[*en] = it->second.as<float>();
+			sizes[*en] = {it->second.as<float>(), true}; // We set dpi scaling to true, it will get changed later
 		}
 		else
 		{
@@ -257,7 +257,7 @@ static Theme::SizesVec loadSizeVectors(YAML::Node& yaml)
 			auto result = parseVec2Seq(node);
 			if (result)
 			{
-				sizesVec[*en] = *result;
+				sizesVec[*en] = {*result, true}; // We set dpi scaling to true, it will get changed later
 			}
 			else
 			{

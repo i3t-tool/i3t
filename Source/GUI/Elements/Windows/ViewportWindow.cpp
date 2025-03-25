@@ -14,7 +14,7 @@
 
 #include "Config.h"
 #include "Core/Input/InputManager.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "I3T.h"

@@ -79,6 +79,10 @@ public:
 	// Layouting
 	// =============================================================================================================
 
+	/**
+	 * Add fixed non-shrinking width to the panel.
+	 * @param width Width to submit in diwne coordinates.
+	 */
 	void submitFixedWidth(float width);
 
 	/**
@@ -96,7 +100,7 @@ public:
 	 * Mark this width as spring width which can shrink if needed.
 	 * Submitted width is added to a cumulative total for the current frame.
 	 * Total submitted width SHOULD NOT be more than the available spring width for this panel.
-	 * @param width
+	 * @param width Spring width in diwne coordinates.
 	 */
 	void submitSpringWidth(float width);
 

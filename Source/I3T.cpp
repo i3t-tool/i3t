@@ -18,6 +18,7 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/StateManager.h"
@@ -57,6 +58,7 @@ void I3TApplication::onInit()
 	App::getModule<StateManager>().addOriginator(viewport);
 
 	createModule<ScriptingModule>();
+	createModule<WorkspaceModule>();
 	UIModule* uiModule = createModule<UIModule>();
 	App::getModule<StateManager>().addOriginator(uiModule);
 
@@ -99,6 +101,10 @@ Core::ResourceManager& getResourceManager()
 {
 	return App::get().getModule<Core::ResourceManager>();
 }
+WorkspaceModule& getWorkspace()
+{
+	return App::get().getModule<WorkspaceModule>();
+}
 std::vector<Theme>& getThemes()
 {
 	return getUI()->getThemes();
@@ -121,7 +127,7 @@ float getSize(ESize size)
 {
 	return getTheme().get(size);
 }
-const ImVec2& getSize(ESizeVec2 size)
+ImVec2 getSize(ESizeVec2 size)
 {
 	return getTheme().get(size);
 }

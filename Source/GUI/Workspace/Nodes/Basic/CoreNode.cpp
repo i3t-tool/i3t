@@ -39,9 +39,9 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	// Set a bit flag identifying this node as a core node
 	setFlag(CORE_NODE_FLAG, true);
 	// I3T DIWNE styling
-	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBg));
-	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeader));
-	m_style.addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBg));
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeader));
+	m_style->addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
 }
 
 CoreNode::~CoreNode()
@@ -163,21 +163,22 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
 
 	// Header extra space
-	float trailingDummyWidth = style.FramePadding.x / zoom;
-	if (m_headerMinWidth > 0)
-	{
-		const float diff = m_headerMinWidth - widthSoFar;
-		if (diff > 0)
-		{
-			trailingDummyWidth += diff;
-		}
-	}
+	// float trailingDummyWidth = style.FramePadding.x / zoom;
+	// if (m_headerMinWidth > 0)
+	// {
+	// 	const float diff = m_headerMinWidth - widthSoFar;
+	// 	if (diff > 0)
+	// 	{
+	// 		trailingDummyWidth += diff;
+	// 	}
+	// }
 	ImGui::SameLine(0, 0);
-	ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
+	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
 	if (interaction_happen)
 	{
-		context.update(true, true, true);
+		context.consumeInput();
 	}
 }
 

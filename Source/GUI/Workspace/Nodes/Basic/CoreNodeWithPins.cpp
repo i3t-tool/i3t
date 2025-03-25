@@ -17,7 +17,7 @@
 using namespace Workspace;
 
 CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins /*=true*/)
-    : CoreNode(diwne, nodebase), m_showDataOnPins(showDataOnPins), m_minRightAlignOfRightPins(0)
+    : CoreNode(diwne, nodebase), m_showDataOnPins(showDataOnPins)
 {
 	const auto& inputPins = m_nodebase->getInputPins();
 	const auto& outputPins = m_nodebase->getOutputPins();
@@ -133,15 +133,18 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			{
 				if (pin->getCorePin().isRendered())
 				{
-					float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) *
-					                                     diwne.getZoom()); /* no shift to the left */
+					// TODO: (DPI-FIX)
+					float act_align =
+					    std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) * diwne.getZoom() *
+					                       diwne.getDpiScale()); /* no shift to the left */
 					m_minRightAlignOfRightPins =
 					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
 					                                                        between two node sizes */
 					const float cursor_pos = ImGui::GetCursorPosX();
 					// LOG_INFO(cursor_pos);
-					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all output
-					                                                                      pins have the same width */
+					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all
+					// output
+					//                                                                       pins have the same width */
 					pin->drawDiwne(context);
 				}
 			}

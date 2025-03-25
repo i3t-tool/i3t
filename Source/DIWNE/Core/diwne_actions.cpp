@@ -20,7 +20,7 @@ void ConnectPinAction::onEnd()
 
 void DragNodeAction::onFrameEnd()
 {
-	ImVec2 offset = editor.input().bypassGetMouseDelta() / editor.getZoom();
+	ImVec2 offset = editor.canvas().screen2diwneSize(editor.input().bypassGetMouseDelta());
 	for (auto node : nodes)
 	{
 		if (!node->isFixed()) // Do not move with "fixed" nodes (would cause visual artefacts)

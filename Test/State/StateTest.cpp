@@ -12,16 +12,16 @@
  */
 #include "gtest/gtest.h"
 
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
 #include "State/StateManager.h"
 
 #include "Generator.h"
 #include "I3TUtil.h"
 
-const auto getNodes(Ptr<WorkspaceWindow> workspaceWindow)
+const auto getNodes(WorkspaceModule& workspace)
 {
-	return workspaceWindow->getNodeEditor().getAllCoreNodes().collect();
+	return workspace.getNodeEditor().getAllCoreNodes().collect();
 }
 
 class StateTest : public ::testing::Test
@@ -52,8 +52,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 	// Requires the application to be initialized!
 	auto* ui = I3T::getUI();
 	ASSERT_TRUE(ui != nullptr);
-	const auto workspace = ui->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	ASSERT_TRUE(workspace != nullptr);
+	auto& workspace = I3T::getWorkspace();
 
 	// create empty scene
 	App::getModule<StateManager>().saveScene(emptyScenePath);
@@ -68,27 +67,27 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
 		nodes.push_back(
-		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
+		    WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
-		nodes.push_back(
-		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		    ImVec2(-1.0f, 1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
-		nodes.push_back(
-		    Workspace::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		    ImVec2(0.0f, -1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
 		// workspace contains 3 operators.
 		ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
 
-		connectNodes(nodes[0], nodes[1], 0, 0);
+		WorkspaceModule::connectNodes(nodes[0], nodes[1], 0, 0);
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 4);
 
-		connectNodes(nodes[1], nodes[2], 0, 0);
+		WorkspaceModule::connectNodes(nodes[1], nodes[2], 0, 0);
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 5);
 
 		const bool result = App::getModule<StateManager>().saveScene(scenePath);
@@ -126,8 +125,7 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 	// Requires the application to be initialized!
 	auto* ui = I3T::getUI();
 	ASSERT_TRUE(ui != nullptr);
-	const auto workspace = ui->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	ASSERT_TRUE(workspace != nullptr);
+	auto& workspace = I3T::getWorkspace();
 
 	auto& stateManager = App::getModule<StateManager>();
 
@@ -180,7 +178,7 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 	using namespace Workspace;
 
 	const auto scenePath = "Test/Data/TestScene.json";
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
+	auto& workspace = I3T::getWorkspace();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
 
@@ -189,9 +187,9 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 
 	std::vector<Ptr<CoreNode>> nodes;
 
-	nodes.push_back(addNodeToNodeEditor<Transformation<ETransformType::Scale>>());
-	nodes.push_back(addNodeToNodeEditor<Transformation<ETransformType::Free>>());
-	nodes.push_back(addNodeToNodeEditor<Workspace::Sequence>());
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Transformation<ETransformType::Scale>>());
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Transformation<ETransformType::Free>>());
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Sequence>());
 
 	const auto randomVec3 = generateVec3();
 

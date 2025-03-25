@@ -12,11 +12,9 @@
  */
 #include "Theme.h"
 
-// #include "imgui_node_editor.h"
-
 #include "Config.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
-#include "Utils/HSLColor.h"
 
 static Theme::CategoryNames g_CategoryNames;
 static std::map<EColor, const char*> g_ColorNames;
@@ -90,28 +88,39 @@ Theme::Theme(std::string name, bool isDark, const Theme::Colors& colors, const T
 
 	m_name = std::move(name);
 	m_isDark = isDark;
-	copyProperties(m_colors, colors);
-	copyProperties(m_sizes, sizes);
-	copyProperties(m_sizesVec2, sizesVec);
+	copyColors(m_colors, colors);
+	// We do not serialize the dpi scaling boolean right now
+	// So we infer the dpi switch from the default values during copying
+	copySizes(m_sizes, sizes);
+	copySizes(m_sizesVec2, sizesVec);
 }
 
 void Theme::initFonts()
 {
 	auto& io = ImGui::GetIO();
 
+	// TODO: (DR) I still feel like we have too many specific fonts.
+	//  Fonts should have as many uses as possible with the possibility of scaling them down for particular use cases.
+	//  It is not a good idea to load and rasterize whole new font just because it's used somewhere once
+	//  Hence I would prefer if the tutorial / welcome window specific fonts were reduced and reused elsewhere
+
+	// Generic fonts
 	m_fontsAssoc.insert(std::pair(EFont::Regular, "Roboto14"));
-	m_fontsAssoc.insert(std::pair(EFont::LargeBold, "RobotoBold20"));
-
 	m_fontsAssoc.insert({EFont::Mono, "RobotoMono14"});
-	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto14"));
 	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
-	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
-	m_fontsAssoc.insert(std::pair(EFont::Node, "Roboto12"));
-	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, "Roboto12"));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
 
-	io.FontDefault = get(EFont::Regular);
+	// Tutorial fonts.
+	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialBold, "RobotoBold16"));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, "RobotoItalic16"));
+
+	// Welcome window fonts
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, "UbuntuBold33.5"));
+	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, "UbuntuBold18"));
+
+	// Set default ImGui font
+	I3T::getUI()->getFontManager().setDefaultFont(m_fontsAssoc[EFont::Regular]);
 }
 
 void Theme::initClassicProperties()
@@ -148,9 +157,8 @@ void Theme::initClassicProperties()
 	set(EColor::DockTabUnfocusedActive, ImVec4(0.263f, 0.291f, 0.325f, 1.f));
 	set(EColor::DockTabHovered, get(EColor::SelectionColor));
 
-	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150));    // TODO: Missing in DarkTheme
-	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));             // TODO: Missing name!
-	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 100)); // TODO: Missing name!
+	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150)); // TODO: Missing in DarkTheme
+	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
@@ -288,148 +296,129 @@ void Theme::initClassicProperties()
 	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
 	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
 
+	m_sizes[ESize::Nodes_FloatMargin] = {1.0f, true};
+	m_sizes[ESize::Nodes_FloatWidth] = {25.0f, true};
+	m_sizes[ESize::Nodes_Rounding] = {5.0f, true};
+	m_sizes[ESize::Nodes_BorderWidth] = {0.0f, true};
+	m_sizes[ESize::Nodes_LabelIndent] = {3.0f, true};
+	m_sizes[ESize::Nodes_HeaderLabelIndent] = {2.0f, true};
+	m_sizes[ESize::Nodes_trackballButtonHeight] = {20.0f, true};
+	m_sizes[ESize::Nodes_TrackBallSensitivity] = {5.0f, true};
 
-	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, "Roboto14"));
-	m_fontsAssoc.insert(std::pair(EFont::Button, "RobotoBold12"));
-	m_fontsAssoc.insert(std::pair(EFont::Tab, "RobotoBold12"));
-	m_fontsAssoc.insert(std::pair(EFont::Node, "Roboto12"));
-	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, "Roboto12"));
-	m_fontsAssoc.insert(std::pair(EFont::Header, "RobotoBold20"));
+	m_sizes[ESize::Nodes_FloatInnerPadding] = {1.0f, true};
 
-	// Tutorial fonts.
-	m_fontsAssoc.insert(std::pair(EFont::TutorialText, "Roboto16"));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialTitle, "UbuntuBold24"));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialAssignment, "RobotoBold16"));
-	m_fontsAssoc.insert(std::pair(EFont::TutorialHint, "RobotoItalic16"));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeTitle, "UbuntuBold33.5"));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeDescription, "Roboto17.5"));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemTitle, "UbuntuBold18"));
-	m_fontsAssoc.insert(std::pair(EFont::WelcomeItemDescription, "Roboto12"));
+	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = {0.015f, true};
+	m_sizes[ESize::Nodes_CtrlMultiplicator] = {0.1f, true};
+	m_sizes[ESize::Nodes_SHIFTMultiplicator] = {10.0f, true};
+	m_sizes[ESize::Nodes_ALTMultiplicator] = {0.01f, true};
 
-	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
-	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
-	m_sizes[ESize::Nodes_Rounding] = 5.0f;
-	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
-	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
-	m_sizes[ESize::Nodes_HeaderLabelIndent] = 2.0f;
-	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
-	m_sizes[ESize::Nodes_TrackBallSensitivity] = 5.0f;
+	m_sizes[ESize::Nodes_InputsAlignment] = {0.0f, false};
+	m_sizes[ESize::Nodes_MiddleAlignment] = {0.0f, false};
+	m_sizes[ESize::Nodes_OutputsAlignment] = {0.0f, false};
 
-	m_sizes[ESize::Nodes_FloatInnerPadding] = 1.0f;
+	m_sizes[ESize::Nodes_leftSideSpacing] = {3.0f, true};
+	m_sizes[ESize::Nodes_rightSideSpacing] = {3.0f, true};
 
-	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = 0.015f;
-	m_sizes[ESize::Nodes_CtrlMultiplicator] = 0.1f;
-	m_sizes[ESize::Nodes_SHIFTMultiplicator] = 10.0f;
-	m_sizes[ESize::Nodes_ALTMultiplicator] = 0.01f;
+	m_sizes[ESize::Workspace_SelectedBorderThickness] = {2.5f, true};
+	m_sizes[ESize::Workspace_FocusBorderThickness] = {1.5f, true};
+	m_sizes[ESize::Workspace_CopyPasteOffset] = {25.f, true};
+	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = {0.0005f, false};
 
-	m_sizes[ESize::Nodes_InputsAlignment] = 0.0f;
-	m_sizes[ESize::Nodes_MiddleAlignment] = 0.0f;
-	m_sizes[ESize::Nodes_OutputsAlignment] = 0.0f;
+	m_sizes[ESize::TutorialTaskSquareXPadding] = {10.0f, true};
+	m_sizes[ESize::TutorialWindow_FrameRounding] = {5.0f, true};
+	m_sizes[ESize::TutorialWindow_ScrollbarRounding] = {5.0f, true};
+	m_sizes[ESize::TutorialWindow_ScrollbarSize] = {15.0f, true};
+	m_sizes[ESize::TutorialWindow_BackButtonWidth] = {40.0f, true};
+	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = {120.0f, true};
 
-	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
-	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
+	m_sizes[ESize::Default_VisiblePrecision] = {1.0f, false};
+	m_sizes[ESize::Default_VisibleQuaternionPrecision] = {4.0f, false};
 
-	m_sizes[ESize::Workspace_SelectedBorderThickness] = 2.5f;
-	m_sizes[ESize::Workspace_FocusBorderThickness] = 1.5f;
-	m_sizes[ESize::Workspace_InteractionFocusBorderThickness] = 1.5f;
-	m_sizes[ESize::Workspace_CopyPasteOffset] = 25.f;
-	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = 0.0005f;
+	m_sizes[ESize::Default_InactiveMark] = {0.0f, false};
 
-	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
-	m_sizes[ESize::TutorialWindow_FrameRounding] = 5.0f;
-	m_sizes[ESize::TutorialWindow_ScrollbarRounding] = 5.0f;
-	m_sizes[ESize::TutorialWindow_ScrollbarSize] = 15.0f;
-	m_sizes[ESize::TutorialWindow_BackButtonWidth] = 40.0f;
-	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 120.0f;
+	m_sizes[ESize::Links_ControlpointsPositionFraction] = {0.2f, false};
+	m_sizes[ESize::Links_ControlpointsPositionMin] = {50.0f, true};
+	m_sizes[ESize::Links_Thickness] = {5.0f, true};
+	m_sizes[ESize::Links_ThicknessSelectedBorder] = {2.0f, true};
 
-	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
-	m_sizes[ESize::Default_VisibleQuaternionPrecision] = 4.0f;
+	m_sizes[ESize::Pins_IconPadding] = {2.0f, true};
+	m_sizes[ESize::Links_selected_alpha] = {0.8f, false};
 
-	m_sizes[ESize::Default_InactiveMark] = 0.0f;
+	m_sizes[ESize::Float_inactive_alphaMultiplicator] = {0.5f, false};
 
-	m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
-	m_sizes[ESize::Links_ControlpointsPositionMin] = 50.0f;
-	m_sizes[ESize::Links_Thickness] = 5.0;
-	m_sizes[ESize::Links_ThicknessSelectedBorder] = 2.0;
+	m_sizes[ESize::Nodes_Operators_Rounding] = {5.0f, true};
+	m_sizes[ESize::Nodes_Sequence_Rounding] = {5.0f, true};
+	m_sizes[ESize::Nodes_LOD_Button_Rounding] = {5.0f, true};
+	m_sizes[ESize::Nodes_Border_Rounding] = {5.0f, true};
+	m_sizes[ESize::Nodes_Border_Thickness] = {1.5f, true};
 
-	m_sizes[ESize::Pins_IconPadding] = 2.0;
-	m_sizes[ESize::Links_selected_alpha] = 0.8;
+	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = {5.f, true};
 
-	m_sizes[ESize::Float_inactive_alphaMultiplicator] = 0.5;
+	m_sizes[ESize::Tracking_SmoothScrollSpeed] = {0.03f, false};
+	m_sizes[ESize::Tracking_JaggedScrollSpeed] = {0.2f, false};
 
-	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
-	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
-	m_sizes[ESize::Nodes_LOD_Button_Rounding] = 5.0;
-	m_sizes[ESize::Nodes_Border_Rounding] = 5.0;
-	m_sizes[ESize::Nodes_Border_Thickness] = 1.5;
+	m_sizes[ESize::Window_Rounding] = {0.0f, true};
+	m_sizes[ESize::Tooltip_Rounding] = {10.0f, true};
 
-	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = 5.f;
+	m_sizes[ESize::StartWindow_WinWidth] = {850.0f, true};
+	m_sizes[ESize::StartWindow_WinHeight] = {500.0f, true};
+	m_sizes[ESize::StartWindow_WinRounding] = {6.0f, true};
+	m_sizes[ESize::StartWindow_TitleVerticalOffset] = {130.0f, true};
+	m_sizes[ESize::StartWindow_LeftBarWidth] = {330.0f, true};
+	m_sizes[ESize::StartWindow_LoadButtonWidth] = {120.0f, true};
+	m_sizes[ESize::StartWindow_StartNewButtonWidth] = {120.0f, true};
+	m_sizes[ESize::StartWindow_ButtonHeight] = {30.0f, true};
+	m_sizes[ESize::StartWindow_ThumbImageSize] = {80.0f, true};
+	m_sizes[ESize::StartWindow_StartButtonWidth] = {120.0f, true};
+	m_sizes[ESize::StartWindow_FrameRounding] = {4.0f, true};
+	m_sizes[ESize::StartWindow_ScrollbarSize] = {14.0f, true};
+	m_sizes[ESize::StartWindow_YourSceneWinRounding] = {6.0f, true};
+	m_sizes[ESize::StartWindow_DotSize] = {10.0f, true};
+	m_sizes[ESize::StartWindow_DotSpacing] = {7.0f, true};
 
-	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
-	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
+	m_sizes[ESize::Cycle_ButtonRounding] = {3.0f, true};
+	m_sizes[ESize::Cycle_RadioButtonRounding] = {5.0f, true};
 
-	m_sizes[ESize::Window_Rounding] = 0.0f;
-	m_sizes[ESize::Tooltip_Rounding] = 10.0f;
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = {{4.0f, 4.0f}, true};
 
-	m_sizes[ESize::StartWindow_WinWidth] = 850.0f;
-	m_sizes[ESize::StartWindow_WinHeight] = 500.0f;
-	m_sizes[ESize::StartWindow_WinRounding] = 6.0f;
-	m_sizes[ESize::StartWindow_TitleVerticalOffset] = 130.0f;
-	m_sizes[ESize::StartWindow_LeftBarWidth] = 330.0f;
-	m_sizes[ESize::StartWindow_LoadButtonWidth] = 120.0f;
-	m_sizes[ESize::StartWindow_StartNewButtonWidth] = 120.0f;
-	m_sizes[ESize::StartWindow_ButtonHeight] = 30.0f;
-	m_sizes[ESize::StartWindow_ThumbImageSize] = 80.0f;
-	m_sizes[ESize::StartWindow_StartButtonWidth] = 120.0f;
-	m_sizes[ESize::StartWindow_FrameRounding] = 4.0f;
-	m_sizes[ESize::StartWindow_ScrollbarSize] = 14.0f;
-	m_sizes[ESize::StartWindow_YourSceneWinRounding] = 6.0f;
-	m_sizes[ESize::StartWindow_DotSize] = 10.0f;
-	m_sizes[ESize::StartWindow_DotSpacing] = 7.0f;
+	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = {{2.0f, 3.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = {{0.0f, 1.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = {{0.0f, 0.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = {{0.0f, 0.5f}, false};
+	m_sizesVec2[ESizeVec2::Nodes_PivotSize] = {{0.0f, 0.0f}, true};
 
-	m_sizes[ESize::Cycle_ButtonRounding] = 3.0f;
-	m_sizes[ESize::Cycle_RadioButtonRounding] = 5.0f;
+	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = {{0.0f, 0.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = {{0.0f, 0.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = {{0.0f, 0.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
+	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = {{25.0f, 25.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(0.0f, 1.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = ImVec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.5f);
-	m_sizesVec2[ESizeVec2::Nodes_PivotSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_IconSize] = {{12.0f, 12.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = {{32.0f, 32.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = {{130.0f, 130.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = {{0.0f, 0.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = ImVec2(25.0f, 25.0f);
+	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = {{20.f, 20.f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
-	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = ImVec2(130.0f, 130.0f);
+	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = {{100.f, 1.f}, true};
 
-	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = {{0.f, 20.f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = ImVec2(20.f, 20.f);
+	m_sizesVec2[ESizeVec2::NewNode_positionShift] = {{10.f, 0.f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
+	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = {{30.f, 35.f}, true};
+	m_sizesVec2[ESizeVec2::Tooltip_Padding] = {{10.f, 10.f}, true};
+	m_sizesVec2[ESizeVec2::Window_Padding] = {{0.f, 0.f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = ImVec2(0.f, 20.f);
+	m_sizesVec2[ESizeVec2::StartWindow_WinSize] = {{1020.f, 800.f}, false};
+	m_sizesVec2[ESizeVec2::StartWindow_LogoOffset] = {{5.f, -20.f}, true};
+	m_sizesVec2[ESizeVec2::StartWindow_WinPadding] = {{0.f, 0.f}, true};
+	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = {{30.f, 30.f}, true};
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = {{10.f, 10.f}, true};
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = {{10.f, 10.f}, true};
 
-	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
-
-	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = ImVec2(30.f, 35.f);
-	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
-	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
-
-	m_sizesVec2[ESizeVec2::StartWindow_WinSize] = ImVec2(1020.f, 600.f);
-	m_sizesVec2[ESizeVec2::StartWindow_LogoOffset] = ImVec2(5.f, -20.f);
-	m_sizesVec2[ESizeVec2::StartWindow_WinPadding] = ImVec2(0.f, 0.f);
-	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = ImVec2(30.f, 30.f);
-	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = ImVec2(10.f, 10.f);
-	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = ImVec2(10.f, 10.f);
-
-	m_sizesVec2[ESizeVec2::Cycle_ButtonSize] = ImVec2(40.0f, 40.0f);
+	m_sizesVec2[ESizeVec2::Cycle_ButtonSize] = {{40.0f, 40.0f}, true};
 }
 
 void Theme::initNames()
@@ -903,6 +892,63 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
 }
 
+void Theme::initImGuiStyle()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Reset ImGuiStyle
+	ImGui::GetCurrentContext()->Style = ImGuiStyle();
+
+	// Default styling
+	ImGui::StyleColorsDark();
+
+	// Extra theme agnostic tweaks
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
+	// windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f; // disable alpha
+	}
+}
+
+void Theme::updateDiwneStyleFromTheme() const
+{
+	float dpiScale = getDpiScale();
+
+	// Since DPI scaling is involved, we re-create the DIWNE style everytime and then scale it and modify it.
+	auto style = std::make_unique<DIWNE::DiwneStyle>();
+	style->scaleAllSizes(dpiScale);
+
+	// TODO: Apply all I3T theme variables to the new DIWNE style
+	// TODO: StyleOverrides need to be updated too, we should keep them separately, update them here and make
+	//  individual DiwneObjects hold a pointer to them.
+	// TODO: Is there a way we could avoid all this? What if DiwneStyle held pointers to style variables?
+	//  It would be nice if there was a single user struct somewhere and modifying it would directly modify diwne style
+	//  But I'm not sure if this is possible whilst supporting dpi scaling, the scale factor would need to be applied
+	//  dynamically. DiwneStyle could hold pointers to that struct and multiple by dpi scale on ::get().
+	//  How would StyleOverrides work in that case?
+
+	// I3T Theme sizes are already DPI scaled so we apply them after scaling the DIWNE style
+	using DIWNE::DiwneStyle;
+	style->set(DiwneStyle::selectionRounding, I3T::getUI()->getTheme().get(ESize::Nodes_Rounding));
+	style->set(DiwneStyle::itemSelectedBorderThicknessDiwne,
+	           I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness));
+	style->set(DiwneStyle::objectHoverBorderThicknessDiwne,
+	           I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness));
+	style->set(DiwneStyle::objectHoverBorderColor, I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder));
+
+	DIWNE::NodeEditor& editor = I3T::getWorkspace().getNodeEditor();
+	editor.setDpiScale(dpiScale); // Inform the NodeEditor that DPI scaling is at play, affects screen <-> diwne coords
+
+	DIWNE::SettingsDiwne& settingsDiwne = *editor.mp_settingsDiwne;
+	settingsDiwne.itemSelectedBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
+
+	editor.setStyle(std::move(style));
+}
+
 void Theme::apply()
 {
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -935,37 +981,21 @@ void Theme::apply()
 
 	style.Colors[ImGuiCol_PlotHistogram] = m_colors[EColor::SelectionColor];
 
-	style.FramePadding.x = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
-	style.FramePadding.y = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
+	style.FramePadding.x = m_sizesVec2[ESizeVec2::Window_FramePadding].first.x;
+	style.FramePadding.y = m_sizesVec2[ESizeVec2::Window_FramePadding].first.y;
 	style.TabRounding = 2.0f;
 
-	// Show borders.
+	// Show borders, these sizes are not scaled by ImGuiStyle::ScaleAllSizes() so we handle it here manually
 	style.ChildBorderSize = 1.0f;
 	style.PopupBorderSize = 1.0f;
-	style.WindowBorderSize = 1.0f;
+	style.WindowBorderSize = std::max(1.0f, m_dpiScale); // Scale with dpi to help with window resizing
 
-	// SS, MH please check this
-	//---------------------------------------------------------------------------------------
-	/* \todo JH \todo JH repaire
-	auto& nodesStyle = ax::NodeEditor::GetStyle();
-
-	nodesStyle.NodeRounding																					 =
-	m_sizes[ESize::Nodes_Rounding]; nodesStyle.NodeBorderWidth =
-	m_sizes[ESize::Nodes_BorderWidth];
-	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
-	m_colors[EColor::NodeBgOperator];
-
-	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg]		 =
-	m_colors[EColor::NodeEditorBg];
-	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Grid] 		 =
-	m_colors[EColor::NodeEditorBg];
-	*/
-	//---------------------------------------------------------------------------------------
+	updateDiwneStyleFromTheme();
 }
 
 ImFont* Theme::get(EFont font)
 {
-	return I3T::getUI()->getFonts()[m_fontsAssoc[font]];
+	return I3T::getUI()->getFontManager().getFont(m_fontsAssoc[font]);
 }
 
 const char* Theme::getCategoryName(const std::string& key)
@@ -1013,8 +1043,8 @@ bool Detail::isLightThemeSet()
 	auto buffer = std::vector<char>(4);
 	auto cbData = static_cast<DWORD>(buffer.size() * sizeof(char));
 	auto res = RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-	                        L"AppsUseLightTheme",
-	                        RRF_RT_REG_DWORD, // expected value type
+	                        L"AppsUseLightTheme", RRF_RT_REG_DWORD,
+	                        // expected value type
 	                        nullptr, buffer.data(), &cbData);
 
 	if (res != ERROR_SUCCESS)

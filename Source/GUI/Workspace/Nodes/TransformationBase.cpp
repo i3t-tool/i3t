@@ -23,8 +23,8 @@ TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node>
     : CoreNode(diwne, nodebase), aboveSequence(0)
 {
 	updateDataItemsWidth();
-	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
-	m_style.addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
 }
 
 bool TransformationBase::allowDrawing()
