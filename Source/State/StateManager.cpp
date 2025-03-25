@@ -103,9 +103,27 @@ void StateManager::takeSnapshot()
 {
 	if (auto state = createSceneMemento(nullptr))
 	{
+		if (!m_mementos.empty())
+		{
+			if (state == m_mementos[m_currentStateIdx])
+			{
+				return;
+			}
+		}
+
+		if (canRedo())
+		{
+			m_mementos.erase(m_mementos.begin() + m_currentStateIdx + 1, m_mementos.end());
+			m_hashes.erase(m_hashes.begin() + m_currentStateIdx + 1, m_hashes.end());
+		}
+
 		m_mementos.push_back(std::move(*state));
 		m_hashes.push_back(randLong());
-		m_currentStateIdx = m_mementos.size() - 1;
+		if (m_hashes.size() == 1)
+		{
+			m_hashes[0] = m_currentScene->m_hash;
+		}
+		m_currentStateIdx++;
 
 		if (m_mementos.size() != 1)
 		{

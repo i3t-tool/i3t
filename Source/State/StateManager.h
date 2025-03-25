@@ -165,9 +165,9 @@ private:
 
 	// Undo/Redo _______________________________________________________________________________________________________
 
-	int m_currentStateIdx;
-	std::deque<Memento> m_mementos;
-	std::deque<long> m_hashes;
+	int m_currentStateIdx{-1};
+	std::vector<Memento> m_mementos;
+	std::vector<long> m_hashes;
 
 	bool m_dirty = false;
 };
