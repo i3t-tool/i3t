@@ -60,6 +60,11 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, int con
 	if (ImGui::IsItemActive()) // TODO: This seems odd, why in the world would we override IsItemActive??
 		inner_interaction_happen = true;
 
+	if (ImGui::IsItemDeactivatedAfterEdit())
+	{
+		diwne.m_takeSnap = true;
+	}
+
 	if (!inactive && !diwne.m_popupDrawn)
 	{
 		if (bypassFloatFocusAction() && bypassFloatRaisePopupAction())
