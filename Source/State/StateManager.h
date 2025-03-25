@@ -141,6 +141,9 @@ private:
 
 	std::optional<Memento> createSceneMemento(Scene* scene);
 
+	// Create a memento from WorkspaceWindow without "zoom" and "workArea" properties
+	std::optional<Memento> createSnapshotMemento(Scene* scene);
+
 	// Global save/load ________________________________________________________________________________________________
 
 	const fs::path m_globalFilePath = fs::path("Global.json");

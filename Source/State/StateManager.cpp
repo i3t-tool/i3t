@@ -14,6 +14,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"
@@ -101,7 +102,7 @@ void StateManager::onClose()
 
 void StateManager::takeSnapshot()
 {
-	if (auto state = createSceneMemento(nullptr))
+	if (auto state = createSnapshotMemento(nullptr))
 	{
 		if (!m_mementos.empty())
 		{
@@ -145,7 +146,10 @@ void StateManager::undo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadScene(memento, nullptr);
+		if (dynamic_cast<WorkspaceWindow*>(originator))
+		{
+			originator->loadScene(memento, nullptr);
+		}
 	}
 
 	setWindowTitle();
@@ -164,7 +168,10 @@ void StateManager::redo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadScene(memento, nullptr);
+		if (dynamic_cast<WorkspaceWindow*>(originator))
+		{
+			originator->loadScene(memento, nullptr);
+		}
 	}
 
 	setWindowTitle();
@@ -233,6 +240,29 @@ std::optional<Memento> StateManager::createSceneMemento(Scene* scene)
 	{
 		auto memento = originator->saveScene(scene);
 		JSON::merge(state, memento, state.GetAllocator());
+	}
+
+	return state;
+}
+
+std::optional<Memento> StateManager::createSnapshotMemento(Scene* scene)
+{
+	Memento state;
+	state.SetObject();
+
+	if (m_originators.empty())
+	{
+		LOG_WARN("You have no originators set for the StateManager. Cannot take scene snapshot.");
+		return std::nullopt;
+	}
+
+	for (const auto& originator : m_originators)
+	{
+		if (dynamic_cast<WorkspaceWindow*>(originator))
+		{
+			auto memento = originator->saveScene(scene);
+			JSON::merge(state, memento, state.GetAllocator());
+		}
 	}
 
 	return state;
