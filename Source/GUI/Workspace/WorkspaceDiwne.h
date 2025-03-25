@@ -213,7 +213,7 @@ public:
 	{
 		return DIWNE::FilteredNodeRange<CoreNode>(
 		    [](const DIWNE::Node* node) -> bool {
-			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && !node->isDestroyed();
 		    },
 		    &m_nodes);
 	}
@@ -223,7 +223,7 @@ public:
 	{
 		return DIWNE::FilteredRecursiveNodeRange<CoreNode>(
 		    [](const DIWNE::Node* node) -> bool {
-			    return node->getFlag(CoreNode::CORE_NODE_FLAG);
+			    return node->getFlag(CoreNode::CORE_NODE_FLAG) && !node->isDestroyed();
 		    },
 		    &m_nodes);
 	}

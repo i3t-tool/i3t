@@ -44,7 +44,7 @@ Memento WorkspaceModule::saveScene(Scene* scene)
 	rapidjson::Value::AllocatorType& a = memento.GetAllocator();
 
 	SerializationVisitor visitor(memento);
-	visitor.dump(getNodeEditor().getAllCoreNodes().collect());
+	visitor.dump(getNodeEditor().getCoreNodes().collect());
 
 	JSON::addFloat(memento["workspace"], "zoom", g_editor->canvas().getZoom(), a);
 	JSON::addRect(memento["workspace"], "workArea", g_editor->canvas().getViewportRectDiwne(), a);

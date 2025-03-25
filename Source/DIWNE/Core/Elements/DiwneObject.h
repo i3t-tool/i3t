@@ -292,7 +292,7 @@ public:
 	virtual void onDestroy(bool logEvent);
 
 	/// @see destroy()
-	bool isDestroyed()
+	bool isDestroyed() const
 	{
 		return m_destroy;
 	}
