@@ -281,8 +281,8 @@ void CorePin::onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin
 		if (logEvent)
 		{
 			LOG_EVENT_DISCONNECT(outputPin, inputPin);
-			diwne.m_takeSnap = true;
 		}
+		diwne.m_takeSnap = true;
 	}
 }
 
