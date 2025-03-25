@@ -20,6 +20,8 @@ void ConnectPinAction::onEnd()
 
 void DragNodeAction::onFrameEnd()
 {
+	// This must be called *right* before rendering to achieve the lowest input delay.
+	// Eg. this expects that onFrameEnd() is actually called onNextFrameBegin() //TODO: Maybe rename this method.
 	ImVec2 offset = editor.canvas().screen2diwneSize(editor.input().bypassGetMouseDelta());
 	for (auto node : nodes)
 	{
