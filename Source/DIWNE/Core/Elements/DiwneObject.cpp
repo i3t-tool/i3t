@@ -96,6 +96,13 @@ void DiwneObject::initializeDiwne(DrawInfo& context)
 
 void DiwneObject::beginDiwne(DrawInfo& context)
 {
+	// DiwneObjects are supposed to be drawn at the current ImGui cursor pos
+	// During the begin call, background are often drawn using the previous frame m_rect information
+	// (m_rect is updated in the updateLayout() method after begin()/end())
+	// Hence m_rect needs to be updated here to be positioned at the cursor position.
+	const ImVec2 offset = diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()) - m_rect.Min;
+	translate(offset); // Move m_rect using the translate method so that derived classes can react accordingly
+
 	begin(context);
 }
 
@@ -381,7 +388,8 @@ void InteractionState::nextFrame()
 			action->endActionNextFrame = 2; // End it immediately
 		}
 
-		action->onFrameEnd();
+		if (action->endActionNextFrame == 0)
+			action->onFrameEnd();
 
 		// When action ends we want to keep it active for the remainder of the frame as well as the entirety of the
 		// next frame. So any objects, even those rendered before the action was ended, can react to it ending.
