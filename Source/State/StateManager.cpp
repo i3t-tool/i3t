@@ -261,6 +261,11 @@ std::optional<Memento> StateManager::createSnapshotMemento(Scene* scene)
 		if (dynamic_cast<WorkspaceWindow*>(originator))
 		{
 			auto memento = originator->saveScene(scene);
+			if (memento.HasMember("workspace"))
+			{
+				memento["workspace"].RemoveMember("zoom");
+				memento["workspace"].RemoveMember("workArea");
+			}
 			JSON::merge(state, memento, state.GetAllocator());
 		}
 	}
