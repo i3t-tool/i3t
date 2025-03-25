@@ -191,6 +191,7 @@ public:
 	 * The object returned is a trivial container wrapper around a node iterator.
 	 * TODO: Better docs with an example
 	 * TODO: This can be const.
+	 * TODO: There is an idea that iterators could filter out destroyed nodes by default. Consider.
 	 */
 	NodeRange<> getNodes() const override;
 	// TODO: Docs and rename to getAllNodes()
