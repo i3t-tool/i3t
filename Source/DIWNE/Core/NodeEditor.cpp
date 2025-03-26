@@ -23,10 +23,9 @@
 namespace DIWNE
 {
 NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
-    : DiwneObject(*this, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne), NodeContainer(this),
-      m_popupPosition(settingsDiwne->initPopupPosition)
+    : DiwneObject(*this, settingsDiwne->editorlabel), NodeContainer(this), mp_settingsDiwne(settingsDiwne)
 {
-	setSelectable(false);
+	DiwneObject::setSelectable(false);
 }
 
 NodeEditor::~NodeEditor()
@@ -116,8 +115,10 @@ void NodeEditor::begin(DrawInfo& context)
 void NodeEditor::content(DrawInfo& context)
 {
 	// Debug work area rect
-	ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
-	                                    ImColor(255, 0, 0, 255));
+	DIWNE_DEBUG(diwne, {
+		ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
+		                                    ImColor(255, 0, 0, 255));
+	});
 
 	// TODO: [Performance] Could the channel splitter with its channel for each node be causing performance issues?
 	//  I haven't investigated too deep but presumably all draw commands (which are many) are being reordered in
@@ -533,19 +534,21 @@ void NodeEditor::addNode(const std::shared_ptr<Node>& node)
 
 void NodeEditor::addNode(const std::shared_ptr<Node>& node, const ImVec2 position, bool shiftToLeftByNodeWidth)
 {
-	// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
-	// size, padding etc.)
-	// Hence scaling is applied here if not active, and then restored to its original state at the end of this
-	// method
-	bool zoomScalingWasActive = m_canvas->ensureZoomScaling(true);
 	node->setPosition(position);
 	if (shiftToLeftByNodeWidth)
 	{
+		// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
+		// size, padding etc.)
+		// Hence scaling is applied here if not active, and then restored to its original state at the end of this
+		// method
+		bool zoomScalingWasActive = m_canvas->ensureZoomScaling(true);
+
 		// We draw the node out of context to obtain its initial size
 		node->draw(DIWNE::DrawMode_JustDraw | DrawMode_ForceDraw);
 		node->translate(ImVec2(-node->getRect().GetSize().x - ImGui::GetFontSize() * 2, 0));
+
+		m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	}
-	m_canvas->ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	m_takeSnap = true;
 	NodeContainer::addNode(node);
 }

@@ -15,7 +15,7 @@
 #include <regex>
 
 #include "GUI/Elements/Modals/ScriptEditor.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Scripting/ScriptingModule.h"
 
 constexpr const char* SCRIPTING_NODE_TEMPLATE = R"(
@@ -185,8 +185,7 @@ ScriptingNode::~ScriptingNode()
 
 void ScriptingNode::popupContent(DIWNE::DrawInfo& context)
 {
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	auto& nodeEditor = workspace->getNodeEditor();
+	auto& nodeEditor = I3T::getWorkspace().getNodeEditor();
 
 	CoreNode::drawMenuSetEditable();
 
@@ -240,8 +239,7 @@ Ptr<ScriptingNode> ScriptingNode::reloadScript()
 
 	auto newNode = std::make_shared<ScriptingNode>(diwne, m_script, std::move(interface.value()));
 
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	auto& nodeEditor = workspace->getNodeEditor();
+	auto& nodeEditor = I3T::getWorkspace().getNodeEditor();
 
 	bool success = nodeEditor.replaceAndReplugNode(self, newNode);
 	if (!success)

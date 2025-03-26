@@ -2,8 +2,8 @@
 
 #include <memory>
 #include <unordered_map>
-#include <utility>
 
+#include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/diwne_common.h"
 #include "DiwneStyle.h"
 
@@ -12,22 +12,22 @@ namespace DIWNE
 struct StyleOverride
 {
 	std::unordered_map<int, std::shared_ptr<void>> overrides; ///< Overrides to the style
-	DiwneStyle& style;                                        ///< The base style
+	NodeEditor& editor; ///< The associated node editor (from which the base style is taken)
 
-	StyleOverride(DiwneStyle& style) : style(style) {}
+	StyleOverride(NodeEditor& editor) : editor(editor) {}
 
 	template <typename T>
 	const T& get(short key)
 	{
 		if (overrides.empty() || overrides.find(key) == overrides.end())
-			return style.get<T>(key);
+			return editor.style().get<T>(key);
 		return *static_cast<T*>(overrides[key].get());
 	};
 
 	template <typename T>
 	void addOverride(short key, T value)
 	{
-		if (key < 0 || key >= style.registry.size())
+		if (key < 0 || key >= editor.style().registry.size())
 		{
 			DIWNE_ERROR("Invalid style override! Key not present in base style.");
 			return;

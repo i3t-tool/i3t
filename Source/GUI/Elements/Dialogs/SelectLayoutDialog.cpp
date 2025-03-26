@@ -16,7 +16,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Resources/ResourceManager.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/WindowManager.h"
 
 

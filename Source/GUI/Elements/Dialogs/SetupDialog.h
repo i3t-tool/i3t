@@ -16,6 +16,8 @@
 
 class SetupDialog : public IWindow
 {
+	float m_uiScaleTmp;
+
 public:
 	I3T_WINDOW(SetupDialog)
 

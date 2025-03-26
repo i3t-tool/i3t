@@ -13,7 +13,7 @@
 
 #include "StatisticsWindow.h"
 #include "Commands/ApplicationCommands.h"
-#include "GUI/IconFonts/Bindings/BindingFontAwesome.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "Localization/Localization.h"
 #include "Utils/Statistics.h"

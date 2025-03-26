@@ -11,11 +11,12 @@
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
 #include "Scripting/Environment.h"
+#include "WorkspaceModule.h"
 
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Builder.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Scripting/Utils.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -24,8 +25,7 @@ static Workspace::TransformBuilder g_TransformBuilder;
 
 static Workspace::WorkspaceDiwne& getNodeEditor()
 {
-	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
-	return workspace->getNodeEditor();
+	return I3T::getWorkspace().getNodeEditor();
 }
 
 //----------------------------------------------------------------------------//
@@ -224,7 +224,7 @@ static Ptr<Workspace::CoreNode> findNodePred(const std::vector<Ptr<Workspace::Co
 
 static bool plug(Ptr<GuiNode> self, int from, Ptr<GuiNode> other, int to)
 {
-	return connectNodesNoSave(self, other, from, to);
+	return WorkspaceModule::connectNodesNoSave(self, other, from, to);
 }
 
 static bool unplugInput(Ptr<GuiNode> self, int inputIndex)
@@ -786,7 +786,7 @@ LUA_REGISTRATION
 		    return transform;
 	    },
 	    sol::meta_function::construct, []() -> Ptr<GuiSequence> {
-		    auto sequence = Workspace::addNodeToNodeEditor<GuiSequence>();
+		    auto sequence = WorkspaceModule::addNodeToNodeEditor<GuiSequence>();
 
 		    print(fmt::format("ID: {}", sequence->getNodebase()->getId()));
 
@@ -797,7 +797,7 @@ LUA_REGISTRATION
 		"Model",
 		sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
 		sol::meta_function::construct, []() -> Ptr<GuiModel> {
-			auto model = Workspace::addNodeToNodeEditor<GuiModel>();
+			auto model = WorkspaceModule::addNodeToNodeEditor<GuiModel>();
 
 			print(fmt::format("ID: {}", model->getNodebase()->getId()));
 
@@ -830,7 +830,7 @@ LUA_REGISTRATION
 		"Cycle",
 		sol::base_classes, sol::bases<GuiNode>(),
 		sol::meta_function::construct, []() -> Ptr<Workspace::Cycle> {
-			auto cycle = Workspace::addNodeToNodeEditor<Workspace::Cycle>();
+			auto cycle = WorkspaceModule::addNodeToNodeEditor<Workspace::Cycle>();
 
 			print(fmt::format("ID: {}", cycle->getNodebase()->getId()));
 
@@ -867,7 +867,7 @@ LUA_REGISTRATION
 		"Camera",
 		sol::base_classes, sol::bases<GuiNode>(),
 		sol::meta_function::construct, []() -> Ptr<Workspace::Camera> {
-			auto camera = Workspace::addNodeToNodeEditor<Workspace::Camera>();
+			auto camera = WorkspaceModule::addNodeToNodeEditor<Workspace::Camera>();
 
 			print(fmt::format("ID: {}", camera->getNodebase()->getId()));
 
@@ -885,7 +885,7 @@ LUA_REGISTRATION
 		"Screen",
 		sol::base_classes, sol::bases<GuiNode>(),
 		sol::meta_function::construct, []() -> Ptr<Workspace::Screen> {
-			auto screen = Workspace::addNodeToNodeEditor<Workspace::Screen>();
+			auto screen = WorkspaceModule::addNodeToNodeEditor<Workspace::Screen>();
 
 			print(fmt::format("ID: {}", screen->getNodebase()->getId()));
 
@@ -900,7 +900,7 @@ LUA_REGISTRATION
 		"ScriptingNode",
 		sol::base_classes, sol::bases<GuiNode>(),
 		sol::meta_function::construct, []() -> Ptr<Workspace::ScriptingNode> {
-			auto node = Workspace::addNodeToNodeEditor<Workspace::ScriptingNode>();
+			auto node = WorkspaceModule::addNodeToNodeEditor<Workspace::ScriptingNode>();
 
 			print(fmt::format("ID: {}", node->getNodebase()->getId()));
 

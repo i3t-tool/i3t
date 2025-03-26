@@ -16,7 +16,7 @@
 #include "Core/Application.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"
-#include "GUI/IconFonts/Icons.h"
+#include "GUI/Fonts/Icons.h"
 #include "GUI/Toolkit.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"

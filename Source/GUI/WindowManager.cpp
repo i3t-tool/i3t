@@ -65,16 +65,16 @@ void WindowManager::draw()
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImVec2 work_pos = viewport->WorkPos;
 		ImVec2 work_size = viewport->WorkSize;
-		ImGui::SetNextWindowPos({work_pos.x + work_size.x - PAD, work_pos.y + PAD}, ImGuiCond_Always, {1.0f, 0.0f});
+		// ImGui::SetNextWindowPos({work_pos.x + work_size.x - PAD, work_pos.y + PAD}, ImGuiCond_Once, {1.0f, 0.0f});
 		ImGui::SetNextWindowViewport(viewport->ID);
 
 		ImVec4 titleBgCol = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
 		ImVec4 titleBgActiveCol = ImGui::GetStyleColorVec4(ImGuiCol_TitleBgActive);
-		titleBgCol.w = 0.4f;
-		titleBgActiveCol.w = 0.6f;
+		titleBgCol.w = 0.76f;
+		titleBgActiveCol.w = 0.92f;
 		ImGui::PushStyleColor(ImGuiCol_TitleBg, titleBgCol);
 		ImGui::PushStyleColor(ImGuiCol_TitleBgActive, titleBgActiveCol);
-		ImGui::SetNextWindowBgAlpha(0.35f);
+		ImGui::SetNextWindowBgAlpha(0.7f);
 		if (ImGui::Begin("WindowManager debug", &I3T::app().m_debugWindowManager, window_flags))
 		{
 			int idx = 41314;
@@ -212,9 +212,9 @@ void WindowManager::updateWindowFocus()
 
 	if (hoveredWindow)
 	{
-		// Switch focus to the known hovered window, potentially the one thats focused already
-		// But only if it has auto-focus on
-		if (hoveredWindow->m_autoFocus)
+		// Switch focus to the known hovered window, potentially the one thats focused already.
+		// Focus is also switched to a non-autofocused window if the one currently holding it is auto-focused.
+		if (hoveredWindow->m_autoFocus || (m_focusedWindow == nullptr || m_focusedWindow->m_autoFocus))
 		{
 			focusWindow(hoveredWindow);
 			// LOG_DEBUG("Auto-switching focus to known window: {}", hoveredWindow->getName());

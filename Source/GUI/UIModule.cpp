@@ -12,9 +12,15 @@
  */
 #include "UIModule.h"
 
-#include "Commands/ApplicationCommands.h"
+#include "GLFW/glfw3.h"
+
 #include "Core/Input/InputManager.h"
 #include "Core/Result.h"
+
+#include "Commands/ApplicationCommands.h"
+#include "State/StateManager.h"
+#include "UserData.h"
+
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
@@ -27,13 +33,9 @@
 #include "GUI/Theme/ThemeLoader.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
-#include "State/StateManager.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Tutorial/TutorialManager.h"
-#include "UserData.h"
-#include "Utils/HSLColor.h"
-
-#include "GUI/IconFonts/Icons.h"
+#include "Workspace/WorkspaceModule.h"
 
 using namespace UI;
 
@@ -41,7 +43,6 @@ UIModule::~UIModule()
 {
 	delete m_menu;
 }
-
 
 static void* LayoutStateReadOpenFn(ImGuiContext*, ImGuiSettingsHandler*, const char* name)
 {
@@ -93,12 +94,15 @@ void UIModule::onInit()
 
 	Theme::initNames();
 
-	ImGuiIO& io = ImGui::GetIO();
+	// Setup Dear ImGui style
+	Theme::initImGuiStyle();
 
-	// Load Themes to be usable in window initializations
-	loadFonts();
+	// Load themes (applies one of them)
 	loadThemes();
-	m_currentTheme->apply();
+
+	// Determine UI scaling factor and apply it (+ load appropriate fonts)
+	float dpiScale = getMainWindowDpiScaleFactor();
+	applyUIScaling(dpiScale);
 
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
@@ -123,21 +127,6 @@ void UIModule::onInit()
 		});
 	});
 
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
-	// windows can look identical to regular ones.
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f; // disable alpha
-	}
-
-	// Apply theme to windows
-	m_currentTheme->apply();
-
 	LoadWindowLayoutFromFileCommand::addListener([this](std::string path) {
 		m_windowManager.loadLayout(path);
 	});
@@ -155,6 +144,16 @@ void UIModule::onInit()
 	iniLayoutHandler.WriteAllFn = LayoutStateWriteAllFn;
 
 	ImGui::AddSettingsHandler(&iniLayoutHandler);
+}
+
+void UIModule::onBeforeFrame()
+{
+	// Update DPI scaling if necessary
+	if (m_queuedUiScale > 0.99f)
+	{
+		applyUIScaling(m_queuedUiScale);
+		m_queuedUiScale = -1.0f;
+	}
 }
 
 void UIModule::onBeginFrame()
@@ -177,10 +176,52 @@ void UIModule::onClose()
 	// and disable Dear ImGui saving
 	ImGui::GetIO().IniFilename = nullptr;
 
+	// TODO: (DR) Investigate if this is still a problem with new DIWNE
 	/// \todo MH - This may not be sufficient.
-	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
-	workspace->getNodeEditor().clear(); // We need to clear nodes here rather than later with destructors
+	I3T::getWorkspace().getNodeEditor().clear(); // We need to clear nodes here rather than later with destructors
 	m_windowManager.clear();
+}
+
+float UIModule::getMainWindowDpiScaleFactor()
+{
+	float xscale, yscale;
+	glfwGetWindowContentScale(App::get().getWindow(), &xscale, &yscale);
+	float dpiScale = std::max(xscale, 1.0f);
+	return dpiScale;
+}
+
+void UIModule::applyUIScaling(float scale)
+{
+	if (m_uiScale == scale)
+		return;
+	assert(scale > 0.99f && scale <= 10.0f);
+	m_uiScale = scale;
+
+	LOG_INFO("Applying UI scale of {}.", scale);
+
+	// Regenerate ImGuiStyle
+	Theme::initImGuiStyle();
+	// Reapply current theme
+	m_currentTheme->setDpiScale(scale);
+	m_currentTheme->apply();
+	// Scale ImGuiStyle
+	ImGui::GetStyle().ScaleAllSizes(scale);
+	// Regenerate fonts
+	m_fontManager.generateFonts(scale);
+
+	WorkspaceModule::g_editor->m_updateDataItemsWidth = true; // Prompt resize of data items
+
+	// TODO: Maybe scale ImGui::GetIO().MouseDragThreshold?
+}
+
+void UIModule::applyUIScalingNextFrame(float scale)
+{
+	m_queuedUiScale = scale;
+}
+
+float UIModule::getUiScale() const
+{
+	return m_uiScale;
 }
 
 void UIModule::loadThemes()
@@ -304,150 +345,6 @@ std::optional<Theme*> UIModule::getThemeByName(const std::string& name) const
 	}
 
 	return std::nullopt;
-}
-
-void UIModule::loadFonts()
-{
-	auto& io = ImGui::GetIO();
-
-	float fontScale = 1.2f;
-
-	// https://www.unicode.org/roadmaps/bmp/
-	// to show the atlas, use
-	//  ImGuiIO& io = ImGui::GetIO();
-	//  ImFontAtlas* atlas = io.Fonts;
-	//  ImGui::ShowFontAtlas(atlas);
-	// or
-	// ImGui Demo / Configuration / Style / Fonts
-
-	// (PF) minimalistic font set - 1024x2048 font atlas texture
-	const ImWchar ranges[] = {
-	    0x0020,
-	    0x007F, // Basic Latin
-	    0x0080,
-	    0x017F, // Czech mini (Latin-1 Supplement + Latin extended A)
-	    0x0400,
-	    0x04FF, // Cyrillic
-	    // 0x0080, 0x07FF, // Czech + lot of right to left characters -- too many never used characters
-	    // 0x25FC, 0x2BC8, // Geometric shapes media buttons stop and play - are not in our fonts
-	    // - this is a too long range instead of two characters
-	    0,
-	};
-	const ImWchar symbolRanges[] = {
-	    0x2300,
-	    0x23E9,
-	    0,
-	};
-	// https://symbl.cc/en/unicode/table/
-	// These icons should be in unicode, but are not in our roboto fonts...
-	// “User interface symbols” subblock of the “Miscellaneous Technical”
-	//  ◼ 0x25FC
-	//  ⯈ 0x2BC8 Black Medium Right-Pointing Triangle Centred
-	// ▶ 25B6 Play Button, play.
-	// ⏩ 23E9 Fast-Forward Button, fast forward.
-	// ⏪ 23EA Fast Reverse Button, fast rewind, rewind.
-	// ⏭ 23ED Next Track Button.
-	// ⏮ 23EE Last Track Button.
-	// ⏯ 23EF Play Or Pause Button.
-	// ⏸ 23F8 Pause Button, pause.
-	// ⏹ 23F9 Stop Button, stop.
-
-
-	// Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
-	ImFontConfig ubuntuBoldCfg;
-	ubuntuBoldCfg.OversampleH = 2;
-	ubuntuBoldCfg.OversampleV = 1;
-	ubuntuBoldCfg.GlyphExtraSpacing.x = -0.5f;
-
-	// NOTE: Oversampling is a technique that scales the loaded font by a specific factor in the X (horizontal) or Y
-	// (vertical) direction (or both). In the process the font is also slightly blurred. Such modified font texture is
-	// meant to be rendered at the original smaller size and the blurred edges of letters allow for subpixel
-	// antialiasing. More info here: https://github.com/nothings/stb/blob/master/tests/oversample/README.md
-	// This can be abused to make scaled up text look less pixelated when zoomed in. Although it also makes the zoomed
-	// in text a little blurry.
-
-	// Inspired by:
-	// https://github.com/thedmd/imgui-node-editor/blob/af7fa51bb9d68c9b44477c341f13a7dadee3e359/examples/application/source/application.cpp#L97
-
-	// In the future, dynamically replacing the font for a non-blurry bigger one would be the solution (or outright
-	// always using a big font and scaling it down)
-	// Another solution could be switching to freetype/vector-based fonts which ImGui might include soon. However, this
-	// is a good enough solution for now. Note that using oversampling with high factors dramatically increases the size
-	// of the font atlas texture, hogging video memory, especially if many fonts with large glyph ranges are used.
-
-	// Default config, using lower horizontal oversampling (3 --> 2) than imgui to save some memory
-	// (The difference is, as imgui docs mention, almost non-existent)
-	ImFontConfig lqConfig;
-	lqConfig.OversampleH = 2;
-	lqConfig.OversampleV = 1;
-
-	// More video memory intensive font config that uses high horizontal AND vertical oversampling.
-	// This is ideal for fonts we zoom in on like in the workspace, albeit they become slightly blurry.
-	ImFontConfig hqConfig;
-	hqConfig.OversampleH = 4;
-	hqConfig.OversampleV = 4;
-	hqConfig.PixelSnapH = false;
-
-	ImFontConfig mqConfig;
-	mqConfig.OversampleH = 3;
-	mqConfig.OversampleV = 2;
-	mqConfig.PixelSnapH = false;
-
-	// TODO: (DR) Do we really need all these fonts? Can't we use just a few (small/large variants) and them scale them?
-	//   Currently we're filling the font atlas with huge fonts just to use them once.
-	// As of right now the font atlas size is 2048x4096
-	// (PF) reduced font ranges above -> font atlas 1024x2048
-
-	m_fonts = {
-	    {"Roboto12", loadFont("Data/Fonts/Roboto-Regular.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},   //
-	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},    //
-	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},   //
-	    {"Roboto17.5", loadFont("Data/Fonts/Roboto-Regular.ttf", 17.5f, fontScale, &lqConfig, ranges, false)}, //
-	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},  //
-	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},  //
-	    {"RobotoBold20", loadFont("Data/Fonts/Roboto-Bold.ttf", 20.0f, fontScale, &mqConfig, ranges, false)},  //
-	    {"RobotoMono14", loadFont("Data/Fonts/RobotoMono-Regular.ttf", 14.0f, fontScale, &lqConfig, ranges, false)},
-	    {"RobotoItalic16", loadFont("Data/Fonts/Roboto-Italic.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},    //
-	    {"UbuntuBold18", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 18.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"UbuntuBold24", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 24.0f, fontScale, &lqConfig, ranges, false)},        //
-	    {"UbuntuBold33.5", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 33.5f, fontScale, &ubuntuBoldCfg, ranges, false)}, //
-	};
-
-	io.Fonts->Build();
-}
-
-void loadFontAwesomeIcons(float size_pixels, float fontScale)
-{
-	ImGuiIO& io = ImGui::GetIO();
-
-	// Merge in icon fonts
-	ImFontConfig icons_config;
-	icons_config.MergeMode = true;
-	icons_config.PixelSnapH = true;
-
-	float baseFontSize = size_pixels * fontScale;
-	float iconFontSize = baseFontSize;
-
-	icons_config.GlyphMinAdvanceX = iconFontSize;
-	//	icons_config.GlyphMaxAdvanceX = iconFontSize;
-	icons_config.GlyphOffset = ImVec2(0, 0);
-
-	static const ImWchar icons_ranges_fa[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-	io.Fonts->AddFontFromFileTTF("Data/Fonts/fa-6-solid-900-i3t.ttf", iconFontSize, &icons_config, icons_ranges_fa);
-}
-
-ImFont* UIModule::loadFont(const char* filename, float size_pixels, float fontScale,
-                           const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges, bool mergeIcons)
-{
-	ImFont* font =
-	    ImGui::GetIO().Fonts->AddFontFromFileTTF(filename, size_pixels * fontScale, font_cfg_template, glyph_ranges);
-
-	if (!mergeIcons)
-		return font;
-
-	loadFontAwesomeIcons(size_pixels, fontScale);
-
-	return font;
 }
 
 void UIModule::buildDockspace()

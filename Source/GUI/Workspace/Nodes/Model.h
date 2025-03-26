@@ -28,8 +28,8 @@ namespace Workspace
 class Model : public CoreNodeWithPins
 {
 private:
-	// initial render texture size - should be large enough or changed during zoom
-	ImVec2 m_textureSize = {84, 100};
+	// Render texture size in font units
+	ImVec2 m_textureSize = {5.25f, 6.25f};
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 	Vp::RenderOptions m_renderOptions;
 

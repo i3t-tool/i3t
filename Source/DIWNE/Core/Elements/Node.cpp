@@ -79,8 +79,10 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	// This is done after updateLayout() in order to know the current node size (otherwise it would be done in end())
 	// This needs to be done BEFORE processing interactions as we determine if the node is hovered using it.
 	// The blocking button uses the NoHoldingActiveId flag in order to avoid setting active id when dragging the node.
-	ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
-	ImGui::InvisibleButton("DiwneNodeBlockingButton", getRect().GetSize() * diwne.getZoom(),
+
+	ImRect screenRect = diwne.canvas().diwne2screen(getRect());
+	ImGui::SetCursorScreenPos(screenRect.Min);
+	ImGui::InvisibleButton("DiwneNodeBlockingButton", screenRect.GetSize(),
 	                       ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_NoHoldingActiveId);
 	m_internalHover = ImGui::IsItemHovered();
 	ImGui::PopID();
@@ -195,9 +197,10 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 {
 	if (m_selected)
 	{
+		DiwneStyle& style = diwne.style();
 		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
-		                            diwne.mp_settingsDiwne->selectionRounding, ImDrawFlags_RoundCornersAll,
-		                            diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+		                            style.decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
+		                            style.decimal(DiwneStyle::itemSelectedBorderThicknessDiwne));
 	}
 }
 bool Node::willBeRemovedFromContainer(const DiwneObject* container)

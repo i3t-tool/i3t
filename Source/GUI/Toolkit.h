@@ -60,6 +60,11 @@ bool ButtonWithCornersEx(const char* label, ImDrawFlags corners, const ImVec2& s
 void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding,
                             ImDrawFlags corners);
 
+/// A float slider that is limited to individual steps
+/// ImGui doesn't support this by default so this is actually an IntSlider that recalculates back into a float.
+/// Uses std::format syntax for the format string, not printf (eg. {:.2f})
+bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format);
+
 inline ImVec2 floorImVec2(const ImVec2& v)
 {
 	return ImVec2((float) (int) v.x, (float) (int) v.y);

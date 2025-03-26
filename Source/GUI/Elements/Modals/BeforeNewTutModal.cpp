@@ -31,7 +31,7 @@ void BeforeNewTutModal::onImGui()
 	ImGui::Text("Save the current scene?\n\n");
 	ImGui::Separator();
 
-	if (ImGui::Button("Yes", ImVec2(100, 0)))
+	if (ImGui::Button("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		InputManager::triggerAction("save", EKeyState::Pressed);
 
@@ -43,13 +43,13 @@ void BeforeNewTutModal::onImGui()
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (ImGui::Button("No", ImVec2(100, 0)))
+	if (ImGui::Button("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		submit();
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Cancel", ImVec2(100, 0)))
+	if (ImGui::Button("Cancel", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 		*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;

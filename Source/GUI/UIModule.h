@@ -12,14 +12,12 @@
  */
 #pragma once
 
-#include <list>
-#include <map>
 #include <string>
 #include <vector>
 
 #include "Core/Defs.h"
 #include "Core/Module.h"
-#include "GUI/Elements/IWindow.h"
+#include "Fonts/FontManager.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/WindowManager.h"
 #include "State/Stateful.h"
@@ -30,16 +28,16 @@ class UIModule final : public Module, public IStateful
 {
 	friend class Application;
 
-	using Fonts = std::unordered_map<std::string, ImFont*>;
-
 public:
 	UIModule() = default;
 	~UIModule() override;
 
 private:
 	void onInit() override;
+	void onBeforeFrame() override;
 	void onBeginFrame() override;
 	void onClose() override;
+	static float getMainWindowDpiScaleFactor();
 
 public:
 	Theme& getTheme()
@@ -64,13 +62,28 @@ public:
 
 	std::optional<Theme*> getThemeByName(const std::string& name) const;
 
-	Fonts& getFonts()
+	/**
+	 * Applies a UI/DPI scaling factor to the current Theme.
+	 * ImGuiStyle is reinitialized, the theme reapplied and fonts reloaded.
+	 * @warning This method cannot be called during ImGui drawing, eg. between NewFrame() and EndFrame/Render()!
+	 * Use applyUIScalingNextFrame() instead for changes within UI code itself.
+	 * @param scale The new UI scaling factor.
+	 */
+	void applyUIScaling(float scale);
+
+	/// @see applyUIScaling()
+	void applyUIScalingNextFrame(float scale);
+
+	/**
+	 * Get the current UI scale, by default derived from main windows DPI scaling factor.
+	 * UI scale can be changed using applyUIScaling() or applyUIScalingNextFrame().
+	 */
+	float getUiScale() const;
+
+	FontManager& getFontManager()
 	{
-		return m_fonts;
+		return m_fontManager;
 	}
-	void loadFonts();
-	ImFont* loadFont(const char* filename, float size_pixels, float fontScale, const ImFontConfig* font_cfg_template,
-	                 const ImWchar* glyph_ranges, bool mergeIcons);
 
 	WindowManager& getWindowManager()
 	{
@@ -92,14 +105,16 @@ public:
 private:
 	void buildDockspace();
 
+	float m_uiScale;
+	float m_queuedUiScale = -1.0f;
+
 	MainMenuBar* m_menu;
 
 	WindowManager m_windowManager;
+	FontManager m_fontManager;
 
 	Theme* m_currentTheme;
 	std::vector<Theme> m_allThemes;
-
-	Fonts m_fonts;
 
 private:
 	// Save layout and tutorial info to the file scene.

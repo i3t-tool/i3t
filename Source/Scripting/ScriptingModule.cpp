@@ -22,6 +22,7 @@
 #include "Core/Nodes/Operations.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Scripting/Environment.h"
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
@@ -222,7 +223,7 @@ void ScriptingModule::onClose()
 
 	// This is a hack to remove all scripting nodes from the workspace.
 	// It must be done before destroying the Lua state, because the nodes are holding Lua objects.
-	auto& nodeEditor = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor();
+	auto& nodeEditor = I3T::getWorkspace().getNodeEditor();
 	for (auto& scriptingNode : nodeEditor.getAllScriptingNodes())
 	{
 		// Associated script must be removed here, because it holds shared_ptr reference to the workspace
