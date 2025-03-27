@@ -146,7 +146,7 @@ void StateManager::undo()
 
 	for (auto& originator : m_originators)
 	{
-		if (dynamic_cast<WorkspaceWindow*>(originator))
+		if (dynamic_cast<WorkspaceModule*>(originator))
 		{
 			originator->loadScene(memento, nullptr);
 		}
@@ -168,7 +168,7 @@ void StateManager::redo()
 
 	for (auto& originator : m_originators)
 	{
-		if (dynamic_cast<WorkspaceWindow*>(originator))
+		if (dynamic_cast<WorkspaceModule*>(originator))
 		{
 			originator->loadScene(memento, nullptr);
 		}
@@ -258,7 +258,7 @@ std::optional<Memento> StateManager::createSnapshotMemento(Scene* scene)
 
 	for (const auto& originator : m_originators)
 	{
-		if (dynamic_cast<WorkspaceWindow*>(originator))
+		if (dynamic_cast<WorkspaceModule*>(originator))
 		{
 			auto memento = originator->saveScene(scene);
 			if (memento.HasMember("workspace"))
