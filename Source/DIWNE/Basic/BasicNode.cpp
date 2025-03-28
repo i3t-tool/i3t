@@ -148,8 +148,8 @@ void BasicNode::updateLayout(DrawInfo& context)
 	//	m_right.setMaxY(bottomYOfCentre);
 
 	// Update DIWNE rect
-	m_rect.Min = m_top.getMin();
-	m_rect.Max = m_middle.getMax();
+	ImRect panelRect = ImRect(m_top.getMin(), m_middle.getMax());
+	setSize(panelRect.GetSize()); // m_rect is just resized, not moved, see updateLayout() docs
 
 	m_left.layout();
 	m_top.layout();
@@ -183,7 +183,7 @@ void BasicNode::drawHeader()
 
 void BasicNode::drawBody()
 {
-	diwne.canvas().AddRectFilledDiwne(m_rect.Min, m_rect.Max, m_style->color(DiwneStyle::nodeBg),
+	diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max, m_style->color(DiwneStyle::nodeBg),
 	                                  m_style->decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersAll);
 }
 

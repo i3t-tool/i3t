@@ -556,27 +556,26 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			ImGui::SameLine();
 			inner_interaction_happen |= buttonWind();
 
-			ImGui::Dummy(ImVec2(0, 4));
-
+			ImGui::Dummy(ImVec2(0, diwne.canvas().diwne2screenSize(4.0f)));
 
 			// -------------------------------------------------------------
 			// line 2: MODE select - radiobuttons: once | repeat | ping-pong
 			// -------------------------------------------------------------
 			int mode = static_cast<int>(m_nodebase->as<Core::Cycle>()->getMode());
 
-			const ImVec2 borderWidth(0.0f, 2.5f);
-
-			static ImRect radio_buttons_rect; // defined in the first frame
+			const ImVec2 borderSize(diwne.canvas().diwne2screenSize(2.5f), diwne.canvas().diwne2screenSize(2.5f));
+			static ImVec2 radioButtonBgSize; // defined in the first frame
 
 			const ImVec2 position = ImGui::GetCursorPos();
 
 			// darker radio buttons background
-			if (radio_buttons_rect.GetWidth() > 0.0f) // area behind
+			if (radioButtonBgSize.x > 0.0f) // area behind
 			{
-				ImGui::SetCursorPos(position - borderWidth);
-				diwne.canvas().EmptyButton(radio_buttons_rect.GetSize(),
-				                           (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground), 5.0f);
-				ImGui::SetCursorPos(position + borderWidth);
+				ImGui::SetCursorPos(position - borderSize);
+				diwne.canvas().EmptyButton(diwne.canvas().diwne2screenSize(radioButtonBgSize),
+				                           (ImVec4) I3T::getColor(EColor::Cycle_RadioButtonBackground),
+				                           diwne.canvas().diwne2screenSize(5.0f));
+				ImGui::SetCursorPos(position + borderSize);
 			}
 
 			ImGui::BeginGroup(); // radio buttons
@@ -598,14 +597,10 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 				ImGui::PopStyleColor();
 			}
 			ImGui::EndGroup();
-
 			// ImGui::DebugDrawItemRect(ImColor(255, 127, 0, 180));
 
-			// radioButtonsSize
-			ImGuiContext& g = *GImGui;
-
-			radio_buttons_rect = g.LastItemData.Rect;
-			radio_buttons_rect.Expand(borderWidth + borderWidth);
+			radioButtonBgSize = diwne.canvas().screen2diwneSize(
+			    ImGui::GetCurrentContext()->LastItemData.Rect.GetSize() + borderSize * 4);
 
 			switch (mode)
 			{

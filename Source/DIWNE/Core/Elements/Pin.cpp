@@ -35,7 +35,7 @@ Pin::Pin(DIWNE::NodeEditor& diwne, Node* node, bool isInput, std::string labelDi
 void Pin::begin(DrawInfo& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
-	ImGui::BeginGroup();
+	DGui::BeginGroup();
 }
 
 void Pin::end(DrawInfo& context)
@@ -47,9 +47,7 @@ void Pin::end(DrawInfo& context)
 
 void Pin::updateLayout(DrawInfo& context)
 {
-	m_rect.Min = diwne.canvas().screen2diwne(ImGui::GetItemRectMin());
-	m_rect.Max = diwne.canvas().screen2diwne(ImGui::GetItemRectMax());
-
+	updateRectFromImGuiItem();
 	updateConnectionPoint();
 }
 

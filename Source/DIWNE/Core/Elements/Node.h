@@ -55,6 +55,7 @@ public:
 
 protected:
 	void afterDrawDiwne(DrawInfo& context) override;
+	void setInitialPositionDiwne() override;
 
 public:
 	bool allowDrawing() override;

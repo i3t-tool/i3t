@@ -96,12 +96,13 @@ void DiwneObject::initializeDiwne(DrawInfo& context)
 
 void DiwneObject::beginDiwne(DrawInfo& context)
 {
-	// DiwneObjects are supposed to be drawn at the current ImGui cursor pos
-	// During the begin call, background are often drawn using the previous frame m_rect information
-	// (m_rect is updated in the updateLayout() method after begin()/end())
-	// Hence m_rect needs to be updated here to be positioned at the cursor position.
-	const ImVec2 offset = diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()) - m_rect.Min;
-	translate(offset); // Move m_rect using the translate method so that derived classes can react accordingly
+	setInitialPositionDiwne();
+
+	// Update display rect
+	ImVec2 truncPos = DIWNE_TRUNC_VEC(ImGui::GetCursorScreenPos());
+	ImVec2 displayOffset = diwne.canvas().screen2diwne(truncPos) - m_rect.Min;
+	m_displayRect = m_rect;
+	m_displayRect.Translate(displayOffset);
 
 	begin(context);
 }
@@ -120,7 +121,7 @@ void DiwneObject::afterDrawDiwne(DrawInfo& context)
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
-void DiwneObject::afterDraw(DrawInfo& context){};
+void DiwneObject::afterDraw(DrawInfo& context) {};
 
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
@@ -521,14 +522,15 @@ void DiwneObject::onHover(DrawInfo& context)
 	// Draw hover border
 	// TODO: Not sure if this should remain in DiwneObject or be virtual.
 	//  Maybe move this impl into node and make it purely virtual?
-	diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.style().color(DiwneStyle::objectHoverBorderColor),
+	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max,
+	                            diwne.style().color(DiwneStyle::objectHoverBorderColor),
 	                            diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
 	                            diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
 	// diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
 	//                             diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
 	//                             diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
 
-	DIWNE_DEBUG(diwne, {
+	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_RED_50, 0,
 		                            ImDrawFlags_RoundCornersNone, 1);
 	});
@@ -647,6 +649,27 @@ void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& col
 		ImGui::EndTooltip();
 	}
 }
+void DiwneObject::setSize(const ImVec2& size)
+{
+	m_rect.Max = m_rect.Min + size;
+	m_displayRect.Max = m_displayRect.Min + size;
+}
+void DiwneObject::updateRectFromImGuiItem()
+{
+	setSize(diwne.canvas().screen2diwneSize(ImGui::GetItemRectSize()));
+}
+
+void DiwneObject::setInitialPositionDiwne()
+{
+	// For everything but the nodes, we update m_rect so that its at cursor pos
+	// This causes m_rects to shift a little based on viewport (THIS is potentially a huge issue for multi-viewport)
+	// But nodes should always stay fixed at their position, their position is persistant and hence cannot be modified
+	// by ImGui layout drift
+
+	// DiwneObjects are supposed to be drawn at the current ImGui cursor pos
+	const ImVec2 offset = diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()) - m_rect.Min;
+	translate(offset); // Move m_rect using the translate method so that derived classes can react accordingly
+}
 
 bool DiwneObject::isDragging(DrawInfo& context)
 {
@@ -686,7 +709,8 @@ bool DiwneObject::isChildObject() const
 }
 void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 {
-	DIWNE_DEBUG((diwne), {
+	DIWNE_DEBUG_GENERAL((diwne), {
+		// TODO: Change to display rect?
 		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1,
 		                            true);
 	});

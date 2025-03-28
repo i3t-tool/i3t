@@ -72,6 +72,7 @@ void Link::updateLayout(DrawInfo& context)
 	                std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
 	                std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
 	                std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+	m_displayRect = m_rect;
 }
 
 /// Link isn't represented by an ImGui item so we need to detect hovering manually.
@@ -99,7 +100,7 @@ void Link::content(DrawInfo& context)
 	}
 	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                   m_color, diwne.style().decimal(DiwneStyle::linkWidth));
-	DIWNE_DEBUG(diwne, {
+	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);

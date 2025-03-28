@@ -67,7 +67,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// TODO: This should again be responsibility of the DIWNE library
 
 	// adding a border
-	diwne.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
+	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max, I3T::getTheme().get(EColor::NodeBorder),
 	                            I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
 	                            I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
@@ -219,6 +219,8 @@ float CoreNode::getDataItemsWidth()
 
 float CoreNode::updateDataItemsWidth()
 {
+	// TODO: It should be possible to determine scaled font size without actually swapping fonts / applying scaling
+	//  All we have to know is the original unscaled font size
 	const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(true);
 	const float fontSize = ImGui::GetFontSize();
 	const float oneCharWidth = fontSize / 2;

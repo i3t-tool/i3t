@@ -81,7 +81,7 @@ void NodeEditor::begin(DrawInfo& context)
 
 	ImGui::SetCursorScreenPos(m_canvas->m_viewRectScreen.Min);
 	ImGui::PushID(m_labelDiwne.c_str()); // TODO: Is this necessary? We already do this in the Begin child no?
-	ImGui::BeginGroup();
+	DGui::BeginGroup();
 
 	assert(!m_canvas->m_zoomScalingApplied);
 	m_canvas->applyZoomScaling();
@@ -115,7 +115,7 @@ void NodeEditor::begin(DrawInfo& context)
 void NodeEditor::content(DrawInfo& context)
 {
 	// Debug work area rect
-	DIWNE_DEBUG(diwne, {
+	DIWNE_DEBUG_GENERAL(diwne, {
 		ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
 		                                    ImColor(255, 0, 0, 255));
 	});
@@ -168,7 +168,16 @@ void NodeEditor::content(DrawInfo& context)
 			if (node != nullptr && node->isRendered())
 			{
 				// Set the ImGui cursor position to the position of the node and draw it
-				ImGui::SetCursorScreenPos(canvas().diwne2screen(node->getPosition()));
+				// ImVec2 nodeScreenPos = canvas().diwne2screen(node->getPosition());
+
+				// Due to how ImGui truncates non-integer positions the node position has to be offset by one pixel
+				// if the coordinates are negative
+				// if (nodeScreenPos.x < 0)
+				// 	nodeScreenPos.x -= 1.0f;
+				// if (nodeScreenPos.y < 0)
+				// 	nodeScreenPos.y -= 1.0f;
+				// ImGui::SetCursorScreenPos(nodeScreenPos);
+
 				DrawInfo drawResult = node->drawDiwneEx(context, m_drawMode);
 
 				// If the node requests focus, bring it to front (unless it's going to be destroyed or removed)
@@ -205,7 +214,7 @@ void NodeEditor::content(DrawInfo& context)
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
 
-	DIWNE_DEBUG((*this), {
+	DIWNE_DEBUG_GENERAL((*this), {
 		float zoom = m_canvas->getZoom();
 		ImGui::GetWindowDrawList()->AddCircleFilled(m_canvas->diwne2screen(ImVec2(0, 0)), 10.f * zoom,
 		                                            IM_COL32(255, 0, 255, 150));
@@ -237,6 +246,7 @@ void NodeEditor::end(DrawInfo& context)
 void NodeEditor::updateLayout(DrawInfo& context)
 {
 	m_rect = m_canvas->getViewportRectDiwne();
+	m_displayRect = m_rect;
 }
 
 void NodeEditor::afterDraw(DrawInfo& context)

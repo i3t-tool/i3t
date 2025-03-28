@@ -108,11 +108,15 @@ public:
 	ImVec2 screen2diwne(const ImVec2& point) const;
 	ImVec2 diwne2screen(const ImVec2& point) const;
 
+	ImVec2 diwne2screenTrunc(const ImVec2& point) const; ///< Convert diwne point to pixel aligned screen position.
+
 	ImRect diwne2screen(const ImRect& rect) const; ///< Convert diwne rect to a screen rect
 	ImRect screen2diwne(const ImRect& rect) const; ///< Convert screen rect to a diwne rect
 
 	float diwne2screenSize(float size) const; ///< Apply diwne scaling factors to a float size
 	float screen2diwneSize(float size) const; ///< Revert diwne scaling factors from a float size
+
+	float diwne2screenSizeTrunc(float size) const;
 
 	ImVec2 diwne2screenSize(const ImVec2& point) const; ///< Apply diwne scaling factors to an ImVec2 size
 	ImVec2 screen2diwneSize(const ImVec2& point) const; ///< Revert diwne scaling factors from a ImVec2 size
@@ -123,6 +127,7 @@ public:
 
 	/**
 	 * Draw filled rectangle to window ImDrawlist
+	 * This method accepts DIWNE coordinates and converts them to truncated screen coordinates.
 	 * @param p_min bottom left corner in diwne coords
 	 * @param p_max top right corner in diwne coords
 	 * @param col
@@ -134,6 +139,7 @@ public:
 
 	/**
 	 * Draw rectangle to window ImDrawlist
+	 * This method accepts DIWNE coordinates and converts them to truncated screen coordinates.
 	 * \see AddRectFilledDiwne
 	 */
 	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,

@@ -12,6 +12,7 @@
  */
 #include "CoreNodeWithPins.h"
 
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 
 using namespace Workspace;
@@ -119,35 +120,11 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			}
 		}
 
-		// TODO: (DR) Rewrite this with DiwnePanel layout system!
-
 		// else - include SetValues
 		// uses getOutputsToShow()) = subset of outputs, based of the level. Override function in the WorkspaceCycle
 		if (m_levelOfDetail != LevelOfDetail::Label) // SetValues must draw the value pin
 		{
-			const float prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
-			                                                                smaller (for example when switch from
-			                                                                precision 2 to precision 0) */
-			m_minRightAlignOfRightPins = FLT_MAX;
-			for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
-			{
-				if (pin->getCorePin().isRendered())
-				{
-					// TODO: (DPI-FIX)
-					float act_align =
-					    std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) * diwne.getZoom() *
-					                       diwne.getDpiScale()); /* no shift to the left */
-					m_minRightAlignOfRightPins =
-					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
-					                                                        between two node sizes */
-					const float cursor_pos = ImGui::GetCursorPosX();
-					// LOG_INFO(cursor_pos);
-					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all
-					// output
-					//                                                                       pins have the same width */
-					pin->drawDiwne(context);
-				}
-			}
+			rightPins(context);
 		}
 	}
 	else
@@ -155,6 +132,50 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 		// TODO: (DR) (zoom-aware) Uncomment perhaps
 		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
+}
+
+void CoreNodeWithPins::rightPins(DIWNE::DrawInfo& context)
+{
+	vstack.begin();
+	for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
+	{
+		if (pin->getCorePin().isRendered())
+		{
+			DIWNE::DiwnePanel* row = vstack.beginRow();
+			row->spring(1.0f);
+			pin->drawDiwne(context);
+			row->submitItem(pin);
+			vstack.endRow();
+		}
+	}
+	vstack.end();
+}
+
+void CoreNodeWithPins::rightPinsOld(DIWNE::DrawInfo& context)
+{
+	// // TODO: (DR) Remove, legacy layouting
+	// const float prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
+	//                                                                 smaller (for example when switch from
+	//                                                                 precision 2 to precision 0) */
+	// m_minRightAlignOfRightPins = FLT_MAX;
+	// for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
+	// {
+	// 	if (pin->getCorePin().isRendered())
+	// 	{
+	// 		// TODO: (DPI-FIX)
+	// 		float act_align = std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) * diwne.getZoom() *
+	// 		                                     diwne.getDpiScale()); /* no shift to the left */
+	// 		m_minRightAlignOfRightPins =
+	// 		    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
+	// 		                                                        between two node sizes */
+	// 		const float cursor_pos = ImGui::GetCursorPosX();
+	// 		// LOG_INFO(cursor_pos);
+	// 		ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all
+	// 		// output
+	// 		//                                                                       pins have the same width */
+	// 		pin->drawDiwne(context);
+	// 	}
+	// }
 }
 
 void CoreNodeWithPins::onDestroy(bool logEvent)

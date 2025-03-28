@@ -63,6 +63,7 @@ public:
 	void drawData(DIWNE::DrawInfo& context);
 	int maxLengthOfData();
 
+	bool allowDrawing() override;
 	bool allowInteraction() const override;
 
 	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;

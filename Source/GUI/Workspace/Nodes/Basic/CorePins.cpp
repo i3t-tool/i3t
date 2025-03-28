@@ -65,24 +65,19 @@ bool CorePin::allowInteraction() const
  */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
-	// TODO: The entire pin shouldn't be rendered when isRendered is false.
-	//  Either handle this here or in the Node with pins
-	// const bool interaction_happen = false; // no interaction in this function allowed
-	if (getCorePin().isRendered())
+	if (isInput())
 	{
-		if (isInput())
-		{
-			drawPin(context);
-			ImGui::SameLine();
-			drawLabel(context);
-			drawDataEx(context);
-		}
-		else
-		{
-			drawDataEx(context);
-			drawLabel(context);
-			drawPin(context);
-		}
+		drawPin(context);
+		ImGui::SameLine();
+		drawLabel(context);
+		drawDataEx(context);
+	}
+	else
+	{
+		drawDataEx(context);
+		drawLabel(context);
+		// ImGui::TextUnformatted("Test label");
+		drawPin(context);
 	}
 }
 
@@ -470,6 +465,10 @@ int CorePin::maxLengthOfData()
 		          "Core to Workspace");
 		return 0;
 	}
+}
+bool CorePin::allowDrawing()
+{
+	return Pin::allowDrawing() && getCorePin().isRendered();
 }
 
 /* \todo JH \todo MH implement this function in Core? */

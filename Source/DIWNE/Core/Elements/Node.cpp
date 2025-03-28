@@ -40,7 +40,7 @@ bool Node::allowDrawing()
 void Node::begin(DrawInfo& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
-	ImGui::BeginGroup(); /* Begin of node */
+	DGui::BeginGroup(); /* Begin of node */
 }
 
 void Node::content(DrawInfo& context)
@@ -69,8 +69,7 @@ void Node::end(DrawInfo& context)
 
 void Node::updateLayout(DrawInfo& context)
 {
-	m_rect.Min = diwne.canvas().screen2diwne(ImGui::GetItemRectMin());
-	m_rect.Max = diwne.canvas().screen2diwne(ImGui::GetItemRectMax());
+	updateRectFromImGuiItem();
 }
 
 void Node::afterDrawDiwne(DrawInfo& context)
@@ -90,6 +89,20 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	drawSelectionIndicator(context);
 
 	DiwneObject::afterDrawDiwne(context);
+}
+
+void Node::setInitialPositionDiwne()
+{
+	// Top level nodes are always drawn at their specified position
+	// Nodes are drawn at their spe position and should set ImGui cursor position before drawing
+	if (isChildObject())
+	{
+		DiwneObject::setInitialPositionDiwne();
+	}
+	else
+	{
+		ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
+	}
 }
 
 bool Node::processSelectDiwne(DrawInfo& context)
@@ -198,7 +211,8 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 	if (m_selected)
 	{
 		DiwneStyle& style = diwne.style();
-		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		diwne.canvas().AddRectDiwne(getDisplayRect().Min, getDisplayRect().Max,
+		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                            style.decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
 		                            style.decimal(DiwneStyle::itemSelectedBorderThicknessDiwne));
 	}
