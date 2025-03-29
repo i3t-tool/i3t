@@ -159,7 +159,7 @@ private:
 
 	std::optional<Memento> createSceneMemento(Scene* scene);
 
-	// Create a memento from WorkspaceWindow without "zoom" and "workArea" properties
+	// Create a memento only from WorkspaceModule
 	std::optional<Memento> createSnapshotMemento(Scene* scene);
 
 	// Global save/load ________________________________________________________________________________________________
