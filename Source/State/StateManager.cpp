@@ -110,17 +110,28 @@ void StateManager::onClose()
 void StateManager::tryTakeSnapshot()
 {
 	static bool takeSnap = false;
+	static bool takeRewritableSnap = false;
 
 	if (takeSnap)
 	{
 		takeSnapshot();
 	}
+	else if (takeRewritableSnap)
+	{
+		takeRewritableSnapshot();
+	}
 	takeSnap = false;
+	takeRewritableSnap = false;
 
 	if (m_snapshotRequested)
 	{
 		takeSnap = true;
 		m_snapshotRequested = false;
+	}
+	if (m_rewritableSnapshotRequested)
+	{
+		takeRewritableSnap = true;
+		m_rewritableSnapshotRequested = false;
 	}
 }
 
@@ -155,6 +166,37 @@ void StateManager::takeSnapshot()
 		}
 
 		setWindowTitle();
+	}
+}
+
+void StateManager::takeRewritableSnapshot()
+{
+	if (auto state = createSnapshotMemento(nullptr))
+	{
+		if (!m_mementos.empty())
+		{
+			if (state == m_mementos[m_currentStateIdx])
+			{
+				return;
+			}
+		}
+
+		static int lastStateIdx = 0;
+		if (lastStateIdx != m_currentStateIdx)
+		{
+			m_currentStateIdx++;
+			lastStateIdx = m_currentStateIdx;
+			m_mementos.insert(m_mementos.begin() + m_currentStateIdx, std::move(*state));
+			m_hashes.insert(m_hashes.begin() + m_currentStateIdx, randLong());
+		}
+		else
+		{
+			m_mementos[m_currentStateIdx] = std::move(*state);
+		}
+		if (m_hashes.size() == 1)
+		{
+			m_hashes[0] = m_currentScene->m_hash;
+		}
 	}
 }
 

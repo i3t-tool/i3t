@@ -48,11 +48,19 @@ private:
 	void tryTakeSnapshot();
 	// Creates a workspace snapshot for undo/redo.
 	void takeSnapshot();
+	// Creates a workspace snapshot for undo/redo. However, overwrites the last snapshot made if it was made with this function.
+	void takeRewritableSnapshot();
 public:
 	// Request a snapshot to be taken in the next frame.
 	void requestSnapshot()
 	{
 		m_snapshotRequested = true;
+	}
+	// Request a snapshot to be taken in the next frame.
+	// If a request for a snapshot to be overwritten was also made in the previous frame, the snapshot will be overwritten.
+	void requestRewritableSnapshot()
+	{
+		m_rewritableSnapshotRequested = true;
 	}
 	void undo();
 	void redo();
@@ -179,6 +187,7 @@ private:
 	// Undo/Redo _______________________________________________________________________________________________________
 
 	bool m_snapshotRequested{false};
+	bool m_rewritableSnapshotRequested{false};
 	int m_currentStateIdx{-1};
 	std::vector<Memento> m_mementos;
 	std::vector<long> m_hashes;
