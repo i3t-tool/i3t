@@ -162,7 +162,7 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 
 	if (m_takeSnap)
 	{
-		App::getModule<StateManager>().takeSnapshot();
+		App::getModule<StateManager>().requestSnapshot();
 	}
 }
 

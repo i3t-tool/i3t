@@ -108,7 +108,7 @@ bool WorkspaceModule::connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhs
 	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	if (result)
 	{
-		App::getModule<StateManager>().takeSnapshot();
+		App::getModule<StateManager>().requestSnapshot();
 	}
 
 	return result;

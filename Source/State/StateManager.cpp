@@ -14,7 +14,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"
@@ -91,6 +91,28 @@ void StateManager::onBeginFrame()
 				    minutesSinceEpoch - std::max(1LL, ((long long) (m_tmpDirectoryLockFileInterval * 0.9))) + 1;
 			}
 		}
+	}
+}
+
+void StateManager::onEndFrame()
+{
+	Module::onEndFrame();
+
+	tryTakeSnapshot();
+}
+
+void StateManager::tryTakeSnapshot()
+{
+	if (m_takeSnapshot)
+	{
+		takeSnapshot();
+		m_takeSnapshot = false;
+	}
+
+	if (m_snapshotRequested)
+	{
+		m_takeSnapshot = true;
+		m_snapshotRequested = false;
 	}
 }
 
@@ -539,7 +561,7 @@ void StateManager::reset()
 
 	setWindowTitle();
 
-	takeSnapshot();
+	requestSnapshot();
 }
 
 void StateManager::setWindowTitle()

@@ -34,6 +34,7 @@ public:
 
 	void onInit() override;
 	void onBeginFrame() override;
+	void onEndFrame() override;
 	void onClose() override;
 
 	void addOriginator(IStateful* originator)
@@ -43,6 +44,11 @@ public:
 
 	// Undo/Redo _______________________________________________________________________________________________________
 
+	void requestSnapshot()
+	{
+		m_snapshotRequested = true;
+	}
+	void tryTakeSnapshot();
 	void takeSnapshot();
 	void undo();
 	void redo();
@@ -168,6 +174,8 @@ private:
 
 	// Undo/Redo _______________________________________________________________________________________________________
 
+	bool m_takeSnapshot{false};
+	bool m_snapshotRequested{false};
 	int m_currentStateIdx{-1};
 	std::vector<Memento> m_mementos;
 	std::vector<long> m_hashes;
