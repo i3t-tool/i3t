@@ -69,6 +69,8 @@ void WorkspaceModule::loadScene(const Memento& memento, Scene* scene)
 
 	if (memento["workspace"].HasMember("workArea"))
 		g_editor->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
+
+	g_editor->manipulatorStartCheck3D();
 }
 
 void WorkspaceModule::clearScene()
