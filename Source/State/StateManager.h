@@ -43,13 +43,17 @@ public:
 	}
 
 	// Undo/Redo _______________________________________________________________________________________________________
-
+private:
+	// The snapshot will be taken in the next frame, after it has been requested
+	void tryTakeSnapshot();
+	// Creates a workspace snapshot for undo/redo.
+	void takeSnapshot();
+public:
+	// Request a snapshot to be taken in the next frame.
 	void requestSnapshot()
 	{
 		m_snapshotRequested = true;
 	}
-	void tryTakeSnapshot();
-	void takeSnapshot();
 	void undo();
 	void redo();
 
@@ -174,7 +178,6 @@ private:
 
 	// Undo/Redo _______________________________________________________________________________________________________
 
-	bool m_takeSnapshot{false};
 	bool m_snapshotRequested{false};
 	int m_currentStateIdx{-1};
 	std::vector<Memento> m_mementos;

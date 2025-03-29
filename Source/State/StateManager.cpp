@@ -101,25 +101,27 @@ void StateManager::onEndFrame()
 	tryTakeSnapshot();
 }
 
-void StateManager::tryTakeSnapshot()
-{
-	if (m_takeSnapshot)
-	{
-		takeSnapshot();
-		m_takeSnapshot = false;
-	}
-
-	if (m_snapshotRequested)
-	{
-		m_takeSnapshot = true;
-		m_snapshotRequested = false;
-	}
-}
-
 void StateManager::onClose()
 {
 	saveGlobal();
 	deleteTmpDirectory();
+}
+
+void StateManager::tryTakeSnapshot()
+{
+	static bool takeSnap = false;
+
+	if (takeSnap)
+	{
+		takeSnapshot();
+	}
+	takeSnap = false;
+
+	if (m_snapshotRequested)
+	{
+		takeSnap = true;
+		m_snapshotRequested = false;
+	}
 }
 
 void StateManager::takeSnapshot()
@@ -133,11 +135,11 @@ void StateManager::takeSnapshot()
 				return;
 			}
 		}
-
+		m_currentStateIdx++;
 		if (canRedo())
 		{
-			m_mementos.erase(m_mementos.begin() + m_currentStateIdx + 1, m_mementos.end());
-			m_hashes.erase(m_hashes.begin() + m_currentStateIdx + 1, m_hashes.end());
+			m_mementos.erase(m_mementos.begin() + m_currentStateIdx, m_mementos.end());
+			m_hashes.erase(m_hashes.begin() + m_currentStateIdx, m_hashes.end());
 		}
 
 		m_mementos.push_back(std::move(*state));
@@ -146,7 +148,6 @@ void StateManager::takeSnapshot()
 		{
 			m_hashes[0] = m_currentScene->m_hash;
 		}
-		m_currentStateIdx++;
 
 		if (m_mementos.size() != 1)
 		{
