@@ -141,20 +141,20 @@ void StateManager::takeSnapshot()
 	{
 		if (!m_mementos.empty())
 		{
-			if (state == m_mementos[m_currentStateIdx])
+			if (state == m_mementos.getCurrent())
 			{
 				return;
 			}
 		}
-		m_currentStateIdx++;
+
 		if (canRedo())
 		{
-			m_mementos.erase(m_mementos.begin() + m_currentStateIdx, m_mementos.end());
-			m_hashes.erase(m_hashes.begin() + m_currentStateIdx, m_hashes.end());
+			m_mementos.truncateFromCurrent();
+			m_hashes.truncateFromCurrent();
 		}
 
-		m_mementos.push_back(std::move(*state));
-		m_hashes.push_back(randLong());
+		m_mementos.pushBack(std::move(*state));
+		m_hashes.pushBack(randLong());
 		if (m_hashes.size() == 1)
 		{
 			m_hashes[0] = m_currentScene->m_hash;
@@ -175,23 +175,28 @@ void StateManager::takeRewritableSnapshot()
 	{
 		if (!m_mementos.empty())
 		{
-			if (state == m_mementos[m_currentStateIdx])
+			if (state == m_mementos.getCurrent())
 			{
 				return;
 			}
 		}
 
 		static int lastStateIdx = 0;
-		if (lastStateIdx != m_currentStateIdx)
+		if (lastStateIdx != m_mementos.getCurrentIndex())
 		{
 			m_currentStateIdx++;
 			lastStateIdx = m_currentStateIdx;
 			m_mementos.insert(m_mementos.begin() + m_currentStateIdx, std::move(*state));
 			m_hashes.insert(m_hashes.begin() + m_currentStateIdx, randLong());
+
+			m_mementos.insertAfterCurrent(std::move(*state));
+			m_hashes.insertAfterCurrent(randLong());
+			lastStateIdx = m_mementos.getCurrentIndex();
 		}
 		else
 		{
 			m_mementos[m_currentStateIdx] = std::move(*state);
+			m_mementos.replaceCurrent(std::move(*state));
 		}
 		if (m_hashes.size() == 1)
 		{
@@ -207,7 +212,9 @@ void StateManager::undo()
 		return;
 	}
 
-	auto& memento = m_mementos[--m_currentStateIdx];
+	auto& memento = m_mementos.popCurrent();
+	m_hashes.popCurrent();
+
 
 	for (auto& originator : m_originators)
 	{
@@ -227,7 +234,8 @@ void StateManager::redo()
 		return;
 	}
 
-	auto& memento = m_mementos[++m_currentStateIdx];
+	auto& memento = m_mementos.revertCurrent();
+	m_hashes.revertCurrent();
 
 	memento.GetAllocator();
 
@@ -244,12 +252,12 @@ void StateManager::redo()
 
 bool StateManager::canUndo() const
 {
-	return m_currentStateIdx > 0;
+	return !m_mementos.empty() && m_mementos.distanceToFirst() > 0;
 }
 
 bool StateManager::canRedo() const
 {
-	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
+	return !m_mementos.empty() && m_mementos.distanceToLast() > 0;
 }
 
 int StateManager::getMementosCount() const
@@ -259,20 +267,20 @@ int StateManager::getMementosCount() const
 
 int StateManager::getPossibleUndosCount() const
 {
-	return m_mementos.size() - 1;
+	return m_mementos.distanceToFirst();
 }
 
 int StateManager::getPossibleRedosCount() const
 {
 	/// \todo Test me!
-	return m_mementos.size() - m_currentStateIdx;
+	return m_mementos.distanceToLast();
 }
 
 //
 
 const Memento& StateManager::getCurrentState() const
 {
-	return m_mementos[m_currentStateIdx];
+	return m_mementos.getCurrent();
 }
 
 bool StateManager::isValidScenePath(const fs::path path)
@@ -380,7 +388,7 @@ bool StateManager::saveScene(const fs::path& target)
 	// Create scene .json file
 	const auto result = JSON::save(target, *createSceneMemento(m_currentScene.get()));
 
-	m_currentScene->m_hash = m_hashes[m_currentStateIdx];
+	m_currentScene->m_hash = m_hashes.getCurrent();
 	if (m_currentScene->m_prevPath != target)
 	{
 		// save as with different name, add original scene to recent files
@@ -592,10 +600,10 @@ void StateManager::loadUserData()
 
 void StateManager::reset()
 {
-	m_currentStateIdx = -1;
 	m_dirty = false;
 
 	m_mementos.clear();
+	m_hashes.clear();
 
 	setWindowTitle();
 

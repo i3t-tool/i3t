@@ -113,3 +113,5 @@ std::string Config::LOAD_SCENE = "NONE";
 
 std::string Config::TUTORIALS_FOLDER = "Data/Tutorials/";
 std::string Config::TEXTURE_FOLDER = "Data/Textures/";
+
+size_t Config::UNDO_LIMIT = 1024;

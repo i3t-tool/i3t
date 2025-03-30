@@ -12,6 +12,9 @@
  */
 #pragma once
 
+#include "Config.h"
+
+
 #include <deque>
 #include <filesystem>
 #include <vector>
@@ -21,6 +24,7 @@
 #include "Scene.h"
 #include "State/Stateful.h"
 #include "UserData.h"
+#include "Utils/CircularVector.h"
 
 using namespace std::literals;
 
@@ -46,8 +50,6 @@ public:
 private:
 	// The snapshot will be taken in the next frame, after it has been requested
 	void tryTakeSnapshot();
-	// Creates a workspace snapshot for undo/redo.
-	void takeSnapshot();
 	// Creates a workspace snapshot for undo/redo. However, overwrites the last snapshot made if it was made with this function.
 	void takeRewritableSnapshot();
 public:
@@ -62,6 +64,8 @@ public:
 	{
 		m_rewritableSnapshotRequested = true;
 	}
+	// Creates a workspace snapshot for undo/redo.
+	void takeSnapshot();
 	void undo();
 	void redo();
 
@@ -76,12 +80,12 @@ public:
 
 	bool isDirty() const
 	{
-		if (m_hashes.empty() || m_currentStateIdx == -1)
+		if (m_hashes.empty() || m_mementos.getCurrentIndex() == -1)
 		{
 			return m_dirty;
 		}
 
-		return m_currentScene->m_hash != m_hashes[m_currentStateIdx] && m_dirty;
+		return m_currentScene->m_hash != m_hashes.getCurrent() && m_dirty;
 	}
 
 	// Scene save/load _________________________________________________________________________________________________
@@ -188,9 +192,8 @@ private:
 
 	bool m_snapshotRequested{false};
 	bool m_rewritableSnapshotRequested{false};
-	int m_currentStateIdx{-1};
-	std::vector<Memento> m_mementos;
-	std::vector<long> m_hashes;
+	CircularVector<Memento> m_mementos = CircularVector<Memento>(Config::UNDO_LIMIT);
+	CircularVector<long> m_hashes = CircularVector<long>(Config::UNDO_LIMIT);
 
 	bool m_dirty = false;
 };

@@ -96,4 +96,5 @@ struct Config
 	static std::string LOAD_SCENE; ///< The load scene
 	static std::string TUTORIALS_FOLDER;
 	static std::string TEXTURE_FOLDER;
+	static size_t UNDO_LIMIT; ///< The undo limit in circular vector
 };
