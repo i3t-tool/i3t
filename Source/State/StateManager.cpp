@@ -184,18 +184,12 @@ void StateManager::takeRewritableSnapshot()
 		static int lastStateIdx = 0;
 		if (lastStateIdx != m_mementos.getCurrentIndex())
 		{
-			m_currentStateIdx++;
-			lastStateIdx = m_currentStateIdx;
-			m_mementos.insert(m_mementos.begin() + m_currentStateIdx, std::move(*state));
-			m_hashes.insert(m_hashes.begin() + m_currentStateIdx, randLong());
-
 			m_mementos.insertAfterCurrent(std::move(*state));
 			m_hashes.insertAfterCurrent(randLong());
 			lastStateIdx = m_mementos.getCurrentIndex();
 		}
 		else
 		{
-			m_mementos[m_currentStateIdx] = std::move(*state);
 			m_mementos.replaceCurrent(std::move(*state));
 		}
 		if (m_hashes.size() == 1)

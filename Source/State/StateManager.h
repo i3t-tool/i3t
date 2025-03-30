@@ -50,8 +50,10 @@ public:
 private:
 	// The snapshot will be taken in the next frame, after it has been requested
 	void tryTakeSnapshot();
-	// Creates a workspace snapshot for undo/redo. However, overwrites the last snapshot made if it was made with this function.
+	// Creates a workspace snapshot for undo/redo. However, overwrites the last snapshot made if it was made with this
+	// function.
 	void takeRewritableSnapshot();
+
 public:
 	// Request a snapshot to be taken in the next frame.
 	void requestSnapshot()
@@ -59,7 +61,8 @@ public:
 		m_snapshotRequested = true;
 	}
 	// Request a snapshot to be taken in the next frame.
-	// If a request for a snapshot to be overwritten was also made in the previous frame, the snapshot will be overwritten.
+	// If a request for a snapshot to be overwritten was also made in the previous frame, the snapshot will be
+	// overwritten.
 	void requestRewritableSnapshot()
 	{
 		m_rewritableSnapshotRequested = true;
