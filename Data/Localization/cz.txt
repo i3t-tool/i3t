@@ -12,7 +12,7 @@ Recent=Nedávné
 Save=Uložit
 Save As=Uložit jako
 Manage Models=Správa modelů
-Exit=Ukončení
+Exit=Ukončit
 
 #####################################################
 ##################### Edit Menu #####################
@@ -20,7 +20,7 @@ Exit=Ukončení
 Edit=Úpravy
 Undo=Zpět
 Redo=Vpřed
-Style Editor=Editor stylu
+Style Editor=Editor vzhledu
 Preferences=Nastavení
 Change Language=Změnit jazyk
 
@@ -29,11 +29,11 @@ Change Language=Změnit jazyk
 ########################################################
 Windows=Okna
 Start window=Úvodní okno
-Tutorial window=Výukové okno
-Scene view window=Okno prohlížení scény
+Tutorial window=Okno tutoriálu
+Scene view window=Okno náhledu scény
 Workspace window=Okno pracovní plochy
 Console window=Konzolové okno
-Log window=Logovácí okno
+Log window=Logovací okno
 Layouts=Rozložení
 Layouts As Submenu=Rozložení jako podnabídku
 
@@ -70,7 +70,7 @@ Correct!=Správně!
 ###############################################################################################################
 ############################################## Scene view window ##############################################
 ###############################################################################################################
-Scene View=Prohlížení scény
+Scene View=Náhled scény
 
 #########################################################
 ##################### Settings Menu #####################
@@ -127,7 +127,7 @@ Show cameras=Zobrazit kamery
 Show frustums=Zobrazit frusta
 
 
-Object visibility toggle=Přepínač viditelnosti objektu
+Object visibility toggle=Přepnout viditelnost objektů
 Object visibility=Viditelnost objektu
 Objects=Objekty
 Axes=Osy
@@ -202,7 +202,7 @@ Selection=Výběr
 select all=vybrat vše
 invert=invertovat
 
-Zoom=Přiblížit
+Zoom=Přiblížit/Zoom
 to all=ke všem
 to selection=k výběru
 
@@ -274,7 +274,7 @@ Step for manual Next/Prev=Krok pro ruční Další/Předchozí
 ############################################## Start window ##############################################
 ##########################################################################################################
 Welcome=Vítejte
-I3T is an educational application that allows the study of 3D transformations and=I3T je výuková aplikace, která umožňuje názorným způsobem studovat 3D transformace a
+I3T is an educational application that allows the study of 3D transformations and=I3T je vzdělávací aplikace, která umožňuje názorným způsobem studovat 3D transformace a
  their hierarchy in an illustrative way.= jejich hierarchii.
 Learn=Studium
 Transformations=Transformace
