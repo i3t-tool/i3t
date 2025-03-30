@@ -101,6 +101,7 @@ void WorkspaceWindow::showEditMenu()
 		if (ImGui::MenuItem(_t("Select all")))
 		{
 			WorkspaceModule::g_editor->selectAllNodes();
+			App::getModule<StateManager>().requestSnapshot();
 		}
 
 		if (ImGui::MenuItem(_t("Zoom all")))

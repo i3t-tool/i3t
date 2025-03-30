@@ -163,7 +163,10 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	if (auto action = context.state.getActiveAction<Actions::DragNodeAction>(Actions::dragNode, this))
 	{
 		if (dragEnd)
+		{
 			action->end();
+			diwne.m_takeSnap = true;
+		}
 	}
 }
 

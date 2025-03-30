@@ -34,7 +34,7 @@ public:
 	{
 		auto result = g_editor->createNode<T>(position);
 
-		App::getModule<StateManager>().takeSnapshot();
+		App::getModule<StateManager>().requestSnapshot();
 
 		return result;
 	}

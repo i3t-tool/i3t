@@ -69,6 +69,8 @@ void WorkspaceModule::loadScene(const Memento& memento, Scene* scene)
 
 	if (memento["workspace"].HasMember("workArea"))
 		g_editor->canvas().setViewportRectDiwne(JSON::getRect(memento["workspace"]["workArea"]));
+
+	g_editor->manipulatorStartCheck3D();
 }
 
 void WorkspaceModule::clearScene()
@@ -108,7 +110,7 @@ bool WorkspaceModule::connectNodes(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, int lhs
 	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	if (result)
 	{
-		App::getModule<StateManager>().takeSnapshot();
+		App::getModule<StateManager>().requestSnapshot();
 	}
 
 	return result;

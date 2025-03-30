@@ -173,10 +173,6 @@ void ImportedModelsDialog::importModel(bool normalize)
 			else
 				failCounter++;
 		}
-
-		// TODO: (DR) Is undoing model import a good idea? Does taking snapshots even make sens in
-		//   the context of physical model files?
-		stateManager.takeSnapshot();
 	}
 	LOG_INFO("[IMPORT] Imported {} resources.{}", std::to_string(counter),
 	         (failCounter > 0 ? std::string(" Failed to import ") + std::to_string(failCounter) + " resource" +
@@ -219,5 +215,4 @@ void ImportedModelsDialog::removeModel(const std::string& alias)
 {
 	StateManager& stateManager = Application::getModule<StateManager>();
 	Application::getModule<Core::ResourceManager>().removeImportedModel(alias);
-	stateManager.takeSnapshot();
 }

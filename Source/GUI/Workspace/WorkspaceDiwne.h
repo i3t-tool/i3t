@@ -126,6 +126,7 @@ public:
 	// TODO: (DR) Reimplement
 	//    bool isZoomingDiwne() override;
 	bool processZoom() override;
+	void onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd) override;
 
 	void manipulatorStartCheck3D();
 

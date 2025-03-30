@@ -12,6 +12,9 @@
  */
 #pragma once
 
+#include "Config.h"
+
+
 #include <deque>
 #include <filesystem>
 #include <vector>
@@ -21,6 +24,7 @@
 #include "Scene.h"
 #include "State/Stateful.h"
 #include "UserData.h"
+#include "Utils/CircularVector.h"
 
 using namespace std::literals;
 
@@ -34,6 +38,7 @@ public:
 
 	void onInit() override;
 	void onBeginFrame() override;
+	void onEndFrame() override;
 	void onClose() override;
 
 	void addOriginator(IStateful* originator)
@@ -42,7 +47,27 @@ public:
 	}
 
 	// Undo/Redo _______________________________________________________________________________________________________
+private:
+	// The snapshot will be taken in the next frame, after it has been requested
+	void tryTakeSnapshot();
+	// Creates a workspace snapshot for undo/redo. However, overwrites the last snapshot made if it was made with this
+	// function.
+	void takeRewritableSnapshot();
 
+public:
+	// Request a snapshot to be taken in the next frame.
+	void requestSnapshot()
+	{
+		m_snapshotRequested = true;
+	}
+	// Request a snapshot to be taken in the next frame.
+	// If a request for a snapshot to be overwritten was also made in the previous frame, the snapshot will be
+	// overwritten.
+	void requestRewritableSnapshot()
+	{
+		m_rewritableSnapshotRequested = true;
+	}
+	// Creates a workspace snapshot for undo/redo.
 	void takeSnapshot();
 	void undo();
 	void redo();
@@ -58,12 +83,12 @@ public:
 
 	bool isDirty() const
 	{
-		if (m_hashes.empty() || m_currentStateIdx == -1)
+		if (m_hashes.empty() || m_mementos.getCurrentIndex() == -1)
 		{
 			return m_dirty;
 		}
 
-		return m_currentScene->m_hash != m_hashes[m_currentStateIdx] && m_dirty;
+		return m_currentScene->m_hash != m_hashes.getCurrent() && m_dirty;
 	}
 
 	// Scene save/load _________________________________________________________________________________________________
@@ -141,6 +166,9 @@ private:
 
 	std::optional<Memento> createSceneMemento(Scene* scene);
 
+	// Create a memento only from WorkspaceModule
+	std::optional<Memento> createSnapshotMemento(Scene* scene);
+
 	// Global save/load ________________________________________________________________________________________________
 
 	const fs::path m_globalFilePath = fs::path("Global.json");
@@ -165,9 +193,10 @@ private:
 
 	// Undo/Redo _______________________________________________________________________________________________________
 
-	int m_currentStateIdx;
-	std::deque<Memento> m_mementos;
-	std::deque<long> m_hashes;
+	bool m_snapshotRequested{false};
+	bool m_rewritableSnapshotRequested{false};
+	CircularVector<Memento> m_mementos = CircularVector<Memento>(Config::UNDO_LIMIT);
+	CircularVector<long> m_hashes = CircularVector<long>(Config::UNDO_LIMIT);
 
 	bool m_dirty = false;
 };

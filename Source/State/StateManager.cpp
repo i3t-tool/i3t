@@ -14,6 +14,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"
@@ -93,19 +94,71 @@ void StateManager::onBeginFrame()
 	}
 }
 
+void StateManager::onEndFrame()
+{
+	Module::onEndFrame();
+
+	tryTakeSnapshot();
+}
+
 void StateManager::onClose()
 {
 	saveGlobal();
 	deleteTmpDirectory();
 }
 
+void StateManager::tryTakeSnapshot()
+{
+	static bool takeSnap = false;
+	static bool takeRewritableSnap = false;
+
+	if (takeSnap)
+	{
+		takeSnapshot();
+	}
+	else if (takeRewritableSnap)
+	{
+		takeRewritableSnapshot();
+	}
+	takeSnap = false;
+	takeRewritableSnap = false;
+
+	if (m_snapshotRequested)
+	{
+		takeSnap = true;
+		m_snapshotRequested = false;
+	}
+	if (m_rewritableSnapshotRequested)
+	{
+		takeRewritableSnap = true;
+		m_rewritableSnapshotRequested = false;
+	}
+}
+
 void StateManager::takeSnapshot()
 {
-	if (auto state = createSceneMemento(nullptr))
+	if (auto state = createSnapshotMemento(nullptr))
 	{
-		m_mementos.push_back(std::move(*state));
-		m_hashes.push_back(randLong());
-		m_currentStateIdx = m_mementos.size() - 1;
+		if (!m_mementos.empty())
+		{
+			if (state == m_mementos.getCurrent())
+			{
+				return;
+			}
+		}
+
+		if (canRedo())
+		{
+			m_mementos.truncateFromCurrent();
+			m_hashes.truncateFromCurrent();
+		}
+
+		m_mementos.pushBack(std::move(*state));
+		m_hashes.pushBack(randLong());
+		if (m_hashes.size() == 1)
+		{
+			m_hashes[0] = m_currentScene->m_hash;
+		}
 
 		if (m_mementos.size() != 1)
 		{
@@ -116,6 +169,36 @@ void StateManager::takeSnapshot()
 	}
 }
 
+void StateManager::takeRewritableSnapshot()
+{
+	if (auto state = createSnapshotMemento(nullptr))
+	{
+		if (!m_mementos.empty())
+		{
+			if (state == m_mementos.getCurrent())
+			{
+				return;
+			}
+		}
+
+		static int lastStateIdx = 0;
+		if (lastStateIdx != m_mementos.getCurrentIndex())
+		{
+			m_mementos.insertAfterCurrent(std::move(*state));
+			m_hashes.insertAfterCurrent(randLong());
+			lastStateIdx = m_mementos.getCurrentIndex();
+		}
+		else
+		{
+			m_mementos.replaceCurrent(std::move(*state));
+		}
+		if (m_hashes.size() == 1)
+		{
+			m_hashes[0] = m_currentScene->m_hash;
+		}
+	}
+}
+
 void StateManager::undo()
 {
 	if (!canUndo())
@@ -123,11 +206,16 @@ void StateManager::undo()
 		return;
 	}
 
-	auto& memento = m_mementos[--m_currentStateIdx];
+	auto& memento = m_mementos.popCurrent();
+	m_hashes.popCurrent();
+
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadScene(memento, nullptr);
+		if (dynamic_cast<WorkspaceModule*>(originator))
+		{
+			originator->loadScene(memento, nullptr);
+		}
 	}
 
 	setWindowTitle();
@@ -140,13 +228,17 @@ void StateManager::redo()
 		return;
 	}
 
-	auto& memento = m_mementos[++m_currentStateIdx];
+	auto& memento = m_mementos.revertCurrent();
+	m_hashes.revertCurrent();
 
 	memento.GetAllocator();
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadScene(memento, nullptr);
+		if (dynamic_cast<WorkspaceModule*>(originator))
+		{
+			originator->loadScene(memento, nullptr);
+		}
 	}
 
 	setWindowTitle();
@@ -154,12 +246,12 @@ void StateManager::redo()
 
 bool StateManager::canUndo() const
 {
-	return m_currentStateIdx > 0;
+	return !m_mementos.empty() && m_mementos.distanceToFirst() > 0;
 }
 
 bool StateManager::canRedo() const
 {
-	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
+	return !m_mementos.empty() && m_mementos.distanceToLast() > 0;
 }
 
 int StateManager::getMementosCount() const
@@ -169,20 +261,20 @@ int StateManager::getMementosCount() const
 
 int StateManager::getPossibleUndosCount() const
 {
-	return m_mementos.size() - 1;
+	return m_mementos.distanceToFirst();
 }
 
 int StateManager::getPossibleRedosCount() const
 {
 	/// \todo Test me!
-	return m_mementos.size() - m_currentStateIdx;
+	return m_mementos.distanceToLast();
 }
 
 //
 
 const Memento& StateManager::getCurrentState() const
 {
-	return m_mementos[m_currentStateIdx];
+	return m_mementos.getCurrent();
 }
 
 bool StateManager::isValidScenePath(const fs::path path)
@@ -215,6 +307,29 @@ std::optional<Memento> StateManager::createSceneMemento(Scene* scene)
 	{
 		auto memento = originator->saveScene(scene);
 		JSON::merge(state, memento, state.GetAllocator());
+	}
+
+	return state;
+}
+
+std::optional<Memento> StateManager::createSnapshotMemento(Scene* scene)
+{
+	Memento state;
+	state.SetObject();
+
+	if (m_originators.empty())
+	{
+		LOG_WARN("You have no originators set for the StateManager. Cannot take scene snapshot.");
+		return std::nullopt;
+	}
+
+	for (const auto& originator : m_originators)
+	{
+		if (dynamic_cast<WorkspaceModule*>(originator))
+		{
+			auto memento = originator->saveScene(scene);
+			JSON::merge(state, memento, state.GetAllocator());
+		}
 	}
 
 	return state;
@@ -267,7 +382,7 @@ bool StateManager::saveScene(const fs::path& target)
 	// Create scene .json file
 	const auto result = JSON::save(target, *createSceneMemento(m_currentScene.get()));
 
-	m_currentScene->m_hash = m_hashes[m_currentStateIdx];
+	m_currentScene->m_hash = m_hashes.getCurrent();
 	if (m_currentScene->m_prevPath != target)
 	{
 		// save as with different name, add original scene to recent files
@@ -479,14 +594,14 @@ void StateManager::loadUserData()
 
 void StateManager::reset()
 {
-	m_currentStateIdx = -1;
 	m_dirty = false;
 
 	m_mementos.clear();
+	m_hashes.clear();
 
 	setWindowTitle();
 
-	takeSnapshot();
+	requestSnapshot();
 }
 
 void StateManager::setWindowTitle()

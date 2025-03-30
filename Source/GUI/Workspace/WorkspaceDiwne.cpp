@@ -162,7 +162,16 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 
 	if (m_takeSnap)
 	{
-		App::getModule<StateManager>().takeSnapshot();
+		App::getModule<StateManager>().requestSnapshot();
+	}
+}
+void WorkspaceDiwne::onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd)
+{
+	NodeEditor::onDrag(context, dragStart, dragEnd);
+
+	if (dragEnd && !context.state.isActionActive(DIWNE::Actions::selectionRect, this))
+	{
+		App::getModule<StateManager>().requestRewritableSnapshot();
 	}
 }
 
@@ -660,6 +669,7 @@ void WorkspaceDiwne::onZoom()
 bool WorkspaceDiwne::processZoom()
 {
 	m_updateDataItemsWidth = true;
+	App::getModule<StateManager>().requestRewritableSnapshot();
 	return NodeEditor::processZoom();
 }
 

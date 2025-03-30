@@ -54,6 +54,8 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 	ASSERT_TRUE(ui != nullptr);
 	auto& workspace = I3T::getWorkspace();
 
+	App::getModule<StateManager>().takeSnapshot();
+
 	// create empty scene
 	App::getModule<StateManager>().saveScene(emptyScenePath);
 
@@ -66,28 +68,33 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		// StateManager contains the initial state only.
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
-		nodes.push_back(
-		    WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		    ImVec2(1.0f, 0.0f)));
+		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
-		nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>(
 		    ImVec2(-1.0f, 1.0f)));
+		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
-		nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>(
 		    ImVec2(0.0f, -1.0f)));
+		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
 		// workspace contains 3 operators.
 		ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
 
-		WorkspaceModule::connectNodes(nodes[0], nodes[1], 0, 0);
+		WorkspaceModule::connectNodesNoSave(nodes[0], nodes[1], 0, 0);
+		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 4);
 
-		WorkspaceModule::connectNodes(nodes[1], nodes[2], 0, 0);
+		WorkspaceModule::connectNodesNoSave(nodes[1], nodes[2], 0, 0);
+		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 5);
 
 		const bool result = App::getModule<StateManager>().saveScene(scenePath);
@@ -98,6 +105,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		// clear all nodes with empty scene file
 
 		const bool result = App::getModule<StateManager>().loadScene(emptyScenePath);
+		App::getModule<StateManager>().takeSnapshot();
 		ASSERT_TRUE(result);
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
@@ -107,6 +115,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 
 	{
 		const bool result = App::getModule<StateManager>().loadScene(scenePath);
+		App::getModule<StateManager>().takeSnapshot();
 		ASSERT_TRUE(result);
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
@@ -129,8 +138,11 @@ TEST_F(StateTest, UnicodeSceneNameLoadAndSave)
 
 	auto& stateManager = App::getModule<StateManager>();
 
+	App::getModule<StateManager>().takeSnapshot();
+
 	// Load the scene
 	bool result = stateManager.loadScene(scenePath);
+	App::getModule<StateManager>().takeSnapshot();
 	{
 		ASSERT_TRUE(result);
 
@@ -177,19 +189,23 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 {
 	using namespace Workspace;
 
-	const auto scenePath = "Test/Data/TestScene.json";
+	const auto scenePath = "Test/Data/TestScene.scene";
 	auto& workspace = I3T::getWorkspace();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
+	App::getModule<StateManager>().takeSnapshot();
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene("Test/Data/EmptyScene.json");
+	App::getModule<StateManager>().saveScene("Test/Data/EmptyScene.scene");
 
 	std::vector<Ptr<CoreNode>> nodes;
 
-	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Transformation<ETransformType::Scale>>());
-	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Transformation<ETransformType::Free>>());
-	nodes.push_back(WorkspaceModule::addNodeToNodeEditor<Workspace::Sequence>());
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Transformation<ETransformType::Scale>>());
+	App::getModule<StateManager>().takeSnapshot();
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Transformation<ETransformType::Free>>());
+	App::getModule<StateManager>().takeSnapshot();
+	nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Sequence>());
+	App::getModule<StateManager>().takeSnapshot();
 
 	const auto randomVec3 = generateVec3();
 
@@ -225,6 +241,7 @@ TEST_F(StateTest, DISABLED_TransformsAreSavedAndLoadedProperly)
 
 	{
 		const bool result = App::getModule<StateManager>().loadScene(scenePath);
+		App::getModule<StateManager>().takeSnapshot();
 		ASSERT_TRUE(result);
 	}
 
