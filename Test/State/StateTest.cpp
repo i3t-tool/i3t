@@ -68,8 +68,8 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		// StateManager contains the initial state only.
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
-		nodes.push_back(
-		    WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
+		nodes.push_back(WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>(
+		    ImVec2(1.0f, 0.0f)));
 		App::getModule<StateManager>().takeSnapshot();
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
