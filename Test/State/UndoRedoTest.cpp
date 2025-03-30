@@ -24,6 +24,7 @@
 TEST(UndoRedoTest, Basic)
 {
 	auto app = initI3T();
+	App::getModule<StateManager>().takeSnapshot();
 
 	auto castNode = [](const std::shared_ptr<DIWNE::Node>& node) -> Workspace::CoreNode* {
 		return node->as<Workspace::CoreNode>();
@@ -36,7 +37,8 @@ TEST(UndoRedoTest, Basic)
 	const auto& nodes = workspace.getNodeEditor().getNodeList();
 	ASSERT_TRUE(nodes.empty());
 
-	WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	App::getModule<StateManager>().takeSnapshot();
 	const float newValue = 10.0f;
 	setValue_expectOk(castNode(nodes[0])->getNodebase(), newValue);
 	App::getModule<StateManager>().takeSnapshot();
@@ -60,9 +62,13 @@ TEST(UndoRedoTest, Basic)
 	App::getModule<StateManager>().takeSnapshot();
 	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
-	WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::FloatToFloat>>();
+	App::getModule<StateManager>().takeSnapshot();
 
-	WorkspaceModule::connectNodes(castNodePtr(nodes[0]), castNodePtr(nodes[1]), 0, 0);
+
+	WorkspaceModule::connectNodesNoSave(castNodePtr(nodes[0]), castNodePtr(nodes[1]), 0, 0);
+	App::getModule<StateManager>().takeSnapshot();
+
 	EXPECT_EQ(castNode(nodes[1])->getNodebase()->data().getFloat(), newValue);
 	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
@@ -98,7 +104,9 @@ TEST(UndoRedoTest, Basic)
 	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->data().getFloat() == newValue);
 	EXPECT_TRUE(castNode(nodes[1])->getNodebase()->getInput(0).isPluggedIn());
 
-	WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::MatrixToMatrix>>();
+	WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Operator<EOperatorType::MatrixToMatrix>>();
+	App::getModule<StateManager>().takeSnapshot();
+
 	const auto mat = generateMat4();
 	setValue_expectOk(castNode(nodes[2])->getNodebase(), mat);
 	App::getModule<StateManager>().takeSnapshot();
