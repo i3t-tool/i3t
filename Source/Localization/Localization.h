@@ -140,6 +140,6 @@ private:
 	    {.id = 0, .name = "English", .filePath = "Data/Localization/en.txt"},
 	    {.id = 1, .name = "Čeština", .filePath = "Data/Localization/cz.txt"},
 	    {.id = 2, .name = "Русский", .filePath = "Data/Localization/ru.txt"},
-		{.id = 3, .name = "Українська", .filePath = "Data/Localization/ua.txt"},
+	    {.id = 3, .name = "Українська", .filePath = "Data/Localization/ua.txt"},
 	};
 };
