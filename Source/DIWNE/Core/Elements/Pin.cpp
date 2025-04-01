@@ -16,7 +16,6 @@
 
 #include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/diwne_actions.h"
-#include "DIWNE/Utils/diwne_utils.h"
 #include "Link.h"
 #include "Node.h"
 

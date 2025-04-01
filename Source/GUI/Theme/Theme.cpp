@@ -393,7 +393,8 @@ void Theme::initClassicProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = {{25.0f, 25.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_IconSize] = {{12.0f, 12.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PinSize] = {{14.0f, 14.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PinSize_MatrixMul] = {{16.0f, 16.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = {{32.0f, 32.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = {{130.0f, 130.0f}, true};
 
@@ -502,7 +503,8 @@ void Theme::initNames()
 	    .add(ESizeVec2::Nodes_Screen_resizeButtonSize, "Screen Resize Button Size")
 	    .add(ESizeVec2::Nodes_Sequence_DummySpaceSize, "Sequence Dummy Space Size")
 	    .add(ESizeVec2::NewNode_positionShift, "New Node Position Shift")
-	    .add(ESizeVec2::Nodes_IconSize, "Nodes Icon Size")
+	    .add(ESizeVec2::Nodes_PinSize, "Nodes Pin Size")
+	    .add(ESizeVec2::Nodes_PinSize_MatrixMul, "Nodes Pin Size Matrix Mul")
 	    .add(ESizeVec2::Nodes_PivotAlignment, "Nodes Pivot Alignment")
 	    .add(ESizeVec2::Nodes_PinSpacing, "Nodes Pin Spacing")
 	    .add(ESizeVec2::Nodes_ItemsSpacing, "Nodes Items Spacing")
@@ -867,12 +869,8 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins IconPadding";
 
-	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes Screen ResizeButtonSize";
-	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes Sequence DummySpaceSize";
-	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode PositionShift";
-
-
-	g_SizeVecNames[ESizeVec2::Nodes_IconSize] = "ngen_Nodes Icon Size";
+	g_SizeVecNames[ESizeVec2::Nodes_PinSize] = "ngen_Nodes Pin Size";
+	g_SizeVecNames[ESizeVec2::Nodes_PinSize_MatrixMul] = "ngen_Nodes Pin Size Matrix Mul";
 	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] = "ngen_Nodes Pivot Alignment";
 	g_SizeVecNames[ESizeVec2::Nodes_PinSpacing] = "ngen_Nodes Pin Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing] = "ngen_Nodes Items Spacing";
@@ -888,6 +886,9 @@ void Theme::initNames()
 
 	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle Button Size";
 	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "ngen_Nodes Screen Texture Size";
+	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes Screen ResizeButtonSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes Sequence DummySpaceSize";
+	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode PositionShift";
 
 	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
 }

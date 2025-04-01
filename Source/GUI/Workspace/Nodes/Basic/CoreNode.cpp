@@ -50,21 +50,33 @@ CoreNode::~CoreNode()
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
 }
 
+void CoreNode::begin(DIWNE::DrawInfo& context)
+{
+	Node::begin(context);
+	m_headerSpacing = m_bottomSpacing = getLevelOfDetail() != LevelOfDetail::Label;
+}
+
 void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
 	// Note: This method does not call superclass topContent!
 	// TODO: But it should :|
 
-	bool interaction_happen = false;
+	bool interacted = false;
 
 	float zoom = diwne.getZoom();
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
-	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
+	LevelOfDetail detail = getLevelOfDetail();
 
-	drawHeader();
-	// TODO: This should again be responsibility of the DIWNE library
+	ImDrawFlags headerCornersFlag = ImDrawFlags_RoundCornersTop;
+	ImDrawFlags lodButtonCornersFlag = ImDrawFlags_RoundCornersTopLeft;
+	if (detail == LevelOfDetail::Label)
+	{
+		headerCornersFlag = ImDrawFlags_RoundCornersAll;
+		lodButtonCornersFlag = ImDrawFlags_RoundCornersLeft;
+	}
+
+	drawHeader(headerCornersFlag);
 
 	// adding a border
 	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max, I3T::getTheme().get(EColor::NodeBorder),
@@ -78,8 +90,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
 
-	LevelOfDetail detail = getLevelOfDetail();
-	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), ImDrawFlags_RoundCornersTopLeft,
+	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), lodButtonCornersFlag,
 	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
 	{
 		if (detail == LevelOfDetail::Full)
@@ -133,17 +144,17 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	if (m_isLabelBeingEdited)
 	{
-		interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
-		                                      ImGuiInputTextFlags_NoHorizontalScroll);
+		interacted = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
+		                              ImGuiInputTextFlags_NoHorizontalScroll);
 		auto id = ImGui::GetItemID();
 		if (m_isFirstDraw)
 		{
 			ImGui::ActivateItemByID(id);
-			interaction_happen = true;
+			interacted = true;
 			m_isFirstDraw = false;
 		}
-		interaction_happen |= ImGui::IsItemActive();
-		if (!interaction_happen)
+		interacted |= ImGui::IsItemActive();
+		if (!interacted)
 		{
 			m_isLabelBeingEdited = false;
 			m_isFirstDraw = true;
@@ -152,7 +163,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	else
 	{
 		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
-		interaction_happen = false;
+		interacted = false;
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
@@ -161,6 +172,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
 	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
+	//   DiwnePanels should possibly have an optional forced minimum fixed size (minimum minimum size?)
 
 	// Header extra space
 	// float trailingDummyWidth = style.FramePadding.x / zoom;
@@ -176,7 +188,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	if (interaction_happen)
+	if (interacted)
 	{
 		context.consumeInput();
 	}

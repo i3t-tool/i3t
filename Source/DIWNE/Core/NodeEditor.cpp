@@ -89,11 +89,11 @@ void NodeEditor::begin(DrawInfo& context)
 	DIWNE_DEBUG_OBJECTS((*this), {
 		ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
 		                                    ImColor(255, 0, 0), 0, ImDrawFlags_RoundCornersNone, 10);
-		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}",
-		                        m_canvas->m_viewRectDiwne.Min.x, m_canvas->m_viewRectDiwne.Min.y,
-		                        m_canvas->m_viewRectDiwne.Max.x, m_canvas->m_viewRectDiwne.Max.y,
-		                        m_canvas->m_viewRectScreen.Min.x, m_canvas->m_viewRectScreen.Min.y,
-		                        m_canvas->m_viewRectScreen.Max.x, m_canvas->m_viewRectScreen.Max.y)
+		ImGui::Text(fmt::format("WADiwne: {}-{}  -  {}-{}\nWAScreen: {}-{}  -  {}-{}", m_canvas->m_viewRectDiwne.Min.x,
+		                        m_canvas->m_viewRectDiwne.Min.y, m_canvas->m_viewRectDiwne.Max.x,
+		                        m_canvas->m_viewRectDiwne.Max.y, m_canvas->m_viewRectScreen.Min.x,
+		                        m_canvas->m_viewRectScreen.Min.y, m_canvas->m_viewRectScreen.Max.x,
+		                        m_canvas->m_viewRectScreen.Max.y)
 		                .c_str());
 
 		ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
@@ -254,7 +254,8 @@ void NodeEditor::afterDraw(DrawInfo& context)
 	DIWNE_DEBUG_LAYOUT(diwne, {
 		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
 		ImGui::GetForegroundDrawList()->AddText(
-		    m_canvas->diwne2screen(originPos) + ImVec2(getRect().GetWidth() * 0.2, 0), IM_COL32_WHITE,
+		    m_canvas->diwne2screen(originPos) + ImVec2(m_canvas->diwne2screenSize(getRect().GetWidth()) * 0.2f, 0),
+		    IM_COL32_WHITE,
 		    (std::string() + "zoom: " + std::to_string(m_canvas->getZoom()) + ", " + "workArea: " +
 		     std::to_string(m_canvas->m_viewRectDiwne.Min.x) + ", " + std::to_string(m_canvas->m_viewRectDiwne.Min.y))
 		        .c_str());
@@ -286,6 +287,23 @@ void NodeEditor::processInteractions(DrawInfo& context)
 				this->invertSelection();
 			if (input().deleteSelectedNodes())
 				this->deleteSelectedNodes();
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad0))
+			// 	setZoom(0.93224556732);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad1))
+			// 	setZoom(0.87931234564);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad2))
+			// 	setZoom(0.78100014347);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad3))
+			// 	setZoom(0.53874932421);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad4))
+			// 	setZoom(0.46544713461);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad5))
+			// 	setZoom(0.34763169471);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad6))
+			// 	setZoom(0.24763169471);
+			// if (ImGui::IsKeyDown(ImGuiKey_Keypad7))
+			// 	setZoom(0.14763169471);
+			// diwne.canvas().setViewportRectDiwne(ImRect(ImVec2(3155.323438873, 21.233444876), ImVec2(3200, 30)));
 		}
 	}
 }

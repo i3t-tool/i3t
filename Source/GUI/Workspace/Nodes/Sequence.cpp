@@ -23,6 +23,9 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 {
 	updateDataItemsWidth();
 	m_headerMinWidth = 120;
+	m_headerSpacing = false; // We want drop zone background to be flush with the header, handled in left/right panels.
+	m_bottomSpacing = false;
+	m_contentSpacing = 4;
 }
 
 void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)
@@ -61,17 +64,6 @@ bool Sequence::allowDrawing()
 	// TODO: Why do we care if we're a Camera sequence? What's the reason?
 	return m_isCameraSequence || CoreNode::allowDrawing();
 }
-
-// TODO: Rewrite
-// bool Sequence::beforeContent()
-//{
-//	// TODO: Remove
-//	/* whole node background */
-//	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_bottom.getMax(),
-//	                         I3T::getTheme().get(EColor::NodeBgTransformation),
-//	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawFlags_RoundCornersAll);
-//	return false;
-//}
 
 void Sequence::begin(DIWNE::DrawInfo& context)
 {
@@ -123,7 +115,6 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	else
 	{
 		m_dropZone->drawDiwne(context, m_drawMode);
-		ImGui::Spacing();
 	}
 }
 
@@ -153,10 +144,51 @@ int Sequence::maxLengthOfData()
 	return 0;
 }
 
-void Sequence::onDestroy(bool logEvent)
+void Sequence::drawInputPins(DIWNE::DrawInfo& context)
 {
-	m_dropZone->destroy(logEvent);
-	CoreNodeWithPins::onDestroy(logEvent);
+	const std::vector<Ptr<CorePin>>& pins = m_workspaceInputs;
+	assert(pins.size() == 2); // Sequences have special pin handling, expecting matrix mul at 0; matrix data in at 1
+
+	ImGui::Spacing(); // Manually add vertical spacing
+
+	pins[1]->drawDiwne(context);
+	ImGui::Dummy(ImGui::GetCurrentContext()->LastItemData.Rect.GetSize()); // Second dummy pin to keep matrix mul align
+
+	if (pins[0]->allowDrawing())
+	{
+		m_left.vspring(0.3f);
+		pins[0]->drawDiwne(context);
+	}
+}
+
+void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
+{
+	std::vector<Ptr<CorePin>> pins = getOutputsToShow();
+	assert(pins.size() == 3); // Sequences have special pin handling, expecting matrix mul at 0; matrix data at 1 and 2
+
+	ImGui::Spacing(); // Manually add vertical spacing
+
+	outputPinsVstack.begin();
+	for (auto pin : {pins[1], pins[2]})
+	{
+		if (pin->allowDrawing())
+		{
+			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			row->spring(1.0f);
+			pin->drawDiwne(context);
+			outputPinsVstack.endRow();
+		}
+	}
+
+	if (pins[0]->allowDrawing())
+	{
+		outputPinsVstack.spring(0.3f);
+		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+		row->spring(1.0f);
+		pins[0]->drawDiwne(context);
+		outputPinsVstack.endRow();
+	}
+	outputPinsVstack.end();
 }
 
 void Sequence::popupContent(DIWNE::DrawInfo& context)
@@ -224,6 +256,7 @@ void Sequence::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
+
 void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
 	DiwneObject::afterDraw(context);
@@ -235,6 +268,12 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		                                        fmt::format("Nodes: {}", m_dropZone->getNodeList().size()).c_str());
 	});
+}
+
+void Sequence::onDestroy(bool logEvent)
+{
+	m_dropZone->destroy(logEvent);
+	CoreNodeWithPins::onDestroy(logEvent);
 }
 
 Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)
@@ -265,7 +304,7 @@ bool Sequence::SequenceDropZone::acceptNode(DIWNE::Node* node)
 void Sequence::SequenceDropZone::drawEmptyContent(DIWNE::DrawInfo& context)
 {
 	float zoom = diwne.getZoom();
-	const ImVec2 defaultSize = ImVec2(10 * ImGui::GetFontSize(), 7.5 * ImGui::GetFontSize());
+	const ImVec2 defaultSize = ImVec2(10.0f * ImGui::GetFontSize(), 8.3f * ImGui::GetFontSize());
 	ImVec2 origin = ImGui::GetCursorScreenPos();
 	const char* emptyLabel = "    Drag and drop\ntransformations here";
 	ImGui::SetCursorScreenPos(origin + (defaultSize / 2.0f) - (ImGui::CalcTextSize(emptyLabel) / 2.0f) -

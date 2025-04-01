@@ -52,6 +52,7 @@ public:
 
 	// Lifecycle
 	// =============================================================================================================
+	void begin(DIWNE::DrawInfo& context) override;
 	void topContent(DIWNE::DrawInfo& context) override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;

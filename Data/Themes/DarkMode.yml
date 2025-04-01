@@ -176,7 +176,7 @@ size vectors:
   ngen_Nodes Middle Size: [0, 0]
   ngen_Nodes Output Size: [0, 0]
   ngen_Nodes LOD Button Size: [27, 27]
-  ngen_Nodes Icon Size: [12, 12]
+  ngen_Nodes Pin Size: [14, 14]
   ngen_Nodes Float Cycle Button Size: [32, 32]
   ngen_Nodes Screen Texture Size: [130, 130]
   ngen_Nodes Screen ResizeButtonSize: [20, 20]

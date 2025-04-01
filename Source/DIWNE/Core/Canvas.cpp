@@ -309,6 +309,14 @@ void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, 
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
+void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                                    ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
+{
+	ImDrawList* idl = ImGui::GetForegroundDrawList();
+	idl->AddRect(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
+}
+
 void Canvas::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
                                  float thickness, int num_segments /*=0*/) const
 {
@@ -576,11 +584,12 @@ void Canvas::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImCol
 void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+	ImVec2 margin = diwne2screenSize(ImVec2(0.5f, 0.5f));
+	topLeft = topLeft + margin;
+	bottomRight = bottomRight - margin;
 
 	int lineCount = 3;
-	float padding = screen2diwneSize(1.5f);
+	float padding = diwne2screenSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -598,11 +607,12 @@ void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor i
 void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                    ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+	ImVec2 margin = diwne2screenSize(ImVec2(0.5f, 0.5f));
+	topLeft = topLeft + margin;
+	bottomRight = bottomRight - margin;
 
 	int lineCount = 3;
-	float padding = screen2diwneSize(1.5f);
+	float padding = diwne2screenSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;

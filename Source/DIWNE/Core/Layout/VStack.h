@@ -1,38 +1,41 @@
 #pragma once
 
-#include <vector>
-
 #include "DiwnePanel.h"
+#include "Stack.h"
 
 namespace DIWNE
 {
-class VStack
+class VStack : public Stack
 {
-	NodeEditor& m_editor;
-	std::vector<DiwnePanel> m_children;
-
-	bool m_buildingRow = false; // Make this a DIWNE_DEBUG variable
-	bool m_buildingStack = false; // Make this a DIWNE_DEBUG variable
-
-	int m_currentRowIndex = 0;
-
-	float m_maxFixedWidth = 0;
-
-
-	ImVec2 origin;
-
 public:
-	explicit VStack(NodeEditor& editor) : m_editor(editor) {}
+	/// Create a vertical item stack
+	explicit VStack(NodeEditor& editor) : Stack(editor, Stack::VERTICAL) {}
+	/// Create a vertical item stack for a specified DIWNE panel, this allows the usage of the spring() method.
+	explicit VStack(NodeEditor& editor, DiwnePanel* panel) : Stack(editor, Stack::VERTICAL, panel) {}
 
-	void begin();
-	void end();
+	/**
+	 * Begins a new row.
+	 * Starting position of all rows is locked on the X coordinate.
+	 * All rows are laid out to have the same width.
+	 * @return Panel corresponding to the new row.
+	 */
+	DiwnePanel* beginRow()
+	{
+		return Stack::beginItem();
+	}
+	void endRow()
+	{
+		Stack::endItem();
+	}
 
-	DiwnePanel* beginRow();
-	void endRow();
+	/// Adds a vertical spring between rows.
+	void spring(float relSize)
+	{
+		Stack::spring(relSize);
+	}
 
 private:
-	// Probably called by end()
-	void layout();
+	DiwnePanel* beginItem() = delete;
+	void endItem() = delete;
 };
-
 } // namespace DIWNE

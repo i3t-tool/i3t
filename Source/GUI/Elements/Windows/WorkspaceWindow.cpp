@@ -55,6 +55,16 @@ void WorkspaceWindow::render()
 				ImGui::MenuItem("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
 				ImGui::MenuItem("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
 				ImGui::MenuItem("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
+
+				if (ImGui::BeginMenu("Zoom"))
+				{
+					if (ImGui::MenuItem("Reset to 1.0"))
+					{
+						WorkspaceModule::g_editor->setZoom(1.0f);
+					}
+					ImGui::EndMenu();
+				}
+
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}

@@ -14,7 +14,9 @@
  * should be available wherever DIWNE is used.
  */
 #pragma once
+#ifndef DIWNE_DEBUG_ENABLED
 #define DIWNE_DEBUG_ENABLED 1
+#endif
 
 #include <memory>
 #include <vector>
@@ -49,17 +51,13 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 // Diwne debug macros used to execute code when diwne debug mode is enabled
 #if DIWNE_DEBUG_ENABLED
 #ifndef NDEBUG
+// Calls an empty helper function that one can put a breakpoint into (poor man's force break)
 #define DIWNE_BREAKPOINT() DIWNE::diwneBreakpointFunc()
-#define DIWNE_ASSERT_BLOCK(debugCode)                                                                                  \
-	do                                                                                                                 \
-	{                                                                                                                  \
-		debugCode                                                                                                      \
-	} while (0) // do-while to prevent issues with single line statements
 #else
-#define DIWNE_ASSERT_BLOCK(debugCode)
 #define DIWNE_BREAKPOINT()
 #endif
 
+// Set of macros that run code when a specific runtime debug flag is true
 #define DIWNE_DEBUG_VARS()                                                                                             \
 	bool m_diwneDebug = false;                                                                                         \
 	bool m_diwneDebugLayout = false;                                                                                   \
@@ -80,7 +78,6 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
 #else
 #define DIWNE_BREAKPOINT()
-#define DIWNE_ASSERT_BLOCK(debugCode)
 #define DIWNE_DEBUG_VARS()
 #define DIWNE_DEBUG_GENERAL(editor, debugCode)
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode)
@@ -96,8 +93,11 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
 // Logs error via DIWNE_ERROR and also triggers an assertion failure in debug mode
 #define DIWNE_FAIL(...)                                                                                                \
-	DIWNE_ERROR(__VA_ARGS__);                                                                                          \
-	assert(false && "DIWNE assertion failure");
+	do                                                                                                                 \
+	{                                                                                                                  \
+		DIWNE_ERROR(__VA_ARGS__);                                                                                      \
+		assert(false && "DIWNE assertion failure");                                                                    \
+	} while (0) // do-while to prevent issues with single line statements
 
 #include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>

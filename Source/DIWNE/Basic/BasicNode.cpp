@@ -22,42 +22,39 @@ void BasicNode::begin(DrawInfo& context)
 
 void BasicNode::content(DrawInfo& context)
 {
+	ImGuiStyle& style = ImGui::GetStyle();
+
 	m_top.begin();
 	topContent(context);
 	m_top.end();
+	if (!m_headerSpacing)
+		DGui::NewLine(); // No vertical spacing
 
 	m_middle.begin();
 	m_left.begin();
 	leftContent(context);
 	m_left.end(&m_middle);
 
-	m_middle.sameLine();
+	ImGui::SameLine(0.0f,
+	                m_contentSpacing == -1 ? style.ItemSpacing.x : diwne.canvas().diwne2screenSize(m_contentSpacing));
 
-	//	if (m_centerDummySpace > 0)
-	//	{
-	//		ImGui::Indent((m_left.getRect().GetWidth() + m_centerDummySpace * diwne.mp_settingsDiwne->middleAlign) *
-	//		                  diwne.getZoom() +
-	//		              ImGui::GetStyle().ItemSpacing.x);
-	//	} /* spacing is already zoomed in Diwne */
-	m_middle.spring(0.5);
+	m_middle.spring(0.5f);
 
 	m_center.begin();
 	centerContent(context);
 	m_center.end(&m_middle);
 
-	m_middle.sameLine();
+	ImGui::SameLine(0.0f,
+	                m_contentSpacing == -1 ? style.ItemSpacing.x : diwne.canvas().diwne2screenSize(m_contentSpacing));
 
-	//	if (m_centerDummySpace > 0)
-	//	{
-	//		ImGui::Indent((m_middle.getRect().GetWidth() + m_centerDummySpace * (1 -
-	// diwne.mp_settingsDiwne->middleAlign))
-	//* 		                  diwne.getZoom() + 		              ImGui::GetStyle().ItemSpacing.x);
-	//	}
-	m_middle.spring(0.5);
+	m_middle.spring(0.5f);
 
 	m_right.begin();
 	rightContent(context);
 	m_right.end(&m_middle);
+
+	if (m_bottomSpacing)
+		ImGui::Spacing();
 
 	m_middle.end();
 }
@@ -93,59 +90,8 @@ void BasicNode::bottomContent(DrawInfo& context) {}
 
 void BasicNode::updateLayout(DrawInfo& context)
 {
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	//	LOG_INFO("top {}:{} {}:{} ({}, {})", m_top.getMinX(), m_top.getMinY(), m_top.getMaxX(), m_top.getMaxY(),
-	// m_top.getWidth(), m_top.getHeight()); 	LOG_INFO("left {}:{} {}:{} ({}, {})", m_left.getMinX(),
-	// m_left.getMinY(), m_left.getMaxX(), m_left.getMaxY(), m_left.getWidth(), m_left.getHeight()); 	LOG_INFO("center
-	// {}:{} {}:{} ({},
-	//{})", m_center.getMinX(), m_center.getMinY(), m_center.getMaxX(), m_center.getMaxY(), m_center.getWidth(),
-	// m_center.getHeight()); 	LOG_INFO("right {}:{} {}:{} ({}, {})", m_right.getMinX(), m_right.getMinY(),
-	// m_right.getMaxX(), m_right.getMaxY(), m_right.getWidth(), m_right.getHeight()); 	LOG_INFO("middle {}:{} {}:{}
-	// ({},
-	//{})", m_middle.getMinX(), m_middle.getMinY(), m_middle.getMaxX(), m_middle.getMaxY(), m_middle.getWidth(),
-	// m_middle.getHeight());
-
-	if (ImGui::IsKeyDown(ImGuiKey_E))
-		int x = 5;
-
-	/* ItemSpacing is already scaled, node rects are using unscaled coordinates, thus the divison */
-	ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.canvas().getZoom();
-
-	float maxX = std::max(m_top.getMaxX(), m_middle.getMinX() + m_middle.getMinimumWidth());
-	m_top.setMaxX(maxX);
-	m_middle.setMaxX(maxX);
-
-	//	Gravity::alignRightEdge({m_top, m_right});
+	Gravity::alignRightEdge({m_top, m_middle});
 	Gravity::alignBottom({m_left, m_center, m_right});
-
-	//	float maxX = std::max(m_top.getMaxX(), m_right.getMaxX());
-	//	float maxY = std::max({m_left.getMaxY(), m_center.getMaxY(), m_right.getMaxY()});
-	//	m_top.setMaxX(maxX);
-	//	m_right.setMaxX(maxX);
-	//	m_right.setMaxY(maxY);
-	//	m_middle.setMaxX(maxX);
-
-	//	float rightWidth = m_right.getRect().GetWidth();
-	//	/* space is between left-middle and middle-right */
-	//	float centerWidth = m_left.getRect().GetWidth() + m_center.getWidth() + rightWidth + (spacing.x * 2);
-	//	float maxWidth = std::max(m_top.getRect().GetWidth(), std::max(centerWidth, m_bottom.getWidth()));
-	//
-	//	float bottomYOfCentre = m_bottom.getRect().Min.y - spacing.y;
-	//
-	//	m_top.setMaxX(m_top.getMinX() + maxWidth); /* top.Max.x is most right point now */
-	//
-	//	m_left.setMaxY(bottomYOfCentre);
-	//
-	//	0 = maxWidth - centerWidth; /* how much shift middle or right content for
-	//	                                                right-alignation */
-	//	/* \todo span graphic of middle background to fill middle of node or left it
-	//	  just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
-	//	  + spacing.x; m_middleRectDiwne.Max.x = m_top.getMax().x - rightWidth -
-	//	  spacing.x;*/ /* space between middle-right */
-	//	//	m_middle.setMaxY(bottomYOfCentre);
-	//
-	//	m_right.setMaxY(bottomYOfCentre);
 
 	// Update DIWNE rect
 	ImRect panelRect = ImRect(m_top.getMin(), m_middle.getMax());
@@ -156,13 +102,6 @@ void BasicNode::updateLayout(DrawInfo& context)
 	m_center.layout();
 	m_right.layout();
 	m_middle.layout();
-	//	LOG_INFO("leftX: {}, cenX: {}, rightX: {}", m_left.getRect().Min.x, m_center.getRect().Min.x,
-	//	         m_right.getRect().Min.x);
-	//	LOG_INFO("leftW: {}, cenW: {}, rightW: {}, topW: {}", m_left.getRect().GetWidth(),
-	// m_center.getRect().GetWidth(), 	         m_right.getRect().GetWidth(), m_top.getRect().GetWidth());
-	// LOG_INFO("middle width:
-	//{}, minW: {}, avail: {}", m_middle.getRect().GetWidth(), m_middle.getMinimumWidth(),
-	// m_middle.getAvailableSpringWidth())
 }
 
 void BasicNode::translate(const ImVec2& vec)
@@ -175,10 +114,10 @@ void BasicNode::translate(const ImVec2& vec)
 	m_right.translate(vec);
 }
 
-void BasicNode::drawHeader()
+void BasicNode::drawHeader(ImDrawFlags corners)
 {
 	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), m_style->color(DiwneStyle::nodeHeaderBg),
-	                                  m_style->decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersTop);
+	                                  m_style->decimal(DiwneStyle::nodeRounding), corners);
 }
 
 void BasicNode::drawBody()

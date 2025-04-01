@@ -257,6 +257,7 @@ void TransformationBase::onDestroy(bool logEvent)
 	CoreNode::onDestroy(logEvent);
 }
 
+// TODO: Remove, However update node drop zone logic so that closest
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()
 {
 	ImVec2 position = getPosition();

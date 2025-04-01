@@ -229,7 +229,7 @@ public:
 	 * It is called after end() and updateLayout(),
 	 * but before the afterDraw() lifecycle method. Internal interactions are processed right before.
 	 */
-	virtual void processInteractions(DrawInfo& context) {};
+	virtual void processInteractions(DrawInfo& context){};
 
 	/**
 	 * Called last during drawing.

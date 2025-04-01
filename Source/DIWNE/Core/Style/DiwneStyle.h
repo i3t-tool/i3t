@@ -96,10 +96,10 @@ public:
 	static const short objectHoverBorderThicknessDiwne;  // float
 	static const short objectHoverBorderColor;           // ImVec4
 
-	static const short dropZoneBg;          // ImVec4
-	static const short dropIndicatorColor;  // ImVec4
-	static const short dropZoneDropGap;     // ImVec2
-	static const short dropZoneMarginWidth; // float
+	static const short dropZoneBg;         // ImVec4
+	static const short dropIndicatorColor; // ImVec4
+	static const short dropZoneDropGap;    // ImVec2
+	static const short dropZoneMargin;     // ImVec2
 
 	static const short linkColor;               // ImVec4
 	static const short linkColorSelected;       // ImVec4
@@ -117,33 +117,7 @@ public:
 	//   dynamically, kinda like PIMPL
 	// TODO: What about the runtime cost though?
 
-	DiwneStyle()
-	{
-		sanityCounter = 0;
-		set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 0.6});
-		set<ImVec4>(nodeHeaderBg, {0.020, 0.341, 0.012, 0.9});
-
-		set<float>(nodeRounding, 0, true);
-		set<ImVec2>(nodePadding, {8.0f, 4.0f}, true);
-
-		set<float>(selectionRounding, 0.0f, true);
-		set<float>(mouseDragThreshold, 2.0f, true); // 6.0 is ImGui default
-		set<float>(itemSelectedBorderThicknessDiwne, 2.5f, true);
-		set<float>(objectHoverBorderThicknessDiwne, 1.5f, true);
-		set<ImVec4>(objectHoverBorderColor, {0.0, 0.0, 0.0, 0.40});
-
-		set<ImVec4>(dropZoneBg, {0.1, 0.1, 0.1, 0.4});
-		set<ImVec4>(dropIndicatorColor, {0.26, 0.59, 0.98, 0.67});
-		set<ImVec2>(dropZoneDropGap, {10.0f, 10.0f}, true);
-		set<float>(dropZoneMarginWidth, 10.0f, true);
-
-		set<ImVec4>(linkColor, {0.6, 0.3, 0.35, 0.6});
-		set<ImVec4>(linkColorSelected, {0.6, 0.3, 0.35, 0.8});
-		set<float>(linkWidth, 5.0f, true);
-		set<float>(linkSelectedBorderWidth, 4.0f, true);
-
-		assert(counter == sanityCounter && "Are you sure all variables are set properly?");
-	}
+	DiwneStyle();
 
 	template <typename T>
 	const T& get(short key) const

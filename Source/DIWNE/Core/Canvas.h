@@ -145,6 +145,9 @@ public:
 	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
 	                  ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
 	                  bool ignoreZoom = false) const;
+	void AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
+	                            ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
+	                            bool ignoreZoom = false) const;
 
 	/** \brief Draw Bezier (not Bezier really) curve to window ImDrawList
 	 *

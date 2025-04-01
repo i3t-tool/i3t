@@ -23,12 +23,40 @@ const short DiwneStyle::objectHoverBorderColor = counter++;
 const short DiwneStyle::dropZoneBg = counter++;
 const short DiwneStyle::dropIndicatorColor = counter++;
 const short DiwneStyle::dropZoneDropGap = counter++;
-const short DiwneStyle::dropZoneMarginWidth = counter++;
+const short DiwneStyle::dropZoneMargin = counter++;
 
 const short DiwneStyle::linkColor = counter++;
 const short DiwneStyle::linkColorSelected = counter++;
 const short DiwneStyle::linkWidth = counter++;
 const short DiwneStyle::linkSelectedBorderWidth = counter++;
+
+DiwneStyle::DiwneStyle()
+{
+	sanityCounter = 0;
+	set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 0.6});
+	set<ImVec4>(nodeHeaderBg, {0.020, 0.341, 0.012, 0.9});
+
+	set<float>(nodeRounding, 0, true);
+	set<ImVec2>(nodePadding, {8.0f, 4.0f}, true);
+
+	set<float>(selectionRounding, 0.0f, true);
+	set<float>(mouseDragThreshold, 2.0f, true); // 6.0 is ImGui default
+	set<float>(itemSelectedBorderThicknessDiwne, 2.5f, true);
+	set<float>(objectHoverBorderThicknessDiwne, 1.5f, true);
+	set<ImVec4>(objectHoverBorderColor, {0.0, 0.0, 0.0, 0.40});
+
+	set<ImVec4>(dropZoneBg, {0.1, 0.1, 0.1, 0.4});
+	set<ImVec4>(dropIndicatorColor, {0.26, 0.59, 0.98, 0.67});
+	set<ImVec2>(dropZoneDropGap, {10.0f, 10.0f}, true);
+	set<ImVec2>(dropZoneMargin, {8.0f, 8.0f}, true);
+
+	set<ImVec4>(linkColor, {0.6, 0.3, 0.35, 0.6});
+	set<ImVec4>(linkColorSelected, {0.6, 0.3, 0.35, 0.8});
+	set<float>(linkWidth, 5.0f, true);
+	set<float>(linkSelectedBorderWidth, 4.0f, true);
+
+	assert(counter == sanityCounter && "Are you sure all variables are set properly?");
+}
 
 void DiwneStyle::scaleAllSizes(float scale)
 {
