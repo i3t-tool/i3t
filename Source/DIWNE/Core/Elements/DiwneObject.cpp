@@ -633,9 +633,9 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 
 	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
 	{
+		// TODO: Stopping and starting zoom scaling DOES NOT create a backup of the current style
+		//  Meaning any pushed style variables will get reset when zoom scaling is applied again
 		const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(false);
-		// I don't think we need to call ImGui::SetNextWindowPos as we want the popup to simply be where the mouse is
-		// and ImGui handles that on its own
 		if (ImGui::BeginPopup(m_popupIDDiwne.c_str()))
 		{
 			popupContent(context);

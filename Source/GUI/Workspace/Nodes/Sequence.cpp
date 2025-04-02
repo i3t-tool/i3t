@@ -110,7 +110,7 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
 
 		// TODO: Pass context to draw data
-		if (DataRenderer::drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
+		if (DataRenderer::drawData4x4(diwne, context, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
 		                              inputMatrix,
 		                              {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
 		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,

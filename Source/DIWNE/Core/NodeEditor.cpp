@@ -51,7 +51,7 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 	       !this->weak_from_this().expired());
 	// clang-format on
 
-	m_popupDrawn = m_tooltipDrawn = m_takeSnap = false; // TODO: (DR) Remove some of these
+	m_tooltipDrawn = m_takeSnap = false; // TODO: (DR) Remove some of these
 
 	// TODO: Unify bringToFront/shifting behavior across pasting, dragging and last active node
 	//   - Last active node should use the bringToFront marking system same as any others

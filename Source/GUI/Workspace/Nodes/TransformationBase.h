@@ -59,19 +59,19 @@ public:
 
 	virtual void drawMenuSetDataMap();
 
-	virtual bool drawDataFull();
-	virtual bool inline drawDataSetValues()
+	virtual bool drawDataFull(DIWNE::DrawInfo& context);
+	virtual bool drawDataSetValues(DIWNE::DrawInfo& context)
 	{
-		return drawDataFull();
+		return drawDataFull(context);
 	};
 
 	virtual int maxLengthOfData() override;
 
 	void drawMenuStorevalues();
 
-	virtual bool drawDataSetValues_InsideTablebuilder(std::vector<std::string> const& labels,
+	virtual bool drawDataSetValues_InsideTablebuilder(DIWNE::DrawInfo& context, std::vector<std::string> const& labels,
 	                                                  std::vector<float*> const& local_data, bool& value_changed);
-	virtual bool drawDataSetValuesTable_builder(std::string const cornerLabel,
+	virtual bool drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string const cornerLabel,
 	                                            std::vector<std::string> const& columnLabels,
 	                                            std::vector<std::string> const& rowLabels,
 	                                            std::vector<float*> const& local_data, bool& value_changed,
