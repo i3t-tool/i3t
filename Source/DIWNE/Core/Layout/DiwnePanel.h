@@ -98,6 +98,7 @@ public:
 	 * @return Whether the spring item was truly added or not.
 	 */
 	bool spring(float relSize, bool horizontal = true);
+
 	bool vspring(float relSize); ///< Vertical spring @see spring()
 
 	// Layouting commands, use with care
@@ -105,6 +106,10 @@ public:
 
 	// TODO: Is this needed? See TODO above.
 	void submitChild(DiwnePanel* child); ///< Submits given panel as fixed width to the panel
+
+	/// Inform the next spring that a new fixed width item will appear this frame.
+	/// Can be used to prevent flickering on layout change.
+	void expectNewWidthThisFrame(float width);
 
 public:
 	// /**

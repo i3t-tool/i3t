@@ -25,6 +25,7 @@ protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
 	float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
+	bool m_drawContextMenuButton = false;
 	bool m_isLabelBeingEdited = false;
 	bool m_isFirstDraw = true;
 	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};

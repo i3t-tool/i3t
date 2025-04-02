@@ -11,6 +11,16 @@ class NodeEditor;
 enum IconType : unsigned int;
 struct IconStyle;
 
+// TODO: (DR) Canvas and style zooming COULD be replaced with context switching and DrawList magic
+//  See gitlab issue #339. Could bring huge benefit and simplify much of the code (avoids integer UI rounding).
+//  However it's a big change, supporting both methods, while possible, is extremely impractical
+//  So an experimental branch would need to be thoroughly tested before implementing, as it would be hard to go back
+//  That is unless we did a slow transition, keeping the old zoom code and just fix it to 1x
+//  In theory the Canvas class could have to implementations.
+// TODO: The TODO above MIGHT be a prerequisite for Multi-View support.
+//  With the way we zoom and pan right now, it might be impossible to keep two views at different zoom levels without
+//  some major overhead / messy instancing.
+
 /**
  * Representation of the 2D infinite plane of a node editor.
  *
@@ -207,6 +217,8 @@ public:
 	//  Some initial issues:
 	//   - Arguments are passed by value for no reason
 	//   - way to many arguments, better to group them into some sort of IconStyle struct
+	//   - But how to avoid the need to constantly construct new structs, they should be mostly static somewhere
+
 	/**
 	 * \brief Draw an Icon combined from two parts (foreground and background)
 	 * to the window \a ImDrawList filled with a \a ShapeColor.
@@ -232,6 +244,12 @@ public:
 	void DrawIcon(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
 	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
 	              ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
+	// TODO: I don't like the whole "filled" argument, yes it is technically correct, we fill the insides to create
+	//  a border with the shape color, BUT, thats just a trick to make a BORDER, "filled" should mean absence of border
+	//  meaning the whole icon has the innerColor, not the shapeColor
+	//  I feel like that makes more sense to the user of the method, hence there should be a "color" and "borderColor"
+	//  Not "shape color" and "inner color", not bool filled, but bool border.
 
 	/**
 	 * \brief Draw a circle icon
@@ -288,6 +306,9 @@ public:
 
 	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
+	                    float thickness) const;
 };
 
 struct IconStyle

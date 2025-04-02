@@ -62,7 +62,7 @@ inline void BeginVerticalAlign(float yOffset)
 	ImGui::BeginGroup();
 	DummyXY(ImVec2(0.0f, yOffset));
 }
-inline void EndVerticalAlign(float yOffset)
+inline void EndVerticalAlign(float yOffset = 0.0f)
 {
 	NewLine();
 	if (yOffset > 0.0f)
@@ -86,6 +86,7 @@ inline float GetFrameHeight(ImVec2 padding)
 	ImGuiContext& g = *GImGui;
 	return g.FontSize + padding.y * 2.0f;
 }
+
 } // namespace DGui
 namespace DUtils
 {
@@ -110,5 +111,14 @@ inline bool equals(const ImVec2& a, const ImVec2& b, float abs_error)
 namespace DDraw
 {
 void drawSpringDebug(const ImVec2& pos, ImVec2 springSize, bool horizontal);
+
+inline void AddLineRaw(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness)
+{
+	if ((col & IM_COL32_A_MASK) == 0)
+		return;
+	idl->PathLineTo(p1); // Removed ImVec2(0.5f, 0.5f)
+	idl->PathLineTo(p2); // Removed ImVec2(0.5f, 0.5f)
+	idl->PathStroke(col, 0, thickness);
+}
 } // namespace DDraw
 } // namespace DIWNE

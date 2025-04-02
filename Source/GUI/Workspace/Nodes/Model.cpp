@@ -27,6 +27,7 @@ Model::Model(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::
 {
 	init();
 	// setDataItemsWidth();
+	m_drawContextMenuButton = true;
 }
 
 Model::~Model()
@@ -227,6 +228,19 @@ void Model::centerContent(DIWNE::DrawInfo& context)
 	else
 	{
 		ImGui::Text("Failed to draw preview!");
+	}
+}
+
+void Model::drawInputPins(DIWNE::DrawInfo& context)
+{
+	// Matrix mul pin is centered
+	const std::vector<Ptr<CorePin>>& pins = m_workspaceInputs;
+	assert(pins.size() == 1); // Models have special pin handling, expecting matrix mul at 0
+
+	if (pins[0]->allowDrawing())
+	{
+		m_left.vspring(0.4f);
+		pins[0]->drawDiwne(context);
 	}
 }
 

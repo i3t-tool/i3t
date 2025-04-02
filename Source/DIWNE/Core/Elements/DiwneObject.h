@@ -99,6 +99,7 @@ protected:
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
 
 	bool m_bringToFront{false}; ///< Request the object's rendering order to be moved to the front above other objects
+	bool m_openPopup{false}; ///< Request to open popup
 
 	/// Sets the parent object of object, relevant in node container and hover hierarchy.
 	DiwneObject* m_parentObject{nullptr};
@@ -576,6 +577,9 @@ public:
 	///< For nodes, they are brought forward in rendering order next frame by the NodeEditor / NodeContainer.
 	void setBringToFront(bool val);
 	bool isToBeBroughtToFront();
+
+	/// Request to open the object's popup if possible.
+	void openPopup();
 
 	// =============================================================================================================
 	// END OF INTERACTION

@@ -123,6 +123,12 @@ void DiwnePanel::submitChild(DiwnePanel* child)
 	// submitFixedWidth(child->getMinimumWidth());
 	// applyQueuedWidth();
 }
+
+void DiwnePanel::expectNewWidthThisFrame(float width)
+{
+	m_availableSpringSize.x -= width;
+}
+
 void DiwnePanel::reset()
 {
 	m_fixedSize = ImVec2();

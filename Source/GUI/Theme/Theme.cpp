@@ -215,10 +215,6 @@ void Theme::initClassicProperties()
 	set(EColor::NodeHeader, createColor(0, 0, 0, 30));
 	set(EColor::NodeFont, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// Sequence
-	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
-	set(EColor::NodeHeaderSequence, ImVec4(0.431f, 0.431f, 0.431f, 1.0f));
-
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
 	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
@@ -231,6 +227,7 @@ void Theme::initClassicProperties()
 	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
 	set(EColor::NodeBorder, ImVec4(0.0f, 0.0f, 0.0f, 0.10f));
 	set(EColor::NodeLODButtonColorText, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::NodeContextButtonColorText, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
 	set(EColor::NodeLODButtonColor, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));
 	set(EColor::NodeLODButtonColorActive, ImVec4(0.0f, 0.0f, 0.0f, 0.05f));
 	set(EColor::NodeLODButtonColorHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.20f));
@@ -461,6 +458,7 @@ void Theme::initNames()
 	    .add(EColor::NodeFont, "General Node Font (text)")
 	    .add(EColor::NodeBorder, "Node Border")
 	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
+		.add(EColor::NodeContextButtonColorText, "Context Button Text")
 	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
 	    .add(EColor::NodeLODButtonColorActive, "LOD Button Active Color")
 	    .add(EColor::NodeLODButtonColorHovered, "LOD Button Hover Color")
@@ -751,6 +749,7 @@ void Theme::initNames()
 	g_ColorNames[EColor::NodeFont] = "ngen_General Node Font (text)";
 	g_ColorNames[EColor::NodeBorder] = "ngen_Node Border";
 	g_ColorNames[EColor::NodeLODButtonColorText] = "ngen_LOD Button Text";
+	g_ColorNames[EColor::NodeContextButtonColorText] = "ngen_Context Button Text";
 	g_ColorNames[EColor::NodeLODButtonColor] = "ngen_LOD Button Color";
 	g_ColorNames[EColor::NodeLODButtonColorActive] = "ngen_LOD Button Active Color";
 	g_ColorNames[EColor::NodeLODButtonColorHovered] = "ngen_LOD Button Hover Color";

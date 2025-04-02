@@ -200,19 +200,6 @@ bool SliderFloatStepped(const char* label, float* v, float step, float v_min, fl
 	return false;
 }
 
-void startVerticalAlign(float yOffset)
-{
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	ImGui::BeginGroup();
-	ImGui::Dummy(ImVec2(0, yOffset));
-}
-
-void endVerticalAlign()
-{
-	ImGui::EndGroup();
-	ImGui::PopStyleVar(1);
-}
-
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {
 	drawList->AddRectFilled(ImVec2(pos.x - floor(thickness / 2), pos.y - floor(size / 2)),

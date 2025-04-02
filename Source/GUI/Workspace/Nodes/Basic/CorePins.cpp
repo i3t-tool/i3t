@@ -122,12 +122,14 @@ void CorePin::drawPin(DIWNE::DrawInfo& context)
 		DIWNE::DGui::BeginVerticalAlign(verticalMargin);
 	}
 
+	bool filled = isConnected();
+	filled = true;
+
 	// We're using a disabled IconButton, so that when its pressed / dragged it does not set an ActiveID in ImGui.
 	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
 	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
 	diwne.canvas().IconButton("PinIcon", true, iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-	                          createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
-	                          ImVec4(padding, padding, padding, padding), isConnected());
+	                          iconColorFg, iconSize, ImVec4(padding, padding, padding, padding), filled);
 
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);

@@ -65,10 +65,6 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 /// Uses std::format syntax for the format string, not printf (eg. {:.2f})
 bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format);
 
-void startVerticalAlign(float yOffset);
-
-void endVerticalAlign();
-
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color);
 
 void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,

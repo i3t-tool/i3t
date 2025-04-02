@@ -237,7 +237,7 @@ ImVec2 Canvas::diwne2screen(const ImVec2& point) const
 ImVec2 Canvas::diwne2screenTrunc(const ImVec2& point) const
 {
 	ImVec2 pos = diwne2screen(point);
-	return ImVec2(IM_TRUNC(pos.x), IM_TRUNC(pos.y));
+	return ImVec2(IM_TRUNC(pos.x + DIWNE_PIXEL_EPSILON), IM_TRUNC(pos.y + DIWNE_PIXEL_EPSILON));
 }
 ImRect Canvas::diwne2screen(const ImRect& rect) const
 {
@@ -625,6 +625,26 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 		             ImVec2(bottomRight.x - pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)),
 		             shapeColor, thickness * m_zoom);
 	}
+}
+void Canvas::DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
+                            float thickness) const
+{
+	thickness *= m_zoom;
+	ImVec2 pad = diwne2screenSize(padding);
+
+	ImVec2 topLeft = rect.Min + pad;
+	ImVec2 bottomRight = rect.Max - pad;
+	topLeft.y += thickness / 2.0f;
+	ImVec2 p2 = ImVec2(bottomRight.x, topLeft.y);
+	float stepY = ((bottomRight.y - topLeft.y) - thickness) / 2.0f;
+
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
+	topLeft.y += stepY;
+	p2.y += stepY;
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
+	topLeft.y += stepY;
+	p2.y += stepY;
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
 }
 
 void Canvas::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,

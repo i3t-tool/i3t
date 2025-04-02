@@ -70,10 +70,12 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	ImDrawFlags headerCornersFlag = ImDrawFlags_RoundCornersTop;
 	ImDrawFlags lodButtonCornersFlag = ImDrawFlags_RoundCornersTopLeft;
+	ImDrawFlags contextButtonCornerFlag = ImDrawFlags_RoundCornersTopRight;
 	if (detail == LevelOfDetail::Label)
 	{
 		headerCornersFlag = ImDrawFlags_RoundCornersAll;
 		lodButtonCornersFlag = ImDrawFlags_RoundCornersLeft;
+		contextButtonCornerFlag = ImDrawFlags_RoundCornersRight;
 	}
 
 	drawHeader(headerCornersFlag);
@@ -113,7 +115,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		{
 			setLevelOfDetail(LevelOfDetail::Full);
 		}
-		this->setSelected(!this->getSelected());
+		interacted = true;
 	}
 	if (ImGui::IsItemActive())
 		context.consumeInput();
@@ -168,8 +170,11 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 
-	const float widthSoFar =
-	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
+	ImGui::SameLine(0, 0);
+	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+
+	// const float widthSoFar =
+	//     I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
 	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
 	//   DiwnePanels should possibly have an optional forced minimum fixed size (minimum minimum size?)
@@ -184,9 +189,37 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// 		trailingDummyWidth += diff;
 	// 	}
 	// }
-	ImGui::SameLine(0, 0);
-	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+	// ImGui::SameLine(0, 0);
+	// ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
+
+	// Right corner context menu button //TODO: Move into a func and add a boolean enabler
+	// TODO: Rename Nodes_LODButtonSize to something like "HeaderButtonSize" as the buttons must have the same height
+
+	if (m_drawContextMenuButton)
+	{
+		ImGui::SameLine(0, 0);
+		m_top.spring(1.0f);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+		                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
+		if (GUI::ButtonWithCorners("###contextBtn", contextButtonCornerFlag,
+		                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
+		{
+			openPopup();
+			interacted = true;
+		}
+		diwne.canvas().DrawBurgerMenu(ImGui::GetWindowDrawList(),
+		                              I3T::getTheme().get(EColor::NodeContextButtonColorText),
+		                              ImGui::GetCurrentContext()->LastItemData.Rect, ImVec2(7.f, 7.5f), 1.2f);
+		if (ImGui::IsItemActive())
+			context.consumeInput();
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar();
+	}
 
 	if (interacted)
 	{

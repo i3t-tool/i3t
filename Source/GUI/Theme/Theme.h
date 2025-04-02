@@ -119,10 +119,6 @@ enum class EColor
 	NodeHeader,
 	NodeFont,
 
-	// Sequence
-	NodeBgSequence,
-	NodeHeaderSequence,
-
 	// 3. Operator
 	NodeBgOperator,
 	NodeHeaderOperator,
@@ -135,6 +131,7 @@ enum class EColor
 	NodeBorder,
 	NodeHeaderTranformation,
 	NodeLODButtonColorText,
+	NodeContextButtonColorText,
 	NodeLODButtonColor,
 	NodeLODButtonColorActive,
 	NodeLODButtonColorHovered,

@@ -19,8 +19,7 @@
 
 using namespace Workspace;
 
-TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
-    : CoreNode(diwne, nodebase), aboveSequence(0)
+TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase) : CoreNode(diwne, nodebase)
 {
 	updateDataItemsWidth();
 	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
@@ -33,34 +32,25 @@ bool TransformationBase::allowDrawing()
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
-void TransformationBase::begin(DIWNE::DrawInfo& context)
-{
-	aboveSequence = 0; /* 0 is none */
-	CoreNode::begin(context);
-}
-
 void TransformationBase::topContent(DIWNE::DrawInfo& context)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 	CoreNode::topContent(context);
 	ImGui::SameLine(0, 0);
 
+	// TODO: Similary how we create the validity icon, a lock icon can be shown for locked data
+
 	if (!isMatrixValid())
 	{
 		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
 
-		//     \todo JH Right Align
-		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX()-ImGui::GetStyle().ItemSpacing.x-1);
-		//    /* remove spacing after Dummy in
-		//    WorkspaceNodeWithCoreData::topContent() */
-		//    /* right align */
-		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f,
-		//    getRect().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
-		//    /*actual free space*/ - iconSize.x -
-		//    m_topOversizeSpace)*diwne.getZoom());
+		if (m_wasValid) // Prevent layout flickering
+			m_top.expectNewWidthThisFrame(diwne.canvas().screen2diwneSize(iconSize.x + 2 * style.FramePadding.x));
+
+		m_top.spring(1.0f);
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
-		GUI::startVerticalAlign(style.FramePadding.y);
+		DIWNE::DGui::BeginVerticalAlign(style.FramePadding.y);
 		diwne.canvas().DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
 		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
 		                        /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
@@ -69,18 +59,24 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		                        ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
 		                            I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
 		                        false);
+		// TODO: We can show a tooltip on this dummy to give a failure reason
 		ImGui::Dummy(iconSize);
-		GUI::endVerticalAlign();
-
 		// 2x Frame padding x spacing gap at the end
 		ImGui::SameLine(0, 0);
 		ImGui::Dummy(ImVec2(2 * style.FramePadding.x, 0));
+		DIWNE::DGui::EndVerticalAlign();
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
 		// ImColor(255, 0, 255), DIWNE::IconType::Cross, 	               ImColor(0,
 		// 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
 		// false); /* \todo JH Icon setting from Theme? */
+
+		m_wasValid = false;
+	}
+	else
+	{
+		m_wasValid = true;
 	}
 }
 

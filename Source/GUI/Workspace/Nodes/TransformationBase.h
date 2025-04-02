@@ -20,6 +20,7 @@ class TransformationBase : public CoreNode
 {
 public:
 	WPtr<Sequence> m_parentSequence{};
+	bool m_wasValid{true};
 
 	TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 
@@ -31,7 +32,6 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	void begin(DIWNE::DrawInfo& context) override;
 	void topContent(DIWNE::DrawInfo& context) override;
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void end(DIWNE::DrawInfo& context) override;
@@ -46,7 +46,6 @@ public:
 	void onDestroy(bool logEvent) override;
 
 	bool isInSequence();
-	DIWNE::ID aboveSequence;
 
 	Ptr<Core::Node> getNodebaseSequence();
 

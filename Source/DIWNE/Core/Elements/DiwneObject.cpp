@@ -121,7 +121,7 @@ void DiwneObject::afterDrawDiwne(DrawInfo& context)
 	processInteractionsDiwne(context);
 	afterDraw(context);
 }
-void DiwneObject::afterDraw(DrawInfo& context){};
+void DiwneObject::afterDraw(DrawInfo& context) {};
 
 void DiwneObject::finalize(DrawInfo& context) {}
 void DiwneObject::finalizeDiwne(DrawInfo& context)
@@ -615,16 +615,22 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 {
 	if (context.state.anyActionActive())
 		return;
-	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
+
 	// TODO: What about dragging? Will popup open at the end of a drag?
-	if (m_hovered && !context.popupOpened && diwne.input().bypassIsMouseReleased1() && allowPopup())
+	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
+	if (m_openPopup || (m_hovered && diwne.input().bypassIsMouseReleased1()))
 	{
-		ImGui::OpenPopup(m_popupIDDiwne.c_str());
-		context.update(true, true, true);
-		context.popup();
-		// Store popup position for stuff like adding nodes at the popup location
-		diwne.setPopupPosition(diwne.input().bypassGetMousePos());
+		if (!context.popupOpened && allowPopup())
+		{
+			ImGui::OpenPopup(m_popupIDDiwne.c_str());
+			context.update(true, true, true);
+			context.popup();
+			// Store popup position for stuff like adding nodes at the popup location
+			diwne.setPopupPosition(diwne.input().bypassGetMousePos());
+		}
+		m_openPopup = false;
 	}
+
 	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
 	{
 		const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(false);
@@ -637,6 +643,11 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 		}
 		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
 	}
+}
+
+void DiwneObject::openPopup()
+{
+	m_openPopup = true;
 }
 
 void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& color)

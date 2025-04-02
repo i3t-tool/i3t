@@ -22,10 +22,13 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
     : CoreNodeWithPins(diwne, nodebase, false), m_isCameraSequence(isCameraSequence)
 {
 	updateDataItemsWidth();
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
+	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
 	m_headerMinWidth = 120;
 	m_headerSpacing = false; // We want drop zone background to be flush with the header, handled in left/right panels.
 	m_bottomSpacing = false;
 	m_contentSpacing = 4;
+	m_drawContextMenuButton = true;
 }
 
 void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)
@@ -92,6 +95,15 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
 	if (matrixInput->isConnected())
 	{
+		// We want to retain the drop zone's background
+		diwne.canvas().AddRectFilledDiwne(m_center.getMin(), m_center.getMax(),
+		                                  diwne.style().color(DIWNE::DiwneStyle::dropZoneBg));
+
+		ImGui::Spacing();
+
+		ImVec2 margin = diwne.style().size(DIWNE::DiwneStyle::dropZoneMargin) * diwne.getZoom();
+		DIWNE::DGui::DummyXY(margin);
+
 		bool valueChanged = false;
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
@@ -110,7 +122,8 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		{
 			context.update(true, true, true);
 		}
-		return;
+		ImGui::Spacing();
+		DIWNE::DGui::DummyMax(margin);
 	}
 	else
 	{
@@ -156,7 +169,7 @@ void Sequence::drawInputPins(DIWNE::DrawInfo& context)
 
 	if (pins[0]->allowDrawing())
 	{
-		m_left.vspring(0.3f);
+		m_left.vspring(0.15f);
 		pins[0]->drawDiwne(context);
 	}
 }
@@ -180,12 +193,13 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 		}
 	}
 
-	if (pins[0]->allowDrawing())
+	auto& pin = pins[0];
+	if (pin->allowDrawing())
 	{
-		outputPinsVstack.spring(0.3f);
+		outputPinsVstack.spring(0.15f);
 		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
 		row->spring(1.0f);
-		pins[0]->drawDiwne(context);
+		pin->drawDiwne(context);
 		outputPinsVstack.endRow();
 	}
 	outputPinsVstack.end();

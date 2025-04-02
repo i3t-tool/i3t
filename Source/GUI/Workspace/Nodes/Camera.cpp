@@ -27,6 +27,8 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
       m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true)),
       m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true))
 {
+	m_drawContextMenuButton = true;
+
 	m_projAndView.push_back(m_projection);
 	m_projAndView.push_back(m_view);
 
@@ -35,9 +37,14 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	//  That way we can draw it at the right moment inside the actual camera node content
 	//  Likely we'll add a flag to DiwneObject that indicates its drawing is handled custom and not by the editor
 	//  This mechanism could be also used for the dragged link instead of checking the active action
-	DIWNE::Pin* view0 = m_view->getInputs().at(0).get();
-	DIWNE::Pin* proj0 = m_projection->getOutputs().at(0).get();
-	view0->plug(proj0, false);
+	// TODO: After this is done, also apply the same mechanism on internal camera pins (eg. pins of the two sequences)
+	//  Any pin thats inside another node must actually draw the pin itself, as otherwise it would be hidden behind
+	//  the node.
+
+	// DIWNE::Pin* view0 = m_view->getInputs().at(0).get();
+	// DIWNE::Pin* proj0 = m_projection->getOutputs().at(0).get();
+	// view0->plug(proj0, false);
+	// They are already plugged in Core!
 
 	m_projection->setSelectable(false);
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
@@ -251,6 +258,34 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine();
 		m_view->drawDiwne(context, m_drawMode);
 	}
+}
+void Camera::drawOutputPins(DIWNE::DrawInfo& context)
+{
+	std::vector<Ptr<CorePin>> pins = getOutputsToShow();
+	assert(pins.size() == 3); // Camera has special pin handling, expecting matrix mul at 2
+
+	outputPinsVstack.begin();
+	for (auto pin : {pins[0], pins[1]})
+	{
+		if (pin->allowDrawing())
+		{
+			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			row->spring(1.0f);
+			pin->drawDiwne(context);
+			outputPinsVstack.endRow();
+		}
+	}
+
+	auto& pin = pins[2];
+	if (pin->allowDrawing())
+	{
+		outputPinsVstack.spring(0.24f);
+		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+		row->spring(1.0f);
+		pin->drawDiwne(context);
+		outputPinsVstack.endRow();
+	}
+	outputPinsVstack.end();
 }
 
 void Camera::drawMenuLevelOfDetail()
