@@ -8,6 +8,9 @@ namespace DIWNE
 short DiwneStyle::counter = 0;
 short DiwneStyle::sanityCounter = 0;
 
+const short DiwneStyle::gridColor = counter++;
+const short DiwneStyle::gridDotsColor = counter++;
+
 const short DiwneStyle::nodeBg = counter++;
 const short DiwneStyle::nodeHeaderBg = counter++;
 
@@ -33,6 +36,10 @@ const short DiwneStyle::linkSelectedBorderWidth = counter++;
 DiwneStyle::DiwneStyle()
 {
 	sanityCounter = 0;
+
+	set<ImVec4>(gridColor, ImColor(57, 57, 57, 120));
+	set<ImVec4>(gridDotsColor, ImColor(200, 200, 200, 40));
+
 	set<ImVec4>(nodeBg, {0.195, 0.195, 0.195, 0.6});
 	set<ImVec4>(nodeHeaderBg, {0.020, 0.341, 0.012, 0.9});
 

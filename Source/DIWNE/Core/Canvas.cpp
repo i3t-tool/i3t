@@ -12,7 +12,7 @@ Canvas::Canvas(NodeEditor& editor)
 
 void Canvas::setZoom(float val)
 {
-	double old = m_zoom;
+	m_prevZoom = m_zoom;
 	if (val < editor.mp_settingsDiwne->minWorkAreaZoom)
 	{
 		m_zoom = editor.mp_settingsDiwne->minWorkAreaZoom;
@@ -23,7 +23,7 @@ void Canvas::setZoom(float val)
 	}
 	else
 		m_zoom = val;
-	if (old != m_zoom)
+	if (m_prevZoom != m_zoom)
 		editor.onZoom();
 }
 
@@ -317,15 +317,58 @@ void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, Im
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void Canvas::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-                                 float thickness, int num_segments /*=0*/) const
+void Canvas::AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3,
+                                 const ImVec2& p4, ImVec4 col, float thickness, int num_segments /*=0*/) const
 {
-	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                                 Clip rect for drawing of manual shapes, but
-	                                                 be careful with order of drew elements */
-
 	idl->AddBezierCubic(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
 	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_zoom, num_segments);
+}
+void Canvas::drawGrid(bool dots, float size, ImVec4 color, float fadeStart, float fadeEnd, bool ignoreZoom) const
+{
+	assert(fadeStart > fadeEnd);
+	if (m_zoom < fadeEnd)
+		return;
+
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	const ImRect diwneRect = getViewportRectDiwne();
+	const ImRect screenRect = getViewportRectScreen();
+	const ImVec2 gridOffset = ImVec2(size, size) - DMath::mod(diwneRect.Min, size);
+	const ImVec2 gridStartS = screenRect.Min + diwne2screenSize(gridOffset);
+	const float step = diwne2screenSize(size);
+
+	float alphaFactor = DMath::smoothstep(0.0f, 1.0f, DMath::map(m_zoom, fadeStart, fadeEnd, 1.f, 0.f));
+	color.w *= alphaFactor;
+
+	ImU32 col = ImGui::ColorConvertFloat4ToU32(color);
+	if (!dots)
+	{
+		for (float x = gridStartS.x; x < screenRect.Max.x; x += step)
+			idl->AddLine({x, screenRect.Min.y}, {x, screenRect.Max.y}, col, ignoreZoom ? 1.0f : m_zoom);
+		for (float y = gridStartS.y; y < screenRect.Max.y; y += step)
+			idl->AddLine({screenRect.Min.x, y}, {screenRect.Max.x, y}, col, ignoreZoom ? 1.0f : m_zoom);
+	}
+	else
+	{
+		ImDrawListFlags backup_flags = idl->Flags;
+		idl->Flags &= ~ImDrawListFlags_AntiAliasedFill;
+		for (float x = gridStartS.x; x < screenRect.Max.x; x += step)
+		{
+			for (float y = gridStartS.y; y < screenRect.Max.y; y += step)
+			{
+				ImVec2 p = {x, y};
+				float o = 1.5f * editor.getDpiScale();
+				ImVec2 points[] = {
+				    ImVec2(p.x - o, p.y),
+				    ImVec2(p.x, p.y - o),
+				    ImVec2(p.x + o, p.y),
+				    ImVec2(p.x, p.y + o),
+				};
+				idl->AddConvexPolyFilled(points, 4, col);
+				// idl->AddCircleFilled({x, y}, 2.0f * editor.getDpiScale(), col, 4);
+			}
+		}
+		idl->Flags = backup_flags;
+	}
 }
 
 void Canvas::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,

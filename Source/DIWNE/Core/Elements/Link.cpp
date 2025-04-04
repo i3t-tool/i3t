@@ -84,26 +84,30 @@ bool Link::isHoveredDiwne()
 
 void Link::onHover(DrawInfo& context)
 {
-	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   diwne.style().color(DiwneStyle::objectHoverBorderColor),
-	                                   diwne.style().decimal(DiwneStyle::linkWidth) / 2);
+	diwne.canvas().AddBezierCurveDiwne(
+	    ImGui::GetWindowDrawList(), m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+	    diwne.style().color(DiwneStyle::objectHoverBorderColor), diwne.style().decimal(DiwneStyle::linkWidth) / 2);
 }
 
 void Link::content(DrawInfo& context)
 {
+	ImDrawList* idl = ImGui::GetWindowDrawList();
 	if (m_selected)
 	{
-		diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-		                                   diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
+		                                   m_endDiwne, diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                                   diwne.style().decimal(DiwneStyle::linkWidth) +
 		                                       diwne.style().decimal(DiwneStyle::linkSelectedBorderWidth));
 	}
-	diwne.canvas().AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+	diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                   m_color, diwne.style().decimal(DiwneStyle::linkWidth));
 	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointEndDiwne, m_endDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
+
+		diwne.canvas().AddBezierCurveDiwne(ImGui::GetForegroundDrawList(), m_startDiwne, m_controlPointStartDiwne,
+		                                   m_controlPointEndDiwne, m_endDiwne, {255, 0, 255, 200}, 1.0f);
 	});
 }
 

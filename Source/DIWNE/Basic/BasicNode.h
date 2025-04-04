@@ -26,6 +26,9 @@ public:
 protected:
 	std::string m_topLabel;
 
+	float m_topLabelWidth{0};       ///< Top label width in DIWNE coordinates.
+	float m_topLabelWidthChange{0}; ///< Change of top label width since last frame, used to prevent layout flicker.
+
 	// Style related stuff
 	bool m_headerSpacing = true; ///< Whether to add a gap between the node header and its content
 	bool m_bottomSpacing = true; ///< Whether to add a gap between the node content end the end.

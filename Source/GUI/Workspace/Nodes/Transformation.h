@@ -434,8 +434,8 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues(DIWN
 		local_data.push_back(valueStore.getVec3());
 	}
 
-	inner_interaction_happen |= drawDataSetValuesTable_builder(context,
-	    cornerLabel, columnLabels, rowLabels,
+	inner_interaction_happen |= drawDataSetValuesTable_builder(
+	    context, cornerLabel, columnLabels, rowLabels,
 	    {&local_data[0][0], &local_data[1][0], &local_data[2][0], &local_data[0][1], &local_data[1][1],
 	     &local_data[2][1], &local_data[0][2], &local_data[1][2], &local_data[2][2]},
 	    value_changed, index_of_change);

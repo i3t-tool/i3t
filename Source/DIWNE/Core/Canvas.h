@@ -4,6 +4,7 @@
 
 #include "DIWNE/Core/Style/DiwneStyle.h"
 #include "diwne_imgui.h"
+#include "diwne_utils.h"
 
 namespace DIWNE
 {
@@ -39,6 +40,7 @@ public:
 	ImRect m_viewRectDiwne;
 	ImRect m_viewRectScreen; ///< Viewport bounds in screen space coordinates.
 	float m_zoom;            ///< Viewport zoom factor (scale ratio between diwne and screen coordinates).
+	float m_prevZoom;        ///< Last frame zoom factor
 
 	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
 protected:
@@ -171,8 +173,12 @@ public:
 	 * \return void
 	 *
 	 */
-	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-	                         float thickness, int num_segments = 0) const;
+	void AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
+	                         ImVec4 col, float thickness, int num_segments = 0) const;
+
+	// =============================================================================================================
+
+	void drawGrid(bool dots, float size, ImVec4 color, float fadeStart, float fadeEnd, bool ignoreZoom) const;
 
 	// Icon drawing
 	// =============================================================================================================

@@ -2,6 +2,9 @@
 
 #include "diwne_imgui.h"
 
+#include <algorithm>
+#include <cmath>
+
 #define DIWNE_PIXEL_EPSILON 0.001f
 
 #define DIWNE_TRUNC(val) IM_TRUNC(val)
@@ -88,25 +91,72 @@ inline float GetFrameHeight(ImVec2 padding)
 }
 
 } // namespace DGui
-namespace DUtils
+namespace DMath
 {
+template <typename T>
+T clamp(T value, T low, T high)
+{
+	return std::min(std::max(value, low), high);
+}
+template <typename T>
+float map(T value, T min1, T max1, T min2, T max2)
+{
+	return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+inline float len(const ImVec2& v)
+{
+	return sqrt(v.x * v.x + v.y * v.y);
+}
+inline ImVec2 normalize(const ImVec2& v)
+{
+	ImVec2 ret(v.x, v.y);
+	float len = sqrt(v.x * v.x + v.y * v.y);
+	ret.x /= len;
+	ret.y /= len;
+	return ret;
+}
+inline float smoothstep(float min, float max, float t)
+{
+	t = clamp((t - min) / (max - min), 0.f, 1.f);
+	return t * t * (3.f - 2.f * t);
+}
+/// Modulo operation supporting negative numbers
+template <typename T>
+float mod(T x, T m)
+{
+	return x - m * floor(x / m);
+}
+/// Modulo operation supporting negative numbers
+inline ImVec2 mod(const ImVec2& v, const ImVec2& m)
+{
+	return ImVec2(mod(v.x, m.x), mod(v.y, m.y));
+}
+/// Modulo operation supporting negative numbers
+inline ImVec2 mod(const ImVec2& v, float m)
+{
+	return ImVec2(mod(v.x, m), mod(v.y, m));
+}
+/// Exact equality
 inline bool equals(const ImVec2& a, const ImVec2& b)
 {
 	return a.x == b.x && a.y == b.y;
 }
+/// Exact equality
 inline bool equals(const ImRect& a, const ImRect& b)
 {
 	return equals(a.Min, b.Min) && equals(a.Max, b.Max);
 }
+/// Absolute epsilon equality
 inline bool equals(float val1, float val2, float abs_error)
 {
 	return fabsf(val1 - val2) <= abs_error;
 }
+/// Absolute epsilon equality
 inline bool equals(const ImVec2& a, const ImVec2& b, float abs_error)
 {
 	return equals(a.x, b.x, abs_error) && equals(a.y, b.y, abs_error);
 }
-} // namespace DUtils
+} // namespace DMath
 
 namespace DDraw
 {

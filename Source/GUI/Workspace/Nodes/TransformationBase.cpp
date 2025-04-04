@@ -45,7 +45,7 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
 
 		if (m_wasValid) // Prevent layout flickering
-			m_top.expectNewWidthThisFrame(diwne.canvas().screen2diwneSize(iconSize.x + 2 * style.FramePadding.x));
+			m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(iconSize.x + 2 * style.FramePadding.x));
 
 		m_top.spring(1.0f);
 

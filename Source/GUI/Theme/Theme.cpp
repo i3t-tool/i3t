@@ -181,6 +181,9 @@ void Theme::initClassicProperties()
 	set(EColor::TrackingSequenceTint, ImVec4(1.2, 1.2, 1.2, 1));
 
 	// Node Editor
+	set(EColor::NodeEditorBackground, ImVec4(0.439f, 0.439f, 0.455f, 1.00f));
+	set(EColor::NodeEditorGridColor, ImColor(57, 57, 57, 120));
+	set(EColor::NodeEditorGridDotsColor, ImColor(200, 200, 200, 40));
 	//	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f,
 	// 255.0f / 255.0f, 1.00f)); 	set(EColor::NodeEditorBg, ImVec4(112.0f /
 	// 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
@@ -335,6 +338,7 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Links_ControlpointsPositionFraction] = {0.2f, false};
 	m_sizes[ESize::Links_ControlpointsPositionMin] = {50.0f, true};
+	m_sizes[ESize::Links_ControlpointsPositionMax] = {350.0f, true};
 	m_sizes[ESize::Links_Thickness] = {5.0f, true};
 	m_sizes[ESize::Links_ThicknessSelectedBorder] = {2.0f, true};
 
@@ -453,12 +457,15 @@ void Theme::initNames()
 	    .add(ESizeVec2::Window_FramePadding, "Windows Frame Padding");
 
 	group("Node Editor")
+	    .add(EColor::NodeEditorBackground, "Node Editor Background")
+	    .add(EColor::NodeEditorGridColor, "Node Editor Grid Color")
+	    .add(EColor::NodeEditorGridDotsColor, "Node Editor Grid Dots Color")
 	    .add(EColor::NodeBg, "General Node Background")
 	    .add(EColor::NodeHeader, "General Node Header")
 	    .add(EColor::NodeFont, "General Node Font (text)")
 	    .add(EColor::NodeBorder, "Node Border")
 	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
-		.add(EColor::NodeContextButtonColorText, "Context Button Text")
+	    .add(EColor::NodeContextButtonColorText, "Context Button Text")
 	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
 	    .add(EColor::NodeLODButtonColorActive, "LOD Button Active Color")
 	    .add(EColor::NodeLODButtonColorHovered, "LOD Button Hover Color")
@@ -492,8 +499,8 @@ void Theme::initNames()
 	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")
 	    .add(ESize::Links_ControlpointsPositionFraction, "Link x distance between controlpoint and start/end of link - "
 	                                                     "fraction of start to end x distance")
-	    .add(ESize::Links_ControlpointsPositionMin,
-	         "Link minimal x distance between controlpoint and start/end of link")
+	    .add(ESize::Links_ControlpointsPositionMin, "Link Min Control Point X Distance")
+	    .add(ESize::Links_ControlpointsPositionMax, "Link Max Control Point X Distance")
 	    .add(ESize::Links_Thickness, "Link Thickness")
 	    .add(ESize::Links_ThicknessSelectedBorder, "Link Additional thickness when selected")
 	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
@@ -609,8 +616,8 @@ void Theme::initNames()
 	g_CategoryNames["tuts_"] = "Tutorials";
 	g_CategoryNames["star_"] = "Start Window";
 	g_CategoryNames["abut_"] = "About Window";
-	g_CategoryNames["npin_"] = "Node Editor Pins";
 	g_CategoryNames["ngen_"] = "Node Editor General";
+	g_CategoryNames["npin_"] = "Node Editor Pins";
 	g_CategoryNames["nops_"] = "Node Editor Operators";
 	g_CategoryNames["ntrs_"] = "Node Editor Transformations";
 	g_CategoryNames["npop_"] = "Node Editor Popups";
@@ -719,9 +726,11 @@ void Theme::initNames()
 	g_ColorNames[EColor::AboutWindow_BackgroundRight] = "abut_AboutWindow BackgroundRight";
 	g_ColorNames[EColor::AboutWindow_Text] = "abut_AboutWindow Text";
 
-	// Node editor colors
+	// Node editor
 	// ------------------
-	/// \todo This will be removed.
+	g_ColorNames[EColor::NodeEditorBackground] = "ngen_Node Editor Background";
+	g_ColorNames[EColor::NodeEditorGridColor] = "ngen_Node Editor Grid Color";
+	g_ColorNames[EColor::NodeEditorGridDotsColor] = "ngen_Node Editor Grid Dots Color";
 
 	// 1. Pins
 	g_ColorNames[EColor::PulsePin] = "npin_Pulse Pin";
@@ -856,12 +865,9 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes Default Inactive Part Marker";
 
-	g_SizeNames[ESize::Links_ControlpointsPositionFraction] =
-	    "ngen_Link x distance between controlpoint and start/end of link - "
-	    "fraction of start to end x distance";
-	g_SizeNames[ESize::Links_ControlpointsPositionMin] =
-	    "ngen_Link minimal x distance between controlpoint and start/end of link";
-
+	g_SizeNames[ESize::Links_ControlpointsPositionFraction] = "ngen_Link Control Point Distance Scaling Factor";
+	g_SizeNames[ESize::Links_ControlpointsPositionMin] = "ngen_Link Min Control Point X Distance";
+	g_SizeNames[ESize::Links_ControlpointsPositionMax] = "ngen_Link Max Control Point X Distance";
 	g_SizeNames[ESize::Links_Thickness] = "ngen_Link Thickness";
 	g_SizeNames[ESize::Links_ThicknessSelectedBorder] = "ngen_Link Additional thickness when selected";
 	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links Selected Alpha";
@@ -933,6 +939,8 @@ void Theme::updateDiwneStyleFromTheme() const
 
 	// I3T Theme sizes are already DPI scaled so we apply them after scaling the DIWNE style
 	using DIWNE::DiwneStyle;
+	style->set(DiwneStyle::gridColor, I3T::getUI()->getTheme().get(EColor::NodeEditorGridColor));
+	style->set(DiwneStyle::gridDotsColor, I3T::getUI()->getTheme().get(EColor::NodeEditorGridDotsColor));
 	style->set(DiwneStyle::selectionRounding, I3T::getUI()->getTheme().get(ESize::Nodes_Rounding));
 	style->set(DiwneStyle::itemSelectedBorderThicknessDiwne,
 	           I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness));

@@ -61,7 +61,7 @@ protected:
 
 	ImVec2 m_availableSpringSize; ///< Total width/height that can be filled with springs, in DIWNE coordinates.
 
-	int hsprings = 0, vsprings = 0;
+	int hsprings = 0, vsprings = 0; // TODO: This isn't really used for anything
 
 	ImVec2 m_fixedSize;           ///< Cumulative size of fixed items within the panel. The minimum size.
 	ImVec2 m_lastFixedPositionXY; ///< Internal variable for tracking the fixed items size automatically
@@ -109,7 +109,7 @@ public:
 
 	/// Inform the next spring that a new fixed width item will appear this frame.
 	/// Can be used to prevent flickering on layout change.
-	void expectNewWidthThisFrame(float width);
+	void expectWidthChangeThisFrame(float width);
 
 public:
 	// /**
@@ -128,10 +128,11 @@ public:
 	// {
 	// 	m_availableSpringWidth = width;
 	// }
-	// inline float getAvailableSpringWidth() const
-	// {
-	// 	return m_availableSpringWidth;
-	// }
+
+	inline ImVec2 getAvailableSize() const
+	{
+		return m_availableSpringSize;
+	}
 
 	// Panel layout
 	// =============================================================================================================

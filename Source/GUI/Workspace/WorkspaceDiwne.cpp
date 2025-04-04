@@ -697,6 +697,74 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	ImGui::PopStyleColor();
 
 	ImGui::Separator();
+
+	addMenu();
+
+	ImGui::Separator();
+
+	if (ImGui::BeginMenu(_t("Delete")))
+	{
+		if (ImGui::MenuItem(_t("Selected nodes")))
+		{
+			deleteSelectedNodes();
+		}
+
+		if (ImGui::MenuItem(_t("Selected links")))
+		{
+			for (auto& link : m_links)
+			{
+				if (link->getSelected())
+				{
+					link->destroy();
+				}
+			}
+		}
+
+		if (ImGui::MenuItem(_t("All nodes")))
+		{
+			clear();
+		}
+
+		if (ImGui::MenuItem(_t("All links")))
+		{
+			for (auto& link : m_links)
+			{
+				link->destroy();
+			}
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::BeginMenu(_t("Selection")))
+	{
+		if (ImGui::MenuItem(_t("select all"), "Ctrl+A"))
+		{
+			selectAllNodes();
+		}
+		if (ImGui::MenuItem(_t("invert"), "Ctrl+I"))
+		{
+			invertSelection();
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu(_t("Zoom")))
+	{
+		if (ImGui::MenuItem(_t("to all"), "Ctrl+Alt+A"))
+		{
+			zoomToAll();
+		}
+		if (ImGui::MenuItem(_t("to selection"), "Ctrl+Alt+S"))
+		{
+			zoomToSelected();
+		}
+		ImGui::EndMenu();
+	}
+}
+
+void WorkspaceDiwne::addMenu()
+{
 	if (ImGui::BeginMenu("transformation"))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
@@ -1160,67 +1228,5 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	if (ImGui::MenuItem("scripting node"))
 	{
 		addNodeToPositionOfPopup<ScriptingNode>();
-	}
-
-	ImGui::Separator();
-
-	if (ImGui::BeginMenu(_t("Delete")))
-	{
-		if (ImGui::MenuItem(_t("Selected nodes")))
-		{
-			deleteSelectedNodes();
-		}
-
-		if (ImGui::MenuItem(_t("Selected links")))
-		{
-			for (auto& link : m_links)
-			{
-				if (link->getSelected())
-				{
-					link->destroy();
-				}
-			}
-		}
-
-		if (ImGui::MenuItem(_t("All nodes")))
-		{
-			clear();
-		}
-
-		if (ImGui::MenuItem(_t("All links")))
-		{
-			for (auto& link : m_links)
-			{
-				link->destroy();
-			}
-		}
-		ImGui::EndMenu();
-	}
-
-	ImGui::Separator();
-
-	if (ImGui::BeginMenu(_t("Selection")))
-	{
-		if (ImGui::MenuItem(_t("select all"), "Ctrl+A"))
-		{
-			selectAllNodes();
-		}
-		if (ImGui::MenuItem(_t("invert"), "Ctrl+I"))
-		{
-			invertSelection();
-		}
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu(_t("Zoom")))
-	{
-		if (ImGui::MenuItem(_t("to all"), "Ctrl+Alt+A"))
-		{
-			zoomToAll();
-		}
-		if (ImGui::MenuItem(_t("to selection"), "Ctrl+Alt+S"))
-		{
-			zoomToSelected();
-		}
-		ImGui::EndMenu();
 	}
 }

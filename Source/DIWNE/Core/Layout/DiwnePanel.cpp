@@ -124,7 +124,7 @@ void DiwnePanel::submitChild(DiwnePanel* child)
 	// applyQueuedWidth();
 }
 
-void DiwnePanel::expectNewWidthThisFrame(float width)
+void DiwnePanel::expectWidthChangeThisFrame(float width)
 {
 	m_availableSpringSize.x -= width;
 }
@@ -215,7 +215,7 @@ bool DiwnePanel::spring(float relSize, bool horizontal)
 	float diffF = horizontal ? diff.x : diff.y;
 	float springSizeF =
 	    horizontal ? springScreenSize.x : DIWNE_TRUNC(sanityCursorPos1.y + springScreenSize.y) - sanityCursorPos1.y;
-	bool test = DUtils::equals(springSizeF, diffF, DIWNE_PIXEL_EPSILON);
+	bool test = DMath::equals(springSizeF, diffF, DIWNE_PIXEL_EPSILON);
 	if (!test)
 	{
 		DIWNE_LOG_DEBUG(std::string("[DiwnePanel] Submitted ") + (horizontal ? "horizontal" : "vertical") +

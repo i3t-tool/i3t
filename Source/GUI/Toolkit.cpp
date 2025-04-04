@@ -215,7 +215,7 @@ void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDra
 	std::vector<ImVec2> points;
 	points.reserve(num_segments);
 
-	float theta = 2 * 3.1415926 / float(num_segments);
+	float theta = 2 * I3_PI / float(num_segments);
 	float c = cosf(theta); // precalculate the sine and cosine
 	float s = sinf(theta);
 	float t;

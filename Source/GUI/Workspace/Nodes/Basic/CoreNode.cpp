@@ -146,8 +146,25 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	if (m_isLabelBeingEdited)
 	{
+		float prevTopLabelWidth = m_topLabelWidth;
 		interacted = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
 		                              ImGuiInputTextFlags_NoHorizontalScroll);
+
+		// Ensure that when the label width changes, the layout does not flicker
+		// InputText doesn't change width on edit until the NEXT frame
+		if (ImGui::IsItemEdited())
+		{
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
+			float diff = m_topLabelWidth - prevTopLabelWidth;
+			m_topLabelWidthChange = diff;
+		}
+		else
+		{
+			if (m_topLabelWidthChange != 0)
+				m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(m_topLabelWidthChange));
+			m_topLabelWidthChange = 0;
+		}
+
 		auto id = ImGui::GetItemID();
 		if (m_isFirstDraw)
 		{
@@ -165,6 +182,8 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	else
 	{
 		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
+		if (m_topLabelWidth == 0 || diwne.canvas().m_prevZoom != diwne.canvas().m_zoom)
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
 		interacted = false;
 	}
 	ImGui::PopStyleColor();
@@ -193,7 +212,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	// Right corner context menu button //TODO: Move into a func and add a boolean enabler
+	// Right corner context menu button
 	// TODO: Rename Nodes_LODButtonSize to something like "HeaderButtonSize" as the buttons must have the same height
 
 	if (m_drawContextMenuButton)

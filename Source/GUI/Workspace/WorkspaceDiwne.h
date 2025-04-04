@@ -102,7 +102,9 @@ public:
 	void end(DIWNE::DrawInfo& context) override;
 	void finalize(DIWNE::DrawInfo& context) override;
 
+	// TODO: Does popupContent really need a context reference?
 	void popupContent(DIWNE::DrawInfo& context) override;
+	void addMenu();
 
 	// Object management
 	// =============================================================================================================

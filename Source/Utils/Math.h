@@ -27,6 +27,8 @@
 #include <random>
 #include <vector>
 
+#define I3_PI 3.14159265358979f
+
 // ----------------------- A better way for float comparison -------------
 // based on https://stackoverflow.com/questions/4548004/how-to-correctly-and-standardly-compare-floats
 //

@@ -95,6 +95,11 @@ enum class EColor
 
 	AddMenuHeader,
 
+	// Node Editor
+	NodeEditorBackground,
+	NodeEditorGridColor,
+	NodeEditorGridDotsColor,
+
 	// 2. Pins
 	PulsePin,
 	FloatPin,
@@ -252,6 +257,7 @@ enum class ESize
 
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
+	Links_ControlpointsPositionMax,
 	Links_Thickness,
 	Links_ThicknessSelectedBorder,
 	Links_OffsetFraction,

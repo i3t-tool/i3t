@@ -59,7 +59,7 @@ public:
 
 	void drawInputPins(DIWNE::DrawInfo& context) override;
 
-	void drawMenuLevelOfDetail() override;                 // todo
+	void drawMenuLevelOfDetail() override; // todo
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContent_axis_showmodel();

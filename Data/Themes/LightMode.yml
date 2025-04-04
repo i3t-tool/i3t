@@ -60,6 +60,9 @@ colors:
   npin_Inner Color Quat: [0.969, 0.969, 0.969, 1.000]
   npin_Inner Color MatrixMul: [0.969, 0.969, 0.969, 1.000]
   npin_Inner Color Screen: [0.969, 0.969, 0.969, 1.000]
+  ngen_Node Editor Background: [0.965, 0.965, 0.965, 1.000]
+  ngen_Node Editor Grid Color: [0.223, 0.223, 0.223, 0.470]
+  ngen_Node Editor Grid Dots Color: [0.784, 0.784, 0.784, 0.156]
   ngen_General Node Background: [0.694, 0.694, 0.694, 1.000]
   ngen_General Node Header: [0.020, 0.341, 0.012, 1.000]
   ngen_General Node Font (text): [1.000, 1.000, 1.000, 1.000]
@@ -142,8 +145,9 @@ sizes:
   ngen_Nodes Left Side spacing: 3
   ngen_Nodes Right Side spacing: 3
   glob_Selected node border thickness: 2.5
-  ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
-  ngen_Link minimal x distance between controlpoint and start/end of link: 50
+  ngen_Link Control Point Distance Scaling Factor: 0.200000003
+  ngen_Link Min Control Point X Distance: 50
+  ngen_Link Max Control Point X Distance: 350
   ngen_Link Thickness: 5
   ngen_Link Additional thickness when selected: 2
   ngen_Links Selected Alpha: 0.800000012

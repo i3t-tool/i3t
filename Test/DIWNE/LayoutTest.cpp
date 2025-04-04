@@ -60,7 +60,7 @@ TEST_F(LayoutTest, ImGuiFractionalSizeMeasuring)
 
 		ImGui::Button("Test button", ImVec2(100, 100));
 		ImVec2 realSize = ImGui::GetItemRectSize();
-		assert(DGui::equals(realSize, ImVec2(100, 100)));
+		assert(DMath::equals(realSize, ImVec2(100, 100)));
 
 		// Testing ImGui cursor behavior with a fractional/unrounded screen cursor position.
 

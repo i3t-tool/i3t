@@ -114,6 +114,15 @@ void NodeEditor::begin(DrawInfo& context)
 
 void NodeEditor::content(DrawInfo& context)
 {
+	if (mp_settingsDiwne->showGrid)
+	{
+		bool dots = mp_settingsDiwne->useDotGrid;
+		ImVec4 gridColor =
+		    dots ? diwne.style().color(DiwneStyle::gridDotsColor) : diwne.style().color(DiwneStyle::gridColor);
+		canvas().drawGrid(dots, 250.f, gridColor, dots ? 0.08f : 0.4f, 0.06f, dots);
+		canvas().drawGrid(dots, 50.f, gridColor, dots ? 0.9f : 1.4f, dots ? 0.7f : 0.4f, dots);
+	}
+
 	// Debug work area rect
 	DIWNE_DEBUG_GENERAL(diwne, {
 		ImGui::GetWindowDrawList()->AddRect(m_canvas->m_viewRectScreen.Min, m_canvas->m_viewRectScreen.Max,
@@ -658,7 +667,7 @@ void NodeEditor::setNodesSelectionChanged(bool value)
 {
 	m_nodesSelectionChanged = value;
 };
-bool NodeEditor::getNodesSelectionChanged()
+bool NodeEditor::getNodesSelectionChanged() const
 {
 	return m_nodesSelectionChanged;
 }

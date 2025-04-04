@@ -84,6 +84,9 @@ public:
 	// Instead of an enum, static shorts are used.
 	// Real style values are kept in a std::vector registry that is accessed by the key index
 
+	static const short gridColor;     // ImVec4
+	static const short gridDotsColor; // ImVec4
+
 	static const short nodeBg;       // ImVec4
 	static const short nodeHeaderBg; // ImVec4
 

@@ -589,8 +589,9 @@ sizes:
   ngen_Nodes Default Visible Precision: 1
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0
-  ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
-  ngen_Link minimal x distance between controlpoint and start/end of link: 50
+  ngen_Link Control Point Distance Scaling Factor: 0.200000003
+  ngen_Link Min Control Point X Distance: 50
+  ngen_Link Max Control Point X Distance: 350
   ngen_Link Thickness: 5
   ngen_Link Additional thickness when selected: 2
   ngen_Pins IconPadding: 2

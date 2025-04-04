@@ -292,11 +292,13 @@ public:
 		m_lastActiveNodeChanged = true;
 	}
 
+	/// Get position of the last popup in screen coordinates.
 	const ImVec2& getPopupPosition() const;
+	/// Set position of the last popup in screen coordinates, used for placement of new nodes.
 	void setPopupPosition(ImVec2 position);
 
 	void setNodesSelectionChanged(bool value);
-	bool getNodesSelectionChanged();
+	bool getNodesSelectionChanged() const;
 
 	void setZoom(float val)
 	{

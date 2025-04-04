@@ -52,4 +52,6 @@ public:
 
 private:
 	void showEditMenu();
+	void showAddMenu();
+	void showViewMenu();
 };
