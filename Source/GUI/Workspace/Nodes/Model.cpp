@@ -14,6 +14,7 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
@@ -41,11 +42,11 @@ void Model::popupContent_axis_showmodel()
 {
 	auto model = m_viewportModel.lock();
 
-	if (ImGui::MenuItem(_t("Show axes"), NULL, model->m_showAxes))
+	if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, model->m_showAxes))
 	{
 		model->m_showAxes = !model->m_showAxes;
 	}
-	if (ImGui::MenuItem(_t("Show model"), NULL, model->m_visible))
+	if (I3TGui::MenuItemWithLog(_t("Show model"), NULL, model->m_visible))
 	{
 		model->m_visible = !model->m_visible;
 	}
@@ -65,43 +66,43 @@ void Model::popupContent_axis_showmodel()
 	{
 		if (ImGui::BeginMenu(_t("Color")))
 		{
-			if (ImGui::MenuItem(_t("None")))
+			if (I3TGui::MenuItemWithLog(_t("None")))
 			{
 				model->m_tint = glm::vec3(1.0f);
 			}
-			if (ImGui::MenuItem(_t("Red")))
+			if (I3TGui::MenuItemWithLog(_t("Red")))
 			{
 				model->m_tint = calculateTint(Color::RED, model);
 			}
-			if (ImGui::MenuItem(_t("Green")))
+			if (I3TGui::MenuItemWithLog(_t("Green")))
 			{
 				model->m_tint = calculateTint(Color::GREEN, model);
 			}
-			if (ImGui::MenuItem(_t("Blue")))
+			if (I3TGui::MenuItemWithLog(_t("Blue")))
 			{
 				model->m_tint = calculateTint(Color::BLUE, model);
 			}
-			if (ImGui::MenuItem(_t("Yellow")))
+			if (I3TGui::MenuItemWithLog(_t("Yellow")))
 			{
 				model->m_tint = calculateTint(Color::YELLOW, model);
 			}
-			if (ImGui::MenuItem(_t("Teal")))
+			if (I3TGui::MenuItemWithLog(_t("Teal")))
 			{
 				model->m_tint = calculateTint(Color::TEAL, model);
 			}
-			if (ImGui::MenuItem(_t("Magenta")))
+			if (I3TGui::MenuItemWithLog(_t("Magenta")))
 			{
 				model->m_tint = calculateTint(Color::MAGENTA, model);
 			}
-			if (ImGui::MenuItem(_t("Light Blue")))
+			if (I3TGui::MenuItemWithLog(_t("Light Blue")))
 			{
 				model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
 			}
-			if (ImGui::MenuItem(_t("Orange")))
+			if (I3TGui::MenuItemWithLog(_t("Orange")))
 			{
 				model->m_tint = calculateTint(Color::ORANGE, model);
 			}
-			if (ImGui::MenuItem(_t("Brown")))
+			if (I3TGui::MenuItemWithLog(_t("Brown")))
 			{
 				model->m_tint = calculateTint(Color::BROWN, model);
 			}

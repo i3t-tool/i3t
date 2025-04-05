@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
 #include "Localization/Localization.h"
 #include "TransformationBase.h"
@@ -184,8 +185,8 @@ public:
 template <>
 inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
-	ImGui::MenuItem(_t("Lock"), NULL, false, false); /* no change DataMap in Free transformation */
-	ImGui::MenuItem(_t("Enable synergies"), NULL, false, false);
+	I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, false); /* no change DataMap in Free transformation */
+	I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false, false);
 }
 
 template <>
@@ -193,14 +194,14 @@ inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -209,14 +210,14 @@ inline void Transformation<Core::ETransformType::Scale>::drawMenuSetDataMap()
 	// the one of two with synergies in LevelOfDetail::FUll and SetValues
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, getLevelOfDetail() != LevelOfDetail::Label))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false, getLevelOfDetail() != LevelOfDetail::Label))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, getLevelOfDetail() != LevelOfDetail::Label))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false, getLevelOfDetail() != LevelOfDetail::Label))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
@@ -236,14 +237,14 @@ inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -258,14 +259,16 @@ inline void Transformation<Core::ETransformType::Quat>::drawMenuSetDataMap()
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
@@ -277,14 +280,14 @@ inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -299,14 +302,16 @@ inline void Transformation<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
@@ -318,14 +323,14 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, getLevelOfDetail() == LevelOfDetail::Full))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -340,14 +345,16 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, getLevelOfDetail() == LevelOfDetail::SetValues))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false,
+		                            getLevelOfDetail() == LevelOfDetail::SetValues))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}

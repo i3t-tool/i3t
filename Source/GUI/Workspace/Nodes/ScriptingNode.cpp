@@ -12,6 +12,8 @@
  */
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 
+#include "GUI/I3TGui.h"
+
 #include <regex>
 
 #include "GUI/Elements/Modals/ScriptEditor.h"
@@ -195,13 +197,13 @@ void ScriptingNode::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(_t("Edit script")))
+	if (I3TGui::MenuItemWithLog(_t("Edit script")))
 	{
 		auto modal = std::make_unique<ScriptEditorModal>((Workspace::ScriptingNode*) shared_from_this().get());
 		I3T::getUI()->getWindowManager().openModal(std::move(modal));
 	}
 
-	if (ImGui::MenuItem(_t("Reload script")))
+	if (I3TGui::MenuItemWithLog(_t("Reload script")))
 	{
 		reloadScript();
 	}

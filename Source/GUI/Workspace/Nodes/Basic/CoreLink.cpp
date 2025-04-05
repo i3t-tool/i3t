@@ -13,6 +13,7 @@
 #include "CoreLink.h"
 
 #include "CorePins.h"
+#include "GUI/I3TGui.h"
 
 using namespace Workspace;
 
@@ -20,7 +21,7 @@ CoreLink::CoreLink(DIWNE::NodeEditor& diwne) : DIWNE::Link(diwne) {}
 
 void CoreLink::popupContent(DIWNE::DrawInfo& context)
 {
-	if (ImGui::MenuItem("Delete"))
+	if (I3TGui::MenuItemWithLog("Delete"))
 	{
 		destroy();
 	}

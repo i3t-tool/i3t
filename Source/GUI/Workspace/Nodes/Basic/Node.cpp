@@ -12,6 +12,8 @@
  */
 #include "Node.h"
 
+#include "GUI/I3TGui.h"
+
 using namespace Workspace;
 
 std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDetail::Full, "Full"},
@@ -32,7 +34,7 @@ bool Node::allowDragStart() const
 
 void Node::drawMenuDelete()
 {
-	if (ImGui::MenuItem(_t("Delete"), "Delete"))
+	if (I3TGui::MenuItemWithLog(_t("Delete"), "Delete"))
 	{
 		destroy();
 	}

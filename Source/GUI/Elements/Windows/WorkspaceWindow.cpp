@@ -15,6 +15,7 @@
 #include "WorkspaceWindow.h"
 
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "GUI/Workspace/WorkspaceModule.h"
@@ -51,10 +52,10 @@ void WorkspaceWindow::render()
 			if (ImGui::BeginMenu("Debug"))
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-				ImGui::MenuItem("Enable", nullptr, &(WorkspaceModule::g_editor->m_diwneDebug));
-				ImGui::MenuItem("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
-				ImGui::MenuItem("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
-				ImGui::MenuItem("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
+				I3TGui::MenuItemWithLog("Enable", nullptr, &(WorkspaceModule::g_editor->m_diwneDebug));
+				I3TGui::MenuItemWithLog("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
+				I3TGui::MenuItemWithLog("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
+				I3TGui::MenuItemWithLog("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}
@@ -83,14 +84,14 @@ void WorkspaceWindow::showEditMenu()
 	if (ImGui::BeginMenu(_t("Edit")))
 	{
 		/*
-		if (ImGui::MenuItem("Undo"))
+		if (I3TGui::MenuItemWithLog("Undo"))
 		{
 		    // B
 		    /// \todo Undo.
 		    // UndoRedo::undo();
 		}
 
-		if (ImGui::MenuItem("Redo"))
+		if (I3TGui::MenuItemWithLog("Redo"))
 		{
 		    // N
 		    /// \todo Redo.
@@ -98,13 +99,13 @@ void WorkspaceWindow::showEditMenu()
 		}
 		 */
 
-		if (ImGui::MenuItem(_t("Select all")))
+		if (I3TGui::MenuItemWithLog(_t("Select all")))
 		{
 			WorkspaceModule::g_editor->selectAllNodes();
 			App::getModule<StateManager>().requestSnapshot();
 		}
 
-		if (ImGui::MenuItem(_t("Zoom all")))
+		if (I3TGui::MenuItemWithLog(_t("Zoom all")))
 		{
 			WorkspaceModule::g_editor->zoomToAll();
 		}

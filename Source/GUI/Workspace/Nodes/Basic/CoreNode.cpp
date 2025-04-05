@@ -249,7 +249,7 @@ bool CoreNode::drawDataLabel()
 
 void CoreNode::drawMenuSetEditable()
 {
-	if (ImGui::MenuItem(_t("Rename"), nullptr, m_isLabelBeingEdited))
+	if (I3TGui::MenuItemWithLog(_t("Rename"), nullptr, m_isLabelBeingEdited))
 	{
 		m_isLabelBeingEdited = !m_isLabelBeingEdited;
 	}
@@ -257,7 +257,7 @@ void CoreNode::drawMenuSetEditable()
 
 void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 {
-	if (ImGui::MenuItem(_t("Duplicate"), "Ctrl+D"))
+	if (I3TGui::MenuItemWithLog(_t("Duplicate"), "Ctrl+D"))
 	{
 		duplicate(context, false);
 	}
@@ -273,8 +273,8 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 
 		for (auto const& levelOfDetail : levels_of_detail)
 		{
-			if (ImGui::MenuItem(LevelOfDetailName[levelOfDetail].c_str(), NULL,
-			                    node->getLevelOfDetail() == levelOfDetail, true))
+			if (I3TGui::MenuItemWithLog(LevelOfDetailName[levelOfDetail].c_str(), NULL,
+			                            node->getLevelOfDetail() == levelOfDetail, true))
 			{
 				node->setLevelOfDetail(levelOfDetail);
 			}
@@ -292,7 +292,7 @@ void CoreNode::drawMenuSetPrecision()
 		for (int i = 0; i < 5; i++) /* \todo JH, \todo MH some better setter for
 		                               precision - allowed values in settings? */
 		{
-			if (ImGui::MenuItem(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal() == i, true))
+			if (I3TGui::MenuItemWithLog(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal() == i, true))
 			{
 				setNumberOfVisibleDecimal(i);
 			}
@@ -305,11 +305,11 @@ static void drawMenuStoreValues(Ptr<Core::Node> node)
 {
 	if (ImGui::BeginMenu(_t("Value")))
 	{
-		if (ImGui::MenuItem(_t("Store")))
+		if (I3TGui::MenuItemWithLog(_t("Store")))
 		{
 			node->dataMut(0).saveValue();
 		}
-		if (ImGui::MenuItem(_t("Restore"), nullptr, false, node->data(0).hasSavedValue()))
+		if (I3TGui::MenuItemWithLog(_t("Restore"), nullptr, false, node->data(0).hasSavedValue()))
 		{
 			node->dataMut(0).reloadValue();
 		}

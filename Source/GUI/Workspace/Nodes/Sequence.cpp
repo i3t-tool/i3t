@@ -12,6 +12,7 @@
  */
 #include "Sequence.h"
 
+#include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -187,18 +188,18 @@ void Sequence::popupContentTracking()
 	if (Core::GraphManager::isTrackingEnabled() &&
 	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
-		if (ImGui::MenuItem(_t("Stop tracking"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
 		{
 			workspaceDiwne.trackingSwitchOff();
 		}
-		if (ImGui::MenuItem(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
 		{
 			workspaceDiwne.trackingModeSwitch();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Start tracking from right"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{
@@ -207,7 +208,7 @@ void Sequence::popupContentTracking()
 
 			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
 		}
-		if (ImGui::MenuItem(_t("Start tracking from left"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{

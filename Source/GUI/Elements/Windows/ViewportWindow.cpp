@@ -246,11 +246,11 @@ bool ViewportWindow::showViewportButtons()
 		ImGui::TextDisabled(_t("Object visibility"));
 		ImGui::Dummy({0.0f, popupTitleDividerSize});
 
-		ImGui::MenuItem(ICON_T(ICON_I3T_MODEL " ", "Objects"), nullptr, &m_displayOptions.showDefault);
-		ImGui::MenuItem(ICON_T(ICON_I3T_MANIPULATOR " ", "Axes"), nullptr, &m_displayOptions.showAxes);
-		ImGui::MenuItem(ICON_T(ICON_I3T_GRID " ", "Grid"), nullptr, &m_displayOptions.showGrid);
-		ImGui::MenuItem(ICON_T(ICON_I3T_CAMERA " ", "Cameras"), nullptr, &m_displayOptions.showCamera);
-		ImGui::MenuItem(ICON_T(ICON_I3T_FRUSTUM " ", "Frustums"), nullptr, &m_displayOptions.showFrustum);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_MODEL " ", "Objects"), nullptr, &m_displayOptions.showDefault);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_MANIPULATOR " ", "Axes"), nullptr, &m_displayOptions.showAxes);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_GRID " ", "Grid"), nullptr, &m_displayOptions.showGrid);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_CAMERA " ", "Cameras"), nullptr, &m_displayOptions.showCamera);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_FRUSTUM " ", "Frustums"), nullptr, &m_displayOptions.showFrustum);
 
 		ImGui::EndPopup();
 	}
@@ -320,21 +320,21 @@ bool ViewportWindow::showViewportMenu()
 		bool msaa8x = m_renderOptions.multisample && m_renderOptions.samples == 8;
 		if (ImGui::BeginMenu(_t("MSAA")))
 		{
-			if (ImGui::MenuItem(_t("OFF"), nullptr, &msaaOff))
+			if (I3TGui::MenuItemWithLog(_t("OFF"), nullptr, &msaaOff))
 			{
 				m_renderOptions.multisample = false;
 			}
-			if (ImGui::MenuItem("2x", nullptr, &msaa2x))
+			if (I3TGui::MenuItemWithLog("2x", nullptr, &msaa2x))
 			{
 				m_renderOptions.multisample = true;
 				m_renderOptions.samples = 2;
 			}
-			if (ImGui::MenuItem("4x", nullptr, &msaa4x))
+			if (I3TGui::MenuItemWithLog("4x", nullptr, &msaa4x))
 			{
 				m_renderOptions.multisample = true;
 				m_renderOptions.samples = 4;
 			}
-			if (ImGui::MenuItem("8x", nullptr, &msaa8x))
+			if (I3TGui::MenuItemWithLog("8x", nullptr, &msaa8x))
 			{
 				m_renderOptions.multisample = true;
 				m_renderOptions.samples = 8;
@@ -345,35 +345,35 @@ bool ViewportWindow::showViewportMenu()
 		if (ImGui::BeginMenu(_t("Highlight")))
 		{
 			userInteractedWithMenus = true;
-			if (ImGui::MenuItem(_t("Ultra"), nullptr, nullptr))
+			if (I3TGui::MenuItemWithLog(_t("Ultra"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 1.0f;
 				stg.global().highlight.kernelSize = 4;
 				stg.global().highlight.outlineCutoff = 0.15f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem(_t("High"), nullptr, nullptr))
+			if (I3TGui::MenuItemWithLog(_t("High"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.8f;
 				stg.global().highlight.kernelSize = 4;
 				stg.global().highlight.outlineCutoff = 0.18f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem(_t("Medium"), nullptr, nullptr))
+			if (I3TGui::MenuItemWithLog(_t("Medium"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.5f;
 				stg.global().highlight.kernelSize = 2;
 				stg.global().highlight.outlineCutoff = 0.23f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem(_t("Low"), nullptr, nullptr))
+			if (I3TGui::MenuItemWithLog(_t("Low"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 1.0f / 3;
 				stg.global().highlight.kernelSize = 2;
 				stg.global().highlight.outlineCutoff = 0.3f;
 				stg.global().highlight.useDepth = true;
 			}
-			if (ImGui::MenuItem(_t("Lowest"), nullptr, nullptr))
+			if (I3TGui::MenuItemWithLog(_t("Lowest"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.25;
 				stg.global().highlight.kernelSize = 2;
@@ -385,42 +385,42 @@ bool ViewportWindow::showViewportMenu()
 
 		if (ImGui::BeginMenu(_t("Transparency")))
 		{
-			ImGui::MenuItem(_t("Use WBOIT"), nullptr, &m_renderOptions.wboit);
 			if (ImGui::BeginMenu(_t("WBOIT weight function")))
+			I3TGui::MenuItemWithLog(_t("Use WBOIT"), nullptr, &m_renderOptions.wboit);
 			{
-				if (ImGui::MenuItem(_t("OFF"), nullptr, m_renderOptions.wboitFunc == 0))
+				if (I3TGui::MenuItemWithLog(_t("OFF"), nullptr, m_renderOptions.wboitFunc == 0))
 				{
 					m_renderOptions.wboitFunc = 0;
 				}
-				if (ImGui::MenuItem("Equation 7", nullptr, m_renderOptions.wboitFunc == 1))
+				if (I3TGui::MenuItemWithLog("Equation 7", nullptr, m_renderOptions.wboitFunc == 1))
 				{
 					m_renderOptions.wboitFunc = 1;
 				}
-				if (ImGui::MenuItem("Equation 8", nullptr, m_renderOptions.wboitFunc == 2))
+				if (I3TGui::MenuItemWithLog("Equation 8", nullptr, m_renderOptions.wboitFunc == 2))
 				{
 					m_renderOptions.wboitFunc = 2;
 				}
-				if (ImGui::MenuItem("Equation 9", nullptr, m_renderOptions.wboitFunc == 3))
+				if (I3TGui::MenuItemWithLog("Equation 9", nullptr, m_renderOptions.wboitFunc == 3))
 				{
 					m_renderOptions.wboitFunc = 3;
 				}
-				if (ImGui::MenuItem("Equation 10", nullptr, m_renderOptions.wboitFunc == 4))
+				if (I3TGui::MenuItemWithLog("Equation 10", nullptr, m_renderOptions.wboitFunc == 4))
 				{
 					m_renderOptions.wboitFunc = 4;
 				}
-				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, m_renderOptions.wboitFunc == 5))
+				if (I3TGui::MenuItemWithLog("LOGL Eq. 9 color bias", nullptr, m_renderOptions.wboitFunc == 5))
 				{
 					m_renderOptions.wboitFunc = 5;
 				}
-				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, m_renderOptions.wboitFunc == 6))
+				if (I3TGui::MenuItemWithLog("LOGL Eq. 10", nullptr, m_renderOptions.wboitFunc == 6))
 				{
 					m_renderOptions.wboitFunc = 6;
 				}
-				if (ImGui::MenuItem("z^-3", nullptr, m_renderOptions.wboitFunc == 7))
+				if (I3TGui::MenuItemWithLog("z^-3", nullptr, m_renderOptions.wboitFunc == 7))
 				{
 					m_renderOptions.wboitFunc = 7;
 				}
-				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, m_renderOptions.wboitFunc == 8))
+				if (I3TGui::MenuItemWithLog("abs(z - zFar + Eps)", nullptr, m_renderOptions.wboitFunc == 8))
 				{
 					m_renderOptions.wboitFunc = 8;
 				}
@@ -431,7 +431,7 @@ bool ViewportWindow::showViewportMenu()
 		}
 
 		// TODO: (DR) Probably move to preferences or help/debug menu
-		if (ImGui::MenuItem(_t("Reload shaders"), nullptr, nullptr))
+		if (I3TGui::MenuItemWithLog(_t("Reload shaders"), nullptr, nullptr))
 		{
 			bool ok = Vp::Shaders::instance().reload();
 			// Flash green if all shaders reloaded successfully, red otherwise
@@ -447,7 +447,8 @@ bool ViewportWindow::showViewportMenu()
 	if (ImGui::BeginMenu(_t("View")))
 	{
 		userInteractedWithMenus = true;
-		if (ImGui::MenuItem(_t("Orbit camera"), nullptr, stg.scene().mainScene.camera.mode == CameraMode::ORBIT))
+		if (I3TGui::MenuItemWithLog(_t("Orbit camera"), nullptr,
+		                            stg.scene().mainScene.camera.mode == CameraMode::ORBIT))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -455,8 +456,8 @@ bool ViewportWindow::showViewportMenu()
 				stg.scene().mainScene.camera.mode = CameraMode::ORBIT;
 			}
 		}
-		if (ImGui::MenuItem(_t("Trackball camera"), nullptr,
-		                    stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
+		if (I3TGui::MenuItemWithLog(_t("Trackball camera"), nullptr,
+		                            stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -464,7 +465,7 @@ bool ViewportWindow::showViewportMenu()
 				stg.scene().mainScene.camera.mode = CameraMode::TRACKBALL;
 			}
 		}
-		if (ImGui::MenuItem(_t("Smooth scroll"), nullptr, stg.global().camera.smoothScroll))
+		if (I3TGui::MenuItemWithLog(_t("Smooth scroll"), nullptr, stg.global().camera.smoothScroll))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -497,42 +498,42 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem(_t("Viewpoint right"), "Num3"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint right"), "Num3"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 			}
 		}
-		if (ImGui::MenuItem(_t("Viewpoint left"), "Ctrl+Num3"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint left"), "Ctrl+Num3"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 			}
 		}
-		if (ImGui::MenuItem(_t("Viewpoint top"), "Num7"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint top"), "Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 			}
 		}
-		if (ImGui::MenuItem(_t("Viewpoint bottom"), "Ctrl+Num7"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint bottom"), "Ctrl+Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 			}
 		}
-		if (ImGui::MenuItem(_t("Viewpoint front"), "Num1"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint front"), "Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 			}
 		}
-		if (ImGui::MenuItem(_t("Viewpoint back"), "Ctrl+Num1"))
+		if (I3TGui::MenuItemWithLog(_t("Viewpoint back"), "Ctrl+Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -542,7 +543,7 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem(_t("Center camera on selection"), "Num0"))
+		if (I3TGui::MenuItemWithLog(_t("Center camera on selection"), "Num0"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -550,7 +551,7 @@ bool ViewportWindow::showViewportMenu()
 			}
 		}
 
-		if (ImGui::MenuItem(_t("Center camera on scene"), "Home"))
+		if (I3TGui::MenuItemWithLog(_t("Center camera on scene"), "Home"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
@@ -560,11 +561,11 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		ImGui::MenuItem(_t("Show objects"), nullptr, &m_displayOptions.showDefault);
-		ImGui::MenuItem(_t("Show axes"), nullptr, &m_displayOptions.showAxes);
-		ImGui::MenuItem(_t("Show grid"), nullptr, &m_displayOptions.showGrid);
-		ImGui::MenuItem(_t("Show cameras"), nullptr, &m_displayOptions.showCamera);
-		ImGui::MenuItem(_t("Show frustums"), nullptr, &m_displayOptions.showFrustum);
+		I3TGui::MenuItemWithLog(_t("Show objects"), nullptr, &m_displayOptions.showDefault);
+		I3TGui::MenuItemWithLog(_t("Show axes"), nullptr, &m_displayOptions.showAxes);
+		I3TGui::MenuItemWithLog(_t("Show grid"), nullptr, &m_displayOptions.showGrid);
+		I3TGui::MenuItemWithLog(_t("Show cameras"), nullptr, &m_displayOptions.showCamera);
+		I3TGui::MenuItemWithLog(_t("Show frustums"), nullptr, &m_displayOptions.showFrustum);
 
 		ImGui::EndMenu();
 	}
@@ -576,50 +577,50 @@ bool ViewportWindow::showViewportMenu()
 	//	if (ImGui::BeginMenu("Viewports"))
 	//	{
 	//		// Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
-	//		if (ImGui::MenuItem("View-x"))
+	//		if (I3TGui::MenuItemWithLog("View-x"))
 	//		{
 	//			// Num 1
 	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), false);
 	//		}
 	//
-	//		if (ImGui::MenuItem("View-y"))
+	//		if (I3TGui::MenuItemWithLog("View-y"))
 	//		{
 	//			// Num 2
 	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
 	//		}
 	//
-	//		if (ImGui::MenuItem("View-z"))
+	//		if (I3TGui::MenuItemWithLog("View-z"))
 	//		{
 	//			// Num 3
 	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), false);
 	//		}
 	//
-	//		if (ImGui::MenuItem("World-x"))
+	//		if (I3TGui::MenuItemWithLog("World-x"))
 	//		{
 	//			// Num 4
 	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), true);
 	//		}
 	//
-	//		if (ImGui::MenuItem("World-y"))
+	//		if (I3TGui::MenuItemWithLog("World-y"))
 	//		{
 	//			// Num 5
 	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
 	//		}
 	//
-	//		if (ImGui::MenuItem("World-z"))
+	//		if (I3TGui::MenuItemWithLog("World-z"))
 	//		{
 	//			// Num 6
 	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), true);
 	//		}
 	//
-	//		if (ImGui::MenuItem("Center"))
+	//		if (I3TGui::MenuItemWithLog("Center"))
 	//		{
 	//			// Num 0
 	//			// App::get().world()->scene->setCamToCenter();
 	//		}
 	//		ImGui::Separator();
 	//		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
-	//		if (ImGui::MenuItem(action))
+	//		if (I3TGui::MenuItemWithLog(action))
 	//		{
 	//			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
 	//			// Num 0
@@ -630,7 +631,7 @@ bool ViewportWindow::showViewportMenu()
 	//	if (ImGui::BeginMenu("Manipulators"))
 	//	{
 	//		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
-	//		if (ImGui::MenuItem(action))
+	//		if (I3TGui::MenuItemWithLog(action))
 	//		{
 	//			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
 	//		}

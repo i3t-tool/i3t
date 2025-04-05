@@ -193,16 +193,16 @@ void TransformationBase::drawMenuStorevalues()
 {
 	if (ImGui::BeginMenu(_t("Value")))
 	{
-		if (ImGui::MenuItem(_t("Reset")))
+		if (I3TGui::MenuItemWithLog(_t("Reset")))
 		{
 			m_nodebase->as<Core::Transform>()->initDefaults();
 			m_nodebase->as<Core::Transform>()->resetMatrixFromDefaults();
 		}
-		if (ImGui::MenuItem(_t("Store")))
+		if (I3TGui::MenuItemWithLog(_t("Store")))
 		{
 			m_nodebase->as<Core::Transform>()->saveValue();
 		}
-		if (ImGui::MenuItem(_t("Restore"), nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
+		if (I3TGui::MenuItemWithLog(_t("Restore"), nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
 		{
 			m_nodebase->as<Core::Transform>()->reloadValue();
 		}
@@ -222,14 +222,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, enableLockMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, enableLockMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -237,14 +237,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, enableSynergiesMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, enableSynergiesMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
