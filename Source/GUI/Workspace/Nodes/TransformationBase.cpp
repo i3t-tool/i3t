@@ -277,8 +277,8 @@ bool TransformationBase::drawDataFull()
 
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)));
 
-	interaction_happen = DataRenderer::drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(),
-	                                               m_floatPopupMode, m_nodebase->data().getMat4(),
+	interaction_happen = DataRenderer::drawData4x4(diwne, getId(), m_labelDiwne, m_numberOfVisibleDecimal,
+	                                               getDataItemsWidth(), m_floatPopupMode, m_nodebase->data().getMat4(),
 	                                               {m_nodebase->as<Core::Transform>()->getValueState({0, 0}),
 	                                                m_nodebase->as<Core::Transform>()->getValueState({1, 0}),
 	                                                m_nodebase->as<Core::Transform>()->getValueState({2, 0}),
@@ -345,7 +345,7 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 		    *local_data[i],
 		    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 		                                                      : Core::EValueState::Editable,
-		    actual_value_changed);
+		    actual_value_changed, m_labelDiwne);
 		value_changed |= actual_value_changed;
 		ImGui::PopItemWidth();
 	}
@@ -396,11 +396,11 @@ bool TransformationBase::drawDataSetValuesTable_builder(std::string const corner
 				ImGui::PushItemWidth(getDataItemsWidth());
 				inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 				    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(),
-				    fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
+				    fmt::format("##{}:row-{},col-{}", m_labelDiwne, rows, columns),
 				    *(local_data[rows * columnLabels.size() + columns]),
 				    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 				                                                      : Core::EValueState::Editable,
-				    actual_value_changed);
+				    actual_value_changed, m_labelDiwne);
 
 				ImGui::PopItemWidth();
 				if (actual_value_changed)

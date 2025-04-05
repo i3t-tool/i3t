@@ -294,10 +294,10 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(getDataItemsWidth()); // width of the drag float widget
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}from", getId()), localData,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:from", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->isConnected() ? Core::EValueState::Locked
 		                                                                 : Core::EValueState::Editable,
-		    valueChanged);
+		    valueChanged, m_labelDiwne);
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
 		// {
@@ -331,10 +331,10 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()), localData,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:to", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
 		                                                               : Core::EValueState::Editable,
-		    valueChanged);
+		    valueChanged, m_labelDiwne);
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 
 		// if (ImGui::IsItemHovered())
@@ -367,10 +367,10 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		// TODO: drawDragFloat should take the context parameter
 		bool interaction = DataRenderer::drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:step", getId()), localData,
 		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->isConnected() ? Core::EValueState::Locked
 		                                                                 : Core::EValueState::Editable,
-		    valueChanged);
+		    valueChanged, m_labelDiwne);
 		if (interaction)
 			context.update(true, true, true);
 
@@ -664,8 +664,8 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			valueChanged = false;
 			ImGui::SetNextItemWidth(getDataItemsWidth()); // \todo according to the number of visible decimals
 			inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-			    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}stepduration", getId()),
-			    localData, Core::EValueState::Editable, valueChanged);
+			    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:stepduration", getId()),
+			    localData, Core::EValueState::Editable, valueChanged, m_labelDiwne);
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::SetTooltip(_t("Automatic step duration"));
@@ -688,8 +688,8 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			valueChanged = false;
 			ImGui::SetNextItemWidth(getDataItemsWidth());
 			inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-			    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}manstep", getId()), localData,
-			    Core::EValueState::Editable, valueChanged);
+			    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:manstep", getId()), localData,
+			    Core::EValueState::Editable, valueChanged, m_labelDiwne);
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::SetTooltip(_t("Step for manual Next/Prev"));
