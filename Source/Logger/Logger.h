@@ -18,11 +18,15 @@
  */
 #pragma once
 
+#include <iostream>
 #include <map>
+#include <queue>
 #include <sstream>
 #include <stack>
 #include <string>
 
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
 
 // Omit trace from release builds in case of any perf issues
