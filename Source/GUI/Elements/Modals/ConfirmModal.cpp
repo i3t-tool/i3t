@@ -17,6 +17,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Application.h"
 #include "Core/Input/InputManager.h"
+#include "GUI/I3TGui.h"
 #include "GUI/UIModule.h"
 #include "State/StateManager.h"
 
@@ -41,20 +42,20 @@ void ConfirmModal::onImGui()
 	ImGui::TextUnformatted("\n\n");
 	ImGui::Separator();
 
-	if (ImGui::Button(strategy->m_yesText.c_str(), ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog(strategy->m_yesText.c_str(), ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		strategy->onYes();
 	}
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (ImGui::Button(strategy->m_noText.c_str(), ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog(strategy->m_noText.c_str(), ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		strategy->onNo();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button(_t("Cancel"), ImVec2(6.25f * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog(_t("Cancel"), ImVec2(6.25f * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 	}

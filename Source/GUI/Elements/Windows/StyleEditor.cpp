@@ -18,6 +18,7 @@
 #include "misc/cpp/imgui_stdlib.h"
 
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Theme/ThemeLoader.h"
 #include "GUI/ThemeVariable.h"
 #include "GUI/Toolkit.h"
@@ -73,7 +74,7 @@ void StyleEditor::render()
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button(_t("Use default theme")))
+	if (I3TGui::ButtonWithLog(_t("Use default theme")))
 	{
 		I3T::getUI()->setDefaultTheme();
 	}
@@ -197,7 +198,7 @@ void StyleEditor::renderSaveRevertField()
 {
 	auto& curr = I3T::getTheme();
 
-	if (ImGui::Button(_t("Revert changes")))
+	if (I3TGui::ButtonWithLog(_t("Revert changes")))
 	{
 		revertChangesOnCurrentTheme();
 	}
@@ -219,7 +220,7 @@ void StyleEditor::renderSaveRevertField()
 	/// \todo Add list of default themes (LightMode and DarkMode) when they be finished.
 	if (curr.getName() != I3T_CLASSIC_THEME_NAME)
 	{
-		if (ImGui::Button(_t("Overwrite")))
+		if (I3TGui::ButtonWithLog(_t("Overwrite")))
 		{
 			saveCurrentTheme(curr.getName());
 		}
@@ -227,7 +228,7 @@ void StyleEditor::renderSaveRevertField()
 	}
 
 	// Save current theme to file.
-	if (ImGui::Button(_t("Save as")))
+	if (I3TGui::ButtonWithLog(_t("Save as")))
 	{
 		auto path = std::string("Data/Themes/") + m_newThemeName + ".yml";
 		static std::regex invalidCharsRe(R"([\\\/\:\*\?\"\<\>\|])");

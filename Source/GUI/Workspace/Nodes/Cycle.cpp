@@ -460,8 +460,8 @@ bool Cycle::myRadioButton(const char* label, int* v, int v_button)
 	}
 
 	bool pressed = false;
-	// pressed = ImGui::Button(fmt::format("{}##{}",label, v_button).c_str());
-	pressed = ImGui::Button(label);
+	// pressed = I3TGui::Button(fmt::format("{}##{}",label, v_button).c_str());
+	pressed = I3TGui::ButtonWithLog(label);
 	if (pressed)
 	{
 		*v = v_button;

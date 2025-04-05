@@ -12,6 +12,8 @@
  */
 #include "Toolkit.h"
 
+#include "I3TGui.h"
+
 #include <math.h>
 
 #include "Utils/Format.h"
@@ -74,7 +76,7 @@ bool Button(const char* id, bool disabled, const ImVec2& size)
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	const auto result = ImGui::Button(id, size);
+	const auto result = I3TGui::ButtonWithLog(id, size);
 
 	if (disabled)
 	{
@@ -101,7 +103,7 @@ bool ToggleButton(const char* label, bool& toggled, bool invert, ImVec2 size)
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::TutorialButtonBg));
 		colorsPushed = colorsPushed + 2;
 	}
-	if (ImGui::Button(label, size))
+	if (I3TGui::ButtonWithLog(label, size))
 	{
 		pressed = true;
 		toggled = !toggled;

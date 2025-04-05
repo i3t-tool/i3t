@@ -15,6 +15,7 @@
 #include "imgui.h"
 
 #include "Core/Nodes/Id.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 
 static const std::string SCRIPT_TEMPLATE = R"(self.operation = Operation.new(
@@ -68,19 +69,19 @@ void ScriptEditorModal::onImGui()
 		ImGui::TextColored(ImVec4(0.8f, 0.0f, 0.0f, 1.0f), m_message.c_str());
 	}
 
-	if (ImGui::Button(_t("Cancel")))
+	if (I3TGui::ButtonWithLog(_t("Cancel")))
 	{
 		close();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button(_t("Save")))
+	if (I3TGui::ButtonWithLog(_t("Save")))
 	{
 		onSave();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button(_t("Save and close")))
+	if (I3TGui::ButtonWithLog(_t("Save and close")))
 	{
 		onSave();
 		close();

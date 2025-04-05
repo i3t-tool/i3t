@@ -15,6 +15,7 @@
 #include "Config.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "I3T.h"
@@ -225,7 +226,7 @@ bool ViewportWindow::showViewportButtons()
 
 	// Object visibility options
 	const char* displayPopupId = "popup_display";
-	if (ImGui::Button(ICON_FA_EYE "###DisplayButton"))
+	if (I3TGui::ButtonWithLog(ICON_FA_EYE "###DisplayButton"))
 	{
 		interacted = true;
 		ImGui::OpenPopup(displayPopupId);

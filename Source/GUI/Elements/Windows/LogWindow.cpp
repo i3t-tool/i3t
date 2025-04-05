@@ -18,6 +18,7 @@
 
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Theme/Theme.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
@@ -81,7 +82,7 @@ void LogWindow::render()
 		s += std::to_string(action.code);
 	}
 	ImGui::Text(_t("Current keys: %s"), s.c_str());
-	if (ImGui::Button(_t("Switch")))
+	if (I3TGui::ButtonWithLog(_t("Switch")))
 	{
 #ifdef I3T_DEBUG
 		val = !val;

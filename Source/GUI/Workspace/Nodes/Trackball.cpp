@@ -155,29 +155,29 @@
 ////		//SS why it have to be shifted? And why this value?
 ////		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 ////
-////		if(ImGui::Button("x-", buttonSize)){
+////		if(I3TGui::Button("x-", buttonSize)){
 ////			//core call
 ////		}
 ////		ImGui::SameLine();
-////		if(ImGui::Button("y-", buttonSize)){
+////		if(I3TGui::Button("y-", buttonSize)){
 ////			//core call
 ////		}
 ////		ImGui::SameLine();
-////		if(ImGui::Button("z-", buttonSize)){
+////		if(I3TGui::Button("z-", buttonSize)){
 ////			//core call
 ////		}
 ////
 ////		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 ////
-////		if(ImGui::Button("x+", buttonSize)){
+////		if(I3TGui::Button("x+", buttonSize)){
 ////			//core call
 ////		}
 ////		ImGui::SameLine();
-////		if(ImGui::Button("y+", buttonSize)){
+////		if(I3TGui::Button("y+", buttonSize)){
 ////			//core call
 ////		}
 ////		ImGui::SameLine();
-////		if(ImGui::Button("z+", buttonSize)){
+////		if(I3TGui::Button("z+", buttonSize)){
 ////			//core call
 ////		}
 ////		ImGui::PopStyleVar();
@@ -283,29 +283,29 @@
 //		//SS why it have to be shifted? And why this value?
 //		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 //
-//		if(ImGui::Button("x-", buttonSize)){
+//		if(I3TGui::Button("x-", buttonSize)){
 //			//core call
 //		}
 //		ImGui::SameLine();
-//		if(ImGui::Button("y-", buttonSize)){
+//		if(I3TGui::Button("y-", buttonSize)){
 //			//core call
 //		}
 //		ImGui::SameLine();
-//		if(ImGui::Button("z-", buttonSize)){
+//		if(I3TGui::Button("z-", buttonSize)){
 //			//core call
 //		}
 //
 //		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 //
-//		if(ImGui::Button("x+", buttonSize)){
+//		if(I3TGui::Button("x+", buttonSize)){
 //			//core call
 //		}
 //		ImGui::SameLine();
-//		if(ImGui::Button("y+", buttonSize)){
+//		if(I3TGui::Button("y+", buttonSize)){
 //			//core call
 //		}
 //		ImGui::SameLine();
-//		if(ImGui::Button("z+", buttonSize)){
+//		if(I3TGui::Button("z+", buttonSize)){
 //			//core call
 //		}
 //		ImGui::PopStyleVar();

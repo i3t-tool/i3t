@@ -89,13 +89,13 @@ void ImportedModelsDialog::render()
 
 		ImGui::BeginChild("ModelRightPane", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
 
-		if (ImGui::Button(_t("Import"), ImVec2(-FLT_MIN, 0)))
+		if (I3TGui::ButtonWithLog(_t("Import"), ImVec2(-FLT_MIN, 0)))
 		{
 			importModel(m_normalizeImportedModels);
 		}
 		ImGui::SetItemDefaultFocus();
 
-		if (ImGui::Button(_t("Remove"), ImVec2(-FLT_MIN, 0)))
+		if (I3TGui::ButtonWithLog(_t("Remove"), ImVec2(-FLT_MIN, 0)))
 		{
 			if (m_selectedModelIndex >= 0)
 			{
