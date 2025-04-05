@@ -50,8 +50,11 @@ def find_missing_keys_in_sources(folder_with_sources, localization_files):
     # Combine the two patterns into one:
     # If the first part (_t(...)) is triggered, the key goes to group 1,
     # If ICON_T(...), it goes to group 2.
+    # If _tbd(...), it goes to group 3.
     pattern = re.compile(
-        r'_ts?\s*\(\s*"([^"]+)"\s*\)|ICON_T\s*\(.*?,\s*"([^"]+)"\s*\)',
+        r'_ts?\s*\(\s*"([^"]+)"\s*\)'
+        r'|ICON_T\s*\(.*?,\s*"([^"]+)"\s*\)'
+        r'|_tbd\s*\(\s*"([^"]+)"\s*\)',
         flags=re.DOTALL
     )
 
@@ -71,8 +74,8 @@ def find_missing_keys_in_sources(folder_with_sources, localization_files):
             print(f"Failed to read file {source_file}: {e}")
             continue
         for match in pattern.finditer(content):
-            # Determine which group is triggered (key from _t or from ICON_T)
-            key = match.group(1) if match.group(1) is not None else match.group(2)
+            # Determine which group is triggered (key from _t or from ICON_T or _tbd)
+            key = match.group(1) or match.group(2) or match.group(3)
             line_number = content.count('\n', 0, match.start()) + 1
             # For each language, check for the key
             for lang, keys in all_keys.items():

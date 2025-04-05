@@ -39,8 +39,14 @@ def get_used_keys_in_source(folder_with_source):
     finds all keys used in the macros _t(“...”) and ICON_T(ANYTHING, “...”),
     and returns them as a set.
     """
+    # Combine the two patterns into one:
+    # If the first part (_t(...)) is triggered, the key goes to group 1,
+    # If ICON_T(...), it goes to group 2.
+    # If _tbd(...), it goes to group 3.
     pattern = re.compile(
-        r'_ts?\s*\(\s*"([^"]+)"\s*\)|ICON_T\s*\(.*?,\s*"([^"]+)"\s*\)',
+        r'_ts?\s*\(\s*"([^"]+)"\s*\)'
+        r'|ICON_T\s*\(.*?,\s*"([^"]+)"\s*\)'
+        r'|_tbd\s*\(\s*"([^"]+)"\s*\)',
         flags=re.DOTALL
     )
     used_keys = set()
@@ -54,7 +60,8 @@ def get_used_keys_in_source(folder_with_source):
                 print(f"Failed to read file {file}: {e}")
                 continue
             for match in pattern.finditer(content):
-                key = match.group(1) if match.group(1) is not None else match.group(2)
+                # Determine which group is triggered (key from _t or from ICON_T or _tbd)
+                key = match.group(1) or match.group(2) or match.group(3)
                 used_keys.add(key)
     return used_keys
 
