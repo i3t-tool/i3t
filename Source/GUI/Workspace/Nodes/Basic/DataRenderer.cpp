@@ -81,6 +81,12 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 		inner_interaction_happen |=
 		    DIWNE::popupDiwne(diwne, label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 
+		if (valueChangedByPopup)
+		{
+			diwne.m_takeSnap = true;
+			LOG_EVENT_MATRIX_VALUE_UPDATE(nodeLabel, label, std::to_string(value));
+		}
+
 		valueChanged |= valueChangedByPopup;
 	}
 
