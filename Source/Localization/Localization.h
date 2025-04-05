@@ -26,11 +26,13 @@
 /**
  * \def _ts(key)
  * Macro for translating a key to the current language.
+ * \return std::string
  */
 #define _ts(key) LOCALIZATION.translate(key)
 
 /**
  * \def _t(key)
+ * \return char*
  * Macro for translating a key and returning a C-style string.
  */
 #define _t(key) _ts(key).c_str()
