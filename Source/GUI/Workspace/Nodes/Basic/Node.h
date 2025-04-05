@@ -60,6 +60,7 @@ class Node : public DIWNE::BasicNode
 {
 public:
 	Node(DIWNE::NodeEditor& diwne, std::string label = "Header");
+	void onDestroy(bool logEvent);
 
 	// TODO: Ideally delete this whole class <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//  as, duplication could be a DIWNE feature
