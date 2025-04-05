@@ -13,4 +13,7 @@
     <Type Name="DIWNE::ForwardNodeIterator&lt;*,*,*&gt;">
         <DisplayString>DiwneIterator (idx={_idx})</DisplayString>
     </Type>
+    <Type Name="DIWNE::DiwnePanel">
+        <DisplayString>DiwnePanel {m_label} [pos=({m_rect.Min.x,g},{m_rect.Min.y,g}) size=({m_rect.Max.x-m_rect.Min.x,g},{m_rect.Max.y-m_rect.Min.y,g})]</DisplayString>
+    </Type>
 </AutoVisualizer>

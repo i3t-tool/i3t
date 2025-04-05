@@ -19,23 +19,32 @@ namespace DIWNE
 {
 /**
  * A rectangular area representing a part of a DIWNE object.
- * Used to keep track of additional information about a part of a DIWNE object's content.
+ * Used for layouting, DiwnePanels support horizontal and vertical springs, which can be used to align fixed items
+ * within the panel.
  * Note that this class is NOT a subclass of a DiwneObject.
  * It is merely a utility class meant to be used within DIWNE objects.
  *
- * Intended use:
+ * DiwnePanels operate in DIWNE coordinates to be as view/zoom agnostic as possible. Unfortunately view position and
+ * zoom level still affects all coordinates due to ImGui pixel alignment.
  *
- * 1. Draw content using ImGui, whilst
- * 	  - Springs use getAvailableSpringWidth() to set their size (setting their width to a fraction of available width).
- *    - Each spring will inform the panel of its width by calling submitSpringWidth()
- * 2. When drawing is done, the panels dimensions are set to the dimensions of the drawn content.
- * 	  (Using ImGui Groups and ImGui::GetItemRectXXX())
- * 3. Layout constraints are calculated.
- *    - Panels can be queried with getSpringWidth() to get width they are willing to shrink by.
- *      The method getMinimumWidth() can be used too. It returns width of the node that DOESN'T include spring widths.
- *    - Panels are then resized, whilst updating their available width via setAvailableSpringWidth()
- * 4. Panel's submitted spring width is reset with resetSpringWidth() to start counting springs widths during next
- *    frame.
+ * Basic layout concept:
+ * DiwnePanel is a rectangle that tracks "fixed" size, which are parts of the rectangle that CANNOT shrink.
+ * Remaining size in the rectangle is considered "springy" and may be shrunk. Since the panel is tracking its fixed
+ * width (eg. it's minimal width), springs can be added within it that share some remaining available space.
+ * So to right align the panels content, a spring can be added to the beginning with a factor of 1.0f, making it use
+ * all the available space, right aligning the content. Similarly two springs with 0.5f factor each can be used to
+ * surround a fixed item and center it in the panel.
+ *
+ * TODO: Better docs, examples etc.
+ *
+ * DiwnePanels are meant to be a generic layout utility, but then need to work in "stable" coordinates.
+ * Hence they use DIWNE coordinates, which are converted from screen space using the provided editor reference.
+ * This incurs an extra runtime cost that wouldn't be necessary if used outside of the NodeEditor.
+ *
+ * TODO: I might create a separate layout class for general ImGui if DiwnePanels prove useful
+ *
+ * DiwnePanels themselves are merely a component of a larger layout system.
+ * @see DIWNE::Stack
  */
 class DiwnePanel
 {
@@ -43,14 +52,19 @@ protected:
 	NodeEditor& m_editor; ///< Reference to the overarching node editor
 	std::string m_label;  ///< ImGui label used for identification
 
-	ImRect m_rect{ImRect()};         ///< Actual rect including any extra spacings that can shrink.
-	float m_availableSpringWidth{0}; ///< Total width that can be filled with springs.
+	ImRect m_rect{ImRect()};           ///< Actual rect including any extra spacings that can shrink. In DIWNE space.
+	ImRect m_lastScreenRect{ImRect()}; ///< Last screen space rectangle reported by ImGui. Used in special cases.
+	                                   ///< @see getLastScreenRectDiwne()
+	// TODO: Panels should perhaps be given a Viewport (canvas?), not the whole editor
 
-	float m_submittedFixedWidth{0};  ///< Width filled with non-shrinkable items.
-	float m_submittedSpringWidth{0}; ///< Actual width filled with springs.
+	// NOTE: All the sizes below are in DIWNE coordinates!
 
-	bool m_widthQueued{false};
-	float m_queuedFixedWidth{0};
+	ImVec2 m_availableSpringSize; ///< Total width/height that can be filled with springs, in DIWNE coordinates.
+
+	int hsprings = 0, vsprings = 0; // TODO: This isn't really used for anything
+
+	ImVec2 m_fixedSize;           ///< Cumulative size of fixed items within the panel. The minimum size.
+	ImVec2 m_lastFixedPositionXY; ///< Internal variable for tracking the fixed items size automatically
 
 public:
 	DiwnePanel(NodeEditor& editor, std::string label);
@@ -59,125 +73,102 @@ public:
 	// =============================================================================================================
 
 	void begin();
+	// TODO: Do we need to submit anything to a parent? Otherwise the parent considers child spring size to be fixed.
+	//  But is that a problem? Because the child doesn't consider it fixed so maybe it all works out in the end?
+	//  That would actually be quite nice because there would be no need for any sort of panel hierarchy.
 	void end(DiwnePanel* parent = nullptr);
 
+	/// Recalculates the available spring size for the next frame, should be called after end() and after its preferred
+	/// dimensions have been set.
 	void layout();
 
-	// Widgets
-	// =============================================================================================================
-
-	inline void submitChild(DiwnePanel* child)
-	{
-		submitFixedWidth(child->getWidth());
-		applyQueuedWidth();
-	}
-
-	void spring(float relSize);
-
-	void sameLine(float spacing = -1.0f);
-
-	// Layouting
+	// Layouting widgets
 	// =============================================================================================================
 
 	/**
-	 * Add fixed non-shrinking width to the panel.
-	 * @param width Width to submit in diwne coordinates.
+	 * Adds a horizontal (or vertical) spring (dummy item) with width/height calculated based on remaining available
+	 * width in the panel.
+	 *
+	 * @warning Springs operate in a single dimension, eg. in a single line, single "column". The space they span isn't
+	 * meant to be occupied by another item. If you, for example, need several horizontal springs above each other, use
+	 * multiple DiwnePanels and a layout manager like VStack.
+	 *
+	 * @param relSize Proportion of the available width/height this spring ends up using
+	 * @param horizontal True for a horizontal spring, false for a vertical spring.
+	 * @return Whether the spring item was truly added or not.
 	 */
-	void submitFixedWidth(float width);
+	bool spring(float relSize, bool horizontal = true);
 
-	/**
-	 * When calling ImGui::SameLine() no width is actually added until an ImGui item is submitted.
-	 * Hence we can't automatically submit fixed width when DiwnePaneL::sameLine() is called since it may not actually
-	 * be "real" width if no other ImGui item is added afterwards.
-	 * So we instead queue the width to be submitted later when another item is added. This panel should be informed
-	 * about a new item being added with addChild() or spring() calls.
-	 */
-	void queueFixedWidth(float width);
+	bool vspring(float relSize); ///< Vertical spring @see spring()
 
-	void applyQueuedWidth();
+	// Layouting commands, use with care
+	// =============================================================================================================
 
-	/**
-	 * Mark this width as spring width which can shrink if needed.
-	 * Submitted width is added to a cumulative total for the current frame.
-	 * Total submitted width SHOULD NOT be more than the available spring width for this panel.
-	 * @param width Spring width in diwne coordinates.
-	 */
-	void submitSpringWidth(float width);
+	// TODO: Is this needed? See TODO above.
+	void submitChild(DiwnePanel* child); ///< Submits given panel as fixed width to the panel
 
-	/**
-	 * Returns this panel's cumulative spring width for the last frame.
-	 * That is the portion of width of the panel which can shrink.
-	 */
-	inline float getSpringWidth() const
+	/// Inform the next spring that a new fixed width item will appear this frame.
+	/// Can be used to prevent flickering on layout change.
+	void expectWidthChangeThisFrame(float width);
+
+public:
+	// /**
+	//  * Returns this panel's cumulative spring width for the last frame.
+	//  * That is the portion of width of the panel which can shrink.
+	//  */
+	// inline float getSpringWidth() const
+	// {
+	// 	return m_submittedSpringWidth;
+	// }
+
+	// /**
+	//  * Sets the available spring width which the panel can use for springs during next frame's drawing.
+	//  */
+	// inline void setAvailableSpringWidth(float width)
+	// {
+	// 	m_availableSpringWidth = width;
+	// }
+
+	inline ImVec2 getAvailableSize() const
 	{
-		return m_submittedSpringWidth;
+		return m_availableSpringSize;
 	}
 
-	/**
-	 * Sets the available spring width which the panel can use for springs during next frame's drawing.
-	 */
-	inline void setAvailableSpringWidth(float width)
-	{
-		m_availableSpringWidth = width;
-	}
-	inline float getAvailableSpringWidth() const
-	{
-		return m_availableSpringWidth;
-	}
+	// Panel layout
+	// =============================================================================================================
 
-	// Higher level modification methods
+	/**
+	 * Returns the minimum width of the panel.
+	 * Minimum width does not contain spring widths as those are willing to shrink if necessary.
+	 */
+	float getMinimumWidth() const;
+	/**
+	 * Returns the minimum height of the panel.
+	 * Minimum height does not contain spring heights as those are willing to shrink if necessary.
+	 */
+	float getMinimumHeight() const;
+	/**
+	 * Returns the minimum size of the panel.
+	 * Minimum size does not contain spring sizes as those are willing to shrink if necessary.
+	 */
+	ImVec2 getMinimumSize() const;
+
+	float getMinMaxX() const;
+	float getMinMaxY() const;
+
+	// Rect modification methods
 	// =============================================================================================================
 
 	/**
 	 * Sets the width of the panel, extending the rectangle to the right. Or shrinking to the left.
-	 * @return The difference between the old and new width (positive if width increased).
 	 */
-	inline float setWidth(float width)
-	{
-		assert(width >= 0); // Width needs to be positive (inversion not desirable)
-		float prevWidth = getWidth();
-		setMaxX(getMinX() + width);
-		return width - prevWidth;
-	}
+	void setWidth(float width);
+	void setHeight(float height);
 
 	inline void translate(const ImVec2& v)
 	{
 		m_rect.Translate(v);
 	}
-
-	// Panel queries
-	// =============================================================================================================
-
-	/**
-	 * Returns the real width of the diwne panel.
-	 */
-	inline float getWidth() const
-	{
-		return m_rect.GetWidth();
-	}
-	/**
-	 * Returns the minimum width of the panel.
-	 * Minimum width does not contain spring widths as those are willing to shrink if necessary.
-	 * This width should equal getWidth() - getSpringWidth() (TODO: perhaps add an assert and warning if it doesnt).
-	 * But we don't use the m_rect width captured from ImGui here as that width includes spring items and unless
-	 * the ImGui measurements are exactly precise there is a risk of a feedback loop expanding the width indefinitely.
-	 */
-	inline float getMinimumWidth()
-	{
-		return m_submittedFixedWidth;
-	}
-
-	inline float getHeight() const
-	{
-		return m_rect.GetHeight();
-	}
-	inline ImVec2 getSize() const
-	{
-		return m_rect.GetSize();
-	}
-
-	// Rect modification methods
-	// =============================================================================================================
 
 	inline void setMinX(float x)
 	{
@@ -209,11 +200,6 @@ public:
 	{
 		setMin(min);
 		setMax(max);
-	}
-	inline void setRect(const ImRect& rect)
-	{
-		setMin(rect.Min);
-		setMax(rect.Max);
 	}
 
 	// Rect Getters
@@ -248,11 +234,42 @@ public:
 		return m_rect;
 	}
 
+	/// Returns the real width of the diwne panel.
+	inline float getWidth() const
+	{
+		return m_rect.GetWidth();
+	}
+	/// Returns real height of the diwne panel.
+	inline float getHeight() const
+	{
+		return m_rect.GetHeight();
+	}
+
+	/// Returns real size of the diwne panel.
+	inline ImVec2 getSize() const
+	{
+		return m_rect.GetSize();
+	}
+
+	/**
+	 * Returns the last screen space rectangle of this panel as reported by ImGui in the last end() call.
+	 * Can be used in special cases instead of the getRect() method to avoid unnecessary coordinate conversion.
+	 *
+	 * @warning This rectangle is merely the last computed ImGui screen space rectangle. It does not have to correspond
+	 * to getRect() and is only valid immediately after drawing, before layouting. Convert getRect() using screen2diwne
+	 * to get a real screen space rect representation.
+	 */
+	inline const ImRect& getLastScreenRectDiwne() const
+	{
+		return m_lastScreenRect;
+	}
+
 protected:
 	// Internal
 	// =============================================================================================================
 	void reset();
+	void beginFixedItem();
+	void endFixedItem();
 };
-
 
 } // namespace DIWNE

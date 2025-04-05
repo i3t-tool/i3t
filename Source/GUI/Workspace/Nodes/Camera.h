@@ -48,9 +48,6 @@ public:
 	Camera(DIWNE::NodeEditor& diwne);
 	~Camera();
 
-	DIWNE::NodeRange<> getNodes() const override;
-	DIWNE::NodeList& getNodeList() override;
-
 	//===-- Double dispatch
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
@@ -58,6 +55,9 @@ public:
 		visitor.visit(std::static_pointer_cast<Camera>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
+
+	DIWNE::NodeRange<> getNodes() const override;
+	DIWNE::NodeList& getNodeList() override;
 
 	const Ptr<Sequence>& getProjection() const
 	{
@@ -69,6 +69,7 @@ public:
 	};
 
 	void centerContent(DIWNE::DrawInfo& context) override;
+	void drawOutputPins(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
 

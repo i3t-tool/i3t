@@ -50,24 +50,38 @@ CoreNode::~CoreNode()
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
 }
 
+void CoreNode::begin(DIWNE::DrawInfo& context)
+{
+	Node::begin(context);
+	m_headerSpacing = m_bottomSpacing = getLevelOfDetail() != LevelOfDetail::Label;
+}
+
 void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
 	// Note: This method does not call superclass topContent!
 	// TODO: But it should :|
 
-	bool interaction_happen = false;
+	bool interacted = false;
 
 	float zoom = diwne.getZoom();
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	// TODO: (DR)(REFACTOR) This method doesn't draw the node header background, it expects subclass methods to do it.
-	//   I'm not a huge fan of such design. Its confusing. Especially since the superclass WorkspaceNode draws it.
+	LevelOfDetail detail = getLevelOfDetail();
 
-	drawHeader();
-	// TODO: This should again be responsibility of the DIWNE library
+	ImDrawFlags headerCornersFlag = ImDrawFlags_RoundCornersTop;
+	ImDrawFlags lodButtonCornersFlag = ImDrawFlags_RoundCornersTopLeft;
+	ImDrawFlags contextButtonCornerFlag = ImDrawFlags_RoundCornersTopRight;
+	if (detail == LevelOfDetail::Label)
+	{
+		headerCornersFlag = ImDrawFlags_RoundCornersAll;
+		lodButtonCornersFlag = ImDrawFlags_RoundCornersLeft;
+		contextButtonCornerFlag = ImDrawFlags_RoundCornersRight;
+	}
+
+	drawHeader(headerCornersFlag);
 
 	// adding a border
-	diwne.canvas().AddRectDiwne(m_rect.Min, m_rect.Max, I3T::getTheme().get(EColor::NodeBorder),
+	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max, I3T::getTheme().get(EColor::NodeBorder),
 	                            I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
 	                            I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
@@ -78,8 +92,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
 
-	LevelOfDetail detail = getLevelOfDetail();
-	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), ImDrawFlags_RoundCornersTopLeft,
+	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), lodButtonCornersFlag,
 	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
 	{
 		if (detail == LevelOfDetail::Full)
@@ -102,7 +115,7 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		{
 			setLevelOfDetail(LevelOfDetail::Full);
 		}
-		this->setSelected(!this->getSelected());
+		interacted = true;
 	}
 	if (ImGui::IsItemActive())
 		context.consumeInput();
@@ -133,17 +146,34 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	if (m_isLabelBeingEdited)
 	{
-		interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
-		                                      ImGuiInputTextFlags_NoHorizontalScroll);
+		float prevTopLabelWidth = m_topLabelWidth;
+		interacted = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
+		                              ImGuiInputTextFlags_NoHorizontalScroll);
+
+		// Ensure that when the label width changes, the layout does not flicker
+		// InputText doesn't change width on edit until the NEXT frame
+		if (ImGui::IsItemEdited())
+		{
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
+			float diff = m_topLabelWidth - prevTopLabelWidth;
+			m_topLabelWidthChange = diff;
+		}
+		else
+		{
+			if (m_topLabelWidthChange != 0)
+				m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(m_topLabelWidthChange));
+			m_topLabelWidthChange = 0;
+		}
+
 		auto id = ImGui::GetItemID();
 		if (m_isFirstDraw)
 		{
 			ImGui::ActivateItemByID(id);
-			interaction_happen = true;
+			interacted = true;
 			m_isFirstDraw = false;
 		}
-		interaction_happen |= ImGui::IsItemActive();
-		if (!interaction_happen)
+		interacted |= ImGui::IsItemActive();
+		if (!interacted)
 		{
 			m_isLabelBeingEdited = false;
 			m_isFirstDraw = true;
@@ -152,15 +182,21 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	else
 	{
 		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
-		interaction_happen = false;
+		if (m_topLabelWidth == 0 || diwne.canvas().m_prevZoom != diwne.canvas().m_zoom)
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
+		interacted = false;
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 
-	const float widthSoFar =
-	    I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
+	ImGui::SameLine(0, 0);
+	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+
+	// const float widthSoFar =
+	//     I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
 
 	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
+	//   DiwnePanels should possibly have an optional forced minimum fixed size (minimum minimum size?)
 
 	// Header extra space
 	// float trailingDummyWidth = style.FramePadding.x / zoom;
@@ -172,11 +208,39 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	// 		trailingDummyWidth += diff;
 	// 	}
 	// }
-	ImGui::SameLine(0, 0);
-	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
+	// ImGui::SameLine(0, 0);
+	// ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
 	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	if (interaction_happen)
+	// Right corner context menu button
+	// TODO: Rename Nodes_LODButtonSize to something like "HeaderButtonSize" as the buttons must have the same height
+
+	if (m_drawContextMenuButton)
+	{
+		ImGui::SameLine(0, 0);
+		m_top.spring(1.0f);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+		                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
+		if (GUI::ButtonWithCorners("###contextBtn", contextButtonCornerFlag,
+		                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
+		{
+			openPopup();
+			interacted = true;
+		}
+		diwne.canvas().DrawBurgerMenu(ImGui::GetWindowDrawList(),
+		                              I3T::getTheme().get(EColor::NodeContextButtonColorText),
+		                              ImGui::GetCurrentContext()->LastItemData.Rect, ImVec2(7.f, 7.5f), 1.2f);
+		if (ImGui::IsItemActive())
+			context.consumeInput();
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar();
+	}
+
+	if (interacted)
 	{
 		context.consumeInput();
 	}
@@ -219,6 +283,8 @@ float CoreNode::getDataItemsWidth()
 
 float CoreNode::updateDataItemsWidth()
 {
+	// TODO: It should be possible to determine scaled font size without actually swapping fonts / applying scaling
+	//  All we have to know is the original unscaled font size
 	const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(true);
 	const float fontSize = ImGui::GetFontSize();
 	const float oneCharWidth = fontSize / 2;

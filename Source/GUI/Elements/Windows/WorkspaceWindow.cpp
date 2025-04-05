@@ -35,11 +35,13 @@ void WorkspaceWindow::render()
 {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
 	GUI::dockTabStylePush();
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, I3T::getTheme().get(EColor::NodeEditorBackground));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
 	                     ImGuiWindowFlags_NoScrollWithMouse))
 	{
+		ImGui::PopStyleColor();
 		GUI::dockTabStylePop();
 		ImGui::PopStyleVar();
 		this->updateWindowInfo();
@@ -47,6 +49,8 @@ void WorkspaceWindow::render()
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
+			showAddMenu();
+			showViewMenu();
 #if DIWNE_DEBUG_ENABLED
 			if (ImGui::BeginMenu("Debug"))
 			{
@@ -104,11 +108,47 @@ void WorkspaceWindow::showEditMenu()
 			App::getModule<StateManager>().requestSnapshot();
 		}
 
-		if (ImGui::MenuItem(_t("Zoom all")))
-		{
-			WorkspaceModule::g_editor->zoomToAll();
-		}
+		ImGui::EndMenu();
+	}
+}
 
+void WorkspaceWindow::showAddMenu()
+{
+	if (ImGui::BeginMenu(_t("Add")))
+	{
+		WorkspaceDiwne& editor = *WorkspaceModule::g_editor;
+		ImRect viewport = editor.canvas().getViewportRectScreen();
+		editor.setPopupPosition(viewport.Min + (viewport.GetSize() * ImVec2(0.24f, 0.31f)));
+		editor.addMenu();
+
+		ImGui::EndMenu();
+	}
+}
+
+void WorkspaceWindow::showViewMenu()
+{
+	if (ImGui::BeginMenu(_t("View")))
+	{
+		if (ImGui::BeginMenu(_tbd("Zoom")))
+		{
+			if (ImGui::MenuItem(_t("Zoom all")))
+			{
+				WorkspaceModule::g_editor->zoomToAll();
+			}
+			if (ImGui::MenuItem(_tbd("Reset zoom")))
+			{
+				WorkspaceModule::g_editor->setZoom(1.0f);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu(_tbd("Grid")))
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+			ImGui::MenuItem(_tbd("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
+			ImGui::MenuItem(_tbd("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
+			ImGui::PopItemFlag();
+			ImGui::EndMenu();
+		}
 		ImGui::EndMenu();
 	}
 }

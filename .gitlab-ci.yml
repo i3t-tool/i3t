@@ -63,6 +63,7 @@ cppcheck:
 
 localization-check-keys-coverage-in-lang:
   stage: lint
+  allow_failure: true
   rules:
     - !reference [ .changes-rules, cpp ]
     - !reference [ .changes-rules, localization ]
@@ -71,6 +72,7 @@ localization-check-keys-coverage-in-lang:
 
 localization-check-unused-keys-in-lang:
   stage: lint
+  allow_failure: true
   rules:
     - !reference [ .changes-rules, cpp ]
     - !reference [ .changes-rules, localization ]

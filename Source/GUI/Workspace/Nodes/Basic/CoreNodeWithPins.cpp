@@ -12,6 +12,7 @@
  */
 #include "CoreNodeWithPins.h"
 
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 
 using namespace Workspace;
@@ -25,14 +26,15 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 	m_workspaceInputs.reserve(inputPins.size());
 	m_workspaceOutputs.reserve(outputPins.size());
 
-	for (Core::Pin const& pin : inputPins)
+	for (Core::Pin const& corePin : inputPins)
 	{
-		m_workspaceInputs.push_back(std::make_unique<CorePin>(diwne, pin, this, true));
+		Ptr<CorePin> pin = std::make_shared<CorePin>(diwne, corePin, this, true);
+		m_workspaceInputs.push_back(std::move(pin));
 	}
 
 	for (Core::Pin const& corePin : outputPins)
 	{
-		Ptr<CorePin> pin = std::make_unique<CorePin>(diwne, corePin, this, false);
+		Ptr<CorePin> pin = std::make_shared<CorePin>(diwne, corePin, this, false);
 		// default true, false for Camera and Sequence - they don't show data on their output pins
 		pin->m_showData = m_showDataOnPins;
 		m_workspaceOutputs.push_back(std::move(pin));
@@ -73,20 +75,13 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 		}
 		else
 		{
-			for (auto const& pin : m_workspaceInputs)
-			{
-				if (pin->getCorePin().isRendered())
-				{
-					pin->drawDiwne(context, m_drawMode); // pin + register the wire
-				}
-			}
+			drawInputPins(context);
 		}
 	}
 }
 
 void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 {
-	bool inner_interaction_happen = false;
 	bool pinsVisible = false;
 
 	for (auto pin : this->getNodebase()->getOutputPins())
@@ -98,7 +93,6 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 		}
 	}
 
-	// TODO: Pins occasionally "vibrate", find out why (probably some kind of pixel rounding issue)
 	if (pinsVisible)
 	{
 		if (m_levelOfDetail == LevelOfDetail::Label ||   // Label draws the wires only
@@ -119,35 +113,11 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			}
 		}
 
-		// TODO: (DR) Rewrite this with DiwnePanel layout system!
-
 		// else - include SetValues
 		// uses getOutputsToShow()) = subset of outputs, based of the level. Override function in the WorkspaceCycle
 		if (m_levelOfDetail != LevelOfDetail::Label) // SetValues must draw the value pin
 		{
-			const float prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
-			                                                                smaller (for example when switch from
-			                                                                precision 2 to precision 0) */
-			m_minRightAlignOfRightPins = FLT_MAX;
-			for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
-			{
-				if (pin->getCorePin().isRendered())
-				{
-					// TODO: (DPI-FIX)
-					float act_align =
-					    std::max(0.0f, (m_right.getWidth() - pin->getRect().GetWidth()) * diwne.getZoom() *
-					                       diwne.getDpiScale()); /* no shift to the left */
-					m_minRightAlignOfRightPins =
-					    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
-					                                                        between two node sizes */
-					const float cursor_pos = ImGui::GetCursorPosX();
-					// LOG_INFO(cursor_pos);
-					ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all
-					// output
-					//                                                                       pins have the same width */
-					pin->drawDiwne(context);
-				}
-			}
+			drawOutputPins(context);
 		}
 	}
 	else
@@ -155,6 +125,33 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 		// TODO: (DR) (zoom-aware) Uncomment perhaps
 		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
+}
+
+void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)
+{
+	for (auto const& pin : m_workspaceInputs)
+	{
+		if (pin->allowDrawing())
+		{
+			pin->drawDiwne(context, m_drawMode);
+		}
+	}
+}
+
+void CoreNodeWithPins::drawOutputPins(DIWNE::DrawInfo& context)
+{
+	outputPinsVstack.begin();
+	for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
+	{
+		if (pin->allowDrawing())
+		{
+			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			row->spring(1.0f);
+			pin->drawDiwne(context);
+			outputPinsVstack.endRow();
+		}
+	}
+	outputPinsVstack.end();
 }
 
 void CoreNodeWithPins::onDestroy(bool logEvent)

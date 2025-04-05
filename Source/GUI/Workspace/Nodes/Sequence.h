@@ -60,11 +60,15 @@ public:
 	void begin(DIWNE::DrawInfo& context) override;
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void afterDraw(DIWNE::DrawInfo& context) override;
-	void onDestroy(bool logEvent) override;
+
+	void drawInputPins(DIWNE::DrawInfo& context) override;
+	void drawOutputPins(DIWNE::DrawInfo& context) override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContentTracking();
 	void drawMenuLevelOfDetail() override;
+
+	void onDestroy(bool logEvent) override;
 
 protected:
 	class SequenceDropZone : public DIWNE::NodeDropZone

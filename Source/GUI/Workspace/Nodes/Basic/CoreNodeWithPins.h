@@ -16,6 +16,7 @@
 
 #include "CoreNode.h"
 #include "CorePins.h"
+#include "DIWNE/Core/Layout/VStack.h"
 
 namespace Workspace
 {
@@ -30,6 +31,8 @@ protected:
 	std::vector<Ptr<CorePin>> m_workspaceInputs;
 	std::vector<Ptr<CorePin>> m_workspaceOutputs;
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
+
+	DIWNE::VStack outputPinsVstack{diwne, &m_right};
 
 public:
 	/**
@@ -48,7 +51,7 @@ public:
 	{
 		return m_workspaceOutputs;
 	};
-	virtual std::vector<Ptr<CorePin>> const getOutputsToShow() const
+	virtual std::vector<Ptr<CorePin>> getOutputsToShow() const
 	{
 		return getOutputs();
 	};
@@ -57,6 +60,9 @@ public:
 
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
+
+	virtual void drawInputPins(DIWNE::DrawInfo& context);
+	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
 	void onDestroy(bool logEvent) override;
 };

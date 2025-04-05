@@ -95,6 +95,11 @@ enum class EColor
 
 	AddMenuHeader,
 
+	// Node Editor
+	NodeEditorBackground,
+	NodeEditorGridColor,
+	NodeEditorGridDotsColor,
+
 	// 2. Pins
 	PulsePin,
 	FloatPin,
@@ -119,10 +124,6 @@ enum class EColor
 	NodeHeader,
 	NodeFont,
 
-	// Sequence
-	NodeBgSequence,
-	NodeHeaderSequence,
-
 	// 3. Operator
 	NodeBgOperator,
 	NodeHeaderOperator,
@@ -135,6 +136,7 @@ enum class EColor
 	NodeBorder,
 	NodeHeaderTranformation,
 	NodeLODButtonColorText,
+	NodeContextButtonColorText,
 	NodeLODButtonColor,
 	NodeLODButtonColorActive,
 	NodeLODButtonColorHovered,
@@ -255,6 +257,7 @@ enum class ESize
 
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
+	Links_ControlpointsPositionMax,
 	Links_Thickness,
 	Links_ThicknessSelectedBorder,
 	Links_OffsetFraction,
@@ -315,10 +318,10 @@ enum class ESizeVec2
 	Tooltip_Padding,
 
 	Nodes_ItemsSpacing,
-	Nodes_FloatPadding,
-	Nodes_PinSpacing,
-	Nodes_PivotAlignment,
-	Nodes_PivotSize,
+	Nodes_FloatPadding,   // Maybe rename to frame padding?
+	Nodes_PinSpacing,     // Unused
+	Nodes_PivotAlignment, // Unused
+	Nodes_PivotSize,      // Unused
 
 	Nodes_InputsSize,
 	Nodes_MiddleSize,
@@ -326,12 +329,14 @@ enum class ESizeVec2
 
 	Nodes_LODButtonSize,
 
-	Nodes_IconSize,
+	Nodes_PinSize,
+	Nodes_PinSize_MatrixMul,
 	Nodes_FloatCycleButtonSize,
 	Nodes_ScreenTextureSize,
 
 	Nodes_Screen_resizeButtonSize,
-	Nodes_Sequence_DummySpaceSize,
+
+	Nodes_Sequence_DummySpaceSize, // TODO: Hook up to drop indicator, create another for empty sequence dummy size
 
 	Nodes_noPinsSpacing,
 

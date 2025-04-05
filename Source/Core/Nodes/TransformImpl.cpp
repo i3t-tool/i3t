@@ -21,11 +21,6 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
 
-#ifndef M_PI
-/// define Pi for compatibility issues (MSVC vs GCC)
-#define M_PI 3.14159f
-#endif
-
 namespace Core
 {
 //===-- Value masks -------------------------------------------------------===//

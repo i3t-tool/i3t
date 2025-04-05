@@ -4,12 +4,23 @@
 
 #include "DIWNE/Core/Style/DiwneStyle.h"
 #include "diwne_imgui.h"
+#include "diwne_utils.h"
 
 namespace DIWNE
 {
 class NodeEditor;
 enum IconType : unsigned int;
 struct IconStyle;
+
+// TODO: (DR) Canvas and style zooming COULD be replaced with context switching and DrawList magic
+//  See gitlab issue #339. Could bring huge benefit and simplify much of the code (avoids integer UI rounding).
+//  However it's a big change, supporting both methods, while possible, is extremely impractical
+//  So an experimental branch would need to be thoroughly tested before implementing, as it would be hard to go back
+//  That is unless we did a slow transition, keeping the old zoom code and just fix it to 1x
+//  In theory the Canvas class could have to implementations.
+// TODO: The TODO above MIGHT be a prerequisite for Multi-View support.
+//  With the way we zoom and pan right now, it might be impossible to keep two views at different zoom levels without
+//  some major overhead / messy instancing.
 
 /**
  * Representation of the 2D infinite plane of a node editor.
@@ -29,6 +40,7 @@ public:
 	ImRect m_viewRectDiwne;
 	ImRect m_viewRectScreen; ///< Viewport bounds in screen space coordinates.
 	float m_zoom;            ///< Viewport zoom factor (scale ratio between diwne and screen coordinates).
+	float m_prevZoom;        ///< Last frame zoom factor
 
 	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
 protected:
@@ -108,11 +120,15 @@ public:
 	ImVec2 screen2diwne(const ImVec2& point) const;
 	ImVec2 diwne2screen(const ImVec2& point) const;
 
+	ImVec2 diwne2screenTrunc(const ImVec2& point) const; ///< Convert diwne point to pixel aligned screen position.
+
 	ImRect diwne2screen(const ImRect& rect) const; ///< Convert diwne rect to a screen rect
 	ImRect screen2diwne(const ImRect& rect) const; ///< Convert screen rect to a diwne rect
 
 	float diwne2screenSize(float size) const; ///< Apply diwne scaling factors to a float size
 	float screen2diwneSize(float size) const; ///< Revert diwne scaling factors from a float size
+
+	float diwne2screenSizeTrunc(float size) const;
 
 	ImVec2 diwne2screenSize(const ImVec2& point) const; ///< Apply diwne scaling factors to an ImVec2 size
 	ImVec2 screen2diwneSize(const ImVec2& point) const; ///< Revert diwne scaling factors from a ImVec2 size
@@ -123,6 +139,7 @@ public:
 
 	/**
 	 * Draw filled rectangle to window ImDrawlist
+	 * This method accepts DIWNE coordinates and converts them to truncated screen coordinates.
 	 * @param p_min bottom left corner in diwne coords
 	 * @param p_max top right corner in diwne coords
 	 * @param col
@@ -134,11 +151,15 @@ public:
 
 	/**
 	 * Draw rectangle to window ImDrawlist
+	 * This method accepts DIWNE coordinates and converts them to truncated screen coordinates.
 	 * \see AddRectFilledDiwne
 	 */
 	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
 	                  ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
 	                  bool ignoreZoom = false) const;
+	void AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding = 0.0f,
+	                            ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
+	                            bool ignoreZoom = false) const;
 
 	/** \brief Draw Bezier (not Bezier really) curve to window ImDrawList
 	 *
@@ -152,8 +173,12 @@ public:
 	 * \return void
 	 *
 	 */
-	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-	                         float thickness, int num_segments = 0) const;
+	void AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
+	                         ImVec4 col, float thickness, int num_segments = 0) const;
+
+	// =============================================================================================================
+
+	void drawGrid(bool dots, float size, ImVec4 color, float fadeStart, float fadeEnd, bool ignoreZoom) const;
 
 	// Icon drawing
 	// =============================================================================================================
@@ -198,6 +223,8 @@ public:
 	//  Some initial issues:
 	//   - Arguments are passed by value for no reason
 	//   - way to many arguments, better to group them into some sort of IconStyle struct
+	//   - But how to avoid the need to constantly construct new structs, they should be mostly static somewhere
+
 	/**
 	 * \brief Draw an Icon combined from two parts (foreground and background)
 	 * to the window \a ImDrawList filled with a \a ShapeColor.
@@ -223,6 +250,12 @@ public:
 	void DrawIcon(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, IconType fgIconType,
 	              ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled,
 	              ImVec2 thickness = ImVec2(1, 1), float rounding = 0) const;
+
+	// TODO: I don't like the whole "filled" argument, yes it is technically correct, we fill the insides to create
+	//  a border with the shape color, BUT, thats just a trick to make a BORDER, "filled" should mean absence of border
+	//  meaning the whole icon has the innerColor, not the shapeColor
+	//  I feel like that makes more sense to the user of the method, hence there should be a "color" and "borderColor"
+	//  Not "shape color" and "inner color", not bool filled, but bool border.
 
 	/**
 	 * \brief Draw a circle icon
@@ -279,6 +312,9 @@ public:
 
 	void DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
 	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
+	                    float thickness) const;
 };
 
 struct IconStyle

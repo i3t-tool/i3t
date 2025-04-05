@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <limits>
 
 #include "DiwnePanel.h"
 
@@ -11,13 +11,11 @@ class Gravity
 public:
 	static inline void alignRightEdge(std::initializer_list<std::reference_wrapper<DiwnePanel>> panels)
 	{
-		float maxX =
-		    std::max(panels,
-		             [](const std::reference_wrapper<DiwnePanel>& a, const std::reference_wrapper<DiwnePanel>& b) {
-			             return a.get().getMaxX() < b.get().getMaxX();
-		             })
-		        .get()
-		        .getMaxX();
+		float maxX = std::numeric_limits<float>::lowest();
+		for (auto& panel : panels)
+		{
+			maxX = std::max(maxX, panel.get().getMinMaxX());
+		}
 		for (auto& panel : panels)
 		{
 			panel.get().setMaxX(maxX);
@@ -26,13 +24,11 @@ public:
 
 	static inline void alignBottom(std::initializer_list<std::reference_wrapper<DiwnePanel>> panels)
 	{
-		float maxY =
-		    std::max(panels,
-		             [](const std::reference_wrapper<DiwnePanel>& a, const std::reference_wrapper<DiwnePanel>& b) {
-			             return a.get().getMaxY() < b.get().getMaxY();
-		             })
-		        .get()
-		        .getMaxY();
+		float maxY = std::numeric_limits<float>::lowest();
+		for (auto& panel : panels)
+		{
+			maxY = std::max(maxY, panel.get().getMinMaxY());
+		}
 		for (auto& panel : panels)
 		{
 			panel.get().setMaxY(maxY);

@@ -58,7 +58,7 @@ public:
 	 */
 	bool myRadioButton(const char* label, int* v, int v_button);
 
-	std::vector<Ptr<CorePin>> const getOutputsToShow() const override
+	std::vector<Ptr<CorePin>> getOutputsToShow() const override
 	{
 		if (m_levelOfDetail == LevelOfDetail::SetValues || m_levelOfDetail == LevelOfDetail::LightCycle)
 			return {getOutputs()[0]}; // output value only

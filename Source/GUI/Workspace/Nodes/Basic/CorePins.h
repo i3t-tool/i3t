@@ -31,6 +31,12 @@ enum class PinKind
 	Input   ///< on the box left hand side
 };
 
+enum class PinStyle
+{
+	Square,
+	Socket
+};
+
 /* DIWNE - \todo JH \todo MH see in .cpp to remove, but I need something what
  * use instead -> from Type get Shape and Color */
 extern std::map<Core::EValueType, EColor> PinColorBackground;
@@ -48,37 +54,42 @@ class CorePin : public DIWNE::Pin
 {
 protected:
 	Core::Pin const& m_pin;
+	PinStyle m_pinStyle{PinStyle::Square};
 
 public:
 	// (PF) icon for the cycle box, Triangle elsewhere
-	DIWNE::IconType m_iconType = DIWNE::IconType::TriangleRight;
+	DIWNE::IconType m_iconType = DIWNE::IconType::NoIcon;
 	bool m_showData{true};
 
-	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput);
+	CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput,
+	        const std::string& label = "CorePin");
 
 	void content(DIWNE::DrawInfo& context) override;
+
+	bool allowDrawing() override;
+
 	void drawPin(DIWNE::DrawInfo& context);
 	void drawLabel(DIWNE::DrawInfo& context);
 	void drawDataEx(DIWNE::DrawInfo& context);
 	void drawData(DIWNE::DrawInfo& context);
 	int maxLengthOfData();
 
-	bool allowInteraction() const override;
-
-	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
-
-	Core::Pin const& getCorePin() const;
-
-	int getCoreIndex() const;
-	Core::EValueType getType() const;
-	bool isConnected() const;
 	void popupContent(DIWNE::DrawInfo& context) override;
 
+	bool allowInteraction() const override;
 	bool allowConnection() const override;
 
+	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
 	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
 	void onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent = true) override;
 	void onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin, bool logEvent = true) override;
+	std::shared_ptr<DIWNE::Link> createLink() override;
+	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
+
+	Core::Pin const& getCorePin() const;
+	int getCoreIndex() const;
+	Core::EValueType getType() const;
+	bool isConnected() const;
 
 	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	/**
@@ -89,11 +100,10 @@ public:
 	 */
 	bool ensureLinkSyncWithCore();
 
-	std::shared_ptr<DIWNE::Link> createLink() override;
-
-	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
-
 private:
+	// TODO: Maybe make this virtual in DIWNE::Pin?
+	ImVec2 getPinSize() const;
+
 	void createNodeFromPin();
 	template <typename T>
 	void createNodeFromPinImpl();

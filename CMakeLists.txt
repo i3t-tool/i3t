@@ -52,25 +52,25 @@ if (MSVC)
 
     set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
     add_definitions(-DUNICODE -D_UNICODE)
-endif()
+endif ()
 
 # Link C++17 filesystem library.
 if (UNIX)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         # TODO: Temporary disable warnings for Clang to get the build on macOS working.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
     endif ()
-endif()
+endif ()
 
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/")
-else()
+else ()
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/${CMAKE_BUILD_TYPE}/")
-endif()
+endif ()
 
 # ---------- Setup output directories and compiler params. -----
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -143,11 +143,11 @@ add_compile_definitions(
 
 # ======== Source groups ======================================
 file(GLOB_RECURSE I3T_SOURCE
-    "Source/*.h"
-    "Source/*.hpp"
-    "Source/*.cpp"
-    "Dependencies/pgr-framework/src/*"
-    "Dependencies/pgr-framework/include/*"
+        "Source/*.h"
+        "Source/*.hpp"
+        "Source/*.cpp"
+        "Dependencies/pgr-framework/src/*"
+        "Dependencies/pgr-framework/include/*"
 )
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/DIWNE/diwne_example.cpp")
@@ -206,7 +206,7 @@ target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
         GLFW_INCLUDE_NONE # OpenGL is included by pgr framework
         RAPIDJSON_HAS_STDSTRING=1)
 
-# DIWNE config file
+# DIWNE configuration
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
 
 # =============================================================
@@ -229,8 +229,11 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
         GLFW_INCLUDE_NONE # OpenGL is included by pgr framework
         RAPIDJSON_HAS_STDSTRING=1)
 
-# DIWNE config file
-target_compile_definitions(${PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
+# DIWNE configuration, force disable DIWNE debug in Release builds
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+        DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h"
+        $<$<CONFIG:Release>:DIWNE_DEBUG_ENABLED=0>
+)
 
 # I3T NO-TEST flag, used to differentiate between test and normal runs
 target_compile_definitions(${PROJECT_NAME} PUBLIC I3T_NTEST=1)

@@ -36,6 +36,12 @@
 #define _t(key) _ts(key).c_str()
 
 /**
+ * \def _tbd(key)
+ * No-op macro for a key that doesn't have translations filled in yet.
+ */
+#define _tbd(key) key
+
+/**
  * \def ICON_T(icon, key)
  * Macro for concatenating an icon with a translated string.
  */

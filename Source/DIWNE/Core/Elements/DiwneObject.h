@@ -66,17 +66,9 @@ public:
 	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
 	std::string m_popupIDDiwne; /**< Used for identifying what element raise popup */
 
-	/**
-	 * Rectangle bounds of the object in diwne coordinates (editor canvas coordinates).
-	 * The top left corner of the rectangle (.Min) represents the objects position.
-	 * Dimensions are the differences between the .Min and .Max (bottom right corner) coordinates.
-	 * <br>
-	 * The objects rectangle gets updated every frame by the updateLayout() method.
-	 * DiwneObjects are drawn at the position of the ImGui cursor, but the position of the object can be set
-	 * and then used to manually set the ImGui cursor position, which is how Nodes are drawn by the NodeEditor.
-	 * @see updateLayout()
-	 */
-	ImRect m_rect;
+	ImRect m_rect;        ///< Rectangle bounds of the object in diwne coordinates. @see getRect()
+	ImRect m_displayRect; ///< Rectangle bounds aligned with the last viewport. @see getDisplayRect()
+
 	bool m_destroy{false};  ///< Indicates the object is to be deleted (and deallocated)
 	bool m_deletable{true}; ///< Whether the object can be deleted by the user
 
@@ -107,6 +99,7 @@ protected:
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
 
 	bool m_bringToFront{false}; ///< Request the object's rendering order to be moved to the front above other objects
+	bool m_openPopup{false};    ///< Request to open popup
 
 	/// Sets the parent object of object, relevant in node container and hover hierarchy.
 	DiwneObject* m_parentObject{nullptr};
@@ -214,10 +207,21 @@ public:
 	virtual void end(DrawInfo& context) = 0;
 
 	/**
-	 * Update objects m_rect and any other object size variables.
+	 * Updates object's m_rect, m_displayRect and any other object size variables.
 	 * In other words this method is responsible for keeping track of the objects size.
+	 * \n
+	 * IMPORTANT: This method should only update the m_rect's size, NOT it's position.\n
+	 * The object's rectangle is often set directly from ImGui's last item rectangle. But ImGui coordinates are aligned
+	 * to pixel boundries via truncation of the coordinates, if the object's rect was updated directly
+	 * using the screen space ImGui rectangle, there might be a slight discrepancy in the new position converted back
+	 * to DIWNE coordinates which would cause the object to drift in a feedback loop.\n
+	 *
+	 * m_displayRect should be updated together with m_rect to preserve correct pixel-aligned rendering in afterDraw().
+	 * TODO: Figure out if m_displayRect.Max should be aligned as well or not
+	 *
 	 * This method is called after end() and before the afterDraw() method which can use the calculated size values
 	 * for final drawing.
+	 * @see m_rect, m_displayRect
 	 */
 	virtual void updateLayout(DrawInfo& context) = 0;
 
@@ -297,9 +301,41 @@ public:
 		return m_destroy;
 	}
 
+	/**
+	 * Rectangle bounds of the object in DIWNE coordinates (editor canvas coordinates).
+	 * The top left corner of the rectangle (.Min) represents the objects position.
+	 * Dimensions are the differences between the .Min and .Max (bottom right corner) coordinates.
+	 * <br>
+	 * The objects rectangle gets updated every frame by the updateLayout() method.
+	 *
+	 * DiwneObjects are mostly drawn at the position of the ImGui cursor and this rect is updated accordingly.
+	 * Some objects (like nodes) instead set the cursor position based on this rect.
+	 *
+	 * Converting the objects position to screen coordinates will inevitably yield fractional pixel positions,
+	 * since Dear ImGui does not handle fractional coordinates well, these initial screen coordinates get truncated to
+	 * a pixel boundary, this new position, when converted back to diwne coordinates is slightly different. The m_rect
+	 * position cannot be rounded as it would then change depending on the viewport position / zoom. Hence the slightly
+	 * offset position is captured in m_displayRect and can be used for more precise, pixel aligned drawing.
+	 *
+	 * @see getDisplayRect(), updateLayout(), m_rect
+	 */
 	virtual ImRect getRect() const
 	{
 		return m_rect;
+	}
+
+	/**
+	 * Object's bounds aligned to current viewport pixel boundaries. Should be within ~1.0 margin of m_rect (but might
+	 * be more). This rectangle should be used instead of m_rect when drawing backgrounds/borders etc,
+	 * as it better aligns with ImGui content. The reason is that ImGui content is aligned on screen pixel boundaries,
+	 * but m_rect isn't as it would then shift around, depending on the viewport position / zoom levels.
+	 *
+	 * This rectangle is updated in DiwneObject::begin() can can be considered valid for the duration of the draw.
+	 * @see getRect(), m_displayRect
+	 */
+	virtual ImRect getDisplayRect() const
+	{
+		return m_displayRect;
 	}
 	virtual ImVec2 getPosition() const
 	{
@@ -542,6 +578,9 @@ public:
 	void setBringToFront(bool val);
 	bool isToBeBroughtToFront();
 
+	/// Request to open the object's popup if possible.
+	void openPopup();
+
 	// =============================================================================================================
 	// END OF INTERACTION
 
@@ -619,6 +658,11 @@ public:
 	 * \param color is the color of the tooltip
 	 */
 	void showTooltipLabel(const std::string& label, const ImColor&& color);
+
+protected:
+	void setSize(const ImVec2& size);
+	void updateRectFromImGuiItem();
+	virtual void setInitialPositionDiwne(); ///< Internal helper for setting the object's initial position
 
 private:
 	void debugDrawing(DrawInfo& context, int debug_logicalUpdate); ///< Debug drawing helper

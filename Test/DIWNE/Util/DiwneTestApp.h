@@ -1,8 +1,7 @@
 #include <stdio.h>
 
-#include <chrono>
+#include <functional>
 #include <iostream>
-#include <thread>
 
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -26,6 +25,12 @@ class DiwneTestApp
 public:
 	GLFWwindow* window{nullptr};
 	DIWNE::NodeEditor* editor{nullptr};
+	std::function<void()> testCallback;
+
+	void setTestCallback(std::function<void()> callback)
+	{
+		testCallback = std::move(callback);
+	}
 
 	static void glfw_error_callback(int error, const char* description)
 	{
@@ -61,6 +66,11 @@ public:
 
 		editor->draw();
 
+		ImGui::End();
+
+		ImGui::Begin("TestWindow");
+		if (testCallback)
+			testCallback();
 		ImGui::End();
 
 		// Rendering
@@ -140,6 +150,11 @@ public:
 		int ret = setupWindow();
 		if (ret)
 			return ret;
+
+		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
+		{
+			return 2;
+		}
 
 		ImGui::GetIO().IniFilename = nullptr;
 

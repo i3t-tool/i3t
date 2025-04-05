@@ -65,40 +65,6 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 /// Uses std::format syntax for the format string, not printf (eg. {:.2f})
 bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format);
 
-inline ImVec2 floorImVec2(const ImVec2& v)
-{
-	return ImVec2((float) (int) v.x, (float) (int) v.y);
-}
-
-inline glm::vec2 imToGlm(const ImVec2& v)
-{
-	return glm::vec2(v.x, v.y);
-}
-
-inline glm::vec4 imToGlm(const ImVec4& v)
-{
-	return glm::vec4(v.x, v.y, v.z, v.w);
-}
-
-inline ImVec2 glmToIm(const glm::vec2& v)
-{
-	return ImVec2(v.x, v.y);
-}
-
-inline ImVec4 glmToIm(const glm::vec4& v)
-{
-	return ImVec4(v.x, v.y, v.z, v.w);
-}
-
-inline glm::vec2 convertCoordinates(glm::vec2 position, glm::vec2 newOrigin)
-{
-	return position - newOrigin;
-}
-
-void startVerticalAlign(float yOffset);
-
-void endVerticalAlign();
-
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color);
 
 void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
@@ -131,5 +97,43 @@ inline void Tooltip(const char* header, const char* description)
  */
 void dockTabStylePush();
 void dockTabStylePop();
+
+inline ImVec2 floorImVec2(const ImVec2& v)
+{
+	return ImVec2((float) (int) v.x, (float) (int) v.y);
+}
+
+inline glm::vec2 imToGlm(const ImVec2& v)
+{
+	return glm::vec2(v.x, v.y);
+}
+
+inline glm::vec4 imToGlm(const ImVec4& v)
+{
+	return glm::vec4(v.x, v.y, v.z, v.w);
+}
+
+inline ImVec2 glmToIm(const glm::vec2& v)
+{
+	return ImVec2(v.x, v.y);
+}
+
+inline ImVec4 glmToIm(const glm::vec4& v)
+{
+	return ImVec4(v.x, v.y, v.z, v.w);
+}
+
+inline glm::vec2 convertCoordinates(glm::vec2 position, glm::vec2 newOrigin)
+{
+	return position - newOrigin;
+}
+inline bool equalsVec(const ImVec2& a, const ImVec2& b)
+{
+	return a.x == b.x && a.y == b.y;
+}
+inline bool equalsRect(const ImRect& a, const ImRect& b)
+{
+	return equalsVec(a.Min, b.Min) && equalsVec(a.Max, b.Max);
+}
 
 } // namespace GUI
