@@ -18,15 +18,11 @@
  */
 #pragma once
 
-#include <iostream>
 #include <map>
-#include <queue>
 #include <sstream>
 #include <stack>
 #include <string>
 
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
 
 // Omit trace from release builds in case of any perf issues
@@ -49,47 +45,34 @@
 #define LOG_EVENT_MOUSE_RELEASE(button, mouseX, mouseY)                                                                \
 	Logger::getInstance().log(LoggingOption::MOUSE_CLICK, Logger::getInstance().getLogString("mouseRelease"), button,  \
 	                          mouseX, mouseY)
-#define LOG_EVENT_OPEN_POP_UP(clickedTab)                                                                              \
-	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("openPopUp"), 1,               \
-	                          clickedTab->getNameableParentNameId())
-#define LOG_EVENT_CLOSE_POP_UP(tab)                                                                                    \
-	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("closePopUp"), 1,              \
-	                          tab->getNameableParentNameId())
-#define LOG_EVENT_CLOSE_POP_UP_IN(tab)                                                                                 \
-	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("closePopUpIn"), 1,            \
-	                          tab->getNameableParentNameId())
-#define LOG_EVENT_BUTTON_CLICK(tab)                                                                                    \
-	if (dynamic_cast<Button*>(tab))                                                                                    \
-	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("button"), 1,                  \
-	                          tab->getNameableParentNameId())
+#define LOG_EVENT_OPEN_POP_UP(label)                                                                                   \
+	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("openPopUp"), label)
+#define LOG_EVENT_MENU_CLICK(label)                                                                                    \
+	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("menu"), label)
+#define LOG_EVENT_BUTTON_CLICK(label)                                                                                  \
+	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("button"), label)
+#define LOG_EVENT_SELECT(label)                                                                                        \
+	Logger::getInstance().log(LoggingOption::POP_UP, Logger::getInstance().getLogString("select"), label)
 #define LOG_EVENT_CONNECT(outputPin, inputPin)                                                                         \
 	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("connect"),                     \
 	                          outputPin->getSignature(), inputPin->getSignature())
 #define LOG_EVENT_DISCONNECT(outputPin, inputPin)                                                                      \
 	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("disconnect"),                  \
 	                          outputPin->getSignature(), inputPin->getSignature())
-#define LOG_EVENT_TAB_ADDED_AT_INDEX(index, addedTab, addedToTab)                                                      \
-	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("tabAddIndex"), 3,              \
-	                          addedTab->getNameableParentNameId(), addedToTab->getNameableParentNameId(), index)
-#define LOG_EVENT_TAB_ADDED(addedTab, addedToTab)                                                                      \
-	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("tabAdd"), 2,                   \
-	                          addedTab->getNameableParentNameId(), addedToTab->getNameableParentNameId())
-#define LOG_EVENT_TAB_REMOVED(removedTab, removedFromTab)                                                              \
-	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("tabRem"), 2,                   \
-	                          removedTab->getNameableParentNameId(), removedFromTab->getNameableParentNameId())
-#define LOG_EVENT_OBJECT_ADDED(objectName, tab)                                                                        \
-	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("objAdd"), 2, objectName,       \
-	                          tab->getNameableParentNameId())
-#define LOG_EVENT_OBJECT_REMOVED(tab)                                                                                  \
-	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("objRem"), 1,                   \
-	                          tab->getNameableParentNameId())
-#define LOG_EVENT_MATRIX_VALUE_UPDATE(tabGroup, matrix, index, newVal)                                                 \
-	if (tabGroup->getDraggedNumberBox() == NULL)                                                                       \
-	Logger::getInstance().log(LoggingOption::MATRIX_FIELD, Logger::getInstance().getLogString("matrix"), 3, index,     \
-	                          matrix->getNameableParentNameId(), newVal)
-#define LOG_EVENT_MATRIX_VALUE_UPDATE_DRAG(matrix, index, newVal)                                                      \
-	Logger::getInstance().log(LoggingOption::MATRIX_FIELD, Logger::getInstance().getLogString("matrix"), 3, index,     \
-	                          matrix->getNameableParentNameId(), newVal)
+#define LOG_EVENT_NODE_ADDED_AT_INDEX(index, addedNode, addedToNode)                                                   \
+	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("nodeAddIndex"), addedNode,     \
+	                          addedToNode, index)
+#define LOG_EVENT_NODE_ADDED(addedNode, addedToNode)                                                                   \
+	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("nodeAdd"), addedNode,          \
+	                          addedToNode)
+#define LOG_EVENT_NODE_REMOVED(removedNode, removedFromNode)                                                           \
+	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("nodeRem"), removedNode,        \
+	                          removedFromNode)
+#define LOG_EVENT_OBJECT_ADDED(objectName, node)                                                                       \
+	Logger::getInstance().log(LoggingOption::LOGIC, Logger::getInstance().getLogString("objAdd"), objectName, node)
+#define LOG_EVENT_MATRIX_VALUE_UPDATE(matrix, index, newVal)                                                           \
+	Logger::getInstance().log(LoggingOption::MATRIX_FIELD, Logger::getInstance().getLogString("matrix"), index,        \
+	                          matrix, newVal)
 #define LOG_EVENT_TUTORIAL_STEP(tutorial, step, name)                                                                  \
 	Logger::getInstance().log(LoggingOption::TUTORIAL, Logger::getInstance().getLogString("tutorial"), tutorial, step, \
 	                          name)
@@ -99,11 +82,6 @@
 #define END_LOGGER Logger::getInstance().endLogger()
 #define UPDATE_LOGGER() Logger::getInstance().update()
 
-// MANUAL TUTORIAL LOGGING - marked with #TUTORIAL - can be safely deleted when
-// tutorial is implemented
-//	- Key in LoggingToggle struct (.h and .cpp)
-//	- Count variables in Logger class (.h)
-//  - Event call in Logger::update() (.cpp)
 
 enum class LoggingOption
 {
@@ -187,13 +165,7 @@ private:
 	void loadStrings();
 
 	int previousTime = 0;
-	const int MOUSE_MOVEMENT_LOG_INTERVALS = 2000;
-
-	/// \todo This should not be at Logger
-	int tutorialCount = 1; // #TUTORIAL
-
-	/// \todo This should not be at Logger
-	int stepCount = 1; // #TUTORIAL
+	const int MOUSE_MOVEMENT_LOG_INTERVALS = 2; // time in seconds
 };
 
 //--------------------------------------------------------------------------------------------------------------------//
