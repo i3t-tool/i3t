@@ -12,7 +12,7 @@
  */
 #include "CoreLink.h"
 
-#include "Utils/Math.h"
+#include <cmath>
 
 #include "CorePins.h"
 
@@ -40,7 +40,7 @@ void CoreLink::updateControlPointsOffsets()
 	// 	angle = 2 * I3_PI - std::min(2 * I3_PI - angle, maxAngle);
 	// ImVec2 lockedDir = ImVec2(cos(angle), sin(angle));
 
-	const float diminishingDistFactor = std::sqrtf(300.f);
+	const float diminishingDistFactor = sqrtf(300.f);
 
 	float distanceFactor = I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
 	float negHorizontalFactor = 0.3f;
@@ -49,7 +49,7 @@ void CoreLink::updateControlPointsOffsets()
 	float maxOffset = I3T::getTheme().get(ESize::Links_ControlpointsPositionMax);
 
 	float dist = DIWNE::DMath::len(diff);
-	float offset = diminishingDistFactor * std::sqrtf(dist) * distanceFactor;
+	float offset = diminishingDistFactor * sqrtf(dist) * distanceFactor;
 
 	if (diff.x < 15.f)
 		offset += abs(diff.x) * negHorizontalFactor;

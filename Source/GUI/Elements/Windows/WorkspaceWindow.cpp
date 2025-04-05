@@ -129,23 +129,23 @@ void WorkspaceWindow::showViewMenu()
 {
 	if (ImGui::BeginMenu(_t("View")))
 	{
-		if (ImGui::BeginMenu("Zoom"))
+		if (ImGui::BeginMenu(_tbd("Zoom")))
 		{
 			if (ImGui::MenuItem(_t("Zoom all")))
 			{
 				WorkspaceModule::g_editor->zoomToAll();
 			}
-			if (ImGui::MenuItem("Reset zoom"))
+			if (ImGui::MenuItem(_tbd("Reset zoom")))
 			{
 				WorkspaceModule::g_editor->setZoom(1.0f);
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu(_t("Grid")))
+		if (ImGui::BeginMenu(_tbd("Grid")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			ImGui::MenuItem("Show", NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
-			ImGui::MenuItem(_t("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
+			ImGui::MenuItem(_tbd("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
+			ImGui::MenuItem(_tbd("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
 			ImGui::PopItemFlag();
 			ImGui::EndMenu();
 		}
