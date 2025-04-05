@@ -484,6 +484,7 @@ protected:
 	 * @param context
 	 */
 	virtual void processPopupDiwne(DrawInfo& context);
+	virtual void onPopup();
 
 	/**
 	 * Processes any interactions related to whether the object should be selected.

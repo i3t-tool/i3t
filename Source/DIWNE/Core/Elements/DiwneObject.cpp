@@ -622,6 +622,7 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 		context.popup();
 		// Store popup position for stuff like adding nodes at the popup location
 		diwne.setPopupPosition(diwne.input().bypassGetMousePos());
+		onPopup();
 	}
 	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
 	{
@@ -636,6 +637,8 @@ void DiwneObject::processPopupDiwne(DrawInfo& context)
 		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
 	}
 }
+
+void DiwneObject::onPopup() {}
 
 void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& color)
 {

@@ -166,6 +166,13 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 		App::getModule<StateManager>().requestSnapshot();
 	}
 }
+
+void WorkspaceDiwne::onPopup()
+{
+	NodeEditor::onPopup();
+	LOG_EVENT_OPEN_POP_UP(m_labelDiwne);
+}
+
 void WorkspaceDiwne::onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	NodeEditor::onDrag(context, dragStart, dragEnd);

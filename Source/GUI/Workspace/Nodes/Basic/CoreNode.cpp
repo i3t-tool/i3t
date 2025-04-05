@@ -375,6 +375,12 @@ void CoreNode::onDestroy(bool logEvent)
 	Super::onDestroy(logEvent);
 }
 
+void CoreNode::onPopup()
+{
+	Node::onPopup();
+	LOG_EVENT_OPEN_POP_UP(m_labelDiwne);
+}
+
 void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)
 {
 	if (m_selected && multiDuplication)

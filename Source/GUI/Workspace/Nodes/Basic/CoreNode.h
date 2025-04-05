@@ -57,6 +57,7 @@ public:
 	void popupContent(DIWNE::DrawInfo& context) override;
 
 	void onDestroy(bool logEvent) override;
+	void onPopup() override;
 
 	// Number format / precision
 	// =============================================================================================================
