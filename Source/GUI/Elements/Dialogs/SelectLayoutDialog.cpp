@@ -17,6 +17,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/WindowManager.h"
 
 
@@ -84,7 +85,7 @@ void SelectLayoutDialog::showSelectLayoutMenu()
 	if (userLayouts.find(selectedFile) != userLayouts.end()) // show delete button only for removable userLayouts
 	{
 		ImGui::SameLine();
-		if (ImGui::Button(_t("Delete")))
+		if (I3TGui::ButtonWithLog(_t("Delete")))
 		{
 			if (!selectedFile.empty() && userLayouts.find(selectedFile) != userLayouts.end())
 			{
@@ -104,7 +105,7 @@ void SelectLayoutDialog::showSelectLayoutMenu()
 	}
 
 	ImGui::SameLine();
-	if ((ImGui::Button(_t("Save")) || enterPressed) && str1[0] != '\0')
+	if ((I3TGui::ButtonWithLog(_t("Save")) || enterPressed) && str1[0] != '\0')
 	{
 		ImGui::SaveIniSettingsToDisk(("Data/Layouts/" + std::string(str1) + ".ini").c_str());
 		userLayouts.insert(str1);
@@ -113,14 +114,14 @@ void SelectLayoutDialog::showSelectLayoutMenu()
 	}
 #ifdef I3T_DEBUG
 	ImGui::Text("Debug only:");
-	if ((ImGui::Button("Save To NonRemovable ") || enterPressed) && str1[0] != '\0')
+	if ((I3TGui::ButtonWithLog("Save To NonRemovable ") || enterPressed) && str1[0] != '\0')
 	{
 		ImGui::SaveIniSettingsToDisk(("Data/Layouts/NonRemovable/" + std::string(str1) + ".ini").c_str());
 		nonRemovableLayouts.insert(str1);
 		selectedFile = str1;
 		str1[0] = '\0';
 	}
-	if (ImGui::Button("Delete From NonRemovable"))
+	if (I3TGui::ButtonWithLog("Delete From NonRemovable"))
 	{
 		if (!selectedFile.empty() && nonRemovableLayouts.find(selectedFile) != nonRemovableLayouts.end())
 		{

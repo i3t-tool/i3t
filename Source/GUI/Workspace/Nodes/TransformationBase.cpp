@@ -187,18 +187,18 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 void TransformationBase::drawMenuStorevalues()
 {
-	if (ImGui::BeginMenu(_t("Value")))
+	if (I3TGui::BeginMenuWithLog(_t("Value")))
 	{
-		if (ImGui::MenuItem(_t("Reset")))
+		if (I3TGui::MenuItemWithLog(_t("Reset")))
 		{
 			m_nodebase->as<Core::Transform>()->initDefaults();
 			m_nodebase->as<Core::Transform>()->resetMatrixFromDefaults();
 		}
-		if (ImGui::MenuItem(_t("Store")))
+		if (I3TGui::MenuItemWithLog(_t("Store")))
 		{
 			m_nodebase->as<Core::Transform>()->saveValue();
 		}
-		if (ImGui::MenuItem(_t("Restore"), nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
+		if (I3TGui::MenuItemWithLog(_t("Restore"), nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
 		{
 			m_nodebase->as<Core::Transform>()->reloadValue();
 		}
@@ -218,14 +218,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
-		if (ImGui::MenuItem(_t("Unlock"), NULL, false, enableLockMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Unlock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Lock"), NULL, false, enableLockMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, enableLockMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->lock();
 		}
@@ -233,14 +233,14 @@ void TransformationBase::drawMenuSetDataMap()
 
 	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
-		if (ImGui::MenuItem(_t("Disable synergies"), NULL, false, enableSynergiesMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Disable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Enable synergies"), NULL, false, enableSynergiesMenuItem))
+		if (I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false, enableSynergiesMenuItem))
 		{
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
@@ -274,7 +274,7 @@ bool TransformationBase::drawDataFull(DIWNE::DrawInfo& context)
 
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)));
 
-	interaction_happen = DataRenderer::drawData4x4(diwne, context, getId(), m_numberOfVisibleDecimal,
+	interaction_happen = DataRenderer::drawData4x4(diwne, context, getId(), m_labelDiwne, m_numberOfVisibleDecimal,
 	                                               getDataItemsWidth(), m_floatPopupMode, m_nodebase->data().getMat4(),
 	                                               {m_nodebase->as<Core::Transform>()->getValueState({0, 0}),
 	                                                m_nodebase->as<Core::Transform>()->getValueState({1, 0}),
@@ -342,7 +342,7 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(DIWNE::DrawInfo& c
 		    fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i],
 		    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 		                                                      : Core::EValueState::Editable,
-		    actual_value_changed);
+		    actual_value_changed, m_labelDiwne);
 		value_changed |= actual_value_changed;
 		ImGui::PopItemWidth();
 	}
@@ -393,11 +393,11 @@ bool TransformationBase::drawDataSetValuesTable_builder(DIWNE::DrawInfo& context
 				ImGui::PushItemWidth(getDataItemsWidth());
 				inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 				    diwne, context, getNumberOfVisibleDecimal(), getFloatPopupMode(),
-				    fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
+				    fmt::format("##{}:row-{},col-{}", m_labelDiwne, rows, columns),
 				    *(local_data[rows * columnLabels.size() + columns]),
 				    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 				                                                      : Core::EValueState::Editable,
-				    actual_value_changed);
+				    actual_value_changed, m_labelDiwne);
 
 				ImGui::PopItemWidth();
 				if (actual_value_changed)

@@ -17,6 +17,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Windows/StartWindow.h"
+#include "GUI/I3TGui.h"
 #include "I3T.h"
 #include "State/StateManager.h"
 #include "Tutorial/TutorialManager.h"
@@ -31,7 +32,7 @@ void BeforeNewTutModal::onImGui()
 	ImGui::Text("Save the current scene?\n\n");
 	ImGui::Separator();
 
-	if (ImGui::Button("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		InputManager::triggerAction("save", EKeyState::Pressed);
 
@@ -43,13 +44,13 @@ void BeforeNewTutModal::onImGui()
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (ImGui::Button("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		submit();
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Cancel", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog("Cancel", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 		*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;

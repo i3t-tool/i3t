@@ -18,6 +18,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/Toolkit.h"
 #include "Localization/Localization.h"
@@ -38,7 +39,7 @@ void SetupDialog::render()
 		this->updateWindowInfo();
 		GUI::dockTabStylePop();
 
-		if (ImGui::Button(_t("Reset to defaults")))
+		if (I3TGui::ButtonWithLog(_t("Reset to defaults")))
 		{
 			App::getModule<StateManager>().resetGlobal();
 		}
@@ -57,7 +58,7 @@ void SetupDialog::render()
 			if (uiScaleTmp != I3T::getUI()->getUiScale())
 			{
 				ImGui::SameLine();
-				if (ImGui::Button("Apply scale"))
+				if (I3TGui::ButtonWithLog("Apply scale"))
 				{
 					I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
 				}

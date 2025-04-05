@@ -16,6 +16,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
+#include "GUI/I3TGui.h"
 
 RemoveModelModal::RemoveModelModal(std::string modelAlias, int usedCount, std::function<void()> onRemove)
     : m_modelAlias(modelAlias), m_usedCount(usedCount), m_onRemove(onRemove), ModalWindow("Remove model?")
@@ -29,7 +30,7 @@ void RemoveModelModal::onImGui()
 
 	ImGui::Separator();
 
-	if (ImGui::Button("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		m_onRemove();
 		hide();
@@ -37,7 +38,7 @@ void RemoveModelModal::onImGui()
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (ImGui::Button("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 	}

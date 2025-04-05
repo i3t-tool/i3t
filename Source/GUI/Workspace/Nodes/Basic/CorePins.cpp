@@ -358,7 +358,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 		float valueOfChange;
 
 		interaction_happen =
-		    DataRenderer::drawData4x4(diwne, context, node.getId(), node.getNumberOfVisibleDecimal(),
+		    DataRenderer::drawData4x4(diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(),
 		                              node.getDataItemsWidth(), node.getFloatPopupMode(), getCorePin().data().getMat4(),
 		                              {valState, valState, valState, valState, valState, valState, valState, valState,
 		                               valState, valState, valState, valState, valState, valState, valState, valState},
@@ -371,7 +371,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		glm::vec4 valueOfChange;
 		interaction_happen = DataRenderer::drawDataVec4(
-		    diwne, context, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getVec4(), {valState, valState, valState, valState},
 		    valueChanged, valueOfChange);
 		if (valueChanged)
@@ -381,10 +381,10 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	case Core::EValueType::Vec3:
 	{
 		glm::vec3 valueOfChange;
-		interaction_happen = DataRenderer::drawDataVec3(diwne, context, node.getId(), node.getNumberOfVisibleDecimal(),
-		                                                node.getDataItemsWidth(), node.getFloatPopupMode(),
-		                                                getCorePin().data().getVec3(), {valState, valState, valState},
-		                                                valueChanged, valueOfChange);
+		interaction_happen = DataRenderer::drawDataVec3(diwne, context, node.getId(), node.m_labelDiwne,
+		                                                node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		                                                node.getFloatPopupMode(), getCorePin().data().getVec3(),
+		                                                {valState, valState, valState}, valueChanged, valueOfChange);
 		if (valueChanged)
 			node.getNodebase()->setValue(valueOfChange);
 	}
@@ -393,7 +393,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		float valueOfChange;
 		interaction_happen = DataRenderer::drawDataFloat(
-		    diwne, context, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getFloat(), node.getNodebase()->getState(getCoreIndex()),
 		    valueChanged, valueOfChange);
 		if (valueChanged)
@@ -404,7 +404,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		glm::quat valueOfChange;
 		interaction_happen = DataRenderer::drawDataQuaternion(
-		    diwne, context, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getQuat(), {valState, valState, valState, valState},
 		    valueChanged, valueOfChange);
 		if (valueChanged)

@@ -21,6 +21,7 @@
 #include "../../../Localization/Localization.h"
 #include "../../../State/StateManager.h"
 #include "../../Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 
 ChangeLanguageModal::ChangeLanguageModal() : ModalWindow(ICON_T(ICON_I3T_LANG " ", "Change Language")) {}
 void ChangeLanguageModal::onImGui()
@@ -41,13 +42,13 @@ void ChangeLanguageModal::onImGui()
 	}
 	ImGui::TextWrapped(_t("You need to restart the application for all changes to take effect."));
 
-	if (ImGui::Button(_t("Cancel")))
+	if (I3TGui::ButtonWithLog(_t("Cancel")))
 	{
 		selectedLanguage = LOCALIZATION.currentLanguageID;
 		close();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(_t("OK")))
+	if (I3TGui::ButtonWithLog(_t("OK")))
 	{
 		LOCALIZATION.loadLanguage(selectedLanguage);
 		LOCALIZATION.currentLanguageID = selectedLanguage;

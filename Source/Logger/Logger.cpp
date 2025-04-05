@@ -30,6 +30,7 @@
 #include "Utils/JSON.h"
 
 #define DEFAULT_LOG_PATTERN "[%H:%M:%S] [%l]: %v"
+#define USER_INTERACTION_LOG_PATTERN "[%d.%m.%Y %T:%e]: %v"
 
 struct LoggingToggle final
 {
@@ -37,7 +38,6 @@ struct LoggingToggle final
 	static Keys::Code KEY_LoggingToggle_logic;
 	static Keys::Code KEY_LoggingToggle_matrixFields;
 	static Keys::Code KEY_LoggingToggle_mouseMovement;
-	static Keys::Code KEY_Dummy_tutorialStep; // #TUTORIAL
 };
 
 Logger& Logger::getInstance()
@@ -53,10 +53,8 @@ std::string Logger::getLogString(const std::string& key) const
 	{
 		return value->second;
 	}
-	else
-	{
-		return "String not found!";
-	}
+
+	return "String not found!";
 }
 
 void Logger::initLogger(int argc, char* argv[])
@@ -88,7 +86,6 @@ void Logger::initLogger(int argc, char* argv[])
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
-	// sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
 	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	constexpr auto maxFileCount = 2;
@@ -100,17 +97,31 @@ void Logger::initLogger(int argc, char* argv[])
 	appLogger->set_level(defaultLogLevel);
 	spdlog::register_logger(appLogger);
 
-	interactionLogger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
-	interactionLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-	    Configuration::userInteractionLog.string(), maxLogSize, maxFileCount));
+	interactionLogger = std::make_shared<spdlog::logger>(
+	    "interaction_logger", std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+	                              Configuration::userInteractionLog.string(), maxLogSize, maxFileCount));
+	interactionLogger->set_level(spdlog::level::trace);
+	interactionLogger->set_pattern(USER_INTERACTION_LOG_PATTERN);
 	spdlog::register_logger(interactionLogger);
 
-	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
-	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-	    Configuration::mouseLog.string(), maxLogSize, maxFileCount));
+	mouseLogger = std::make_shared<spdlog::logger>(
+	    "mouse_logger", std::make_shared<spdlog::sinks::rotating_file_sink_mt>(Configuration::mouseLog.string(),
+	                                                                           maxLogSize, maxFileCount));
+	mouseLogger->set_level(spdlog::level::trace);
 	spdlog::register_logger(mouseLogger);
 
 	spdlog::cfg::load_env_levels();
+
+	std::ostringstream init_message;
+	init_message << " >> Strings version: " << getLogString("version") << " <<";
+	interactionLogger->trace(getLogString("logInit") + init_message.str());
+	mouseLogger->trace(getLogString("mouseLogInit") + init_message.str());
+
+#ifdef I3T_DEBUG
+	toggleLoggingPopUps();
+	toggleLoggingLogic();
+	toggleLoggingMatrixFields();
+#endif
 }
 
 void Logger::endLogger() const
@@ -137,18 +148,6 @@ void Logger::update()
 	{
 		toggleLoggingMouseRaw();
 	}
-	// #TUTORIAL
-	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_Dummy_tutorialStep))
-	{
-		if (stepCount > 4)
-		{
-			tutorialCount++;
-			stepCount = 1;
-		}
-		LOG_EVENT_TUTORIAL_STEP(std::to_string(tutorialCount), std::to_string(stepCount),
-		                        std::string("Dummy tutorial step"));
-		stepCount++;
-	}
 }
 
 void Logger::addToLogBuffer(const LoggingOption& logType, const std::string& message,
@@ -172,8 +171,9 @@ void Logger::addToLogBuffer(const LoggingOption& logType, const std::string& mes
 bool Logger::shouldLogMouse()
 {
 	// Current time in milliseconds.
-	// const int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	const int currentTime = (int) (glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
+	static double previousTime = 0.0f;
+
+	const double currentTime = glfwGetTime();
 	bool shouldLog = currentTime - previousTime > MOUSE_MOVEMENT_LOG_INTERVALS;
 	if (shouldLog)
 	{
@@ -264,4 +264,3 @@ Keys::Code LoggingToggle::KEY_LoggingToggle_popUps = Keys::f1;
 Keys::Code LoggingToggle::KEY_LoggingToggle_logic = Keys::f2;
 Keys::Code LoggingToggle::KEY_LoggingToggle_matrixFields = Keys::f3;
 Keys::Code LoggingToggle::KEY_LoggingToggle_mouseMovement = Keys::f4;
-Keys::Code LoggingToggle::KEY_Dummy_tutorialStep = Keys::f5; // #TUTORIAL

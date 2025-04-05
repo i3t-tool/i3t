@@ -12,6 +12,7 @@
  */
 #include "Sequence.h"
 
+#include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -110,8 +111,8 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 		const auto inputMatrix = m_nodebase->getInput(Core::I3T_SEQ_IN_MAT).data().getMat4();
 
 		// TODO: Pass context to draw data
-		if (DataRenderer::drawData4x4(diwne, context, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(),
-		                              m_floatPopupMode, inputMatrix,
+		if (DataRenderer::drawData4x4(diwne, context, getId(), m_labelDiwne, m_numberOfVisibleDecimal,
+		                              getDataItemsWidth(), m_floatPopupMode, inputMatrix,
 		                              {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
 		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
 		                               Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
@@ -233,18 +234,18 @@ void Sequence::popupContentTracking()
 	if (Core::GraphManager::isTrackingEnabled() &&
 	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
-		if (ImGui::MenuItem(_t("Stop tracking"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
 		{
 			workspaceDiwne.trackingSwitchOff();
 		}
-		if (ImGui::MenuItem(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
 		{
 			workspaceDiwne.trackingModeSwitch();
 		}
 	}
 	else
 	{
-		if (ImGui::MenuItem(_t("Start tracking from right"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{
@@ -253,7 +254,7 @@ void Sequence::popupContentTracking()
 
 			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
 		}
-		if (ImGui::MenuItem(_t("Start tracking from left"), ""))
+		if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
 		{
 			if (Core::GraphManager::isTrackingEnabled())
 			{
@@ -301,6 +302,7 @@ void Sequence::SequenceDropZone::onNodeAdd(DIWNE::Node* node, int index)
 	m_sequence->m_nodebase->as<Core::Sequence>()->pushMatrix(coreTransformation, index);
 	transformation->m_parentSequence = std::static_pointer_cast<Sequence>(m_sequence->shared_from_this());
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
+	LOG_EVENT_NODE_ADDED_AT_INDEX(std::to_string(index), node->m_labelDiwne, m_sequence->m_labelDiwne);
 }
 void Sequence::SequenceDropZone::onNodeRemove(std::shared_ptr<DIWNE::Node> node, int index)
 {
@@ -309,6 +311,7 @@ void Sequence::SequenceDropZone::onNodeRemove(std::shared_ptr<DIWNE::Node> node,
 	transformation->m_parentSequence.reset();
 	m_sequence->m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
+	LOG_EVENT_NODE_REMOVED(node->m_labelDiwne, m_sequence->m_labelDiwne);
 }
 bool Sequence::SequenceDropZone::acceptNode(DIWNE::Node* node)
 {

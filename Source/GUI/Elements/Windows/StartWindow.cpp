@@ -25,6 +25,7 @@
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/UIModule.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
@@ -219,7 +220,7 @@ void StartWindow::renderRightPanel()
 					ImGui::PushFont(theme.get(EFont::Button));
 					ImGui::PushStyleColor(ImGuiCol_Text, theme.get(EColor::StartWindow_NewSceneButtonFont));
 					ImGui::PushStyleColor(ImGuiCol_Button, theme.get(EColor::StartWindow_NewSceneButton));
-					if (ImGui::Button(_t("New"), ImVec2(startNewBtnWidth, buttonHeight)))
+					if (I3TGui::ButtonWithLog(_t("New"), ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
 						InputManager::triggerAction("new", EKeyState::Pressed);
@@ -229,7 +230,7 @@ void StartWindow::renderRightPanel()
 						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::Dummy(ImVec2(0, 0.126 * ImGui::GetFontSize()));
-					if (ImGui::Button(_t("Open"), ImVec2(loadBtnWidth, buttonHeight)))
+					if (I3TGui::ButtonWithLog(_t("Open"), ImVec2(loadBtnWidth, buttonHeight)))
 					{
 						if (MenuBarDialogs::open())
 						{
@@ -317,7 +318,8 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, theme.get(EColor::TutorialButtonHovered));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, theme.get(EColor::TutorialButtonActive));
 
-					if (ImGui::Button((_ts("Open") + "##" + it->string()).c_str(), ImVec2(buttonWidth, buttonHeight)))
+					if (I3TGui::ButtonWithLog((_ts("Open") + "##" + it->string()).c_str(),
+					                          ImVec2(buttonWidth, buttonHeight)))
 					{
 						this->hide(); // Close Welcome window
 						askBeforeExitScene([scenePath = *it]() {
@@ -426,7 +428,7 @@ void StartWindow::renderRightPanel()
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, theme.get(EColor::TutorialButtonActive));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, theme.get(EColor::TutorialButtonHovered));
 					std::string buttonName = _ts("Start") + "##" + header->m_filename.string();
-					if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
+					if (I3TGui::ButtonWithLog(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
 					{
 						auto tutorial = TutorialLoader::loadTutorial(header);
 						if (tutorial)

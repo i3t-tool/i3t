@@ -23,7 +23,8 @@ using namespace Workspace;
 bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context,
                                                int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode,
                                                std::string const label, float& value,
-                                               Core::EValueState const& valueState, bool& valueChanged)
+                                               Core::EValueState const& valueState, bool& valueChanged,
+                                               const std::string& nodeLabel)
 {
 	bool inactive = (valueState == Core::EValueState::Locked || valueState == Core::EValueState::LockedSyn);
 	bool synergies = (valueState == Core::EValueState::EditableSyn || valueState == Core::EValueState::LockedSyn);
@@ -64,6 +65,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 	if (ImGui::IsItemDeactivatedAfterEdit())
 	{
 		diwne.m_takeSnap = true;
+		LOG_EVENT_MATRIX_VALUE_UPDATE(nodeLabel, label, std::to_string(value));
 	}
 
 	if (!inactive && !context.popupOpened)
@@ -78,6 +80,12 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 
 		inner_interaction_happen |=
 		    DIWNE::popupDiwne(diwne, label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+
+		if (valueChangedByPopup)
+		{
+			diwne.m_takeSnap = true;
+			LOG_EVENT_MATRIX_VALUE_UPDATE(nodeLabel, label, std::to_string(value));
+		}
 
 		valueChanged |= valueChangedByPopup;
 	}
@@ -345,8 +353,8 @@ void DataRenderer::popupFloatContent(FloatPopupMode& popupMode, float& selectedV
 
 /* nodebase->getValueState({colum, row}) /* EValueState */
 bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                               int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode,
-                               const glm::mat4& data,
+                               std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                               FloatPopupMode& floatPopupMode, const glm::mat4& data,
                                std::array<std::array<Core::EValueState, 4> const, 4> const& dataState,
                                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange)
 {
@@ -377,8 +385,8 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
 
 			inner_interaction_happen |=
 			    drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
-			                                fmt::format("##{}:r{}c{}", node_id, rows, columns), localData,
-			                                dataState[rows][columns], actualValueChanged);
+			                                fmt::format("##{}:row-{},col-{}", node_id, rows, columns), localData,
+			                                dataState[rows][columns], actualValueChanged, nodeLabel);
 
 			if (actualValueChanged)
 			{
@@ -455,9 +463,10 @@ int DataRenderer::maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleD
 }
 
 bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                                int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode,
-                                const glm::vec4& data, std::array<Core::EValueState, 4> const& dataState,
-                                bool& valueChanged, glm::vec4& valueOfChange)
+                                std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                                FloatPopupMode& floatPopupMode, const glm::vec4& data,
+                                std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+                                glm::vec4& valueOfChange)
 {
 	//    const glm::vec4& coreData = m_nodebase->data(index).getVec4();
 	//    const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
@@ -477,8 +486,8 @@ bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 		valueOfChange[columns] = data[columns]; /* \todo JH \todo MH copy whole data directly - not in
 		                                           for see lines above */
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
-		    valueOfChange[columns], dataState[columns], actualValueChanged);
+		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, columns),
+		    valueOfChange[columns], dataState[columns], actualValueChanged, nodeLabel);
 		if (actualValueChanged)
 			valueChanged = true;
 	}
@@ -507,9 +516,10 @@ int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisible
 }
 
 bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
-                                int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode,
-                                const glm::vec3& data, std::array<Core::EValueState, 3> const& dataState,
-                                bool& valueChanged, glm::vec3& valueOfChange)
+                                std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                                FloatPopupMode& floatPopupMode, const glm::vec3& data,
+                                std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
+                                glm::vec3& valueOfChange)
 {
 	bool actualValueChanged = false;
 	bool inner_interaction_happen = false;
@@ -524,8 +534,8 @@ bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	{
 		valueOfChange[columns] = data[columns];
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
-		    valueOfChange[columns], dataState[columns], actualValueChanged);
+		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, columns),
+		    valueOfChange[columns], dataState[columns], actualValueChanged, nodeLabel);
 		;
 		if (actualValueChanged)
 			valueChanged = true;
@@ -554,9 +564,9 @@ int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisible
 }
 
 bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
-                                 int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode,
-                                 const float& data, Core::EValueState const& dataState, bool& valueChanged,
-                                 float& valueOfChange)
+                                 std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                                 FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState,
+                                 bool& valueChanged, float& valueOfChange)
 {
 	bool inner_interaction_happen = false;
 
@@ -568,7 +578,7 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& cont
 	valueOfChange = data;
 	inner_interaction_happen |=
 	    drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
-	                                fmt::format("##{}:_", node_id), valueOfChange, dataState, valueChanged);
+	                                fmt::format("##{}:_", node_id), valueOfChange, dataState, valueChanged, nodeLabel);
 
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar();
@@ -582,9 +592,10 @@ int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDec
 }
 
 bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                                      int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode,
-                                      const glm::quat& data, std::array<Core::EValueState, 4> const& dataState,
-                                      bool& valueChanged, glm::quat& valueOfChange)
+                                      std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+                                      FloatPopupMode floatPopupMode, const glm::quat& data,
+                                      std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+                                      glm::quat& valueOfChange)
 {
 	bool inner_interaction_happen = false;
 	bool actualValueChanged = false;
@@ -615,8 +626,8 @@ bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo&
 	{
 		valueOfChange[column] = data[column];
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, column),
-		    valueOfChange[column], dataState[column], actualValueChanged);
+		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, column),
+		    valueOfChange[column], dataState[column], actualValueChanged, nodeLabel);
 
 		if (actualValueChanged)
 			valueChanged = true;

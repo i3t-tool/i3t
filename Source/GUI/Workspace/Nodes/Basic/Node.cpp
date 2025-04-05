@@ -12,6 +12,8 @@
  */
 #include "Node.h"
 
+#include "GUI/I3TGui.h"
+
 using namespace Workspace;
 
 std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDetail::Full, "Full"},
@@ -19,7 +21,15 @@ std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDet
                                                                      {LevelOfDetail::Label, "Label"},
                                                                      {LevelOfDetail::LightCycle, "Light cycle"}};
 
-Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label) {}
+Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label)
+{
+	LOG_EVENT_NODE_ADDED(m_labelDiwne, diwne.m_labelDiwne);
+}
+
+void Node::onDestroy(bool logEvent)
+{
+	LOG_EVENT_NODE_REMOVED(m_labelDiwne, diwne.m_labelDiwne);
+}
 
 bool Node::allowDragStart() const
 {
@@ -32,7 +42,7 @@ bool Node::allowDragStart() const
 
 void Node::drawMenuDelete()
 {
-	if (ImGui::MenuItem(_t("Delete"), "Delete"))
+	if (I3TGui::MenuItemWithLog(_t("Delete"), "Delete"))
 	{
 		destroy();
 	}

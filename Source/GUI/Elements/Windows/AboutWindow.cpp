@@ -18,6 +18,7 @@
 
 #include "Config.h"
 #include "GUI/Elements/Windows/StartWindow.h"
+#include "GUI/I3TGui.h"
 #include "Utils/System.h"
 
 static const char* I3T_WEBSITE = "https://i3t-tool.org/";
@@ -94,7 +95,7 @@ void AboutWindow::render()
 
 				ImGui::PushStyleColor(ImGuiCol_Button,
 				                      I3T::getUI()->getTheme().get(EColor::AboutWindow_BackgroundRight));
-				if (ImGui::Button(I3T_WEBSITE))
+				if (I3TGui::ButtonWithLog(I3T_WEBSITE))
 				{
 					systemOpen(I3T_WEBSITE);
 				}
@@ -171,7 +172,7 @@ void AboutWindow::render()
 		// ImGui::BeginHorizontal("AboutFooter",
 		// ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
 		// ImGui::Text(Config::VERSION.c_str());
-		// if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
+		// if (I3TGui::Button("OK", ImVec2{100.0f, 0.0f}))
 		// {
 		//	 HideWindowCommand::dispatch(ID);
 		// }

@@ -53,6 +53,7 @@
 #endif // unix
 
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "Localization/Localization.h"
 #include "Scripting/Environment.h"
 
@@ -360,7 +361,7 @@ void TutorialWindow::renderTutorialContent()
 		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getUI()->getTheme().get(EColor::TutorialButtonBg));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getUI()->getTheme().get(EColor::TutorialButtonActive));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getUI()->getTheme().get(EColor::TutorialButtonHovered));
-		if (ImGui::Button(_t("Open Start Menu"), ImVec2(-1, NEXT_BUTTON_SIZE_Y * 5)))
+		if (I3TGui::ButtonWithLog(_t("Open Start Menu"), ImVec2(-1, NEXT_BUTTON_SIZE_Y * 5)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 			this->hide();
@@ -425,8 +426,9 @@ void TutorialWindow::renderTutorialControls()
 	// Back button
 	if (currentStep != 0)
 	{
-		if (ImGui::Button(_t("< Back"), ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth),
-		                                       NEXT_BUTTON_SIZE_Y)))
+		if (I3TGui::ButtonWithLog(
+		        _t("< Back"),
+		        ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth), NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep - 1);
 			// std::cout << m_currentStep << std::endl;
@@ -438,7 +440,7 @@ void TutorialWindow::renderTutorialControls()
 	}
 	else
 	{
-		if (ImGui::Button(
+		if (I3TGui::ButtonWithLog(
 		        _t("< Start Menu"),
 		        ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_MainMenuButtonWidth), NEXT_BUTTON_SIZE_Y)))
 		{
@@ -522,7 +524,7 @@ void TutorialWindow::renderHeadline(Headline* headline)
 
 static void renderTestQuestionControls(TestQuestion* task)
 {
-	if (ImGui::Button(_t("Submit")))
+	if (I3TGui::ButtonWithLog(_t("Submit")))
 	{
 		task->submit();
 	}
@@ -687,7 +689,8 @@ void TutorialWindow::renderHint(Hint* hint)
 	}
 
 	// Hint button, pass the hint content to create a unique id
-	if (ImGui::Button(fmt::format("Tip##{}", hint->m_content).c_str(), ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
+	if (I3TGui::ButtonWithLog(fmt::format("Tip##{}", hint->m_content).c_str(),
+	                          ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
 		hint->m_expanded = !hint->m_expanded;
 	}

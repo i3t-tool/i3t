@@ -315,7 +315,7 @@ bool CoreNode::drawDataLabel()
 
 void CoreNode::drawMenuSetEditable()
 {
-	if (ImGui::MenuItem(_t("Rename"), nullptr, m_isLabelBeingEdited))
+	if (I3TGui::MenuItemWithLog(_t("Rename"), nullptr, m_isLabelBeingEdited))
 	{
 		m_isLabelBeingEdited = !m_isLabelBeingEdited;
 	}
@@ -323,7 +323,7 @@ void CoreNode::drawMenuSetEditable()
 
 void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 {
-	if (ImGui::MenuItem(_t("Duplicate"), "Ctrl+D"))
+	if (I3TGui::MenuItemWithLog(_t("Duplicate"), "Ctrl+D"))
 	{
 		duplicate(context, false);
 	}
@@ -331,7 +331,7 @@ void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 
 void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vector<LevelOfDetail>& levels_of_detail)
 {
-	if (ImGui::BeginMenu(_t("Level of detail")))
+	if (I3TGui::BeginMenuWithLog(_t("Level of detail")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual level: {}",
 		// LevelOfDetailName[node->getLevelOfDetail()]).c_str());
@@ -339,8 +339,8 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 
 		for (auto const& levelOfDetail : levels_of_detail)
 		{
-			if (ImGui::MenuItem(LevelOfDetailName[levelOfDetail].c_str(), NULL,
-			                    node->getLevelOfDetail() == levelOfDetail, true))
+			if (I3TGui::MenuItemWithLog(LevelOfDetailName[levelOfDetail].c_str(), NULL,
+			                            node->getLevelOfDetail() == levelOfDetail, true))
 			{
 				node->setLevelOfDetail(levelOfDetail);
 			}
@@ -351,14 +351,14 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 
 void CoreNode::drawMenuSetPrecision()
 {
-	if (ImGui::BeginMenu(_t("Decimal digits")))
+	if (I3TGui::BeginMenuWithLog(_t("Decimal digits")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}",
 		// getNumberOfVisibleDecimal()).c_str()); ImGui::Separator();
 		for (int i = 0; i < 5; i++) /* \todo JH, \todo MH some better setter for
 		                               precision - allowed values in settings? */
 		{
-			if (ImGui::MenuItem(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal() == i, true))
+			if (I3TGui::MenuItemWithLog(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal() == i, true))
 			{
 				setNumberOfVisibleDecimal(i);
 			}
@@ -369,13 +369,13 @@ void CoreNode::drawMenuSetPrecision()
 
 static void drawMenuStoreValues(Ptr<Core::Node> node)
 {
-	if (ImGui::BeginMenu(_t("Value")))
+	if (I3TGui::BeginMenuWithLog(_t("Value")))
 	{
-		if (ImGui::MenuItem(_t("Store")))
+		if (I3TGui::MenuItemWithLog(_t("Store")))
 		{
 			node->dataMut(0).saveValue();
 		}
-		if (ImGui::MenuItem(_t("Restore"), nullptr, false, node->data(0).hasSavedValue()))
+		if (I3TGui::MenuItemWithLog(_t("Restore"), nullptr, false, node->data(0).hasSavedValue()))
 		{
 			node->dataMut(0).reloadValue();
 		}
@@ -439,6 +439,12 @@ void CoreNode::onDestroy(bool logEvent)
 {
 	m_nodebase->finalize();
 	Super::onDestroy(logEvent);
+}
+
+void CoreNode::onPopup()
+{
+	Node::onPopup();
+	LOG_EVENT_OPEN_POP_UP(m_labelDiwne);
 }
 
 void CoreNode::duplicate(DIWNE::DrawInfo& context, bool multiDuplication)

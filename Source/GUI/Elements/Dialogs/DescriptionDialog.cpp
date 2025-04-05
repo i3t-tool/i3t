@@ -15,6 +15,7 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "GUI/I3TGui.h"
 #include "GUI/WindowManager.h"
 #include "Localization/Localization.h"
 
@@ -43,7 +44,7 @@ void DescriptionDialog::render()
 
 	ImGui::Separator();
 
-	if (ImGui::Button("OK"))
+	if (I3TGui::ButtonWithLog("OK"))
 	{
 		if (m_isEditState)
 		{
@@ -60,7 +61,7 @@ void DescriptionDialog::render()
 	if (!m_isEditState)
 	{
 		ImGui::SameLine();
-		if (ImGui::Button(_t("Edit")))
+		if (I3TGui::ButtonWithLog(_t("Edit")))
 		{
 			m_isEditState = true;
 		}

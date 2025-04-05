@@ -90,6 +90,8 @@ void TutorialManager::setStep(int stepNumber)
 		{
 			ConsoleCommand::dispatchImmediate(step.m_scriptToRunWhenShown);
 		}
+		LOG_EVENT_TUTORIAL_STEP(m_currentTutorial->m_header->m_title, std::to_string(m_currentStep),
+		                        m_currentTutorial->m_header->m_description);
 	}
 }
 

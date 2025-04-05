@@ -15,6 +15,7 @@
 #include "WorkspaceWindow.h"
 
 #include "GUI/Fonts/Icons.h"
+#include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "GUI/Workspace/WorkspaceModule.h"
@@ -55,10 +56,10 @@ void WorkspaceWindow::render()
 			if (ImGui::BeginMenu("Debug"))
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-				ImGui::MenuItem("Enable", nullptr, &(WorkspaceModule::g_editor->m_diwneDebug));
-				ImGui::MenuItem("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
-				ImGui::MenuItem("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
-				ImGui::MenuItem("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
+				I3TGui::MenuItemWithLog("Enable", nullptr, &(WorkspaceModule::g_editor->m_diwneDebug));
+				I3TGui::MenuItemWithLog("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
+				I3TGui::MenuItemWithLog("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
+				I3TGui::MenuItemWithLog("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}
@@ -84,17 +85,17 @@ void WorkspaceWindow::render()
 
 void WorkspaceWindow::showEditMenu()
 {
-	if (ImGui::BeginMenu(_t("Edit")))
+	if (I3TGui::BeginMenuWithLog(_t("Edit")))
 	{
 		/*
-		if (ImGui::MenuItem("Undo"))
+		if (I3TGui::MenuItemWithLog("Undo"))
 		{
 		    // B
 		    /// \todo Undo.
 		    // UndoRedo::undo();
 		}
 
-		if (ImGui::MenuItem("Redo"))
+		if (I3TGui::MenuItemWithLog("Redo"))
 		{
 		    // N
 		    /// \todo Redo.
@@ -102,7 +103,7 @@ void WorkspaceWindow::showEditMenu()
 		}
 		 */
 
-		if (ImGui::MenuItem(_t("Select all")))
+		if (I3TGui::MenuItemWithLog(_t("Select all")))
 		{
 			WorkspaceModule::g_editor->selectAllNodes();
 			App::getModule<StateManager>().requestSnapshot();
@@ -114,7 +115,7 @@ void WorkspaceWindow::showEditMenu()
 
 void WorkspaceWindow::showAddMenu()
 {
-	if (ImGui::BeginMenu(_t("Add")))
+	if (I3TGui::BeginMenuWithLog(_t("Add")))
 	{
 		WorkspaceDiwne& editor = *WorkspaceModule::g_editor;
 		ImRect viewport = editor.canvas().getViewportRectScreen();
@@ -127,25 +128,25 @@ void WorkspaceWindow::showAddMenu()
 
 void WorkspaceWindow::showViewMenu()
 {
-	if (ImGui::BeginMenu(_t("View")))
+	if (I3TGui::BeginMenuWithLog(_t("View")))
 	{
-		if (ImGui::BeginMenu(_tbd("Zoom")))
+		if (I3TGui::BeginMenuWithLog(_tbd("Zoom")))
 		{
-			if (ImGui::MenuItem(_t("Zoom all")))
+			if (I3TGui::MenuItemWithLog(_t("Zoom all")))
 			{
 				WorkspaceModule::g_editor->zoomToAll();
 			}
-			if (ImGui::MenuItem(_tbd("Reset zoom")))
+			if (I3TGui::MenuItemWithLog(_tbd("Reset zoom")))
 			{
 				WorkspaceModule::g_editor->setZoom(1.0f);
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu(_tbd("Grid")))
+		if (I3TGui::BeginMenuWithLog(_tbd("Grid")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			ImGui::MenuItem(_tbd("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
-			ImGui::MenuItem(_tbd("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
+			I3TGui::MenuItemWithLog(_tbd("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
+			I3TGui::MenuItemWithLog(_tbd("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
 			ImGui::PopItemFlag();
 			ImGui::EndMenu();
 		}
