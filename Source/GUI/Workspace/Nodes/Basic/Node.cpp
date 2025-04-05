@@ -22,6 +22,10 @@ std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDet
                                                                      {LevelOfDetail::LightCycle, "Light cycle"}};
 
 Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label) {}
+Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label)
+{
+	LOG_EVENT_NODE_ADDED(m_labelDiwne, diwne.m_labelDiwne);
+}
 
 bool Node::allowDragStart() const
 {
