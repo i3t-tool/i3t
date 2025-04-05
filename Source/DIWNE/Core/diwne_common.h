@@ -14,7 +14,9 @@
  * should be available wherever DIWNE is used.
  */
 #pragma once
+#ifndef DIWNE_DEBUG_ENABLED
 #define DIWNE_DEBUG_ENABLED 1
+#endif
 
 #include <memory>
 #include <vector>
@@ -25,6 +27,8 @@ namespace DIWNE
 {
 class Node;
 using NodeList = std::vector<std::shared_ptr<DIWNE::Node>>;
+
+void diwneBreakpointFunc();
 } // namespace DIWNE
 
 static constexpr ImVec4 DIWNE_WHITE = ImVec4(1.f, 1.f, 1.f, 1.f);
@@ -46,7 +50,20 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
 // Diwne debug macros used to execute code when diwne debug mode is enabled
 #if DIWNE_DEBUG_ENABLED
-#define DEBUG_TEMPLATE(editor, debugCode, debugVar)                                                                    \
+#ifndef NDEBUG
+// Calls an empty helper function that one can put a breakpoint into (poor man's force break)
+#define DIWNE_BREAKPOINT() DIWNE::diwneBreakpointFunc()
+#else
+#define DIWNE_BREAKPOINT()
+#endif
+
+// Set of macros that run code when a specific runtime debug flag is true
+#define DIWNE_DEBUG_VARS()                                                                                             \
+	bool m_diwneDebug = false;                                                                                         \
+	bool m_diwneDebugLayout = false;                                                                                   \
+	bool m_diwneDebugObjects = false;                                                                                  \
+	bool m_diwneDebugInteractions = false;
+#define DIWNE_DEBUG_TEMPLATE(editor, debugCode, debugVar)                                                              \
 	do                                                                                                                 \
 	{                                                                                                                  \
 		if ((editor).m_diwneDebug && (editor).debugVar)                                                                \
@@ -54,19 +71,15 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 			debugCode                                                                                                  \
 		}                                                                                                              \
 	} while (0) // do-while to prevent issues with single line statements
-#define DIWNE_DEBUG_VARS()                                                                                             \
-	bool m_diwneDebug = false;                                                                                         \
-	bool m_diwneDebugLayout = false;                                                                                   \
-	bool m_diwneDebugObjects = false;                                                                                  \
-	bool m_diwneDebugInteractions = false;
-#define DIWNE_DEBUG(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebug)
-#define DIWNE_DEBUG_LAYOUT(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugLayout)
-#define DIWNE_DEBUG_OBJECTS(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugObjects)
-#define DIWNE_DEBUG_INTERACTIONS(editor, debugCode) DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugInteractions)
+#define DIWNE_DEBUG_GENERAL(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebug)
+#define DIWNE_DEBUG_LAYOUT(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugLayout)
+#define DIWNE_DEBUG_OBJECTS(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugObjects)
+#define DIWNE_DEBUG_INTERACTIONS(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugInteractions)
 
 #else
+#define DIWNE_BREAKPOINT()
 #define DIWNE_DEBUG_VARS()
-#define DIWNE_DEBUG(editor, debugCode)
+#define DIWNE_DEBUG_GENERAL(editor, debugCode)
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode)
 #define DIWNE_DEBUG_OBJECTS(editor, debugCode)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode)
@@ -80,8 +93,11 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
 // Logs error via DIWNE_ERROR and also triggers an assertion failure in debug mode
 #define DIWNE_FAIL(...)                                                                                                \
-	DIWNE_ERROR(__VA_ARGS__);                                                                                          \
-	assert(false && "DIWNE assertion failure");
+	do                                                                                                                 \
+	{                                                                                                                  \
+		DIWNE_ERROR(__VA_ARGS__);                                                                                      \
+		assert(false && "DIWNE assertion failure");                                                                    \
+	} while (0) // do-while to prevent issues with single line statements
 
 #include "spdlog/fmt/fmt.h" // TODO: (Library) Probably shouldn't require fmt as a dependency hmm
 #include <limits>
@@ -90,3 +106,10 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #include DIWNE_USER_CONFIG
 #endif
 #include "DIWNE/diwne_config.h"
+
+#ifdef NDEBUG
+#undef DIWNE_LOG_DEBUG
+#define DIWNE_LOG_DEBUG(...)
+#endif
+
+#include "DIWNE/Core/diwne_utils.h"

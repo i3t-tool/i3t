@@ -27,6 +27,8 @@ public:
 	void popupContent(DIWNE::DrawInfo& context) override;
 	void initialize(DIWNE::DrawInfo& context) override;
 
+	bool allowSelectOnClick(const DIWNE::DrawInfo& context) const override;
+
 	void updateControlPointsOffsets();
 };
 } // namespace Workspace

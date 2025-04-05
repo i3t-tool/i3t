@@ -48,9 +48,6 @@ public:
 
 	std::vector<std::shared_ptr<Link>> m_links;
 
-	// TODO: (DR) Replace fully with context popup flag
-	/// not draw popup two times \todo maybe unused when every object is drawn just one time
-	bool m_popupDrawn{false};
 	// TODO: (DR) Replace fully with mew context flag or something (isn't this a popup anyway?)
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
 	bool m_tooltipDrawn{false};
@@ -295,11 +292,13 @@ public:
 		m_lastActiveNodeChanged = true;
 	}
 
+	/// Get position of the last popup in screen coordinates.
 	const ImVec2& getPopupPosition() const;
+	/// Set position of the last popup in screen coordinates, used for placement of new nodes.
 	void setPopupPosition(ImVec2 position);
 
 	void setNodesSelectionChanged(bool value);
-	bool getNodesSelectionChanged();
+	bool getNodesSelectionChanged() const;
 
 	void setZoom(float val)
 	{
@@ -338,24 +337,25 @@ static void expandPopupContent(T& object) /**< \brief used for popupContent() fu
  *
  */
 template <typename... Args>
-static bool popupDiwne(std::string const popupID, const ImVec2& popupPos, void (*popupContent)(Args...), Args&&... args)
+static bool popupDiwne(NodeEditor& diwne, std::string const popupID, void (*popupContent)(Args...), Args&&... args)
 {
 	bool interaction_happen = false;
 
 	if (ImGui::IsPopupOpen(popupID.c_str()))
 	{
-		ImGui::SetNextWindowPos(popupPos);
+		ImGuiStyle styleBackup = ImGui::GetStyle();
+		const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(false);
+
 		if (ImGui::BeginPopup(popupID.c_str()))
 		{
-			// float oldSize = ImGui::GetFontSize();
-			/* \todo create somewhere pre loaded font of desired size and push/pop
-			 * then here */
 			interaction_happen = true;
 
 			popupContent(std::forward<Args>(args)...);
-
 			ImGui::EndPopup();
 		}
+
+		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
+		ImGui::GetCurrentContext()->Style = styleBackup;
 	}
 	return interaction_happen;
 }

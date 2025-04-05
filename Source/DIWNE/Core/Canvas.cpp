@@ -12,7 +12,7 @@ Canvas::Canvas(NodeEditor& editor)
 
 void Canvas::setZoom(float val)
 {
-	double old = m_zoom;
+	m_prevZoom = m_zoom;
 	if (val < editor.mp_settingsDiwne->minWorkAreaZoom)
 	{
 		m_zoom = editor.mp_settingsDiwne->minWorkAreaZoom;
@@ -23,7 +23,7 @@ void Canvas::setZoom(float val)
 	}
 	else
 		m_zoom = val;
-	if (old != m_zoom)
+	if (m_prevZoom != m_zoom)
 		editor.onZoom();
 }
 
@@ -107,6 +107,8 @@ float Canvas::applyZoomScalingToFont(ImFont* font, float scaleMultiplier)
 	// {
 	// 	f = largeFont;
 	// }
+	// TODO: (DR) Original scale could be stored in view specific temp storage
+	//  that way we could calculate scaled font size without actually scaling the font
 	float originalScale = f->Scale;
 	f->Scale = m_zoom * scaleMultiplier;
 	ImGui::PushFont(f);
@@ -114,19 +116,6 @@ float Canvas::applyZoomScalingToFont(ImFont* font, float scaleMultiplier)
 	return originalScale;
 
 	// TODO: Test dynamic font switching based on zoom level
-
-	// Temporary font idea from imgui password impl
-	//	const ImFontGlyph* glyph = g.Font->FindGlyph('*');
-	//	ImFont* password_font = &g.InputTextPasswordFont;
-	//	password_font->FontSize = g.Font->FontSize;
-	//	password_font->Scale = g.Font->Scale;
-	//	password_font->Ascent = g.Font->Ascent;
-	//	password_font->Descent = g.Font->Descent;
-	//	password_font->ContainerAtlas = g.Font->ContainerAtlas;
-	//	password_font->FallbackGlyph = glyph;
-	//	password_font->FallbackAdvanceX = glyph->AdvanceX;
-	//	IM_ASSERT(password_font->Glyphs.empty() && password_font->IndexAdvanceX.empty() &&
-	// password_font->IndexLookup.empty()); 	PushFont(password_font);
 }
 
 void Canvas::stopZoomScalingToFont(ImFont* font, float originalScale)
@@ -245,7 +234,11 @@ ImVec2 Canvas::diwne2screen(const ImVec2& point) const
 {
 	return workArea2screen(diwne2workArea(point));
 }
-
+ImVec2 Canvas::diwne2screenTrunc(const ImVec2& point) const
+{
+	ImVec2 pos = diwne2screen(point);
+	return ImVec2(IM_TRUNC(pos.x + DIWNE_PIXEL_EPSILON), IM_TRUNC(pos.y + DIWNE_PIXEL_EPSILON));
+}
 ImRect Canvas::diwne2screen(const ImRect& rect) const
 {
 	return ImRect(diwne2screen(rect.Min), diwne2screen(rect.Max));
@@ -261,6 +254,10 @@ float Canvas::diwne2screenSize(float size) const
 float Canvas::screen2diwneSize(float size) const
 {
 	return size / (editor.getZoom() * editor.getDpiScale());
+}
+float Canvas::diwne2screenSizeTrunc(float size) const
+{
+	return IM_TRUNC(diwne2screenSize(size));
 }
 ImVec2 Canvas::diwne2screenSize(const ImVec2& point) const
 {
@@ -294,7 +291,7 @@ void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	idl->AddRectFilled(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
 	                   rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners);
 }
 
@@ -308,19 +305,70 @@ void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, 
                           ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	idl->AddRect(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void Canvas::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
-                                 float thickness, int num_segments /*=0*/) const
+void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+                                    ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
-	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                                 Clip rect for drawing of manual shapes, but
-	                                                 be careful with order of drew elements */
+	ImDrawList* idl = ImGui::GetForegroundDrawList();
+	idl->AddRect(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
+	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
+}
 
+void Canvas::AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3,
+                                 const ImVec2& p4, ImVec4 col, float thickness, int num_segments /*=0*/) const
+{
 	idl->AddBezierCubic(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
 	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_zoom, num_segments);
+}
+void Canvas::drawGrid(bool dots, float size, ImVec4 color, float fadeStart, float fadeEnd, bool ignoreZoom) const
+{
+	assert(fadeStart > fadeEnd);
+	if (m_zoom < fadeEnd)
+		return;
+
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	const ImRect diwneRect = getViewportRectDiwne();
+	const ImRect screenRect = getViewportRectScreen();
+	const ImVec2 gridOffset = ImVec2(size, size) - DMath::mod(diwneRect.Min, size);
+	const ImVec2 gridStartS = screenRect.Min + diwne2screenSize(gridOffset);
+	const float step = diwne2screenSize(size);
+
+	float alphaFactor = DMath::smoothstep(0.0f, 1.0f, DMath::map(m_zoom, fadeStart, fadeEnd, 1.f, 0.f));
+	color.w *= alphaFactor;
+
+	ImU32 col = ImGui::ColorConvertFloat4ToU32(color);
+	if (!dots)
+	{
+		for (float x = gridStartS.x; x < screenRect.Max.x; x += step)
+			idl->AddLine({x, screenRect.Min.y}, {x, screenRect.Max.y}, col, ignoreZoom ? 1.0f : m_zoom);
+		for (float y = gridStartS.y; y < screenRect.Max.y; y += step)
+			idl->AddLine({screenRect.Min.x, y}, {screenRect.Max.x, y}, col, ignoreZoom ? 1.0f : m_zoom);
+	}
+	else
+	{
+		ImDrawListFlags backup_flags = idl->Flags;
+		idl->Flags &= ~ImDrawListFlags_AntiAliasedFill;
+		for (float x = gridStartS.x; x < screenRect.Max.x; x += step)
+		{
+			for (float y = gridStartS.y; y < screenRect.Max.y; y += step)
+			{
+				ImVec2 p = {x, y};
+				float o = 1.5f * editor.getDpiScale();
+				ImVec2 points[] = {
+				    ImVec2(p.x - o, p.y),
+				    ImVec2(p.x, p.y - o),
+				    ImVec2(p.x + o, p.y),
+				    ImVec2(p.x, p.y + o),
+				};
+				idl->AddConvexPolyFilled(points, 4, col);
+				// idl->AddCircleFilled({x, y}, 2.0f * editor.getDpiScale(), col, 4);
+			}
+		}
+		idl->Flags = backup_flags;
+	}
 }
 
 void Canvas::DrawIconCircle(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,
@@ -579,11 +627,12 @@ void Canvas::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor shapeColor, ImCol
 void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                   ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+	ImVec2 margin = diwne2screenSize(ImVec2(0.5f, 0.5f));
+	topLeft = topLeft + margin;
+	bottomRight = bottomRight - margin;
 
 	int lineCount = 3;
-	float padding = screen2diwneSize(1.5f);
+	float padding = diwne2screenSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -601,11 +650,12 @@ void Canvas::DrawIconGrabDownLeft(ImDrawList* idl, ImColor shapeColor, ImColor i
 void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft,
                                    ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
 {
-	topLeft = topLeft + ImVec2(0.5f, 0.5f);
-	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+	ImVec2 margin = diwne2screenSize(ImVec2(0.5f, 0.5f));
+	topLeft = topLeft + margin;
+	bottomRight = bottomRight - margin;
 
 	int lineCount = 3;
-	float padding = screen2diwneSize(1.5f);
+	float padding = diwne2screenSize(1.5f);
 	float squaredPadding = sqrt(2) * padding;
 	float pointOffsetLong = 2 * squaredPadding;
 	float pointOffsetShort = padding;
@@ -618,6 +668,26 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 		             ImVec2(bottomRight.x - pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)),
 		             shapeColor, thickness * m_zoom);
 	}
+}
+void Canvas::DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
+                            float thickness) const
+{
+	thickness *= m_zoom;
+	ImVec2 pad = diwne2screenSize(padding);
+
+	ImVec2 topLeft = rect.Min + pad;
+	ImVec2 bottomRight = rect.Max - pad;
+	topLeft.y += thickness / 2.0f;
+	ImVec2 p2 = ImVec2(bottomRight.x, topLeft.y);
+	float stepY = ((bottomRight.y - topLeft.y) - thickness) / 2.0f;
+
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
+	topLeft.y += stepY;
+	p2.y += stepY;
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
+	topLeft.y += stepY;
+	p2.y += stepY;
+	DDraw::AddLineRaw(idl, topLeft, p2, color, thickness);
 }
 
 void Canvas::DrawIconCross(ImDrawList* idl, ImColor shapeColor, ImColor innerColor, ImVec2 topLeft, ImVec2 bottomRight,

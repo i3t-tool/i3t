@@ -77,7 +77,7 @@ public:
 		//                                                              LevelOfDetail::Label});
 	}
 
-	bool drawDataSetValues() override
+	bool drawDataSetValues(DIWNE::DrawInfo& context) override
 	{
 		bool inner_interaction_happen = false, value_changed = false;
 		auto nodebase = m_nodebase->as<Core::TransformImpl<T>>();
@@ -97,6 +97,7 @@ public:
 					auto localData = valueStore.getVec3();
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    context,
 					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
 					     fmt::format("{} Z", key.c_str())} /* \todo MH all/whole labels from core? */
 					    ,
@@ -113,6 +114,7 @@ public:
 					auto localData = valueStore.getVec4();
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    context,
 					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
 					     fmt::format("{} Z", key.c_str()), fmt::format("{} W", key.c_str())}
 					    /* \todo MH all/whole labels from core? */
@@ -130,6 +132,7 @@ public:
 					auto localData = valueStore.getQuat(); // the default "quat" value
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    context,
 					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
 					     fmt::format("{} Z", key.c_str()), fmt::format("{} W", key.c_str())}
 					    /* \todo MH all/whole labels from core? */
@@ -151,15 +154,15 @@ public:
 				}
 				case Core::EValueType::Matrix:
 				{
-					inner_interaction_happen |= drawDataFull();
+					inner_interaction_happen |= drawDataFull(context);
 					break;
 				}
 				case Core::EValueType::Float:
 				{
 					auto localData = valueStore.getFloat();
 
-					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}", key.c_str())},
-					                                                                 {&localData}, value_changed);
+					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    context, {fmt::format("{}", key.c_str())}, {&localData}, value_changed);
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
@@ -168,7 +171,7 @@ public:
 					break;
 				}
 				default:
-					inner_interaction_happen |= drawDataFull();
+					inner_interaction_happen |= drawDataFull(context);
 				}
 			}
 			ImGui::EndTable();
@@ -362,7 +365,7 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 }
 
 template <>
-inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
+inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues(DIWNE::DrawInfo& context)
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::Scale>>();
@@ -380,7 +383,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 				if (m_nodebase->as<Core::Transform>()->hasSynergies()) /* uniform */
 				{
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
-					    {fmt::format("{}", key.c_str())} /* \todo MH all/whole labels from core? */
+					    context, {fmt::format("{}", key.c_str())} /* \todo MH all/whole labels from core? */
 					    ,
 					    {&localData[0]}, value_changed);
 					if (value_changed)
@@ -397,6 +400,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 				else /* non-uniform */
 				{
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    context,
 					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
 					     fmt::format("{} Z", key.c_str())} /* \todo MH all/whole labels from core? */
 					    ,
@@ -419,7 +423,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues()
 }
 
 template <>
-inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
+inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues(DIWNE::DrawInfo& context)
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::LookAt>>();
@@ -438,7 +442,7 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues()
 	}
 
 	inner_interaction_happen |= drawDataSetValuesTable_builder(
-	    cornerLabel, columnLabels, rowLabels,
+	    context, cornerLabel, columnLabels, rowLabels,
 	    {&local_data[0][0], &local_data[1][0], &local_data[2][0], &local_data[0][1], &local_data[1][1],
 	     &local_data[2][1], &local_data[0][2], &local_data[1][2], &local_data[2][2]},
 	    value_changed, index_of_change);

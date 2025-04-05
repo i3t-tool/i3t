@@ -19,8 +19,7 @@
 
 using namespace Workspace;
 
-TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
-    : CoreNode(diwne, nodebase), aboveSequence(0)
+TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase) : CoreNode(diwne, nodebase)
 {
 	updateDataItemsWidth();
 	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
@@ -33,34 +32,25 @@ bool TransformationBase::allowDrawing()
 	return isInSequence() || CoreNode::allowDrawing();
 }
 
-void TransformationBase::begin(DIWNE::DrawInfo& context)
-{
-	aboveSequence = 0; /* 0 is none */
-	CoreNode::begin(context);
-}
-
 void TransformationBase::topContent(DIWNE::DrawInfo& context)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 	CoreNode::topContent(context);
 	ImGui::SameLine(0, 0);
 
+	// TODO: Similary how we create the validity icon, a lock icon can be shown for locked data
+
 	if (!isMatrixValid())
 	{
 		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
 
-		//     \todo JH Right Align
-		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX()-ImGui::GetStyle().ItemSpacing.x-1);
-		//    /* remove spacing after Dummy in
-		//    WorkspaceNodeWithCoreData::topContent() */
-		//    /* right align */
-		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f,
-		//    getRect().Max.x - diwne.canvas().screen2diwne(ImGui::GetCursorPos()).x
-		//    /*actual free space*/ - iconSize.x -
-		//    m_topOversizeSpace)*diwne.getZoom());
+		if (m_wasValid) // Prevent layout flickering
+			m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(iconSize.x + 2 * style.FramePadding.x));
+
+		m_top.spring(1.0f);
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
-		GUI::startVerticalAlign(style.FramePadding.y);
+		DIWNE::DGui::BeginVerticalAlign(style.FramePadding.y);
 		diwne.canvas().DrawIcon(DIWNE::IconType::Circle, I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
 		                        I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
 		                        /* DIWNE::IconType::Cross,*/ DIWNE::IconType::Hyphen,
@@ -69,18 +59,24 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		                        ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
 		                            I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
 		                        false);
+		// TODO: We can show a tooltip on this dummy to give a failure reason
 		ImGui::Dummy(iconSize);
-		GUI::endVerticalAlign();
-
 		// 2x Frame padding x spacing gap at the end
 		ImGui::SameLine(0, 0);
 		ImGui::Dummy(ImVec2(2 * style.FramePadding.x, 0));
+		DIWNE::DGui::EndVerticalAlign();
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
 		// ImColor(255, 0, 255), DIWNE::IconType::Cross, 	               ImColor(0,
 		// 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
 		// false); /* \todo JH Icon setting from Theme? */
+
+		m_wasValid = false;
+	}
+	else
+	{
+		m_wasValid = true;
 	}
 }
 
@@ -91,10 +87,10 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 	switch (m_levelOfDetail)
 	{
 	case LevelOfDetail::Full:
-		inner_interaction_happen = drawDataFull();
+		inner_interaction_happen = drawDataFull(context);
 		break;
 	case LevelOfDetail::SetValues:
-		inner_interaction_happen = drawDataSetValues();
+		inner_interaction_happen = drawDataSetValues(context);
 		break;
 	case LevelOfDetail::Label:
 		inner_interaction_happen = drawDataLabel();
@@ -102,7 +98,7 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 
 	default:
 		I3T_ABORT("drawData: Unknown m_levelOfDetail");
-		inner_interaction_happen = drawDataFull();
+		inner_interaction_happen = drawDataFull(context);
 	}
 	if (inner_interaction_happen)
 	{
@@ -257,6 +253,7 @@ void TransformationBase::onDestroy(bool logEvent)
 	CoreNode::onDestroy(logEvent);
 }
 
+// TODO: Remove, However update node drop zone logic so that closest
 std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()
 {
 	ImVec2 position = getPosition();
@@ -269,7 +266,7 @@ std::vector<ImVec2> TransformationBase::getInteractionPointsWithSequence()
 	return {topMiddle, middle, bottomMiddle};
 }
 
-bool TransformationBase::drawDataFull()
+bool TransformationBase::drawDataFull(DIWNE::DrawInfo& context)
 {
 	bool valueChanged = false, interaction_happen = false;
 	int rowOfChange, columnOfChange;
@@ -277,7 +274,7 @@ bool TransformationBase::drawDataFull()
 
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)));
 
-	interaction_happen = DataRenderer::drawData4x4(diwne, getId(), m_labelDiwne, m_numberOfVisibleDecimal,
+	interaction_happen = DataRenderer::drawData4x4(diwne, context, getId(), m_labelDiwne, m_numberOfVisibleDecimal,
 	                                               getDataItemsWidth(), m_floatPopupMode, m_nodebase->data().getMat4(),
 	                                               {m_nodebase->as<Core::Transform>()->getValueState({0, 0}),
 	                                                m_nodebase->as<Core::Transform>()->getValueState({1, 0}),
@@ -314,11 +311,11 @@ int TransformationBase::maxLengthOfData()
 	return DataRenderer::maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool TransformationBase::drawDataSetValues_InsideTablebuilder(
-    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label
-                                              passed to drawDragFloatWithMap_Inline() below */
-    ,
-    std::vector<float*> const& local_data, bool& value_changed)
+/// labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below
+bool TransformationBase::drawDataSetValues_InsideTablebuilder(DIWNE::DrawInfo& context,
+                                                              std::vector<std::string> const& labels,
+                                                              std::vector<float*> const& local_data,
+                                                              bool& value_changed)
 {
 	int number_of_values = labels.size();
 	I3T_ASSERT(number_of_values == local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, "
@@ -341,8 +338,8 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 
 		ImGui::PushItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]),
-		    *local_data[i],
+		    diwne, context, getNumberOfVisibleDecimal(), getFloatPopupMode(),
+		    fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i],
 		    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 		                                                      : Core::EValueState::Editable,
 		    actual_value_changed, m_labelDiwne);
@@ -355,7 +352,7 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(
 	return inner_interaction_happen;
 }
 
-bool TransformationBase::drawDataSetValuesTable_builder(std::string const cornerLabel,
+bool TransformationBase::drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string const cornerLabel,
                                                         std::vector<std::string> const& columnLabels,
                                                         std::vector<std::string> const& rowLabels,
                                                         std::vector<float*> const& local_data, bool& value_changed,
@@ -395,7 +392,7 @@ bool TransformationBase::drawDataSetValuesTable_builder(std::string const corner
 
 				ImGui::PushItemWidth(getDataItemsWidth());
 				inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
-				    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(),
+				    diwne, context, getNumberOfVisibleDecimal(), getFloatPopupMode(),
 				    fmt::format("##{}:row-{},col-{}", m_labelDiwne, rows, columns),
 				    *(local_data[rows * columnLabels.size() + columns]),
 				    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn

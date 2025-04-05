@@ -9,6 +9,8 @@
 
 #undef DIWNE_LOG_DEBUG
 #define DIWNE_LOG_DEBUG(...) std::cout << "[DIWNE DEBUG] " << __VA_ARGS__ << std::endl;
+#undef DIWNE_TRACE
+#define DIWNE_TRACE(...) std::cout << "[DIWNE TRACE] " << __VA_ARGS__ << std::endl;
 #undef DIWNE_INFO
 #define DIWNE_INFO(...) std::cout << "[DIWNE INFO] " << __VA_ARGS__ << std::endl;
 #undef DIWNE_WARN

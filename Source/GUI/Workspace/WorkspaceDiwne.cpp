@@ -705,6 +705,74 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	ImGui::PopStyleColor();
 
 	ImGui::Separator();
+
+	addMenu();
+
+	ImGui::Separator();
+
+	if (I3TGui::BeginMenuWithLog(_t("Delete")))
+	{
+		if (I3TGui::MenuItemWithLog(_t("Selected nodes")))
+		{
+			deleteSelectedNodes();
+		}
+
+		if (I3TGui::MenuItemWithLog(_t("Selected links")))
+		{
+			for (auto& link : m_links)
+			{
+				if (link->getSelected())
+				{
+					link->destroy();
+				}
+			}
+		}
+
+		if (I3TGui::MenuItemWithLog(_t("All nodes")))
+		{
+			clear();
+		}
+
+		if (I3TGui::MenuItemWithLog(_t("All links")))
+		{
+			for (auto& link : m_links)
+			{
+				link->destroy();
+			}
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+
+	if (I3TGui::BeginMenuWithLog(_t("Selection")))
+	{
+		if (I3TGui::MenuItemWithLog(_t("select all"), "Ctrl+A"))
+		{
+			selectAllNodes();
+		}
+		if (I3TGui::MenuItemWithLog(_t("invert"), "Ctrl+I"))
+		{
+			invertSelection();
+		}
+		ImGui::EndMenu();
+	}
+	if (I3TGui::BeginMenuWithLog(_t("Zoom")))
+	{
+		if (I3TGui::MenuItemWithLog(_t("to all"), "Ctrl+Alt+A"))
+		{
+			zoomToAll();
+		}
+		if (I3TGui::MenuItemWithLog(_t("to selection"), "Ctrl+Alt+S"))
+		{
+			zoomToSelected();
+		}
+		ImGui::EndMenu();
+	}
+}
+
+void WorkspaceDiwne::addMenu()
+{
 	if (I3TGui::BeginMenuWithLog("transformation"))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
@@ -1168,67 +1236,5 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	if (I3TGui::MenuItemWithLog("scripting node"))
 	{
 		addNodeToPositionOfPopup<ScriptingNode>();
-	}
-
-	ImGui::Separator();
-
-	if (I3TGui::BeginMenuWithLog(_t("Delete")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("Selected nodes")))
-		{
-			deleteSelectedNodes();
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("Selected links")))
-		{
-			for (auto& link : m_links)
-			{
-				if (link->getSelected())
-				{
-					link->destroy();
-				}
-			}
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("All nodes")))
-		{
-			clear();
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("All links")))
-		{
-			for (auto& link : m_links)
-			{
-				link->destroy();
-			}
-		}
-		ImGui::EndMenu();
-	}
-
-	ImGui::Separator();
-
-	if (I3TGui::BeginMenuWithLog(_t("Selection")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("select all"), "Ctrl+A"))
-		{
-			selectAllNodes();
-		}
-		if (I3TGui::MenuItemWithLog(_t("invert"), "Ctrl+I"))
-		{
-			invertSelection();
-		}
-		ImGui::EndMenu();
-	}
-	if (I3TGui::BeginMenuWithLog(_t("Zoom")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("to all"), "Ctrl+Alt+A"))
-		{
-			zoomToAll();
-		}
-		if (I3TGui::MenuItemWithLog(_t("to selection"), "Ctrl+Alt+S"))
-		{
-			zoomToSelected();
-		}
-		ImGui::EndMenu();
 	}
 }

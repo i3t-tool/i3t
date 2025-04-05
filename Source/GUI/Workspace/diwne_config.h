@@ -9,6 +9,8 @@
 
 #undef DIWNE_LOG_DEBUG
 #define DIWNE_LOG_DEBUG(...) LOG_DEBUG(__VA_ARGS__)
+#undef DIWNE_TRACE
+#define DIWNE_TRACE(...) LOG_TRACE(__VA_ARGS__)
 #undef DIWNE_INFO
 #define DIWNE_INFO(...) LOG_INFO(__VA_ARGS__)
 #undef DIWNE_WARN

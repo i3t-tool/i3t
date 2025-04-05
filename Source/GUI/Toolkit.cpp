@@ -202,19 +202,6 @@ bool SliderFloatStepped(const char* label, float* v, float step, float v_min, fl
 	return false;
 }
 
-void startVerticalAlign(float yOffset)
-{
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	ImGui::BeginGroup();
-	ImGui::Dummy(ImVec2(0, yOffset));
-}
-
-void endVerticalAlign()
-{
-	ImGui::EndGroup();
-	ImGui::PopStyleVar(1);
-}
-
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {
 	drawList->AddRectFilled(ImVec2(pos.x - floor(thickness / 2), pos.y - floor(size / 2)),
@@ -230,7 +217,7 @@ void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDra
 	std::vector<ImVec2> points;
 	points.reserve(num_segments);
 
-	float theta = 2 * 3.1415926 / float(num_segments);
+	float theta = 2 * I3_PI / float(num_segments);
 	float c = cosf(theta); // precalculate the sine and cosine
 	float s = sinf(theta);
 	float t;

@@ -20,6 +20,9 @@ struct SettingsDiwne
 	float zoomSpeed = 0.5f;
 	float zoomSensitivity = 0.5f;
 
+	bool showGrid = true;
+	bool useDotGrid = true;
+
 	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.1);
 	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.1);
 	float selectionRectBorderAlpha = 0.8f;

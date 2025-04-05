@@ -50,8 +50,8 @@ std::map<Core::EValueType, EColor> Workspace::PinColorForeground = {
     {Core::EValueType::Quat, EColor::InnerQuatPin},           {Core::EValueType::Screen, EColor::InnerScreenPin},
     {Core::EValueType::Vec3, EColor::InnerVec3Pin},           {Core::EValueType::Vec4, EColor::InnerVec4Pin}};
 
-CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput)
-    : DIWNE::Pin(diwne, node, isInput), m_pin(pin)
+CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput, const std::string& label)
+    : DIWNE::Pin(diwne, node, isInput, label), m_pin(pin)
 {}
 
 bool CorePin::allowInteraction() const
@@ -65,55 +65,43 @@ bool CorePin::allowInteraction() const
  */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
-	// TODO: The entire pin shouldn't be rendered when isRendered is false.
-	//  Either handle this here or in the Node with pins
-	// const bool interaction_happen = false; // no interaction in this function allowed
-	if (getCorePin().isRendered())
+	if (isInput())
 	{
-		if (isInput())
-		{
-			drawPin(context);
-			ImGui::SameLine();
-			drawLabel(context);
-			drawDataEx(context);
-		}
-		else
-		{
-			drawDataEx(context);
-			drawLabel(context);
-			drawPin(context);
-		}
+		drawPin(context);
+		ImGui::SameLine();
+		drawLabel(context);
+		drawDataEx(context);
 	}
+	else
+	{
+		drawDataEx(context);
+		drawLabel(context);
+		drawPin(context);
+	}
+}
+
+bool CorePin::allowDrawing()
+{
+	return Pin::allowDrawing() && getCorePin().isRendered();
 }
 
 void CorePin::drawPin(DIWNE::DrawInfo& context)
 {
-	const float alpha = ImGui::GetStyle().Alpha;
+	// Pin shall be at least ImGui::GetFrameHeight() high, see drawLabel()
 
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+	Core::EValueType pinType = getType();
+	const DIWNE::IconType iconTypeBg = PinShapeBackground[pinType];
+	const ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]);
 
-	const DIWNE::IconType iconTypeBg = PinShapeBackground[getType()];
-	const ImColor iconColorBg = I3T::getColor(PinColorBackground[getType()]);
 	DIWNE::IconType iconTypeFg;
-	if (getType() == Core::EValueType::Pulse)
-	{
-		iconTypeFg = m_iconType; // (PF) icon for the cycle box, Triangle elsewhere
-		                         // iconTypeFg = DIWNE::IconType::SkipBack;
-		                         // iconTypeFg = DIWNE::IconType::SkipBack2;
-		                         // iconTypeFg = DIWNE::IconType::SkipForward;
-		                         // iconTypeFg = DIWNE::IconType::SkipForward2;
-		                         // iconTypeFg = DIWNE::IconType::Rewind;
-		                         // iconTypeFg = DIWNE::IconType::FastForward;
-	}
+	if (m_iconType != DIWNE::IconType::NoIcon)
+		iconTypeFg = m_iconType;
 	else
-	{
-		iconTypeFg = PinShapeForeground[getType()];
-	}
-	const ImColor iconColorFg = I3T::getColor(PinColorForeground[getType()]);
+		iconTypeFg = PinShapeForeground[pinType];
 
-	const ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getZoom();
+	const ImColor iconColorFg = I3T::getColor(PinColorForeground[pinType]);
 
-	ImGuiContext& g = *GImGui;
+	ImVec2 iconSize = getPinSize();
 
 	// space between icon symbol and icon boundary
 	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
@@ -123,42 +111,64 @@ void CorePin::drawPin(DIWNE::DrawInfo& context)
 	// todo (PF) - I have temporally added the pi n border drawing of not-connected pins
 	// connected pins have no border now
 
+	ImVec2 nodeFramePadding = I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom();
+	float frameHeight = DIWNE::DGui::GetFrameHeight(nodeFramePadding);
+	bool alignPin = false;
+	float verticalMargin = 0.0f;
+	if (iconSize.y < frameHeight)
+	{
+		alignPin = true;
+		verticalMargin = (frameHeight - iconSize.y) / 2.0f;
+		DIWNE::DGui::BeginVerticalAlign(verticalMargin);
+	}
+
+	bool filled = isConnected();
+	filled = true;
+
 	// We're using a disabled IconButton, so that when its pressed / dragged it does not set an ActiveID in ImGui.
 	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
 	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
 	diwne.canvas().IconButton("PinIcon", true, iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-	                          createColor(232, 232, 232, 255) /*iconColorFg*/, iconSize,
-	                          ImVec4(padding, padding, padding, padding), isConnected());
+	                          iconColorFg, iconSize, ImVec4(padding, padding, padding, padding), filled);
+
+	if (alignPin)
+		DIWNE::DGui::EndVerticalAlign(verticalMargin);
+
 	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
 	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
-
-	ImGui::PopStyleVar();
 }
 
 void CorePin::drawLabel(DIWNE::DrawInfo& context)
 {
 	const std::string& label = m_pin.getLabel();
+	if (label.empty())
+		return;
+	// if (m_pin.ValueType == Core::EValueType::Pulse) // no labels for pulse and cycle
 	// todo (PF) Label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
-	// probably not - would be good for scalars, but wrong for mat4
-	// if (!label.empty())
-	if (m_pin.ValueType != Core::EValueType::Pulse && !label.empty()) // no labels for pulse and cycle
+
+	// Each label + pin combo should be at least Nodes_FloatPadding (eg. FramePadding for nodes) high,
+	// that makes vertical centering easy.
+	// Height of the label should be the same as the pin, eg. we want to center the label on the pin
+	// When the pin is small then we do the opposite and we center the pin on the frame height
+	ImVec2 pinSize = getPinSize();
+	ImVec2 nodeFramePadding = I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom();
+	if (pinSize.y <= DIWNE::DGui::GetFrameHeight(nodeFramePadding))
 	{
-		ImGui::TextUnformatted(label.c_str());
-		ImGui::SameLine();
+		DIWNE::DGui::AlignTextToPadding(nodeFramePadding);
 	}
+	else
+	{
+		float verticalMargin = (pinSize.y - ImGui::GetTextLineHeight()) / 2.0f;
+		DIWNE::DGui::DummyXY(ImVec2(0.0f, verticalMargin));
+	}
+	ImGui::TextUnformatted(label.c_str());
+	ImGui::SameLine();
 }
 
 void CorePin::drawDataEx(DIWNE::DrawInfo& context)
 {
-	bool interaction_happen = false;
-	// if (getNode().getLevelOfDetail() == LevelOfDetail::Full ||
-	//     getNode().getLevelOfDetail() == LevelOfDetail::SetValues || // for cycle box
-	//     getNode().getLevelOfDetail() == LevelOfDetail::LightCycle)  // for cycle box
-	if (static_cast<CoreNode*>(getNode())->getLevelOfDetail() != LevelOfDetail::Label)
-	{
-		if (!m_isInput && m_showData)
-			drawData(context);
-	}
+	if (!m_isInput && m_showData)
+		drawData(context);
 }
 
 void CorePin::popupContent(DIWNE::DrawInfo& context) {}
@@ -348,7 +358,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 		float valueOfChange;
 
 		interaction_happen =
-		    DataRenderer::drawData4x4(diwne, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(),
+		    DataRenderer::drawData4x4(diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(),
 		                              node.getDataItemsWidth(), node.getFloatPopupMode(), getCorePin().data().getMat4(),
 		                              {valState, valState, valState, valState, valState, valState, valState, valState,
 		                               valState, valState, valState, valState, valState, valState, valState, valState},
@@ -361,7 +371,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		glm::vec4 valueOfChange;
 		interaction_happen = DataRenderer::drawDataVec4(
-		    diwne, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getVec4(), {valState, valState, valState, valState},
 		    valueChanged, valueOfChange);
 		if (valueChanged)
@@ -371,7 +381,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	case Core::EValueType::Vec3:
 	{
 		glm::vec3 valueOfChange;
-		interaction_happen = DataRenderer::drawDataVec3(diwne, node.getId(), node.m_labelDiwne,
+		interaction_happen = DataRenderer::drawDataVec3(diwne, context, node.getId(), node.m_labelDiwne,
 		                                                node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		                                                node.getFloatPopupMode(), getCorePin().data().getVec3(),
 		                                                {valState, valState, valState}, valueChanged, valueOfChange);
@@ -383,7 +393,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		float valueOfChange;
 		interaction_happen = DataRenderer::drawDataFloat(
-		    diwne, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getFloat(), node.getNodebase()->getState(getCoreIndex()),
 		    valueChanged, valueOfChange);
 		if (valueChanged)
@@ -394,7 +404,7 @@ void CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	{
 		glm::quat valueOfChange;
 		interaction_happen = DataRenderer::drawDataQuaternion(
-		    diwne, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
+		    diwne, context, node.getId(), node.m_labelDiwne, node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(),
 		    node.getFloatPopupMode(), getCorePin().data().getQuat(), {valState, valState, valState, valState},
 		    valueChanged, valueOfChange);
 		if (valueChanged)
@@ -502,6 +512,12 @@ void CorePin::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	DiwneObject::onReleased(justReleased, context);
 }
 
+ImVec2 CorePin::getPinSize() const
+{
+	if (getType() == Core::EValueType::MatrixMul)
+		return I3T::getSize(ESizeVec2::Nodes_PinSize_MatrixMul) * diwne.getZoom();
+	return I3T::getSize(ESizeVec2::Nodes_PinSize) * diwne.getZoom();
+}
 
 void CorePin::createNodeFromPin()
 {

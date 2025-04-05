@@ -56,7 +56,10 @@ public:
 	// bool drawDataFull(, int index);
 	int maxLengthOfData() override;                        // todo
 	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
-	void drawMenuLevelOfDetail() override;                 // todo
+
+	void drawInputPins(DIWNE::DrawInfo& context) override;
+
+	void drawMenuLevelOfDetail() override; // todo
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContent_axis_showmodel();

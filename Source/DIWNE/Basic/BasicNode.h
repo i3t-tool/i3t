@@ -26,15 +26,15 @@ public:
 protected:
 	std::string m_topLabel;
 
+	float m_topLabelWidth{0};       ///< Top label width in DIWNE coordinates.
+	float m_topLabelWidthChange{0}; ///< Change of top label width since last frame, used to prevent layout flicker.
+
+	// Style related stuff
+	bool m_headerSpacing = true; ///< Whether to add a gap between the node header and its content
+	bool m_bottomSpacing = true; ///< Whether to add a gap between the node content end the end.
+	float m_contentSpacing = -1; ///< Gap between left, center and right panels (-1 for default item spacing).
+
 public:
-	// TODO: Remove centerDummySpace and handle layouting in DiwnePanels
-
-	/** \brief Rectangle of parts of node in diwne,
-	 * are computed every frame based on node content and m_nodePositionDiwne.
-	 * Note that these rects are using "world" node editor coordinates, not scaled and translated screen ones.
-	 */
-	float m_centerDummySpace{0}; ///< indent value to center the middle part
-
 	BasicNode(NodeEditor& editor, std::string label);
 
 	void begin(DrawInfo& context) override;
@@ -49,7 +49,7 @@ public:
 
 	void updateLayout(DrawInfo& context) override;
 
-	virtual void drawHeader();
+	virtual void drawHeader(ImDrawFlags corners = ImDrawFlags_RoundCornersTop);
 	virtual void drawBody();
 
 	void translate(const ImVec2& vec) override;

@@ -40,7 +40,7 @@ bool Node::allowDrawing()
 void Node::begin(DrawInfo& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
-	ImGui::BeginGroup(); /* Begin of node */
+	DGui::BeginGroup(); /* Begin of node */
 }
 
 void Node::content(DrawInfo& context)
@@ -52,16 +52,15 @@ void Node::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
 		ImRect rect = getRect();
+		ImRect screenRect = diwne.canvas().diwne2screen(rect);
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Max.y);
-		ImGui::GetForegroundDrawList()->AddText(
-		    diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
-		    m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
-		    fmt::format("D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}", rect.Min.x, rect.Min.y, rect.Max.x, rect.Max.y,
-		                diwne.canvas().diwne2workArea(rect.Min).x, diwne.canvas().diwne2workArea(rect.Min).y,
-		                diwne.canvas().diwne2workArea(rect.Max).x, diwne.canvas().diwne2workArea(rect.Max).y,
-		                diwne.canvas().diwne2screen(rect.Min).x, diwne.canvas().diwne2screen(rect.Min).y,
-		                diwne.canvas().diwne2screen(rect.Max).x, diwne.canvas().diwne2screen(rect.Max).y)
-		        .c_str());
+		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
+		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
+		                                        fmt::format("R: {}, {} ({}, {})\nS: {}, {} ({}, {})", rect.Min.x,
+		                                                    rect.Min.y, rect.GetSize().x, rect.GetSize().y,
+		                                                    screenRect.Min.x, screenRect.Min.y, screenRect.GetSize().x,
+		                                                    screenRect.GetSize().y)
+		                                            .c_str());
 	});
 	ImGui::EndGroup();
 	// Node ImGui ID gets popped later in afterDrawDiwne, see explanation there.
@@ -69,8 +68,7 @@ void Node::end(DrawInfo& context)
 
 void Node::updateLayout(DrawInfo& context)
 {
-	m_rect.Min = diwne.canvas().screen2diwne(ImGui::GetItemRectMin());
-	m_rect.Max = diwne.canvas().screen2diwne(ImGui::GetItemRectMax());
+	updateRectFromImGuiItem();
 }
 
 void Node::afterDrawDiwne(DrawInfo& context)
@@ -90,6 +88,20 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	drawSelectionIndicator(context);
 
 	DiwneObject::afterDrawDiwne(context);
+}
+
+void Node::setInitialPositionDiwne()
+{
+	// Top level nodes are always drawn at their specified position
+	// Nodes are drawn at their spe position and should set ImGui cursor position before drawing
+	if (isChildObject())
+	{
+		DiwneObject::setInitialPositionDiwne();
+	}
+	else
+	{
+		ImGui::SetCursorScreenPos(diwne.canvas().diwne2screen(getPosition()));
+	}
 }
 
 bool Node::processSelectDiwne(DrawInfo& context)
@@ -198,7 +210,8 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 	if (m_selected)
 	{
 		DiwneStyle& style = diwne.style();
-		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
+		diwne.canvas().AddRectDiwne(getDisplayRect().Min, getDisplayRect().Max,
+		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
 		                            style.decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
 		                            style.decimal(DiwneStyle::itemSelectedBorderThicknessDiwne));
 	}

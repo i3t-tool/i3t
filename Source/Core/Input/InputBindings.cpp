@@ -93,9 +93,6 @@ void InputBindings::init()
 
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});
 
-	// TODO: (DR) Probably remove this, this is still used in legacy DataRenderer.h code
-	InputManager::setInputAction("raisePopup", Keys::mouseRight);
-
 	InputManager::setInputAction("viewport_select", Keys::mouseLeft);
 
 	InputManager::setInputAction("toggleNodeWorkspaceVisibility", Keys::i, {Keys::ctrlr});
