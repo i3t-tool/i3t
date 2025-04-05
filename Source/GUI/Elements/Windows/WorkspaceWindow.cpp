@@ -130,23 +130,23 @@ void WorkspaceWindow::showViewMenu()
 {
 	if (I3TGui::BeginMenuWithLog(_t("View")))
 	{
-		if (I3TGui::BeginMenuWithLog(_tbd("Zoom")))
+		if (I3TGui::BeginMenuWithLog(_t("Zoom")))
 		{
 			if (I3TGui::MenuItemWithLog(_t("Zoom all")))
 			{
 				WorkspaceModule::g_editor->zoomToAll();
 			}
-			if (I3TGui::MenuItemWithLog(_tbd("Reset zoom")))
+			if (I3TGui::MenuItemWithLog(_t("Reset zoom")))
 			{
 				WorkspaceModule::g_editor->setZoom(1.0f);
 			}
 			ImGui::EndMenu();
 		}
-		if (I3TGui::BeginMenuWithLog(_tbd("Grid")))
+		if (I3TGui::BeginMenuWithLog(_t("Grid")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			I3TGui::MenuItemWithLog(_tbd("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
-			I3TGui::MenuItemWithLog(_tbd("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
+			I3TGui::MenuItemWithLog(_t("Show"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->showGrid);
+			I3TGui::MenuItemWithLog(_t("Use dots"), NULL, &WorkspaceModule::g_editor->mp_settingsDiwne->useDotGrid);
 			ImGui::PopItemFlag();
 			ImGui::EndMenu();
 		}
