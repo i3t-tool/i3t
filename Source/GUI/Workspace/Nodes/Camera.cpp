@@ -140,7 +140,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		m_fillFrustum = !m_fillFrustum;
 		m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
 	}
-	if (ImGui::BeginMenu(_t("Frustum fill color")))
+	if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Default")))
 		{
@@ -152,7 +152,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 			m_frustumColor = calculateFrustumColor(Color::RED);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
 		}
-		if (ImGui::MenuItem(_t("Blue")))
+		if (I3TGui::MenuItemWithLog(_t("Blue")))
 		{
 			m_frustumColor = calculateFrustumColor(Color::BLUE);
 			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
@@ -184,7 +184,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu(_t("Frustum outline color")))
+	if (I3TGui::BeginMenuWithLog(_t("Frustum outline color")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Red")))
 		{

@@ -191,7 +191,7 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 void TransformationBase::drawMenuStorevalues()
 {
-	if (ImGui::BeginMenu(_t("Value")))
+	if (I3TGui::BeginMenuWithLog(_t("Value")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Reset")))
 		{

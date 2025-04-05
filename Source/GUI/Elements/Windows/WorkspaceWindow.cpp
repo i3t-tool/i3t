@@ -81,7 +81,7 @@ void WorkspaceWindow::render()
 
 void WorkspaceWindow::showEditMenu()
 {
-	if (ImGui::BeginMenu(_t("Edit")))
+	if (I3TGui::BeginMenuWithLog(_t("Edit")))
 	{
 		/*
 		if (I3TGui::MenuItemWithLog("Undo"))

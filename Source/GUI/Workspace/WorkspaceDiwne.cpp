@@ -698,7 +698,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	ImGui::PopStyleColor();
 
 	ImGui::Separator();
-	if (ImGui::BeginMenu("transformation"))
+	if (I3TGui::BeginMenuWithLog("transformation"))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
 		 * with group (transformation, operator, ...) and label*/
@@ -711,7 +711,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Translation>>();
 		}
 
-		if (ImGui::BeginMenu("rotate"))
+		if (I3TGui::BeginMenuWithLog("rotate"))
 		{
 
 			if (I3TGui::MenuItemWithLog("eulerAngleX"))
@@ -749,7 +749,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::LookAt>>();
 		}
-		if (ImGui::BeginMenu("projection"))
+		if (I3TGui::BeginMenuWithLog("projection"))
 		{
 			if (I3TGui::MenuItemWithLog("ortho"))
 			{
@@ -767,7 +767,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("operator"))
+	if (I3TGui::BeginMenuWithLog("operator"))
 	{
 		if (I3TGui::BeginMenuWithLog("transformation"))
 		{
@@ -813,7 +813,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("matrix"))
+		if (I3TGui::BeginMenuWithLog("matrix"))
 		{
 			if (I3TGui::MenuItemWithLog("matrix"))
 			{
@@ -859,7 +859,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("vec3"))
+		if (I3TGui::BeginMenuWithLog("vec3"))
 		{
 			if (I3TGui::MenuItemWithLog("vec3"))
 			{
@@ -903,7 +903,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("vec4"))
+		if (I3TGui::BeginMenuWithLog("vec4"))
 		{
 			if (I3TGui::MenuItemWithLog("vec4"))
 			{
@@ -939,7 +939,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("quat"))
+		if (I3TGui::BeginMenuWithLog("quat"))
 		{
 			if (I3TGui::MenuItemWithLog("quat"))
 			{
@@ -1016,7 +1016,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("float"))
+		if (I3TGui::BeginMenuWithLog("float"))
 		{
 			if (I3TGui::MenuItemWithLog("float"))
 			{
@@ -1060,7 +1060,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("conversion"))
+		if (I3TGui::BeginMenuWithLog("conversion"))
 		{
 			if (I3TGui::MenuItemWithLog("mat -> TR"))
 			{
@@ -1165,7 +1165,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu(_t("Delete")))
+	if (I3TGui::BeginMenuWithLog(_t("Delete")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Selected nodes")))
 		{
@@ -1200,7 +1200,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (ImGui::BeginMenu(_t("Selection")))
+	if (I3TGui::BeginMenuWithLog(_t("Selection")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("select all"), "Ctrl+A"))
 		{
@@ -1212,7 +1212,7 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu(_t("Zoom")))
+	if (I3TGui::BeginMenuWithLog(_t("Zoom")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("to all"), "Ctrl+Alt+A"))
 		{

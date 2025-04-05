@@ -50,7 +50,7 @@ void Model::popupContent_axis_showmodel()
 	{
 		model->m_visible = !model->m_visible;
 	}
-	if (ImGui::BeginMenu(_t("Transparency")))
+	if (I3TGui::BeginMenuWithLog(_t("Transparency")))
 	{
 		if (ImGui::Checkbox(_t("Opaque"), &model->m_opaque))
 		{
@@ -62,9 +62,9 @@ void Model::popupContent_axis_showmodel()
 	}
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-	if (ImGui::BeginMenu(_t("Set tint")))
+	if (I3TGui::BeginMenuWithLog(_t("Set tint")))
 	{
-		if (ImGui::BeginMenu(_t("Color")))
+		if (I3TGui::BeginMenuWithLog(_t("Color")))
 		{
 			if (I3TGui::MenuItemWithLog(_t("None")))
 			{
@@ -114,7 +114,7 @@ void Model::popupContent_axis_showmodel()
 	}
 	ImGui::PopItemFlag();
 
-	if (ImGui::BeginMenu(_t("Change model")))
+	if (I3TGui::BeginMenuWithLog(_t("Change model")))
 	{
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{

@@ -297,17 +297,17 @@ bool ViewportWindow::showViewportMenu()
 	Vp::ViewportSettings& stg = m_viewport->getSettings();
 
 	bool userInteractedWithMenus = false;
-	if (ImGui::BeginMenu(_t("Settings")))
+	if (I3TGui::BeginMenuWithLog(_t("Settings")))
 	{
 		userInteractedWithMenus = true;
 
-		if (ImGui::BeginMenu(_t("Scene")))
+		if (I3TGui::BeginMenuWithLog(_t("Scene")))
 		{
 			ImGui::Checkbox(_t("World space lighting"), &stg.scene().mainScene.lightFollowsCamera);
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu(_t("Manipulators")))
+		if (I3TGui::BeginMenuWithLog(_t("Manipulators")))
 		{
 			ImGui::Checkbox(_t("Show manipulators"), &stg.scene().manipulator_enabled);
 			ImGui::SliderFloat(_t("Size"), &stg.global().manipulator_size, 0.01f, 1.0f, "%.2f");
@@ -318,7 +318,7 @@ bool ViewportWindow::showViewportMenu()
 		bool msaa2x = m_renderOptions.multisample && m_renderOptions.samples == 2;
 		bool msaa4x = m_renderOptions.multisample && m_renderOptions.samples == 4;
 		bool msaa8x = m_renderOptions.multisample && m_renderOptions.samples == 8;
-		if (ImGui::BeginMenu(_t("MSAA")))
+		if (I3TGui::BeginMenuWithLog(_t("MSAA")))
 		{
 			if (I3TGui::MenuItemWithLog(_t("OFF"), nullptr, &msaaOff))
 			{
@@ -342,7 +342,7 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu(_t("Highlight")))
+		if (I3TGui::BeginMenuWithLog(_t("Highlight")))
 		{
 			userInteractedWithMenus = true;
 			if (I3TGui::MenuItemWithLog(_t("Ultra"), nullptr, nullptr))
@@ -383,10 +383,10 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu(_t("Transparency")))
+		if (I3TGui::BeginMenuWithLog(_t("Transparency")))
 		{
-			if (ImGui::BeginMenu(_t("WBOIT weight function")))
 			I3TGui::MenuItemWithLog(_t("Use WBOIT"), nullptr, &m_renderOptions.wboit);
+			if (I3TGui::BeginMenuWithLog(_t("WBOIT weight function")))
 			{
 				if (I3TGui::MenuItemWithLog(_t("OFF"), nullptr, m_renderOptions.wboitFunc == 0))
 				{
@@ -444,7 +444,7 @@ bool ViewportWindow::showViewportMenu()
 
 	// TODO: (DR) To follow the "unified api methodology", the UI here should only update the viewport settings and not
 	//  actually perform the changes. Although this is more "efficient" in a way. But cumbersome I suppose.
-	if (ImGui::BeginMenu(_t("View")))
+	if (I3TGui::BeginMenuWithLog(_t("View")))
 	{
 		userInteractedWithMenus = true;
 		if (I3TGui::MenuItemWithLog(_t("Orbit camera"), nullptr,
@@ -574,7 +574,7 @@ bool ViewportWindow::showViewportMenu()
 	return userInteractedWithMenus;
 
 	//	World* w = App::get().world();
-	//	if (ImGui::BeginMenu("Viewports"))
+	//	if (I3TGui::BeginMenu("Viewports"))
 	//	{
 	//		// Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
 	//		if (I3TGui::MenuItemWithLog("View-x"))
@@ -628,7 +628,7 @@ bool ViewportWindow::showViewportMenu()
 	//		}
 	//		ImGui::EndMenu();
 	//	}
-	//	if (ImGui::BeginMenu("Manipulators"))
+	//	if (I3TGui::BeginMenu("Manipulators"))
 	//	{
 	//		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
 	//		if (I3TGui::MenuItemWithLog(action))

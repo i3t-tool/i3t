@@ -265,7 +265,7 @@ void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 
 void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vector<LevelOfDetail>& levels_of_detail)
 {
-	if (ImGui::BeginMenu(_t("Level of detail")))
+	if (I3TGui::BeginMenuWithLog(_t("Level of detail")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual level: {}",
 		// LevelOfDetailName[node->getLevelOfDetail()]).c_str());
@@ -285,7 +285,7 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 
 void CoreNode::drawMenuSetPrecision()
 {
-	if (ImGui::BeginMenu(_t("Decimal digits")))
+	if (I3TGui::BeginMenuWithLog(_t("Decimal digits")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}",
 		// getNumberOfVisibleDecimal()).c_str()); ImGui::Separator();
@@ -303,7 +303,7 @@ void CoreNode::drawMenuSetPrecision()
 
 static void drawMenuStoreValues(Ptr<Core::Node> node)
 {
-	if (ImGui::BeginMenu(_t("Value")))
+	if (I3TGui::BeginMenuWithLog(_t("Value")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Store")))
 		{

@@ -203,7 +203,7 @@ void MainMenuBar::render()
 
 void MainMenuBar::showFileMenu()
 {
-	if (ImGui::BeginMenu(_t("File")))
+	if (I3TGui::BeginMenuWithLog(_t("File")))
 	{
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_NEW_FILE " ", "New")))
 		{
@@ -215,7 +215,7 @@ void MainMenuBar::showFileMenu()
 			InputManager::triggerAction("open", EKeyState::Pressed);
 		}
 
-		if (ImGui::BeginMenu(ICON_T(ICON_I3T_CLOCK " ", "Recent")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_CLOCK " ", "Recent")))
 		{
 			showRecentFiles();
 
@@ -255,7 +255,7 @@ void MainMenuBar::showFileMenu()
 void MainMenuBar::showEditMenu()
 {
 	// See #297
-	if (ImGui::BeginMenu(_t("Edit")))
+	if (I3TGui::BeginMenuWithLog(_t("Edit")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Undo"), "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
 		{
@@ -284,7 +284,7 @@ void MainMenuBar::showEditMenu()
 void MainMenuBar::showWindowsMenu()
 {
 
-	if (ImGui::BeginMenu(_t("Windows")))
+	if (I3TGui::BeginMenuWithLog(_t("Windows")))
 	{
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_HOME " ", "Start window"), nullptr,
 		                        I3T::getWindowPtr<StartWindow>()->getShowPtr());
@@ -307,7 +307,7 @@ void MainMenuBar::showWindowsMenu()
 			App::getModule<UIModule>().getWindowManager().showUniqueWindow<SelectLayoutDialog>();
 		}
 #ifdef I3T_DEBUG
-		if (ImGui::BeginMenu(ICON_T(ICON_I3T_GRID " ", "Layouts As Submenu")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_GRID " ", "Layouts As Submenu")))
 		{
 
 			SelectLayoutDialog::showSelectLayoutMenu();
@@ -321,7 +321,7 @@ void MainMenuBar::showWindowsMenu()
 
 void MainMenuBar::showTutorialMenu()
 {
-	if (ImGui::BeginMenu(ICON_T(ICON_I3T_TUTORIAL " ", "Tutorials")))
+	if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_TUTORIAL " ", "Tutorials")))
 	{
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_HOME " ", "Start window"), nullptr,
 		                        I3T::getWindowPtr<StartWindow>()->getShowPtr());
@@ -341,7 +341,7 @@ void MainMenuBar::showTutorialMenu()
 
 void MainMenuBar::showHelpMenu()
 {
-	if (ImGui::BeginMenu(ICON_T(ICON_I3T_HELP " ", "Help")))
+	if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_HELP " ", "Help")))
 	{
 #ifdef I3T_DEBUG
 		if (I3TGui::MenuItemWithLog(_t("Description")))
@@ -360,9 +360,9 @@ void MainMenuBar::showHelpMenu()
 
 #ifdef I3T_DEBUG
 		ImGui::Separator();
-		if (ImGui::BeginMenu(ICON_T(ICON_I3T_DEBUG " ", "Debug")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_DEBUG " ", "Debug")))
 		{
-			if (ImGui::BeginMenu("Log level"))
+			if (I3TGui::BeginMenuWithLog("Log level"))
 			{
 				Logger& logger = Logger::getInstance();
 				spdlog::level::level_enum logLevel = logger.getAppLogger()->level();
