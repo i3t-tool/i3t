@@ -118,7 +118,9 @@ void Model::popupContent_axis_showmodel()
 	{
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{
-			if (ImGui::MenuItem(resource.alias.c_str()))
+			if (I3TGui::MenuItemWithLog(resource.alias.c_str(), nullptr, false, true, [&]() {
+				    LOG_EVENT_OBJECT_ADDED(resource.alias, m_labelDiwne);
+			    }))
 			{
 				model->setModel(resource.alias);
 			}
@@ -132,14 +134,18 @@ void Model::popupContent_axis_showmodel()
 				Core::Mesh* importedModel = RMI.meshByAlias(alias);
 				if (importedModel)
 				{
-					if (ImGui::MenuItem(alias.c_str()))
+					if (I3TGui::MenuItemWithLog(alias.c_str(), nullptr, false, true, [&]() {
+						    LOG_EVENT_OBJECT_ADDED(alias, m_labelDiwne);
+					    }))
 					{
 						model->setModel(alias);
 					}
 				}
 				else
 				{
-					ImGui::MenuItem(alias.c_str(), NULL, false, false);
+					I3TGui::MenuItemWithLog(alias.c_str(), nullptr, false, false, [&]() {
+						LOG_EVENT_OBJECT_ADDED(alias, m_labelDiwne);
+					});
 				}
 			}
 		}
