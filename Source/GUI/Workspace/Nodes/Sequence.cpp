@@ -249,6 +249,7 @@ void Sequence::SequenceDropZone::onNodeAdd(DIWNE::Node* node, int index)
 	m_sequence->m_nodebase->as<Core::Sequence>()->pushMatrix(coreTransformation, index);
 	transformation->m_parentSequence = std::static_pointer_cast<Sequence>(m_sequence->shared_from_this());
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
+	LOG_EVENT_NODE_ADDED_AT_INDEX(std::to_string(index), node->m_labelDiwne, m_sequence->m_labelDiwne);
 }
 void Sequence::SequenceDropZone::onNodeRemove(std::shared_ptr<DIWNE::Node> node, int index)
 {
@@ -257,6 +258,7 @@ void Sequence::SequenceDropZone::onNodeRemove(std::shared_ptr<DIWNE::Node> node,
 	transformation->m_parentSequence.reset();
 	m_sequence->m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	assert(m_sequence->m_nodebase->as<Core::Sequence>()->getMatrices().size() == this->m_nodes.size());
+	LOG_EVENT_NODE_REMOVED(node->m_labelDiwne, m_sequence->m_labelDiwne);
 }
 bool Sequence::SequenceDropZone::acceptNode(DIWNE::Node* node)
 {
