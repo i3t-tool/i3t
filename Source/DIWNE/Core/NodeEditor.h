@@ -115,17 +115,14 @@ protected:
 	bool isDraggedDiwne() override;
 
 public:
-	// Interaction - Zooming
+	// Editor interaction
 	// =============================================================================================================
-	virtual bool allowProcessZoom(); // TODO: Rename to allowZoom()
+	virtual bool allowZoom(); // TODO: Rename to allowZoom()
 	virtual bool isZoomingDiwne();
-	virtual bool processZoom();      // TODO: Rename to onZoom()
-	virtual bool processDiwneZoom(); // TODO: Rename to processZoomDiwne()
+	virtual bool processZoom();
+	virtual void onZoom() {}; ///< Called by Canvas::setZoom() when the zoom level changes.
 
-	/**
-	 * Called by Canvas::setZoom() when the zoom level changes.
-	 */
-	virtual void onZoom(){};
+	virtual bool processPan();
 
 	// Subsystems
 	// =============================================================================================================

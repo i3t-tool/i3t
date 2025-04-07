@@ -65,6 +65,8 @@ public:
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
 	void onDestroy(bool logEvent) override;
+
+	void translate(const ImVec2& vec) override;
 };
 } // namespace Workspace
 

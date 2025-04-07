@@ -284,9 +284,8 @@ void NodeEditor::processInteractions(DrawInfo& context)
 
 	if (!context.inputConsumed)
 	{
-		// Handle zooming
 		if (m_hovered)
-			processDiwneZoom();
+			processZoom();
 
 		if (!context.logicalUpdates)
 		{
@@ -333,10 +332,7 @@ void NodeEditor::onReleased(bool justReleased, DrawInfo& context)
 void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
 	DiwneObject::onDrag(context, dragStart, dragEnd);
-	if (m_input->bypassIsMouseDown2())
-	{
-		m_canvas->moveViewportZoomed(m_input->bypassGetMouseDelta() * -1);
-	}
+	processPan();
 
 	using namespace Actions;
 
@@ -407,21 +403,23 @@ bool NodeEditor::isDraggedDiwne()
 
 bool NodeEditor::processZoom()
 {
-	ImVec2 mousePosDiwne = m_canvas->screen2diwne(m_input->bypassGetMousePos());
-
-	//	editor.mp_settingsDiwne->zoomWheelReverseSenzitivity;
-
-	//	m_canvas->setZoom(m_canvas->getZoom() + m_input->getZoomDelta());
-	m_canvas->setZoom(m_canvas->getZoom() * powf(1.0f + mp_settingsDiwne->zoomSensitivity, m_input->getZoomDelta()));
-	m_canvas->moveViewport(mousePosDiwne - m_canvas->screen2diwne(m_input->bypassGetMousePos()));
-	return true;
+	if (isZoomingDiwne() && allowZoom())
+	{
+		ImVec2 mousePosDiwne = m_canvas->screen2diwne(m_input->bypassGetMousePos());
+		m_canvas->setZoom(m_canvas->getZoom() *
+		                  powf(1.0f + mp_settingsDiwne->zoomSensitivity, m_input->getZoomDelta()));
+		m_canvas->moveViewport(mousePosDiwne - m_canvas->screen2diwne(m_input->bypassGetMousePos()));
+		return true;
+	}
+	return false;
 }
 
-bool NodeEditor::processDiwneZoom()
+bool NodeEditor::processPan()
 {
-	if (isZoomingDiwne() && allowProcessZoom())
+	if (m_input->bypassIsMouseDown2())
 	{
-		return processZoom();
+		m_canvas->moveViewportZoomed(m_input->bypassGetMouseDelta() * -1);
+		return true;
 	}
 	return false;
 }
@@ -502,7 +500,7 @@ void NodeEditor::bringMarkedNodesToFront()
 		shiftNodesToEnd(shift);
 }
 
-bool NodeEditor::allowProcessZoom()
+bool NodeEditor::allowZoom()
 {
 	return true;
 }

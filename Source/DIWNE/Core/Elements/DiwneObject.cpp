@@ -21,6 +21,7 @@
 #if DIWNE_DEBUG_ENABLED
 #include "Link.h"
 #include "Pin.h"
+#include <bitset>
 #endif
 
 /*
@@ -148,7 +149,7 @@ bool DiwneObject::allowInteraction() const
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
-	if (m_drawMode != DrawMode_Interactive)
+	if ((m_drawMode & DrawMode_JustDraw) && !m_isDragged)
 		return;
 
 	if (!allowInteraction())
@@ -248,9 +249,10 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 			context.state.dragStart = true;
 			context.state.dragging = true;
 			context.state.dragSource = shared_from_this();
+			context.state.dragSourceID = this->getId();
 		}
 	}
-	if (m_isDragged) // Dispatch user method
+	if (m_isDragged && context.state.dragging) // Dispatch user method
 	{
 		onDrag(context, context.state.dragStart, false);
 	}
@@ -418,6 +420,7 @@ void InteractionState::nextFrame()
 	{
 		dragEndedLastFrame = false;
 		dragSource.reset();
+		dragSourceID = 0;
 	}
 	if (dragEnd)
 	{
@@ -782,7 +785,7 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 			                                            ImVec2(diwne.canvas().getViewportRectScreen().GetWidth() * 0.25,
 			                                                   ImGui::GetTextLineHeightWithSpacing()),
 			                                        IM_COL32(255, 0, 255, 255), dbgMsg2.c_str());
-
+			topLeftString += "\nMode: " + std::bitset<sizeof(int) * 2>(m_drawMode).to_string();
 			auto lastActiveNode = editor->getLastActiveNode<>();
 			if (lastActiveNode)
 			{

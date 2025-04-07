@@ -30,6 +30,7 @@ protected:
 
 public:
 	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
+	bool m_forceDraw{false}; ///< Internal flag to force drawing of the node, used by pins (TODO: move to DiwneObject?)
 
 	~Node() override;
 

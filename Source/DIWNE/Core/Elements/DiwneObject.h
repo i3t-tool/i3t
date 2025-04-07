@@ -125,7 +125,7 @@ public:
 	 */
 	bool m_justReleased{false}; ///< Is object just released? Eg. was the button released this frame.
 
-	bool m_isDragged{false}; /**< Is object dragged */
+	bool m_isDragged{false}; ///< Is the object dragged? Returns false immediately on drag end (unlike isDragging()).
 	bool m_draggable{true};  ///< Whether dragging of the object is allowed by default
 
 	bool m_hovered{false};   ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
@@ -774,6 +774,9 @@ public:
 	 *   dragEnd value:   - - - | - - - - - - | - - - - - - | - - T T T T | - - - - - - | - -
 	 * dragEndLF value:   - - - | - - - - - - | - - - - - - | - - - - - - | T T T T T T | - -
 	 *  dragSource ptr:   - - - | - - O O O O | O O O O O O | O O O O O O | O O O O O O | - -
+	 *     m_isDragged:   - - - | - - T T T T | T T T T T T | T T T - - - | - - - - - - | - -
+	 *    isDragging():   - - - | - - T T T T | T T T T T T | T T T T T T | - - - - - - | - -
+	 *  isDragSource():   - - - | - - T T T T | T T T T T T | T T T T T T | T T T T T T | - -
 	 *                          |     ^       |             |     ^       |             | - -
 	 *                         dragging started                 ended
 	 *   Legend: 'T' = true, '-' = false or null, 'O' = valid pointer
@@ -808,15 +811,20 @@ public:
 	bool dragEndedLastFrame{false};
 	/// Weak pointer to the object that initiated the drag @see dragging
 	std::weak_ptr<DiwneObject> dragSource;
+	ID dragSourceID; ///< ID of the last drag source, quick way to check if an object is the drag source.
 
+	/// Whether passed object is a drag source of an active drag operation.
+	/// Unlike DiwneObject::isDragging() or m_isDragged flag, this remains true for one frame after the end of drag.
+	/// @see dragging
 	bool isDragSource(const DiwneObject* object) const
 	{
-		return !dragSource.expired() && dragSource.lock().get() == object;
+		return !dragSource.expired() && object->getId() == dragSourceID;
 	}
 
 	// TODO: Docs to explain hover root and object parent references
 	/**
 	 * Used to specify which object can be handed hover when a hovered child object isn't a hover root.
+	 * Is usually set to the object's parent object.
 	 */
 	std::string hoverTarget;
 

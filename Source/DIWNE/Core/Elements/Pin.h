@@ -167,6 +167,9 @@ public:
 	 */
 	bool unregisterLink(Link* link);
 
+	// =============================================================================================================
+	void translate(const ImVec2& vec) override;
+
 protected:
 	virtual void updateConnectionPoint();
 

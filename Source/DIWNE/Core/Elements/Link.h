@@ -72,6 +72,8 @@ public:
 	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
 	void updateLayout(DrawInfo& context) override;
 
+	bool allowDrawing() override;
+
 	void onDestroy(bool logEvent) override;
 
 protected:
@@ -141,7 +143,11 @@ public:
 protected:
 	void updateSquareDistanceMouseFromLink();
 	virtual void updateEndpoints();
-	void updateControlPoints();
+	virtual void updateControlPoints();
+
+	/// Get the rect formed by the starting and ending point, as well as any curve control points.
+	/// This method is used in updateLayout() to update the object's rect as well as in allowDrawing().
+	virtual ImRect getBounds();
 };
 
 } /* namespace DIWNE */

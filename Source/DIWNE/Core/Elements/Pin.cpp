@@ -22,10 +22,12 @@
 namespace DIWNE
 {
 
-Pin::Pin(DIWNE::NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne)
+Pin::Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne)
     : DiwneObject(diwne, labelDiwne), m_node(node), m_isInput(isInput)
 {
+	assert(node != nullptr);
 	setSelectable(false);
+	setParentObject(node);
 	if (m_isInput)
 		m_allowMultipleConnections = false;
 }
@@ -133,6 +135,12 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 			action->draggedLink->setEndPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
 		else
 			action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+		// Allow editor panning
+		diwne.processPan();
+
+		// Force drawing of the pin's node to ensure this pin is being drawn while dragging
+		assert(m_node && "Pin doesn't have a node assigned!");
+		m_node->m_forceDraw = true;
 
 		if (dragEnd)
 		{
@@ -267,6 +275,13 @@ bool Pin::unregisterLink(Link* link)
 		return true;
 	}
 	return false;
+}
+
+void Pin::translate(const ImVec2& vec)
+{
+	DiwneObject::translate(vec);
+	m_pinRect.Translate(vec);
+	updateConnectionPoint();
 }
 
 void Pin::setConnectionPointDiwne(const ImVec2 value)

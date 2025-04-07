@@ -23,21 +23,6 @@ Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"
 	m_color = diwne.style().color(DiwneStyle::linkColor);
 }
 
-void Link::updateSquareDistanceMouseFromLink()
-{
-	ImVec2 mousePosDiwne = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
-	ImVec2 closestPointOnLink =
-	    ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                       mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
-	ImVec2 diff = closestPointOnLink - mousePosDiwne;
-	m_squaredDistanceMouseFromLink = diff.x * diff.x + diff.y * diff.y;
-}
-
-void Link::updateControlPoints()
-{
-	m_controlPointStartDiwne = m_startDiwne + diwne.mp_settingsDiwne->linkStartControlOffsetDiwne;
-	m_controlPointEndDiwne = m_endDiwne + diwne.mp_settingsDiwne->linkEndControlOffsetDiwne;
-}
 
 bool Link::isLinkOnWorkArea()
 {
@@ -68,11 +53,14 @@ void Link::end(DrawInfo& context)
 
 void Link::updateLayout(DrawInfo& context)
 {
-	m_rect = ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-	                std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
-	                std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-	                std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+	m_rect = getBounds();
 	m_displayRect = m_rect;
+}
+
+bool Link::allowDrawing()
+{
+	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
+	return DiwneObject::allowDrawing() && (getBounds().Overlaps(viewportRect));
 }
 
 /// Link isn't represented by an ImGui item so we need to detect hovering manually.
@@ -119,6 +107,30 @@ void Link::updateEndpoints()
 		m_startDiwne = startPin->getConnectionPoint();
 	if (endPin)
 		m_endDiwne = endPin->getConnectionPoint();
+}
+
+void Link::updateControlPoints()
+{
+	m_controlPointStartDiwne = m_startDiwne + diwne.mp_settingsDiwne->linkStartControlOffsetDiwne;
+	m_controlPointEndDiwne = m_endDiwne + diwne.mp_settingsDiwne->linkEndControlOffsetDiwne;
+}
+
+ImRect Link::getBounds()
+{
+	return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+	              std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
+	              std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+	              std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+}
+
+void Link::updateSquareDistanceMouseFromLink()
+{
+	ImVec2 mousePosDiwne = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
+	ImVec2 closestPointOnLink =
+	    ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
+	                                       mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
+	ImVec2 diff = closestPointOnLink - mousePosDiwne;
+	m_squaredDistanceMouseFromLink = diff.x * diff.x + diff.y * diff.y;
 }
 
 void Link::setStartPoint(const ImVec2& mStartDiwne)

@@ -34,11 +34,14 @@ Node& Node::operator=(const Node& rhs)
 bool Node::allowDrawing()
 {
 	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
-	return DiwneObject::allowDrawing() || getRect().Overlaps(viewportRect) || m_isDragged;
+	return DiwneObject::allowDrawing() &&
+	       (getRect().Overlaps(viewportRect) || diwne.interactionState.isDragSource(this) || m_forceDraw);
 }
 
 void Node::begin(DrawInfo& context)
 {
+	m_forceDraw = false; // Reset the force draw flag, it is valid between draws
+
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup(); /* Begin of node */
 }
