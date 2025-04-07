@@ -64,6 +64,48 @@ void WorkspaceWindow::render()
 				ImGui::EndMenu();
 			}
 #endif
+			// TODO: Temporary, remove and move into I3T themes!
+			if (ImGui::BeginMenu("Style"))
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+
+				if (ImGui::BeginMenu("Pin style"))
+				{
+					ImGui::MenuItem("General", NULL, &WorkspaceModule::g_useSquarePins);
+					ImGui::MenuItem("Matrix Mul", NULL, &WorkspaceModule::g_useSquarePinsMul);
+					ImGui::MenuItem("Pulse", NULL, &WorkspaceModule::g_useSquarePinsPulse);
+					ImGui::MenuItem("Screen", NULL, &WorkspaceModule::g_useSquarePinsScreen);
+					ImGui::EndMenu();
+				}
+				ImGui::MenuItem(
+				    "Drag by label", nullptr,
+				    WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_ENABLE_DRAG_LABEL));
+				ImGui::MenuItem("Pin BG on hover", nullptr,
+				                WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_ENABLE_HOVER_BG));
+				ImGui::SliderFloat2(
+				    "Pin spacing", &WorkspaceModule::g_editor->styleBase().getPtr<ImVec2>(DIWNE::Style::PIN_SPACING)->x,
+				    0.0f, 20.f, "%.2f");
+				ImGui::SliderFloat("Pin icon offset",
+				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_OFFSET), 0.0f,
+				                   20.f, "%.2f");
+				ImGui::SliderFloat(
+				    "Pin label spacing",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_LABEL_SPACING), 0.0f, 20.f,
+				    "%.2f");
+				ImGui::SliderFloat2(
+				    "Pin BG spacing",
+				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec2>(DIWNE::Style::PIN_BG_SPACING)->x, 0.0f, 20.f,
+				    "%.2f");
+				ImGui::ColorEdit4("Pin BG color",
+				                  &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_BG_COLOR)->x,
+				                  ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+				ImGui::SliderFloat("Pin BG rounding",
+				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_BG_ROUNDING),
+				                   0.0f, 20.f, "%.2f");
+
+				ImGui::PopItemFlag();
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenuBar();
 		}
 

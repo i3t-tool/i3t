@@ -71,7 +71,7 @@ public:
 
 	virtual bool drawDataSetValues_InsideTablebuilder(DIWNE::DrawInfo& context, std::vector<std::string> const& labels,
 	                                                  std::vector<float*> const& local_data, bool& value_changed);
-	virtual bool drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string const cornerLabel,
+	virtual bool drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string cornerLabel,
 	                                            std::vector<std::string> const& columnLabels,
 	                                            std::vector<std::string> const& rowLabels,
 	                                            std::vector<float*> const& local_data, bool& value_changed,

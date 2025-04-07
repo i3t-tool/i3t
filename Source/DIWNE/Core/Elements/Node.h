@@ -17,6 +17,7 @@
 namespace DIWNE
 {
 class NodeEditor;
+class StyleOverride;
 
 using NodeFlag = uint64_t;
 
@@ -29,10 +30,9 @@ protected:
 	NodeFlag m_flag{0}; ///< The node flag bit field @see Node::getFlag()
 
 public:
-	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
 	bool m_forceDraw{false}; ///< Internal flag to force drawing of the node, used by pins (TODO: move to DiwneObject?)
 
-	~Node() override;
+	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
 
 	// TODO: Why was copy constuctor commented out? Is it ever used?
 	//        /** Copy constructor
@@ -61,11 +61,11 @@ protected:
 public:
 	bool allowDrawing() override;
 
-
 	// Interaction
 	// =============================================================================================================
 	void onSelection(bool selected) override;
 	void onDrag(DrawInfo& context, bool dragStart, bool dragEnd) override;
+	void onHover(DrawInfo& context) override;
 	void onDestroy(bool logEvent) override;
 
 protected:

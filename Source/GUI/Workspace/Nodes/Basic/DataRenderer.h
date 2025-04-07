@@ -23,8 +23,8 @@ class DataRenderer
 {
 public:
 	static bool drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context,
-	                                        int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode,
-	                                        std::string const label, float& value, Core::EValueState const& valueState,
+	                                        int numberOfVisibleDecimals, FloatPopupMode& floatPopupMode,
+	                                        const std::string& label, float& value, const Core::EValueState& valueState,
 	                                        bool& valueChanged, const std::string& nodeLabel);
 	static void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& valueSelected);
 
@@ -32,10 +32,10 @@ public:
 	 * \param valueOfChange is set to value setted by user if so - not touched if no
 	 * user change heppen \return whether some interaction happen
 	 */
-	static bool drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-	                        std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+	static bool drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+	                        const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
 	                        FloatPopupMode& floatPopupMode, const glm::mat4& data,
-	                        std::array<std::array<Core::EValueState, 4> const, 4> const& dataState, bool& valueChanged,
+	                        const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
 	                        int& rowOfChange, int& columnOfChange, float& valueOfChange);
 	// static bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int
 	// const numberOfVisibleDecimals, float dataWidth, FloatPopupMode&
@@ -44,30 +44,30 @@ public:
 	// valueOfChange );
 	static int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
-	static bool drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-	                         std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+	static bool drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+	                         const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
 	                         FloatPopupMode& floatPopupMode, const glm::vec4& data,
-	                         std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+	                         const std::array<Core::EValueState, 4>& dataState, bool& valueChanged,
 	                         glm::vec4& valueOfChange);
 	static int maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
 
-	static bool drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-	                         std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+	static bool drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+	                         const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
 	                         FloatPopupMode& floatPopupMode, const glm::vec3& data,
-	                         std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
+	                         const std::array<Core::EValueState, 3>& dataState, bool& valueChanged,
 	                         glm::vec3& valueOfChange);
 	static int maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
 
-	static bool drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-	                          std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+	static bool drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+	                          const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
 	                          FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState,
 	                          bool& valueChanged, float& valueOfChange);
 	static int maxLengthOfDataFloat(const float& data, int numberOfVisibleDecimal);
 
-	static bool drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-	                               std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+	static bool drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+	                               const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
 	                               FloatPopupMode floatPopupMode, const glm::quat& data,
-	                               std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+	                               const std::array<Core::EValueState, 4>& dataState, bool& valueChanged,
 	                               glm::quat& valueOfChange);
 	static int maxLengthOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
 };

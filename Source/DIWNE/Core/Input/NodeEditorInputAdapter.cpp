@@ -70,14 +70,14 @@ float NodeEditorInputAdapter::getZoomDelta()
 
 bool NodeEditorInputAdapter::bypassIsMouseDragging0()
 {
-	return ImGui::IsMouseDragging(0, editor.style().decimal(DiwneStyle::mouseDragThreshold));
+	return ImGui::IsMouseDragging(0, editor.style().decimal(Style::MOUSE_DRAG_THRESHOLD));
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging1()
 {
-	return ImGui::IsMouseDragging(1, editor.style().decimal(DiwneStyle::mouseDragThreshold));
+	return ImGui::IsMouseDragging(1, editor.style().decimal(Style::MOUSE_DRAG_THRESHOLD));
 }
 bool NodeEditorInputAdapter::bypassIsMouseDragging2()
 {
-	return ImGui::IsMouseDragging(2, editor.style().decimal(DiwneStyle::mouseDragThreshold));
+	return ImGui::IsMouseDragging(2, editor.style().decimal(Style::MOUSE_DRAG_THRESHOLD));
 }
 } // namespace DIWNE

@@ -12,18 +12,18 @@
  */
 #include "NodeEditor.h"
 
-#include "Logger/Logger.h"
-
 #include "Elements/Link.h"
 #include "Elements/Node.h"
 #include "Elements/Pin.h"
 
 #include "diwne_actions.h"
 
+#include "DIWNE/Core/Style/StyleOverride.h"
+
 namespace DIWNE
 {
-NodeEditor::NodeEditor(SettingsDiwne* settingsDiwne)
-    : DiwneObject(*this, settingsDiwne->editorlabel), NodeContainer(this), mp_settingsDiwne(settingsDiwne)
+NodeEditor::NodeEditor(const char* label, SettingsDiwne* settingsDiwne)
+    : DiwneObject(*this, label), NodeContainer(this), mp_settingsDiwne(settingsDiwne)
 {
 	DiwneObject::setSelectable(false);
 }
@@ -117,8 +117,7 @@ void NodeEditor::content(DrawInfo& context)
 	if (mp_settingsDiwne->showGrid)
 	{
 		bool dots = mp_settingsDiwne->useDotGrid;
-		ImVec4 gridColor =
-		    dots ? diwne.style().color(DiwneStyle::gridDotsColor) : diwne.style().color(DiwneStyle::gridColor);
+		ImVec4 gridColor = dots ? diwne.style().color(Style::GRID_DOTS_COLOR) : diwne.style().color(Style::GRID_COLOR);
 		canvas().drawGrid(dots, 250.f, gridColor, dots ? 0.08f : 0.4f, 0.06f, dots);
 		canvas().drawGrid(dots, 50.f, gridColor, dots ? 0.9f : 1.4f, dots ? 0.7f : 0.4f, dots);
 	}
@@ -354,14 +353,14 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		{
 			action->rect.Min.x = startPos.x;
 			action->rect.Max.x = startPos.x + dragDelta.x;
-			color = mp_settingsDiwne->selectionRectFullColor;
+			color = style().color(Style::SELECTION_RECT_FULL_COLOR);
 			action->touch = false;
 		}
 		else
 		{
 			action->rect.Min.x = startPos.x + dragDelta.x;
 			action->rect.Max.x = startPos.x;
-			color = mp_settingsDiwne->selectionRectTouchColor;
+			color = style().color(Style::SELECTION_RECT_TOUCH_COLOR);
 			action->touch = true;
 		}
 		if (dragDelta.y > 0)
@@ -377,8 +376,7 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		m_canvas->AddRectFilledDiwne(action->rect.Min, action->rect.Max, color);
 		m_canvas->AddRectDiwne(
 		    action->rect.Min, action->rect.Max,
-		    ImVec4(color.Value.x, color.Value.y, color.Value.z, mp_settingsDiwne->selectionRectBorderAlpha));
-
+		    ImVec4(color.Value.x, color.Value.y, color.Value.z, style().decimal(Style::SELECTION_RECT_ALPHA)));
 		if (dragEnd)
 		{
 			action->end();

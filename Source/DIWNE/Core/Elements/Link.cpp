@@ -17,14 +17,13 @@
 
 namespace DIWNE
 {
-Link::Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne /*="DiwneLink"*/)
+Link::Link(DIWNE::NodeEditor& diwne, std::string labelDiwne)
     : DiwneObject(diwne, labelDiwne), m_startDiwne(ImVec2(0, 0)), m_endDiwne(ImVec2(0, 0))
 {
-	m_color = diwne.style().color(DiwneStyle::linkColor);
+	m_color = diwne.style().color(Style::LINK_COLOR);
 }
 
-
-bool Link::isLinkOnWorkArea()
+bool Link::isLinkOnWorkArea() const
 {
 	return diwne.canvas().getViewportRectDiwne().Overlaps(getRect());
 }
@@ -32,10 +31,11 @@ bool Link::isLinkOnWorkArea()
 void Link::initialize(DrawInfo& context) {}
 void Link::initializeDiwne(DrawInfo& context)
 {
-	initialize(context);
 	updateEndpoints();
 	updateControlPoints();
 	updateSquareDistanceMouseFromLink();
+	initialize(context);
+	m_previewPlugged = false;
 }
 
 void Link::end(DrawInfo& context)
@@ -74,7 +74,7 @@ void Link::onHover(DrawInfo& context)
 {
 	diwne.canvas().AddBezierCurveDiwne(
 	    ImGui::GetWindowDrawList(), m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	    diwne.style().color(DiwneStyle::objectHoverBorderColor), diwne.style().decimal(DiwneStyle::linkWidth) / 2);
+	    diwne.style().color(Style::HOVER_BORDER_COLOR), diwne.style().decimal(Style::LINK_WIDTH) / 2);
 }
 
 void Link::content(DrawInfo& context)
@@ -83,12 +83,11 @@ void Link::content(DrawInfo& context)
 	if (m_selected)
 	{
 		diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
-		                                   m_endDiwne, diwne.mp_settingsDiwne->itemSelectedBorderColor,
-		                                   diwne.style().decimal(DiwneStyle::linkWidth) +
-		                                       diwne.style().decimal(DiwneStyle::linkSelectedBorderWidth));
+		                                   m_endDiwne, diwne.style().color(Style::SELECTED_BORDER_COLOR),
+		                                   diwne.style().decimal(Style::LINK_SELECTED_WIDTH));
 	}
 	diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   m_color, diwne.style().decimal(DiwneStyle::linkWidth));
+	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH));
 	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
@@ -207,15 +206,15 @@ void Link::onDestroy(bool logEvent)
 	disconnect(logEvent);
 }
 
-bool Link::isPlugged()
+bool Link::isPlugged() const
 {
 	return m_startPin != nullptr && m_endPin != nullptr;
 }
-bool Link::isOnePinPlugged()
+bool Link::isOnePinPlugged() const
 {
 	return (m_startPin == nullptr) != (m_endPin == nullptr);
 }
-Pin* Link::getSinglePin()
+Pin* Link::getSinglePin() const
 {
 	if (!isOnePinPlugged())
 		return nullptr;
@@ -223,7 +222,7 @@ Pin* Link::getSinglePin()
 		return m_startPin;
 	return m_endPin;
 }
-Pin* Link::getAnyPin()
+Pin* Link::getAnyPin() const
 {
 	if (m_startPin)
 		return m_startPin;
@@ -231,7 +230,7 @@ Pin* Link::getAnyPin()
 		return m_endPin;
 	return nullptr;
 }
-Pin* Link::getOtherPin(Pin* pin)
+Pin* Link::getOtherPin(Pin* pin) const
 {
 	assert(isPlugged());
 	if (m_startPin == pin)

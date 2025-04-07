@@ -247,6 +247,10 @@ ImRect Canvas::screen2diwne(const ImRect& rect) const
 {
 	return ImRect(screen2diwne(rect.Min), screen2diwne(rect.Max));
 }
+ImRect Canvas::diwne2screenTrunc(const ImRect& rect) const
+{
+	return ImRect(diwne2screenTrunc(rect.Min), diwne2screenTrunc(rect.Max));
+}
 float Canvas::diwne2screenSize(float size) const
 {
 	return size * editor.getZoom() * editor.getDpiScale();
@@ -672,7 +676,7 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 void Canvas::DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
                             float thickness) const
 {
-	thickness *= m_zoom;
+	thickness = diwne2screenSize(thickness);
 	ImVec2 pad = diwne2screenSize(padding);
 
 	ImVec2 topLeft = rect.Min + pad;
@@ -743,7 +747,7 @@ void Canvas::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerCo
 }
 
 bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
-                        bool filled, std::string const id) const
+                        bool filled, std::string id) const
 {
 	return IconButton(id, false, bgIconType, bgShapeColor, bgInnerColor, IconType::NoIcon, IM_COL32_BLACK,
 	                  IM_COL32_BLACK, size, padding, filled);
@@ -753,11 +757,8 @@ bool Canvas::IconButton(const std::string id, bool disabled, IconType bgIconType
                         ImColor bgInnerColor, IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
                         ImVec2 size, ImVec4 padding, bool filled) const
 {
-	ImVec2 initPos = ImGui::GetCursorScreenPos();
-
 	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled);
 
-	ImGui::SetCursorScreenPos(initPos);
 	//	ImGui::Dummy(size); // Better to use InvisibleButton
 	// We're making the InvisibleButton disabled so that when its pressed / dragged it does not set an ActiveID in ImGui
 	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
@@ -774,18 +775,9 @@ bool Canvas::IconButton2(const std::string& id, ImVec2 size, bool disabled, Icon
                          const IconStyle& style, const IconStyle& hoveredStyle, const IconStyle& activeStyle) const
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
-
-	ImGuiContext& g = *ImGui::GetCurrentContext();
-	bool wasDisabled = (g.CurrentItemFlags & ImGuiItemFlags_Disabled) != 0;
-	bool startDisabled = !wasDisabled && disabled;
-	if (startDisabled)
-		ImGui::BeginDisabled(true);
-	bool result = ImGui::InvisibleButton(id.c_str(), size);
+	bool hovered, active;
+	bool result = DIWNE::DGui::ButtonDummy(id, size, disabled, hovered, active);
 	ImVec2 afterPos = ImGui::GetCursorScreenPos();
-	if (startDisabled)
-		ImGui::EndDisabled();
-	bool hovered = ImGui::IsItemHovered(startDisabled ? ImGuiHoveredFlags_AllowWhenDisabled : 0);
-	bool active = ImGui::IsItemActive();
 
 	// Decide which icon style to used based on button state
 	const IconStyle* sp = nullptr;

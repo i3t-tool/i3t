@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #define DIWNE_PIXEL_EPSILON 0.001f
 
@@ -88,6 +89,49 @@ inline float GetFrameHeight(ImVec2 padding)
 {
 	ImGuiContext& g = *GImGui;
 	return g.FontSize + padding.y * 2.0f;
+}
+/// Invisible button that can optionally be disabled to allow drag operations with no active id
+inline bool ButtonDummy(const std::string& id, const ImVec2& size, bool disabled, bool& hovered, bool& active)
+{
+	ImGuiContext& g = *ImGui::GetCurrentContext();
+	bool wasDisabled = (g.CurrentItemFlags & ImGuiItemFlags_Disabled) != 0;
+	bool startDisabled = !wasDisabled && disabled;
+	if (startDisabled)
+		ImGui::BeginDisabled(true);
+	bool result = ImGui::InvisibleButton(id.c_str(), size);
+	if (startDisabled)
+		ImGui::EndDisabled();
+	hovered = ImGui::IsItemHovered(startDisabled ? ImGuiHoveredFlags_AllowWhenDisabled : 0);
+	active = ImGui::IsItemActive();
+	return result;
+}
+
+/// Helper data structure for BeginRect()/EndRect().
+struct RectData
+{
+	ImVec2 BackupCursorPos;
+	ImVec2 BackupCursorMaxPos;
+};
+
+/// Begin measurement of an ImGui item rect. Much like BeginGroup(), but just the item rect size measuring part.
+/// Returns temporary RectData that need to be passed to the corresponding EndRect() call.
+/// Explicit passing of data is necessary as we don't have a global stack for it like Dear ImGui does.
+inline RectData BeginRect()
+{
+	RectData data;
+	ImGuiContext& g = *GImGui;
+	ImGuiWindow* window = g.CurrentWindow;
+	data.BackupCursorPos = window->DC.CursorPos;
+	data.BackupCursorMaxPos = window->DC.CursorMaxPos;
+	return data;
+}
+
+/// End measurement of a previous BeginRect() call. Finalized the passed rect data.
+inline ImRect EndRect(RectData& data)
+{
+	ImGuiContext& g = *GImGui;
+	ImGuiWindow* window = g.CurrentWindow;
+	return ImRect(data.BackupCursorPos, ImMax(window->DC.CursorMaxPos, data.BackupCursorPos));
 }
 
 } // namespace DGui

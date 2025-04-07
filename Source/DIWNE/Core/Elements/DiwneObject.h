@@ -15,7 +15,6 @@
  */
 #pragma once
 
-#include <any>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -23,11 +22,15 @@
 #include "DIWNE/Core/diwne_actions.h"
 #include "DIWNE/Core/diwne_common.h"
 
+#include "DIWNE/Core/Style/Style.h"
+
 namespace DIWNE
 {
 typedef unsigned int ID;
 
 class NodeEditor;
+class StyleOverride;
+class Style;
 
 // TODO JH: some attributes should be private/protected // Agreed
 
@@ -69,6 +72,8 @@ public:
 	ImRect m_rect;        ///< Rectangle bounds of the object in diwne coordinates. @see getRect()
 	ImRect m_displayRect; ///< Rectangle bounds aligned with the last viewport. @see getDisplayRect()
 
+	StyleOverride* m_styleOverride{nullptr}; ///< Style override to allow uniquely styled object types
+
 	bool m_destroy{false};  ///< Indicates the object is to be deleted (and deallocated)
 	bool m_deletable{true}; ///< Whether the object can be deleted by the user
 
@@ -78,7 +83,7 @@ public:
 
 	/// Read-only flag thats updated on each drawDiwne().
 	/// Essentially just a way to avoid passing this along everywhere as it should stay constant for each object.
-	DrawMode m_drawMode;
+	DrawMode m_drawMode{DrawMode_Interactive};
 
 	// TODO: Workspace nodes use a LOD system, it might be a good idea to generalize that system into the DIWNE library
 	//  itself. The LOD system is also, coincidentally, useful as a true LOD system to improve performance (despite the
@@ -133,8 +138,8 @@ public:
 	bool m_hoverable{true};  ///< Whether hovering is enabled by default
 
 protected:
-	bool m_internalHover; ///< Temporary storage for an internal ImGui::IsItemHovered() check
-	                      ///< Can be set in the end() method to determine if object is hovered if applicable
+	bool m_internalHover{false}; ///< Temporary storage for an internal ImGui::IsItemHovered() check
+	                             ///< Can be set in the end() method to determine if object is hovered if applicable
 
 public:
 	/**
@@ -142,7 +147,7 @@ public:
 	 * \param id used to identification
 	 * \param labelDiwne used to identification
 	 */
-	DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne);
+	DiwneObject(DIWNE::NodeEditor& diwne, std::string labelDiwne);
 	virtual ~DiwneObject();
 
 	/**
@@ -360,8 +365,8 @@ public:
 	 * Whether the object can be selected. When this is set to true the object cannot be selected anymore.
 	 * Although it may remain selected if it was selected beforehand.
 	 */
-	virtual void setSelectable(bool selectable);
-	virtual bool getSelectable();
+	void setSelectable(bool selectable);
+	bool getSelectable();
 
 	bool isRendered() const;
 	void setRendered(bool val);
@@ -568,29 +573,54 @@ public:
 	 */
 	virtual bool isJustPressedDiwne();
 
-	// Miscellaneous
+	// Popups and tooltips
 	// =============================================================================================================
-public:
-	bool isDragging(DrawInfo& context);
-	void stopDrag(DrawInfo& context);
-
-	///< Marks the object to be brought to front (be drawn first). Is handled by the object's parent / container.
-	///< For nodes, they are brought forward in rendering order next frame by the NodeEditor / NodeContainer.
-	void setBringToFront(bool val);
-	bool isToBeBroughtToFront();
 
 	/// Request to open the object's popup if possible.
 	void openPopup();
 
-	// =============================================================================================================
-	// END OF INTERACTION
+	// TODO: Elevate to the same status as popupContent -> tooltipContent
+	// TODO: Should probably be moved into some util class to keep the DiwneObject concise
+	/** \brief Show a colored text for example for immediate hints
+	 * \param label is the text to show
+	 * \param color is the color of the tooltip
+	 */
+	void showTooltipLabel(const std::string& label, const ImColor&& color);
 
+	// Miscellaneous
+	// =============================================================================================================
 public:
-	inline DIWNE::ID const getId() const
+	/**
+	 * Assign a StyleOverride object to this DiwneObject.
+	 * This object acts as a proxy of the overarching NodeEditor's style. It can replace certain style variables with
+	 * different ones to change style of a particular set of DiwneObject's it has been assigned to.
+	 * A single StyleOverride object can be shared among many objects (to style a particular Node type for example).
+	 * @warning StyleOverride objects ARE NOT managed by DIWNE, meaning this pointer is assumed to be always valid.
+	 * Handle lifetime of StyleOverride objects in your own code.
+	 */
+	void setStyleOverride(StyleOverride* styleOverride);
+	StyleOverride* getStyleOverride() const; ///< @see setStyleOverride()
+
+	/// Get the style for this object.
+	/// NodeEditor subclass is where the base style is stored. Other objects however can override the base style.
+	/// @see setStyleOverride(), StyleBase
+	virtual Style& style() const;
+
+	/// Is this object the source of an active dragging operation? @see onDrag()
+	/// @see dragging
+	bool isDragging(DrawInfo& context);
+	/// End an active drag operation this object is a source of. @see onDrag()
+	void stopDrag(DrawInfo& context);
+
+	/// Marks the object to be brought to front (be drawn first). Is handled by the object's parent / container.
+	/// For nodes, they are brought forward in rendering order next frame by the NodeEditor / NodeContainer.
+	void setBringToFront(bool val);
+	bool isToBeBroughtToFront();
+
+	ID getId() const
 	{
 		return m_idDiwne;
-	};
-
+	}
 
 	DiwneObject* getParentObject() const;
 	void setParentObject(DiwneObject* parent);
@@ -653,22 +683,6 @@ public:
 		return static_cast<T*>(this);
 	}
 
-	// TODO: Should probably be moved into some util class to keep the DiwneObject concise
-	/** \brief Show a colored text for example for immediate hints
-	 * \param label is the text to show
-	 * \param color is the color of the tooltip
-	 */
-	void showTooltipLabel(const std::string& label, const ImColor&& color);
-
-protected:
-	void setSize(const ImVec2& size);
-	void updateRectFromImGuiItem();
-	virtual void setInitialPositionDiwne(); ///< Internal helper for setting the object's initial position
-
-private:
-	void debugDrawing(DrawInfo& context, int debug_logicalUpdate); ///< Debug drawing helper
-
-public:
 	// Operators
 	// =============================================================================================================
 	bool operator==(const DiwneObject& rhs) const
@@ -679,6 +693,14 @@ public:
 	{
 		return !(rhs == *this);
 	}
+
+protected:
+	void setSize(const ImVec2& size);
+	void updateRectFromImGuiItem();
+	virtual void setInitialPositionDiwne(); ///< Internal helper for setting the object's initial position
+
+private:
+	void debugDrawing(DrawInfo& context, int debug_logicalUpdate); ///< Debug drawing helper
 };
 
 // TODO: (DR) Should be moved to NodeEditor or to a separate class

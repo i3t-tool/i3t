@@ -20,8 +20,7 @@ void NodeDropZone::initialize(DrawInfo& context)
 
 void NodeDropZone::begin(DrawInfo& context)
 {
-	diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max,
-	                                  diwne.style().color(DiwneStyle::dropZoneBg));
+	diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max, diwne.style().color(Style::DROP_ZONE_BG));
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup();
 }
@@ -35,8 +34,8 @@ void NodeDropZone::content(DrawInfo& context)
 	}
 	else
 	{
-		ImVec2 margin = diwne.style().size(DiwneStyle::dropZoneMargin) * zoom;
-		ImVec2 dropGap = diwne.style().size(DiwneStyle::dropZoneDropGap) * zoom;
+		ImVec2 margin = diwne.style().size(Style::DROP_ZONE_MARGIN) * zoom;
+		ImVec2 dropGap = diwne.style().size(Style::DROP_ZONE_DROP_GAP) * zoom;
 		DGui::DummyXY(margin);
 		for (int i = 0; i < m_nodes.size(); ++i)
 		{
@@ -229,24 +228,24 @@ void NodeDropZone::drawDropIndicator(Node* newNode, int index)
 	if (m_nodes.empty())
 	{
 		diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max,
-		                                  diwne.style().color(DiwneStyle::dropIndicatorColor));
+		                                  diwne.style().color(Style::DROP_INDICATOR_COLOR));
 		return;
 	}
 
 	const ImGuiStyle& style = ImGui::GetStyle();
-	const DiwneStyle& dstyle = diwne.style();
+	const Style& dstyle = diwne.style();
 	float zoom = diwne.getZoom();
-	ImVec2 margin = dstyle.size(DiwneStyle::dropZoneMargin) * zoom;
+	ImVec2 margin = dstyle.size(Style::DROP_ZONE_MARGIN) * zoom;
 	if (index == 0)
 	{
 		diwne.canvas().AddRectFilledDiwne(m_displayRect.Min,
 		                                  m_displayRect.Min + ImVec2(margin.x, m_displayRect.GetHeight()),
-		                                  dstyle.color(DiwneStyle::dropIndicatorColor));
+		                                  dstyle.color(Style::DROP_INDICATOR_COLOR));
 	}
 	else if (index == m_nodes.size())
 	{
 		diwne.canvas().AddRectFilledDiwne(m_displayRect.Max - ImVec2(margin.x, m_displayRect.GetHeight()),
-		                                  m_displayRect.Max, dstyle.color(DiwneStyle::dropIndicatorColor));
+		                                  m_displayRect.Max, dstyle.color(Style::DROP_INDICATOR_COLOR));
 	}
 	else
 	{
@@ -254,7 +253,7 @@ void NodeDropZone::drawDropIndicator(Node* newNode, int index)
 		ImRect rect2 = m_nodes[index]->getDisplayRect();
 		ImVec2 min = rect1.GetTR();
 		ImVec2 max = rect2.GetBL();
-		diwne.canvas().AddRectFilledDiwne(min, max, dstyle.color(DiwneStyle::dropIndicatorColor));
+		diwne.canvas().AddRectFilledDiwne(min, max, dstyle.color(Style::DROP_INDICATOR_COLOR));
 	}
 }
 

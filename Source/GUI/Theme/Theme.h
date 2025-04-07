@@ -22,6 +22,7 @@
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 #include "Core/Result.h"
+#include "DIWNE/Core/Style/StyleOverride.h"
 #include "GUI/ThemeVariable.h"
 
 constexpr int I3T_PROPERTY_NAME_OFFSET = 5;
@@ -100,7 +101,9 @@ enum class EColor
 	NodeEditorGridColor,
 	NodeEditorGridDotsColor,
 
-	// 2. Pins
+	// Pins
+	DisabledPinColor,
+
 	PulsePin,
 	FloatPin,
 	Vec3Pin,
@@ -168,7 +171,7 @@ enum class EColor
 	Nodes_Transformation_ValidIcon_padding,
 
 	// 6. Links
-	Links_selected_colorShift,
+	Links_selected_colorShift, // Unused
 
 	Builder_NodePadding, // not a color but i need a vec4
 
@@ -222,16 +225,16 @@ enum class ESize
 {
 	Nodes_Rounding,
 	Nodes_FloatWidth,
-	Nodes_FloatMargin,
-	Nodes_BorderWidth,
-	Nodes_LabelIndent,
-	Nodes_HeaderLabelIndent,
-	Nodes_trackballButtonHeight,
-	Nodes_TrackBallSensitivity,
+	Nodes_FloatMargin,           // Unused
+	Nodes_BorderWidth,           // Unused // TODO: Impl
+	Nodes_LabelIndent,           // Unused // TODO: What does this mean?
+	Nodes_HeaderLabelIndent,     // Unused // TODO: Impl
+	Nodes_trackballButtonHeight, // TODO: [Trackball]
+	Nodes_TrackBallSensitivity,  // TODO: [Trackball]
 
 	Nodes_FloatInnerPadding,
 
-	Nodes_dragSpeedDefaulrRatio,
+	Nodes_dragSpeedDefaultRatio,
 	Nodes_CtrlMultiplicator,
 	Nodes_SHIFTMultiplicator,
 	Nodes_ALTMultiplicator,
@@ -259,7 +262,7 @@ enum class ESize
 	Links_ControlpointsPositionMin,
 	Links_ControlpointsPositionMax,
 	Links_Thickness,
-	Links_ThicknessSelectedBorder,
+	Links_ThicknessSelected,
 	Links_OffsetFraction,
 	Links_OffsetMin,
 
@@ -401,7 +404,11 @@ public:
 	/// (std::unordered_map cannot be used).
 	using CategoryNames = std::map<std::string, const char*>;
 
-public:
+	// DIWNE node styles
+	static DIWNE::StyleOverride m_nodeStyle;
+	static DIWNE::StyleOverride m_transformationStyle;
+	static DIWNE::StyleOverride m_operatorStyle;
+
 	Theme() = default;
 	Theme(std::string name, bool isDark, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
@@ -438,6 +445,7 @@ public:
 	 */
 	void apply();
 
+	/// Returns color variable value
 	const ImVec4& get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
@@ -445,20 +453,41 @@ public:
 
 		return m_colors[color];
 	}
+	/// Returns a pointer to a color variable
+	ImVec4* getPtr(EColor color)
+	{
+		if (m_colors.count(color) == 0)
+			return &m_defaultColor;
+
+		return &m_colors[color];
+	}
 
 	ImFont* get(EFont font);
 
+	/// Returns size variable value, scaled by DPI factor.
 	float get(ESize size)
 	{
 		const auto entry = m_sizes[size];
 		return entry.second ? entry.first * m_dpiScale : entry.first;
 	}
+	/// Returns a pointer to a size variable. Not DPI scaled.
+	float* getPtr(ESize size)
+	{
+		auto& entry = m_sizes[size];
+		return &entry.first;
+	}
 
+	/// Returns 2D size variable value, scaled by DPI factor.
 	ImVec2 get(ESizeVec2 sizeVec)
 	{
-		I3T_ASSERT(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
-		const auto entry = m_sizesVec2[sizeVec];
+		const auto& entry = m_sizesVec2[sizeVec];
 		return entry.second ? entry.first * m_dpiScale : entry.first;
+	}
+	/// Returns a pointer to a 2D size variable. Not DPI scaled.
+	ImVec2* getPtr(ESizeVec2 sizeVec)
+	{
+		auto& entry = m_sizesVec2[sizeVec];
+		return &entry.first;
 	}
 
 	static const char* getCategoryName(const std::string& key);
@@ -536,7 +565,7 @@ private:
 		}
 	}
 
-	static ThemeGroup& group(const char* name);
+	static ThemeGroup& group(const char* name, int indent = 0);
 
 	std::string m_name = "default";
 

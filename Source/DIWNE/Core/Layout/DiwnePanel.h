@@ -73,6 +73,7 @@ public:
 	// =============================================================================================================
 
 	void begin();
+
 	// TODO: Do we need to submit anything to a parent? Otherwise the parent considers child spring size to be fixed.
 	//  But is that a problem? Because the child doesn't consider it fixed so maybe it all works out in the end?
 	//  That would actually be quite nice because there would be no need for any sort of panel hierarchy.
@@ -105,7 +106,7 @@ public:
 	// =============================================================================================================
 
 	// TODO: Is this needed? See TODO above.
-	void submitChild(DiwnePanel* child); ///< Submits given panel as fixed width to the panel
+	// void submitChild(DiwnePanel* child); ///< Submits given panel as fixed width to the panel
 
 	/// Inform the next spring that a new fixed width item will appear this frame.
 	/// Can be used to prevent flickering on layout change.

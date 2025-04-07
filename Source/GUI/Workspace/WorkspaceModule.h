@@ -21,6 +21,11 @@ class WorkspaceModule : public Module, public IStateful
 public:
 	static Ptr<Workspace::WorkspaceDiwne> g_editor;
 
+	static bool g_useSquarePins;
+	static bool g_useSquarePinsMul;
+	static bool g_useSquarePinsPulse;
+	static bool g_useSquarePinsScreen;
+
 	WorkspaceModule();
 
 	Workspace::WorkspaceDiwne& getNodeEditor();

@@ -2,9 +2,7 @@
 
 #include <string>
 
-#include "DIWNE/Core/Style/DiwneStyle.h"
 #include "diwne_imgui.h"
-#include "diwne_utils.h"
 
 namespace DIWNE
 {
@@ -122,8 +120,9 @@ public:
 
 	ImVec2 diwne2screenTrunc(const ImVec2& point) const; ///< Convert diwne point to pixel aligned screen position.
 
-	ImRect diwne2screen(const ImRect& rect) const; ///< Convert diwne rect to a screen rect
-	ImRect screen2diwne(const ImRect& rect) const; ///< Convert screen rect to a diwne rect
+	ImRect diwne2screen(const ImRect& rect) const;      ///< Convert diwne rect to a screen rect
+	ImRect screen2diwne(const ImRect& rect) const;      ///< Convert screen rect to a diwne rect
+	ImRect diwne2screenTrunc(const ImRect& rect) const; ///< Convert diwne rect to pixel aligned screen rect.
 
 	float diwne2screenSize(float size) const; ///< Apply diwne scaling factors to a float size
 	float screen2diwneSize(float size) const; ///< Revert diwne scaling factors from a float size
@@ -187,7 +186,7 @@ public:
 	 * \return true if interaction with button happen, false otherwise
 	 */
 	bool IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
-	                bool filled, std::string const id) const;
+	                bool filled, std::string id) const;
 
 	/**
 	 * Add ImGui Button with icon on it \see DrawIcon()
@@ -195,9 +194,9 @@ public:
 	 * querying of hover state when wrapped in a ImGui group or with appropriate IsItemHovered flags.
 	 * \return true if interaction with button happen, false otherwise
 	 */
-	bool IconButton(std::string const id, bool disabled, IconType bgIconType, ImColor bgShapeColor,
-	                ImColor bgInnerColor, IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-	                ImVec4 padding, bool filled) const;
+	bool IconButton(std::string id, bool disabled, IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+	                IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding,
+	                bool filled) const;
 
 	/**
 	 * // TODO: (DR) Docs, new IconButton that allows various styles depening on the button state (hover, maybe press)

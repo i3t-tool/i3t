@@ -29,6 +29,6 @@ public:
 
 	bool allowSelectOnClick(const DIWNE::DrawInfo& context) const override;
 
-	void updateControlPointsOffsets();
+	void updateControlPoints() override;
 };
 } // namespace Workspace

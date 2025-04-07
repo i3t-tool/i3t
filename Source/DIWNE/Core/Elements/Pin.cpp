@@ -12,8 +12,6 @@
  */
 #include "Pin.h"
 
-#include "Logger/Logger.h"
-
 #include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/diwne_actions.h"
 #include "Link.h"
@@ -37,6 +35,21 @@ void Pin::begin(DrawInfo& context)
 {
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup();
+
+	// Drawing pin hover background, uses hover information from the last frame
+	if (m_hovered && allowConnection())
+	{
+		m_previewPlugged = true;
+		if (style().boolean(Style::PIN_ENABLE_HOVER_BG))
+			drawPinBackground();
+	}
+}
+void Pin::content(DrawInfo& context)
+{
+	m_pinRect = m_rect;
+	m_dragRect = m_rect;
+	// TODO: Implement basic pin from CorePin
+	assert(false && "Not implemented!");
 }
 
 void Pin::end(DrawInfo& context)
@@ -44,12 +57,37 @@ void Pin::end(DrawInfo& context)
 	ImGui::EndGroup();
 	ImGui::PopID();
 	m_internalHover = ImGui::IsItemHovered();
+
+	m_previewPlugged = false;
 }
 
 void Pin::updateLayout(DrawInfo& context)
 {
 	updateRectFromImGuiItem();
 	updateConnectionPoint();
+}
+
+void Pin::drawPinBackground()
+{
+	// The background is drawn based on the m_dragRect, eg. the area that will create a new connection when dragged.
+
+	// But notably, it is expanded by ItemSpacing, to create spacing without actually needing to submit it in the pin
+	// This only works if the content around is aware of this, so it might be necessary to modify this based on how
+	// pins are laid out exactly.
+	// Input pins are assumed to be on the left side of the node, flush with the node edge, hence either left or right
+	// side of the background is not offset by spacing, and the other side is also not rounded.
+	// TODO: All of this can be modifed by changing the relevant style variables or drawing a different background
+	// in a subclass.
+	bool leftSide = isInput(); // TODO: Might need to introduce another flag that indicates left or right position
+	ImVec2 eOffset = style().size(Style::PIN_BG_SPACING) * diwne.getZoom();
+	ImVec2 offsetMin = ImVec2(leftSide ? 0 : -eOffset.x, -eOffset.y);
+	ImVec2 offsetMax = ImVec2(leftSide ? eOffset.x : 0, eOffset.y);
+	ImDrawFlags cornerFlags = leftSide ? ImDrawFlags_RoundCornersRight : ImDrawFlags_RoundCornersLeft;
+
+	ImRect displayRectScreen = diwne.canvas().diwne2screenTrunc(m_dragRect);
+	ImGui::GetWindowDrawList()->AddRectFilled(displayRectScreen.Min + offsetMin, displayRectScreen.Max + offsetMax,
+	                                          ImGui::ColorConvertFloat4ToU32(style().color(Style::PIN_BG_COLOR)),
+	                                          style().decimal(Style::PIN_BG_ROUNDING) * diwne.getZoom(), cornerFlags);
 }
 
 bool Pin::isInput() const
@@ -67,34 +105,47 @@ void Pin::processInteractions(DrawInfo& context)
 	// Check if a link was dragged over this one this frame and released
 	// To allow connecting pins of the same Node, we must also check if the dragged pin was released the previous frame.
 	bool draggingThisOrPrevFrame = (context.state.dragging || context.state.dragEndedLastFrame);
-	if (m_hovered && draggingThisOrPrevFrame && allowConnection() && !connectionChangedLastFrame)
+	if (m_hovered)
 	{
-		// The connect pin action is active during the frame the drag has ended,
-		// but also the one frame right after that, so we can still react to it's end with a one frame delay.
-		Actions::ConnectPinAction* action = context.state.getActiveAction<Actions::ConnectPinAction>();
-		if (action)
+		if (draggingThisOrPrevFrame && allowConnection() && !connectionChangedLastFrame)
 		{
-			if (!action->sourcePin)
+			// The connect pin action is active during the frame the drag has ended,
+			// but also the one frame right after that, so we can still react to it's end with a one frame delay.
+			Actions::ConnectPinAction* action = context.state.getActiveAction<Actions::ConnectPinAction>();
+			if (action)
 			{
-				DIWNE_FAIL("[DIWNE] Source pin was not defined for the drag link action!");
-				return;
+				if (!action->sourcePin)
+				{
+					DIWNE_FAIL("[DIWNE] Source pin was not defined for the drag link action!");
+					return;
+				}
+				if (!action->draggedLink)
+				{
+					DIWNE_FAIL("[DIWNE] Drag link action has no link set!");
+					return;
+				}
+				Pin* otherPin = action->draggedLink->getSinglePin();
+				if (!otherPin)
+				{
+					DIWNE_FAIL("[DIWNE] Dragged link has both or no ends connected!");
+				}
+
+				if (otherPin == this) // Link cannot be plugged into a single pin on both sides
+					return;
+
+				// The link is released when the drag ends this frame
+				// It is possible that this pin has missed the initial drag end event and so we also check whether
+				// the drag has ended the previous frame, but we MUST avoid plugging the link twice, hence on the next
+				// frame we must ensure the link wasn't plugged in already by inspecting our m_connectionChanged flag.
+				bool linkReleased = context.state.dragEnd || context.state.dragEndedLastFrame;
+				action->validConnection = preparePlug(otherPin, action->draggedLink, !linkReleased);
+				action->connectionPoint = getConnectionPoint();
 			}
-			if (!action->draggedLink)
-			{
-				DIWNE_FAIL("[DIWNE] Drag link action has no link set!");
-				return;
-			}
-			Pin* otherPin = action->draggedLink->getSinglePin();
-			if (!otherPin)
-			{
-				DIWNE_FAIL("[DIWNE] Dragged link both or no ends connected!");
-			}
-			// The link is released when the drag ends this frame
-			// It is possible that this pin has missed the initial drag end event and so we also check whether
-			// the drag has ended the previous frame, but we MUST avoid plugging the link twice, hence on the next frame
-			// we must ensure the link wasn't plugged in already by inspecting our m_connectionChanged flag.
-			bool linkReleased = context.state.dragEnd || context.state.dragEndedLastFrame;
-			preparePlug(otherPin, action->draggedLink, !linkReleased);
+		}
+		else
+		{
+			if (isDisabled() && isDragAreaHovered())
+				diwne.showTooltipLabel("Pin is disabled!", ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 		}
 	}
 }
@@ -131,10 +182,26 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		Actions::ConnectPinAction* action = context.state.getAction<Actions::ConnectPinAction>();
 
 		// Update temporary link start/end point
+		// Snap the dragged link to this pin if the connection is valid
 		if (action->draggedLink->getEndPin() == nullptr)
-			action->draggedLink->setEndPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+		{
+			if (action->validConnection)
+				action->draggedLink->setEndPoint(action->connectionPoint);
+			else
+				action->draggedLink->setEndPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+			action->draggedLink->getStartPin()->m_previewPlugged = true;
+		}
 		else
-			action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+		{
+			if (action->validConnection)
+				action->draggedLink->setStartPoint(action->connectionPoint);
+			else
+				action->draggedLink->setStartPoint(diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()));
+			action->draggedLink->getEndPin()->m_previewPlugged = true;
+		}
+		action->draggedLink->m_previewPlugged = action->validConnection;
+		action->validConnection = false; /// Reset valid flag
+
 		// Allow editor panning
 		diwne.processPan();
 
@@ -152,9 +219,10 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 // TODO: (DR) Not tested standalone
 bool Pin::preparePlug(Pin* otherPin, Link* link, bool hovering)
 {
+	assert(this != otherPin && "Pin cannot be plugged into itself");
 	if (!hovering)
 		return plugLink(otherPin, link);
-	return false;
+	return true;
 }
 
 // TODO: (DR) Not tested standalone
@@ -166,6 +234,7 @@ bool Pin::plug(Pin* otherPin, bool logEvent)
 
 bool Pin::plugLink(Pin* otherPin, Link* link, bool logEvent)
 {
+	assert(this != otherPin && "Pin cannot be plugged into itself");
 	assert(!isInput() || !otherPin->isInput() && "Both pins cannot be input pins!");
 	if (!m_allowMultipleConnections)
 	{
@@ -229,7 +298,17 @@ bool Pin::connectionChanged() const
 
 bool Pin::allowConnection() const
 {
-	return true;
+	return !isDisabled();
+}
+
+bool Pin::isDragAreaHovered() const
+{
+	if (!m_hovered)
+		return false;
+	const ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
+	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
+		return m_dragRect.Contains(mousePos);
+	return m_pinRect.Contains(mousePos);
 }
 
 bool Pin::allowPopup() const
@@ -240,6 +319,7 @@ bool Pin::allowDragStart() const
 {
 	return DiwneObject::allowDragStart() && allowConnection();
 }
+
 Node* Pin::getNode()
 {
 	return m_node;
@@ -281,6 +361,7 @@ void Pin::translate(const ImVec2& vec)
 {
 	DiwneObject::translate(vec);
 	m_pinRect.Translate(vec);
+	m_dragRect.Translate(vec);
 	updateConnectionPoint();
 }
 
@@ -292,6 +373,11 @@ const ImVec2& Pin::getConnectionPoint()
 {
 	return m_connectionPoint;
 }
+bool Pin::isDisabled() const
+{
+	return false;
+}
+
 void Pin::updateConnectionPoint()
 {
 	m_connectionPoint = m_pinRect.GetCenter();

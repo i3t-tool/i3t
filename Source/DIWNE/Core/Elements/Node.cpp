@@ -12,16 +12,12 @@
  */
 #include "Node.h"
 
-#include "Logger/Logger.h"
-
 #include "DIWNE/Core/NodeEditor.h"
 #include "DIWNE/Core/diwne_actions.h"
 
 namespace DIWNE
 {
 Node::Node(DIWNE::NodeEditor& diwne, std::string labelDiwne) : DiwneObject(diwne, labelDiwne) {}
-
-Node::~Node() {}
 
 Node& Node::operator=(const Node& rhs)
 {
@@ -184,6 +180,16 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		}
 	}
 }
+void Node::onHover(DrawInfo& context)
+{
+	DiwneObject::onHover(context);
+	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max, diwne.style().color(Style::HOVER_BORDER_COLOR),
+	                            diwne.style().decimal(Style::SELECTION_ROUNDING), ImDrawFlags_RoundCornersAll,
+	                            diwne.style().decimal(Style::HOVER_BORDER_WIDTH));
+	// diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
+	//                             diwne.style().decimal(Style::selectionRounding), ImDrawFlags_RoundCornersAll,
+	//                             diwne.style().decimal(Style::objectHoverBorderThicknessDiwne));
+}
 
 void Node::onDestroy(bool logEvent)
 {
@@ -212,11 +218,10 @@ void Node::drawSelectionIndicator(DrawInfo& context)
 {
 	if (m_selected)
 	{
-		DiwneStyle& style = diwne.style();
+		Style& style = diwne.style();
 		diwne.canvas().AddRectDiwne(getDisplayRect().Min, getDisplayRect().Max,
-		                            diwne.mp_settingsDiwne->itemSelectedBorderColor,
-		                            style.decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
-		                            style.decimal(DiwneStyle::itemSelectedBorderThicknessDiwne));
+		                            style.color(Style::SELECTED_BORDER_COLOR), style.decimal(Style::SELECTION_ROUNDING),
+		                            ImDrawFlags_RoundCornersAll, style.decimal(Style::SELECTED_BORDER_WIDTH));
 	}
 }
 bool Node::willBeRemovedFromContainer(const DiwneObject* container)

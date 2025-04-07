@@ -38,7 +38,7 @@ StyleEditor::StyleEditor() : IWindow(ICON_T(ICON_I3T_STYLE " ", "Style Editor"))
 
 void StyleEditor::render()
 {
-	ImGui::Begin(getName(), getShowPtr(), g_dialogFlags);
+	ImGui::Begin(getName(), getShowPtr(), g_WindowFlags);
 
 	this->updateWindowInfo();
 
@@ -94,8 +94,15 @@ void renderVariables()
 
 	for (const auto& group : Theme::getVariables())
 	{
-		ImGui::TextUnformatted(group.name);
-		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		if (group.indent > 0)
+		{
+			for (int i = 0; i < group.indent; i++)
+				ImGui::Indent();
+		}
+
+		ImGui::SeparatorText(group.name);
 
 		for (const auto& var : group.variables)
 		{
@@ -106,90 +113,98 @@ void renderVariables()
 				valueMax = var.range.value().y;
 			}
 
-			std::visit(Detail::Overloaded{
-			               [&](const EColor& color) {
-				               auto& val = curr.getColorsRef()[color];
-				               ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
-				               if (ImGui::ColorEdit4(var.name, (float*) (&val)))
-				               {
-					               curr.apply();
-				               }
-			               },
-			               [&](const ESize& size) {
-				               auto& entry = curr.getSizesRef()[size];
-				               auto& val = entry.first;
-				               bool dpiScaled = entry.second;
+			std::visit(
+			    Detail::Overloaded{
+			        [&](const EColor& color) {
+				        auto& val = curr.getColorsRef()[color];
+				        ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
+				        if (ImGui::ColorEdit4(var.name, (float*) (&val),
+				                              ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+				        {
+					        curr.apply();
+				        }
+			        },
+			        [&](const ESize& size) {
+				        auto& entry = curr.getSizesRef()[size];
+				        auto& val = entry.first;
+				        bool dpiScaled = entry.second;
 
-				               ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
+				        ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
 
-				               if (var.forceInt)
-				               {
-					               int intVal = (int) val;
-					               if (ImGui::DragInt(var.name, &intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
-					               {
-						               val = (float) intVal;
-						               curr.apply();
-					               }
-				               }
-				               else
-				               {
-					               if (ImGui::DragFloat(var.name, &val, 1.0f, valueMin, valueMax, "%.0f"))
-					               {
-						               curr.apply();
-					               }
-				               }
-				               if (dpiScaled)
-				               {
-					               ImGui::SameLine();
-					               ImGui::TextDisabled("(?)");
-					               if (ImGui::BeginItemTooltip())
-					               {
-						               ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						               ImGui::TextUnformatted("This variable is DPI scaled");
-						               ImGui::PopTextWrapPos();
-						               ImGui::EndTooltip();
-					               }
-				               }
-			               },
-			               [&](const ESizeVec2& sizeVec) {
-				               auto& entry = curr.getSizesVecRef()[sizeVec];
-				               auto& val = entry.first;
-				               bool dpiScaled = entry.second;
+				        if (var.forceInt)
+				        {
+					        int intVal = (int) val;
+					        if (ImGui::DragInt(var.name, &intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
+					        {
+						        val = (float) intVal;
+						        curr.apply();
+					        }
+				        }
+				        else
+				        {
+					        if (ImGui::DragFloat(var.name, &val, 1.0f, valueMin, valueMax, "%.0f"))
+					        {
+						        curr.apply();
+					        }
+				        }
+				        if (dpiScaled)
+				        {
+					        ImGui::SameLine();
+					        ImGui::TextDisabled("(?)");
+					        if (ImGui::BeginItemTooltip())
+					        {
+						        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+						        ImGui::TextUnformatted("This variable is DPI scaled");
+						        ImGui::PopTextWrapPos();
+						        ImGui::EndTooltip();
+					        }
+				        }
+			        },
+			        [&](const ESizeVec2& sizeVec) {
+				        auto& entry = curr.getSizesVecRef()[sizeVec];
+				        auto& val = entry.first;
+				        bool dpiScaled = entry.second;
 
-				               ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
+				        ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
 
-				               if (var.forceInt)
-				               {
-					               int intVal[2] = {(int) val[0], (int) val[1]};
-					               if (ImGui::DragInt2(var.name, intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
-					               {
-						               val[0] = (float) intVal[0];
-						               val[1] = (float) intVal[1];
-						               curr.apply();
-					               }
-				               }
-				               else
-				               {
-					               if (ImGui::DragFloat2(var.name, &val[0], 1.0f, valueMin, valueMax, "%.0f"))
-					               {
-						               curr.apply();
-					               }
-				               }
-				               if (dpiScaled)
-				               {
-					               ImGui::SameLine();
-					               ImGui::TextDisabled("(?)");
-					               if (ImGui::BeginItemTooltip())
-					               {
-						               ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						               ImGui::TextUnformatted("This variable is DPI scaled");
-						               ImGui::PopTextWrapPos();
-						               ImGui::EndTooltip();
-					               }
-				               }
-			               },
-			           },
-			           var.key);
+				        if (var.forceInt)
+				        {
+					        int intVal[2] = {(int) val[0], (int) val[1]};
+					        if (ImGui::DragInt2(var.name, intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
+					        {
+						        val[0] = (float) intVal[0];
+						        val[1] = (float) intVal[1];
+						        curr.apply();
+					        }
+				        }
+				        else
+				        {
+					        if (ImGui::DragFloat2(var.name, &val[0], 1.0f, valueMin, valueMax, "%.0f"))
+					        {
+						        curr.apply();
+					        }
+				        }
+				        if (dpiScaled)
+				        {
+					        ImGui::SameLine();
+					        ImGui::TextDisabled("(?)");
+					        if (ImGui::BeginItemTooltip())
+					        {
+						        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+						        ImGui::TextUnformatted("This variable is DPI scaled");
+						        ImGui::PopTextWrapPos();
+						        ImGui::EndTooltip();
+					        }
+				        }
+			        },
+			    },
+			    var.key);
+		}
+
+		if (group.indent > 0)
+		{
+			for (int i = 0; i < group.indent; i++)
+				ImGui::Unindent();
 		}
 	}
 }

@@ -14,6 +14,7 @@
 
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 
 using namespace Workspace;
 
