@@ -86,6 +86,16 @@ void Link::content(DrawInfo& context)
 		                                   m_endDiwne, diwne.style().color(Style::SELECTED_BORDER_COLOR),
 		                                   diwne.style().decimal(Style::LINK_SELECTED_WIDTH));
 	}
+	else
+	{
+		float borderWidth = style().decimal(Style::LINK_BORDER_WIDTH);
+		if (borderWidth > 0)
+		{
+			diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
+			                                   m_endDiwne, diwne.style().color(Style::LINK_BORDER_COLOR), borderWidth);
+		}
+	}
+
 	diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
 	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH));
 	DIWNE_DEBUG_GENERAL(diwne, {

@@ -36,9 +36,10 @@ StyleBase::StyleBase()
 	set<float>(LINK_UNPLUGGED_ALPHA, 0.5f);
 	set<float>(LINK_WIDTH, 5.0f, true);
 	set<float>(LINK_SELECTED_WIDTH, 7.0f, true);
+	set<float>(LINK_BORDER_WIDTH, 6.0f, true);
+	set<ImVec4>(LINK_BORDER_COLOR, {0.0, 0.0, 0.0, 0.23});
 
 	set<ImVec2>(PIN_SPACING, {4.0f, 4.0f}, true);
-	set<float>(PIN_OFFSET, 4.0f, true);
 	set<float>(PIN_LABEL_SPACING, 4.0f, true);
 	set<bool>(PIN_ENABLE_DRAG_LABEL, true);
 	set<bool>(PIN_ENABLE_HOVER_BG, true);
@@ -47,8 +48,18 @@ StyleBase::StyleBase()
 	set<float>(PIN_BG_ROUNDING, 5.0f, true);
 	set<ImVec4>(PIN_HOVER_COLOR_SHIFT, {0.1f, 0.1f, 0.1f, 0.0f});
 
+	set<float>(PIN_SOCKET_OFFSET, 4.0f, true);
+	set<float>(PIN_SOCKET_BORDER_WIDTH, 0.0f, true);
+	set<ImVec4>(PIN_SOCKET_BORDER_COLOR, {0.f, 0.f, 0.f, 0.25f});
+	set<float>(PIN_SOCKET_BORDER_ROUNDING, 4.0f, true);
 	set<ImVec4>(PIN_SOCKET_BG, {0.f, 0.f, 0.f, 0.31f});
 	set<float>(PIN_SOCKET_THICKNESS, 2.0f, true);
+	set<float>(PIN_SOCKET_CONNECTED_GAP, 2.0f, true);
+
+	set<float>(PIN_SQUARE_OFFSET, 4.0f, true);
+	set<float>(PIN_SQUARE_BORDER_WIDTH, 0.0f, true);
+	set<ImVec4>(PIN_SQUARE_BORDER_COLOR, {0.f, 0.f, 0.f, 0.25f});
+	set<float>(PIN_SQUARE_ROUNDING, 2.0f, true);
 
 	set<ImVec4>(SELECTION_RECT_FULL_COLOR, {0.0, 0.0, 1.0, 0.1});
 	set<ImVec4>(SELECTION_RECT_TOUCH_COLOR, {0.0, 1.0, 0.0, 0.1});

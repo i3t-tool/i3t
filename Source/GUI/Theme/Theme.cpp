@@ -162,7 +162,7 @@ void Theme::initClassicProperties()
 	set(EColor::DockTabHovered, get(EColor::SelectionColor));
 
 	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150)); // TODO: Missing in DarkTheme
-	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
+	set(EColor::Workspace_HoverBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
@@ -326,7 +326,7 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_rightSideSpacing] = {3.0f, true};
 
 	m_sizes[ESize::Workspace_SelectedBorderThickness] = {2.5f, true};
-	m_sizes[ESize::Workspace_FocusBorderThickness] = {1.5f, true};
+	m_sizes[ESize::Workspace_HoverBorderThickness] = {1.5f, true};
 	m_sizes[ESize::Workspace_CopyPasteOffset] = {25.f, true};
 	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = {0.0005f, false};
 
@@ -466,20 +466,22 @@ void Theme::initNames()
 	    .add(EColor::NodeHeader, "General Node Header")
 	    .add(EColor::NodeFont, "General Node Font (text)")
 	    .add(EColor::NodeBorder, "Node Border")
+	    .add(EColor::Workspace_HoverBorder, "Hover Border Color")
+	    .add(EColor::SelectionRectFull, "Selection rectangle full")
+	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
+	    .add(EColor::Workspace_SelectedBorder, "Selected node border")
 	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
 	    .add(EColor::NodeContextButtonColorText, "Context Button Text")
 	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
 	    .add(EColor::NodeLODButtonColorActive, "LOD Button Active Color")
 	    .add(EColor::NodeLODButtonColorHovered, "LOD Button Hover Color")
-	    .add(EColor::SelectionRectFull, "Selection rectangle full")
-	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
-	    .add(EColor::Workspace_SelectedBorder, "Selected node border")
 	    .add(ESize::Float_inactive_alphaMultiplicator, "Float_inactive_alphaMultiplicator")
 	    .add(ESize::Nodes_Operators_Rounding, "Nodes Operators Rounding")
 	    .add(ESize::Nodes_Sequence_Rounding, "Nodes Sequence Rounding")
 	    .add(ESize::Nodes_LOD_Button_Rounding, "Nodes LOD Button Rounding")
 	    .add(ESize::Nodes_Border_Rounding, "Nodes Border Rounding")
 	    .add(ESize::Nodes_Border_Thickness, "Nodes Border Thickness")
+	    .add(ESize::Workspace_HoverBorderThickness, "Hover Border Thickness")
 	    .add(ESize::Workspace_SelectedBorderThickness, "Selected node border thickness")
 	    .add(ESize::Nodes_Rounding, "Nodes Rounding")
 	    .add(ESize::Nodes_FloatWidth, "Nodes Float Width")
@@ -658,11 +660,15 @@ void Theme::initNames()
 	g_ColorNames[EColor::DockTabHovered] = "glob_Dock Hovered Tab Color";
 
 	g_ColorNames[EColor::SceneViewBackground] = "glob_Tab SceneView Background";
+
+	g_ColorNames[EColor::Workspace_HoverBorder] = "glob_Hover Border Color";
+	g_SizeNames[ESize::Workspace_HoverBorderThickness] = "glob_Hover Border Thickness";
+
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";
 	g_ColorNames[EColor::Workspace_SelectedBorder] = "glob_Selected node border";
-
 	g_SizeNames[ESize::Workspace_SelectedBorderThickness] = "glob_Selected node border thickness";
+
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	// Tutorials
@@ -947,11 +953,11 @@ void Theme::updateDiwneStyleFromTheme() const
 
 	style.set(Style::NODE_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding));
 
-	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding));
+	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Border_Rounding));
 	style.set(Style::SELECTED_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_SelectedBorderThickness));
 	style.set(Style::SELECTED_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_SelectedBorder));
-	style.set(Style::HOVER_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_FocusBorderThickness));
-	style.set(Style::HOVER_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_FocusBorder));
+	style.set(Style::HOVER_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_HoverBorderThickness));
+	style.set(Style::HOVER_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_HoverBorder));
 
 	style.set(Style::LINK_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_Thickness));
 	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected));
@@ -965,18 +971,19 @@ void Theme::updateDiwneStyleFromTheme() const
 	m_nodeStyle.setEditor(&editor);
 	m_nodeStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG, I3T::getTheme().getPtr(EColor::NodeBg));
 	m_nodeStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG, I3T::getTheme().getPtr(EColor::NodeHeader));
-	m_nodeStyle.setOverride<float*>(DIWNE::Style::NODE_ROUNDING, I3T::getTheme().getPtr(ESize::Nodes_Border_Rounding));
 
 	// Transformation
 	m_transformationStyle.setEditor(&editor);
-	m_transformationStyle.setOverride<ImVec4>(DIWNE::Style::NODE_BG, I3T::getTheme().get(EColor::NodeBgTransformation));
-	m_transformationStyle.setOverride<ImVec4>(DIWNE::Style::NODE_HEADER_BG,
-	                                          I3T::getTheme().get(EColor::NodeHeaderTranformation));
+	m_transformationStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG,
+	                                           I3T::getTheme().getPtr(EColor::NodeBgTransformation));
+	m_transformationStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG,
+	                                           I3T::getTheme().getPtr(EColor::NodeHeaderTranformation));
 
 	// Operator
 	m_operatorStyle.setEditor(&editor);
-	m_operatorStyle.setOverride<ImVec4>(DIWNE::Style::NODE_BG, I3T::getTheme().get(EColor::NodeBgOperator));
-	m_operatorStyle.setOverride<ImVec4>(DIWNE::Style::NODE_HEADER_BG, I3T::getTheme().get(EColor::NodeHeaderOperator));
+	m_operatorStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG, I3T::getTheme().getPtr(EColor::NodeBgOperator));
+	m_operatorStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG,
+	                                     I3T::getTheme().getPtr(EColor::NodeHeaderOperator));
 }
 
 void Theme::apply()

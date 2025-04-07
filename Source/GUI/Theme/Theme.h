@@ -72,7 +72,7 @@ enum class EColor
 	Synergies_FloatBgHovered,
 
 	Workspace_SelectedBorder,
-	Workspace_FocusBorder,
+	Workspace_HoverBorder,
 
 	TutorialBgColor,
 	TutorialText,
@@ -247,7 +247,7 @@ enum class ESize
 	Nodes_rightSideSpacing,
 
 	Workspace_SelectedBorderThickness,
-	Workspace_FocusBorderThickness,
+	Workspace_HoverBorderThickness,
 	Workspace_CopyPasteOffset,
 	Workspace_TrackingTimeBetweenTracks,
 

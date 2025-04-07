@@ -597,10 +597,10 @@ sizes:
   ngen_Pins IconPadding: 2
   ngen_Links Selected Alpha: 0.800000012
   ngen_Float_inactive_alphaMultiplicator: 0.5
-  ngen_Nodes Operators Rounding: 5
-  ngen_Nodes Sequence Rounding: 5
-  ngen_Nodes LOD Button Rounding: 5
-  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Operators Rounding: 7
+  ngen_Nodes Sequence Rounding: 7
+  ngen_Nodes LOD Button Rounding: 7
+  ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
   star_Window Width: 850

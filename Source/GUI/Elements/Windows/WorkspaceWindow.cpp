@@ -80,18 +80,58 @@ void WorkspaceWindow::render()
 				ImGui::MenuItem(
 				    "Drag by label", nullptr,
 				    WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_ENABLE_DRAG_LABEL));
-				ImGui::MenuItem("Pin BG on hover", nullptr,
-				                WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_ENABLE_HOVER_BG));
 				ImGui::SliderFloat2(
 				    "Pin spacing", &WorkspaceModule::g_editor->styleBase().getPtr<ImVec2>(DIWNE::Style::PIN_SPACING)->x,
 				    0.0f, 20.f, "%.2f");
-				ImGui::SliderFloat("Pin icon offset",
-				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_OFFSET), 0.0f,
-				                   20.f, "%.2f");
 				ImGui::SliderFloat(
 				    "Pin label spacing",
 				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_LABEL_SPACING), 0.0f, 20.f,
 				    "%.2f");
+
+				ImGui::SeparatorText("Socket pin style");
+				ImGui::SliderFloat(
+				    "Pin socket offset",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_OFFSET), 0.0f, 20.f,
+				    "%.2f");
+				ImGui::SliderFloat(
+				    "Pin socket thickness",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_THICKNESS), 0.0f,
+				    20.f, "%.2f");
+				ImGui::SliderFloat(
+				    "Pin socket connected gap",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_CONNECTED_GAP), 0.0f,
+				    20.f, "%.2f");
+				ImGui::SliderFloat(
+				    "Pin socket border width (0 for off)",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_BORDER_WIDTH), 0.0f,
+				    20.f, "%.2f");
+				ImGui::ColorEdit4(
+				    "Pin socket border color",
+				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_SOCKET_BORDER_COLOR)->x,
+				    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+				ImGui::SeparatorText("Square pin style");
+				ImGui::SliderFloat(
+				    "Pin square offset",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_OFFSET), 0.0f, 20.f,
+				    "%.2f");
+
+				ImGui::SliderFloat(
+				    "Pin square rounding",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_ROUNDING), 0.0f, 20.f,
+				    "%.2f");
+				ImGui::SliderFloat(
+				    "Pin square border width (0 for off)",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_BORDER_WIDTH), 0.0f,
+				    20.f, "%.2f");
+				ImGui::ColorEdit4(
+				    "Pin square border color",
+				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_SQUARE_BORDER_COLOR)->x,
+				    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+				ImGui::SeparatorText("Pin hover background");
+				ImGui::MenuItem("Pin BG on hover", nullptr,
+				                WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_ENABLE_HOVER_BG));
 				ImGui::SliderFloat2(
 				    "Pin BG spacing",
 				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec2>(DIWNE::Style::PIN_BG_SPACING)->x, 0.0f, 20.f,
@@ -102,6 +142,16 @@ void WorkspaceWindow::render()
 				ImGui::SliderFloat("Pin BG rounding",
 				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_BG_ROUNDING),
 				                   0.0f, 20.f, "%.2f");
+
+				ImGui::SeparatorText("Link style");
+				ImGui::SliderFloat(
+				    "Link border width (0 for off)",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::LINK_BORDER_WIDTH), 0.0f, 20.f,
+				    "%.2f");
+				ImGui::ColorEdit4(
+				    "Lin border color",
+				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::LINK_BORDER_COLOR)->x,
+				    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();

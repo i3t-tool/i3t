@@ -48,9 +48,10 @@ public:
 		LINK_UNPLUGGED_ALPHA, // float
 		LINK_WIDTH,           // float
 		LINK_SELECTED_WIDTH,  // float
+		LINK_BORDER_WIDTH,    // float
+		LINK_BORDER_COLOR,    // ImVec4
 
 		PIN_SPACING,           // ImVec2, spacing around the pin
-		PIN_OFFSET,            // float, offset between the pin icon and the edge of a node
 		PIN_LABEL_SPACING,     // float, gap between the pin icon and the label
 		PIN_ENABLE_DRAG_LABEL, // bool, whether to include pin label in the "draggable" area
 		PIN_ENABLE_HOVER_BG,   // bool, whether to draw pin background on hover
@@ -59,8 +60,18 @@ public:
 		PIN_BG_ROUNDING,       // float
 		PIN_HOVER_COLOR_SHIFT, // ImVec4, added to the pin color on hover
 
-		PIN_SOCKET_BG,        // ImVec4
-		PIN_SOCKET_THICKNESS, // float
+		PIN_SOCKET_OFFSET,          // float, offset between the pin socket and the edge of a node
+		PIN_SOCKET_BORDER_WIDTH,    // float, thickness of the socket pin border
+		PIN_SOCKET_BORDER_COLOR,    // ImVec4, color of the socket pin border
+		PIN_SOCKET_BORDER_ROUNDING, // float
+		PIN_SOCKET_BG,              // ImVec4
+		PIN_SOCKET_THICKNESS,       // float
+		PIN_SOCKET_CONNECTED_GAP,   // float, gap between the outer and inner circle of a connected socket
+
+		PIN_SQUARE_OFFSET,       // float, offset between the pin icon and the edge of a node
+		PIN_SQUARE_BORDER_WIDTH, // float, thickness of the square pin border
+		PIN_SQUARE_BORDER_COLOR, // ImVec4, color of the square pin border
+		PIN_SQUARE_ROUNDING,     // float
 
 		SELECTION_RECT_FULL_COLOR,  // ImVec4
 		SELECTION_RECT_TOUCH_COLOR, // ImVec4
