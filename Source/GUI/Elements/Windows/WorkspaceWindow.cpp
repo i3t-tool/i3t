@@ -153,6 +153,13 @@ void WorkspaceWindow::render()
 				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::LINK_BORDER_COLOR)->x,
 				    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 
+				ImGui::SeparatorText("Pin dimming");
+				ImGui::MenuItem("Enabled", nullptr,
+				                WorkspaceModule::g_editor->styleBase().getPtr<bool>(DIWNE::Style::PIN_DIM_ENABLED));
+				ImGui::SliderFloat("Dim alpha",
+				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_DIM_ALPHA),
+				                   0.0f, 1.f, "%.2f");
+
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();
 			}

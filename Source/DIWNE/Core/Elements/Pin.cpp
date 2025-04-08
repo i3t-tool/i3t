@@ -30,6 +30,15 @@ Pin::Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne)
 		m_allowMultipleConnections = false;
 }
 
+void Pin::initialize(DrawInfo& context)
+{
+	DiwneObject::initialize(context);
+	if (!m_allowMultipleConnections && m_links.size() > 1)
+	{
+		DIWNE_WARN(std::string() + "Pin " + m_labelDiwne +
+		           " has multiple links but multiple connections are not allowed!");
+	}
+}
 
 void Pin::begin(DrawInfo& context)
 {
@@ -67,16 +76,22 @@ void Pin::updateLayout(DrawInfo& context)
 	updateConnectionPoint();
 }
 
+void Pin::onDestroy(bool logEvent)
+{
+	for (auto link : m_links)
+		link->destroy(logEvent);
+	DiwneObject::onDestroy(logEvent);
+}
+
 void Pin::drawPinBackground()
 {
 	// The background is drawn based on the m_dragRect, eg. the area that will create a new connection when dragged.
-
 	// But notably, it is expanded by ItemSpacing, to create spacing without actually needing to submit it in the pin
 	// This only works if the content around is aware of this, so it might be necessary to modify this based on how
 	// pins are laid out exactly.
 	// Input pins are assumed to be on the left side of the node, flush with the node edge, hence either left or right
 	// side of the background is not offset by spacing, and the other side is also not rounded.
-	// TODO: All of this can be modifed by changing the relevant style variables or drawing a different background
+	// All of this can be modifed by changing the relevant style variables or drawing a different background
 	// in a subclass.
 	bool leftSide = isInput(); // TODO: Might need to introduce another flag that indicates left or right position
 	ImVec2 eOffset = style().size(Style::PIN_BG_SPACING) * diwne.getZoom();
@@ -301,16 +316,6 @@ bool Pin::allowConnection() const
 	return !isDisabled();
 }
 
-bool Pin::isDragAreaHovered() const
-{
-	if (!m_hovered)
-		return false;
-	const ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
-	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
-		return m_dragRect.Contains(mousePos);
-	return m_pinRect.Contains(mousePos);
-}
-
 bool Pin::allowPopup() const
 {
 	return false;
@@ -365,7 +370,7 @@ void Pin::translate(const ImVec2& vec)
 	updateConnectionPoint();
 }
 
-void Pin::setConnectionPointDiwne(const ImVec2 value)
+void Pin::setConnectionPointDiwne(const ImVec2& value)
 {
 	m_connectionPoint = value;
 }
@@ -382,21 +387,22 @@ void Pin::updateConnectionPoint()
 {
 	m_connectionPoint = m_pinRect.GetCenter();
 }
-void Pin::initialize(DrawInfo& context)
+
+bool Pin::isDragAreaHovered() const
 {
-	DiwneObject::initialize(context);
-	if (!m_allowMultipleConnections && m_links.size() > 1)
-	{
-		DIWNE_WARN(std::string() + "Pin " + m_labelDiwne +
-		           " has multiple links but multiple connections are not allowed!");
-	}
+	if (!m_hovered)
+		return false;
+	const ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
+	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
+		return m_dragRect.Contains(mousePos);
+	return m_pinRect.Contains(mousePos);
 }
 
-void Pin::onDestroy(bool logEvent)
+bool Pin::canPlug(Pin* other) const
 {
-	for (auto link : m_links)
-		link->destroy(logEvent);
-	DiwneObject::onDestroy(logEvent);
+	if (this == other)
+		return false;
+	return true;
 }
 
 } /* namespace DIWNE */

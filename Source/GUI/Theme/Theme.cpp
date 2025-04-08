@@ -197,9 +197,9 @@ void Theme::initClassicProperties()
 
 	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
 
-	// pin colors (background)
 	set(EColor::DisabledPinColor, createColor(93, 93, 93, 85));
 
+	// pin colors (background)
 	set(EColor::PulsePin, createColor(164, 58, 190, 255));
 	set(EColor::FloatPin, createColor(58, 144, 66, 255));
 	set(EColor::MatrixPin, createColor(178, 71, 66, 255));
