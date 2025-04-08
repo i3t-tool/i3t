@@ -62,7 +62,7 @@ StyleBase::StyleBase()
 	set<float>(PIN_SQUARE_ROUNDING, 2.0f, true);
 
 	set<bool>(PIN_DIM_ENABLED, true);
-	set<float>(PIN_DIM_ALPHA, 0.32f);
+	set<float>(PIN_DIM_ALPHA, 0.35f);
 
 	set<ImVec4>(SELECTION_RECT_FULL_COLOR, {0.0, 0.0, 1.0, 0.1});
 	set<ImVec4>(SELECTION_RECT_TOUCH_COLOR, {0.0, 1.0, 0.0, 0.1});

@@ -19,6 +19,8 @@ namespace Workspace
 {
 class Cycle : public CoreNodeWithPins
 {
+	using Super = CoreNodeWithPins;
+
 public:
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -46,6 +48,8 @@ public:
 	void rightContent(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
+	LevelOfDetail switchLevelOfDetail(LevelOfDetail oldLevel) override;
+	int getLODCount() override;
 
 	int maxLengthOfData() override;
 

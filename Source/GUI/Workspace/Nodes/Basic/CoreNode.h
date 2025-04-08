@@ -17,6 +17,12 @@
 
 namespace Workspace
 {
+inline bool CoreNode_useLODIcons = true;
+inline bool CoreNode_useDotsForMultiLOD = true;
+inline bool CoreNode_useAngleLODIcon = true;
+inline bool CoreNode_useCaretLODIcon = false;
+inline bool CoreNode_usePenInBoxIcon = true;
+
 class CoreNode : public Node, public IVisitable
 {
 	using Super = Node;
@@ -61,9 +67,10 @@ public:
 	void onDestroy(bool logEvent) override;
 	void onPopup() override;
 
+	void onSelection(bool selected) override;
+
 	// Number format / precision
 	// =============================================================================================================
-	bool drawDataLabel();
 	void drawMenuSetEditable();
 	void drawMenuSetPrecision();
 
@@ -86,6 +93,12 @@ public:
 	LevelOfDetail setLevelOfDetail(LevelOfDetail levelOfDetail);
 	LevelOfDetail getLevelOfDetail();
 
+	/// Switches to the next LOD level
+	/// @returns Thew new LOD level
+	virtual LevelOfDetail switchLevelOfDetail(LevelOfDetail oldLevel);
+	virtual int getLODCount(); ///< Number of levels this node cycles through
+
+public:
 	// Duplication
 	// =============================================================================================================
 	void drawMenuDuplicate(DIWNE::DrawInfo& context);
@@ -94,9 +107,10 @@ public:
 
 	// =============================================================================================================
 
-	void onSelection(bool selected) override;
-
 private:
+	void drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImDrawFlags cornerFlags);
 	const char* getButtonSymbolFromLOD(LevelOfDetail detail);
+	void drawContextMenuButton(DIWNE::DrawInfo& context, ImDrawFlags cornerFlags);
+	void drawHeaderLabel(DIWNE::DrawInfo& context);
 };
 } // namespace Workspace

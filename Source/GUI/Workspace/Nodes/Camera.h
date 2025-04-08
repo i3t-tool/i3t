@@ -72,21 +72,16 @@ public:
 	void drawOutputPins(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
+	LevelOfDetail switchLevelOfDetail(LevelOfDetail oldLevel) override;
+	int getLODCount() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
 	int maxLengthOfData() override;
 
-	bool isCamera();
+	// TODO: Move screen output to the left side
 
-	//	void leftContent(DIWNE::Diwne &diwne);
-	//	void rightContent(DIWNE::Diwne &diwne);
-
-	// TODO: Uncomment
 	void onSelection(bool selected) override;
-	//	bool processSelect() override;
-	//	bool processUnselect() override;
-
 	void onDestroy(bool logEvent) override;
 
 private:

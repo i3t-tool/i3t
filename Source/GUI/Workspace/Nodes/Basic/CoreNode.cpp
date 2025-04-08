@@ -16,6 +16,8 @@
 #include "misc/cpp/imgui_stdlib.h" // for changable text
 
 #include "Core/Input/InputManager.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6_I3T.h"
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Tools.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
@@ -57,11 +59,7 @@ void CoreNode::begin(DIWNE::DrawInfo& context)
 void CoreNode::topContent(DIWNE::DrawInfo& context)
 {
 	// Note: This method does not call superclass topContent!
-	// TODO: But it should :|
 
-	bool interacted = false;
-
-	float zoom = diwne.getZoom();
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	LevelOfDetail detail = getLevelOfDetail();
@@ -83,109 +81,22 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 	                            I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawFlags_RoundCornersAll,
 	                            I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
-	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
-	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
-	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
-
-	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), lodButtonCornersFlag,
-	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
+	if (getLODCount() > 0)
 	{
-		if (detail == LevelOfDetail::Full)
-		{
-			if (std::dynamic_pointer_cast<TransformationBase>(shared_from_this()) ||
-			    std::dynamic_pointer_cast<Cycle>(shared_from_this()))
-			{
-				setLevelOfDetail(LevelOfDetail::SetValues);
-			}
-			else if (!std::dynamic_pointer_cast<Camera>(shared_from_this())) // camera does not change state
-			{
-				setLevelOfDetail(LevelOfDetail::Label);
-			}
-		}
-		else if (detail == LevelOfDetail::SetValues)
-		{
-			setLevelOfDetail(LevelOfDetail::Label);
-		}
-		else if (detail == LevelOfDetail::Label)
-		{
-			setLevelOfDetail(LevelOfDetail::Full);
-		}
-		interacted = true;
+		drawLODButton(context, detail, lodButtonCornersFlag);
+		ImGui::SameLine(0, style.FramePadding.x);
 	}
-	if (ImGui::IsItemActive())
-		context.consumeInput();
-	ImGui::PopStyleColor(4);
-	ImGui::PopStyleVar();
-
-	ImGui::SameLine(0, style.FramePadding.x);
+	else
+	{
+		DIWNE::DGui::SameLineDummy({style.FramePadding.x, 0});
+	}
 
 	//	// Left frame padding, shouldn't be necessary as LabelText already includes frame padding
 	//	float paddingWidth = ImGui::GetStyle().FramePadding.x; // Already scaled
 	//	ImGui::Indent(paddingWidth);
 
 	// Top label
-	if (m_topLabel.empty())
-	{
-		m_topLabel = m_nodebase->getLabel();
-	}
-	const char* topLabel = m_topLabel.c_str();
-	const ImVec2 textSize = ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel));
-
-	//	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	//	ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + style.FramePadding, cursorPos + textSize +
-	//  style.FramePadding, IM_COL32(0, 255, 255, 120));
-
-	const float labelWidth = textSize.x + style.FramePadding.x * 2;
-	ImGui::PushItemWidth(labelWidth);
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
-
-	if (m_isLabelBeingEdited)
-	{
-		float prevTopLabelWidth = m_topLabelWidth;
-		interacted = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
-		                              ImGuiInputTextFlags_NoHorizontalScroll);
-
-		// Ensure that when the label width changes, the layout does not flicker
-		// InputText doesn't change width on edit until the NEXT frame
-		if (ImGui::IsItemEdited())
-		{
-			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
-			float diff = m_topLabelWidth - prevTopLabelWidth;
-			m_topLabelWidthChange = diff;
-		}
-		else
-		{
-			if (m_topLabelWidthChange != 0)
-				m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(m_topLabelWidthChange));
-			m_topLabelWidthChange = 0;
-		}
-
-		auto id = ImGui::GetItemID();
-		if (m_isFirstDraw)
-		{
-			ImGui::ActivateItemByID(id);
-			interacted = true;
-			m_isFirstDraw = false;
-		}
-		interacted |= ImGui::IsItemActive();
-		if (!interacted)
-		{
-			m_isLabelBeingEdited = false;
-			m_isFirstDraw = true;
-		}
-	}
-	else
-	{
-		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
-		if (m_topLabelWidth == 0 || diwne.canvas().m_prevZoom != diwne.canvas().m_zoom)
-			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
-		interacted = false;
-	}
-	ImGui::PopStyleColor();
-	ImGui::PopItemWidth();
+	drawHeaderLabel(context);
 
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
@@ -218,31 +129,171 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine(0, 0);
 		m_top.spring(1.0f);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
-		                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
-		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
-		if (GUI::ButtonWithCorners("###contextBtn", contextButtonCornerFlag,
-		                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
-		{
-			openPopup();
-			interacted = true;
-		}
-		diwne.canvas().DrawBurgerMenu(ImGui::GetWindowDrawList(),
-		                              I3T::getTheme().get(EColor::NodeContextButtonColorText),
-		                              ImGui::GetCurrentContext()->LastItemData.Rect, ImVec2(7.f, 7.5f), 1.2f);
-		if (ImGui::IsItemActive())
-			context.consumeInput();
-		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar();
-	}
-
-	if (interacted)
-	{
-		context.consumeInput();
+		drawContextMenuButton(context, contextButtonCornerFlag);
 	}
 }
+
+void CoreNode::drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImDrawFlags cornerFlags)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
+	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
+	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
+
+	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), cornerFlags,
+	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
+	{
+		switchLevelOfDetail(m_levelOfDetail);
+		context.consumeInput();
+	}
+	if (ImGui::IsItemActive())
+		context.consumeInput();
+	ImGui::PopStyleColor(4);
+	ImGui::PopStyleVar();
+}
+
+const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
+{
+	if (detail == LevelOfDetail::LightCycle)
+		return "."; // was a lightcycle error
+	if (!CoreNode_useLODIcons)
+	{
+		if (detail == LevelOfDetail::Full)
+			return "v";
+		if (detail == LevelOfDetail::SetValues)
+			return "s";
+		if (detail == LevelOfDetail::Label)
+			return ">";
+	}
+	if (getLODCount() <= 2 || !CoreNode_useDotsForMultiLOD)
+	{
+		if (detail == LevelOfDetail::Full)
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_DOWN
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_DOWN
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_DOWN;
+		}
+		if (detail == LevelOfDetail::SetValues)
+		{
+			return CoreNode_usePenInBoxIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_PEN_TO_SQUARE
+			                                : ICON_FA_I3T_NSPACE_1 ICON_FA_PEN;
+		}
+		if (detail == LevelOfDetail::Label)
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_RIGHT
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_RIGHT
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_RIGHT;
+		}
+	}
+	else
+	{
+		if (detail == LevelOfDetail::Full)
+		{
+			return ICON_FA_I3T_DOTS_3_1;
+		}
+		if (detail == LevelOfDetail::SetValues)
+		{
+			return ICON_FA_I3T_DOTS_3_2;
+		}
+		if (detail == LevelOfDetail::Label)
+		{
+			return ICON_FA_I3T_DOTS_3_3;
+		}
+	}
+
+	return "err";
+}
+
+void CoreNode::drawContextMenuButton(DIWNE::DrawInfo& context, ImDrawFlags cornerFlags)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getZoom());
+	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
+	if (GUI::ButtonWithCorners("###contextBtn", cornerFlags,
+	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
+	{
+		openPopup();
+		context.consumeInput();
+	}
+	diwne.canvas().DrawBurgerMenu(ImGui::GetWindowDrawList(), I3T::getTheme().get(EColor::NodeContextButtonColorText),
+	                              ImGui::GetCurrentContext()->LastItemData.Rect, ImVec2(7.f, 7.5f), 1.2f);
+	if (ImGui::IsItemActive())
+		context.consumeInput();
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+}
+
+void CoreNode::drawHeaderLabel(DIWNE::DrawInfo& context)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (m_topLabel.empty())
+	{
+		m_topLabel = m_nodebase->getLabel();
+	}
+	const char* topLabel = m_topLabel.c_str();
+	const ImVec2 textSize = ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel));
+
+	//	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	//	ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + style.FramePadding, cursorPos + textSize +
+	//  style.FramePadding, IM_COL32(0, 255, 255, 120));
+
+	const float labelWidth = textSize.x + style.FramePadding.x * 2;
+	ImGui::PushItemWidth(labelWidth);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
+
+	if (m_isLabelBeingEdited)
+	{
+		float prevTopLabelWidth = m_topLabelWidth;
+		bool interacted = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
+		                                   ImGuiInputTextFlags_NoHorizontalScroll);
+
+		// Ensure that when the label width changes, the layout does not flicker
+		// InputText doesn't change width on edit until the NEXT frame
+		if (ImGui::IsItemEdited())
+		{
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
+			float diff = m_topLabelWidth - prevTopLabelWidth;
+			m_topLabelWidthChange = diff;
+		}
+		else
+		{
+			if (m_topLabelWidthChange != 0)
+				m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(m_topLabelWidthChange));
+			m_topLabelWidthChange = 0;
+		}
+
+		auto id = ImGui::GetItemID();
+		if (m_isFirstDraw)
+		{
+			ImGui::ActivateItemByID(id);
+			interacted = true;
+			m_isFirstDraw = false;
+		}
+		interacted |= ImGui::IsItemActive();
+		if (!interacted)
+		{
+			m_isLabelBeingEdited = false;
+			m_isFirstDraw = true;
+		}
+		else
+		{
+			context.consumeInput();
+		}
+	}
+	else
+	{
+		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
+		if (m_topLabelWidth == 0 || diwne.canvas().m_prevZoom != diwne.canvas().m_zoom)
+			m_topLabelWidth = ImGui::CalcTextSize(m_topLabel.c_str()).x;
+	}
+	ImGui::PopStyleColor();
+	ImGui::PopItemWidth();
+}
+
 
 Ptr<Core::Node> CoreNode::getNodebase() const
 {
@@ -306,9 +357,18 @@ LevelOfDetail CoreNode::getLevelOfDetail()
 	return m_levelOfDetail;
 }
 
-bool CoreNode::drawDataLabel()
+LevelOfDetail CoreNode::switchLevelOfDetail(LevelOfDetail oldLevel)
 {
-	return false;
+	if (oldLevel == LevelOfDetail::Full)
+		return setLevelOfDetail(LevelOfDetail::Label);
+	if (oldLevel == LevelOfDetail::Label)
+		return setLevelOfDetail(LevelOfDetail::Full);
+	return LevelOfDetail::Full;
+}
+
+int CoreNode::getLODCount()
+{
+	return 2;
 }
 
 void CoreNode::drawMenuSetEditable()
@@ -415,22 +475,7 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 		context.consumeInput();
 	}
 
-
 	DiwneObject::onReleased(justReleased, context);
-}
-
-const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
-{
-	if (detail == LevelOfDetail::Full)
-		return "v";
-	if (detail == LevelOfDetail::SetValues)
-		return "s";
-	if (detail == LevelOfDetail::Label)
-		return ">";
-	if (detail == LevelOfDetail::LightCycle)
-		return "."; // was a lightcycle error
-
-	return "missingLOD";
 }
 
 void CoreNode::onDestroy(bool logEvent)
