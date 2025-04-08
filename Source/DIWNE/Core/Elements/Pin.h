@@ -58,6 +58,8 @@ public:
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
 
+	void translate(const ImVec2& vec) override;
+
 	void onDestroy(bool logEvent) override;
 
 	// Interaction
@@ -68,13 +70,29 @@ public:
 	bool allowPopup() const override;
 	bool allowDragStart() const override;
 
-	// Pin drawing
-	// =============================================================================================================
-	// TODO: Move square/socket pin drawing here
-	void drawPinBackground();
+	/**
+	 * A condition for starting and receiving a link connection.
+	 * Can be used to specify an area where the pin can be dragged from or a link dropped at.
+	 */
+	virtual bool allowConnection() const;
+
+	/**
+	 * Condition determining when a new link can be created from the pin on drag.
+	 * The drag area is defined by the m_dragRect, or the m_pinRect if dragging by labels is disabled.
+	 */
+	virtual bool isDragAreaHovered() const;
 
 	// Link management
 	// =============================================================================================================
+
+	/**
+	 * Quick check of compatibility between this and some other pin. Used for invalid pin dimming.
+	 * The check in preparePlug() is expected to be more precise and potentially more demanding (checking of loops),
+	 * that's why this "quick" check exists, since it gets called very often from all pins on the screen when dragging.
+	 * @see preparePlug()
+	 */
+	virtual bool canPlug(Pin* other) const;
+
 	/**
 	 * Called when the mouse is dragging a new link and is hovering over this pin as well as when it is released.
 	 * When the hovering argument is false, the mouse was released and the link should be connected.
@@ -83,6 +101,7 @@ public:
 	 * @param link The link that's being prepared for plugging
 	 * @param hovering True when the mouse is only hovering over the pin and it shouldn't be plugged in yet.
 	 * @return Whether the link is ready to be plugged in.
+	 * @see canPlug()
 	 */
 	virtual bool preparePlug(Pin* otherPin, Link* link, bool hovering);
 
@@ -100,7 +119,6 @@ public:
 	template <typename T>
 	bool plug(Pin* otherPin, T logEvent) = delete;
 
-	// TODO: Wrong assertion, the link can have anything on either end!
 	/**
 	 * Connect this and some other pin together using an existing link.
 	 * The other pin is considered the start of the link, except when it is an input pin.
@@ -149,24 +167,6 @@ public:
 	 */
 	virtual std::shared_ptr<Link> createLink();
 
-	Link* getLink(size_t index = 0);
-
-	bool isPlugged() const;
-	bool connectionChanged() const;
-
-	/**
-	 * A condition for starting and receiving a link connection.
-	 * Can be used to specify an area where the pin can be dragged from or a link dropped at.
-	 */
-	virtual bool allowConnection() const;
-	virtual bool isDragAreaHovered() const;
-
-	virtual void setConnectionPointDiwne(const ImVec2 value);
-	virtual const ImVec2& getConnectionPoint();
-
-	/// Whether the pin is disabled or not. When disabled it cannot be plugged in.
-	virtual bool isDisabled() const;
-
 	/**
 	 * Adds the link to the pin's list of links
 	 * @return true if the link was added, false if it already existed
@@ -179,14 +179,19 @@ public:
 	 */
 	bool unregisterLink(Link* link);
 
+	// Pin drawing
 	// =============================================================================================================
-	void translate(const ImVec2& vec) override;
+	/// Set the point to which connected links are attached
+	virtual void setConnectionPointDiwne(const ImVec2& value);
+	virtual const ImVec2& getConnectionPoint();
 
 protected:
-	virtual void updateConnectionPoint();
+	// TODO: Move square/socket pin drawing here
+	void drawPinBackground();
+
+	virtual void updateConnectionPoint(); ///< Updates the connection point
 
 public:
-	// Getters
 	// =============================================================================================================
 	/**
 	 * Whether this is an input or output pin.
@@ -198,6 +203,8 @@ public:
 	 */
 	bool isInput() const;
 
+	virtual bool isDisabled() const; ///< /// Whether the pin is disabled or not. When disabled it cannot be plugged in.
+
 	template <typename T = Node>
 	T* getNode()
 	{
@@ -205,6 +212,10 @@ public:
 		return static_cast<T*>(m_node);
 	}
 	Node* getNode();
+
+	Link* getLink(size_t index = 0);
+	bool isPlugged() const;
+	bool connectionChanged() const;
 };
 
 } /* namespace DIWNE */

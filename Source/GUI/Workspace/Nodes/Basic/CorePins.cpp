@@ -61,6 +61,9 @@ CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node,
  */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
+	ImGuiStyle& imStyle = ImGui::GetStyle();
+
+	// Setup styling
 	if (getType() == Core::EValueType::MatrixMul)
 		m_pinStyle = WorkspaceModule::g_useSquarePinsMul ? PinStyle::Square : PinStyle::Socket;
 	else if (getType() == Core::EValueType::Pulse)
@@ -74,11 +77,29 @@ void CorePin::content(DIWNE::DrawInfo& context)
 	ImVec2 pinSpacing = style().size(DIWNE::Style::PIN_SPACING) * diwne.getZoom();
 	float labelSpacing = style().decimal(DIWNE::Style::PIN_LABEL_SPACING) * diwne.getZoom();
 
+	// TODO: DIMMING NOT WORKING PROPERLY!!, also needs lower alpha
+
+	// Handle pin dimming
+	const bool dimmingEnabled = style().boolean(Style::PIN_DIM_ENABLED);
+	float alphaBackup = 1.0f;
+	float pinAlpha = 1.0f;
+	if (dimmingEnabled)
+	{
+		alphaBackup = imStyle.Alpha;
+		auto action = context.state.getActiveAction<Actions::ConnectPinAction>();
+		if (action != nullptr && !m_isDragged && !canPlug(action->draggedLink->getAnyPin()))
+		{
+			pinAlpha = style().decimal(Style::PIN_DIM_ALPHA);
+			imStyle.Alpha = pinAlpha;
+		}
+	}
+
+	// Draw content
 	ImRect dragRect;
 	if (isInput()) // TODO: Change to m_left or something in the future to support i/o pins on both sides
 	{
 		DGui::RectData rectData = DGui::BeginRect();
-		drawPin(true, context);
+		drawPin(true, pinAlpha);
 		ImGui::SameLine(0, labelSpacing);
 
 		if (drawLabel(context))
@@ -97,11 +118,15 @@ void CorePin::content(DIWNE::DrawInfo& context)
 		if (drawLabel(context))
 			ImGui::SameLine(0, labelSpacing);
 
-		drawPin(false, context);
+		drawPin(false, pinAlpha);
 		dragRect = DGui::EndRect(rectData);
 	}
 	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
 		m_dragRect = diwne.canvas().screen2diwne(dragRect);
+
+	// End dimming
+	if (dimmingEnabled)
+		imStyle.Alpha = alphaBackup;
 
 	DIWNE_DEBUG_LAYOUT(diwne, {
 		diwne.canvas().AddRectDiwne(m_dragRect.Min, m_dragRect.Max, ImColor(204, 255, 0, 255), 0.0f, 0, 1.0f, true);
@@ -113,7 +138,7 @@ bool CorePin::allowDrawing()
 	return Pin::allowDrawing() && getCorePin().isRendered();
 }
 
-void CorePin::drawPin(bool left, DIWNE::DrawInfo& context)
+void CorePin::drawPin(bool left, float alpha)
 {
 	// Pin shall be at least ImGui::GetFrameHeight() high, see drawLabel()
 
@@ -131,9 +156,9 @@ void CorePin::drawPin(bool left, DIWNE::DrawInfo& context)
 	}
 
 	if (m_pinStyle == PinStyle::Socket)
-		drawSocketPin(iconSize, left);
+		drawSocketPin(iconSize, left, alpha);
 	else
-		drawSquarePin(iconSize, left);
+		drawSquarePin(iconSize, left, alpha);
 
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);
@@ -149,7 +174,7 @@ void CorePin::drawPin(bool left, DIWNE::DrawInfo& context)
 	});
 }
 
-void CorePin::drawSquarePin(const ImVec2& size, bool left)
+void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 {
 	// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 	//   not visible anyway so we're just drawing stuff twice for no reason
@@ -162,7 +187,7 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left)
 
 	Core::EValueType pinType = getType();
 	const DIWNE::IconType iconTypeBg = PinShapeBackground[pinType];
-	const ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]);
+	const ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]) * ImVec4(1.f, 1.f, 1.f, alpha);
 
 	DIWNE::IconType iconTypeFg;
 	if (m_iconType != DIWNE::IconType::NoIcon)
@@ -170,8 +195,7 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left)
 	else
 		iconTypeFg = PinShapeForeground[pinType];
 
-	const ImColor iconColorFg = I3T::getColor(PinColorForeground[pinType]);
-
+	const ImColor iconColorFg = I3T::getColor(PinColorForeground[pinType]) * ImVec4(1.f, 1.f, 1.f, alpha);
 
 	// space between icon symbol and icon boundary
 	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
@@ -212,13 +236,12 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left)
 	}
 }
 
-void CorePin::drawSocketPin(const ImVec2& size, bool left)
+void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha)
 {
 	float offset = style().decimal(DIWNE::Style::PIN_SOCKET_OFFSET) * diwne.getZoom();
 
 	Core::EValueType pinType = getType();
-	const ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]);
-	const ImColor iconColorFg = I3T::getColor(PinColorForeground[pinType]);
+	const ImColor baseColor = I3T::getColor(PinColorBackground[pinType]);
 
 	if (left)
 	{
@@ -240,14 +263,19 @@ void CorePin::drawSocketPin(const ImVec2& size, bool left)
 	float innerRadius = size.x / 2.f - outerThickness;
 	float connectGap = style().decimal(DIWNE::Style::PIN_SOCKET_CONNECTED_GAP) * diwne.getZoom();
 
-	ImVec4 color = iconColorBg;
+	ImVec4 color = baseColor;
+	ImVec4 hoverColor = baseColor;
+	ImVec4 bgColor = style().color(DIWNE::Style::PIN_SOCKET_BG);
 	if (m_previewPlugged)
-		color = color + style().color(DIWNE::Style::PIN_HOVER_COLOR_SHIFT);
+		hoverColor = hoverColor + style().color(DIWNE::Style::PIN_HOVER_COLOR_SHIFT);
+
+	color.w *= alpha;
+	hoverColor.w *= alpha;
+	bgColor.w *= alpha;
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddCircleFilled(center, outerRadius,
-	                     ImGui::ColorConvertFloat4ToU32(style().color(DIWNE::Style::PIN_SOCKET_BG)), 0);
-	idl->AddCircle(center, outerRadius, ImGui::ColorConvertFloat4ToU32(color), 0, outerThickness);
+	idl->AddCircleFilled(center, outerRadius, ImGui::ColorConvertFloat4ToU32(bgColor), 0);
+	idl->AddCircle(center, outerRadius, ImGui::ColorConvertFloat4ToU32(hoverColor), 0, outerThickness);
 
 	// Optionally draw pin socket border
 	float borderWidth = style().decimal(DIWNE::Style::PIN_SOCKET_BORDER_WIDTH) * diwne.getZoom();
@@ -257,9 +285,8 @@ void CorePin::drawSocketPin(const ImVec2& size, bool left)
 		               ImGui::ColorConvertFloat4ToU32(style().color(DIWNE::Style::PIN_SOCKET_BORDER_COLOR)), 0,
 		               borderWidth);
 	}
-
 	if (isConnected() || m_previewPlugged)
-		idl->AddCircleFilled(center, innerRadius - connectGap, iconColorBg, 0);
+		idl->AddCircleFilled(center, innerRadius - connectGap, ImGui::ColorConvertFloat4ToU32(color), 0);
 
 	if (isDisabled()) // Disabled overlay
 	{
@@ -358,6 +385,21 @@ bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering)
 	}
 	return false;
 }
+
+bool CorePin::canPlug(Pin* other) const
+{
+	if (this == other)
+		return false;
+	if (!other)
+		return false;
+	if (isInput() == other->isInput())
+		return false;
+	CorePin* corePin = static_cast<CorePin*>(other);
+	if (getCorePin().ValueType != corePin->getCorePin().ValueType)
+		return false;
+	return true;
+}
+
 
 bool CorePin::plugLink(Pin* otherPin, DIWNE::Link* link, bool logEvent)
 {

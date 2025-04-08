@@ -17,39 +17,23 @@
 #include "Core/Nodes/NodeData.h"
 #include "GUI/Theme/Theme.h"
 
-#include "CoreLink.h"
 #include "CoreNode.h"
 
 namespace Workspace
 {
-/*! \enum PinKind
-    \brief kinds (in/out) of Workspace Pin
- */
-enum class PinKind
-{
-	Output, ///< on the box right hand side
-	Input   ///< on the box left hand side
-};
 
+// TODO: Move to some DIWNE::BasicPin impl
 enum class PinStyle
 {
 	Square,
 	Socket
 };
 
-/* DIWNE - \todo JH \todo MH see in .cpp to remove, but I need something what
- * use instead -> from Type get Shape and Color */
 extern std::map<Core::EValueType, EColor> PinColorBackground;
-
 extern std::map<Core::EValueType, DIWNE::IconType> PinShapeBackground;
-
 extern std::map<Core::EValueType, DIWNE::IconType> PinShapeForeground;
-
 extern std::map<Core::EValueType, EColor> PinColorForeground;
 
-/*! \class WorkspaceCorePinProperties
-    \brief Information of Pin for graphic
- */
 class CorePin : public DIWNE::Pin
 {
 protected:
@@ -68,7 +52,7 @@ public:
 
 	bool allowDrawing() override;
 
-	void drawPin(bool left, DIWNE::DrawInfo& context);
+	void drawPin(bool left, float alpha);
 	bool drawLabel(DIWNE::DrawInfo& context);  ///< @return Whether a new item was created
 	bool drawDataEx(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 	bool drawData(DIWNE::DrawInfo& context);   ///< @return Whether a new item was created
@@ -80,6 +64,7 @@ public:
 	bool isDisabled() const override;
 
 	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
+	bool canPlug(Pin* other) const override;
 	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
 	void onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent = true) override;
 	void onUnplug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool wasStartPin, bool logEvent = true) override;
@@ -91,7 +76,7 @@ public:
 	Core::EValueType getType() const;
 	bool isConnected() const;
 
-	// TODO: Finish this <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// TODO: Finish this "debug" check
 	/**
 	 * This method ensures the state of this pin is synchronized with the core state.
 	 * Currently ONLY deletes links that should no longer exist.
@@ -111,7 +96,7 @@ private:
 	bool drawBasicPinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 
-	void drawSquarePin(const ImVec2& size, bool left);
-	void drawSocketPin(const ImVec2& size, bool left);
+	void drawSquarePin(const ImVec2& size, bool left, float alpha);
+	void drawSocketPin(const ImVec2& size, bool left, float alpha);
 };
 } // namespace Workspace
