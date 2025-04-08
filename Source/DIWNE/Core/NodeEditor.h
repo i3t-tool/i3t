@@ -18,7 +18,7 @@
 #include "Elements/DiwneObject.h"
 
 #include "Canvas.h"
-#include "DIWNE/Core/Style/DiwneStyle.h"
+#include "DIWNE/Core/Style/StyleBase.h"
 #include "DiwneSettings.h"
 #include "Elements/Containers/NodeContainer.h"
 #include "Input/NodeEditorInputAdapter.h"
@@ -55,14 +55,14 @@ public:
 	InteractionState interactionState;
 
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
-	                        //  this feature shouldn't be specific to our undo/redo system if it were to remain here
+	//  this feature shouldn't be specific to our undo/redo system if it were to remain here
 
 	DIWNE_DEBUG_VARS()
 
 protected:
 	std::unique_ptr<Canvas> m_canvas = std::make_unique<Canvas>(*this);
 	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(*this);
-	std::unique_ptr<DiwneStyle> m_style = std::make_unique<DiwneStyle>();
+	std::unique_ptr<StyleBase> m_style = std::make_unique<StyleBase>();
 
 	ImDrawListSplitter m_channelSplitter;
 
@@ -83,7 +83,7 @@ public:
 	 * @param settingsDiwne
 	 * @return
 	 */
-	explicit NodeEditor(SettingsDiwne* settingsDiwne);
+	NodeEditor(const char* label, SettingsDiwne* settingsDiwne);
 	~NodeEditor() override;
 
 	// Lifecycle
@@ -115,17 +115,14 @@ protected:
 	bool isDraggedDiwne() override;
 
 public:
-	// Interaction - Zooming
+	// Editor interaction
 	// =============================================================================================================
-	virtual bool allowProcessZoom(); // TODO: Rename to allowZoom()
+	virtual bool allowZoom(); // TODO: Rename to allowZoom()
 	virtual bool isZoomingDiwne();
-	virtual bool processZoom();      // TODO: Rename to onZoom()
-	virtual bool processDiwneZoom(); // TODO: Rename to processZoomDiwne()
+	virtual bool processZoom();
+	virtual void onZoom(){}; ///< Called by Canvas::setZoom() when the zoom level changes.
 
-	/**
-	 * Called by Canvas::setZoom() when the zoom level changes.
-	 */
-	virtual void onZoom(){};
+	virtual bool processPan();
 
 	// Subsystems
 	// =============================================================================================================
@@ -155,14 +152,20 @@ public:
 	/**
 	 * Get a reference to the editors style settings, which specify various colors and sizes much like ImStyle.
 	 */
-	DiwneStyle& style() const
+	Style& style() const override
+	{
+		return styleBase(); // Returning the editors base style, not the style override
+	}
+	StyleBase& styleBase() const
 	{
 		return *m_style;
 	}
-	void setStyle(std::unique_ptr<DiwneStyle>&& ptr)
+	void setStyle(std::unique_ptr<StyleBase>&& ptr)
 	{
 		m_style = std::move(ptr);
 	}
+	void setStyleOverride(StyleOverride* styleOverride) = delete;
+	StyleOverride* getStyleOverride() const = delete;
 
 	// Object management
 	// =============================================================================================================
@@ -308,9 +311,11 @@ public:
 	{
 		return m_canvas->getZoom();
 	}
+	/// Set the node editor's dpi scale. Updates dpi scale of its style as well.
 	void setDpiScale(float dpiScale)
 	{
 		mp_settingsDiwne->dpiScale = dpiScale;
+		m_style->setDpiScale(dpiScale);
 	}
 	float getDpiScale() const
 	{
@@ -337,7 +342,7 @@ static void expandPopupContent(T& object) /**< \brief used for popupContent() fu
  *
  */
 template <typename... Args>
-static bool popupDiwne(NodeEditor& diwne, std::string const popupID, void (*popupContent)(Args...), Args&&... args)
+static bool popupDiwne(NodeEditor& diwne, std::string popupID, void (*popupContent)(Args...), Args&&... args)
 {
 	bool interaction_happen = false;
 

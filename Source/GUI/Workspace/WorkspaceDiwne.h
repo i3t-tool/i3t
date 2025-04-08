@@ -91,7 +91,7 @@ public:
 	 */
 	std::unordered_map<Core::ID, CoreNode*> m_coreIdMap;
 
-	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+	WorkspaceDiwne(const char* label, DIWNE::SettingsDiwne* settingsDiwne);
 	~WorkspaceDiwne() override;
 
 	// Lifecycle
@@ -125,11 +125,11 @@ public:
 	// =============================================================================================================
 	void processInteractions(DIWNE::DrawInfo& context) override;
 
-	void onZoom() override;
+	void onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd) override;
+
 	// TODO: (DR) Reimplement
 	//    bool isZoomingDiwne() override;
-	bool processZoom() override;
-	void onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragEnd) override;
+	void onZoom() override;
 
 	void manipulatorStartCheck3D();
 

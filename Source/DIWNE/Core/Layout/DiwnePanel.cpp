@@ -16,8 +16,6 @@
 #include <cmath>
 #include <iostream>
 
-#include "Logger/Logger.h" //TODO: Remove
-
 #include "DIWNE/Core/NodeEditor.h"
 
 namespace DIWNE
@@ -45,10 +43,10 @@ void DiwnePanel::end(DiwnePanel* parent)
 	m_rect = m_editor.canvas().screen2diwne(m_lastScreenRect);
 
 	// Submit itself to the parent panel
-	if (parent != nullptr)
-	{
-		parent->submitChild(this);
-	}
+	// if (parent != nullptr)
+	// {
+	// 	parent->submitChild(this);
+	// }
 
 	DIWNE_DEBUG_LAYOUT((m_editor), {
 		if (m_rect.GetArea() > 0.0f)
@@ -116,13 +114,13 @@ void DiwnePanel::layout()
 	});
 }
 
-void DiwnePanel::submitChild(DiwnePanel* child)
-{
-	// TODO: Some special logic to forward only portion of the fixed with
-	// In principle we DON'T want to subtract spring width as that might oscillate again
-	// submitFixedWidth(child->getMinimumWidth());
-	// applyQueuedWidth();
-}
+// void DiwnePanel::submitChild(DiwnePanel* child)
+// {
+// 	// TODO: Some special logic to forward only portion of the fixed with
+// 	// In principle we DON'T want to subtract spring width as that might oscillate again
+// 	// submitFixedWidth(child->getMinimumWidth());
+// 	// applyQueuedWidth();
+// }
 
 void DiwnePanel::expectWidthChangeThisFrame(float width)
 {

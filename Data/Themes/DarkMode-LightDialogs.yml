@@ -1,4 +1,4 @@
-mode: "dark"
+mode: dark
 colors:
   glob_Primary Color (tabs, tiles, ...): [0.278, 0.278, 0.286, 1.000]
   glob_Active Color: [0.308, 0.308, 0.316, 1.000]
@@ -28,6 +28,7 @@ colors:
   nflo_Synergies FloatBgActive: [0.000, 0.703, 0.000, 1.000]
   nflo_Synergies FloatBgHovered: [0.057, 0.536, 0.057, 1.000]
   glob_Selected node border: [0.345, 1.000, 0.918, 0.588]
+  glob_Hover Border Color: [0.000, 0.000, 0.000, 0.196]
   tuts_Background: [0.910, 0.910, 0.910, 1.000]
   tuts_Text: [0.200, 0.200, 0.200, 1.000]
   tuts_Bar Background: [0.843, 0.843, 0.843, 1.000]
@@ -42,13 +43,17 @@ colors:
   tuts_Button Active: [0.075, 0.518, 0.902, 1.000]
   tuts_Button Hovered: [0.075, 0.455, 0.788, 1.000]
   tuts_Task Background: [0.392, 0.392, 0.392, 0.098]
-  glob_Selection rectangle full: [0.000, 0.420, 0.150, 0.392]
-  glob_Selection rectangle touch: [0.012, 0.641, 0.378, 0.392]
+  glob_Selection rectangle full: [0.000, 0.000, 1.000, 0.100]
+  glob_Selection rectangle touch: [0.000, 1.000, 0.000, 0.100]
+  ngen_Node Editor Background: [0.135, 0.135, 0.135, 1.000]
+  ngen_Node Editor Grid Color: [0.223, 0.223, 0.223, 0.470]
+  ngen_Node Editor Grid Dots Color: [0.784, 0.784, 0.784, 0.156]
+  npin_Disabled Pin Color: [0.365, 0.365, 0.365, 0.333]
   npin_Pulse Pin: [0.657, 0.075, 0.799, 1.000]
   npin_Float Pin: [0.039, 0.702, 0.027, 1.000]
   npin_Vector 3 Pin: [0.227, 0.329, 0.733, 1.000]
   npin_Vector 4 Pin: [0.436, 0.324, 0.000, 1.000]
-  npin_Matrix Pin: [0.710, 0.008, 0.024, 1.000]
+  npin_Matrix Pin: [0.647, 0.098, 0.055, 1.000]
   npin_Quaternion Pin: [0.713, 0.723, 0.073, 1.000]
   npin_MatrixMul Pin: [0.267, 0.788, 0.612, 1.000]
   npin_Screen Pin: [0.000, 0.503, 1.000, 1.000]
@@ -60,21 +65,19 @@ colors:
   npin_Inner Color Quat: [0.098, 0.098, 0.098, 1.000]
   npin_Inner Color MatrixMul: [0.098, 0.098, 0.098, 1.000]
   npin_Inner Color Screen: [0.098, 0.098, 0.098, 1.000]
-  ngen_Node Editor Background: [0.135, 0.135, 0.135, 1.000]
-  ngen_Node Editor Grid Color: [0.223, 0.223, 0.223, 0.470]
-  ngen_Node Editor Grid Dots Color: [0.784, 0.784, 0.784, 0.156]
-  ngen_General Node Background: [0.195, 0.195, 0.195, 1.000]
+  ngen_General Node Background: [0.216, 0.216, 0.216, 0.784]
   ngen_General Node Header: [0.020, 0.341, 0.012, 1.000]
   ngen_General Node Font (text): [1.000, 1.000, 1.000, 1.000]
-  nops_Operator Background: [0.196, 0.196, 0.196, 1.000]
+  nops_Operator Background: [0.216, 0.216, 0.216, 0.784]
   nops_Operator Header: [0.004, 0.400, 0.490, 1.000]
   nops_Operator Float Background: [0.302, 0.333, 0.416, 1.000]
   nops_Operator Active Float Background: [0.380, 0.412, 0.494, 1.000]
   nops_Operator Hovered Float Background: [0.341, 0.373, 0.455, 1.000]
-  ntrs_Transform Background: [0.196, 0.196, 0.196, 1.000]
+  ntrs_Transform Background: [0.216, 0.216, 0.216, 0.784]
   ngen_Node Border: [0.000, 0.000, 0.000, 0.278]
   ntrs_Transform Header: [0.490, 0.114, 0.153, 1.000]
   ngen_LOD Button Text: [1.000, 1.000, 1.000, 1.000]
+  ngen_Context Button Text: [0.800, 0.800, 0.800, 1.000]
   ngen_LOD Button Color: [0.000, 0.000, 0.000, 0.100]
   ngen_LOD Button Active Color: [0.000, 0.000, 0.000, 0.050]
   ngen_LOD Button Hover Color: [0.000, 0.000, 0.000, 0.200]
@@ -145,17 +148,18 @@ sizes:
   ngen_Nodes Left Side spacing: 3
   ngen_Nodes Right Side spacing: 3
   glob_Selected node border thickness: 2.5
+  glob_Hover Border Thickness: 1.5
   ngen_Link Control Point Distance Scaling Factor: 0.200000003
-  ngen_Link Min Control Point X Distance: 50
+  ngen_Link Min Control Point X Distance: 65
   ngen_Link Max Control Point X Distance: 350
   ngen_Link Thickness: 5
-  ngen_Link Additional thickness when selected: 2
+  ngen_Link thickness when selected: 7
   ngen_Links Selected Alpha: 0.800000012
   ngen_Pins IconPadding: 2
-  ngen_Nodes Operators Rounding: 5
-  ngen_Nodes Sequence Rounding: 5
-  ngen_Nodes LOD Button Rounding: 5
-  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Operators Rounding: 7
+  ngen_Nodes Sequence Rounding: 7
+  ngen_Nodes LOD Button Rounding: 7
+  ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
   ngen_Float_inactive_alphaMultiplicator: 0.5
@@ -190,7 +194,8 @@ size vectors:
   ngen_Nodes Middle Size: [0, 0]
   ngen_Nodes Output Size: [0, 0]
   ngen_Nodes LOD Button Size: [27, 27]
-  ngen_Nodes Pin Size: [14, 14]
+  ngen_Nodes Pin Size: [15, 15]
+  ngen_Nodes Pin Size Matrix Mul: [16, 16]
   ngen_Nodes Float Cycle Button Size: [32, 32]
   ngen_Nodes Screen Texture Size: [130, 130]
   ngen_Nodes Screen ResizeButtonSize: [20, 20]

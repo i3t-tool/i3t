@@ -16,7 +16,6 @@ namespace DIWNE
  */
 class Stack : public Layout
 {
-	// TODO: Add support for springs between items, the Stack should probably be a DiwnePanel
 public:
 	enum Mode
 	{

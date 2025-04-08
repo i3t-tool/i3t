@@ -22,7 +22,7 @@ using namespace Workspace;
 
 bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context,
                                                int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode,
-                                               std::string const label, float& value,
+                                               const std::string& label, float& value,
                                                Core::EValueState const& valueState, bool& valueChanged,
                                                const std::string& nodeLabel)
 {
@@ -43,7 +43,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 		                    ImGui::GetStyle().Alpha * I3T::getSize(ESize::Float_inactive_alphaMultiplicator));
 	}
 
-	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
+	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaultRatio);
 
 	//	ImGuiStyle& style = ImGui::GetStyle();
 	//	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
@@ -352,10 +352,10 @@ void DataRenderer::popupFloatContent(FloatPopupMode& popupMode, float& selectedV
 }
 
 /* nodebase->getValueState({colum, row}) /* EValueState */
-bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                               std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+                               const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
                                FloatPopupMode& floatPopupMode, const glm::mat4& data,
-                               std::array<std::array<Core::EValueState, 4> const, 4> const& dataState,
+                               const std::array<std::array<Core::EValueState, 4> const, 4>& dataState,
                                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange)
 {
 	bool inner_interaction_happen = false;
@@ -462,10 +462,10 @@ int DataRenderer::maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleD
 	return maximal;
 }
 
-bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                                std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+                                const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
                                 FloatPopupMode& floatPopupMode, const glm::vec4& data,
-                                std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+                                const std::array<Core::EValueState, 4>& dataState, bool& valueChanged,
                                 glm::vec4& valueOfChange)
 {
 	//    const glm::vec4& coreData = m_nodebase->data(index).getVec4();
@@ -516,9 +516,9 @@ int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisible
 }
 
 bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
-                                std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                                const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
                                 FloatPopupMode& floatPopupMode, const glm::vec3& data,
-                                std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
+                                const std::array<Core::EValueState, 3>& dataState, bool& valueChanged,
                                 glm::vec3& valueOfChange)
 {
 	bool actualValueChanged = false;
@@ -564,8 +564,8 @@ int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisible
 }
 
 bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
-                                 std::string nodeLabel, int numberOfVisibleDecimals, float dataWidth,
-                                 FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState,
+                                 const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
+                                 FloatPopupMode& floatPopupMode, const float& data, const Core::EValueState& dataState,
                                  bool& valueChanged, float& valueOfChange)
 {
 	bool inner_interaction_happen = false;
@@ -591,10 +591,10 @@ int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDec
 	return Tools::numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
 }
 
-bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID const node_id,
-                                      std::string nodeLabel, int const numberOfVisibleDecimals, float dataWidth,
+bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
+                                      const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
                                       FloatPopupMode floatPopupMode, const glm::quat& data,
-                                      std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
+                                      const std::array<Core::EValueState, 4>& dataState, bool& valueChanged,
                                       glm::quat& valueOfChange)
 {
 	bool inner_interaction_happen = false;

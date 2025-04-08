@@ -509,17 +509,17 @@ sizes:
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0
   ngen_Link Control Point Distance Scaling Factor: 0.200000003
-  ngen_Link Min Control Point X Distance: 50
+  ngen_Link Min Control Point X Distance: 65
   ngen_Link Max Control Point X Distance: 350
   ngen_Link Thickness: 5
-  ngen_Link Additional thickness when selected: 2
+  ngen_Link thickness when selected: 7
   ngen_Pins IconPadding: 2
   ngen_Links Selected Alpha: 0.800000012
   ngen_Float_inactive_alphaMultiplicator: 0.5
-  ngen_Nodes Operators Rounding: 5
-  ngen_Nodes Sequence Rounding: 5
-  ngen_Nodes LOD Button Rounding: 5
-  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Operators Rounding: 7
+  ngen_Nodes Sequence Rounding: 7
+  ngen_Nodes LOD Button Rounding: 7
+  ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
   star_Window Width: 850

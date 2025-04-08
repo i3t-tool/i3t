@@ -20,6 +20,7 @@
 
 namespace Workspace
 {
+// TODO: Make this node part of DIWNE (BasicNodeWithPins or something)
 class CoreNodeWithPins : public CoreNode
 {
 	using Super = CoreNode;
@@ -35,6 +36,8 @@ protected:
 	DIWNE::VStack outputPinsVstack{diwne, &m_right};
 
 public:
+	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
+
 	/**
 	 * \brief get vector of input pins
 	 * \return m_workspaceInputs
@@ -56,8 +59,6 @@ public:
 		return getOutputs();
 	};
 
-	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
-
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
 
@@ -65,6 +66,8 @@ public:
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
 	void onDestroy(bool logEvent) override;
+
+	void translate(const ImVec2& vec) override;
 };
 } // namespace Workspace
 

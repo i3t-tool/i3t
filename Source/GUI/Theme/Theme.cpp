@@ -21,6 +21,10 @@ static std::map<EColor, const char*> g_ColorNames;
 static std::map<ESize, const char*> g_SizeNames;
 static std::map<ESizeVec2, const char*> g_SizeVecNames;
 
+DIWNE::StyleOverride Theme::m_nodeStyle;
+DIWNE::StyleOverride Theme::m_transformationStyle;
+DIWNE::StyleOverride Theme::m_operatorStyle;
+
 template <typename T>
 concept Enumerable = std::is_enum_v<T>;
 
@@ -158,7 +162,7 @@ void Theme::initClassicProperties()
 	set(EColor::DockTabHovered, get(EColor::SelectionColor));
 
 	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150)); // TODO: Missing in DarkTheme
-	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
+	set(EColor::Workspace_HoverBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
@@ -175,8 +179,8 @@ void Theme::initClassicProperties()
 
 	set(EColor::TutorialTaskBg, createColor(100, 100, 100, 25));
 
-	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
-	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
+	set(EColor::SelectionRectFull, createColor(0, 0, 255, 26));
+	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 26));
 
 	set(EColor::TrackingSequenceTint, ImVec4(1.2, 1.2, 1.2, 1));
 
@@ -194,6 +198,8 @@ void Theme::initClassicProperties()
 	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
 
 	// pin colors (background)
+	set(EColor::DisabledPinColor, createColor(93, 93, 93, 85));
+
 	set(EColor::PulsePin, createColor(164, 58, 190, 255));
 	set(EColor::FloatPin, createColor(58, 144, 66, 255));
 	set(EColor::MatrixPin, createColor(178, 71, 66, 255));
@@ -219,14 +225,14 @@ void Theme::initClassicProperties()
 	set(EColor::NodeFont, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// Folta operator color set
-	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
+	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 0.784f));
 	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperator, ImVec4(77.0f / 255.0f, 85.0f / 255.0f, 106.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
 	// Folta transformation color set
-	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
+	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 0.784f));
 	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
 	set(EColor::NodeBorder, ImVec4(0.0f, 0.0f, 0.0f, 0.10f));
 	set(EColor::NodeLODButtonColorText, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -307,7 +313,7 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Nodes_FloatInnerPadding] = {1.0f, true};
 
-	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = {0.015f, true};
+	m_sizes[ESize::Nodes_dragSpeedDefaultRatio] = {0.015f, true};
 	m_sizes[ESize::Nodes_CtrlMultiplicator] = {0.1f, true};
 	m_sizes[ESize::Nodes_SHIFTMultiplicator] = {10.0f, true};
 	m_sizes[ESize::Nodes_ALTMultiplicator] = {0.01f, true};
@@ -320,7 +326,7 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_rightSideSpacing] = {3.0f, true};
 
 	m_sizes[ESize::Workspace_SelectedBorderThickness] = {2.5f, true};
-	m_sizes[ESize::Workspace_FocusBorderThickness] = {1.5f, true};
+	m_sizes[ESize::Workspace_HoverBorderThickness] = {1.5f, true};
 	m_sizes[ESize::Workspace_CopyPasteOffset] = {25.f, true};
 	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = {0.0005f, false};
 
@@ -337,10 +343,10 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Default_InactiveMark] = {0.0f, false};
 
 	m_sizes[ESize::Links_ControlpointsPositionFraction] = {0.2f, false};
-	m_sizes[ESize::Links_ControlpointsPositionMin] = {50.0f, true};
+	m_sizes[ESize::Links_ControlpointsPositionMin] = {65.0f, true};
 	m_sizes[ESize::Links_ControlpointsPositionMax] = {350.0f, true};
 	m_sizes[ESize::Links_Thickness] = {5.0f, true};
-	m_sizes[ESize::Links_ThicknessSelectedBorder] = {2.0f, true};
+	m_sizes[ESize::Links_ThicknessSelected] = {7.0f, true};
 
 	m_sizes[ESize::Pins_IconPadding] = {2.0f, true};
 	m_sizes[ESize::Links_selected_alpha] = {0.8f, false};
@@ -394,7 +400,7 @@ void Theme::initClassicProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = {{25.0f, 25.0f}, true};
 
-	m_sizesVec2[ESizeVec2::Nodes_PinSize] = {{14.0f, 14.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PinSize] = {{15.0f, 15.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_PinSize_MatrixMul] = {{16.0f, 16.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = {{32.0f, 32.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = {{130.0f, 130.0f}, true};
@@ -450,10 +456,6 @@ void Theme::initNames()
 	    .add(EColor::DockTabUnfocused, "Dock Unfocused")
 	    .add(EColor::DockTabUnfocusedActive, "Dock Unfocused Active")
 	    .add(EColor::DockTabHovered, "Dock Tab Hovered")
-	    .add(EColor::SelectionRectFull, "Selection rectangle full")
-	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
-	    .add(EColor::Workspace_SelectedBorder, "Selected node border")
-	    .add(ESize::Workspace_SelectedBorderThickness, "Selected node border thickness")
 	    .add(ESizeVec2::Window_FramePadding, "Windows Frame Padding");
 
 	group("Node Editor")
@@ -464,6 +466,10 @@ void Theme::initNames()
 	    .add(EColor::NodeHeader, "General Node Header")
 	    .add(EColor::NodeFont, "General Node Font (text)")
 	    .add(EColor::NodeBorder, "Node Border")
+	    .add(EColor::Workspace_HoverBorder, "Hover Border Color")
+	    .add(EColor::SelectionRectFull, "Selection rectangle full")
+	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
+	    .add(EColor::Workspace_SelectedBorder, "Selected node border")
 	    .add(EColor::NodeLODButtonColorText, "LOD Button Text")
 	    .add(EColor::NodeContextButtonColorText, "Context Button Text")
 	    .add(EColor::NodeLODButtonColor, "LOD Button Color")
@@ -475,6 +481,8 @@ void Theme::initNames()
 	    .add(ESize::Nodes_LOD_Button_Rounding, "Nodes LOD Button Rounding")
 	    .add(ESize::Nodes_Border_Rounding, "Nodes Border Rounding")
 	    .add(ESize::Nodes_Border_Thickness, "Nodes Border Thickness")
+	    .add(ESize::Workspace_HoverBorderThickness, "Hover Border Thickness")
+	    .add(ESize::Workspace_SelectedBorderThickness, "Selected node border thickness")
 	    .add(ESize::Nodes_Rounding, "Nodes Rounding")
 	    .add(ESize::Nodes_FloatWidth, "Nodes Float Width")
 	    .add(ESize::Nodes_FloatMargin, "Nodes Float Margin")
@@ -484,7 +492,7 @@ void Theme::initNames()
 	    .add(ESize::Nodes_trackballButtonHeight, "Trackball Button Height")
 	    .add(ESize::Nodes_TrackBallSensitivity, "TrackBall Sensitivity")
 	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding")
-	    .add(ESize::Nodes_dragSpeedDefaulrRatio, "Drag Speed fo Float")
+	    .add(ESize::Nodes_dragSpeedDefaultRatio, "Drag Speed fo Float")
 	    .add(ESize::Nodes_CtrlMultiplicator, "CTRL Multiplicator")
 	    .add(ESize::Nodes_SHIFTMultiplicator, "SHIFT Multiplicator")
 	    .add(ESize::Nodes_ALTMultiplicator, "ALT Multiplicator")
@@ -497,14 +505,6 @@ void Theme::initNames()
 	    .add(ESize::Default_VisiblePrecision, "Nodes Default Visible Precision")
 	    .add(ESize::Default_VisibleQuaternionPrecision, "Nodes Default Visible Precision For Quaternions")
 	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")
-	    .add(ESize::Links_ControlpointsPositionFraction, "Link x distance between controlpoint and start/end of link - "
-	                                                     "fraction of start to end x distance")
-	    .add(ESize::Links_ControlpointsPositionMin, "Link Min Control Point X Distance")
-	    .add(ESize::Links_ControlpointsPositionMax, "Link Max Control Point X Distance")
-	    .add(ESize::Links_Thickness, "Link Thickness")
-	    .add(ESize::Links_ThicknessSelectedBorder, "Link Additional thickness when selected")
-	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
-	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
 	    .add(ESizeVec2::Nodes_Screen_resizeButtonSize, "Screen Resize Button Size")
 	    .add(ESizeVec2::Nodes_Sequence_DummySpaceSize, "Sequence Dummy Space Size")
 	    .add(ESizeVec2::NewNode_positionShift, "New Node Position Shift")
@@ -523,7 +523,19 @@ void Theme::initNames()
 	    .add(ESizeVec2::Nodes_ScreenTextureSize, "Nodes Screen Texture Size")
 	    .add(ESizeVec2::Builder_ItemSpacing, "Builder Item Spacing");
 
-	group("Node Editor Pins")
+	group("Node Editor Links", 1)
+	    .add(ESize::Links_ControlpointsPositionFraction, "Link x distance between controlpoint and start/end of link - "
+	                                                     "fraction of start to end x distance")
+	    .add(ESize::Links_ControlpointsPositionMin, "Link Min Control Point X Distance")
+	    .add(ESize::Links_ControlpointsPositionMax, "Link Max Control Point X Distance")
+	    .add(ESize::Links_Thickness, "Link Thickness")
+	    .add(ESize::Links_ThicknessSelected, "Link Thickness when selected")
+	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
+	    .add(EColor::Links_selected_colorShift, "selected_colorShift");
+
+	group("Node Editor Pins", 1)
+	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
+	    .add(EColor::DisabledPinColor, "Disabled Pin Color")
 	    .add(EColor::PulsePin, "Pulse Pin")
 	    .add(EColor::FloatPin, "Float Pin")
 	    .add(EColor::MatrixPin, "Matrix Pin")
@@ -541,14 +553,14 @@ void Theme::initNames()
 	    .add(EColor::InnerScreenPin, "Inner Color Screen")
 	    .add(EColor::InnerMatrixMulPin, "Inner Color MatrixMul");
 
-	group("Node Editor Operators")
+	group("Node Editor Operators", 1)
 	    .add(EColor::NodeBgOperator, "Operator Background")
 	    .add(EColor::NodeHeaderOperator, "Operator Header")
 	    .add(EColor::FloatBgOperator, "Operator Float Background")
 	    .add(EColor::FloatBgOperatorActive, "Operator Active Float Background")
 	    .add(EColor::FloatBgOperatorHovered, "Operator Hovered Float Background");
 
-	group("Node Editor Transformations")
+	group("Node Editor Transformations", 1)
 	    .add(EColor::NodeBgTransformation, "Transform Background")
 	    .add(EColor::NodeHeaderTranformation, "Transform Header")
 	    .add(EColor::FloatBgTransformation, "Transform Float Background")
@@ -562,7 +574,7 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Transformation_TrackingColor, "Nodes Transformation TrackingColor")
 	    .add(EColor::Nodes_Transformation_TrackingMarkColor, "Nodes Transformation TrackingMarkColor");
 
-	group("Node Editor Popups")
+	group("Node Editor Popups", 1)
 	    .add(EColor::Nodes_Screen_resizeBtn_bgShape, "Nodes Screen resizeBtn bgShape")
 	    .add(EColor::Nodes_Screen_resizeBtn_bgInner, "Nodes Screen resizeBtn bgInner")
 	    .add(EColor::Nodes_Screen_resizeBtn_fgShape, "Nodes Screen resizeBtn fgShape")
@@ -570,12 +582,12 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Screen_noInput_background, "Nodes Screen noInput background")
 	    .add(EColor::Nodes_Screen_noInput_text, "Nodes Screen noInput text");
 
-	group("Node Editor Floats")
+	group("Node Editor Floats", 1)
 	    .add(EColor::Synergies_FloatBg, "Synergies FloatBg")
 	    .add(EColor::Synergies_FloatBgHovered, "Synergies FloatBgHovered")
 	    .add(EColor::Synergies_FloatBgActive, "Synergies FloatBgActive");
 
-	group("Node Editor ScreenNode")
+	group("Node Editor ScreenNode", 1)
 	    .add(EColor::Nodes_Screen_resizeBtn_bgShape, "Nodes Screen resizeBtn bgShape")
 	    .add(EColor::Nodes_Screen_resizeBtn_bgInner, "Nodes Screen resizeBtn bgInner")
 	    .add(EColor::Nodes_Screen_resizeBtn_fgShape, "Nodes Screen resizeBtn fgShape")
@@ -583,7 +595,7 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Screen_noInput_background, "Nodes_Screen_noInput_background")
 	    .add(EColor::Nodes_Screen_noInput_text, "Nodes_Screen_noInput_text");
 
-	group("Node Editor Cycle")
+	group("Node Editor Cycle", 1)
 	    // large button icons
 	    .add(EColor::Cycle_Button, "Button")
 	    .add(EColor::Cycle_ButtonHovered, "ButtonHovered")
@@ -601,12 +613,6 @@ void Theme::initNames()
 	    .add(EColor::Cycle_RadioButtonSelectedText, "RadioButtonSelectedText")
 	    .add(EColor::Cycle_RadioButtonBackground, "RadioButtonBackground")
 	    .add(ESize::Cycle_RadioButtonRounding, "RadioButtonRounding");
-
-	/*
-
-	 */
-
-	group("Node Editor Link").add(EColor::Links_selected_colorShift, "selected_colorShift");
 
 	checkThemeVariables();
 
@@ -654,11 +660,15 @@ void Theme::initNames()
 	g_ColorNames[EColor::DockTabHovered] = "glob_Dock Hovered Tab Color";
 
 	g_ColorNames[EColor::SceneViewBackground] = "glob_Tab SceneView Background";
+
+	g_ColorNames[EColor::Workspace_HoverBorder] = "glob_Hover Border Color";
+	g_SizeNames[ESize::Workspace_HoverBorderThickness] = "glob_Hover Border Thickness";
+
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";
 	g_ColorNames[EColor::Workspace_SelectedBorder] = "glob_Selected node border";
-
 	g_SizeNames[ESize::Workspace_SelectedBorderThickness] = "glob_Selected node border thickness";
+
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	// Tutorials
@@ -732,7 +742,8 @@ void Theme::initNames()
 	g_ColorNames[EColor::NodeEditorGridColor] = "ngen_Node Editor Grid Color";
 	g_ColorNames[EColor::NodeEditorGridDotsColor] = "ngen_Node Editor Grid Dots Color";
 
-	// 1. Pins
+	// Pins
+	g_ColorNames[EColor::DisabledPinColor] = "npin_Disabled Pin Color";
 	g_ColorNames[EColor::PulsePin] = "npin_Pulse Pin";
 	g_ColorNames[EColor::FloatPin] = "npin_Float Pin";
 	g_ColorNames[EColor::MatrixPin] = "npin_Matrix Pin";
@@ -846,7 +857,7 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "ngen_Float Inner Padding";
 
-	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "ngen_Drag Speed fo Float";
+	g_SizeNames[ESize::Nodes_dragSpeedDefaultRatio] = "ngen_Drag Speed fo Float";
 	g_SizeNames[ESize::Nodes_CtrlMultiplicator] = "ngen_CTRL Multiplicator";
 	g_SizeNames[ESize::Nodes_SHIFTMultiplicator] = "ngen_SHIFT Multiplicator";
 	g_SizeNames[ESize::Nodes_ALTMultiplicator] = "ngen_ALT Multiplicator";
@@ -869,7 +880,7 @@ void Theme::initNames()
 	g_SizeNames[ESize::Links_ControlpointsPositionMin] = "ngen_Link Min Control Point X Distance";
 	g_SizeNames[ESize::Links_ControlpointsPositionMax] = "ngen_Link Max Control Point X Distance";
 	g_SizeNames[ESize::Links_Thickness] = "ngen_Link Thickness";
-	g_SizeNames[ESize::Links_ThicknessSelectedBorder] = "ngen_Link Additional thickness when selected";
+	g_SizeNames[ESize::Links_ThicknessSelected] = "ngen_Link thickness when selected";
 	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links Selected Alpha";
 
 	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins IconPadding";
@@ -924,37 +935,55 @@ void Theme::updateDiwneStyleFromTheme() const
 {
 	float dpiScale = getDpiScale();
 
-	// Since DPI scaling is involved, we re-create the DIWNE style everytime and then scale it and modify it.
-	auto style = std::make_unique<DIWNE::DiwneStyle>();
-	style->scaleAllSizes(dpiScale);
-
-	// TODO: Apply all I3T theme variables to the new DIWNE style
-	// TODO: StyleOverrides need to be updated too, we should keep them separately, update them here and make
-	//  individual DiwneObjects hold a pointer to them.
-	// TODO: Is there a way we could avoid all this? What if DiwneStyle held pointers to style variables?
-	//  It would be nice if there was a single user struct somewhere and modifying it would directly modify diwne style
-	//  But I'm not sure if this is possible whilst supporting dpi scaling, the scale factor would need to be applied
-	//  dynamically. DiwneStyle could hold pointers to that struct and multiple by dpi scale on ::get().
-	//  How would StyleOverrides work in that case?
-
-	// I3T Theme sizes are already DPI scaled so we apply them after scaling the DIWNE style
-	using DIWNE::DiwneStyle;
-	style->set(DiwneStyle::gridColor, I3T::getUI()->getTheme().get(EColor::NodeEditorGridColor));
-	style->set(DiwneStyle::gridDotsColor, I3T::getUI()->getTheme().get(EColor::NodeEditorGridDotsColor));
-	style->set(DiwneStyle::selectionRounding, I3T::getUI()->getTheme().get(ESize::Nodes_Rounding));
-	style->set(DiwneStyle::itemSelectedBorderThicknessDiwne,
-	           I3T::getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness));
-	style->set(DiwneStyle::objectHoverBorderThicknessDiwne,
-	           I3T::getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness));
-	style->set(DiwneStyle::objectHoverBorderColor, I3T::getUI()->getTheme().get(EColor::Workspace_FocusBorder));
-
 	DIWNE::NodeEditor& editor = I3T::getWorkspace().getNodeEditor();
 	editor.setDpiScale(dpiScale); // Inform the NodeEditor that DPI scaling is at play, affects screen <-> diwne coords
 
-	DIWNE::SettingsDiwne& settingsDiwne = *editor.mp_settingsDiwne;
-	settingsDiwne.itemSelectedBorderColor = I3T::getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
+	// I3T Theme variable POINTERS are passed to DIWNE style. There pointers are NOT dpi scaled.
+	// Note that get() calls ARE dpi scaled, getPtr() calls aren't (since they point to underlying values)
+	// Pointers are passed so that Style can be dynamically updated without explicitly updating all values
 
-	editor.setStyle(std::move(style));
+	using DIWNE::Style;
+	DIWNE::StyleBase& style = editor.styleBase();
+
+	style.set(Style::GRID_COLOR, I3T::getUI()->getTheme().getPtr(EColor::NodeEditorGridColor));
+	style.set(Style::GRID_DOTS_COLOR, I3T::getUI()->getTheme().getPtr(EColor::NodeEditorGridDotsColor));
+
+	style.set(Style::NODE_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeBg));
+	style.set(Style::NODE_HEADER_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeHeader));
+
+	style.set(Style::NODE_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding));
+
+	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Border_Rounding));
+	style.set(Style::SELECTED_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_SelectedBorderThickness));
+	style.set(Style::SELECTED_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_SelectedBorder));
+	style.set(Style::HOVER_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_HoverBorderThickness));
+	style.set(Style::HOVER_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_HoverBorder));
+
+	style.set(Style::LINK_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_Thickness));
+	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected));
+
+	style.set(Style::SELECTION_RECT_FULL_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectFull));
+	style.set(Style::SELECTION_RECT_TOUCH_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectTouch));
+
+	// Update StyleOverrides
+
+	// CoreNode
+	m_nodeStyle.setEditor(&editor);
+	m_nodeStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG, I3T::getTheme().getPtr(EColor::NodeBg));
+	m_nodeStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG, I3T::getTheme().getPtr(EColor::NodeHeader));
+
+	// Transformation
+	m_transformationStyle.setEditor(&editor);
+	m_transformationStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG,
+	                                           I3T::getTheme().getPtr(EColor::NodeBgTransformation));
+	m_transformationStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG,
+	                                           I3T::getTheme().getPtr(EColor::NodeHeaderTranformation));
+
+	// Operator
+	m_operatorStyle.setEditor(&editor);
+	m_operatorStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_BG, I3T::getTheme().getPtr(EColor::NodeBgOperator));
+	m_operatorStyle.setOverride<ImVec4*>(DIWNE::Style::NODE_HEADER_BG,
+	                                     I3T::getTheme().getPtr(EColor::NodeHeaderOperator));
 }
 
 void Theme::apply()
@@ -1034,9 +1063,9 @@ std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
 	return g_SizeVecNames;
 }
 
-ThemeGroup& Theme::group(const char* name)
+ThemeGroup& Theme::group(const char* name, int indent)
 {
-	s_variables.emplace_back(name);
+	s_variables.emplace_back(name, indent);
 
 	return s_variables.back();
 }

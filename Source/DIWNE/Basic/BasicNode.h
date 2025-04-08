@@ -54,8 +54,6 @@ public:
 
 	void translate(const ImVec2& vec) override;
 
-	std::shared_ptr<StyleOverride> m_style;
-
 public:
 	// Getters / Setters
 	const std::string& getTopLabel() const;

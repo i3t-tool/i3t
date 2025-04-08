@@ -29,7 +29,8 @@ void CoreLink::popupContent(DIWNE::DrawInfo& context)
 	}
 }
 
-void CoreLink::updateControlPointsOffsets()
+// TODO: Move this to DIWNE eventually
+void CoreLink::updateControlPoints()
 {
 	ImVec2 diff = getEndPoint() - getStartPoint();
 
@@ -73,28 +74,27 @@ void CoreLink::updateControlPointsOffsets()
 	// if (abs(diff.y) < yDeadzone)
 	// 	offset *= (abs(diff.y) / yDeadzone);
 
-	diwne.mp_settingsDiwne->linkStartControlOffsetDiwne = ImVec2(offset, 0);
-	diwne.mp_settingsDiwne->linkEndControlOffsetDiwne = ImVec2(-offset, 0);
+	// TODO: Probably swap based on some parameter if output pins on the left side were supported
+	m_controlPointStartDiwne = m_startDiwne + ImVec2(offset, 0);
+	m_controlPointEndDiwne = m_endDiwne + ImVec2(-offset, 0);
 }
 
 void CoreLink::initialize(DIWNE::DrawInfo& context)
 {
-	updateControlPointsOffsets();
-
 	ImVec4 color;
+	bool unplugged = !this->isPlugged() && !m_previewPlugged;
 	DIWNE::Pin* pin = getAnyPin();
 	if (pin)
 	{
 		color = I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(pin)->getType()]);
+		if (unplugged)
+			color.w = style().decimal(DIWNE::Style::LINK_UNPLUGGED_ALPHA);
 	}
 	else
 	{
 		color = ImColor(0.5f, 0.5f, 0.5f);
 	}
 	m_color = color;
-
-	// TODO: Hookup link thickness
-	//	diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
 	if (m_selected)
 	{

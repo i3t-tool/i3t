@@ -18,7 +18,7 @@ public:
 
 	void SetUp() override
 	{
-		editor = std::make_shared<NodeEditor>(&settings);
+		editor = std::make_shared<NodeEditor>("NodeEditor", &settings);
 		app = std::make_unique<DiwneTestApp>();
 		app->create(editor.get());
 	}

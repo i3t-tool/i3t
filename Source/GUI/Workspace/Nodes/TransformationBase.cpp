@@ -22,8 +22,7 @@ using namespace Workspace;
 TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase) : CoreNode(diwne, nodebase)
 {
 	updateDataItemsWidth();
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
+	setStyleOverride(&I3T::getTheme().m_transformationStyle);
 }
 
 bool TransformationBase::allowDrawing()
@@ -352,7 +351,7 @@ bool TransformationBase::drawDataSetValues_InsideTablebuilder(DIWNE::DrawInfo& c
 	return inner_interaction_happen;
 }
 
-bool TransformationBase::drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string const cornerLabel,
+bool TransformationBase::drawDataSetValuesTable_builder(DIWNE::DrawInfo& context, std::string cornerLabel,
                                                         std::vector<std::string> const& columnLabels,
                                                         std::vector<std::string> const& rowLabels,
                                                         std::vector<float*> const& local_data, bool& value_changed,

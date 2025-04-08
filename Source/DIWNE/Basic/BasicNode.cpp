@@ -2,8 +2,6 @@
 
 #include "DIWNE/Core/Layout/Gravity.h"
 #include "DIWNE/Core/NodeEditor.h"
-#include "DIWNE/Core/Style/DiwneStyle.h"
-#include "DIWNE/Core/Style/StyleOverride.h"
 #include "DIWNE/Core/diwne_utils.h"
 
 namespace DIWNE
@@ -11,7 +9,7 @@ namespace DIWNE
 BasicNode::BasicNode(NodeEditor& editor, std::string label)
     : Node(editor, label), m_top(diwne, label + "_top"), m_left(diwne, label + "_left"),
       m_center(diwne, label + "_center"), m_right(diwne, label + "_right"), m_middle(diwne, label + "_middle"),
-      m_topLabel(label), m_style(std::make_shared<StyleOverride>(diwne))
+      m_topLabel(label)
 {}
 
 void BasicNode::begin(DrawInfo& context)
@@ -33,7 +31,7 @@ void BasicNode::content(DrawInfo& context)
 	m_middle.begin();
 	m_left.begin();
 	leftContent(context);
-	m_left.end(&m_middle);
+	m_left.end();
 
 	ImGui::SameLine(0.0f,
 	                m_contentSpacing == -1 ? style.ItemSpacing.x : diwne.canvas().diwne2screenSize(m_contentSpacing));
@@ -42,7 +40,7 @@ void BasicNode::content(DrawInfo& context)
 
 	m_center.begin();
 	centerContent(context);
-	m_center.end(&m_middle);
+	m_center.end();
 
 	ImGui::SameLine(0.0f,
 	                m_contentSpacing == -1 ? style.ItemSpacing.x : diwne.canvas().diwne2screenSize(m_contentSpacing));
@@ -51,7 +49,7 @@ void BasicNode::content(DrawInfo& context)
 
 	m_right.begin();
 	rightContent(context);
-	m_right.end(&m_middle);
+	m_right.end();
 
 	if (m_bottomSpacing)
 		ImGui::Spacing();
@@ -69,7 +67,7 @@ void BasicNode::topContent(DrawInfo& context)
 {
 	drawHeader();
 	float zoom = diwne.getZoom();
-	ImVec2 padding = m_style->size(DiwneStyle::nodePadding);
+	ImVec2 padding = style().size(Style::NODE_PADDING);
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y * zoom);
 	ImGui::Dummy(ImVec2(padding.x * zoom, 0));
 	ImGui::SameLine(0, 0);
@@ -116,14 +114,14 @@ void BasicNode::translate(const ImVec2& vec)
 
 void BasicNode::drawHeader(ImDrawFlags corners)
 {
-	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), m_style->color(DiwneStyle::nodeHeaderBg),
-	                                  m_style->decimal(DiwneStyle::nodeRounding), corners);
+	diwne.canvas().AddRectFilledDiwne(m_top.getMin(), m_top.getMax(), style().color(Style::NODE_HEADER_BG),
+	                                  style().decimal(Style::NODE_ROUNDING), corners);
 }
 
 void BasicNode::drawBody()
 {
-	diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max, m_style->color(DiwneStyle::nodeBg),
-	                                  m_style->decimal(DiwneStyle::nodeRounding), ImDrawFlags_RoundCornersAll);
+	diwne.canvas().AddRectFilledDiwne(m_displayRect.Min, m_displayRect.Max, style().color(Style::NODE_BG),
+	                                  style().decimal(Style::NODE_ROUNDING), ImDrawFlags_RoundCornersAll);
 }
 
 const std::string& BasicNode::getTopLabel() const

@@ -23,8 +23,7 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
     : CoreNodeWithPins(diwne, nodebase, false), m_isCameraSequence(isCameraSequence)
 {
 	updateDataItemsWidth();
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBgTransformation));
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeaderTranformation));
+	setStyleOverride(&I3T::getTheme().m_transformationStyle);
 	m_headerMinWidth = 120;
 	m_headerSpacing = false; // We want drop zone background to be flush with the header, handled in left/right panels.
 	m_bottomSpacing = false;
@@ -98,11 +97,11 @@ void Sequence::centerContent(DIWNE::DrawInfo& context)
 	{
 		// We want to retain the drop zone's background
 		diwne.canvas().AddRectFilledDiwne(m_center.getMin(), m_center.getMax(),
-		                                  diwne.style().color(DIWNE::DiwneStyle::dropZoneBg));
+		                                  diwne.style().color(DIWNE::Style::DROP_ZONE_BG));
 
 		ImGui::Spacing();
 
-		ImVec2 margin = diwne.style().size(DIWNE::DiwneStyle::dropZoneMargin) * diwne.getZoom();
+		ImVec2 margin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN) * diwne.getZoom();
 		DIWNE::DGui::DummyXY(margin);
 
 		bool valueChanged = false;

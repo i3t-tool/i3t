@@ -12,28 +12,21 @@
  */
 #include "DiwneObject.h"
 
-// TODO: REMOVE THIS IMPORT, move the functionality to the concrete Workspace implementation
-#include "Core/Input/InputManager.h"
-
 #include "DIWNE/Core/NodeEditor.h"
+#include "DIWNE/Core/Style/StyleOverride.h"
 #include "DIWNE/Core/diwne_actions.h"
 
 #if DIWNE_DEBUG_ENABLED
 #include "Link.h"
 #include "Pin.h"
+#include <bitset>
 #endif
-
-/*
- * Order of actions is important -> usually,  objects are drawn in the order
- * Link-Pin-Node-Diwne, so Pin does not know about process that WILL happen in
- * Node (has to ask for previous frame action)
- */
 
 namespace DIWNE
 {
 unsigned long long DiwneObject::g_diwneIDCounter = 1; // 0 is reserved for no/invalid ID
 
-DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string const labelDiwne)
+DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string labelDiwne)
     : diwne(diwne), m_idDiwne(g_diwneIDCounter++), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
       m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
 {}
@@ -148,7 +141,7 @@ bool DiwneObject::allowInteraction() const
 
 void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 {
-	if (m_drawMode != DrawMode_Interactive)
+	if ((m_drawMode & DrawMode_JustDraw) && !m_isDragged)
 		return;
 
 	if (!allowInteraction())
@@ -248,9 +241,10 @@ void DiwneObject::processDragDiwne(DrawInfo& context)
 			context.state.dragStart = true;
 			context.state.dragging = true;
 			context.state.dragSource = shared_from_this();
+			context.state.dragSourceID = this->getId();
 		}
 	}
-	if (m_isDragged) // Dispatch user method
+	if (m_isDragged && context.state.dragging) // Dispatch user method
 	{
 		onDrag(context, context.state.dragStart, false);
 	}
@@ -418,6 +412,7 @@ void InteractionState::nextFrame()
 	{
 		dragEndedLastFrame = false;
 		dragSource.reset();
+		dragSourceID = 0;
 	}
 	if (dragEnd)
 	{
@@ -514,21 +509,7 @@ void DiwneObject::popupContent(DrawInfo& context)
 
 void DiwneObject::onHover(DrawInfo& context)
 {
-	// TODO: CONTINUE HERE add custom pin impl <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  Pins should probably have their own effect, come back to this later
-
 	context.update(true);
-
-	// Draw hover border
-	// TODO: Not sure if this should remain in DiwneObject or be virtual.
-	//  Maybe move this impl into node and make it purely virtual?
-	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max,
-	                            diwne.style().color(DiwneStyle::objectHoverBorderColor),
-	                            diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
-	                            diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
-	// diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, ImColor(255, 0, 0, 150),
-	//                             diwne.style().decimal(DiwneStyle::selectionRounding), ImDrawFlags_RoundCornersAll,
-	//                             diwne.style().decimal(DiwneStyle::objectHoverBorderThicknessDiwne));
 
 	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddRectDiwne(getRect().Min + ImVec2(1, 1), getRect().Max - ImVec2(1, 1), DIWNE_RED_50, 0,
@@ -663,6 +644,23 @@ void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& col
 		ImGui::EndTooltip();
 	}
 }
+
+void DiwneObject::setStyleOverride(StyleOverride* styleOverride)
+{
+	m_styleOverride = styleOverride;
+}
+StyleOverride* DiwneObject::getStyleOverride() const
+{
+	return m_styleOverride;
+}
+
+Style& DiwneObject::style() const
+{
+	if (m_styleOverride != nullptr)
+		return *m_styleOverride;
+	return diwne.style();
+}
+
 void DiwneObject::setSize(const ImVec2& size)
 {
 	m_rect.Max = m_rect.Min + size;
@@ -725,8 +723,8 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 {
 	DIWNE_DEBUG_GENERAL((diwne), {
 		// TODO: Change to display rect?
-		diwne.canvas().AddRectDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0, ImDrawFlags_RoundCornersNone, 1,
-		                            true);
+		diwne.canvas().AddRectForegroundDiwne(getRect().Min, getRect().Max, DIWNE_YELLOW_50, 0,
+		                                      ImDrawFlags_RoundCornersNone, 1, true);
 	});
 	DIWNE_DEBUG_INTERACTIONS(diwne, {
 		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Max.y);
@@ -782,7 +780,7 @@ void DiwneObject::debugDrawing(DrawInfo& context, int debug_logicalUpdate)
 			                                            ImVec2(diwne.canvas().getViewportRectScreen().GetWidth() * 0.25,
 			                                                   ImGui::GetTextLineHeightWithSpacing()),
 			                                        IM_COL32(255, 0, 255, 255), dbgMsg2.c_str());
-
+			topLeftString += "\nMode: " + std::bitset<sizeof(int) * 2>(m_drawMode).to_string();
 			auto lastActiveNode = editor->getLastActiveNode<>();
 			if (lastActiveNode)
 			{

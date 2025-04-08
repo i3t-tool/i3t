@@ -39,9 +39,7 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	// Set a bit flag identifying this node as a core node
 	setFlag(CORE_NODE_FLAG, true);
 	// I3T DIWNE styling
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeBg, I3T::getTheme().get(EColor::NodeBg));
-	m_style->addOverride<ImVec4>(DIWNE::DiwneStyle::nodeHeaderBg, I3T::getTheme().get(EColor::NodeHeader));
-	m_style->addOverride<float>(DIWNE::DiwneStyle::nodeRounding, I3T::getTheme().get(ESize::Nodes_Border_Rounding));
+	setStyleOverride(&I3T::getTheme().m_nodeStyle);
 }
 
 CoreNode::~CoreNode()

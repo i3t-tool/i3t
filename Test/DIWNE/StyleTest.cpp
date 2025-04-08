@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "DIWNE/Core/Style/DiwneStyle.h"
+#include "DIWNE/Core/Style/Style.h"
 #include "DIWNE/diwne_include.h"
 
 using namespace DIWNE;
@@ -12,10 +12,10 @@ bool imVec4Eq(const ImVec4& a, const ImVec4& b)
 
 TEST(StyleTest, BasicStyleTest)
 {
-	DiwneStyle style;
-	ImVec4 test = style.color(DiwneStyle::nodeBg);
-	const ImVec4& test2 = style.color(DiwneStyle::nodeBg);
-	const ImVec4& test3 = style.color(DiwneStyle::nodeBg);
+	StyleBase style;
+	ImVec4 test = style.color(Style::NODE_BG);
+	const ImVec4& test2 = style.color(Style::NODE_BG);
+	const ImVec4& test3 = style.color(Style::NODE_BG);
 	ASSERT_TRUE(&test2 == &test3);
 	ASSERT_TRUE(imVec4Eq(test2, test3));
 	ASSERT_TRUE(imVec4Eq(test2, test));

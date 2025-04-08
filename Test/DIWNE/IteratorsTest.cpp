@@ -17,7 +17,7 @@ TEST(IteratorsTest, NodeRangeTest)
 	auto app = initI3T(spdlog::level::warn);
 
 	DIWNE::SettingsDiwne settings;
-	NodeEditor editor(&settings);
+	NodeEditor editor("NodeEditor", &settings);
 	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
 	editor.addNode(node1, ImVec2(0, 0));
 	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");
@@ -82,7 +82,7 @@ TEST(IteratorsTest, RecursiveNodeRangeTest)
 	auto app = initI3T(spdlog::level::warn);
 
 	DIWNE::SettingsDiwne settings;
-	NodeEditor editor(&settings);
+	NodeEditor editor("NodeEditor", &settings);
 	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
 	editor.addNode(node1, ImVec2(0, 0));
 	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");
@@ -169,7 +169,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeTest)
 	auto app = initI3T(spdlog::level::warn);
 
 	DIWNE::SettingsDiwne settings;
-	NodeEditor editor(&settings);
+	NodeEditor editor("NodeEditor", &settings);
 	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
 	editor.addNode(node1, ImVec2(0, 0));
 	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");
@@ -319,7 +319,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeWithDivePredicateTest)
 	auto app = initI3T(spdlog::level::warn);
 
 	DIWNE::SettingsDiwne settings;
-	NodeEditor editor(&settings);
+	NodeEditor editor("NodeEditor", &settings);
 	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
 	editor.addNode(node1, ImVec2(0, 0));
 	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");
@@ -512,7 +512,7 @@ TEST(IteratorsTest, FilteredRecursiveNodeRangeWithDivePredicateTest)
 //	auto app = initI3T(spdlog::level::warn);
 //
 //	DIWNE::SettingsDiwne settings;
-//	NodeEditor editor(&settings);
+//	NodeEditor editor("NodeEditor", &settings);
 //	auto node1 = std::make_shared<DIWNE::BasicNode>(editor, "Node 1");
 //	editor.addNode(node1, ImVec2(0, 0));
 //	auto node2 = std::make_shared<DIWNE::BasicNode>(editor, "Node 2");

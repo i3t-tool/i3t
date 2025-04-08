@@ -27,10 +27,14 @@ class Pin : public DiwneObject
 public:
 	bool m_isInput{false};                 ///< Whether this is an input or output pin, @see isInput()
 	bool m_allowMultipleConnections{true}; ///< Only allow one link to be connected, set to false for input pins
-	ImRect m_pinRect;                      ///< Rect of the actual pin that can be dragged
+
+	ImRect m_pinRect;  ///< Rect of the pin icon/socket. Links will connect to this.
+	ImRect m_dragRect; ///< Rect of the area that can be dragged to start a new connection
 
 	Node* m_node;               ///< Node this pin belongs to
 	std::vector<Link*> m_links; ///< Links connected to this pin
+
+	bool m_previewPlugged{false}; ///< Style the pin as if it was plugged in
 
 	/**
 	 * Flag indicating that the pin has been plugged or unplugged last time the pin was drawn.
@@ -50,7 +54,7 @@ public:
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
 	void begin(DrawInfo& context) override;
-	void content(DrawInfo& context) override{};
+	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
 
@@ -64,9 +68,13 @@ public:
 	bool allowPopup() const override;
 	bool allowDragStart() const override;
 
+	// Pin drawing
+	// =============================================================================================================
+	// TODO: Move square/socket pin drawing here
+	void drawPinBackground();
+
 	// Link management
 	// =============================================================================================================
-
 	/**
 	 * Called when the mouse is dragging a new link and is hovering over this pin as well as when it is released.
 	 * When the hovering argument is false, the mouse was released and the link should be connected.
@@ -74,7 +82,7 @@ public:
 	 * @param otherPin The other pin, usually the starting pin of the link, but it can be the end pin as well.
 	 * @param link The link that's being prepared for plugging
 	 * @param hovering True when the mouse is only hovering over the pin and it shouldn't be plugged in yet.
-	 * @return
+	 * @return Whether the link is ready to be plugged in.
 	 */
 	virtual bool preparePlug(Pin* otherPin, Link* link, bool hovering);
 
@@ -151,9 +159,13 @@ public:
 	 * Can be used to specify an area where the pin can be dragged from or a link dropped at.
 	 */
 	virtual bool allowConnection() const;
+	virtual bool isDragAreaHovered() const;
 
 	virtual void setConnectionPointDiwne(const ImVec2 value);
 	virtual const ImVec2& getConnectionPoint();
+
+	/// Whether the pin is disabled or not. When disabled it cannot be plugged in.
+	virtual bool isDisabled() const;
 
 	/**
 	 * Adds the link to the pin's list of links
@@ -166,6 +178,9 @@ public:
 	 * @return true if removed, false if it didn't exist
 	 */
 	bool unregisterLink(Link* link);
+
+	// =============================================================================================================
+	void translate(const ImVec2& vec) override;
 
 protected:
 	virtual void updateConnectionPoint();

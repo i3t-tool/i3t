@@ -247,6 +247,10 @@ ImRect Canvas::screen2diwne(const ImRect& rect) const
 {
 	return ImRect(screen2diwne(rect.Min), screen2diwne(rect.Max));
 }
+ImRect Canvas::diwne2screenTrunc(const ImRect& rect) const
+{
+	return ImRect(diwne2screenTrunc(rect.Min), diwne2screenTrunc(rect.Max));
+}
 float Canvas::diwne2screenSize(float size) const
 {
 	return size * editor.getZoom() * editor.getDpiScale();
@@ -285,7 +289,7 @@ ImRect Canvas::getViewportRectScreen() const
 	return m_viewRectScreen;
 };
 
-void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
                                 ImDrawFlags rounding_corners, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
@@ -295,13 +299,13 @@ void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4
 	                   rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners);
 }
 
-void Canvas::AddLine(const ImVec2& p1, const ImVec2& p2, ImVec4 col, float thickness, bool ignoreZoom) const
+void Canvas::AddLine(const ImVec2& p1, const ImVec2& p2, const ImVec4& col, float thickness, bool ignoreZoom) const
 {
 	ImGui::GetWindowDrawList()->AddLine(diwne2screen(p1), diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
 	                                    thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
                           ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
@@ -309,12 +313,36 @@ void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, 
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
-void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding,
+void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
                                     ImDrawFlags rounding_corners, float thickness, bool ignoreZoom) const
 {
 	ImDrawList* idl = ImGui::GetForegroundDrawList();
 	idl->AddRect(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
+}
+
+void Canvas::AddInnerRoundedRectScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col, float rounding,
+                                       ImDrawFlags flags, float thickness, float offset)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	ImVec2 hThickness(offset * 0.5f, offset * 0.5f);
+	ImVec2 borderMin = min + hThickness;
+	ImVec2 borderMax = max - hThickness;
+	float adjRounding = ImMax(0.0f, rounding - thickness * 0.5f);
+	idl->AddRect(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col), adjRounding, flags, thickness);
+}
+
+// TODO: Test or remove
+void Canvas::AddRectFilledOffsetDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
+                                      ImDrawFlags rounding_corners, bool ignoreZoom, float offset) const
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	ImVec2 vOffset(offset, offset);
+	ImVec2 borderMin = diwne2screenTrunc(p_min + vOffset);
+	ImVec2 borderMax = diwne2screenTrunc(p_max - vOffset);
+	float adjRounding = ImMax(0.0f, rounding - offset);
+	idl->AddRectFilled(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col),
+	                   adjRounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners);
 }
 
 void Canvas::AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3,
@@ -672,7 +700,7 @@ void Canvas::DrawIconGrabDownRight(ImDrawList* idl, ImColor shapeColor, ImColor 
 void Canvas::DrawBurgerMenu(ImDrawList* idl, const ImColor& color, const ImRect& rect, const ImVec2& padding,
                             float thickness) const
 {
-	thickness *= m_zoom;
+	thickness = diwne2screenSize(thickness);
 	ImVec2 pad = diwne2screenSize(padding);
 
 	ImVec2 topLeft = rect.Min + pad;
@@ -743,7 +771,7 @@ void Canvas::DrawIconHyphen(ImDrawList* idl, ImColor shapeColor, ImColor innerCo
 }
 
 bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
-                        bool filled, std::string const id) const
+                        bool filled, std::string id) const
 {
 	return IconButton(id, false, bgIconType, bgShapeColor, bgInnerColor, IconType::NoIcon, IM_COL32_BLACK,
 	                  IM_COL32_BLACK, size, padding, filled);
@@ -751,13 +779,11 @@ bool Canvas::IconButton(IconType bgIconType, ImColor bgShapeColor, ImColor bgInn
 
 bool Canvas::IconButton(const std::string id, bool disabled, IconType bgIconType, ImColor bgShapeColor,
                         ImColor bgInnerColor, IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
-                        ImVec2 size, ImVec4 padding, bool filled) const
+                        ImVec2 size, ImVec4 padding, bool filled, ImVec2 thickness, float rounding) const
 {
-	ImVec2 initPos = ImGui::GetCursorScreenPos();
+	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled,
+	         thickness, rounding);
 
-	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled);
-
-	ImGui::SetCursorScreenPos(initPos);
 	//	ImGui::Dummy(size); // Better to use InvisibleButton
 	// We're making the InvisibleButton disabled so that when its pressed / dragged it does not set an ActiveID in ImGui
 	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
@@ -774,18 +800,9 @@ bool Canvas::IconButton2(const std::string& id, ImVec2 size, bool disabled, Icon
                          const IconStyle& style, const IconStyle& hoveredStyle, const IconStyle& activeStyle) const
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
-
-	ImGuiContext& g = *ImGui::GetCurrentContext();
-	bool wasDisabled = (g.CurrentItemFlags & ImGuiItemFlags_Disabled) != 0;
-	bool startDisabled = !wasDisabled && disabled;
-	if (startDisabled)
-		ImGui::BeginDisabled(true);
-	bool result = ImGui::InvisibleButton(id.c_str(), size);
+	bool hovered, active;
+	bool result = DIWNE::DGui::ButtonDummy(id, size, disabled, hovered, active);
 	ImVec2 afterPos = ImGui::GetCursorScreenPos();
-	if (startDisabled)
-		ImGui::EndDisabled();
-	bool hovered = ImGui::IsItemHovered(startDisabled ? ImGuiHoveredFlags_AllowWhenDisabled : 0);
-	bool active = ImGui::IsItemActive();
 
 	// Decide which icon style to used based on button state
 	const IconStyle* sp = nullptr;

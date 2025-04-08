@@ -34,7 +34,9 @@ protected:
 	ImVec4 m_color;
 
 public:
-	Link(DIWNE::NodeEditor& diwne, std::string const labelDiwne = "DiwneLink");
+	bool m_previewPlugged{false}; ///< Style the link as if it was plugged in
+
+	Link(NodeEditor& diwne, std::string labelDiwne = "DiwneLink");
 
 	/**
 	 * Connect the two pins using this link.
@@ -72,6 +74,8 @@ public:
 	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
 	void updateLayout(DrawInfo& context) override;
 
+	bool allowDrawing() override;
+
 	void onDestroy(bool logEvent) override;
 
 protected:
@@ -96,12 +100,12 @@ public:
 	};
 	/// Get the pin on either end in cases when only one pin is plugged in.
 	/// Returns nullptr no pins are connected or if both ends are connected.
-	Pin* getSinglePin();
-	Pin* getAnyPin(); ///< Get any of the two pins or nullptr if neither are connected
+	Pin* getSinglePin() const;
+	Pin* getAnyPin() const; ///< Get any of the two pins or nullptr if neither are connected
 	/// Get the other pin that this link connects with the specified pin.
 	/// Assumes the link is connected on both ends
 	/// Returns nullptr when neither of the two pins are the passed one.
-	Pin* getOtherPin(Pin* pin);
+	Pin* getOtherPin(Pin* pin) const;
 
 	void setStartPin(Pin* pin)
 	{
@@ -111,19 +115,19 @@ public:
 	{
 		m_endPin = pin;
 	};
-	ImVec2 getStartPoint()
+	ImVec2 getStartPoint() const
 	{
 		return m_startDiwne;
 	};
-	ImVec2 getEndPoint()
+	ImVec2 getEndPoint() const
 	{
 		return m_endDiwne;
 	};
-	ImVec2 getStartControlPoint()
+	ImVec2 getStartControlPoint() const
 	{
 		return m_controlPointStartDiwne;
 	};
-	ImVec2 getEndControlPoint()
+	ImVec2 getEndControlPoint() const
 	{
 		return m_controlPointEndDiwne;
 	};
@@ -131,17 +135,21 @@ public:
 	void setEndPoint(const ImVec2& mEndDiwne);
 
 	// TODO: (DR) figure out why this method isn't used (maybe related to allowDrawing?), what is the hiding behavior?
-	bool isLinkOnWorkArea(); /*!< in fact just rectangle (from startPoint to
+	bool isLinkOnWorkArea() const; /*!< in fact just rectangle (from startPoint to
 	                            endPoint) check - so could return true while Link
 	                            is not visible */
 
-	bool isPlugged();       ///< Whether the link is connected on both ends
-	bool isOnePinPlugged(); ///< Whether the link has exactly one pin plugged in at either end
+	bool isPlugged() const;       ///< Whether the link is connected on both ends
+	bool isOnePinPlugged() const; ///< Whether the link has exactly one pin plugged in at either end
 
 protected:
 	void updateSquareDistanceMouseFromLink();
 	virtual void updateEndpoints();
-	void updateControlPoints();
+	virtual void updateControlPoints();
+
+	/// Get the rect formed by the starting and ending point, as well as any curve control points.
+	/// This method is used in updateLayout() to update the object's rect as well as in allowDrawing().
+	virtual ImRect getBounds();
 };
 
 } /* namespace DIWNE */

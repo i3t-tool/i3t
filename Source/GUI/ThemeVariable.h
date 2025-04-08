@@ -36,7 +36,11 @@ struct ThemeVariable
 struct ThemeGroup
 {
 	const char* name;
+	int indent = 0;
+
 	std::vector<ThemeVariable> variables;
+
+	ThemeGroup(const char* name, int indent) : name(name), indent(indent) {}
 
 	/// \see ThemeVariable parameters
 	template <typename... Args>

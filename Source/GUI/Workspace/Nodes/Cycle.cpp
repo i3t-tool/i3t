@@ -308,7 +308,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 			m_nodebase->as<Core::Cycle>()->setFrom(localData);
 			updateDataItemsWidth();
 
-			context.update(true, true, true);
+			context.consumeInput();
 		}
 
 		//----------------
@@ -372,7 +372,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		                                                                 : Core::EValueState::Editable,
 		    valueChanged, m_labelDiwne);
 		if (interaction)
-			context.update(true, true, true);
+			context.consumeInput();
 
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
@@ -416,6 +416,8 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 			}
 		}
 	}
+	if (inner_interaction_happen)
+		context.consumeInput();
 	// ImGui::PopStyleVar(1);
 }
 

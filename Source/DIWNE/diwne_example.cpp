@@ -35,7 +35,7 @@ std::shared_ptr<DIWNE::NodeEditor> editor;
 
 void diwneInit()
 {
-	editor = std::make_shared<DIWNE::NodeEditor>(&settings);
+	editor = std::make_shared<DIWNE::NodeEditor>("NodeEditor", &settings);
 	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 1"), ImVec2(20, 20));
 	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 2"), ImVec2(150, 20));
 	editor->addNode(std::make_shared<DIWNE::BasicNode>(*editor, "Node 3"), ImVec2(300, 20));

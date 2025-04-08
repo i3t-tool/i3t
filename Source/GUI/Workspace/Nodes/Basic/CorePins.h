@@ -54,9 +54,9 @@ class CorePin : public DIWNE::Pin
 {
 protected:
 	Core::Pin const& m_pin;
-	PinStyle m_pinStyle{PinStyle::Square};
 
 public:
+	PinStyle m_pinStyle{PinStyle::Square};
 	// (PF) icon for the cycle box, Triangle elsewhere
 	DIWNE::IconType m_iconType = DIWNE::IconType::NoIcon;
 	bool m_showData{true};
@@ -68,16 +68,16 @@ public:
 
 	bool allowDrawing() override;
 
-	void drawPin(DIWNE::DrawInfo& context);
-	void drawLabel(DIWNE::DrawInfo& context);
-	void drawDataEx(DIWNE::DrawInfo& context);
-	void drawData(DIWNE::DrawInfo& context);
+	void drawPin(bool left, DIWNE::DrawInfo& context);
+	bool drawLabel(DIWNE::DrawInfo& context);  ///< @return Whether a new item was created
+	bool drawDataEx(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
+	bool drawData(DIWNE::DrawInfo& context);   ///< @return Whether a new item was created
 	int maxLengthOfData();
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	bool allowInteraction() const override;
 	bool allowConnection() const override;
+	bool isDisabled() const override;
 
 	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
 	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
@@ -108,7 +108,10 @@ private:
 	template <typename T>
 	void createNodeFromPinImpl();
 
-	void drawBasicPinData(DIWNE::DrawInfo& context);
-	void drawPulsePinData(DIWNE::DrawInfo& context);
+	bool drawBasicPinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
+	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
+
+	void drawSquarePin(const ImVec2& size, bool left);
+	void drawSocketPin(const ImVec2& size, bool left);
 };
 } // namespace Workspace

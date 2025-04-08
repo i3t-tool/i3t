@@ -33,8 +33,8 @@ using namespace Workspace;
 /* ======================================== */
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
-WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
-    : NodeEditor(settingsDiwne), m_viewportHighlightResolver(this)
+WorkspaceDiwne::WorkspaceDiwne(const char* label, DIWNE::SettingsDiwne* settingsDiwne)
+    : NodeEditor(label, settingsDiwne), m_viewportHighlightResolver(this)
 {
 	setInputAdapter<WorkspaceEditorInputAdapter>();
 }
@@ -46,8 +46,6 @@ WorkspaceDiwne::~WorkspaceDiwne()
 
 void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 {
-	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
-
 	// TODO: This system is tbh kinda stupid, why can't the nodes update themselves before drawing?
 	//  Why iterate over everything again? What am I missing?
 	//  On another node I think data items width could be updated every frame, its not that deep
@@ -663,22 +661,17 @@ DIWNE::FilteredRecursiveNodeRange<ScriptingNode> WorkspaceDiwne::getAllScripting
 	    &m_nodes);
 }
 
-void WorkspaceDiwne::onZoom()
-{
-	m_updateDataItemsWidth = true;
-}
-
 // TODO: This is inconsistent with the getZoomDelta method!
 // bool WorkspaceDiwne::isZoomingDiwne()
 //{
 //	return InputManager::isAxisActive("scroll") != 0;
 //}
 
-bool WorkspaceDiwne::processZoom()
+void WorkspaceDiwne::onZoom()
 {
 	m_updateDataItemsWidth = true;
 	App::getModule<StateManager>().requestRewritableSnapshot();
-	return NodeEditor::processZoom();
+	NodeEditor::onZoom();
 }
 
 bool WorkspaceEditorInputAdapter::selectAllNodes()

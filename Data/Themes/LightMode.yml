@@ -42,8 +42,8 @@ colors:
   tuts_Button Active: [0.075, 0.518, 0.902, 1.000]
   tuts_Button Hovered: [0.075, 0.455, 0.788, 1.000]
   tuts_Task Background: [0.392, 0.392, 0.392, 0.098]
-  glob_Selection rectangle full: [0.000, 0.420, 0.150, 0.392]
-  glob_Selection rectangle touch: [0.012, 0.641, 0.378, 0.392]
+  glob_Selection rectangle full: [0.000, 0.000, 1.000, 0.100]
+  glob_Selection rectangle touch: [0.000, 1.000, 0.000, 0.100]
   npin_Pulse Pin: [0.475, 0.039, 0.582, 1.000]
   npin_Float Pin: [0.091, 0.633, 0.081, 1.000]
   npin_Vector 3 Pin: [0.227, 0.329, 0.733, 1.000]
@@ -71,7 +71,7 @@ colors:
   nops_Operator Float Background: [0.302, 0.333, 0.416, 1.000]
   nops_Operator Active Float Background: [0.380, 0.412, 0.494, 1.000]
   nops_Operator Hovered Float Background: [0.341, 0.373, 0.455, 1.000]
-  ntrs_Transform Background: [0.694, 0.694, 0.694, 1.000]
+  ntrs_Transform Background: [0.694, 0.694, 0.694, 0.784]
   ngen_Node Border: [0.000, 0.000, 0.000, 0.149]
   ntrs_Transform Header: [0.490, 0.114, 0.153, 1.000]
   ngen_LOD Button Text: [1.000, 1.000, 1.000, 1.000]
@@ -146,16 +146,16 @@ sizes:
   ngen_Nodes Right Side spacing: 3
   glob_Selected node border thickness: 2.5
   ngen_Link Control Point Distance Scaling Factor: 0.200000003
-  ngen_Link Min Control Point X Distance: 50
+  ngen_Link Min Control Point X Distance: 65
   ngen_Link Max Control Point X Distance: 350
   ngen_Link Thickness: 5
-  ngen_Link Additional thickness when selected: 2
+  ngen_Link thickness when selected: 7
   ngen_Links Selected Alpha: 0.800000012
   ngen_Pins IconPadding: 2
-  ngen_Nodes Operators Rounding: 5
-  ngen_Nodes Sequence Rounding: 5
-  ngen_Nodes LOD Button Rounding: 5
-  ngen_Nodes Border Rounding: 5
+  ngen_Nodes Operators Rounding: 7
+  ngen_Nodes Sequence Rounding: 7
+  ngen_Nodes LOD Button Rounding: 7
+  ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
   ngen_Float_inactive_alphaMultiplicator: 0.5
@@ -190,7 +190,7 @@ size vectors:
   ngen_Nodes Middle Size: [0, 0]
   ngen_Nodes Output Size: [0, 0]
   ngen_Nodes LOD Button Size: [27, 27]
-  ngen_Nodes Pin Size: [14, 14]
+  ngen_Nodes Pin Size: [15, 15]
   ngen_Nodes Float Cycle Button Size: [32, 32]
   ngen_Nodes Screen Texture Size: [130, 130]
   ngen_Nodes Screen ResizeButtonSize: [20, 20]

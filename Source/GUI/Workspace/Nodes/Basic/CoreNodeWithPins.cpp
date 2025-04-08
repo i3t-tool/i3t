@@ -14,6 +14,7 @@
 
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 
 using namespace Workspace;
 
@@ -161,4 +162,14 @@ void CoreNodeWithPins::onDestroy(bool logEvent)
 	for (auto pin : m_workspaceOutputs)
 		pin->destroy(logEvent);
 	Super::onDestroy(logEvent);
+}
+
+void CoreNodeWithPins::translate(const ImVec2& vec)
+{
+	CoreNode::translate(vec);
+	// Pin rect's need to be moved as well
+	for (auto pin : m_workspaceInputs)
+		pin->translate(vec);
+	for (auto pin : m_workspaceOutputs)
+		pin->translate(vec);
 }

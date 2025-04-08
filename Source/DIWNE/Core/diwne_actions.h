@@ -112,6 +112,9 @@ struct ConnectPinAction : public DiwneAction
 	Pin* sourcePin{nullptr};    ///< The pin being dragged
 	Link* draggedLink{nullptr}; ///< The link being dragged (source pin doesn't need to be connected to it necessarily)
 
+	bool validConnection{false}; ///< Internal flag, indicates that a valid connection is ready
+	ImVec2 connectionPoint;      ///< Internal value, target point of the valid connection, used for link snapping
+
 	ConnectPinAction(const std::shared_ptr<DiwneObject>& source) : DiwneAction(connectPin, source) {}
 
 	void onEnd() override;

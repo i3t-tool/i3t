@@ -28,6 +28,7 @@ void Stack::end()
 
 	// TODO: We have to relay Stack information to some parent
 	//   If Stack was a DiwnePanel itself this would become easier I suppose.
+	//   Update: Do we need to? Child DiwnePanel springy just can be considered a fixed size managed by the child
 
 	layout();
 }
@@ -77,6 +78,7 @@ DiwnePanel* Stack::beginItem()
 		{
 			const float ypos = !m_springAdded ? lastPanelRect.Max.y + spacing.y : cursorPos.y;
 			ImGui::SetCursorScreenPos(ImVec2(lastPanelRect.Min.x, ypos));
+			DGui::SameLineDummy({0, 0}); // Anchor the new cursor pos line (prevents SameLine messing things up)
 		}
 		else
 		{

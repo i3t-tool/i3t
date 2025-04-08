@@ -14,9 +14,14 @@ using namespace Workspace;
 
 Ptr<WorkspaceDiwne> WorkspaceModule::g_editor;
 
+bool WorkspaceModule::g_useSquarePins = false;
+bool WorkspaceModule::g_useSquarePinsMul = true;
+bool WorkspaceModule::g_useSquarePinsPulse = true;
+bool WorkspaceModule::g_useSquarePinsScreen = true;
+
 WorkspaceModule::WorkspaceModule()
 {
-	g_editor = std::make_shared<WorkspaceDiwne>(&settingsDiwne);
+	g_editor = std::make_shared<WorkspaceDiwne>("WorkspaceEditor", &settingsDiwne);
 
 	App::getModule<StateManager>().addOriginator(this);
 
