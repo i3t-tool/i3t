@@ -12,6 +12,7 @@
  */
 #include "Node.h"
 
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 
 using namespace Workspace;
@@ -42,7 +43,7 @@ bool Node::allowDragStart() const
 
 void Node::drawMenuDelete()
 {
-	if (I3TGui::MenuItemWithLog(_t("Delete"), "Delete"))
+	if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_TRASH_CAN " ", "Delete"), "Delete"))
 	{
 		destroy();
 	}

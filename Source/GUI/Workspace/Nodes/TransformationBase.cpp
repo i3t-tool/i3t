@@ -28,13 +28,13 @@ TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node>
 bool TransformationBase::allowDrawing()
 {
 	// TODO: (DR) Why is drawing strictly allowed when in sequence?
-	return isInSequence() || CoreNode::allowDrawing();
+	return isInSequence() || Super::allowDrawing();
 }
 
 void TransformationBase::topContent(DIWNE::DrawInfo& context)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
-	CoreNode::topContent(context);
+	Super::topContent(context);
 	ImGui::SameLine(0, 0);
 
 	// TODO: Similary how we create the validity icon, a lock icon can be shown for locked data
@@ -92,7 +92,7 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 		inner_interaction_happen = drawDataSetValues(context);
 		break;
 	case LevelOfDetail::Label:
-		inner_interaction_happen = drawDataLabel();
+		// no-op
 		break;
 
 	default:
@@ -107,7 +107,7 @@ void TransformationBase::centerContent(DIWNE::DrawInfo& context)
 
 void TransformationBase::end(DIWNE::DrawInfo& context)
 {
-	CoreNode::end(context);
+	Super::end(context);
 
 	if (!Core::GraphManager::isTrackingEnabled())
 	{
@@ -163,7 +163,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 
 void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 {
-	CoreNode::drawMenuSetEditable();
+	Super::drawMenuSetEditable();
 
 	ImGui::Separator();
 
@@ -172,16 +172,29 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuSetPrecision();
+	Super::drawMenuSetPrecision();
 	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate(context);
+	Super::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
 	Node::popupContent(context);
+}
+
+LevelOfDetail TransformationBase::switchLevelOfDetail(LevelOfDetail oldLevel)
+{
+	if (oldLevel == LevelOfDetail::Full)
+		return setLevelOfDetail(LevelOfDetail::SetValues);
+	if (oldLevel == LevelOfDetail::SetValues)
+		return setLevelOfDetail(LevelOfDetail::Label);
+	return Super::switchLevelOfDetail(oldLevel);
+}
+int TransformationBase::getLODCount()
+{
+	return Super::getLODCount() + 1;
 }
 
 void TransformationBase::drawMenuStorevalues()
@@ -249,7 +262,7 @@ void TransformationBase::drawMenuSetDataMap()
 void TransformationBase::onDestroy(bool logEvent)
 {
 	m_parentSequence.reset();
-	CoreNode::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 // TODO: Remove, However update node drop zone logic so that closest

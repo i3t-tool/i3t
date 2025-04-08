@@ -18,6 +18,8 @@ namespace Workspace
 {
 class TransformationBase : public CoreNode
 {
+	using Super = CoreNode;
+
 public:
 	WPtr<Sequence> m_parentSequence{};
 	bool m_wasValid{true};
@@ -39,7 +41,10 @@ public:
 	virtual bool allowDrawing() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
+
 	virtual void drawMenuLevelOfDetail() override = 0;
+	LevelOfDetail switchLevelOfDetail(LevelOfDetail oldLevel) override;
+	int getLODCount() override;
 
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 

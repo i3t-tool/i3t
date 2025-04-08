@@ -51,6 +51,18 @@ void Cycle::drawMenuLevelOfDetail()
 	    std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	    {LevelOfDetail::Full, LevelOfDetail::SetValues, LevelOfDetail::LightCycle, LevelOfDetail::Label});
 }
+LevelOfDetail Cycle::switchLevelOfDetail(LevelOfDetail oldLevel)
+{
+	if (oldLevel == LevelOfDetail::Full)
+		return setLevelOfDetail(LevelOfDetail::SetValues);
+	if (oldLevel == LevelOfDetail::SetValues)
+		return setLevelOfDetail(LevelOfDetail::Label);
+	return Super::switchLevelOfDetail(oldLevel);
+}
+int Cycle::getLODCount()
+{
+	return Super::getLODCount() + 1;
+}
 
 bool Cycle::buttonPlayPause()
 {
@@ -260,7 +272,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 	else if (m_levelOfDetail == LevelOfDetail::Label)
 	{
 		// inner_interaction_happen |= WorkspaceNode::leftContent();
-		CoreNodeWithPins::leftContent(context);
+		Super::leftContent(context);
 	}
 	else // setValues or Full  // todo (PF) missing wires to pulse input pins for setValues mode
 	{
@@ -427,9 +439,10 @@ void Cycle::rightContent(DIWNE::DrawInfo& context)
 	// - icons for output pins DONE
 	// - no labels for pulse pins DONE
 	// - put labels to the hover - postponed - long hover text overlaps the box and distracts
+	// TODO: I don't really know what that last bit means
+	//  Adding tooltips on hover is quite a good idea imo
 
-	bool inner_interaction_happen = false;
-	CoreNodeWithPins::rightContent(context);
+	Super::rightContent(context);
 }
 
 bool Cycle::myRadioButton(const char* label, int* v, int v_button)

@@ -294,20 +294,18 @@ void Camera::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
 	                              {LevelOfDetail::Full, LevelOfDetail::Label});
 }
-
-// bool WorkspaceCamera::leftContent(){return false;};
-// bool WorkspaceCamera::rightContent(){return
-// WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on
-// opposite side */
-
-int Camera::maxLengthOfData()
+LevelOfDetail Camera::switchLevelOfDetail(LevelOfDetail oldLevel)
+{
+	return LevelOfDetail::Full;
+}
+int Camera::getLODCount()
 {
 	return 0;
 }
 
-bool Camera::isCamera()
+int Camera::maxLengthOfData()
 {
-	return true;
+	return 0;
 }
 
 DIWNE::NodeRange<> Camera::getNodes() const
@@ -324,6 +322,7 @@ void Camera::onDestroy(bool logEvent)
 	m_view->destroy(logEvent);
 	CoreNodeWithPins::onDestroy(logEvent);
 }
+
 void Camera::onSelection(bool selected)
 {
 	Node::onSelection(selected);

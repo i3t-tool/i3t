@@ -121,10 +121,10 @@ void FontManager::generateFonts(float dpiScale)
 	// I assume this is a general effort to ease handling of DPI in ImGui which is ongoing and still in BETA
 
 	std::unordered_map<std::string, ImFont*> fonts = {
-	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true)},   //
-	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},  //
-	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)}, //
-	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &mqConfig, ranges, false)}, //
+	    {"Roboto14", loadFont("Data/Fonts/Roboto-Regular.ttf", 14.0f, fontScale, &hqConfig, ranges, true, true)}, //
+	    {"Roboto16", loadFont("Data/Fonts/Roboto-Regular.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},      //
+	    {"RobotoBold12", loadFont("Data/Fonts/Roboto-Bold.ttf", 12.0f, fontScale, &lqConfig, ranges, false)},     //
+	    {"RobotoBold16", loadFont("Data/Fonts/Roboto-Bold.ttf", 16.0f, fontScale, &mqConfig, ranges, false)},     //
 	    {"RobotoMono14", loadFont("Data/Fonts/RobotoMono-Regular.ttf", 14.0f, fontScale, &lqConfig, ranges, false)},
 	    {"RobotoItalic16", loadFont("Data/Fonts/Roboto-Italic.ttf", 16.0f, fontScale, &lqConfig, ranges, false)},    //
 	    {"UbuntuBold18", loadFont("Data/Fonts/Ubuntu-Bold.ttf", 18.0f, fontScale, &lqConfig, ranges, false)},        //
@@ -141,16 +141,15 @@ void FontManager::generateFonts(float dpiScale)
 }
 
 ImFont* FontManager::loadFont(const char* filename, float size_pixels, float fontScale,
-                              const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges, bool mergeIcons)
+                              const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges, bool mergeIcons,
+                              bool mergeNodeEditorIcons)
 {
 	ImFont* font =
 	    ImGui::GetIO().Fonts->AddFontFromFileTTF(filename, size_pixels * fontScale, font_cfg_template, glyph_ranges);
-
-	if (!mergeIcons)
-		return font;
-
-	loadFontAwesomeIcons(size_pixels, fontScale);
-
+	if (mergeNodeEditorIcons) // Node editor icons take precedence (must be merged first)
+		loadNodeEditorIcons(size_pixels, fontScale);
+	if (mergeIcons)
+		loadFontAwesomeIcons(size_pixels, fontScale);
 	return font;
 }
 
@@ -163,15 +162,63 @@ void FontManager::loadFontAwesomeIcons(float size_pixels, float fontScale)
 	icons_config.MergeMode = true;
 	icons_config.PixelSnapH = true;
 
-	float baseFontSize = size_pixels * fontScale;
-	float iconFontSize = baseFontSize;
+	float iconFontSize = size_pixels * fontScale;
 
-	icons_config.GlyphMinAdvanceX = iconFontSize;
+	icons_config.GlyphMinAdvanceX = (size_pixels + 1) * fontScale;
 	//	icons_config.GlyphMaxAdvanceX = iconFontSize;
 	icons_config.GlyphOffset = ImVec2(0, 0);
 
+	io.Fonts->AddFontFromFileTTF("Data/Icons/" FONT_ICON_FILE_NAME_FA_I3T, iconFontSize, &icons_config,
+	                             getFontRanges_faIcons());
+	;
+}
+
+/// Special oversampled set of icons for use in the node editor. These icons are less blurry when scaled.
+void FontManager::loadNodeEditorIcons(float size_pixels, float fontScale)
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Merge in node editor icon fonts, using higher oversampling
+	ImFontConfig icons_config;
+	icons_config.MergeMode = true;
+	icons_config.OversampleH = 4;
+	icons_config.OversampleV = 4;
+	icons_config.PixelSnapH = false;
+
+	float iconFontSize = size_pixels * fontScale;
+
+	icons_config.GlyphMinAdvanceX = 0; // Don't align to allow alignment using narrow spaces
+	icons_config.GlyphOffset = ImVec2(0, 0);
+	// icons_config.RasterizerMultiply = 1.1f;
+
+	io.Fonts->AddFontFromFileTTF("Data/Icons/" FONT_ICON_FILE_NAME_FA_I3T, iconFontSize, &icons_config,
+	                             getFontRanges_nodeEditorIcons());
+}
+
+const ImWchar* FontManager::getFontRanges_faIcons()
+{
 	static const ImWchar icons_ranges_fa[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-	io.Fonts->AddFontFromFileTTF("Data/Fonts/fa-6-solid-900-i3t.ttf", iconFontSize, &icons_config, icons_ranges_fa);
+	return &icons_ranges_fa[0];
+}
+
+const ImWchar* FontManager::getFontRanges_nodeEditorIcons()
+{
+	// Custom range to include as little glyphs as possible
+	static ImVector<ImWchar> node_editor_icons_ranges;
+	static bool loaded = false;
+	if (!loaded)
+	{
+		node_editor_icons_ranges.clear();
+
+		ImFontGlyphRangesBuilder builder;
+		builder.AddText(ICON_FA_CHEVRON_DOWN ICON_FA_CHEVRON_RIGHT ICON_FA_ANGLE_DOWN ICON_FA_ANGLE_RIGHT
+		                    ICON_FA_CARET_DOWN ICON_FA_CARET_RIGHT ICON_FA_PEN_TO_SQUARE ICON_FA_I3T_DOTS_3_1
+		                        ICON_FA_PEN ICON_FA_I3T_DOTS_3_2 ICON_FA_I3T_DOTS_3_3 ICON_FA_I3T_NSPACE_1
+		                            ICON_FA_I3T_NSPACE_2 ICON_FA_I3T_NSPACE_3 ICON_FA_I3T_NSPACE_4);
+		builder.BuildRanges(&node_editor_icons_ranges);
+		loaded = true;
+	}
+	return node_editor_icons_ranges.Data;
 }
 
 void FontManager::setDefaultFont(std::string name)

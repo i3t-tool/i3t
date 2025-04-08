@@ -18,6 +18,7 @@
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "GUI/Workspace/Nodes/Basic/CoreNode.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "Logger/Logger.h"
@@ -159,6 +160,32 @@ void WorkspaceWindow::render()
 				ImGui::SliderFloat("Dim alpha",
 				                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_DIM_ALPHA),
 				                   0.0f, 1.f, "%.2f");
+
+				ImGui::SeparatorText("Node icons");
+				ImGui::MenuItem("Use LOD icons", NULL, &CoreNode_useLODIcons);
+				if (ImGui::BeginMenu("LOD expand/collapse"))
+				{
+					if (ImGui::MenuItem("Chevron", NULL, !(CoreNode_useAngleLODIcon || CoreNode_useCaretLODIcon)))
+					{
+						CoreNode_useAngleLODIcon = false;
+						CoreNode_useCaretLODIcon = false;
+					}
+					if (ImGui::MenuItem("Angle", NULL, &CoreNode_useAngleLODIcon))
+					{
+						CoreNode_useCaretLODIcon = false;
+					}
+					if (ImGui::MenuItem("Caret", NULL, &CoreNode_useCaretLODIcon))
+					{
+						CoreNode_useAngleLODIcon = false;
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::MenuItem("Use three dots for multi LODs (>2 modes)", NULL, &CoreNode_useDotsForMultiLOD);
+				if (ImGui::BeginMenu("Set value mode icon (when three dots are off)"))
+				{
+					ImGui::MenuItem("Pen in box", NULL, &CoreNode_usePenInBoxIcon);
+					ImGui::EndMenu();
+				}
 
 				ImGui::PopItemFlag();
 				ImGui::EndMenu();

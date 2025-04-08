@@ -1408,7 +1408,3 @@
 #define ICON_FA_YEN_SIGN "\xef\x85\x97"                               // U+f157
 #define ICON_FA_YIN_YANG "\xef\x9a\xad"                               // U+f6ad
 #define ICON_FA_Z "Z"                                                 // U+005a
-
-// Custom I3T icons
-#define ICON_FA_GIZMO "\xee\xb8\x80"   // U+ee00
-#define ICON_FA_FRUSTUM "\xee\xb8\x81" // U+ee01

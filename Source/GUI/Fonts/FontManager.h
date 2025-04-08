@@ -40,7 +40,20 @@ public:
 	void setDefaultFont(std::string name);
 
 private:
-	ImFont* loadFont(const char* filename, float size_pixels, float fontScale, const ImFontConfig* font_cfg_template,
-	                 const ImWchar* glyph_ranges, bool mergeIcons);
+	static ImFont* loadFont(const char* filename, float size_pixels, float fontScale,
+	                        const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges, bool mergeIcons,
+	                        bool mergeNodeEditorIcons = false);
+
+
+	// Icon rendering
+	// ============================================================================================================
+	// fa-6-solid-900-i3t.ttf contains some custom I3T icons, see IconsFontAwesome6_I3T.h
+	// The I3T icons begin at Private Use Area code point 0xEE00
+
+	/// Icons are loaded from a custom icon font file, rasterized and merged into the last loaded font
 	static void loadFontAwesomeIcons(float size_pixels, float fontScale);
+	static void loadNodeEditorIcons(float size_pixels, float fontScale);
+
+	static const ImWchar* getFontRanges_faIcons();
+	static const ImWchar* getFontRanges_nodeEditorIcons();
 };
