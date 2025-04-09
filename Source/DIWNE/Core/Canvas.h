@@ -161,12 +161,9 @@ public:
 	                            ImDrawFlags rounding_corners = ImDrawFlags_RoundCornersAll, float thickness = 1.0f,
 	                            bool ignoreZoom = false) const;
 
-	/// Draws a rounded border inside the given min/max bounds. Needed to properly aling rounded corners.
-	void AddInnerRoundedRectScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col, float rounding,
-	                               ImDrawFlags flags, float thickness, float offset);
-	/// Draws a rounded filled rect offset inwards
-	void AddRectFilledOffsetDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
-	                              ImDrawFlags rounding_corners, bool ignoreZoom, float offset) const;
+	// /// Draws a rounded filled rect offset inwards
+	// void AddRectFilledOffsetDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
+	//                               ImDrawFlags rounding_corners, bool ignoreZoom, float offset) const;
 
 	/** \brief Draw Bezier (not Bezier really) curve to window ImDrawList
 	 *

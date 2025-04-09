@@ -244,6 +244,8 @@ void Model::drawInputPins(DIWNE::DrawInfo& context)
 	const std::vector<Ptr<CorePin>>& pins = m_workspaceInputs;
 	assert(pins.size() == 1); // Models have special pin handling, expecting matrix mul at 0
 
+	updatePinStyle(*pins[0]);
+
 	if (pins[0]->allowDrawing())
 	{
 		m_left.vspring(0.4f);

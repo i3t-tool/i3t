@@ -289,7 +289,9 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// From: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->drawDiwne(context, m_drawMode); // icon and label
+		auto& pinInFrom = m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM);
+		updatePinStyle(*pinInFrom);
+		pinInFrom->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		const float fromWidth = ImGui::GetItemRectSize().x; // length of the icon + label (from is the longest text)
 		// ImGui::DebugDrawItemRect(ImColor(255, 127, 0, 127));
@@ -307,9 +309,8 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::SetNextItemWidth(getDataItemsWidth()); // width of the drag float widget
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:from", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->isConnected() ? Core::EValueState::Locked
-		                                                                 : Core::EValueState::Editable,
-		    valueChanged, m_labelDiwne);
+		    pinInFrom->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
+		    m_labelDiwne);
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
 		// {
@@ -327,7 +328,9 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// To: -------- v| > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->drawDiwne(context, m_drawMode); // icon and label
+		auto& pinInTo = m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO);
+		updatePinStyle(*pinInTo);
+		pinInTo->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float toWidth = ImGui::GetItemRectSize().x;
 
@@ -344,9 +347,8 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
 		inner_interaction_happen |= DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:to", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
-		                                                               : Core::EValueState::Editable,
-		    valueChanged, m_labelDiwne);
+		    pinInTo->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
+		    m_labelDiwne);
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 
 		// if (ImGui::IsItemHovered())
@@ -363,7 +365,9 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// Step: -------- | > | from | value |
 		//----------------
 		ImGui::BeginGroup();
-		m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->drawDiwne(context, m_drawMode); // icon and label
+		auto& pinInStep = m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP);
+		updatePinStyle(*pinInStep);
+		pinInStep->drawDiwne(context, m_drawMode); // icon and label
 		ImGui::EndGroup();
 		float stepWidth = ImGui::GetItemRectSize().x;
 
@@ -380,9 +384,8 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		// TODO: drawDragFloat should take the context parameter
 		bool interaction = DataRenderer::drawDragFloatWithMap_Inline(
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:step", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_STEP)->isConnected() ? Core::EValueState::Locked
-		                                                                 : Core::EValueState::Editable,
-		    valueChanged, m_labelDiwne);
+		    pinInStep->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
+		    m_labelDiwne);
 		if (interaction)
 			context.consumeInput();
 
@@ -407,7 +410,9 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 			                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 			{
 				// inner_interaction_happen |= m_workspaceInputs.at(i)->m_iconType
-				m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
+				auto& pin = m_workspaceInputs.at(i);
+				updatePinStyle(*pin);
+				pin->drawDiwne(context, m_drawMode);
 			}
 		}
 		else if (m_levelOfDetail == LevelOfDetail::SetValues)

@@ -26,11 +26,6 @@ StyleBase::StyleBase()
 	set<float>(HOVER_BORDER_WIDTH, 1.5f, true);
 	set<ImVec4>(HOVER_BORDER_COLOR, {0.0, 0.0, 0.0, 0.40});
 
-	set<ImVec4>(DROP_ZONE_BG, {0.1, 0.1, 0.1, 0.4});
-	set<ImVec4>(DROP_INDICATOR_COLOR, {0.26, 0.59, 0.98, 0.67});
-	set<ImVec2>(DROP_ZONE_DROP_GAP, {10.0f, 10.0f}, true);
-	set<ImVec2>(DROP_ZONE_MARGIN, {8.0f, 8.0f}, true);
-
 	set<ImVec4>(LINK_COLOR, {0.6, 0.3, 0.35, 0.6});
 	set<ImVec4>(LINK_COLOR_SELECTED, {0.6, 0.3, 0.35, 0.8});
 	set<float>(LINK_UNPLUGGED_ALPHA, 0.5f);
@@ -55,6 +50,8 @@ StyleBase::StyleBase()
 	set<ImVec4>(PIN_SOCKET_BG, {0.f, 0.f, 0.f, 0.31f});
 	set<float>(PIN_SOCKET_THICKNESS, 2.0f, true);
 	set<float>(PIN_SOCKET_CONNECTED_GAP, 2.0f, true);
+	set<float>(PIN_SOCKET_ROUNDING, 2.0f, true);
+	set<float>(PIN_SOCKET_INNER_ROUNDING, 0.75f, true);
 
 	set<float>(PIN_SQUARE_OFFSET, 4.0f, true);
 	set<float>(PIN_SQUARE_BORDER_WIDTH, 0.0f, true);
@@ -67,6 +64,11 @@ StyleBase::StyleBase()
 	set<ImVec4>(SELECTION_RECT_FULL_COLOR, {0.0, 0.0, 1.0, 0.1});
 	set<ImVec4>(SELECTION_RECT_TOUCH_COLOR, {0.0, 1.0, 0.0, 0.1});
 	set<float>(SELECTION_RECT_ALPHA, 0.8f);
+
+	set<ImVec4>(DROP_ZONE_BG, {0.1, 0.1, 0.1, 0.4});
+	set<ImVec4>(DROP_INDICATOR_COLOR, {0.26, 0.59, 0.98, 0.67});
+	set<ImVec2>(DROP_ZONE_DROP_GAP, {10.0f, 10.0f}, true);
+	set<ImVec2>(DROP_ZONE_MARGIN, {8.0f, 8.0f}, true);
 
 	assert(Style::Var::STYLE_VAR_COUNT == sanityCounter && "Are you sure all variables are set properly?");
 }

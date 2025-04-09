@@ -26,7 +26,8 @@ namespace Workspace
 enum class PinStyle
 {
 	Square,
-	Socket
+	Socket,
+	SocketSquare,
 };
 
 extern std::map<Core::EValueType, EColor> PinColorBackground;
@@ -97,6 +98,15 @@ private:
 	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 
 	void drawSquarePin(const ImVec2& size, bool left, float alpha); ///< Responsible for setting the m_pinRect!
-	void drawSocketPin(const ImVec2& size, bool left, float alpha); ///< Responsible for setting the m_pinRect!
+
+	/**
+	 * Draw pin in the socket style.
+	 * Responsible for setting the m_pinRect!
+	 * @param size Size of the pin
+	 * @param left Whether the pin is on the left or right side of a node.
+	 * @param rounding How round should the socket be, -1 for circle.
+	 * @param alpha Transparency multiplier of the pin colors.
+	 */
+	void drawSocketPin(const ImVec2& size, bool left, float alpha, float rounding = -1.0f);
 };
 } // namespace Workspace

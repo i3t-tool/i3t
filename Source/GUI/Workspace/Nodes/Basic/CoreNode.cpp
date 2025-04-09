@@ -142,6 +142,8 @@ void CoreNode::drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImD
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
 
+	if (CoreNode_useDotsForMultiLOD)
+		ImGui::AlignTextToFramePadding();
 	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), cornerFlags,
 	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getZoom()))
 	{

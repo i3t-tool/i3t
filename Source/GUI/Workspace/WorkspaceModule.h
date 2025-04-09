@@ -21,10 +21,11 @@ class WorkspaceModule : public Module, public IStateful
 public:
 	static Ptr<Workspace::WorkspaceDiwne> g_editor;
 
-	static bool g_useSquarePins;
-	static bool g_useSquarePinsMul;
-	static bool g_useSquarePinsPulse;
-	static bool g_useSquarePinsScreen;
+	static int g_pinStyle;
+	static int g_pinStyleMul;
+	static int g_pinStylePulse;
+	static int g_pinStyleScreen;
+	static int g_pinStyleModelMatrix;
 
 	WorkspaceModule();
 

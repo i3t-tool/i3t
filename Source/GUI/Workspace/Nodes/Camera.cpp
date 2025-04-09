@@ -268,6 +268,7 @@ void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 	outputPinsVstack.begin();
 	for (auto pin : {pins[0], pins[1]})
 	{
+		updatePinStyle(*pin);
 		if (pin->allowDrawing())
 		{
 			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
@@ -278,6 +279,7 @@ void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 	}
 
 	auto& pin = pins[2];
+	updatePinStyle(*pin);
 	if (pin->allowDrawing())
 	{
 		outputPinsVstack.spring(0.24f);
