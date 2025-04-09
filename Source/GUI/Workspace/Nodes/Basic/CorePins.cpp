@@ -163,8 +163,6 @@ void CorePin::drawPin(bool left, float alpha)
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);
 
-	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
-	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 	if (!style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
 		m_dragRect = m_pinRect;
 
@@ -212,6 +210,8 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
 	diwne.canvas().IconButton("PinIcon", true, iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
 	                          iconColorFg, size, ImVec4(padding, padding, padding, padding), filled, {1, 1}, rounding);
+	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
+	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	// Optionally draw pin icon border
@@ -251,6 +251,8 @@ void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha)
 	ImVec2 pos = ImGui::GetCursorScreenPos();
 	bool hovered, active;
 	bool result = DIWNE::DGui::ButtonDummy("PinSocket", size, true, hovered, active);
+	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
+	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
 	if (!left)
 	{
 		ImGui::SameLine(0, 0);
@@ -307,6 +309,7 @@ bool CorePin::drawLabel(DIWNE::DrawInfo& context)
 	// that makes vertical centering easy.
 	// Height of the label should be the same as the pin, eg. we want to center the label on the pin
 	// When the pin is small then we do the opposite and we center the pin on the frame height
+	bool beganGroup = false;
 	ImVec2 pinSize = getPinSize();
 	ImVec2 nodeFramePadding = I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom();
 	if (pinSize.y <= DIWNE::DGui::GetFrameHeight(nodeFramePadding))
@@ -315,10 +318,14 @@ bool CorePin::drawLabel(DIWNE::DrawInfo& context)
 	}
 	else
 	{
+		ImGui::BeginGroup();
+		beganGroup = true;
 		float verticalMargin = (pinSize.y - ImGui::GetTextLineHeight()) / 2.0f;
 		DIWNE::DGui::DummyXY(ImVec2(0.0f, verticalMargin));
 	}
 	ImGui::TextUnformatted(label.c_str());
+	if (beganGroup)
+		ImGui::EndGroup();
 	return true;
 }
 

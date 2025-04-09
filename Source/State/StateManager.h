@@ -185,6 +185,7 @@ private:
 
 	fs::path m_tmpDirectory;
 	long long m_lastTmpDirectoryLockTimestamp{0};
+	int m_lockFileWriteFailures{0};
 
 	void createTmpDirectory();
 	void deleteTmpDirectory();
