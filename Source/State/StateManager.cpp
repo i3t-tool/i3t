@@ -68,27 +68,53 @@ void StateManager::onBeginFrame()
 				}
 				else
 				{
-					LOG_ERROR("[STATE MANAGER] Failed to open tmp directory LOCK file for writing! Path: {}",
+					LOG_ERROR("[STATE MANAGER] Failed to open tmp directory LOCK file for writing! Path: '{}'",
 					          lockFile.string());
+					LOG_ERROR("[STATE MANAGER] CWD: {}", fs::current_path().string());
 				}
 			}
 			catch (std::exception& e)
 			{
-				LOG_ERROR(
-				    "[STATE MANAGER] An exception occurred while writing to the tmp directory LOCK file: {}, code: {}",
-				    e.what(), strerror(errno));
+				LOG_ERROR("[STATE MANAGER] An exception occurred while writing to the tmp directory LOCK file at '{}', "
+				          "msg: {}, code: {}",
+				          lockFile.string(), e.what(), strerror(errno));
+				LOG_ERROR("[STATE MANAGER] CWD: {}", fs::current_path().string());
 			}
 
 			// Schedule next write
 			if (success)
 			{
 				m_lastTmpDirectoryLockTimestamp = minutesSinceEpoch; // Next write in lock interval
+				m_lockFileWriteFailures = 0;
 			}
 			else
 			{
 				// Try again soon
 				m_lastTmpDirectoryLockTimestamp =
 				    minutesSinceEpoch - std::max(1LL, ((long long) (m_tmpDirectoryLockFileInterval * 0.9))) + 1;
+				m_lockFileWriteFailures++;
+				if (m_lockFileWriteFailures > 1)
+				{
+					LOG_ERROR("Failing to create a temporary directory lock file!\nI3T uses a '{}' folder located next "
+					          "to its executable, this folder should not be deleted when I3T is running. The "
+					          "temporary directory cannot be written to, there may have been a catastrophic error.\n"
+					          "\nPlease report this to the I3T developers!\n",
+					          m_tmpDirectoryRootName.string());
+					LOG_ERROR("Debug info:\n");
+					LOG_ERROR("tmpDir: {}", m_tmpDirectory.string());
+					LOG_ERROR("globalData: {}", m_globalFilePath.string());
+					fs::path cwd = fs::current_path();
+					LOG_ERROR("CWD: '{}'", cwd.string());
+					LOG_ERROR("Startup CWD: '{}'", Configuration::root.string());
+					if (cwd != Configuration::root)
+					{
+						LOG_ERROR("The application's working directory has changed since its startup! This shouldn't "
+						          "happen.\n");
+					}
+					LOG_ERROR("scenePath: '{}'", m_currentScene ? m_currentScene->m_path.string() : "<no scene>");
+					LOG_ERROR("sceneDataDir: '{}'",
+					          m_currentScene ? m_currentScene->m_dataPath.string() : "<no scene>");
+				}
 			}
 		}
 	}

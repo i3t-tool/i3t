@@ -96,7 +96,7 @@ private:
 	bool drawBasicPinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 
-	void drawSquarePin(const ImVec2& size, bool left, float alpha);
-	void drawSocketPin(const ImVec2& size, bool left, float alpha);
+	void drawSquarePin(const ImVec2& size, bool left, float alpha); ///< Responsible for setting the m_pinRect!
+	void drawSocketPin(const ImVec2& size, bool left, float alpha); ///< Responsible for setting the m_pinRect!
 };
 } // namespace Workspace
