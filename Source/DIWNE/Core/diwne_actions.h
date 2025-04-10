@@ -123,6 +123,7 @@ struct ConnectPinAction : public DiwneAction
 struct SelectionRectAction : public DiwneAction
 {
 	bool touch = false;
+	ImVec2 startPos{0, 0};
 	ImRect rect{0, 0, 0, 0};
 
 	SelectionRectAction(const std::shared_ptr<DiwneObject>& source) : DiwneAction(selectionRect, source) {}

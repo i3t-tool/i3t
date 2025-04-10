@@ -339,39 +339,40 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 	{
 		if (dragStart && !context.state.action)
 		{
-			context.state.startAction<SelectionRectAction>(shared_from_this());
+			auto action = context.state.startAction<SelectionRectAction>(shared_from_this());
+			action->startPos = m_input->selectionRectangleStartPosition();
 		}
 	}
 	if (context.state.isActionActive(Actions::selectionRect, this))
 	{
-		ImVec2 startPos = m_input->selectionRectangleStartPosition();
-		ImVec2 dragDelta = m_input->selectionRectangleSize();
+		SelectionRectAction* action = context.state.getAction<SelectionRectAction>();
+		ImVec2 cursorPos = canvas().screen2diwne(m_input->bypassGetMousePos());
+		ImVec2 dragDelta = cursorPos - action->startPos;
 		ImColor color;
 
-		SelectionRectAction* action = context.state.getAction<SelectionRectAction>();
 		if (dragDelta.x > 0)
 		{
-			action->rect.Min.x = startPos.x;
-			action->rect.Max.x = startPos.x + dragDelta.x;
+			action->rect.Min.x = action->startPos.x;
+			action->rect.Max.x = action->startPos.x + dragDelta.x;
 			color = style().color(Style::SELECTION_RECT_FULL_COLOR);
 			action->touch = false;
 		}
 		else
 		{
-			action->rect.Min.x = startPos.x + dragDelta.x;
-			action->rect.Max.x = startPos.x;
+			action->rect.Min.x = action->startPos.x + dragDelta.x;
+			action->rect.Max.x = action->startPos.x;
 			color = style().color(Style::SELECTION_RECT_TOUCH_COLOR);
 			action->touch = true;
 		}
 		if (dragDelta.y > 0)
 		{
-			action->rect.Min.y = startPos.y;
-			action->rect.Max.y = startPos.y + dragDelta.y;
+			action->rect.Min.y = action->startPos.y;
+			action->rect.Max.y = action->startPos.y + dragDelta.y;
 		}
 		else
 		{
-			action->rect.Min.y = startPos.y + dragDelta.y;
-			action->rect.Max.y = startPos.y;
+			action->rect.Min.y = action->startPos.y + dragDelta.y;
+			action->rect.Max.y = action->startPos.y;
 		}
 		m_canvas->AddRectFilledDiwne(action->rect.Min, action->rect.Max, color);
 		m_canvas->AddRectDiwne(

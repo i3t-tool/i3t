@@ -22,10 +22,6 @@ ImVec2 NodeEditorInputAdapter::selectionRectangleStartPosition()
 {
 	return editor.canvas().screen2diwne(editor.input().bypassMouseClickedPos0());
 }
-ImVec2 NodeEditorInputAdapter::selectionRectangleSize()
-{
-	return editor.canvas().screen2diwneSize(editor.input().bypassGetMouseDragDelta0());
-}
 
 bool NodeEditorInputAdapter::panKeyDown()
 {
