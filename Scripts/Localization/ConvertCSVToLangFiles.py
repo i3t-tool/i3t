@@ -15,7 +15,7 @@ def parse_csv_to_lang_files(csv_filename, localization_dir):
         reader = csv.DictReader(f)
 
         # Determine which columns are "language" columns (all after "Key" and "Title")
-        language_columns = [col for col in reader.fieldnames if col not in ("Key", "Title")]
+        language_columns = reader.fieldnames[2:]
 
         # Prepare structures to store data,
         # where the key is the language name, and the value is a list of "key=value" strings
@@ -27,7 +27,10 @@ def parse_csv_to_lang_files(csv_filename, localization_dir):
             # If there is something in the Key cell, generate entries for all languages
             if key:
                 for lang in language_columns:
-                    value = row[lang] if row[lang] else ""
+                    if not row[lang]:
+                        # If the cell is empty, we skip it
+                        continue
+                    value = row[lang]
                     # Format "key=value"
                     lang_data[lang].append(f"{key}={value}")
 
