@@ -65,6 +65,8 @@ public:
 	virtual void drawInputPins(DIWNE::DrawInfo& context);
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
+	void updatePinStyle(CorePin& pin);
+
 	void onDestroy(bool logEvent) override;
 
 	void translate(const ImVec2& vec) override;

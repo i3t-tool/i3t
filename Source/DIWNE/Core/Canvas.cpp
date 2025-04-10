@@ -271,7 +271,6 @@ ImVec2 Canvas::screen2diwneSize(const ImVec2& point) const
 {
 	return ImVec2(screen2diwneSize(point.x), screen2diwneSize(point.y));
 }
-
 float Canvas::getZoom() const
 {
 	return m_zoom;
@@ -319,30 +318,6 @@ void Canvas::AddRectForegroundDiwne(const ImVec2& p_min, const ImVec2& p_max, co
 	ImDrawList* idl = ImGui::GetForegroundDrawList();
 	idl->AddRect(diwne2screenTrunc(p_min), diwne2screenTrunc(p_max), ImGui::ColorConvertFloat4ToU32(col),
 	             rounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners, thickness * (ignoreZoom ? 1.0f : m_zoom));
-}
-
-void Canvas::AddInnerRoundedRectScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col, float rounding,
-                                       ImDrawFlags flags, float thickness, float offset)
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList();
-	ImVec2 hThickness(offset * 0.5f, offset * 0.5f);
-	ImVec2 borderMin = min + hThickness;
-	ImVec2 borderMax = max - hThickness;
-	float adjRounding = ImMax(0.0f, rounding - thickness * 0.5f);
-	idl->AddRect(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col), adjRounding, flags, thickness);
-}
-
-// TODO: Test or remove
-void Canvas::AddRectFilledOffsetDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,
-                                      ImDrawFlags rounding_corners, bool ignoreZoom, float offset) const
-{
-	ImDrawList* idl = ImGui::GetWindowDrawList();
-	ImVec2 vOffset(offset, offset);
-	ImVec2 borderMin = diwne2screenTrunc(p_min + vOffset);
-	ImVec2 borderMax = diwne2screenTrunc(p_max - vOffset);
-	float adjRounding = ImMax(0.0f, rounding - offset);
-	idl->AddRectFilled(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col),
-	                   adjRounding * (ignoreZoom ? 1.0f : m_zoom), rounding_corners);
 }
 
 void Canvas::AddBezierCurveDiwne(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3,

@@ -33,6 +33,17 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	m_autoFocus = true;
 }
 
+void pinStyleSelection(int* ptr)
+{
+	static const char* pinStyleNames[3] = {"Square", "Socket", "SocketSquare"};
+	for (int i = 0; i < 3; i++)
+	{
+		if (ImGui::MenuItem(pinStyleNames[i], NULL, *ptr == i))
+			*ptr = i;
+	}
+	ImGui::EndMenu();
+}
+
 void WorkspaceWindow::render()
 {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
@@ -72,10 +83,16 @@ void WorkspaceWindow::render()
 
 				if (ImGui::BeginMenu("Pin style"))
 				{
-					ImGui::MenuItem("General", NULL, &WorkspaceModule::g_useSquarePins);
-					ImGui::MenuItem("Matrix Mul", NULL, &WorkspaceModule::g_useSquarePinsMul);
-					ImGui::MenuItem("Pulse", NULL, &WorkspaceModule::g_useSquarePinsPulse);
-					ImGui::MenuItem("Screen", NULL, &WorkspaceModule::g_useSquarePinsScreen);
+					if (ImGui::BeginMenu("General"))
+						pinStyleSelection(&WorkspaceModule::g_pinStyle);
+					if (ImGui::BeginMenu("Matrix Mul"))
+						pinStyleSelection(&WorkspaceModule::g_pinStyleMul);
+					if (ImGui::BeginMenu("Pulse"))
+						pinStyleSelection(&WorkspaceModule::g_pinStylePulse);
+					if (ImGui::BeginMenu("Screen"))
+						pinStyleSelection(&WorkspaceModule::g_pinStyleScreen);
+					if (ImGui::BeginMenu("Seq model matrix"))
+						pinStyleSelection(&WorkspaceModule::g_pinStyleModelMatrix);
 					ImGui::EndMenu();
 				}
 				ImGui::MenuItem(
@@ -92,7 +109,7 @@ void WorkspaceWindow::render()
 				ImGui::SeparatorText("Socket pin style");
 				ImGui::SliderFloat(
 				    "Pin socket offset",
-				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_OFFSET), 0.0f, 20.f,
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_OFFSET), -15.0f, 20.f,
 				    "%.2f");
 				ImGui::SliderFloat(
 				    "Pin socket thickness",
@@ -110,11 +127,19 @@ void WorkspaceWindow::render()
 				    "Pin socket border color",
 				    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_SOCKET_BORDER_COLOR)->x,
 				    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+				ImGui::SliderFloat(
+				    "Pin socket rounding",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_ROUNDING), 0.0f, 20.f,
+				    "%.2f");
+				ImGui::SliderFloat(
+				    "Pin socket inner rounding",
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_INNER_ROUNDING), 0.0f,
+				    20.f, "%.2f");
 
 				ImGui::SeparatorText("Square pin style");
 				ImGui::SliderFloat(
 				    "Pin square offset",
-				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_OFFSET), 0.0f, 20.f,
+				    WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_OFFSET), -15.0f, 20.f,
 				    "%.2f");
 
 				ImGui::SliderFloat(

@@ -132,6 +132,7 @@ void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)
 {
 	for (auto const& pin : m_workspaceInputs)
 	{
+		updatePinStyle(*pin);
 		if (pin->allowDrawing())
 		{
 			pin->drawDiwne(context, m_drawMode);
@@ -144,6 +145,7 @@ void CoreNodeWithPins::drawOutputPins(DIWNE::DrawInfo& context)
 	outputPinsVstack.begin();
 	for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
 	{
+		updatePinStyle(*pin);
 		if (pin->allowDrawing())
 		{
 			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
@@ -153,6 +155,18 @@ void CoreNodeWithPins::drawOutputPins(DIWNE::DrawInfo& context)
 		}
 	}
 	outputPinsVstack.end();
+}
+void CoreNodeWithPins::updatePinStyle(CorePin& pin)
+{
+	// Pin styling
+	if (pin.getType() == Core::EValueType::MatrixMul)
+		pin.m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyleMul);
+	else if (pin.getType() == Core::EValueType::Pulse)
+		pin.m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStylePulse);
+	else if (pin.getType() == Core::EValueType::Screen)
+		pin.m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyleScreen);
+	else
+		pin.m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyle);
 }
 
 void CoreNodeWithPins::onDestroy(bool logEvent)

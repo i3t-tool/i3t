@@ -14,6 +14,7 @@
 
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -164,6 +165,9 @@ void Sequence::drawInputPins(DIWNE::DrawInfo& context)
 
 	ImGui::Spacing(); // Manually add vertical spacing
 
+	updatePinStyle(*pins[0]);
+	updatePinStyle(*pins[1]);
+
 	pins[1]->drawDiwne(context);
 	ImGui::Dummy(ImGui::GetCurrentContext()->LastItemData.Rect.GetSize()); // Second dummy pin to keep matrix mul align
 
@@ -181,6 +185,11 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 
 	ImGui::Spacing(); // Manually add vertical spacing
 
+
+	updatePinStyle(*pins[1]);
+	updatePinStyle(*pins[2]);
+	pins[2]->m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyleModelMatrix);
+
 	outputPinsVstack.begin();
 	for (auto pin : {pins[1], pins[2]})
 	{
@@ -194,6 +203,7 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 	}
 
 	auto& pin = pins[0];
+	updatePinStyle(*pin);
 	if (pin->allowDrawing())
 	{
 		outputPinsVstack.spring(0.15f);

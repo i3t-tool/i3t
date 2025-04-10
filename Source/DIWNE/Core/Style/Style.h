@@ -28,7 +28,7 @@ public:
 		NODE_HEADER_BG, // ImVec4
 
 		NODE_ROUNDING, // int
-		NODE_PADDING,  // float
+		NODE_PADDING,  // float // TODO: Review in example app
 
 		MOUSE_DRAG_THRESHOLD, // float // TODO: Maybe shouldnt be style but setting? what about dpi?
 
@@ -38,14 +38,9 @@ public:
 		HOVER_BORDER_WIDTH,    // float
 		HOVER_BORDER_COLOR,    // ImVec4
 
-		DROP_ZONE_BG,         // ImVec4
-		DROP_INDICATOR_COLOR, // ImVec4
-		DROP_ZONE_DROP_GAP,   // ImVec2
-		DROP_ZONE_MARGIN,     // ImVec2
-
 		LINK_COLOR,           // ImVec4
 		LINK_COLOR_SELECTED,  // ImVec4
-		LINK_UNPLUGGED_ALPHA, // float
+		LINK_UNPLUGGED_ALPHA, // float, replacement link color alpha value set when the link is connected on both sides
 		LINK_WIDTH,           // float
 		LINK_SELECTED_WIDTH,  // float
 		LINK_BORDER_WIDTH,    // float
@@ -67,6 +62,8 @@ public:
 		PIN_SOCKET_BG,              // ImVec4
 		PIN_SOCKET_THICKNESS,       // float
 		PIN_SOCKET_CONNECTED_GAP,   // float, gap between the outer and inner circle of a connected socket
+		PIN_SOCKET_ROUNDING,        // float, rounding for square socket style
+		PIN_SOCKET_INNER_ROUNDING,  // float
 
 		PIN_SQUARE_OFFSET,       // float, offset between the pin icon and the edge of a node
 		PIN_SQUARE_BORDER_WIDTH, // float, thickness of the square pin border
@@ -79,6 +76,11 @@ public:
 		SELECTION_RECT_FULL_COLOR,  // ImVec4
 		SELECTION_RECT_TOUCH_COLOR, // ImVec4
 		SELECTION_RECT_ALPHA,       // float
+
+		DROP_ZONE_BG,         // ImVec4
+		DROP_INDICATOR_COLOR, // ImVec4
+		DROP_ZONE_DROP_GAP,   // ImVec2
+		DROP_ZONE_MARGIN,     // ImVec2
 
 		STYLE_VAR_COUNT // Total number of style variables, used internally
 	};

@@ -951,16 +951,17 @@ void Theme::updateDiwneStyleFromTheme() const
 	style.set(Style::NODE_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeBg));
 	style.set(Style::NODE_HEADER_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeHeader));
 
-	style.set(Style::NODE_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding));
+	style.set(Style::NODE_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding), true);
 
-	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Border_Rounding));
-	style.set(Style::SELECTED_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_SelectedBorderThickness));
+	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Border_Rounding), true);
+	style.set(Style::SELECTED_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_SelectedBorderThickness),
+	          true);
 	style.set(Style::SELECTED_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_SelectedBorder));
-	style.set(Style::HOVER_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_HoverBorderThickness));
+	style.set(Style::HOVER_BORDER_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Workspace_HoverBorderThickness), true);
 	style.set(Style::HOVER_BORDER_COLOR, I3T::getUI()->getTheme().getPtr(EColor::Workspace_HoverBorder));
 
-	style.set(Style::LINK_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_Thickness));
-	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected));
+	style.set(Style::LINK_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_Thickness), true);
+	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected), true);
 
 	style.set(Style::SELECTION_RECT_FULL_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectFull));
 	style.set(Style::SELECTION_RECT_TOUCH_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectTouch));

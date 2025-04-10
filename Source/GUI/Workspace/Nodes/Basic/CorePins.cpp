@@ -18,6 +18,7 @@
 #include "GUI/Workspace/WorkspaceModule.h"
 
 using namespace Workspace;
+using DIWNE::Style;
 
 /// \todo Remove these.
 /* DIWNE - \todo JH to remove, but I need something what use instead -> from
@@ -63,19 +64,9 @@ void CorePin::content(DIWNE::DrawInfo& context)
 {
 	ImGuiStyle& imStyle = ImGui::GetStyle();
 
-	// Setup styling
-	if (getType() == Core::EValueType::MatrixMul)
-		m_pinStyle = WorkspaceModule::g_useSquarePinsMul ? PinStyle::Square : PinStyle::Socket;
-	else if (getType() == Core::EValueType::Pulse)
-		m_pinStyle = WorkspaceModule::g_useSquarePinsPulse ? PinStyle::Square : PinStyle::Socket;
-	else if (getType() == Core::EValueType::Screen)
-		m_pinStyle = WorkspaceModule::g_useSquarePinsScreen ? PinStyle::Square : PinStyle::Socket;
-	else
-		m_pinStyle = WorkspaceModule::g_useSquarePins ? PinStyle::Square : PinStyle::Socket;
-
 	using namespace DIWNE;
-	ImVec2 pinSpacing = style().size(DIWNE::Style::PIN_SPACING) * diwne.getZoom();
-	float labelSpacing = style().decimal(DIWNE::Style::PIN_LABEL_SPACING) * diwne.getZoom();
+	ImVec2 pinSpacing = style().size(Style::PIN_SPACING) * diwne.getZoom();
+	float labelSpacing = style().decimal(Style::PIN_LABEL_SPACING) * diwne.getZoom();
 
 	// TODO: DIMMING NOT WORKING PROPERLY!!, also needs lower alpha
 
@@ -121,7 +112,7 @@ void CorePin::content(DIWNE::DrawInfo& context)
 		drawPin(false, pinAlpha);
 		dragRect = DGui::EndRect(rectData);
 	}
-	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
+	if (style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
 		m_dragRect = diwne.canvas().screen2diwne(dragRect);
 
 	// End dimming
@@ -155,15 +146,23 @@ void CorePin::drawPin(bool left, float alpha)
 		DIWNE::DGui::BeginVerticalAlign(verticalMargin);
 	}
 
-	if (m_pinStyle == PinStyle::Socket)
-		drawSocketPin(iconSize, left, alpha);
+	if (m_pinStyle == PinStyle::Socket || m_pinStyle == PinStyle::SocketSquare)
+	{
+		drawSocketPin(iconSize, left, alpha,
+		              m_pinStyle == PinStyle::SocketSquare
+		                  ? style().decimal(Style::PIN_SOCKET_ROUNDING) * diwne.getZoom()
+		                  : -1.0f);
+	}
 	else
+	{
 		drawSquarePin(iconSize, left, alpha);
+	}
+
 
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);
 
-	if (!style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
+	if (!style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
 		m_dragRect = m_pinRect;
 
 	DIWNE_DEBUG_LAYOUT(diwne, {
@@ -181,7 +180,7 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 	bool filled = isConnected();
 	filled = true;
 
-	float offset = style().decimal(DIWNE::Style::PIN_SQUARE_OFFSET) * diwne.getZoom();
+	float offset = style().decimal(Style::PIN_SQUARE_OFFSET) * diwne.getZoom();
 
 	Core::EValueType pinType = getType();
 	const DIWNE::IconType iconTypeBg = PinShapeBackground[pinType];
@@ -197,7 +196,7 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 
 	// space between icon symbol and icon boundary
 	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
-	const float rounding = style().decimal(DIWNE::Style::PIN_SQUARE_ROUNDING) * diwne.getZoom();
+	const float rounding = style().decimal(Style::PIN_SQUARE_ROUNDING) * diwne.getZoom();
 
 	if (left)
 	{
@@ -215,12 +214,11 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	// Optionally draw pin icon border
-	float borderWidth = style().decimal(DIWNE::Style::PIN_SQUARE_BORDER_WIDTH) * diwne.getZoom();
+	float borderWidth = style().decimal(Style::PIN_SQUARE_BORDER_WIDTH) * diwne.getZoom();
 	if (borderWidth > 0.0f)
 	{
-		diwne.canvas().AddInnerRoundedRectScreen(pos, pos + size, style().color(DIWNE::Style::PIN_SQUARE_BORDER_COLOR),
-		                                         rounding, ImDrawFlags_RoundCornersAll, borderWidth,
-		                                         borderWidth * 0.8f);
+		DIWNE::DDraw::AddInnerRoundedRectScreen(pos, pos + size, style().color(Style::PIN_SQUARE_BORDER_COLOR),
+		                                        rounding, ImDrawFlags_RoundCornersAll, borderWidth, borderWidth * 0.8f);
 	}
 	// Disabled overlay
 	if (isDisabled())
@@ -236,9 +234,9 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 	}
 }
 
-void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha)
+void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha, float rounding)
 {
-	float offset = style().decimal(DIWNE::Style::PIN_SOCKET_OFFSET) * diwne.getZoom();
+	float offset = style().decimal(Style::PIN_SOCKET_OFFSET) * diwne.getZoom();
 
 	Core::EValueType pinType = getType();
 	const ImColor baseColor = I3T::getColor(PinColorBackground[pinType]);
@@ -259,41 +257,78 @@ void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha)
 		ImGui::Dummy(ImVec2(offset, 0.f));
 	}
 
-	ImVec2 center = pos + size / 2.f;
-	float outerThickness = style().decimal(DIWNE::Style::PIN_SOCKET_THICKNESS) * diwne.getZoom();
-	float outerRadius = (size.x - outerThickness) / 2.f;
-	float innerRadius = size.x / 2.f - outerThickness;
-	float connectGap = style().decimal(DIWNE::Style::PIN_SOCKET_CONNECTED_GAP) * diwne.getZoom();
-
 	ImVec4 color = baseColor;
 	ImVec4 hoverColor = baseColor;
-	ImVec4 bgColor = style().color(DIWNE::Style::PIN_SOCKET_BG);
+	ImVec4 bgColor = style().color(Style::PIN_SOCKET_BG);
 	if (m_previewPlugged)
-		hoverColor = hoverColor + style().color(DIWNE::Style::PIN_HOVER_COLOR_SHIFT);
+		hoverColor = hoverColor + style().color(Style::PIN_HOVER_COLOR_SHIFT);
 
 	color.w *= alpha;
 	hoverColor.w *= alpha;
 	bgColor.w *= alpha;
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddCircleFilled(center, outerRadius, ImGui::ColorConvertFloat4ToU32(bgColor), 0);
-	idl->AddCircle(center, outerRadius, ImGui::ColorConvertFloat4ToU32(hoverColor), 0, outerThickness);
 
-	// Optionally draw pin socket border
-	float borderWidth = style().decimal(DIWNE::Style::PIN_SOCKET_BORDER_WIDTH) * diwne.getZoom();
-	if (borderWidth > 0.0f)
+	float socketThickness = style().decimal(Style::PIN_SOCKET_THICKNESS) * diwne.getZoom();
+	float connectGap = style().decimal(Style::PIN_SOCKET_CONNECTED_GAP) * diwne.getZoom();
+
+	if (rounding == -1.0f)
 	{
-		idl->AddCircle(center, outerRadius + outerThickness / 2.f - borderWidth / 2.f,
-		               ImGui::ColorConvertFloat4ToU32(style().color(DIWNE::Style::PIN_SOCKET_BORDER_COLOR)), 0,
-		               borderWidth);
+		ImVec2 center = pos + size / 2.f;
+		float outerRadius = (size.x - socketThickness) / 2.f;
+		float innerRadius = size.x / 2.f - socketThickness;
+
+		idl->AddCircleFilled(center, outerRadius, ImGui::ColorConvertFloat4ToU32(bgColor), 0);
+		idl->AddCircle(center, outerRadius, ImGui::ColorConvertFloat4ToU32(hoverColor), 0, socketThickness);
+
+		// Optionally draw pin socket border
+		float borderWidth = style().decimal(Style::PIN_SOCKET_BORDER_WIDTH) * diwne.getZoom();
+		if (borderWidth > 0.0f)
+		{
+			idl->AddCircle(center, outerRadius + socketThickness / 2.f - borderWidth / 2.f,
+			               ImGui::ColorConvertFloat4ToU32(style().color(Style::PIN_SOCKET_BORDER_COLOR)), 0,
+			               borderWidth);
+		}
+		if (isConnected() || m_previewPlugged)
+			idl->AddCircleFilled(center, innerRadius - connectGap, ImGui::ColorConvertFloat4ToU32(color), 0);
+
+		if (isDisabled()) // Disabled overlay
+		{
+			idl->AddCircleFilled(center, outerRadius + socketThickness / 2.f,
+			                     ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)), 0);
+		}
 	}
-	if (isConnected() || m_previewPlugged)
-		idl->AddCircleFilled(center, innerRadius - connectGap, ImGui::ColorConvertFloat4ToU32(color), 0);
-
-	if (isDisabled()) // Disabled overlay
+	else
 	{
-		idl->AddCircleFilled(center, outerRadius + outerThickness / 2.f,
-		                     ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)), 0);
+		assert(rounding >= 0.0f);
+		ImVec2 min = pos;
+		ImVec2 max = pos + size;
+
+		ImVec2 minO = pos + ImVec2(socketThickness + DIWNE_PIXEL_EPSILON, socketThickness + DIWNE_PIXEL_EPSILON) / 2.f;
+		ImVec2 maxO =
+		    pos + size - ImVec2(socketThickness - DIWNE_PIXEL_EPSILON, socketThickness - DIWNE_PIXEL_EPSILON) / 2.f;
+
+		idl->AddRectFilled(minO, maxO, ImGui::ColorConvertFloat4ToU32(bgColor), rounding, ImDrawFlags_RoundCornersAll);
+		idl->AddRect(minO, maxO, ImGui::ColorConvertFloat4ToU32(hoverColor), rounding, ImDrawFlags_RoundCornersAll,
+		             socketThickness);
+
+		// Optionally draw pin socket border
+		float borderWidth = style().decimal(Style::PIN_SOCKET_BORDER_WIDTH) * diwne.getZoom();
+		if (borderWidth > 0.0f)
+		{
+			idl->AddRect(minO, maxO, ImGui::ColorConvertFloat4ToU32(style().color(Style::PIN_SOCKET_BORDER_COLOR)),
+			             rounding, ImDrawFlags_RoundCornersAll, borderWidth);
+		}
+		if (isConnected() || m_previewPlugged)
+		{
+			DIWNE::DDraw::AddRectFilledOffsetScreen(min, max, color, style().decimal(Style::PIN_SOCKET_INNER_ROUNDING),
+			                                        ImDrawFlags_RoundCornersAll, socketThickness + connectGap, false);
+		}
+		if (isDisabled()) // Disabled overlay
+		{
+			idl->AddRectFilled(min, max, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)),
+			                   rounding, ImDrawFlags_RoundCornersAll);
+		}
 	}
 }
 

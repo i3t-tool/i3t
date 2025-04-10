@@ -14,10 +14,11 @@ using namespace Workspace;
 
 Ptr<WorkspaceDiwne> WorkspaceModule::g_editor;
 
-bool WorkspaceModule::g_useSquarePins = false;
-bool WorkspaceModule::g_useSquarePinsMul = true;
-bool WorkspaceModule::g_useSquarePinsPulse = true;
-bool WorkspaceModule::g_useSquarePinsScreen = true;
+int WorkspaceModule::g_pinStyle = 1;
+int WorkspaceModule::g_pinStyleMul = 0;
+int WorkspaceModule::g_pinStylePulse = 0;
+int WorkspaceModule::g_pinStyleScreen = 0;
+int WorkspaceModule::g_pinStyleModelMatrix = 2;
 
 WorkspaceModule::WorkspaceModule()
 {

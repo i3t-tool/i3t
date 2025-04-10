@@ -18,7 +18,6 @@ public:
 	virtual bool selectionRectangleKeyPressed();
 	virtual bool selectionRectangleDragging();
 	virtual ImVec2 selectionRectangleStartPosition();
-	virtual ImVec2 selectionRectangleSize();
 
 	virtual bool panKeyDown();
 	virtual bool panKeyPressed();

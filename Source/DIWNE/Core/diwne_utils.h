@@ -214,5 +214,66 @@ inline void AddLineRaw(ImDrawList* idl, const ImVec2& p1, const ImVec2& p2, ImU3
 	idl->PathLineTo(p2); // Removed ImVec2(0.5f, 0.5f)
 	idl->PathStroke(col, 0, thickness);
 }
+
+/// Draws a rounded border inside the given min/max bounds. Needed to properly aling rounded corners.
+inline void AddInnerRoundedRectScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col, float rounding,
+                                      ImDrawFlags flags, float thickness, float offset)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	ImVec2 hThickness(offset * 0.5f, offset * 0.5f);
+	ImVec2 borderMin = min + hThickness;
+	ImVec2 borderMax = max - hThickness;
+	float adjRounding = ImMax(0.0f, rounding - thickness * 0.5f);
+	idl->AddRect(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col), adjRounding, flags, thickness);
+}
+
+inline void AddRectFilledOffsetScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col, float rounding,
+                                      ImDrawFlags flags, float offset, bool adjustRounding = true)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	ImVec2 hThickness(offset, offset);
+	ImVec2 borderMin = min + hThickness;
+	ImVec2 borderMax = max - hThickness;
+	float adjRounding = adjustRounding ? ImMax(0.0f, rounding - offset) : rounding;
+	idl->AddRectFilled(borderMin, borderMax, ImGui::ColorConvertFloat4ToU32(col), adjRounding, flags);
+}
+
+inline void AddRectFilledBorderedScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col,
+                                        const ImVec4& borderCol, float rounding, ImDrawFlags flags, float thickness)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	if (thickness > 0.0f)
+	{
+		AddRectFilledOffsetScreen(min, max, col, rounding, flags, thickness);
+		idl->AddRectFilled(min, max, ImGui::ColorConvertFloat4ToU32(borderCol), rounding, flags);
+	}
+	else
+	{
+		idl->AddRectFilled(min, max, ImGui::ColorConvertFloat4ToU32(col), rounding, flags);
+	}
+}
+
+inline void AddRectFilledDoubleBorderedScreen(const ImVec2& min, const ImVec2& max, const ImVec4& col,
+                                              const ImVec4& borderCol1, const ImVec4& borderCol2, float rounding,
+                                              ImDrawFlags flags, float thickness1, float thickness2)
+{
+	constexpr ImVec2 pxo = ImVec2(0.5f, 0.5f);
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+	if (thickness1 > 0.0f && thickness2 > 0.0f)
+	{
+		idl->AddRectFilled(min + pxo, max - pxo, ImGui::ColorConvertFloat4ToU32(borderCol2), rounding, flags);
+		AddRectFilledOffsetScreen(min + pxo, max - pxo, borderCol1, rounding, flags, thickness1);
+		AddRectFilledOffsetScreen(min + pxo, max - pxo, col, rounding, flags, thickness1 + thickness2);
+	}
+	else if (thickness1 > 0.0f)
+	{
+		idl->AddRectFilled(min + pxo, max - pxo, ImGui::ColorConvertFloat4ToU32(borderCol1), rounding, flags);
+		AddRectFilledOffsetScreen(min + pxo, max - pxo, col, rounding, flags, thickness1);
+	}
+	else
+	{
+		idl->AddRectFilled(min + pxo, max - pxo, ImGui::ColorConvertFloat4ToU32(col), rounding, flags);
+	}
+}
 } // namespace DDraw
 } // namespace DIWNE
