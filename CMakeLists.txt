@@ -261,3 +261,45 @@ set_target_properties(assimp PROPERTIES
 # =============================================================
 
 add_subdirectory(Source/DIWNE) # DIWNE standalone example project
+
+
+# =============================================================
+
+# ========== Custom command for creation localization files from CSV table. ======
+
+# Minimal insertion for generating language files if Python is available
+find_package(Python3 COMPONENTS Interpreter QUIET)
+
+if (Python3_FOUND)
+
+    SET(CONVERT_CSV_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/Localization/ConvertCSVToLangFiles.py")
+    SET(L10N_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Localization")
+    SET(CSV_TABLE_NAME "${L10N_DIR}/localization.csv")
+
+    message(STATUS "Python found: localization files will be generated from ${CSV_TABLE_NAME} to ${L10N_DIR}")
+
+    # Define the output file that will be created after running the script.
+    # This can be an empty marker file used to track that the script has been executed.
+    set(PROCESS_MARKER "${CMAKE_CURRENT_BINARY_DIR}/.localization_table_processed")
+
+    add_custom_command(
+            OUTPUT ${PROCESS_MARKER}
+            COMMAND Python3::Interpreter ${CONVERT_CSV_SCRIPT} ${CSV_TABLE_NAME} ${L10N_DIR}
+            # Update the marker to change its modification time and signal an update
+            COMMAND ${CMAKE_COMMAND} -E touch ${PROCESS_MARKER}
+            DEPENDS ${CSV_TABLE_NAME} ${CONVERT_CSV_SCRIPT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Running ${CONVERT_CSV_SCRIPT} script as ${CSV_TABLE_NAME} has changed"
+    )
+
+    # Target that will always be executed during the build
+    add_custom_target(generate_lang_files ALL
+            DEPENDS ${PROCESS_MARKER}
+            COMMENT "Generating language files"
+    )
+
+    add_dependencies(${PROJECT_NAME} generate_lang_files)
+    add_dependencies(${TEST_PROJECT_NAME} generate_lang_files)
+else ()
+    message(STATUS "Python not found: skipping generation of localization files, do it manually if needed.")
+endif ()
