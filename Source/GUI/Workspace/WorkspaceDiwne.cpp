@@ -21,6 +21,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Localization/Localization.h"
@@ -700,73 +701,63 @@ void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 	ImGui::Separator();
 
 	addMenu();
-
-	ImGui::Separator();
-
-	if (I3TGui::BeginMenuWithLog(_t("Delete")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("Selected nodes")))
-		{
-			deleteSelectedNodes();
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("Selected links")))
-		{
-			for (auto& link : m_links)
-			{
-				if (link->getSelected())
-				{
-					link->destroy();
-				}
-			}
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("All nodes")))
-		{
-			clear();
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("All links")))
-		{
-			for (auto& link : m_links)
-			{
-				link->destroy();
-			}
-		}
-		ImGui::EndMenu();
-	}
-
-	ImGui::Separator();
-
-	if (I3TGui::BeginMenuWithLog(_t("Selection")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("select all"), "Ctrl+A"))
-		{
-			selectAllNodes();
-		}
-		if (I3TGui::MenuItemWithLog(_t("invert"), "Ctrl+I"))
-		{
-			invertSelection();
-		}
-		ImGui::EndMenu();
-	}
-	if (I3TGui::BeginMenuWithLog(_t("Zoom")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("to all"), "Ctrl+Alt+A"))
-		{
-			zoomToAll();
-		}
-		if (I3TGui::MenuItemWithLog(_t("to selection"), "Ctrl+Alt+S"))
-		{
-			zoomToSelected();
-		}
-		ImGui::EndMenu();
-	}
 }
 
 void WorkspaceDiwne::addMenu()
 {
-	if (I3TGui::BeginMenuWithLog("transformation"))
+	if (I3TGui::BeginMenuWithLog(_t("Model")))
+	{
+		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
+		{
+			if (I3TGui::MenuItemWithLog(resource.alias.c_str(), nullptr, false, true, [&]() {
+				    LOG_EVENT_OBJECT_ADDED(resource.alias, m_labelDiwne);
+			    }))
+			{
+				auto model = addNodeToPositionOfPopup<Model>();
+				model->m_viewportModel.lock()->setModel(resource.alias);
+			}
+		}
+		std::vector<std::string> importedResources = RMI.getImportedResourceAliases();
+		if (!importedResources.empty())
+		{
+			ImGui::Separator();
+			for (const auto& alias : importedResources)
+			{
+				Core::Mesh* importedModel = RMI.meshByAlias(alias);
+				if (importedModel)
+				{
+					if (I3TGui::MenuItemWithLog(alias.c_str(), nullptr, false, true, [&]() {
+						    LOG_EVENT_OBJECT_ADDED(alias, m_labelDiwne);
+					    }))
+					{
+						auto model = addNodeToPositionOfPopup<Model>();
+						model->m_viewportModel.lock()->setModel(alias);
+					}
+				}
+				else
+				{
+					I3TGui::MenuItemWithLog(alias.c_str(), nullptr, false, false, [&]() {
+						LOG_EVENT_OBJECT_ADDED(alias, m_labelDiwne);
+					});
+				}
+			}
+		}
+		ImGui::Separator();
+		if (I3TGui::MenuItemWithLog(_t("Import models...")))
+		{
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
+		}
+
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+
+	if (I3TGui::MenuItemWithLog("Sequence"))
+	{
+		addNodeToPositionOfPopup<Sequence>();
+	}
+	if (I3TGui::BeginMenuWithLog("Transformation"))
 	{
 		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
 		 * with group (transformation, operator, ...) and label*/
@@ -835,7 +826,36 @@ void WorkspaceDiwne::addMenu()
 		}
 		ImGui::EndMenu();
 	}
-	if (I3TGui::BeginMenuWithLog("operator"))
+
+	ImGui::Separator();
+
+	if (I3TGui::MenuItemWithLog("Camera"))
+	{
+		addNodeToPositionOfPopup<Camera>();
+	}
+	if (I3TGui::MenuItemWithLog("Screen"))
+	{
+		addNodeToPositionOfPopup<Screen>();
+	}
+
+	ImGui::Separator();
+
+	if (I3TGui::BeginMenuWithLog("Animate"))
+	{
+		if (I3TGui::MenuItemWithLog("Pulse"))
+		{
+			addNodeToPositionOfPopup<Operator<Core::EOperatorType::PulseToPulse>>();
+		}
+		if (I3TGui::MenuItemWithLog("Cycle"))
+		{
+			addNodeToPositionOfPopup<Cycle>();
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+
+	if (I3TGui::BeginMenuWithLog("Operator"))
 	{
 		if (I3TGui::BeginMenuWithLog("transformation"))
 		{
@@ -1202,31 +1222,7 @@ void WorkspaceDiwne::addMenu()
 		}
 		ImGui::EndMenu();
 	}
-	if (I3TGui::MenuItemWithLog("sequence"))
-	{
-		addNodeToPositionOfPopup<Sequence>();
-	}
-	if (I3TGui::MenuItemWithLog("camera"))
-	{
-		addNodeToPositionOfPopup<Camera>();
-	}
-	if (I3TGui::MenuItemWithLog("model"))
-	{
-		addNodeToPositionOfPopup<Model>();
-	}
-	if (I3TGui::MenuItemWithLog("pulse"))
-	{
-		addNodeToPositionOfPopup<Operator<Core::EOperatorType::PulseToPulse>>();
-	}
-	if (I3TGui::MenuItemWithLog("screen"))
-	{
-		addNodeToPositionOfPopup<Screen>();
-	}
-	if (I3TGui::MenuItemWithLog("cycle"))
-	{
-		addNodeToPositionOfPopup<Cycle>();
-	}
-	if (I3TGui::MenuItemWithLog("scripting node"))
+	if (I3TGui::MenuItemWithLog("Scripting node"))
 	{
 		addNodeToPositionOfPopup<ScriptingNode>();
 	}
