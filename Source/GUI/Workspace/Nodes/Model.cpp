@@ -14,6 +14,7 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
+#include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/Color.h"
@@ -43,74 +44,83 @@ void Model::popupContent_axis_showmodel()
 {
 	auto model = m_viewportModel.lock();
 
-	if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, model->m_showAxes))
+	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
 	{
-		model->m_showAxes = !model->m_showAxes;
-	}
-	if (I3TGui::MenuItemWithLog(_t("Show model"), NULL, model->m_visible))
-	{
-		model->m_visible = !model->m_visible;
-	}
-	if (I3TGui::BeginMenuWithLog(_t("Transparency")))
-	{
-		if (ImGui::Checkbox(_t("Opaque"), &model->m_opaque))
+		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, model->m_showAxes))
 		{
-			// model->m_opaque = !model->m_opaque;
+			model->m_showAxes = !model->m_showAxes;
 		}
-		ImGui::Checkbox(_t("Back-face culling"), &model->m_backFaceCull);
-		ImGui::SliderFloat(_t("Opacity"), &model->m_opacity, 0.0f, 1.0f, "%.2f");
+		if (I3TGui::MenuItemWithLog(_t("Show model"), NULL, model->m_visible))
+		{
+			model->m_visible = !model->m_visible;
+		}
+		if (I3TGui::BeginMenuWithLog(_t("Set opacity")))
+		{
+			ImGui::Checkbox(_t("Back-face culling"), &model->m_backFaceCull);
+			if (ImGui::Checkbox(_t("Opaque"), &model->m_opaque))
+			{
+				// model->m_opaque = !model->m_opaque;
+			}
+			if (!model->m_opaque)
+			{
+				ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+				ImGui::SliderFloat(_t("Opacity"), &model->m_opacity, 0.0f, 1.0f, "%.2f");
+			}
+			ImGui::EndMenu();
+		}
 		ImGui::EndMenu();
 	}
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-	if (I3TGui::BeginMenuWithLog(_t("Set tint")))
+	if (I3TGui::BeginMenuWithLog(_t("Change color")))
 	{
-		if (I3TGui::BeginMenuWithLog(_t("Color")))
+		if (I3TGui::MenuItemWithLog(_t("None")))
 		{
-			if (I3TGui::MenuItemWithLog(_t("None")))
-			{
-				model->m_tint = glm::vec3(1.0f);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Red")))
-			{
-				model->m_tint = calculateTint(Color::RED, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Green")))
-			{
-				model->m_tint = calculateTint(Color::GREEN, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Blue")))
-			{
-				model->m_tint = calculateTint(Color::BLUE, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Yellow")))
-			{
-				model->m_tint = calculateTint(Color::YELLOW, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Teal")))
-			{
-				model->m_tint = calculateTint(Color::TEAL, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Magenta")))
-			{
-				model->m_tint = calculateTint(Color::MAGENTA, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Light Blue")))
-			{
-				model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Orange")))
-			{
-				model->m_tint = calculateTint(Color::ORANGE, model);
-			}
-			if (I3TGui::MenuItemWithLog(_t("Brown")))
-			{
-				model->m_tint = calculateTint(Color::BROWN, model);
-			}
+			model->m_tint = glm::vec3(1.0f);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Red")))
+		{
+			model->m_tint = calculateTint(Color::RED, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Green")))
+		{
+			model->m_tint = calculateTint(Color::GREEN, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Blue")))
+		{
+			model->m_tint = calculateTint(Color::BLUE, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Yellow")))
+		{
+			model->m_tint = calculateTint(Color::YELLOW, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Teal")))
+		{
+			model->m_tint = calculateTint(Color::TEAL, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Magenta")))
+		{
+			model->m_tint = calculateTint(Color::MAGENTA, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Light Blue")))
+		{
+			model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Orange")))
+		{
+			model->m_tint = calculateTint(Color::ORANGE, model);
+		}
+		if (I3TGui::MenuItemWithLog(_t("Brown")))
+		{
+			model->m_tint = calculateTint(Color::BROWN, model);
+		}
+		if (I3TGui::BeginMenuWithLog(_t("Adjust tint")))
+		{
+			ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+			ImGui::SliderFloat(_t("Strength"), &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
+
 			ImGui::EndMenu();
 		}
-		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-		ImGui::SliderFloat(_t("Strength"), &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
 	ImGui::PopItemFlag();
@@ -150,6 +160,12 @@ void Model::popupContent_axis_showmodel()
 				}
 			}
 		}
+		ImGui::Separator();
+		if (I3TGui::MenuItemWithLog(_t("Import models...")))
+		{
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
+		}
+
 		ImGui::EndMenu();
 	}
 }

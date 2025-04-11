@@ -254,10 +254,65 @@ void WorkspaceWindow::showEditMenu()
 		}
 		 */
 
-		if (I3TGui::MenuItemWithLog(_t("Select all")))
+		if (I3TGui::BeginMenuWithLog(_t("Selection")))
 		{
-			WorkspaceModule::g_editor->selectAllNodes();
-			App::getModule<StateManager>().requestSnapshot();
+			if (I3TGui::MenuItemWithLog(_t("Select all"), "Ctrl+A"))
+			{
+				WorkspaceModule::g_editor->selectAllNodes();
+			}
+			if (I3TGui::MenuItemWithLog(_t("Invert"), "Ctrl+I"))
+			{
+				WorkspaceModule::g_editor->invertSelection();
+			}
+			ImGui::EndMenu();
+		}
+
+		if (I3TGui::BeginMenuWithLog(_t("Zoom")))
+		{
+			if (I3TGui::MenuItemWithLog(_t("To all"), "Ctrl+Alt+A"))
+			{
+				WorkspaceModule::g_editor->zoomToAll();
+			}
+			if (I3TGui::MenuItemWithLog(_t("To selection"), "Ctrl+Alt+S"))
+			{
+				WorkspaceModule::g_editor->zoomToSelected();
+			}
+			ImGui::EndMenu();
+		}
+
+		if (I3TGui::BeginMenuWithLog(_t("Delete")))
+		{
+			if (I3TGui::MenuItemWithLog(_t("Selected nodes")))
+			{
+				WorkspaceModule::g_editor->deleteSelectedNodes();
+			}
+
+			if (I3TGui::MenuItemWithLog(_t("All nodes")))
+			{
+				WorkspaceModule::g_editor->clear();
+			}
+
+			ImGui::Separator();
+
+			if (I3TGui::MenuItemWithLog(_t("Selected links")))
+			{
+				for (auto& link : WorkspaceModule::g_editor->m_links)
+				{
+					if (link->getSelected())
+					{
+						link->destroy();
+					}
+				}
+			}
+
+			if (I3TGui::MenuItemWithLog(_t("All links")))
+			{
+				for (auto& link : WorkspaceModule::g_editor->m_links)
+				{
+					link->destroy();
+				}
+			}
+			ImGui::EndMenu();
 		}
 
 		ImGui::EndMenu();

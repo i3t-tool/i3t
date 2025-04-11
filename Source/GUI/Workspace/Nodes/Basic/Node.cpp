@@ -17,9 +17,9 @@
 
 using namespace Workspace;
 
-std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDetail::Full, "Full"},
-                                                                     {LevelOfDetail::SetValues, "Set values"},
-                                                                     {LevelOfDetail::Label, "Label"},
+std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDetail::Full, _t("Expanded")},
+                                                                     {LevelOfDetail::SetValues, _t("Value setter")},
+                                                                     {LevelOfDetail::Label, _t("Collapsed")},
                                                                      {LevelOfDetail::LightCycle, "Light cycle"}};
 
 Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label)

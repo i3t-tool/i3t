@@ -391,7 +391,25 @@ void CoreNode::drawMenuDuplicate(DIWNE::DrawInfo& context)
 
 void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vector<LevelOfDetail>& levels_of_detail)
 {
-	if (I3TGui::BeginMenuWithLog(_t("Level of detail")))
+	if (levels_of_detail.size() == 2)
+	{
+		if (node->getLevelOfDetail() == LevelOfDetail::Full)
+		{
+			if (I3TGui::MenuItemWithLog(_t("Collapse node")))
+			{
+				node->setLevelOfDetail(LevelOfDetail::Label);
+			}
+		}
+		else
+		{
+			if (I3TGui::MenuItemWithLog(_t("Expand node")))
+			{
+				node->setLevelOfDetail(LevelOfDetail::Full);
+			}
+		}
+		return;
+	}
+	if (I3TGui::BeginMenuWithLog(_t("Set display mode")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual level: {}",
 		// LevelOfDetailName[node->getLevelOfDetail()]).c_str());
