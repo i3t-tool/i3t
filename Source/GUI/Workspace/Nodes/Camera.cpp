@@ -127,106 +127,114 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, m_axisOn))
+	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
 	{
-		m_axisOn = !m_axisOn;
-		m_viewportCamera.lock()->m_showAxes = m_axisOn;
-	}
-	if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, m_showCamera))
-	{
-		m_showCamera = !m_showCamera;
-		m_viewportCamera.lock()->m_visible = m_showCamera;
-	}
-	if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, m_showFrustum))
-	{
-		m_showFrustum = !m_showFrustum;
-		m_viewportCamera.lock()->m_showFrustum = m_showFrustum;
-	}
-	if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, m_fillFrustum))
-	{
-		m_fillFrustum = !m_fillFrustum;
-		m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
-	}
-	if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("Default")))
+		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, m_axisOn))
 		{
-			m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			m_axisOn = !m_axisOn;
+			m_viewportCamera.lock()->m_showAxes = m_axisOn;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Red")))
+		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, m_showCamera))
 		{
-			m_frustumColor = calculateFrustumColor(Color::RED);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			m_showCamera = !m_showCamera;
+			m_viewportCamera.lock()->m_visible = m_showCamera;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Blue")))
+		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, m_showFrustum))
 		{
-			m_frustumColor = calculateFrustumColor(Color::BLUE);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			m_showFrustum = !m_showFrustum;
+			m_viewportCamera.lock()->m_showFrustum = m_showFrustum;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Green")))
+		if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, m_fillFrustum))
 		{
-			m_frustumColor = calculateFrustumColor(Color::GREEN);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Yellow")))
-		{
-			m_frustumColor = calculateFrustumColor(Color::YELLOW);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Orange")))
-		{
-			m_frustumColor = calculateFrustumColor(Color::ORANGE);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Magenta")))
-		{
-			m_frustumColor = calculateFrustumColor(Color::MAGENTA);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Teal")))
-		{
-			m_frustumColor = calculateFrustumColor(Color::TEAL);
-			m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			m_fillFrustum = !m_fillFrustum;
+			m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
 		}
 		ImGui::EndMenu();
 	}
-	if (I3TGui::BeginMenuWithLog(_t("Frustum outline color")))
+	if (I3TGui::BeginMenuWithLog(_t("Change frustum color")))
 	{
-		if (I3TGui::MenuItemWithLog(_t("Red")))
+		if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
 		{
-			m_frustumOutlineColor = Color::RED;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			if (I3TGui::MenuItemWithLog(_t("Default")))
+			{
+				m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Red")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::RED);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Blue")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::BLUE);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Green")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::GREEN);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Yellow")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::YELLOW);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Orange")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::ORANGE);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Magenta")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::MAGENTA);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Teal")))
+			{
+				m_frustumColor = calculateFrustumColor(Color::TEAL);
+				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+			}
+			ImGui::EndMenu();
 		}
-		if (I3TGui::MenuItemWithLog(_t("Blue")))
+		if (I3TGui::BeginMenuWithLog(_t("Frustum outline color")))
 		{
-			m_frustumOutlineColor = Color::BLUE;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Green")))
-		{
-			m_frustumOutlineColor = Color::GREEN;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Yellow")))
-		{
-			m_frustumOutlineColor = Color::YELLOW;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Orange")))
-		{
-			m_frustumOutlineColor = Color::ORANGE;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Magenta")))
-		{
-			m_frustumOutlineColor = Color::MAGENTA;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Teal")))
-		{
-			m_frustumOutlineColor = Color::TEAL;
-			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			if (I3TGui::MenuItemWithLog(_t("Red")))
+			{
+				m_frustumOutlineColor = Color::RED;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Blue")))
+			{
+				m_frustumOutlineColor = Color::BLUE;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Green")))
+			{
+				m_frustumOutlineColor = Color::GREEN;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Yellow")))
+			{
+				m_frustumOutlineColor = Color::YELLOW;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Orange")))
+			{
+				m_frustumOutlineColor = Color::ORANGE;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Magenta")))
+			{
+				m_frustumOutlineColor = Color::MAGENTA;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Teal")))
+			{
+				m_frustumOutlineColor = Color::TEAL;
+				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+			}
+			ImGui::EndMenu();
 		}
 		ImGui::EndMenu();
 	}

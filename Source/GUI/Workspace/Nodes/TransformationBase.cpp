@@ -167,12 +167,12 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	drawMenuSetDataMap();
 	drawMenuStorevalues();
+	Super::drawMenuSetPrecision();
+	drawMenuSetDataMap();
 
 	ImGui::Separator();
 
-	Super::drawMenuSetPrecision();
 	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
@@ -199,7 +199,7 @@ int TransformationBase::getLODCount()
 
 void TransformationBase::drawMenuStorevalues()
 {
-	if (I3TGui::BeginMenuWithLog(_t("Value")))
+	if (I3TGui::BeginMenuWithLog(_t("Set value")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Reset")))
 		{

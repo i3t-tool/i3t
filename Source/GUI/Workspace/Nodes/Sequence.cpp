@@ -226,6 +226,9 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 	ImGui::Separator();
 
 	drawMenuSetPrecision();
+
+	ImGui::Separator();
+
 	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
@@ -254,23 +257,27 @@ void Sequence::popupContentTracking()
 	}
 	else
 	{
-		if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
+		if (I3TGui::BeginMenuWithLog(_t("Tracking")))
 		{
-			if (Core::GraphManager::isTrackingEnabled())
+			if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
 			{
-				workspaceDiwne.trackingSwitchOff();
-			}
+				if (Core::GraphManager::isTrackingEnabled())
+				{
+					workspaceDiwne.trackingSwitchOff();
+				}
 
-			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
-		}
-		if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
-		{
-			if (Core::GraphManager::isTrackingEnabled())
+				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
 			{
-				workspaceDiwne.trackingSwitchOff();
-			}
+				if (Core::GraphManager::isTrackingEnabled())
+				{
+					workspaceDiwne.trackingSwitchOff();
+				}
 
-			workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), false);
+				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), false);
+			}
+			ImGui::EndMenu();
 		}
 	}
 }

@@ -200,6 +200,9 @@ Add...=Přidat...
 #Set values=Nastavit hodnoty
 #Label=Označení
 #Light cycle=
+#Expanded=Otevřený
+#Value setter=Nastavení hodnot
+#Collapsed=Sbalený
 
 Choose value...=Zvolte hodnotu...
 Angle=Úhel
@@ -229,7 +232,13 @@ Store=Uložit
 Restore=Obnovit
 Decimal digits=Desetinné číslice
 Level of detail=Úroveň detailů
+Set display mode=Nastavit režim zobrazení
 Duplicate=Duplikovat
+Set visibility=Nastavit viditelnost
+Set value=Nastavit hodnotu
+
+Collapse node=Sbalit uzel
+Expand node=Rozbalit uzel
 
 #######################################################
 ##################### Camera node #####################
@@ -248,6 +257,7 @@ Magenta=Magenta
 Teal=Tyrkysový
 
 Frustum outline color=Barva obrysu frustumu
+Change frustum color=Změnit barvu frustumu
 
 ######################################################
 ##################### Model node #####################
@@ -263,6 +273,9 @@ Brown=Hnědý
 Light Blue=Světle modrý
 Strength=Síla
 Change model=Změnit model
+Set opacity=Nastavit průhlednost
+Change color=Změnit barvu
+Adjust tint=Upravit odstín
 
 
 Stop tracking=Zastavit sledování
