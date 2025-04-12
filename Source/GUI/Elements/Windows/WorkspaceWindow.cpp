@@ -36,8 +36,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 void pinStyleSelection(int* ptr)
 {
-	static const char* pinStyleNames[3] = {"Square", "Socket", "SocketSquare"};
-	for (int i = 0; i < 3; i++)
+	static const char* pinStyleNames[4] = {"Square", "Socket", "SocketSquare", "Circle"};
+	for (int i = 0; i < 4; i++)
 	{
 		if (ImGui::MenuItem(pinStyleNames[i], NULL, *ptr == i))
 			*ptr = i;
@@ -350,7 +350,7 @@ void WorkspaceWindow::showDiwneStyleMenu()
 		ImGui::SeparatorText("Socket pin style");
 		ImGui::SliderFloat("Pin socket offset",
 		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_OFFSET),
-		                   -15.0f, 20.f, "%.2f");
+		                   -25.0f, 25.f, "%.2f");
 		ImGui::SliderFloat("Pin socket thickness",
 		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SOCKET_THICKNESS),
 		                   0.0f, 20.f, "%.2f");
@@ -375,7 +375,7 @@ void WorkspaceWindow::showDiwneStyleMenu()
 		ImGui::SeparatorText("Square pin style");
 		ImGui::SliderFloat("Pin square offset",
 		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_OFFSET),
-		                   -15.0f, 20.f, "%.2f");
+		                   -25.0f, 25.f, "%.2f");
 
 		ImGui::SliderFloat("Pin square rounding",
 		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_SQUARE_ROUNDING),
@@ -386,6 +386,18 @@ void WorkspaceWindow::showDiwneStyleMenu()
 		ImGui::ColorEdit4(
 		    "Pin square border color",
 		    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_SQUARE_BORDER_COLOR)->x,
+		    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+		ImGui::SeparatorText("Circle pin style");
+		ImGui::SliderFloat("Pin circle offset",
+		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_CIRCLE_OFFSET),
+		                   -25.0f, 25.f, "%.2f");
+		ImGui::SliderFloat("Pin circle border width (0 for off)",
+		                   WorkspaceModule::g_editor->styleBase().getPtr<float>(DIWNE::Style::PIN_CIRCLE_BORDER_WIDTH),
+		                   0.0f, 20.f, "%.2f");
+		ImGui::ColorEdit4(
+		    "Pin circle border color",
+		    &WorkspaceModule::g_editor->styleBase().getPtr<ImVec4>(DIWNE::Style::PIN_CIRCLE_BORDER_COLOR)->x,
 		    ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 
 		ImGui::SeparatorText("Pin hover background");

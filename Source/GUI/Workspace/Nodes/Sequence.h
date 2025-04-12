@@ -16,12 +16,13 @@
 #include "DIWNE/Core/Elements/Containers/NodeDropZone.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
-#include "TransformationBase.h"
 
 namespace Workspace
 {
 class Sequence : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
+	using Super = CoreNodeWithPins;
+
 protected:
 	class SequenceDropZone;
 

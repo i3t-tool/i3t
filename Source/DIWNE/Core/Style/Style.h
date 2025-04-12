@@ -70,6 +70,10 @@ public:
 		PIN_SQUARE_BORDER_COLOR, // ImVec4, color of the square pin border
 		PIN_SQUARE_ROUNDING,     // float
 
+		PIN_CIRCLE_OFFSET,       // float
+		PIN_CIRCLE_BORDER_WIDTH, // float
+		PIN_CIRCLE_BORDER_COLOR, // ImVec4
+
 		PIN_DIM_ENABLED, // bool, whether to dim incompatible pins when dragging a link
 		PIN_DIM_ALPHA,   // float, pin dim alpha
 

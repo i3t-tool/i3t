@@ -34,6 +34,7 @@ StyleBase::StyleBase()
 	set<float>(LINK_BORDER_WIDTH, 0.0f, true);
 	set<ImVec4>(LINK_BORDER_COLOR, {0.0, 0.0, 0.0, 0.23});
 
+	// TODO: Add pin size
 	set<ImVec2>(PIN_SPACING, {4.0f, 4.0f}, true);
 	set<float>(PIN_LABEL_SPACING, 4.0f, true);
 	set<bool>(PIN_ENABLE_DRAG_LABEL, true);
@@ -57,6 +58,10 @@ StyleBase::StyleBase()
 	set<float>(PIN_SQUARE_BORDER_WIDTH, 0.0f, true);
 	set<ImVec4>(PIN_SQUARE_BORDER_COLOR, {0.f, 0.f, 0.f, 0.25f});
 	set<float>(PIN_SQUARE_ROUNDING, 2.0f, true);
+
+	set<float>(PIN_CIRCLE_OFFSET, -7.0f, true);
+	set<float>(PIN_CIRCLE_BORDER_WIDTH, 1.0f, true);
+	set<ImVec4>(PIN_CIRCLE_BORDER_COLOR, {0.03f, 0.03f, 0.03f, 0.8f});
 
 	set<bool>(PIN_DIM_ENABLED, true);
 	set<float>(PIN_DIM_ALPHA, 0.35f);

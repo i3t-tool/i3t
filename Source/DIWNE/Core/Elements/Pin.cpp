@@ -28,11 +28,13 @@ Pin::Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne)
 	setParentObject(node);
 	if (m_isInput)
 		m_allowMultipleConnections = false;
+	else
+		m_isLeft = false;
 }
 
 void Pin::initialize(DrawInfo& context)
 {
-	DiwneObject::initialize(context);
+	Super::initialize(context);
 	if (!m_allowMultipleConnections && m_links.size() > 1)
 	{
 		DIWNE_WARN(std::string() + "Pin " + m_labelDiwne +
@@ -45,13 +47,22 @@ void Pin::begin(DrawInfo& context)
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup();
 
+	if (ImGui::IsKeyDown(ImGuiKey_E))
+		int x = 5;
+
 	// Drawing pin hover background, uses hover information from the last frame
 	if (m_hovered && allowConnection())
 	{
-		m_previewPlugged = true;
+		m_previewPluggedInternal = true;
 		if (style().boolean(Style::PIN_ENABLE_HOVER_BG))
 			drawPinBackground();
 	}
+	else
+	{
+		m_previewPluggedInternal = false;
+	}
+	LOG_INFO("{} begin: drect: {}, {} ({}, {})", m_labelDiwne, m_dragRect.Min.x, m_dragRect.Min.y,
+	         m_dragRect.GetSize().x, m_dragRect.GetSize().y);
 }
 void Pin::content(DrawInfo& context)
 {
@@ -66,13 +77,28 @@ void Pin::end(DrawInfo& context)
 	ImGui::EndGroup();
 	ImGui::PopID();
 	m_internalHover = ImGui::IsItemHovered();
+	m_internalHover |= m_pinIconData.hovered; // Allow pins sticking outside the node to be hovered
 
-	m_previewPlugged = false;
+	m_previewPlugged = m_previewPluggedInternal;
 }
 
 void Pin::updateLayout(DrawInfo& context)
 {
-	updateRectFromImGuiItem();
+	ImRect itemRect = ImGui::GetCurrentContext()->LastItemData.Rect;
+	// If this pin is sticking out of a node, we pretend it's imgui item is smaller, special handling is needed
+	// to keep DIWNE rects contain the whole pin.
+	if (m_pinIconData.protrusion != 0.f)
+	{
+		if (m_pinIconData.protrusion > 0) // Adjust drag rect if the pin is stickin out of the node
+			itemRect.Max.x += m_pinIconData.protrusion;
+		else if (m_pinIconData.protrusion < 0)
+			itemRect.Min.x += m_pinIconData.protrusion;
+		m_rect = diwne.canvas().screen2diwne(itemRect);
+	}
+	else
+	{
+		setSize(diwne.canvas().screen2diwneSize(itemRect.GetSize()));
+	}
 	updateConnectionPoint();
 }
 
@@ -80,7 +106,7 @@ void Pin::onDestroy(bool logEvent)
 {
 	for (auto link : m_links)
 		link->destroy(logEvent);
-	DiwneObject::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 void Pin::drawPinBackground()
@@ -93,12 +119,17 @@ void Pin::drawPinBackground()
 	// side of the background is not offset by spacing, and the other side is also not rounded.
 	// All of this can be modifed by changing the relevant style variables or drawing a different background
 	// in a subclass.
-	bool leftSide = isInput(); // TODO: Might need to introduce another flag that indicates left or right position
+	bool leftSide = isLeft();
 	ImVec2 eOffset = style().size(Style::PIN_BG_SPACING) * diwne.getZoom();
 	ImVec2 offsetMin = ImVec2(leftSide ? 0 : -eOffset.x, -eOffset.y);
 	ImVec2 offsetMax = ImVec2(leftSide ? eOffset.x : 0, eOffset.y);
 	ImDrawFlags cornerFlags = leftSide ? ImDrawFlags_RoundCornersRight : ImDrawFlags_RoundCornersLeft;
-
+	if (m_pinIconData.protrusion != 0.f)
+	{
+		cornerFlags = ImDrawFlags_RoundCornersAll;
+		offsetMin = ImVec2(-eOffset.x, -eOffset.y);
+		offsetMax = ImVec2(eOffset.x, eOffset.y);
+	}
 	ImRect displayRectScreen = diwne.canvas().diwne2screenTrunc(m_dragRect);
 	ImGui::GetWindowDrawList()->AddRectFilled(displayRectScreen.Min + offsetMin, displayRectScreen.Max + offsetMax,
 	                                          ImGui::ColorConvertFloat4ToU32(style().color(Style::PIN_BG_COLOR)),
@@ -110,9 +141,14 @@ bool Pin::isInput() const
 	return m_isInput;
 }
 
+bool Pin::isLeft() const
+{
+	return m_isLeft;
+}
+
 void Pin::processInteractions(DrawInfo& context)
 {
-	DiwneObject::processInteractions(context);
+	Super::processInteractions(context);
 
 	bool connectionChangedLastFrame = m_connectionChanged;
 	m_connectionChanged = false;
@@ -167,7 +203,7 @@ void Pin::processInteractions(DrawInfo& context)
 
 void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	DiwneObject::onDrag(context, dragStart, dragEnd);
+	Super::onDrag(context, dragStart, dragEnd);
 	if (dragStart)
 	{
 		Actions::ConnectPinAction* action = context.state.startAction<Actions::ConnectPinAction>(shared_from_this());
@@ -322,7 +358,7 @@ bool Pin::allowPopup() const
 }
 bool Pin::allowDragStart() const
 {
-	return DiwneObject::allowDragStart() && allowConnection();
+	return Super::allowDragStart() && allowConnection();
 }
 
 Node* Pin::getNode()
@@ -364,10 +400,12 @@ bool Pin::unregisterLink(Link* link)
 
 void Pin::translate(const ImVec2& vec)
 {
-	DiwneObject::translate(vec);
-	m_pinRect.Translate(vec);
-	m_dragRect.Translate(vec);
-	updateConnectionPoint();
+	Super::translate(vec);
+	m_connectionPoint += vec;
+	// We don't translate pin and drag rect as they can be outside of m_rect
+	// m_pinRect.Translate(vec);
+	// m_dragRect.Translate(vec);
+	// updateConnectionPoint();
 }
 
 void Pin::setConnectionPointDiwne(const ImVec2& value)

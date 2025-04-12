@@ -43,6 +43,8 @@ class Link;
  */
 class NodeEditor : public DiwneObject, public NodeContainer
 {
+	using Super = DiwneObject;
+
 public:
 	SettingsDiwne* mp_settingsDiwne;
 
@@ -201,7 +203,7 @@ public:
 	// TODO: Docs and rename to getAllSelectedNodes()
 	virtual FilteredRecursiveNodeRange<> getSelectedNodesInnerIncluded() const;
 
-	// TODO: Docs and rename to deselectAllNodes?
+	// TODO: Docs
 	virtual void deselectAllNodes();
 
 	// TODO: Docs

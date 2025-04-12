@@ -495,7 +495,7 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 		context.consumeInput();
 	}
 
-	DiwneObject::onReleased(justReleased, context);
+	Super::onReleased(justReleased, context);
 }
 
 void CoreNode::onDestroy(bool logEvent)

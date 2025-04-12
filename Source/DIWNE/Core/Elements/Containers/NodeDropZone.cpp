@@ -89,12 +89,12 @@ void NodeDropZone::updateLayout(DrawInfo& context)
 
 void NodeDropZone::afterDraw(DrawInfo& context)
 {
-	DiwneObject::afterDraw(context);
+	Super::afterDraw(context);
 }
 
 void NodeDropZone::processInteractions(DrawInfo& context)
 {
-	DiwneObject::processInteractions(context);
+	Super::processInteractions(context);
 
 	// Check if a node was dragged over the drop zone area
 	tryAddNode(context);
@@ -271,7 +271,7 @@ void NodeDropZone::onDestroy(bool logEvent)
 	{
 		node->destroy(logEvent);
 	}
-	DiwneObject::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 } // namespace DIWNE

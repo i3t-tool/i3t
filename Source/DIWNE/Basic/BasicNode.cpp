@@ -14,7 +14,7 @@ BasicNode::BasicNode(NodeEditor& editor, std::string label)
 
 void BasicNode::begin(DrawInfo& context)
 {
-	Node::begin(context);
+	Super::begin(context);
 	drawBody();
 }
 
@@ -104,7 +104,7 @@ void BasicNode::updateLayout(DrawInfo& context)
 
 void BasicNode::translate(const ImVec2& vec)
 {
-	DiwneObject::translate(vec);
+	Super::translate(vec);
 	m_top.translate(vec);
 	m_left.translate(vec);
 	m_middle.translate(vec);

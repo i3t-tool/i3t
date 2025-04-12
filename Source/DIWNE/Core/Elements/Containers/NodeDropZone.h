@@ -7,6 +7,8 @@ namespace DIWNE
 {
 class NodeDropZone : public DiwneObject, public NodeContainer
 {
+	using Super = DiwneObject;
+
 protected:
 	int m_dropIndex = -1; ///< Insertion index of a dragged node that might get dropped in (invalid if negative)
 

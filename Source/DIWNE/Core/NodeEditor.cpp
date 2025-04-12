@@ -25,7 +25,7 @@ namespace DIWNE
 NodeEditor::NodeEditor(const char* label, SettingsDiwne* settingsDiwne)
     : DiwneObject(*this, label), NodeContainer(this), mp_settingsDiwne(settingsDiwne)
 {
-	DiwneObject::setSelectable(false);
+	setSelectable(false);
 }
 
 NodeEditor::~NodeEditor()
@@ -68,7 +68,7 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 
 	purgeObjects(); // Erase objects marked for destruction or removal in the previous frame
 
-	DiwneObject::initializeDiwne(context);
+	Super::initializeDiwne(context);
 }
 
 void NodeEditor::begin(DrawInfo& context)
@@ -97,8 +97,10 @@ void NodeEditor::begin(DrawInfo& context)
 		                        m_canvas->m_viewRectScreen.Min.y, m_canvas->m_viewRectScreen.Max.x,
 		                        m_canvas->m_viewRectScreen.Max.y)
 		                .c_str());
-
-		ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
+		ImVec2 diwneMousePos = canvas().screen2diwne(ImGui::GetIO().MousePos);
+		ImGui::Text(fmt::format("MousePos: {}, {} ({}, {})", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y,
+		                        diwneMousePos.x, diwneMousePos.y)
+		                .c_str());
 		ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
 		ImGui::Text(fmt::format("Zoom: {}", m_canvas->m_zoom).c_str());
 
@@ -328,12 +330,12 @@ void NodeEditor::onReleased(bool justReleased, DrawInfo& context)
 			deselectAllNodes();
 		}
 	}
-	DiwneObject::onReleased(justReleased, context);
+	Super::onReleased(justReleased, context);
 }
 
 void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	DiwneObject::onDrag(context, dragStart, dragEnd);
+	Super::onDrag(context, dragStart, dragEnd);
 	processPan();
 
 	using namespace Actions;
@@ -674,7 +676,7 @@ bool NodeEditor::getNodesSelectionChanged() const
 void NodeEditor::onDestroy(bool logEvent)
 {
 	clear();
-	DiwneObject::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 } /* namespace DIWNE */

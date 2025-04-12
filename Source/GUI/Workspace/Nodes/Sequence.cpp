@@ -15,8 +15,8 @@
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
+#include "TransformationBase.h"
 #include "Viewport/Viewport.h"
-#include "Viewport/entity/nodes/SceneModel.h"
 
 using namespace Workspace;
 
@@ -66,12 +66,12 @@ std::optional<Ptr<CoreNode>> Sequence::getTransform(int index) const
 bool Sequence::allowDrawing()
 {
 	// TODO: Why do we care if we're a Camera sequence? What's the reason?
-	return m_isCameraSequence || CoreNode::allowDrawing();
+	return m_isCameraSequence || Super::allowDrawing();
 }
 
 void Sequence::begin(DIWNE::DrawInfo& context)
 {
-	BasicNode::begin(context);
+	Super::begin(context);
 	const auto matrixInput = getInputs().at(Core::I3T_SEQ_IN_MAT);
 	if (matrixInput->isConnected())
 	{
@@ -217,7 +217,7 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 
 void Sequence::popupContent(DIWNE::DrawInfo& context)
 {
-	CoreNodeWithPins::drawMenuSetEditable();
+	drawMenuSetEditable();
 
 	ImGui::Separator();
 
@@ -233,11 +233,11 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate(context);
+	drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent(context);
+	Super::popupContent(context);
 }
 
 void Sequence::popupContentTracking()
@@ -290,7 +290,7 @@ void Sequence::drawMenuLevelOfDetail()
 
 void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
-	DiwneObject::afterDraw(context);
+	Super::afterDraw(context);
 	DIWNE_DEBUG_OBJECTS((diwne), {
 		ImRect rect = getRect();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Min.y);
@@ -304,7 +304,7 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 void Sequence::onDestroy(bool logEvent)
 {
 	m_dropZone->destroy(logEvent);
-	CoreNodeWithPins::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)

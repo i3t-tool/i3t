@@ -59,6 +59,7 @@ public:
 		return getOutputs();
 	};
 
+	void afterDraw(DIWNE::DrawInfo& context) override;
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
 
