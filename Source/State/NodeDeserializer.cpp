@@ -433,7 +433,8 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node, bool select)
 	if (value.HasMember("selected"))
 	{
 		node->setSelected(value["selected"].GetBool() || select);
-	} else
+	}
+	else
 	{
 		node->setSelected(select);
 	}

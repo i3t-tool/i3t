@@ -95,7 +95,6 @@ void WorkspaceModule::appendScene(const Memento& memento, Scene* scene)
 }
 
 
-
 void WorkspaceModule::clearScene()
 {
 	getNodeEditor().clear();

@@ -18,7 +18,7 @@ namespace MenuBarDialogs
 {
 Result<Void, Error> open();
 Result<Void, Error> append();
-}
+} // namespace MenuBarDialogs
 
 /**
  * Top menu bar.
