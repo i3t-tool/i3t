@@ -984,7 +984,8 @@ void ResourceManager::appendScene(const Memento& memento, State::Scene* scene)
 			if (importModel(path, modelEntry.normalize))
 			{
 				counter++;
-			} else
+			}
+			else
 			{
 				failCounter++;
 			}

@@ -35,7 +35,7 @@ using namespace State;
 class IStateful
 {
 public:
-	virtual ~IStateful() {};
+	virtual ~IStateful(){};
 
 	/**
 	 * Save state for the current scene.
