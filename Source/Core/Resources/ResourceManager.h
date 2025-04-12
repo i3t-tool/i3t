@@ -253,6 +253,7 @@ public:
 	bool cleanUpModelFiles(State::Scene* scene);
 
 	void loadScene(const Memento& memento, State::Scene* scene) override;
+	void appendScene(const Memento& memento, State::Scene* scene) override;
 	void clearScene() override;
 
 	Memento saveGlobal() override;

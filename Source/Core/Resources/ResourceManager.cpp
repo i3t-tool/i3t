@@ -960,6 +960,42 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 		                          : ""));
 	}
 }
+void ResourceManager::appendScene(const Memento& memento, State::Scene* scene)
+{
+	if (scene)
+	{
+		int counter = 0;
+		int failCounter = 0;
+		LOG_INFO("[RESOURCE MANAGER] Loading imported resources ...");
+
+		if (!memento.HasMember("resources"))
+		{
+			LOG_WARN(
+			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.")
+			return;
+		}
+
+		std::vector<ModelSaveEntry> modelEntries = deserializeModels(memento["resources"]["imported"]);
+		for (const auto& modelEntry : modelEntries)
+		{
+			// The resource path should be relative to the .scene file's parent folder
+			fs::path path = scene->m_path.parent_path() / fs::path(modelEntry.path);
+
+			if (importModel(path, modelEntry.normalize))
+			{
+				counter++;
+			} else
+			{
+				failCounter++;
+			}
+		}
+
+		LOG_INFO("[RESOURCE MANAGER] Loaded {} imported resources.{}", std::to_string(counter),
+		         (failCounter > 0 ? std::string(" Failed to load ") + std::to_string(failCounter) + " resource" +
+		                                (failCounter == 1 ? "" : "s") + "."
+		                          : ""));
+	}
+}
 
 void ResourceManager::clearScene()
 {
