@@ -44,6 +44,7 @@ enum class EColor
 	PopupBackground,
 	Border,
 	BorderShadow,
+	BorderDim,
 	FrameBg,
 	FrameBgHovered,
 	FrameBgActive,
@@ -101,7 +102,11 @@ enum class EColor
 	DockTabHovered,
 
 	// Custom general stuff
-	SelectionColor, /// Active selection color // TODO: Rename to something button related
+	ButtonDim,
+	ButtonDimHovered,
+	ButtonDimActive,
+	ButtonDimToggled,
+	ButtonDimDark,
 
 	FloatBg,
 	FloatBgActive,
@@ -263,6 +268,8 @@ enum class ESize
 	Tooltip_Rounding,
 	Window_Rounding,
 	Frame_Rounding,
+
+	FloatingButtonRounding,
 
 	Nodes_Rounding,
 	Nodes_BorderWidth,           // Unused // TODO: Impl
@@ -545,6 +552,11 @@ public:
 	float getDpiScale() const
 	{
 		return m_dpiScale;
+	}
+
+	float getBorderSize() const
+	{
+		return std::max(1.0f, IM_TRUNC(m_dpiScale));
 	}
 
 	const bool isDark() const

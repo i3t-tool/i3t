@@ -130,12 +130,15 @@ void ViewportWindow::render()
 
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, I3T::getTheme().getBorderSize());
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Border, I3T::getTheme().get(EColor::BorderDim));
 	GUI::dockTabStylePush();
 	if (ImGui::Begin(getName(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar))
 	{
-		GUI::dockTabStylePop();
-		ImGui::PopStyleVar();
+		GUI::dockTabStylePop(); // MUST BE POPPED IN THE WINDOW BEGIN ELSE STATEMENT TOO!!
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar(2);
 		// Get info about current window's dimensions
 		this->updateWindowInfo();
 
@@ -203,7 +206,8 @@ void ViewportWindow::render()
 	else
 	{
 		GUI::dockTabStylePop();
-		ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar(2);
 	}
 	ImGui::End();
 }
@@ -226,7 +230,7 @@ bool ViewportWindow::showViewportButtons()
 
 	// Object visibility options
 	const char* displayPopupId = "popup_display";
-	if (I3TGui::ButtonWithLog(ICON_FA_EYE "###DisplayButton"))
+	if (GUI::FloatingButton(ICON_FA_EYE "###DisplayButton"))
 	{
 		interacted = true;
 		ImGui::OpenPopup(displayPopupId);
@@ -257,7 +261,8 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::SameLine();
 
-	if (GUI::ToggleButton(ICON_I3T_EARTH "###WorldLightingButton", stg.scene().mainScene.lightFollowsCamera, true))
+	if (GUI::FloatingToggleButton(ICON_I3T_EARTH "###WorldLightingButton", stg.scene().mainScene.lightFollowsCamera,
+	                              true))
 	{
 		interacted = true;
 	}
@@ -272,7 +277,7 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::SameLine();
 
-	if (GUI::ToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", stg.scene().manipulator_enabled))
+	if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", stg.scene().manipulator_enabled))
 	{
 		interacted = true;
 	}

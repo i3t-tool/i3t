@@ -51,7 +51,14 @@ public:
 	void render() override;
 
 private:
+	ImDrawListSplitter m_channelSplitter;
+
+	bool showQuickAddButtons();
+
+	void showMenuBar();
 	void showEditMenu();
 	void showAddMenu();
 	void showViewMenu();
+	void showDebugMenu();
+	void showDiwneStyleMenu();
 };

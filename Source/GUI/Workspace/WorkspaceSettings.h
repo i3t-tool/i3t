@@ -18,4 +18,7 @@ struct WorkspaceSettings
 
 	float tracking_smoothScrollSpeed{0.03f};
 	float tracking_jaggedScrollSpeed{0.2f};
+
+	bool showQuickAddMenu{false};      // Option in preferences
+	bool quickAddMenuCollapsed{false}; // Persistant flag, no need for UI
 };

@@ -94,7 +94,7 @@ bool ToggleButton(const char* label, bool& toggled, bool invert, ImVec2 size)
 	bool state = invert ? !toggled : toggled;
 	if (state)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::SelectionColor));
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::CheckMark));
 		colorsPushed++;
 	}
 	else
@@ -109,6 +109,83 @@ bool ToggleButton(const char* label, bool& toggled, bool invert, ImVec2 size)
 		toggled = !toggled;
 	}
 	ImGui::PopStyleColor(colorsPushed);
+	return pressed;
+}
+
+bool DimButton(const char* label, const ImVec2& size)
+{
+	bool pressed = false;
+	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ButtonDim));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::ButtonDimHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::ButtonDimActive));
+	if (I3TGui::ButtonWithLog(label, size))
+	{
+		pressed = true;
+	}
+	ImGui::PopStyleColor(3);
+	return pressed;
+}
+
+bool DimButtonDark(const char* label, const ImVec2& size)
+{
+	bool pressed = false;
+	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ButtonDimDark));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::ButtonDimHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::ButtonDimActive));
+	if (I3TGui::ButtonWithLog(label, size))
+	{
+		pressed = true;
+	}
+	ImGui::PopStyleColor(3);
+	return pressed;
+}
+
+bool FloatingButton(const char* label, const ImVec2& size)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, I3T::getTheme().getBorderSize());
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getTheme().get(ESize::FloatingButtonRounding));
+	bool pressed = DimButton(label, size);
+	ImGui::PopStyleVar(2);
+	return pressed;
+}
+
+bool FloatingButtonDark(const char* label, const ImVec2& size, float rounding)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, rounding);
+	bool pressed = DimButtonDark(label, size);
+	ImGui::PopStyleVar(2);
+	return pressed;
+}
+
+bool FloatingToggleButton(const char* label, bool& toggled, bool invert, const ImVec2& size)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, I3T::getTheme().getBorderSize());
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getTheme().get(ESize::FloatingButtonRounding));
+	bool pressed = false;
+	int colorsPushed = 0;
+	bool state = invert ? !toggled : toggled;
+	if (state)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ButtonDimToggled));
+		colorsPushed++;
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ButtonDim));
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+		colorsPushed += 2;
+	}
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::ButtonDimHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::ButtonDimActive));
+	if (I3TGui::ButtonWithLog(label, size))
+	{
+		pressed = true;
+		toggled = !toggled;
+	}
+	ImGui::PopStyleColor(2);
+	ImGui::PopStyleColor(colorsPushed);
+	ImGui::PopStyleVar(2);
 	return pressed;
 }
 
