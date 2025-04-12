@@ -31,18 +31,18 @@ static Workspace::TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
-std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
+std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 {
 	std::map<Core::ID, Ptr<Workspace::CoreNode>> createdNodes;
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
-		const auto maybeNode = NodeDeserializer::createOperator(value);
+		const auto maybeNode = NodeDeserializer::createOperator(value, selectAll);
 		if (maybeNode)
 		{
 			const auto node = *maybeNode;
-			NodeDeserializer::assignCommon(value, node);
+			NodeDeserializer::assignCommon(value, node, selectAll);
 			createdNodes[value["id"].GetInt()] = node;
 		}
 	}
@@ -51,8 +51,8 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
-		const auto node = NodeDeserializer::createSequence(value);
-		NodeDeserializer::assignCommon(value, node);
+		const auto node = NodeDeserializer::createSequence(value, selectAll);
+		NodeDeserializer::assignCommon(value, node, selectAll);
 		createdNodes[value["id"].GetInt()] = node;
 	}
 
@@ -63,7 +63,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 		const auto cycle = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Cycle>();
 		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
 		createdNodes[value["id"].GetInt()] = cycle;
-		NodeDeserializer::assignCommon(value, cycle);
+		NodeDeserializer::assignCommon(value, cycle, selectAll);
 
 		if (value.HasMember("from") && value["from"].IsFloat())
 		{
@@ -122,14 +122,14 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
 		const auto camera = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Camera>();
-		NodeDeserializer::assignCommon(value, camera);
+		NodeDeserializer::assignCommon(value, camera, selectAll);
 		createdNodes[value["id"].GetInt()] = camera;
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
-		NodeDeserializer::assignSequence(viewValue, camera->getView());
+		NodeDeserializer::assignSequence(viewValue, camera->getView(), selectAll);
 
 		const auto& projValue = value["sequences"].GetArray()[1];
-		NodeDeserializer::assignSequence(projValue, camera->getProjection());
+		NodeDeserializer::assignSequence(projValue, camera->getProjection(), selectAll);
 	}
 
 	//
@@ -137,7 +137,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
 		const auto screen = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Screen>();
-		NodeDeserializer::assignCommon(value, screen);
+		NodeDeserializer::assignCommon(value, screen, selectAll);
 		createdNodes[value["id"].GetInt()] = screen;
 
 		if (value.HasMember("aspect"))
@@ -152,7 +152,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
 		const auto model = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Model>();
-		NodeDeserializer::assignCommon(value, model);
+		NodeDeserializer::assignCommon(value, model, selectAll);
 		createdNodes[value["id"].GetInt()] = model;
 
 		auto mesh = model->viewportModel().lock();
@@ -203,7 +203,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 		for (auto& value : memento["workspace"]["scriptingNodes"].GetArray())
 		{
 			const auto node = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::ScriptingNode>();
-			NodeDeserializer::assignCommon(value, node);
+			NodeDeserializer::assignCommon(value, node, selectAll);
 
 			/// \todo Assign script after the node is connected with the other nodes.
 			if (value["script"].IsString())
@@ -222,11 +222,11 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	const auto& transforms = memento["workspace"]["transforms"];
 	for (auto& value : transforms.GetArray())
 	{
-		const auto maybeTransform = NodeDeserializer::createTransform(value);
+		const auto maybeTransform = NodeDeserializer::createTransform(value, selectAll);
 		if (maybeTransform)
 		{
 			const auto transform = maybeTransform.value();
-			NodeDeserializer::assignCommon(value, transform);
+			NodeDeserializer::assignCommon(value, transform, selectAll);
 			createdNodes[value["id"].GetInt()] = transform;
 		}
 	}
@@ -259,7 +259,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento)
 	return result;
 }
 
-std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
+std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value, bool select)
 {
 	const auto& type = value["type"].GetString();
 
@@ -289,7 +289,7 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 
 	const auto coreNode = node->getNodebase();
 
-	assignCommon(value, node);
+	assignCommon(value, node, select);
 
 	if (value.HasMember("value") && coreNode->getOperation().isConstructor)
 	{
@@ -310,16 +310,16 @@ std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value)
 	return node;
 }
 
-Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
+Ptr<GuiSequence> createSequence(const rapidjson::Value& value, bool select)
 {
 	auto sequence = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Sequence>();
 
-	assignCommon(value, sequence);
-	assignSequence(value, sequence);
+	assignCommon(value, sequence, select);
+	assignSequence(value, sequence, select);
 	return sequence;
 }
 
-std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
+std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value, bool select)
 {
 	I3T_ASSERT(value.IsObject(), "Invalid value type");
 
@@ -335,7 +335,7 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 
 	const auto coreNode = node->getNodebase()->as<Core::Transform>();
 
-	assignCommon(value, node);
+	assignCommon(value, node, select);
 
 	value["synergies"].GetBool() ? coreNode->enableSynergies() : coreNode->disableSynergies();
 
@@ -406,7 +406,7 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value)
 
 //
 
-void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
+void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node, bool select)
 {
 	if (value.HasMember("label"))
 	{
@@ -432,19 +432,22 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 
 	if (value.HasMember("selected"))
 	{
-		node->setSelected(value["selected"].GetBool());
+		node->setSelected(value["selected"].GetBool() || select);
+	} else
+	{
+		node->setSelected(select);
 	}
 
 	const auto position = JSON::getVec2(value["position"].GetArray());
 	node->setPosition(position);
 }
 
-void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)
+void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence, bool select)
 {
 	std::vector<Ptr<Workspace::TransformationBase>> transforms;
 	for (const auto& transform : value["transforms"].GetArray())
 	{
-		auto maybeTransform = createTransform(transform);
+		auto maybeTransform = createTransform(transform, select);
 		if (!maybeTransform)
 		{
 			LOG_ERROR("Unable to create transform node with id {}.", transform["id"].GetInt());
