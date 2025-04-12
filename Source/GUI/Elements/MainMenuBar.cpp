@@ -350,6 +350,14 @@ void MainMenuBar::showHelpMenu()
 		}
 #endif
 		I3TGui::MenuItemWithLog(_t("About"), nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
+		if (I3TGui::BeginMenuWithLog(_tbd("Diagnostic tools")))
+		{
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_DEBUG " ", "Statistics")))
+			{
+				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
+			}
+			ImGui::EndMenu();
+		}
 
 		ImGui::Separator();
 
@@ -388,10 +396,6 @@ void MainMenuBar::showHelpMenu()
 			I3TGui::MenuItemWithLog("Debug window manager", nullptr, &I3T::app().m_debugWindowManager);
 			I3TGui::MenuItemWithLog("Debug trackball camera", nullptr, &I3T::app().m_debugTrackball);
 			I3TGui::MenuItemWithLog("Show test window", nullptr, &App::getModule<TestModule>().getShowTestWindow());
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_DEBUG " ", "Statistics")))
-			{
-				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
-			}
 			ImGui::EndMenu();
 		}
 

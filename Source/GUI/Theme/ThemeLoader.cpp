@@ -20,18 +20,7 @@
 #include "GUI/Theme/Theme.h"
 #include "Utils/FilesystemUtils.h"
 
-template <typename T>
-std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
-{
-	for (const auto& [key, val] : map)
-	{
-		if (strcmp(val, name.c_str()) == 0)
-		{
-			return key;
-		}
-	}
-	return std::nullopt;
-}
+#include <magic_enum.hpp>
 
 void dumpVec2Seq(YAML::Emitter& out, const float* vec)
 {
@@ -187,6 +176,10 @@ static Theme::Colors loadColors(YAML::Node& yaml)
 		return colors;
 	}
 
+	int count = magic_enum::enum_count<EColor>();
+	int loadedCount = 0;
+
+	bool failedOnce = false;
 	auto yamlColors = yaml["colors"];
 	for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end(); ++it)
 	{
@@ -201,15 +194,27 @@ static Theme::Colors loadColors(YAML::Node& yaml)
 			}
 			else
 			{
-				LOG_ERROR("[loadTheme] Invalid value in file: {}", it->first.as<std::string>());
+				LOG_ERROR("[THEME] Invalid value in file: {}", it->first.as<std::string>());
+				failedOnce = true;
 			}
 		}
 		else
 		{
-			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+			LOG_ERROR("[THEME] Invalid style variable {}", it->first.as<std::string>());
+			failedOnce = true;
 		}
+		loadedCount++;
 	}
-
+	if (failedOnce)
+	{
+		assert(false && "Theme contains an invalid EColor style variable!");
+	}
+	if (count != loadedCount)
+	{
+		int diff = count - loadedCount;
+		assert(diff > 0);
+		LOG_INFO("[THEME] Theme is missing {} color style variable definitions! Defaults are used instead.", diff);
+	}
 	return colors;
 }
 
@@ -222,6 +227,10 @@ static Theme::Sizes loadSizes(YAML::Node& yaml)
 		return sizes;
 	}
 
+	int count = magic_enum::enum_count<ESize>();
+	int loadedCount = 0;
+
+	bool failedOnce = false;
 	auto yamlSizes = yaml["sizes"];
 	for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
 	{
@@ -231,10 +240,21 @@ static Theme::Sizes loadSizes(YAML::Node& yaml)
 		}
 		else
 		{
-			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+			LOG_ERROR("[THEME] Invalid style variable {}", it->first.as<std::string>());
+			failedOnce = true;
 		}
+		loadedCount++;
 	}
-
+	if (failedOnce)
+	{
+		assert(false && "Theme contains an invalid ESize style variable!");
+	}
+	if (count != loadedCount)
+	{
+		int diff = count - loadedCount;
+		assert(diff > 0);
+		LOG_INFO("[THEME] Theme is missing {} size style variable definitions! Defaults are used instead.", diff);
+	}
 	return sizes;
 }
 
@@ -247,6 +267,10 @@ static Theme::SizesVec loadSizeVectors(YAML::Node& yaml)
 		return sizesVec;
 	}
 
+	int count = magic_enum::enum_count<ESizeVec2>();
+	int loadedCount = 0;
+
+	bool failedOnce = false;
 	auto yamlSizeVec = yaml["size vectors"];
 	for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end(); ++it)
 	{
@@ -261,21 +285,33 @@ static Theme::SizesVec loadSizeVectors(YAML::Node& yaml)
 			}
 			else
 			{
-				LOG_ERROR("[loadTheme] Invalid value in file: {}", it->first.as<std::string>());
+				LOG_ERROR("[THEME] Invalid value in file: {}", it->first.as<std::string>());
+				failedOnce = true;
 			}
 		}
 		else
 		{
-			LOG_ERROR("[loadTheme] Invalid name {}", it->first.as<std::string>());
+			LOG_ERROR("[THEME] Invalid style variable {}", it->first.as<std::string>());
+			failedOnce = true;
 		}
+		loadedCount++;
 	}
-
+	if (failedOnce)
+	{
+		assert(false && "Theme contains an invalid ESizeVec2 style variable!");
+	}
+	if (count != loadedCount)
+	{
+		int diff = count - loadedCount;
+		assert(diff > 0);
+		LOG_INFO("[THEME] Theme is missing {} size2 style variable definitions! Defaults are used instead.", diff);
+	}
 	return sizesVec;
 }
 
 std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
-	LOG_INFO("Loading theme from file: {}", path.string());
+	LOG_INFO("[THEME] Loading theme from file: {}", path.string());
 
 	if (!fs::exists(path))
 	{

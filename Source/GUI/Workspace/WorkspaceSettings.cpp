@@ -10,22 +10,14 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#pragma once
+#include "WorkspaceSettings.h"
 
-#include "GUI/Elements/IWindow.h"
+#include "rttr/registration.h"
 
-class SetupDialog : public IWindow
+RTTR_REGISTRATION
 {
-	float m_uiScaleTmp;
-
-public:
-	I3T_WINDOW(SetupDialog)
-
-	SetupDialog();
-
-	virtual void render() override;
-
-	void showGeneralSettings();
-	void showViewportSettings();
-	void showWorkspaceSettings();
-};
+	rttr::registration::class_<WorkspaceSettings>("WorkspaceSettings")
+	    .property("tracking_timeBetweenTracks", &WorkspaceSettings::tracking_timeBetweenTracks)
+	    .property("tracking_smoothScrollSpeed", &WorkspaceSettings::tracking_smoothScrollSpeed)
+	    .property("tracking_jaggedScrollSpeeds", &WorkspaceSettings::tracking_jaggedScrollSpeed);
+}

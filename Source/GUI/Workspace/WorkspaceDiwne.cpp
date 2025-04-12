@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \author Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
@@ -13,6 +13,8 @@
  */
 
 #include "WorkspaceDiwne.h"
+
+#include "WorkspaceModule.h"
 
 #include <ranges>
 
@@ -288,7 +290,7 @@ void WorkspaceDiwne::performLazyDuplication()
 	if (shouldDuplicate)
 	{
 		Tools::pasteNodes(
-		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+		    *Tools::copyNodes(duplicatedNodes, I3T::getUI()->getTheme().get(ESizeVec2::Nodes_NewPositionShift).x));
 	}
 }
 
@@ -320,9 +322,9 @@ void WorkspaceDiwne::trackingSmoothLeft()
 			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
 			return;
 		}
-		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
+		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
 
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTrackingProgress().size();
 		if (m_trackingFromLeft)
 			tracking->setParam(tracking->getParam() - step);
 		else
@@ -339,9 +341,10 @@ void WorkspaceDiwne::trackingSmoothRight()
 			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
 			return;
 		}
-		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
+		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
 
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+
+		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTrackingProgress().size();
 		if (m_trackingFromLeft)
 			tracking->setParam(tracking->getParam() + step);
 		else
@@ -353,7 +356,7 @@ void WorkspaceDiwne::trackingJaggedLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
 	{
-		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
+		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTrackingProgress().size();
 		if (m_trackingFromLeft)
 			tracking->setParam(tracking->getParam() - step);
 		else
@@ -365,7 +368,7 @@ void WorkspaceDiwne::trackingJaggedRight()
 {
 	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
 	{
-		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
+		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTrackingProgress().size();
 
 		if (m_trackingFromLeft)
 			tracking->setParam(tracking->getParam() + step);
@@ -420,14 +423,13 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<Sequence> sequence, bool isRightToLeft
 
 void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft)
 {
-	LOG_INFO("TRACKING ON");
+	LOG_DEBUG("TRACKING ON");
 
 	std::vector<UPtr<Core::IModelProxy>> proxy(models.size());
 	std::transform(models.begin(), models.end(), proxy.begin(), [](Ptr<Model> model) {
 		return std::make_unique<ModelProxy>(model);
 	});
 
-	//	sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint)); // TODO: (DR) This wasn't implemented
 	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
 	if (isRightToLeft)
 	{
@@ -442,7 +444,7 @@ void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>
 
 void WorkspaceDiwne::trackingSwitchOff()
 {
-	LOG_INFO("TRACKING OFF CALLED");
+	LOG_DEBUG("TRACKING OFF CALLED"); // TODO: Remove
 	if (Core::GraphManager::isTrackingEnabled())
 	{
 		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
@@ -489,7 +491,7 @@ void WorkspaceDiwne::copySelectedNodes()
 {
 	LOG_INFO("Copying nodes");
 	copiedNodes = Tools::copyNodes(getAllSelectedCoreNodesWithoutNesting().collect(),
-	                               I3T::getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+	                               I3T::getUI()->getTheme().get(ESizeVec2::Nodes_NewPositionShift).x);
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -691,7 +693,7 @@ bool WorkspaceEditorInputAdapter::deleteSelectedNodes()
 void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)
 {
 	ImGui::PushFont(I3T::getFont(EFont::TutorialHint));
-	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getColor(EColor::AddMenuHeader));
+	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getColor(EColor::TextDisabled));
 
 	ImGui::Text(_t("Add..."));
 

@@ -73,9 +73,11 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 
 void NodeEditor::begin(DrawInfo& context)
 {
-	ImGui::BeginChild(this->m_labelDiwne.c_str(), ImVec2(0, 0), false,
-	                  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove);
-
+	if (mp_settingsDiwne->useChildWindow)
+	{
+		ImGui::BeginChild(this->m_labelDiwne.c_str(), ImVec2(0, 0), false,
+		                  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove);
+	}
 	m_canvas->updateViewportRects();
 	m_nodesSelectionChanged = false;
 
@@ -269,7 +271,8 @@ void NodeEditor::afterDraw(DrawInfo& context)
 		        .c_str());
 	});
 	// The editor child window is ended here instead of end() so that afterDraw() drawing is in the same window DrawList
-	ImGui::EndChild();
+	if (mp_settingsDiwne->useChildWindow)
+		ImGui::EndChild();
 }
 
 void NodeEditor::processInteractions(DrawInfo& context)

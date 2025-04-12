@@ -17,6 +17,7 @@
 #include "GUI/Elements/IWindow.h"
 
 class Theme;
+struct ThemeVariable;
 
 namespace UI
 {
@@ -28,6 +29,9 @@ public:
 	StyleEditor();
 
 	void render() override;
+
+	// Must be public as its called from std::visit
+	static void showDescription(const ThemeVariable& var, bool dpiScaled);
 
 private:
 	void renderSaveRevertField();

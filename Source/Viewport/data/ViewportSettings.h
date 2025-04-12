@@ -12,9 +12,6 @@
  */
 #pragma once
 
-#include "glm/glm.hpp"
-
-#include "Viewport/camera/AggregateCamera.h"
 #include "ViewportGlobalSettings.h"
 #include "ViewportSceneSettings.h"
 

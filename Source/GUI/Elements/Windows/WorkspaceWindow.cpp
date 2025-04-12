@@ -228,6 +228,7 @@ void WorkspaceWindow::render()
 	}
 	else
 	{
+		ImGui::PopStyleColor();
 		GUI::dockTabStylePop();
 		ImGui::PopStyleVar();
 	}

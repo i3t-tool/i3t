@@ -62,9 +62,9 @@ inline void DummyMax(const ImVec2& size)
 }
 inline void BeginVerticalAlign(float yOffset)
 {
-	assert(yOffset > 0.0f);
 	ImGui::BeginGroup();
-	DummyXY(ImVec2(0.0f, yOffset));
+	if (yOffset > 0.0f)
+		DummyXY(ImVec2(0.0f, yOffset));
 }
 inline void EndVerticalAlign(float yOffset = 0.0f)
 {

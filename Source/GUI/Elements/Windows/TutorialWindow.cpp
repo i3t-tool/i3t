@@ -100,8 +100,8 @@ void TutorialWindow::emptyTutorial()
 
 inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 {
-	ImGui::GetStyle().WindowRounding = I3T::getUI()->getTheme().get(ESize::Tooltip_Rounding);
-	ImGui::GetStyle().WindowPadding = I3T::getUI()->getTheme().get(ESizeVec2::Tooltip_Padding);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, I3T::getUI()->getTheme().get(ESize::Tooltip_Rounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, I3T::getUI()->getTheme().get(ESizeVec2::Tooltip_Padding));
 	if (data_.linkData.isImage)
 	{
 		ImGui::SetTooltip("%.*s", data_.linkData.textLength, data_.linkData.text);
@@ -112,8 +112,7 @@ inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 		// ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon,
 		// data_.linkData.linkLength, data_.linkData.link );
 	}
-	ImGui::GetStyle().WindowRounding = I3T::getUI()->getTheme().get(ESize::Window_Rounding);
-	ImGui::GetStyle().WindowPadding = I3T::getUI()->getTheme().get(ESizeVec2::Window_Padding);
+	ImGui::PopStyleVar(2);
 }
 
 inline void DefaultLinkCallback(ImGui::MarkdownLinkCallbackData data_)
@@ -233,11 +232,11 @@ void TutorialWindow::render()
 
 	// PUSH STYLE
 	GUI::dockTabStylePush();
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, I3T::getUI()->getTheme().get(ESizeVec2::TutorialWindow_Padding));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getUI()->getTheme().get(ESize::TutorialWindow_FrameRounding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, I3T::getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarSize));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, I3T::getUI()->getTheme().get(ESizeVec2::Tutorial_WindowPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getUI()->getTheme().get(ESize::Tutorial_FrameRounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, I3T::getUI()->getTheme().get(ESize::Tutorial_ScrollbarSize));
 	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding,
-	                    I3T::getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarRounding));
+	                    I3T::getUI()->getTheme().get(ESize::Tutorial_ScrollbarRounding));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, I3T::getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, I3T::getUI()->getTheme().get(EColor::TutorialBgColor));
@@ -426,9 +425,8 @@ void TutorialWindow::renderTutorialControls()
 	// Back button
 	if (currentStep != 0)
 	{
-		if (I3TGui::ButtonWithLog(
-		        _t("< Back"),
-		        ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth), NEXT_BUTTON_SIZE_Y)))
+		if (I3TGui::ButtonWithLog(_t("< Back"), ImVec2(I3T::getUI()->getTheme().get(ESize::Tutorial_BackButtonWidth),
+		                                               NEXT_BUTTON_SIZE_Y)))
 		{
 			TutorialManager::instance().setStep(currentStep - 1);
 			// std::cout << m_currentStep << std::endl;
@@ -442,7 +440,7 @@ void TutorialWindow::renderTutorialControls()
 	{
 		if (I3TGui::ButtonWithLog(
 		        _t("< Start Menu"),
-		        ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialWindow_MainMenuButtonWidth), NEXT_BUTTON_SIZE_Y)))
+		        ImVec2(I3T::getUI()->getTheme().get(ESize::Tutorial_MainMenuButtonWidth), NEXT_BUTTON_SIZE_Y)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 			this->hide();
@@ -642,17 +640,17 @@ void TutorialWindow::renderTask(Task* task)
 	{
 		ImVec2 drawPos =
 		    ImGui::GetCursorScreenPos() +
-		    ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), ImGui::GetStyle().FramePadding.y);
+		    ImVec2(I3T::getUI()->getTheme().get(ESize::Tutorial_TaskSquareXPadding), ImGui::GetStyle().FramePadding.y);
 		ImDrawList* draw_list = ImGui::GetWindowDrawList();
 		ImU32 color = ImGui::ColorConvertFloat4ToU32(I3T::getUI()->getTheme().get(EColor::TutorialTitleText));
 		draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + squareSize, drawPos.y + squareSize),
 		                         color);
-		ImGui::Dummy(ImVec2(squareSize + I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), squareSize));
+		ImGui::Dummy(ImVec2(squareSize + I3T::getUI()->getTheme().get(ESize::Tutorial_TaskSquareXPadding), squareSize));
 		ImGui::SameLine();
 	}
 	else
 	{
-		ImGui::Dummy(ImVec2(I3T::getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding) / 2, squareSize));
+		ImGui::Dummy(ImVec2(I3T::getUI()->getTheme().get(ESize::Tutorial_TaskSquareXPadding) / 2, squareSize));
 		ImGui::SameLine();
 		ImGui::TextUnformatted(ICON_I3T_CHECK);
 		ImGui::SameLine();
