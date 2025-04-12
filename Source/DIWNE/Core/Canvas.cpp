@@ -759,16 +759,7 @@ bool Canvas::IconButton(const std::string id, bool disabled, IconType bgIconType
 	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled,
 	         thickness, rounding);
 
-	//	ImGui::Dummy(size); // Better to use InvisibleButton
-	// We're making the InvisibleButton disabled so that when its pressed / dragged it does not set an ActiveID in ImGui
-	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
-	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
-	if (disabled)
-		ImGui::BeginDisabled(true);
-	bool result = ImGui::InvisibleButton(id.c_str(), size);
-	if (disabled)
-		ImGui::EndDisabled();
-	return result;
+	return DGui::InvisibleButton(id, size, disabled);
 }
 
 bool Canvas::IconButton2(const std::string& id, ImVec2 size, bool disabled, IconType bgIconType, IconType fgIconType,
@@ -776,7 +767,7 @@ bool Canvas::IconButton2(const std::string& id, ImVec2 size, bool disabled, Icon
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
 	bool hovered, active;
-	bool result = DIWNE::DGui::ButtonDummy(id, size, disabled, hovered, active);
+	bool result = DIWNE::DGui::InvisibleButton(id, size, disabled, hovered, active);
 	ImVec2 afterPos = ImGui::GetCursorScreenPos();
 
 	// Decide which icon style to used based on button state

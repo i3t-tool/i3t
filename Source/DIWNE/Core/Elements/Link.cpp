@@ -60,7 +60,7 @@ void Link::updateLayout(DrawInfo& context)
 bool Link::allowDrawing()
 {
 	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
-	return DiwneObject::allowDrawing() && (getBounds().Overlaps(viewportRect));
+	return Super::allowDrawing() && (getBounds().Overlaps(viewportRect));
 }
 
 /// Link isn't represented by an ImGui item so we need to detect hovering manually.

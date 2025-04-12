@@ -42,6 +42,25 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 	}
 }
 
+void CoreNodeWithPins::afterDraw(DIWNE::DrawInfo& context)
+{
+	Super::afterDraw(context);
+
+	// If pin icons stick out of the node (when pin offset is negative), their drawing is deferred to us.
+	// Meaning this node will draw the pin icons using already prepared data from the pins.
+	// This is done so that any node borders or hover/selection indicators are drawn UNDER the pins.
+	for (auto& pin : m_workspaceInputs)
+	{
+		if (!pin->m_pinIconData.rendered)
+			pin->renderPinDiwne(pin->m_pinIconData);
+	}
+	for (auto& pin : m_workspaceOutputs)
+	{
+		if (!pin->m_pinIconData.rendered)
+			pin->renderPinDiwne(pin->m_pinIconData);
+	}
+}
+
 void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 {
 	bool pinsVisible = false;

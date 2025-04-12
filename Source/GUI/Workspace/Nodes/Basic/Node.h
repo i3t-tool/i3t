@@ -58,6 +58,8 @@ extern std::map<LevelOfDetail, std::string> LevelOfDetailName;
 
 class Node : public DIWNE::BasicNode
 {
+	using Super = DIWNE::BasicNode;
+
 public:
 	Node(DIWNE::NodeEditor& diwne, std::string label = "Header");
 	void onDestroy(bool logEvent);

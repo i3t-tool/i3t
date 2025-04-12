@@ -7,7 +7,7 @@ colors:
   glob_Popup Background: [0.102, 0.102, 0.102, 0.863]
   glob_Border: [0.298, 0.298, 0.306, 1.000]
   glob_Border Shadow: [0.000, 0.000, 0.000, 0.000]
-  glob_Border Dim: [0.000, 0.000, 0.000, 0.471]
+  glob_Border Dim: [0.088, 0.088, 0.088, 0.784]
   glob_Frame Background: [0.160, 0.290, 0.480, 0.540]
   glob_Frame Background Hovered: [0.260, 0.590, 0.980, 0.400]
   glob_Frame Background Active: [0.260, 0.590, 0.980, 0.670]

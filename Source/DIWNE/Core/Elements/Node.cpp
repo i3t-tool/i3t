@@ -30,7 +30,7 @@ Node& Node::operator=(const Node& rhs)
 bool Node::allowDrawing()
 {
 	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();
-	return DiwneObject::allowDrawing() &&
+	return Super::allowDrawing() &&
 	       (getRect().Overlaps(viewportRect) || diwne.interactionState.isDragSource(this) || m_forceDraw);
 }
 
@@ -86,7 +86,7 @@ void Node::afterDrawDiwne(DrawInfo& context)
 
 	drawSelectionIndicator(context);
 
-	DiwneObject::afterDrawDiwne(context);
+	Super::afterDrawDiwne(context);
 }
 
 void Node::setInitialPositionDiwne()
@@ -95,7 +95,7 @@ void Node::setInitialPositionDiwne()
 	// Nodes are drawn at their spe position and should set ImGui cursor position before drawing
 	if (isChildObject())
 	{
-		DiwneObject::setInitialPositionDiwne();
+		Super::setInitialPositionDiwne();
 	}
 	else
 	{
@@ -105,7 +105,7 @@ void Node::setInitialPositionDiwne()
 
 bool Node::processSelectDiwne(DrawInfo& context)
 {
-	if (DiwneObject::processSelectDiwne(context))
+	if (Super::processSelectDiwne(context))
 		return true;
 
 	// Check if the node is inside a selection rectangle
@@ -129,13 +129,13 @@ bool Node::processSelectDiwne(DrawInfo& context)
 
 void Node::onSelection(bool selected)
 {
-	DiwneObject::onSelection(selected);
+	Super::onSelection(selected);
 	diwne.setNodesSelectionChanged(true);
 }
 
 void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 {
-	DiwneObject::onDrag(context, dragStart, dragEnd);
+	Super::onDrag(context, dragStart, dragEnd);
 
 	// Handle node dragging
 	if (dragStart)
@@ -182,7 +182,7 @@ void Node::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 }
 void Node::onHover(DrawInfo& context)
 {
-	DiwneObject::onHover(context);
+	Super::onHover(context);
 	diwne.canvas().AddRectDiwne(m_displayRect.Min, m_displayRect.Max, diwne.style().color(Style::HOVER_BORDER_COLOR),
 	                            diwne.style().decimal(Style::SELECTION_ROUNDING), ImDrawFlags_RoundCornersAll,
 	                            diwne.style().decimal(Style::HOVER_BORDER_WIDTH));
@@ -198,7 +198,7 @@ void Node::onDestroy(bool logEvent)
 		diwne.setNodesSelectionChanged(true);
 	}
 	diwne.m_takeSnap = true;
-	DiwneObject::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 bool Node::getFlag(char index) const

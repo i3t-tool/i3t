@@ -26,6 +26,8 @@ using NodeFlag = uint64_t;
  */
 class Node : public DiwneObject
 {
+	using Super = DiwneObject;
+
 protected:
 	NodeFlag m_flag{0}; ///< The node flag bit field @see Node::getFlag()
 
