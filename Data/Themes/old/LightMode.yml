@@ -24,16 +24,6 @@ colors:
     y: 0.000691592693
     z: 0.000691592693
     w: 1
-  glob_Primary Color (tabs, tiles, ...):
-    x: 0.716459215
-    y: 0.716459215
-    z: 0.716459215
-    w: 1
-  glob_Active Color:
-    x: 0.716459215
-    y: 0.716459215
-    z: 0.716459215
-    w: 1
   glob_Selection Color:
     x: 0.201919198
     y: 0.395685673
@@ -49,7 +39,7 @@ colors:
     y: 0.214789003
     z: 0.214789003
     w: 1
-  glob_Tab SceneView Background:
+  sgen_Scene View Background:
     x: 0.300000012
     y: 0.300000012
     z: 0.349999994
@@ -134,12 +124,12 @@ colors:
     y: 0.392156869
     z: 0.392156869
     w: 0.0980392173
-  glob_Selection rectangle full:
+  ngen_Selection rectangle full:
     x: 0
     y: 0.419910192
     z: 0.150237262
     w: 0.392156869
-  glob_Selection rectangle touch:
+  ngen_Selection rectangle touch:
     x: 0.0124690849
     y: 0.640718579
     z: 0.378320754
@@ -485,17 +475,17 @@ colors:
     z: 0
     w: 0
 sizes:
-  ngen_Nodes Float Margin: 5
-  ngen_Nodes Float Width: 45
+  nflo_Nodes Float Margin: 5
+  nflo_Nodes Float Width: 45
   star_Dot Spacing: 7
   ngen_Nodes Rounding: 7
   star_Dot Size: 10
   ngen_Nodes BorderWidth: 0
-  ngen_Pin labels Indent: 12
+  ngen_Pin Label Indent: 12
   ngen_Header Label Indent: 2
   ngen_Trackball Button Height: 20
-  ngen_Trackball Sensitivity: 5
-  ngen_Float Inner Padding: 1
+  ngen_TrackBall Sensitivity: 5
+  nflo_Float Inner Padding: 1
   ngen_Drag Speed fo Float: 0.0149999997
   ngen_CTRL Multiplicator: 0.100000001
   ngen_SHIFT Multiplicator: 10
@@ -508,14 +498,14 @@ sizes:
   ngen_Nodes Default Visible Precision: 1
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0
-  ngen_Link Control Point Distance Scaling Factor: 0.200000003
-  ngen_Link Min Control Point X Distance: 65
-  ngen_Link Max Control Point X Distance: 350
-  ngen_Link Thickness: 5
-  ngen_Link thickness when selected: 7
-  ngen_Pins IconPadding: 2
-  ngen_Links Selected Alpha: 0.800000012
-  ngen_Float_inactive_alphaMultiplicator: 0.5
+  nlnk_Link Control Point Distance Scaling Factor: 0.200000003
+  nlnk_Link Min Control Point X Distance: 65
+  nlnk_Link Max Control Point X Distance: 350
+  nlnk_Link Thickness: 5
+  nlnk_Link Thickness when selected: 7
+  npin_Pin Icon Padding: 2
+  nlnk_Link Selected Alpha: 0.800000012
+  nflo_Float Inactive Alpha Factor: 0.5
   ngen_Nodes Operators Rounding: 7
   ngen_Nodes Sequence Rounding: 7
   ngen_Nodes LOD Button Rounding: 7
@@ -539,13 +529,13 @@ size vectors:
   ngen_Nodes Pivot Size:
     x: 0
     y: 0
-  glob_Windows Frame Padding:
+  glob_Window Frame Padding:
     x: 5
     y: 5
   ngen_Nodes Items Spacing:
     x: 4
     y: 4
-  ngen_Nodes Float Padding:
+  nflo_Nodes Float Padding:
     x: 0
     y: 1
   ngen_Nodes Pin Spacing:
@@ -569,22 +559,22 @@ size vectors:
   ngen_Nodes Pin Size:
     x: 12
     y: 12
-  ngen_Nodes Float Cycle Button Size:
+  nflo_Nodes Float Cycle Button Size:
     x: 32
     y: 32
-  ngen_Nodes Screen Texture Size:
+  nscr_Nodes Screen Texture Size:
     x: 130
     y: 130
   ngen_Builder Item Spacing:
     x: 0
     y: 0
-  ngen_Nodes Screen ResizeButtonSize:
+  nscr_Screen Resize Button Size:
     x: 20
     y: 20
-  ngen_Nodes Sequence DummySpaceSize:
+  ntrs_Sequence Dummy Space Size:
     x: 100
     y: 1
-  ngen_NewNode PositionShift:
+  ngen_New Node Position Shift:
     x: 10
     y: 0
   star_Window Size:

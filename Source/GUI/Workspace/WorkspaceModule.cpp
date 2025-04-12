@@ -13,6 +13,7 @@ static DIWNE::SettingsDiwne settingsDiwne;
 using namespace Workspace;
 
 Ptr<WorkspaceDiwne> WorkspaceModule::g_editor;
+WorkspaceSettings WorkspaceModule::g_settings;
 
 int WorkspaceModule::g_pinStyle = 1;
 int WorkspaceModule::g_pinStyleMul = 0;
@@ -22,6 +23,7 @@ int WorkspaceModule::g_pinStyleModelMatrix = 2;
 
 WorkspaceModule::WorkspaceModule()
 {
+	settingsDiwne.useChildWindow = false;
 	g_editor = std::make_shared<WorkspaceDiwne>("WorkspaceEditor", &settingsDiwne);
 
 	App::getModule<StateManager>().addOriginator(this);
@@ -86,12 +88,34 @@ void WorkspaceModule::clearScene()
 
 Memento WorkspaceModule::saveGlobal()
 {
-	return emptyMemento();
+	rapidjson::Document doc;
+	doc.SetObject();
+
+	rapidjson::Document workspaceDoc(&doc.GetAllocator());
+	auto result = JSON::serializeToDocument(g_settings, workspaceDoc);
+	if (!result)
+	{
+		return emptyMemento();
+	}
+	doc.AddMember("workspace", workspaceDoc, doc.GetAllocator());
+
+	return doc;
 }
 
-void WorkspaceModule::loadGlobal(const Memento& memento) {}
+void WorkspaceModule::loadGlobal(const Memento& memento)
+{
+	if (!memento.HasMember("workspace"))
+	{
+		LOG_ERROR("Cannot load global workspace data! No 'workspace' entry found!");
+		return;
+	}
+	JSON::deserializeDocument(memento["workspace"], g_settings);
+}
 
-void WorkspaceModule::clearGlobal() {}
+void WorkspaceModule::clearGlobal()
+{
+	g_settings = WorkspaceSettings();
+}
 
 /////////////////////////////////////////
 // NodeEditor management
