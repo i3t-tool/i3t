@@ -51,6 +51,14 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 
 bool ToggleButton(const char* label, bool& toggled, bool invert = false, ImVec2 size = ImVec2(0.0f, 0.0f));
 
+bool DimButton(const char* label, const ImVec2& size = ImVec2(0, 0));
+
+bool FloatingButton(const char* label, const ImVec2& size = ImVec2(0, 0));
+
+bool FloatingButtonDark(const char* label, const ImVec2& size = ImVec2(0, 0), float rounding = 0.f);
+
+bool FloatingToggleButton(const char* label, bool& toggled, bool invert = false, const ImVec2& size = ImVec2(0, 0));
+
 bool ButtonWithCorners(const char* label, ImDrawFlags corners, const ImVec2& size = ImVec2(0, 0));
 
 bool ButtonWithCornersEx(const char* label, ImDrawFlags corners, const ImVec2& size_arg = ImVec2(0, 0),
@@ -135,5 +143,4 @@ inline bool equalsRect(const ImRect& a, const ImRect& b)
 {
 	return equalsVec(a.Min, b.Min) && equalsVec(a.Max, b.Max);
 }
-
 } // namespace GUI

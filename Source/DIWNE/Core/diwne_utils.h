@@ -6,6 +6,8 @@
 #include <cmath>
 #include <string>
 
+// This util header should NOT include DIWNE specific classes as it should be easily usable outside of DIWNE.
+
 #define DIWNE_PIXEL_EPSILON 0.001f
 
 #define DIWNE_TRUNC(val) IM_TRUNC(val)

@@ -24,11 +24,6 @@ colors:
     y: 0.199101806
     z: 0.199101806
     w: 1
-  glob_Selection Color:
-    x: 0.201919198
-    y: 0.395685673
-    z: 0.626556039
-    w: 1
   npop_Connection is possible (text):
     x: 0.118354835
     y: 0.786676645

@@ -1,6 +1,5 @@
 mode: "light"
 colors:
-  glob_Selection Color: [0.416, 0.678, 1.000, 1.000]
   glob_Text: [0.064, 0.064, 0.064, 1.000]
   glob_Disabled Text: [0.500, 0.500, 0.500, 1.000]
   glob_Window Background: [0.965, 0.965, 0.965, 1.000]

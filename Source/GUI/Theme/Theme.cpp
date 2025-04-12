@@ -142,6 +142,7 @@ void Theme::initDefaultClassic()
 	set(EColor::PopupBackground, ImVec4(0.08f, 0.08f, 0.08f, 0.94f));
 	set(EColor::Border, ImVec4(0.43f, 0.43f, 0.50f, 0.50f));
 	set(EColor::BorderShadow, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+	set(EColor::BorderDim, ImVec4(0.1f, 0.1f, 0.1f, 0.50f));
 	set(EColor::FrameBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FrameBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.40f));
 	set(EColor::FrameBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
@@ -192,7 +193,11 @@ void Theme::initDefaultClassic()
 	set(EColor::ModalWindowDimBg, ImVec4(0.80f, 0.80f, 0.80f, 0.35f));
 
 	// Custom stuff below
-	set(EColor::SelectionColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::ButtonDim, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::ButtonDimHovered, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::ButtonDimActive, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::ButtonDimToggled, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::ButtonDimDark, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
 
 	set(EColor::SceneViewBackground, ImVec4(0.3f, 0.3f, 0.35f, 1.f));
 
@@ -338,6 +343,8 @@ void Theme::initDefaultClassic()
 	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
 	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
 
+	m_sizes[ESize::FloatingButtonRounding] = {2.0f, true};
+
 	m_sizes[ESize::Nodes_FloatMargin] = {1.0f, true};
 	m_sizes[ESize::Nodes_FloatWidth] = {25.0f, true};
 	m_sizes[ESize::Nodes_Rounding] = {5.0f, true};
@@ -464,16 +471,14 @@ void Theme::initDefaultClassic()
 void Theme::initNames()
 {
 	group("Global", "glob")
-
-	    .add(EColor::SelectionColor, "Selection Color")
-
 	    .add(EColor::Text, "Text")
 	    .add(EColor::TextDisabled, "Disabled Text")
 	    .add(EColor::WindowBackground, "Window Background")
 	    .add(EColor::ChildBackground, "Child Window Background")
 	    .add(EColor::PopupBackground, "Popup Background")
-	    .add(EColor::Border, "Border")
+	    .add(EColor::Border, "Border", "Border color of items and windows.")
 	    .add(EColor::BorderShadow, "Border Shadow")
+	    .add(EColor::BorderDim, "Border Dim", "Dim variant of the border used in some special cases.")
 	    .add(EColor::FrameBg, "Frame Background")
 	    .add(EColor::FrameBgHovered, "Frame Background Hovered")
 	    .add(EColor::FrameBgActive, "Frame Background Active")
@@ -538,13 +543,20 @@ void Theme::initNames()
 	    .add(EColor::DockTabUnfocusedActive, "Dock Tab Unfocused Active")
 	    .add(EColor::DockTabHovered, "Dock Tab Hovered")
 
+	    .add(EColor::ButtonDim, "Button Dim")
+	    .add(EColor::ButtonDimHovered, "Button Dim Hovered")
+	    .add(EColor::ButtonDimActive, "Button Dim Active")
+	    .add(EColor::ButtonDimToggled, "Button Dim Toggled")
+	    .add(EColor::ButtonDimDark, "Button Dim Dark")
+
 	    // TODO: All ImGui sizes
 	    .add(ESize::Window_Rounding, "Window Rounding")
 	    .add(ESizeVec2::Window_Padding, "Window Padding")
 	    .add(ESize::Frame_Rounding, "Frame Rounding")
 	    .add(ESizeVec2::FramePadding, "Window Frame Padding")
 	    .add(ESize::Tooltip_Rounding, "Tooltip Rounding")
-	    .add(ESizeVec2::Tooltip_Padding, "Tooltip Padding");
+	    .add(ESizeVec2::Tooltip_Padding, "Tooltip Padding")
+	    .add(ESize::FloatingButtonRounding, "Floating Button Rounding");
 
 	group("Start Window", "star")
 	    .add(EColor::StartWindow_DescriptionBackground, "Description Background")
