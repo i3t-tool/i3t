@@ -27,7 +27,7 @@ def parse_csv_to_lang_files(csv_filename, localization_dir):
             # If there is something in the Key cell, generate entries for all languages
             if key:
                 for lang in language_columns:
-                    if not row[lang]:
+                    if not row[lang] or row[lang].isspace():
                         # If the cell is empty, we skip it
                         continue
                     value = row[lang]
