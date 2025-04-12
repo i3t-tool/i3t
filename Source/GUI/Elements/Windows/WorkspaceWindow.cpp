@@ -200,10 +200,12 @@ void WorkspaceWindow::showEditMenu()
 			if (I3TGui::MenuItemWithLog(_t("Select all"), "Ctrl+A"))
 			{
 				WorkspaceModule::g_editor->selectAllNodes();
+				App::getModule<StateManager>().requestSnapshot();
 			}
 			if (I3TGui::MenuItemWithLog(_t("Invert"), "Ctrl+I"))
 			{
 				WorkspaceModule::g_editor->invertSelection();
+				App::getModule<StateManager>().requestSnapshot();
 			}
 			ImGui::EndMenu();
 		}

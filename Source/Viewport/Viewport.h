@@ -233,6 +233,7 @@ public:
 
 	Memento saveScene(State::Scene* scene) override;
 	void loadScene(const Memento& memento, State::Scene* scene) override;
+	void appendScene(const Memento& memento, State::Scene* scene) override {}
 	void clearScene() override;
 
 	Memento saveGlobal() override;

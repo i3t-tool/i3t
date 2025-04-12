@@ -81,6 +81,20 @@ void WorkspaceModule::loadScene(const Memento& memento, Scene* scene)
 	g_editor->manipulatorStartCheck3D();
 }
 
+void WorkspaceModule::appendScene(const Memento& memento, Scene* scene)
+{
+	if (!memento.HasMember("workspace"))
+	{
+		LOG_ERROR("Failed to load workspace! No 'workspace' member found.");
+		return;
+	}
+	g_editor->deselectAllNodes();
+	NodeDeserializer::createFrom(memento, true);
+
+	g_editor->manipulatorStartCheck3D();
+}
+
+
 void WorkspaceModule::clearScene()
 {
 	getNodeEditor().clear();

@@ -73,6 +73,7 @@ public:
 private:
 	Memento saveScene(Scene* scene) override;
 	void loadScene(const Memento& memento, Scene* scene) override;
+	void appendScene(const Memento& memento, Scene* scene) override;
 	void clearScene() override;
 
 public:

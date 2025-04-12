@@ -24,12 +24,12 @@ namespace NodeDeserializer
 {
 /// @pre DIWNE and WorkspaceWindow are initialized.
 /// @return Vector of Workspace::CoreNodes (casted to base type DIWNE::Node for perf reasons)
-std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento);
+std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll = false);
 
-std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value);
-Ptr<GuiSequence> createSequence(const rapidjson::Value& value);
-std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value);
+std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value, bool select);
+Ptr<GuiSequence> createSequence(const rapidjson::Value& value, bool select);
+std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value, bool select);
 
-void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node);
-void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence);
+void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node, bool select);
+void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence, bool select);
 } // namespace NodeDeserializer

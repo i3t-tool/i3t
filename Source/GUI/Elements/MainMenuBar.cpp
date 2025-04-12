@@ -155,6 +155,19 @@ Result<Void, Error> MenuBarDialogs::open()
 	return Err("No file selected");
 }
 
+Result<Void, Error> MenuBarDialogs::append()
+{
+	std::filesystem::path sceneFile;
+	bool hasFile = openSceneDialog(sceneFile, "Append I3T scene");
+	if (hasFile)
+	{
+		App::getModule<StateManager>().appendScene(sceneFile);
+		return Void{};
+	}
+
+	return Err("No file selected");
+}
+
 //===----------------------------------------------------------------------===//
 
 MainMenuBar::MainMenuBar()
@@ -213,6 +226,10 @@ void MainMenuBar::showFileMenu()
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_OPEN_FILE " ", "Open"), "Ctrl+O"))
 		{
 			InputManager::triggerAction("open", EKeyState::Pressed);
+		}
+		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_FILE_IMPORT " ", "Append")))
+		{
+			MenuBarDialogs::append();
 		}
 
 		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_CLOCK " ", "Recent")))
