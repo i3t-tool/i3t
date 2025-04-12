@@ -158,16 +158,20 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 
 void DiwneObject::processHoverDiwne(DrawInfo& context)
 {
-	bool hovered = isHoveredDiwne() && !context.hoverConsumed &&
-	               (context.state.hoverTarget.empty() || context.state.hoverTarget == m_labelDiwne);
+	bool hoveredTmp = isHoveredDiwne() && !context.hoverConsumed;
+	bool hovered = hoveredTmp && (context.state.hoverTarget.empty() || context.state.hoverTarget == m_labelDiwne);
 	m_hovered = hovered && allowHover();
 	if (m_hovered)
 		onHover(context);
 
-	if (hovered)
+	if (hovered || context.state.hoverTarget == m_labelDiwne)
 	{
-		// We are being hovered but hover isn't allowed / is disabled.
-		// In that case we still propagate the hover event, propagation can still end if this is a hover root
+		// When we are being hovered but hover isn't allowed / is disabled, we still propagate the hover event,
+		// propagation can still end if this is a hover root
+
+		// Other special case when we still want to propagate hover is when one of our children is hovered despite
+		// ourselves not being hovered, that can happen when a children rect reaches outside the parent rect.
+		// In that case we are the hover target and will propagate hover too.
 
 		// Handle hover propagation, hover is propagated from a child to its parent
 		if (m_hoverRoot)

@@ -21,6 +21,7 @@
 #include "GUI/I3TGui.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/Toolkit.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
@@ -44,103 +45,9 @@ void SetupDialog::render()
 			App::getModule<StateManager>().resetGlobal();
 		}
 
-		if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::Indent();
-
-			static float uiScaleTmp = 1.0f;
-			if (ImGui::IsWindowAppearing())
-			{
-				uiScaleTmp = I3T::getUI()->getUiScale();
-			}
-			ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-			GUI::SliderFloatStepped("UI Scale", &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
-			if (uiScaleTmp != I3T::getUI()->getUiScale())
-			{
-				ImGui::SameLine();
-				if (I3TGui::ButtonWithLog("Apply scale"))
-				{
-					I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
-				}
-			}
-			ImGui::Unindent();
-			ImGui::Spacing();
-		}
-
-		Vp::Viewport* viewport = I3T::getViewport();
-		Vp::ViewportSettings& stg = viewport->getSettings();
-
-		if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::Indent();
-			ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");
-			ImGui::SliderFloat("Model preview radius", &stg.global().preview_radiusFactor, 0.1f, 10.0f, "%.2f");
-			ImGui::SliderFloat("Model preview rotate speed", &stg.global().preview_rotateSpeed, 0.f, 100.f, "%f");
-
-			ImGui::Combo("Lighting model", &stg.global().lighting_lightingModel, "Phong\0Blinn-Phong\0\0");
-
-			if (ImGui::CollapsingHeader("Highlight"))
-			{
-				ImGui::Indent();
-				// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
-				ImGui::SliderFloat("Downscale factor", &stg.global().highlight.downscaleFactor, 0.01f, 1.0f, "%.2f");
-				ImGui::SliderInt("Kernel size", &stg.global().highlight.kernelSize, 1, 10);
-				ImGui::SliderFloat("Blur cutoff", &stg.global().highlight.outlineCutoff, 0.01f, 1.0f, "%.2f");
-				ImGui::Checkbox("Use depth", &stg.global().highlight.useDepth);
-				ImGui::SliderFloat("Darken factor", &stg.global().highlight.useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
-				ImGui::SliderFloat("Desaturate factor", &stg.global().highlight.useDepth_desaturateFactor, 0.0f, 1.0f,
-				                   "%.2f");
-				ImGui::Unindent();
-			}
-
-			if (ImGui::CollapsingHeader("Grid"))
-			{
-				ImGui::Indent();
-				ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid.color), ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid.axisXColor),
-				                  ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid.axisYColor),
-				                  ImGuiColorEditFlags_Float);
-				ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid.axisZColor),
-				                  ImGuiColorEditFlags_Float);
-
-				ImGui::SliderFloat("Size", &stg.global().grid.size, 0.01f, 2.f, "%.2f");
-				ImGui::SliderFloat("Strength", &stg.global().grid.strength, 0.01f, 1.f, "%.2f");
-				ImGui::SliderFloat("Line width", &stg.global().grid.lineWidth, 0.01f, 5.0f, "%.2f");
-				ImGui::SliderFloat("Fade 1 start", &stg.global().grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 1 end", &stg.global().grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 start", &stg.global().grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
-				ImGui::SliderFloat("Fade 2 end", &stg.global().grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
-				ImGui::Unindent();
-			}
-
-			ImGui::Unindent();
-			ImGui::Spacing();
-		}
-
-		//		if (ImGui::CollapsingHeader("Legacy", ImGuiTreeNodeFlags_None))
-		//		{
-		//			ImGui::Text("Camera control:");
-		//			ImGui::RadioButton("orbit", &cameraMode, 0);
-		//			ImGui::SameLine();
-		//			ImGui::RadioButton("trackball", &cameraMode, 1);
-		//			ImGui::SameLine();
-		//			ImGui::NewLine();
-		//
-		//			ImGui::Separator();
-		//
-		//			ImGui::Text("Angle units:");
-		//			ImGui::RadioButton("radians", &angleUnits, 0);
-		//			ImGui::SameLine();
-		//			ImGui::RadioButton("degrees", &angleUnits, 1);
-		//			ImGui::SameLine();
-		//			ImGui::NewLine();
-		//
-		//			ImGui::Separator();
-		//
-		//			static bool check = true;
-		//			ImGui::Checkbox("console", &check);
-		//		}
+		showGeneralSettings();
+		showWorkspaceSettings();
+		showViewportSettings();
 	}
 	else
 	{
@@ -151,4 +58,120 @@ void SetupDialog::render()
 		HideWindowCommand::dispatch(ID);
 	}
 	ImGui::End();
+}
+
+void SetupDialog::showGeneralSettings()
+{
+	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent();
+
+		static float uiScaleTmp = 1.0f;
+		if (ImGui::IsWindowAppearing())
+		{
+			uiScaleTmp = I3T::getUI()->getUiScale();
+		}
+		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
+		GUI::SliderFloatStepped("UI Scale", &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
+		if (uiScaleTmp != I3T::getUI()->getUiScale())
+		{
+			ImGui::SameLine();
+			if (I3TGui::ButtonWithLog("Apply scale"))
+			{
+				I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
+			}
+		}
+		ImGui::Unindent();
+		ImGui::Spacing();
+	}
+}
+void SetupDialog::showWorkspaceSettings()
+{
+	if (ImGui::CollapsingHeader("Workspace", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent();
+		ImGui::Checkbox("Show quick add menu", &WorkspaceModule::g_settings.showQuickAddMenu);
+		ImGui::SeparatorText("Tracking");
+		ImGui::DragFloat("Time between ticks", &WorkspaceModule::g_settings.tracking_timeBetweenTracks, 0.00005f,
+		                 0.00001f, 1.0f, "%.5f");
+		ImGui::DragFloat("Smooth scroll speed", &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f, 0.001f);
+		ImGui::DragFloat("Jagged scroll speed", &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f, 0.001f);
+
+		ImGui::Unindent();
+		ImGui::Spacing();
+	}
+}
+void SetupDialog::showViewportSettings()
+{
+	Vp::Viewport* viewport = I3T::getViewport();
+	Vp::ViewportSettings& stg = viewport->getSettings();
+
+	if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent();
+		ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");
+		ImGui::SliderFloat("Model preview radius", &stg.global().preview_radiusFactor, 0.1f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Model preview rotate speed", &stg.global().preview_rotateSpeed, 0.f, 100.f, "%f");
+
+		ImGui::Combo("Lighting model", &stg.global().lighting_lightingModel, "Phong\0Blinn-Phong\0\0");
+
+		if (ImGui::CollapsingHeader("Highlight"))
+		{
+			ImGui::Indent();
+			// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
+			ImGui::SliderFloat("Downscale factor", &stg.global().highlight.downscaleFactor, 0.01f, 1.0f, "%.2f");
+			ImGui::SliderInt("Kernel size", &stg.global().highlight.kernelSize, 1, 10);
+			ImGui::SliderFloat("Blur cutoff", &stg.global().highlight.outlineCutoff, 0.01f, 1.0f, "%.2f");
+			ImGui::Checkbox("Use depth", &stg.global().highlight.useDepth);
+			ImGui::SliderFloat("Darken factor", &stg.global().highlight.useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
+			ImGui::SliderFloat("Desaturate factor", &stg.global().highlight.useDepth_desaturateFactor, 0.0f, 1.0f,
+			                   "%.2f");
+			ImGui::Unindent();
+		}
+
+		if (ImGui::CollapsingHeader("Grid"))
+		{
+			ImGui::Indent();
+			ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid.color), ImGuiColorEditFlags_Float);
+			ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid.axisXColor), ImGuiColorEditFlags_Float);
+			ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid.axisYColor), ImGuiColorEditFlags_Float);
+			ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid.axisZColor), ImGuiColorEditFlags_Float);
+
+			ImGui::SliderFloat("Size", &stg.global().grid.size, 0.01f, 2.f, "%.2f");
+			ImGui::SliderFloat("Strength", &stg.global().grid.strength, 0.01f, 1.f, "%.2f");
+			ImGui::SliderFloat("Line width", &stg.global().grid.lineWidth, 0.01f, 5.0f, "%.2f");
+			ImGui::SliderFloat("Fade 1 start", &stg.global().grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
+			ImGui::SliderFloat("Fade 1 end", &stg.global().grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
+			ImGui::SliderFloat("Fade 2 start", &stg.global().grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
+			ImGui::SliderFloat("Fade 2 end", &stg.global().grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
+			ImGui::Unindent();
+		}
+
+		ImGui::Unindent();
+		ImGui::Spacing();
+	}
+
+	//		if (ImGui::CollapsingHeader("Legacy", ImGuiTreeNodeFlags_None))
+	//		{
+	//			ImGui::Text("Camera control:");
+	//			ImGui::RadioButton("orbit", &cameraMode, 0);
+	//			ImGui::SameLine();
+	//			ImGui::RadioButton("trackball", &cameraMode, 1);
+	//			ImGui::SameLine();
+	//			ImGui::NewLine();
+	//
+	//			ImGui::Separator();
+	//
+	//			ImGui::Text("Angle units:");
+	//			ImGui::RadioButton("radians", &angleUnits, 0);
+	//			ImGui::SameLine();
+	//			ImGui::RadioButton("degrees", &angleUnits, 1);
+	//			ImGui::SameLine();
+	//			ImGui::NewLine();
+	//
+	//			ImGui::Separator();
+	//
+	//			static bool check = true;
+	//			ImGui::Checkbox("console", &check);
+	//		}
 }

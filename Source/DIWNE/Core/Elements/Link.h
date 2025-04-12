@@ -23,6 +23,8 @@ class Pin;
 
 class Link : public DiwneObject
 {
+	using Super = DiwneObject;
+
 protected:
 	Pin* m_startPin{nullptr};
 	Pin* m_endPin{nullptr};

@@ -68,8 +68,6 @@ void CorePin::content(DIWNE::DrawInfo& context)
 	ImVec2 pinSpacing = style().size(Style::PIN_SPACING) * diwne.getZoom();
 	float labelSpacing = style().decimal(Style::PIN_LABEL_SPACING) * diwne.getZoom();
 
-	// TODO: DIMMING NOT WORKING PROPERLY!!, also needs lower alpha
-
 	// Handle pin dimming
 	const bool dimmingEnabled = style().boolean(Style::PIN_DIM_ENABLED);
 	float alphaBackup = 1.0f;
@@ -87,17 +85,16 @@ void CorePin::content(DIWNE::DrawInfo& context)
 
 	// Draw content
 	ImRect dragRect;
-	if (isInput()) // TODO: Change to m_left or something in the future to support i/o pins on both sides
+	if (isLeft())
 	{
 		DGui::RectData rectData = DGui::BeginRect();
-		drawPin(true, pinAlpha);
+		m_pinIconData = drawPin(true, pinAlpha);
 		ImGui::SameLine(0, labelSpacing);
 
 		if (drawLabel(context))
 			ImGui::SameLine(0, pinSpacing.x);
 
 		dragRect = DGui::EndRect(rectData);
-
 		drawDataEx(context);
 	}
 	else
@@ -109,18 +106,28 @@ void CorePin::content(DIWNE::DrawInfo& context)
 		if (drawLabel(context))
 			ImGui::SameLine(0, labelSpacing);
 
-		drawPin(false, pinAlpha);
+		m_pinIconData = drawPin(false, pinAlpha);
 		dragRect = DGui::EndRect(rectData);
 	}
+	if (ImGui::IsKeyDown(ImGuiKey_E))
+		int x = 5;
 	if (style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
+	{
+		if (m_pinIconData.protrusion > 0) // Adjust drag rect if the pin is stickin out of the node
+			dragRect.Max.x += m_pinIconData.protrusion;
+		else if (m_pinIconData.protrusion < 0)
+			dragRect.Min.x += m_pinIconData.protrusion;
 		m_dragRect = diwne.canvas().screen2diwne(dragRect);
+	}
+	LOG_INFO("{}: drect: {}, {} ({}, {})", m_labelDiwne, m_dragRect.Min.x, m_dragRect.Min.y, m_dragRect.GetSize().x,
+	         m_dragRect.GetSize().y);
 
 	// End dimming
 	if (dimmingEnabled)
 		imStyle.Alpha = alphaBackup;
 
 	DIWNE_DEBUG_LAYOUT(diwne, {
-		diwne.canvas().AddRectDiwne(m_dragRect.Min, m_dragRect.Max, ImColor(204, 255, 0, 255), 0.0f, 0, 1.0f, true);
+		diwne.canvas().AddRectDiwne(m_dragRect.Min, m_dragRect.Max, ImColor(225, 255, 0, 150), 0.0f, 0, 3.0f, true);
 	});
 }
 
@@ -129,10 +136,9 @@ bool CorePin::allowDrawing()
 	return Pin::allowDrawing() && getCorePin().isRendered();
 }
 
-void CorePin::drawPin(bool left, float alpha)
+DIWNE::PinIconDrawData CorePin::drawPin(bool left, float alpha)
 {
 	// Pin shall be at least ImGui::GetFrameHeight() high, see drawLabel()
-
 	ImVec2 iconSize = getPinSize();
 
 	ImVec2 nodeFramePadding = I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.canvas().getZoom();
@@ -146,18 +152,21 @@ void CorePin::drawPin(bool left, float alpha)
 		DIWNE::DGui::BeginVerticalAlign(verticalMargin);
 	}
 
+	float pinOffset = 0.f;
 	if (m_pinStyle == PinStyle::Socket || m_pinStyle == PinStyle::SocketSquare)
-	{
-		drawSocketPin(iconSize, left, alpha,
-		              m_pinStyle == PinStyle::SocketSquare
-		                  ? style().decimal(Style::PIN_SOCKET_ROUNDING) * diwne.getZoom()
-		                  : -1.0f);
-	}
+		pinOffset = style().decimal(Style::PIN_SOCKET_OFFSET) * diwne.getZoom();
+	else if (m_pinStyle == PinStyle::Square)
+		pinOffset = style().decimal(Style::PIN_SQUARE_OFFSET) * diwne.getZoom();
 	else
-	{
-		drawSquarePin(iconSize, left, alpha);
-	}
+		pinOffset = style().decimal(Style::PIN_CIRCLE_OFFSET) * diwne.getZoom();
 
+	// Add the pin item
+	DIWNE::PinIconDrawData data = addPinItem(iconSize, left, pinOffset);
+	data.alpha = alpha;
+
+	// Render the pin icon if it doesn't stick out of the node
+	if (pinOffset >= 0.f)
+		renderPinDiwne(data);
 
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);
@@ -169,9 +178,72 @@ void CorePin::drawPin(bool left, float alpha)
 		ImGui::GetForegroundDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
 		                                        IM_COL32(0, 255, 0, 255));
 	});
+	return data;
 }
 
-void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
+DIWNE::PinIconDrawData CorePin::addPinItem(const ImVec2& size, bool left, float offset)
+{
+	DIWNE::PinIconDrawData data;
+	if (left)
+	{
+		if (offset > 0)
+		{
+			ImGui::Dummy(ImVec2(offset, 0.f));
+			ImGui::SameLine(0, 0);
+		}
+		else if (offset < 0)
+		{
+			ImVec2 cp = ImGui::GetCursorScreenPos();
+			ImGui::SetCursorScreenPos(ImVec2(cp.x + offset, cp.y));
+		}
+	}
+	// We're using a disabled invisible, so that when its pressed / dragged it does not set an ActiveID in ImGui.
+	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
+	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
+	bool hovered, active;
+	DIWNE::DGui::InvisibleButton("PinSocket", size, true, data.hovered, data.active);
+	data.rect = ImGui::GetCurrentContext()->LastItemData.Rect;
+	m_pinRect = diwne.canvas().screen2diwne(data.rect);
+
+	if (!left)
+	{
+		if (offset > 0)
+		{
+			ImGui::SameLine(0, 0);
+			ImGui::Dummy(ImVec2(offset, 0.f));
+		}
+		else if (offset < 0)
+		{
+			DIWNE::DGui::LimitLine(ImGui::GetItemRectMax().x + offset);
+		}
+	}
+	data.protrusion = offset >= 0.f ? 0.f : left ? offset : -offset;
+	return data;
+}
+
+void CorePin::renderPinDiwne(DIWNE::PinIconDrawData& data) const
+{
+	if (m_pinStyle == PinStyle::Socket || m_pinStyle == PinStyle::SocketSquare)
+	{
+		renderSocketPin(data.rect.Min, data.rect.GetSize(), data.alpha,
+		                m_pinStyle == PinStyle::SocketSquare
+		                    ? style().decimal(Style::PIN_SOCKET_ROUNDING) * diwne.getZoom()
+		                    : -1.0f);
+		data.rendered = true;
+	}
+	else if (m_pinStyle == PinStyle::Square)
+	{
+		renderSquarePin(data.rect.Min, data.rect.GetSize(), data.alpha);
+		data.rendered = true;
+	}
+	else
+	{
+		renderCirclePin(data.rect.Min, data.rect.GetSize(), data.alpha);
+		data.rendered = true;
+	}
+}
+
+void CorePin::renderSquarePin(const ImVec2& pos, const ImVec2& size, float alpha) const
 {
 	// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
 	//   not visible anyway so we're just drawing stuff twice for no reason
@@ -179,8 +251,6 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 	// connected pins have no border now
 	bool filled = isConnected();
 	filled = true;
-
-	float offset = style().decimal(Style::PIN_SQUARE_OFFSET) * diwne.getZoom();
 
 	Core::EValueType pinType = getType();
 	const DIWNE::IconType iconTypeBg = PinShapeBackground[pinType];
@@ -198,19 +268,10 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
 	const float rounding = style().decimal(Style::PIN_SQUARE_ROUNDING) * diwne.getZoom();
 
-	if (left)
-	{
-		ImGui::Dummy(ImVec2(offset, 0.f));
-		ImGui::SameLine(0, 0);
-	}
-	ImVec2 pos = ImGui::GetCursorScreenPos();
-	// We're using a disabled IconButton, so that when its pressed / dragged it does not set an ActiveID in ImGui.
-	// Setting ActiveID is the same thing what a DragFloat does when it drags, it disables interaction with other items
-	// until the drag/press operation stops. This is not desirable for a pin as we want other things to hover still.
-	diwne.canvas().IconButton("PinIcon", true, iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
-	                          iconColorFg, size, ImVec4(padding, padding, padding, padding), filled, {1, 1}, rounding);
-	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
-	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
+	ImVec2 origPos = ImGui::GetCursorScreenPos();
+	ImGui::SetCursorScreenPos(pos);
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, size,
+	                        ImVec4(padding, padding, padding, padding), filled, {1, 1}, rounding);
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	// Optionally draw pin icon border
@@ -226,36 +287,12 @@ void CorePin::drawSquarePin(const ImVec2& size, bool left, float alpha)
 		idl->AddRectFilled(pos, pos + size,
 		                   ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)), rounding);
 	}
-
-	if (!left)
-	{
-		ImGui::SameLine(0, 0);
-		ImGui::Dummy(ImVec2(offset, 0.f));
-	}
+	ImGui::SetCursorScreenPos(origPos); // Restore cursor
 }
-
-void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha, float rounding)
+void CorePin::renderSocketPin(const ImVec2& pos, const ImVec2& size, float alpha, float rounding) const
 {
-	float offset = style().decimal(Style::PIN_SOCKET_OFFSET) * diwne.getZoom();
-
 	Core::EValueType pinType = getType();
 	const ImColor baseColor = I3T::getColor(PinColorBackground[pinType]);
-
-	if (left)
-	{
-		ImGui::Dummy(ImVec2(offset, 0.f));
-		ImGui::SameLine(0, 0);
-	}
-	ImVec2 pos = ImGui::GetCursorScreenPos();
-	bool hovered, active;
-	bool result = DIWNE::DGui::ButtonDummy("PinSocket", size, true, hovered, active);
-	m_pinRect = ImRect(diwne.canvas().screen2diwne(ImGui::GetItemRectMin()),
-	                   diwne.canvas().screen2diwne(ImGui::GetItemRectMax()));
-	if (!left)
-	{
-		ImGui::SameLine(0, 0);
-		ImGui::Dummy(ImVec2(offset, 0.f));
-	}
 
 	ImVec4 color = baseColor;
 	ImVec4 hoverColor = baseColor;
@@ -329,6 +366,38 @@ void CorePin::drawSocketPin(const ImVec2& size, bool left, float alpha, float ro
 			idl->AddRectFilled(min, max, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)),
 			                   rounding, ImDrawFlags_RoundCornersAll);
 		}
+	}
+}
+void CorePin::renderCirclePin(const ImVec2& pos, const ImVec2& size, float alpha) const
+{
+	Core::EValueType pinType = getType();
+	const ImColor baseColor = I3T::getColor(PinColorBackground[pinType]);
+
+	ImVec4 color = baseColor;
+	ImVec4 hoverColor = baseColor;
+	ImVec4 borderColor = style().color(Style::PIN_CIRCLE_BORDER_COLOR);
+	if (m_previewPlugged)
+		hoverColor = hoverColor + style().color(Style::PIN_HOVER_COLOR_SHIFT);
+
+	color.w *= alpha;
+	hoverColor.w *= alpha;
+	borderColor.w *= alpha;
+
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+
+	float borderWidth = style().decimal(Style::PIN_CIRCLE_BORDER_WIDTH) * diwne.getZoom();
+
+	ImVec2 center = pos + size / 2.f;
+	float outerRadius = size.x / 2.f;
+	float innerRadius = outerRadius - borderWidth;
+
+	idl->AddCircleFilled(center, outerRadius, ImGui::ColorConvertFloat4ToU32(borderColor), 0);
+	idl->AddCircleFilled(center, innerRadius, ImGui::ColorConvertFloat4ToU32(hoverColor), 0);
+
+	if (isDisabled()) // Disabled overlay
+	{
+		idl->AddCircleFilled(center, outerRadius,
+		                     ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::DisabledPinColor)), 0);
 	}
 }
 
@@ -730,7 +799,7 @@ void CorePin::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 			context.consumeInput();
 		}
 	}
-	DiwneObject::onReleased(justReleased, context);
+	Super::onReleased(justReleased, context);
 }
 
 ImVec2 CorePin::getPinSize() const

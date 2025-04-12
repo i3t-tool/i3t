@@ -25,9 +25,14 @@ namespace Workspace
 // TODO: Move to some DIWNE::BasicPin impl
 enum class PinStyle
 {
-	Square,
-	Socket,
-	SocketSquare,
+	Square, // Colored square style, useful for displaying icons inside it, can be used inside, flush with the edge or
+	        // halfway outside the node. Can be rounded.
+	Socket, // Socket style, circle ring with a transparent middle which gets filled by a dot. Meant to be placed inside
+	        // a node. Recommended to be used with semi-transparent node backgrounds.
+	SocketSquare, // Like Socket style but with a square that can have rounded corners. High rounding will look like
+	              // the circular Socket style, but prefer to use that for full circles. Mean
+	Circle, // Simple style of a filled circle with a border. Very similar to Blender, meant to be used on node edges
+	        // sticking outside.
 };
 
 extern std::map<Core::EValueType, EColor> PinColorBackground;
@@ -37,6 +42,8 @@ extern std::map<Core::EValueType, EColor> PinColorForeground;
 
 class CorePin : public DIWNE::Pin
 {
+	using Super = DIWNE::Pin;
+
 protected:
 	Core::Pin const& m_pin;
 
@@ -53,10 +60,12 @@ public:
 
 	bool allowDrawing() override;
 
-	void drawPin(bool left, float alpha);
-	bool drawLabel(DIWNE::DrawInfo& context);  ///< @return Whether a new item was created
-	bool drawDataEx(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
-	bool drawData(DIWNE::DrawInfo& context);   ///< @return Whether a new item was created
+
+	DIWNE::PinIconDrawData drawPin(bool left,
+	                               float alpha); ///< @return Offset by which the pin is sticking out of the node.
+	bool drawLabel(DIWNE::DrawInfo& context);    ///< @return Whether a new item was created
+	bool drawDataEx(DIWNE::DrawInfo& context);   ///< @return Whether a new item was created
+	bool drawData(DIWNE::DrawInfo& context);     ///< @return Whether a new item was created
 	int maxLengthOfData();
 
 	void popupContent(DIWNE::DrawInfo& context) override;
@@ -97,16 +106,42 @@ private:
 	bool drawBasicPinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 
-	void drawSquarePin(const ImVec2& size, bool left, float alpha); ///< Responsible for setting the m_pinRect!
-
 	/**
-	 * Draw pin in the socket style.
+	 * Add an invisible ImGui item representing the pin. Perform pin rendering later with one of renderXXXPin() methods.
 	 * Responsible for setting the m_pinRect!
 	 * @param size Size of the pin
 	 * @param left Whether the pin is on the left or right side of a node.
-	 * @param rounding How round should the socket be, -1 for circle.
+	 * @param offset Position offset of the pin (-left/+right)
+	 */
+	DIWNE::PinIconDrawData addPinItem(const ImVec2& size, bool left, float offset);
+
+public:
+	void renderPinDiwne(DIWNE::PinIconDrawData& data) const;
+
+private:
+	/**
+	 * Draw a square style pin icon.
+	 * @param size Size of the pin
+	 * @param left Whether the pin is on the left or right side of a node.
 	 * @param alpha Transparency multiplier of the pin colors.
 	 */
-	void drawSocketPin(const ImVec2& size, bool left, float alpha, float rounding = -1.0f);
+	void renderSquarePin(const ImVec2& pos, const ImVec2& size, float alpha) const;
+
+	/**
+	 * Draw a socket style pin icon.
+	 * @param size Size of the pin
+	 * @param left Whether the pin is on the left or right side of a node.
+	 * @param alpha Transparency multiplier of the pin colors.
+	 * @param rounding How round should the socket be, -1 for circle.
+	 */
+	void renderSocketPin(const ImVec2& pos, const ImVec2& size, float alpha, float rounding = -1.0f) const;
+
+	/**
+	 * Draw a circle style pin icon.
+	 * @param size Size of the pin
+	 * @param left Whether the pin is on the left or right side of a node.
+	 * @param alpha Transparency multiplier of the pin colors.
+	 */
+	void renderCirclePin(const ImVec2& pos, const ImVec2& size, float alpha) const;
 };
 } // namespace Workspace

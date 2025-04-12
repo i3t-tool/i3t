@@ -20,7 +20,7 @@
 #include "GUI/Fonts/Icons.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Theme/ThemeLoader.h"
-#include "GUI/ThemeVariable.h"
+#include "GUI/Theme/ThemeVariable.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Localization/Localization.h"
@@ -38,8 +38,9 @@ StyleEditor::StyleEditor() : IWindow(ICON_T(ICON_I3T_STYLE " ", "Style Editor"))
 
 void StyleEditor::render()
 {
+	GUI::dockTabStylePush();
 	ImGui::Begin(getName(), getShowPtr(), g_WindowFlags);
-
+	GUI::dockTabStylePop();
 	this->updateWindowInfo();
 
 	auto& currThemeName = getUserData().customThemeName.empty() ? "default" : I3T::getTheme().getName();
@@ -88,6 +89,52 @@ void StyleEditor::render()
 	ImGui::End();
 }
 
+void StyleEditor::saveCurrentTheme(const std::string& name)
+{
+	auto& curr = I3T::getTheme();
+	auto themeName = name;
+	if (themeName.empty())
+	{
+		themeName = m_newThemeName;
+	}
+	auto path = std::string("Data/Themes/") + themeName + ".yml";
+
+	saveTheme(path, curr);
+	I3T::getUI()->reloadThemes();
+
+	auto& themes = I3T::getThemes();
+
+	// newly saved theme is now the current theme
+	m_currentThemeIdx = Utils::indexOf(themes, [&curr, &themeName](Theme& t) {
+		return t.getName() == themeName;
+	});
+	if (m_currentThemeIdx != -1)
+	{
+		I3T::getUI()->setTheme(themes[m_currentThemeIdx]);
+	}
+
+	m_infoMessage = "";
+	m_newThemeName = "";
+}
+
+void StyleEditor::revertChangesOnCurrentTheme()
+{
+	auto& curr = I3T::getTheme();
+
+	if (curr.getName() == I3T_CLASSIC_THEME_NAME)
+	{
+		I3T::emplaceTheme(Theme::createDefaultClassic());
+	}
+	else
+	{
+		auto path = std::string("Data/Themes/") + curr.getName() + ".yml";
+		if (auto theme = loadTheme(path))
+		{
+			I3T::emplaceTheme(*theme);
+		}
+	}
+}
+
 void renderVariables()
 {
 	auto& curr = I3T::getTheme();
@@ -123,6 +170,7 @@ void renderVariables()
 				        {
 					        curr.apply();
 				        }
+				        StyleEditor::showDescription(var, false);
 			        },
 			        [&](const ESize& size) {
 				        auto& entry = curr.getSizesRef()[size];
@@ -130,72 +178,22 @@ void renderVariables()
 				        bool dpiScaled = entry.second;
 
 				        ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
-
-				        if (var.forceInt)
+				        if (ImGui::DragFloat(var.name, &val, var.speed, valueMin, valueMax, var.format))
 				        {
-					        int intVal = (int) val;
-					        if (ImGui::DragInt(var.name, &intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
-					        {
-						        val = (float) intVal;
-						        curr.apply();
-					        }
+					        curr.apply();
 				        }
-				        else
-				        {
-					        if (ImGui::DragFloat(var.name, &val, 1.0f, valueMin, valueMax, "%.0f"))
-					        {
-						        curr.apply();
-					        }
-				        }
-				        if (dpiScaled)
-				        {
-					        ImGui::SameLine();
-					        ImGui::TextDisabled("(?)");
-					        if (ImGui::BeginItemTooltip())
-					        {
-						        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						        ImGui::TextUnformatted("This variable is DPI scaled");
-						        ImGui::PopTextWrapPos();
-						        ImGui::EndTooltip();
-					        }
-				        }
+				        StyleEditor::showDescription(var, dpiScaled);
 			        },
 			        [&](const ESizeVec2& sizeVec) {
 				        auto& entry = curr.getSizesVecRef()[sizeVec];
 				        auto& val = entry.first;
 				        bool dpiScaled = entry.second;
-
 				        ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-
-				        if (var.forceInt)
+				        if (ImGui::DragFloat2(var.name, &val[0], var.speed, valueMin, valueMax, var.format))
 				        {
-					        int intVal[2] = {(int) val[0], (int) val[1]};
-					        if (ImGui::DragInt2(var.name, intVal, 1.0f, (int) valueMin, (int) valueMax, "%.0f"))
-					        {
-						        val[0] = (float) intVal[0];
-						        val[1] = (float) intVal[1];
-						        curr.apply();
-					        }
+					        curr.apply();
 				        }
-				        else
-				        {
-					        if (ImGui::DragFloat2(var.name, &val[0], 1.0f, valueMin, valueMax, "%.0f"))
-					        {
-						        curr.apply();
-					        }
-				        }
-				        if (dpiScaled)
-				        {
-					        ImGui::SameLine();
-					        ImGui::TextDisabled("(?)");
-					        if (ImGui::BeginItemTooltip())
-					        {
-						        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						        ImGui::TextUnformatted("This variable is DPI scaled");
-						        ImGui::PopTextWrapPos();
-						        ImGui::EndTooltip();
-					        }
-				        }
+				        StyleEditor::showDescription(var, dpiScaled);
 			        },
 			    },
 			    var.key);
@@ -278,48 +276,22 @@ void StyleEditor::renderSaveRevertField()
 	ImGui::TextUnformatted(m_infoMessage.c_str());
 }
 
-void StyleEditor::saveCurrentTheme(const std::string& name)
+
+void StyleEditor::showDescription(const ThemeVariable& var, bool dpiScaled)
 {
-	auto& curr = I3T::getTheme();
-	auto themeName = name;
-	if (themeName.empty())
+	if (var.description != nullptr || dpiScaled)
 	{
-		themeName = m_newThemeName;
-	}
-	auto path = std::string("Data/Themes/") + themeName + ".yml";
-
-	saveTheme(path, curr);
-	I3T::getUI()->reloadThemes();
-
-	auto& themes = I3T::getThemes();
-
-	// newly saved theme is now the current theme
-	m_currentThemeIdx = Utils::indexOf(themes, [&curr, &themeName](Theme& t) {
-		return t.getName() == themeName;
-	});
-	if (m_currentThemeIdx != -1)
-	{
-		I3T::getUI()->setTheme(themes[m_currentThemeIdx]);
-	}
-
-	m_infoMessage = "";
-	m_newThemeName = "";
-}
-
-void StyleEditor::revertChangesOnCurrentTheme()
-{
-	auto& curr = I3T::getTheme();
-
-	if (curr.getName() == I3T_CLASSIC_THEME_NAME)
-	{
-		I3T::emplaceTheme(Theme::createDefaultClassic());
-	}
-	else
-	{
-		auto path = std::string("Data/Themes/") + curr.getName() + ".yml";
-		if (auto theme = loadTheme(path))
+		ImGui::SameLine();
+		ImGui::TextDisabled("(?)");
+		if (ImGui::BeginItemTooltip())
 		{
-			I3T::emplaceTheme(*theme);
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			if (var.description)
+				ImGui::TextUnformatted(var.description);
+			if (dpiScaled)
+				ImGui::TextUnformatted("This variable is DPI scaled");
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
 		}
 	}
 }

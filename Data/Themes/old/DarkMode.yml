@@ -24,32 +24,17 @@ colors:
     y: 0.199101806
     z: 0.199101806
     w: 1
-  glob_Primary Color (tabs, tiles, ...):
-    x: 0.268000007
-    y: 0.268000007
-    z: 0.276000023
-    w: 1
-  glob_Active Color:
-    x: 0.298000008
-    y: 0.298000008
-    z: 0.306000024
-    w: 1
-  glob_Selection Color:
-    x: 0.201919198
-    y: 0.395685673
-    z: 0.626556039
-    w: 1
-  glob_Tab SceneView Background:
+  sgen_Scene View Background:
     x: 0.137254909
     y: 0.137254909
     z: 0.137254909
     w: 1
-  glob_Dock Tab Color:
+  glob_Dock Tab:
     x: 0.252669036
     y: 0.252669036
     z: 0.252669036
     w: 1
-  glob_Dock Selected Tab Color:
+  glob_Dock Tab Active:
     x: 0.0996441245
     y: 0.0996441245
     z: 0.0996441245
@@ -59,7 +44,7 @@ colors:
     y: 0.786676645
     z: 0.118354835
     w: 1
-  glob_Dock Unfocused Tab Color:
+  glob_Dock Tab Unfocused:
     x: 0.250980407
     y: 0.250980407
     z: 0.250980407
@@ -69,7 +54,7 @@ colors:
     y: 0.214789003
     z: 0.214789003
     w: 1
-  glob_Dock Unfocused Selected Tab Color:
+  glob_Dock Tab Unfocused Active:
     x: 0.196078435
     y: 0.196078435
     z: 0.196078435
@@ -79,12 +64,12 @@ colors:
     y: 0.176470593
     z: 0.125490203
     w: 0.70588237
-  glob_Dock Hovered Tab Color:
+  glob_Dock Tab Hovered:
     x: 0.234999999
     y: 0.497999996
     z: 0.811999977
     w: 1
-  glob_Selected node border:
+  ngen_Selected Node Border:
     x: 1
     y: 0.913725495
     z: 0
@@ -159,12 +144,12 @@ colors:
     y: 0.392156869
     z: 0.392156869
     w: 0.196078435
-  glob_Selection rectangle full:
+  ngen_Selection rectangle full:
     x: 0
     y: 0.419910192
     z: 0.150237262
     w: 0.392156869
-  glob_Selection rectangle touch:
+  ngen_Selection rectangle touch:
     x: 0.0124690849
     y: 0.640718579
     z: 0.378320754
@@ -565,17 +550,17 @@ colors:
     z: 0.129411772
     w: 1
 sizes:
-  ngen_Nodes Float Margin: 5
+  nflo_Nodes Float Margin: 5
   star_Dot Spacing: 7
-  ngen_Nodes Float Width: 45
+  nflo_Nodes Float Width: 45
   star_Dot Size: 10
   ngen_Nodes Rounding: 7
   ngen_Nodes BorderWidth: 0
-  ngen_Pin labels Indent: 12
+  ngen_Pin Label Indent: 12
   ngen_Header Label Indent: 2
   ngen_Trackball Button Height: 20
-  ngen_Trackball Sensitivity: 5
-  ngen_Float Inner Padding: 1
+  ngen_TrackBall Sensitivity: 5
+  nflo_Float Inner Padding: 1
   ngen_Drag Speed fo Float: 0.0149999997
   ngen_CTRL Multiplicator: 0.100000001
   ngen_SHIFT Multiplicator: 10
@@ -585,18 +570,18 @@ sizes:
   ngen_Nodes Outputs Alignment: 0
   ngen_Nodes Left Side spacing: 3
   ngen_Nodes Right Side spacing: 3
-  glob_Selected node border thickness: 2.5
+  ngen_Selected Node Border Thickness: 2.5
   ngen_Nodes Default Visible Precision: 1
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0
-  ngen_Link Control Point Distance Scaling Factor: 0.200000003
-  ngen_Link Min Control Point X Distance: 65
-  ngen_Link Max Control Point X Distance: 350
-  ngen_Link Thickness: 5
-  ngen_Link thickness when selected: 7
-  ngen_Pins IconPadding: 2
-  ngen_Links Selected Alpha: 0.800000012
-  ngen_Float_inactive_alphaMultiplicator: 0.5
+  nlnk_Link Control Point Distance Scaling Factor: 0.200000003
+  nlnk_Link Min Control Point X Distance: 65
+  nlnk_Link Max Control Point X Distance: 350
+  nlnk_Link Thickness: 5
+  nlnk_Link Thickness when selected: 7
+  npin_Pin Icon Padding: 2
+  nlnk_Link Selected Alpha: 0.800000012
+  nflo_Float Inactive Alpha Factor: 0.5
   ngen_Nodes Operators Rounding: 7
   ngen_Nodes Sequence Rounding: 7
   ngen_Nodes LOD Button Rounding: 7
@@ -622,13 +607,13 @@ size vectors:
   ngen_Nodes Pivot Size:
     x: 0
     y: 0
-  glob_Windows Frame Padding:
+  glob_Window Frame Padding:
     x: 5
     y: 5
   ngen_Nodes Items Spacing:
     x: 4
     y: 4
-  ngen_Nodes Float Padding:
+  nflo_Nodes Float Padding:
     x: 0
     y: 1
   ngen_Nodes Pin Spacing:
@@ -652,22 +637,22 @@ size vectors:
   ngen_Nodes Pin Size:
     x: 12
     y: 12
-  ngen_Nodes Float Cycle Button Size:
+  nflo_Nodes Float Cycle Button Size:
     x: 32
     y: 32
-  ngen_Nodes Screen Texture Size:
+  nscr_Nodes Screen Texture Size:
     x: 130
     y: 130
   ngen_Builder Item Spacing:
     x: 0
     y: 0
-  ngen_Nodes Screen ResizeButtonSize:
+  nscr_Screen Resize Button Size:
     x: 20
     y: 20
-  ngen_Nodes Sequence DummySpaceSize:
+  ntrs_Sequence Dummy Space Size:
     x: 100
     y: 1
-  ngen_NewNode PositionShift:
+  ngen_New Node Position Shift:
     x: 10
     y: 0
   star_Window Size:

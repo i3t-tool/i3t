@@ -10,14 +10,18 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-
 #include "StatisticsWindow.h"
+
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Fonts/Icons.h"
 #include "GUI/WindowManager.h"
 #include "Localization/Localization.h"
 #include "Utils/Statistics.h"
+
+#include "GUI/Toolkit.h"
 #include "imgui.h"
+
+#include <imgui_internal.h>
 
 /**
  * \brief Constructs a StatisticsWindow and initializes its title.
@@ -36,10 +40,16 @@ void StatisticsWindow::render()
 	// Set the window size and create the GUI window
 	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 25, ImGui::GetFontSize() * 30);
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-	ImGui::Begin(getName(), getShowPtr());
+	GUI::dockTabStylePush();
+	if (ImGui::Begin(getName(), getShowPtr()))
 	{
 		this->updateWindowInfo();
+		GUI::dockTabStylePop();
 		drawContent();
+	}
+	else
+	{
+		GUI::dockTabStylePop();
 	}
 	ImGui::End();
 
@@ -79,7 +89,7 @@ void StatisticsWindow::drawContent()
 	frameratesOffset = (frameratesOffset + 1) % IM_ARRAYSIZE(framerates);
 	sprintf(overlay, _t("Framerate: %.3f"), Statistics::FPS);
 	ImGui::PlotLines("", framerates, IM_ARRAYSIZE(framerates), frameratesOffset, overlay, 0.0f, maxFramerate * 2,
-	                 ImVec2(-1.0f, 80.0f));
+	                 ImVec2(-1.0f, IM_TRUNC(ImGui::GetFontSize() * 5.0f)));
 
 	// Display and update the frametime plot
 	static float deltaTimes[500] = {};
@@ -97,7 +107,7 @@ void StatisticsWindow::drawContent()
 	deltaTimesOffset = (deltaTimesOffset + 1) % IM_ARRAYSIZE(deltaTimes);
 	sprintf(overlay, _t("Frametime: %.3f"), Statistics::DeltaTime);
 	ImGui::PlotLines("", deltaTimes, IM_ARRAYSIZE(deltaTimes), deltaTimesOffset, overlay, 0.0f, deltaMaxTime * 2,
-	                 ImVec2(-1.0f, 80.0f));
+	                 ImVec2(-1.0f, IM_TRUNC(ImGui::GetFontSize() * 5.0f)));
 
 	// Display and update custom timers
 	if (!Statistics::CPUTimers.empty())
@@ -105,8 +115,10 @@ void StatisticsWindow::drawContent()
 		ImGui::Text(_t("CPU Timers:"));
 		for (auto& [name, timer] : Statistics::CPUTimers)
 		{
-			ImGui::Text("%f %s", timer->get(), name.c_str());
-			ImGui::ProgressBar(timer->get() / Statistics::DeltaTime, ImVec2(-1.0f, 40.0f));
+			ImGui::Text("%f (avg. %f) %s", timer->get(), timer->getAverage(), name.c_str());
+
+			ImGui::ProgressBar(timer->get() / Statistics::DeltaTime,
+			                   ImVec2(-1.0f, IM_TRUNC(ImGui::GetFontSize() * 1.5f)));
 		}
 	}
 
@@ -115,19 +127,20 @@ void StatisticsWindow::drawContent()
 		ImGui::Text(_t("GPU Timers:"));
 		for (auto& [name, timer] : Statistics::GPUTimers)
 		{
-			ImGui::Text("%f %s", timer->get(), name.c_str());
-			ImGui::ProgressBar(timer->get() / Statistics::DeltaTime, ImVec2(-1.0f, 40.0f));
+			ImGui::Text("%f (avg. %f) %s", timer->get(), timer->getAverage(), name.c_str());
+			ImGui::ProgressBar(timer->get() / Statistics::DeltaTime,
+			                   ImVec2(-1.0f, IM_TRUNC(ImGui::GetFontSize() * 1.5f)));
 		}
 	}
 
 	// Display GPU memory statistics
 	ImGui::Text(_t("Total GPU memory %d MB"), Statistics::GPU::TotalMemory / 1024);
 	ImGui::ProgressBar(Statistics::GPU::AllocatedMemory / static_cast<float>(Statistics::GPU::TotalMemory),
-	                   ImVec2(80.0f, 0.0f));
+	                   ImVec2(IM_TRUNC(ImGui::GetFontSize() * 5.0f), 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 	ImGui::Text(_t("%u MB alloc."), static_cast<unsigned int>(Statistics::GPU::AllocatedMemory / 1024));
 	ImGui::ProgressBar(Statistics::GPU::FreeMemory / static_cast<float>(Statistics::GPU::TotalMemory),
-	                   ImVec2(80.0f, 0.0f));
+	                   ImVec2(IM_TRUNC(ImGui::GetFontSize() * 5.0f), 0.0f));
 	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 	ImGui::Text(_t("%u MB free."), static_cast<unsigned int>(Statistics::GPU::FreeMemory / 1024));
 }

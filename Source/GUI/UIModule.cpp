@@ -201,11 +201,11 @@ void UIModule::applyUIScaling(float scale)
 
 	// Regenerate ImGuiStyle
 	Theme::initImGuiStyle();
-	// Reapply current theme
-	m_currentTheme->setDpiScale(scale);
-	m_currentTheme->apply();
 	// Scale ImGuiStyle
 	ImGui::GetStyle().ScaleAllSizes(scale);
+	// Reapply current theme (will override ImGuiStyle with already scaled values)
+	m_currentTheme->setDpiScale(scale);
+	m_currentTheme->apply();
 	// Regenerate fonts
 	m_fontManager.generateFonts(scale);
 

@@ -20,6 +20,14 @@ struct SettingsDiwne
 	bool showGrid = true;
 	bool useDotGrid = true;
 
+	/**
+	 * Whether to wrap NodeEditor components in an ImGui child window.
+	 * This is preferable when the node editor does not span the whole area of a parent window.
+	 * But it prevents other ImGui components being overlaid on top of it, in such cases this can be disabled and
+	 * the node editor can be wrapped in a child window manually.
+	 */
+	bool useChildWindow = true;
+
 	float linkInteractionWidthDiwne = 7;
 	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0); // TODO: Turn into style variable, move calc from Worksp
 	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);  // TODO: Turn into style variable

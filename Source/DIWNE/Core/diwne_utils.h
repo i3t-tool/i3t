@@ -6,6 +6,8 @@
 #include <cmath>
 #include <string>
 
+// This util header should NOT include DIWNE specific classes as it should be easily usable outside of DIWNE.
+
 #define DIWNE_PIXEL_EPSILON 0.001f
 
 #define DIWNE_TRUNC(val) IM_TRUNC(val)
@@ -39,9 +41,27 @@ inline void BeginGroup()
 /// Ensures a new ImGui line and moves the cursor so that no vertical item spacing is applied.
 inline void NewLine()
 {
-	if (ImGui::GetCurrentWindowRead()->DC.IsSameLine)
+	ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+	if (window->SkipItems)
+		return;
+	if (window->DC.IsSameLine)
 		ImGui::NewLine();
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetStyle().ItemSpacing.y);
+}
+/// Limits the width of an ImGui line to not exceed a particular X coordinate.
+inline void LimitLine(float newMaxX)
+{
+	ImGuiContext& g = *GImGui;
+	ImGuiWindow* window = g.CurrentWindow;
+	if (window->SkipItems)
+		return;
+
+	float diff = window->DC.CursorPosPrevLine.x - newMaxX;
+	if (diff > 0)
+	{
+		window->DC.CursorPosPrevLine.x = newMaxX;
+		window->DC.CursorMaxPos.x = newMaxX;
+	}
 }
 inline void SameLineDummy(const ImVec2& size)
 {
@@ -51,20 +71,26 @@ inline void SameLineDummy(const ImVec2& size)
 /// Dummy that effectively moves the cursor by exactly the passed size in the X and Y direction.
 inline void DummyXY(const ImVec2& size)
 {
+	ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+	if (window->SkipItems)
+		return;
 	ImGui::Dummy(size);
 	ImGui::SetCursorScreenPos(ImGui::GetItemRectMax());
 }
 /// Dummy that begins at the max cursor position. Expands current content by the size and starts a new line.
 inline void DummyMax(const ImVec2& size)
 {
-	ImGui::SetCursorScreenPos(ImGui::GetCurrentWindowRead()->DC.CursorMaxPos);
+	ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+	if (window->SkipItems)
+		return;
+	ImGui::SetCursorScreenPos(window->DC.CursorMaxPos);
 	ImGui::Dummy(size);
 }
 inline void BeginVerticalAlign(float yOffset)
 {
-	assert(yOffset > 0.0f);
 	ImGui::BeginGroup();
-	DummyXY(ImVec2(0.0f, yOffset));
+	if (yOffset > 0.0f)
+		DummyXY(ImVec2(0.0f, yOffset));
 }
 inline void EndVerticalAlign(float yOffset = 0.0f)
 {
@@ -91,7 +117,7 @@ inline float GetFrameHeight(ImVec2 padding)
 	return g.FontSize + padding.y * 2.0f;
 }
 /// Invisible button that can optionally be disabled to allow drag operations with no active id
-inline bool ButtonDummy(const std::string& id, const ImVec2& size, bool disabled, bool& hovered, bool& active)
+inline bool InvisibleButton(const std::string& id, const ImVec2& size, bool disabled, bool& hovered, bool& active)
 {
 	ImGuiContext& g = *ImGui::GetCurrentContext();
 	bool wasDisabled = (g.CurrentItemFlags & ImGuiItemFlags_Disabled) != 0;
@@ -103,6 +129,17 @@ inline bool ButtonDummy(const std::string& id, const ImVec2& size, bool disabled
 		ImGui::EndDisabled();
 	hovered = ImGui::IsItemHovered(startDisabled ? ImGuiHoveredFlags_AllowWhenDisabled : 0);
 	active = ImGui::IsItemActive();
+	return result;
+}
+
+/// Invisible button that can optionally be disabled to allow drag operations with no active id
+inline bool InvisibleButton(const std::string id, const ImVec2& size, bool disabled)
+{
+	if (disabled)
+		ImGui::BeginDisabled(true);
+	bool result = ImGui::InvisibleButton(id.c_str(), size);
+	if (disabled)
+		ImGui::EndDisabled();
 	return result;
 }
 

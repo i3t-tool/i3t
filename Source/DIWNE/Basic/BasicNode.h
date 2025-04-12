@@ -19,6 +19,8 @@ class StyleOverride;
  */
 class BasicNode : public Node
 {
+	using Super = Node;
+
 public:
 	DiwnePanel m_top, m_left, m_center, m_right;
 	DiwnePanel m_middle; // Parent panel of m_left, m_center and m_right.

@@ -53,6 +53,13 @@ public:
 	virtual void loadScene(const Memento& memento, State::Scene* scene) = 0;
 
 	/**
+	 * Called on scene append.
+	 * \param scene The current scene
+	 * @param memento Scene state to appended
+	 */
+	virtual void appendScene(const Memento& memento, State::Scene* scene) = 0;
+
+	/**
 	 * Set the scene state to some default empty state.
 	 */
 	virtual void clearScene() = 0;

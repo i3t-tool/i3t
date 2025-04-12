@@ -12,20 +12,13 @@
  */
 #pragma once
 
-#include "GUI/Elements/IWindow.h"
-
-class SetupDialog : public IWindow
+struct WorkspaceSettings
 {
-	float m_uiScaleTmp;
+	float tracking_timeBetweenTracks{0.0005f};
 
-public:
-	I3T_WINDOW(SetupDialog)
+	float tracking_smoothScrollSpeed{0.03f};
+	float tracking_jaggedScrollSpeed{0.2f};
 
-	SetupDialog();
-
-	virtual void render() override;
-
-	void showGeneralSettings();
-	void showViewportSettings();
-	void showWorkspaceSettings();
+	bool showQuickAddMenu{false};      // Option in preferences
+	bool quickAddMenuCollapsed{false}; // Persistant flag, no need for UI
 };

@@ -1,3 +1,15 @@
+/**
+ * \file
+ * \brief
+ * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
 #include "Core/Defs.h"
@@ -6,6 +18,7 @@
 #include "State/Stateful.h"
 
 #include "GUI/Workspace/WorkspaceDiwne.h"
+#include "WorkspaceSettings.h"
 
 namespace Workspace
 {
@@ -20,6 +33,7 @@ class WorkspaceModule : public Module, public IStateful
 {
 public:
 	static Ptr<Workspace::WorkspaceDiwne> g_editor;
+	static WorkspaceSettings g_settings;
 
 	static int g_pinStyle;
 	static int g_pinStyleMul;
@@ -59,6 +73,7 @@ public:
 private:
 	Memento saveScene(Scene* scene) override;
 	void loadScene(const Memento& memento, Scene* scene) override;
+	void appendScene(const Memento& memento, Scene* scene) override;
 	void clearScene() override;
 
 public:

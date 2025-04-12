@@ -149,6 +149,7 @@ void StateManager::tryTakeSnapshot()
 	takeSnap = false;
 	takeRewritableSnap = false;
 
+	// Necessary to ensure the snapshot is taken only in the next frame
 	if (m_snapshotRequested)
 	{
 		takeSnap = true;
@@ -460,6 +461,42 @@ bool StateManager::loadScene(const fs::path& path)
 
 	reset();
 
+	return true;
+}
+
+bool StateManager::appendScene(const fs::path& path)
+{
+	LOG_INFO("");
+	LOG_INFO("[SCENE LOAD] Loading scene from '{}'.", path.string());
+
+	if (!fs::exists(path))
+	{
+		LOG_ERROR("[SCENE LOAD] Scene file at '{}' does not exist!", path.string());
+		return false;
+	}
+
+	rapidjson::Document doc;
+	if (!JSON::parse(path, doc, I3T_SCENE_SCHEMA))
+	{
+		LOG_ERROR("[SCENE LOAD] Failed to parse the scene file!");
+		return false;
+	}
+	Ptr<Scene> newScene = std::make_shared<Scene>(this, false);
+	newScene->m_path = path;
+	newScene->m_dataPath = path.parent_path() / m_sceneDataFolderName;
+	createTmpDirectory();
+
+	for (auto* originator : m_originators)
+	{
+		originator->appendScene(doc, newScene.get());
+	}
+
+	pushRecentFile(path);
+
+	m_dirty = true;
+	setWindowTitle();
+
+	requestSnapshot();
 	return true;
 }
 

@@ -14,46 +14,85 @@
 
 #include "imgui.h"
 
-#include <array>
 #include <cstddef>
 #include <filesystem>
 #include <map>
 
-#include "Core/Defs.h"
-#include "Core/Nodes/NodeData.h"
-#include "Core/Result.h"
 #include "DIWNE/Core/Style/StyleOverride.h"
-#include "GUI/ThemeVariable.h"
-
-constexpr int I3T_PROPERTY_NAME_OFFSET = 5;
+#include "ThemeVariable.h"
 
 constexpr auto I3T_CLASSIC_THEME_NAME = "Classic";
 constexpr auto I3T_DEFAULT_THEME_LIGHT_NAME = "LightMode";
 constexpr auto I3T_DEFAULT_THEME_DARK_NAME = "DarkMode";
 
+//
+// To create a new theme style variable:
+// 1. Define an enum key in one of style enums EColor/ESize/ESizeVec2 ...
+// 2. Register the style variable name in Theme::initNames(), add it to one of the groups and define its name
+// 3. Set its default value in Theme::initDefaultClassic()
+//
+
 enum class EColor
 {
-	// Main I3T colors
-	PrimaryColor,   /// Color of tabs, separators, titles ...
-	ActiveColor,    /// Focused primary color
-	SelectionColor, /// Active selection color
-
-	// ImGui standard colors
+	// TODO: (DR) Many important ImGui style colors are not covered by the theme keys!
+	//  Hence it's impossible to change color of buttons, menu items, resize handles, checkboxes etc. etc!
+	// ImGui standard colors, in the order of definition of ImGuiCol_ in imgui.h
 	Text,
 	TextDisabled,
 	WindowBackground,
+	ChildBackground,
 	PopupBackground,
 	Border,
+	BorderShadow,
+	BorderDim,
 	FrameBg,
 	FrameBgHovered,
 	FrameBgActive,
+	WindowTitleBg,
+	WindowTitleBgActive,
+	WindowTitleBgCollapsed,
 	MenuBarBackground,
+	ScrollbarBg,
+	ScrollbarGrab,
+	ScrollbarGrabHovered,
+	ScrollbarGrabActive,
+	CheckMark,
+	SliderGrab,
+	SliderGrabActive,
 	Button,
 	ButtonHovered,
 	ButtonActive,
+	Header,
+	HeaderHovered,
+	HeaderActive,
+	Separator,
+	SeparatorHovered,
+	SeparatorActive,
+	ResizeGrip,
+	ResizeGripHovered,
+	ResizeGripActive,
 	Tab,
 	TabHovered,
 	TabActive,
+	TabUnfocused,
+	TabUnfocusedActive,
+	DockingPreview,
+	DockingEmptyBg,
+	PlotLines,
+	PlotLinesHovered,
+	PlotHistogram,
+	PlotHistogramHovered,
+	TableHeaderBg,
+	TableBorderStrong,
+	TableBorderLight,
+	TableRowBg,
+	TableRowBgAlt,
+	TextSelectedBg,
+	DragDropTarget,
+	NavHighlight,
+	NavWindowingHighlight,
+	NavWindowingDimBg,
+	ModalWindowDimBg,
 
 	// Extra dock tab options
 	DockTab,
@@ -62,10 +101,16 @@ enum class EColor
 	DockTabUnfocusedActive,
 	DockTabHovered,
 
+	// Custom general stuff
+	ButtonDim,
+	ButtonDimHovered,
+	ButtonDimActive,
+	ButtonDimToggled,
+	ButtonDimDark,
+
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
-	SceneViewBackground,
 
 	Synergies_FloatBg,
 	Synergies_FloatBgActive,
@@ -73,6 +118,12 @@ enum class EColor
 
 	Workspace_SelectedBorder,
 	Workspace_HoverBorder,
+
+	// TODO: (DR) Tutorials should try to reuse colors from the more general theme colors
+	//  its extra keys to maintain, they are hence harder to change and are inconsistent with the rest of the app
+	//	Point is they are separated for no good reason, because they were developed separately
+	//  Same goes for the Start Window and some of the extra node editor styling stuff (cycle)
+	//  We should strive to reduce the total amount of keys if possible
 
 	TutorialBgColor,
 	TutorialText,
@@ -92,9 +143,8 @@ enum class EColor
 	SelectionRectFull,
 	SelectionRectTouch,
 
-	TrackingSequenceTint,
-
-	AddMenuHeader,
+	// Scene View (3D Viewport)
+	SceneViewBackground,
 
 	// Node Editor
 	NodeEditorBackground,
@@ -130,9 +180,6 @@ enum class EColor
 	// 3. Operator
 	NodeBgOperator,
 	NodeHeaderOperator,
-	FloatBgOperator,
-	FloatBgOperatorActive,
-	FloatBgOperatorHovered,
 
 	// 4. Transform
 	NodeBgTransformation,
@@ -143,9 +190,6 @@ enum class EColor
 	NodeLODButtonColor,
 	NodeLODButtonColorActive,
 	NodeLODButtonColorHovered,
-	FloatBgTransformation,
-	FloatBgTransformationActive,
-	FloatBgTransformationHovered,
 
 	// 5. Popups
 	Nodes_ConnectionPossible,
@@ -172,8 +216,6 @@ enum class EColor
 
 	// 6. Links
 	Links_selected_colorShift, // Unused
-
-	Builder_NodePadding, // not a color but i need a vec4
 
 	StartWindow_DescriptionBackground,
 	StartWindow_WindowBackground,
@@ -223,48 +265,51 @@ enum class EFont
 
 enum class ESize
 {
+	Tooltip_Rounding,
+	Window_Rounding,
+	Frame_Rounding,
+
+	FloatingButtonRounding,
+
 	Nodes_Rounding,
-	Nodes_FloatWidth,
-	Nodes_FloatMargin,           // Unused
 	Nodes_BorderWidth,           // Unused // TODO: Impl
 	Nodes_LabelIndent,           // Unused // TODO: What does this mean?
 	Nodes_HeaderLabelIndent,     // Unused // TODO: Impl
 	Nodes_trackballButtonHeight, // TODO: [Trackball]
 	Nodes_TrackBallSensitivity,  // TODO: [Trackball]
 
+	Nodes_FloatWidth,  // Sort of unused?
+	Nodes_FloatMargin, // Unused
 	Nodes_FloatInnerPadding,
+	Float_inactive_alphaMultiplicator,
 
 	Nodes_dragSpeedDefaultRatio,
-	Nodes_CtrlMultiplicator,
-	Nodes_SHIFTMultiplicator,
-	Nodes_ALTMultiplicator,
+	Nodes_CtrlMultiplicator,  // Unused
+	Nodes_SHIFTMultiplicator, // Unused
+	Nodes_ALTMultiplicator,   // Unused
 
-	Nodes_InputsAlignment,
-	Nodes_MiddleAlignment,
-	Nodes_OutputsAlignment,
+	Nodes_InputsAlignment,  // Unused
+	Nodes_MiddleAlignment,  // Unused
+	Nodes_OutputsAlignment, // Unused
 
-	Nodes_leftSideSpacing,
-	Nodes_rightSideSpacing,
+	Nodes_leftSideSpacing,  // Unused
+	Nodes_rightSideSpacing, // Unused
 
 	Workspace_SelectedBorderThickness,
 	Workspace_HoverBorderThickness,
-	Workspace_CopyPasteOffset,
-	Workspace_TrackingTimeBetweenTracks,
 
-	TutorialTaskSquareXPadding,
-	TutorialWindow_FrameRounding,
-	TutorialWindow_ScrollbarSize,
-	TutorialWindow_ScrollbarRounding,
-	TutorialWindow_BackButtonWidth,
-	TutorialWindow_MainMenuButtonWidth,
+	Tutorial_TaskSquareXPadding,
+	Tutorial_FrameRounding,
+	Tutorial_ScrollbarSize,
+	Tutorial_ScrollbarRounding,
+	Tutorial_BackButtonWidth,
+	Tutorial_MainMenuButtonWidth,
 
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
 	Links_ControlpointsPositionMax,
 	Links_Thickness,
 	Links_ThicknessSelected,
-	Links_OffsetFraction,
-	Links_OffsetMin,
 
 	Links_selected_alpha,
 
@@ -278,18 +323,9 @@ enum class ESize
 
 	Nodes_Transformation_TrackingMarkSize,
 
-	Float_inactive_alphaMultiplicator,
-
 	Default_VisiblePrecision,
 	Default_VisibleQuaternionPrecision,
 	Default_InactiveMark, // Unused
-
-	Tracking_SmoothScrollSpeed,
-	Tracking_JaggedScrollSpeed,
-
-	Tooltip_Rounding,
-
-	Window_Rounding,
 
 	StartWindow_WinWidth,
 	StartWindow_WinHeight,
@@ -313,10 +349,10 @@ enum class ESize
 
 enum class ESizeVec2
 {
-	Window_FramePadding,
+	FramePadding,
 	Window_Padding,
 
-	TutorialWindow_Padding,
+	Tutorial_WindowPadding,
 
 	Tooltip_Padding,
 
@@ -341,9 +377,9 @@ enum class ESizeVec2
 
 	Nodes_Sequence_DummySpaceSize, // TODO: Hook up to drop indicator, create another for empty sequence dummy size
 
-	Nodes_noPinsSpacing,
+	// Nodes_noPinsSpacing,
 
-	NewNode_positionShift,
+	Nodes_NewPositionShift,
 
 	Builder_ItemSpacing,
 
@@ -369,13 +405,26 @@ inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 }
 
 template <typename T>
-const char* enumToStr(const std::map<T, const char*>& map, T en)
+const char* enumToStr(const std::map<T, std::string>& map, T en)
 {
 	if (!map.contains(en))
 	{
 		return nullptr;
 	}
-	return map.at(en);
+	return map.at(en).c_str();
+}
+
+template <typename T>
+std::optional<T> strToEnum(std::map<T, std::string>& map, std::string&& name)
+{
+	for (const auto& [key, val] : map)
+	{
+		if (val == name)
+		{
+			return key;
+		}
+	}
+	return std::nullopt;
 }
 
 /**
@@ -394,15 +443,12 @@ const char* enumToStr(const std::map<T, const char*>& map, T en)
 class Theme
 {
 public:
+	// TODO: (DR) Same like with g_names, why are these maps? Enums are unique int ids we can just use a vector.
 	using Colors = std::unordered_map<EColor, ImVec4>;
 	/// Map of ESizeVec2 and a pair of float and bool, bool specifies whether the float is dpi scaled.
 	using Sizes = std::unordered_map<ESize, std::pair<float, bool>>;
 	/// Map of ESizeVec2 and a pair of ImVec2 and bool, bool specifies whether the ImVec2 is dpi scaled.
 	using SizesVec = std::unordered_map<ESizeVec2, std::pair<ImVec2, bool>>;
-
-	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a
-	/// (std::unordered_map cannot be used).
-	using CategoryNames = std::map<std::string, const char*>;
 
 	// DIWNE node styles
 	static DIWNE::StyleOverride m_nodeStyle;
@@ -420,7 +466,7 @@ private:
 	/**
 	 * Style based on Folta/Zadina style.
 	 */
-	void initClassicProperties();
+	void initDefaultClassic();
 
 public:
 	/**
@@ -490,11 +536,9 @@ public:
 		return &entry.first;
 	}
 
-	static const char* getCategoryName(const std::string& key);
-	static CategoryNames& getCategoryNames();
-	static std::map<EColor, const char*>& getColorNames();
-	static std::map<ESize, const char*>& getSizeNames();
-	static std::map<ESizeVec2, const char*>& getSizeVecNames();
+	static std::map<EColor, std::string>& getColorNames();
+	static std::map<ESize, std::string>& getSizeNames();
+	static std::map<ESizeVec2, std::string>& getSizeVecNames();
 
 	const std::string& getName() const
 	{
@@ -508,6 +552,11 @@ public:
 	float getDpiScale() const
 	{
 		return m_dpiScale;
+	}
+
+	float getBorderSize() const
+	{
+		return std::max(1.0f, IM_TRUNC(m_dpiScale));
 	}
 
 	const bool isDark() const
@@ -565,7 +614,7 @@ private:
 		}
 	}
 
-	static ThemeGroup& group(const char* name, int indent = 0);
+	static ThemeGroup& group(const char* name, const char* id, int indent = 0);
 
 	std::string m_name = "default";
 

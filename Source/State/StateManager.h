@@ -97,6 +97,7 @@ public:
 	bool saveScene(const fs::path& scene);
 
 	bool loadScene(const fs::path& path);
+	bool appendScene(const fs::path& path);
 
 	void newScene(bool firstRun = false);
 

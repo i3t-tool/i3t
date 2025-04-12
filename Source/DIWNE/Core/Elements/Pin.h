@@ -22,11 +22,28 @@ namespace DIWNE
 class Link;
 class Node;
 
+/// Small utility struct for passing around info about pin draw status
+/// The actual drawing of pins can be deferred to be done later by a node if the pins stick out of it.
+struct PinIconDrawData
+{
+	ImRect rect;           ///< Rect of the pin icon, might stick outside a node / reported ImGui item
+	float protrusion{0.f}; ///< Width of the pin sticking outside a node (negative on the left, positive on the right)
+	bool hovered{false};   ///< Whether the pin icon is hovered
+	bool active{false};    ///< Whether the pin is active (being held down)
+	bool rendered{false};  ///< Whether the pin icon has been drawn or not
+	float alpha{1.f};      ///< Alpha of the pin
+};
+
 class Pin : public DiwneObject
 {
+	using Super = DiwneObject;
+
 public:
 	bool m_isInput{false};                 ///< Whether this is an input or output pin, @see isInput()
 	bool m_allowMultipleConnections{true}; ///< Only allow one link to be connected, set to false for input pins
+	bool m_isLeft{true};                   ///< Whether this pin is on the left or right side of a node
+	                                       ///< Determined from m_isInput by default (inputs are on the right)
+	PinIconDrawData m_pinIconData;         ///< Temporary data used while drawing the pin
 
 	ImRect m_pinRect;  ///< Rect of the pin icon/socket. Links will connect to this.
 	ImRect m_dragRect; ///< Rect of the area that can be dragged to start a new connection
@@ -46,6 +63,7 @@ public:
 
 protected:
 	ImVec2 m_connectionPoint{ImVec2(0, 0)}; ///< Point where a link connects to this pin
+	bool m_previewPluggedInternal{false};   ///< Temp flag during drawing
 
 public:
 	Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne = "DiwnePin");
@@ -202,6 +220,8 @@ public:
 	 * @return
 	 */
 	bool isInput() const;
+
+	bool isLeft() const;
 
 	virtual bool isDisabled() const; ///< /// Whether the pin is disabled or not. When disabled it cannot be plugged in.
 
