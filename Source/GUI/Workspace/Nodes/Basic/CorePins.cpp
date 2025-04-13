@@ -56,10 +56,6 @@ CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node,
     : DIWNE::Pin(diwne, node, isInput, label), m_pin(pin)
 {}
 
-/**
- * \brief Draw the pin icon
- * \return false - no interaction allowed
- */
 void CorePin::content(DIWNE::DrawInfo& context)
 {
 	ImGuiStyle& imStyle = ImGui::GetStyle();
@@ -83,39 +79,73 @@ void CorePin::content(DIWNE::DrawInfo& context)
 		}
 	}
 
+	const std::string& label = m_pin.getLabel();
+
 	// Draw content
 	ImRect dragRect;
 	if (isLeft())
 	{
 		DGui::RectData rectData = DGui::BeginRect();
 		m_pinIconData = drawPin(true, pinAlpha);
-		ImGui::SameLine(0, labelSpacing);
 
-		if (drawLabel(context))
-			ImGui::SameLine(0, pinSpacing.x);
+		if (!label.empty())
+		{
+			ImGui::SameLine(0, labelSpacing);
+			drawLabel(context, label);
+		}
+		ImGui::SameLine(0, 0);
+		DGui::DummyXYSameLine({pinSpacing.x, 0});
 
 		dragRect = DGui::EndRect(rectData);
-		drawDataEx(context);
+
+		if (!m_isInput && m_showData)
+		{
+			drawData(context);
+			DGui::DummyXY({pinSpacing.x, 0});
+		}
 	}
 	else
 	{
-		if (drawDataEx(context))
+		DGui::RectData rectData;
+		if (!m_isInput && m_showData)
+		{
+			DGui::DummyXYSameLine({pinSpacing.x, 0});
+			drawData(context);
+			ImGui::SameLine(0, 0);
+			rectData = DGui::BeginRect();
 			ImGui::SameLine(0, pinSpacing.x);
+		}
+		else
+		{
+			rectData = DGui::BeginRect();
+			DGui::DummyXYSameLine({pinSpacing.x, 0});
+		}
 
-		DGui::RectData rectData = DGui::BeginRect();
-		if (drawLabel(context))
+		if (!label.empty())
+		{
+			drawLabel(context, label);
 			ImGui::SameLine(0, labelSpacing);
+		}
 
 		m_pinIconData = drawPin(false, pinAlpha);
 		dragRect = DGui::EndRect(rectData);
 	}
+
+	// Vertical pin gap
+	DGui::DummyMax({0.f, pinSpacing.y});
+
 	if (style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
 	{
 		if (m_pinIconData.protrusion > 0) // Adjust drag rect if the pin is stickin out of the node
 			dragRect.Max.x += m_pinIconData.protrusion;
 		else if (m_pinIconData.protrusion < 0)
 			dragRect.Min.x += m_pinIconData.protrusion;
+		dragRect.Max.y += pinSpacing.y; // Adjust drag rect to account for the vertical spacing
 		m_dragRect = diwne.canvas().screen2diwne(dragRect);
+	}
+	else
+	{
+		m_dragRect = m_pinRect;
 	}
 
 	// End dimming
@@ -166,9 +196,6 @@ DIWNE::PinIconDrawData CorePin::drawPin(bool left, float alpha)
 
 	if (alignPin)
 		DIWNE::DGui::EndVerticalAlign(verticalMargin);
-
-	if (!style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
-		m_dragRect = m_pinRect;
 
 	DIWNE_DEBUG_LAYOUT(diwne, {
 		ImGui::GetForegroundDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
@@ -401,11 +428,8 @@ void CorePin::renderCirclePin(const ImVec2& pos, const ImVec2& size, float alpha
 	}
 }
 
-bool CorePin::drawLabel(DIWNE::DrawInfo& context)
+void CorePin::drawLabel(DIWNE::DrawInfo& context, const std::string& label)
 {
-	const std::string& label = m_pin.getLabel();
-	if (label.empty())
-		return false;
 	// if (m_pin.ValueType == Core::EValueType::Pulse) // no labels for pulse and cycle
 	// todo (PF) Label and value order should be switched (used by cycle, mat->TR, x->floats, pulse)
 
@@ -430,14 +454,6 @@ bool CorePin::drawLabel(DIWNE::DrawInfo& context)
 	ImGui::TextUnformatted(label.c_str());
 	if (beganGroup)
 		ImGui::EndGroup();
-	return true;
-}
-
-bool CorePin::drawDataEx(DIWNE::DrawInfo& context)
-{
-	if (m_isInput || !m_showData)
-		return false;
-	return drawData(context);
 }
 
 void CorePin::popupContent(DIWNE::DrawInfo& context) {}

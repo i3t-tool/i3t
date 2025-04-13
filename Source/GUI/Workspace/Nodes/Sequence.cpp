@@ -28,7 +28,7 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 	m_headerMinWidth = 120;
 	m_headerSpacing = false; // We want drop zone background to be flush with the header, handled in left/right panels.
 	m_bottomSpacing = false;
-	m_contentSpacing = 4;
+	m_contentSpacing = 0;
 	m_drawContextMenuButton = true;
 }
 
@@ -168,12 +168,15 @@ void Sequence::drawInputPins(DIWNE::DrawInfo& context)
 	updatePinStyle(*pins[1]);
 
 	pins[1]->drawDiwne(context);
+	DIWNE::DGui::NewLine();
 	ImGui::Dummy(ImGui::GetCurrentContext()->LastItemData.Rect.GetSize()); // Second dummy pin to keep matrix mul align
+	DIWNE::DGui::NewLine();
 
 	if (pins[0]->allowDrawing())
 	{
 		m_left.vspring(0.15f);
 		pins[0]->drawDiwne(context);
+		DIWNE::DGui::NewLine();
 	}
 }
 
@@ -188,15 +191,15 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 	updatePinStyle(*pins[2]);
 	pins[2]->m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyleModelMatrix);
 
-	outputPinsVstack.begin();
+	m_outputPinsVstack.begin();
 	for (auto pin : {pins[1], pins[2]})
 	{
 		if (pin->allowDrawing())
 		{
-			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
 			row->spring(1.0f);
 			pin->drawDiwne(context);
-			outputPinsVstack.endRow();
+			m_outputPinsVstack.endRow();
 		}
 	}
 
@@ -204,13 +207,13 @@ void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 	updatePinStyle(*pin);
 	if (pin->allowDrawing())
 	{
-		outputPinsVstack.spring(0.15f);
-		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+		m_outputPinsVstack.spring(0.15f);
+		DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
 		row->spring(1.0f);
 		pin->drawDiwne(context);
-		outputPinsVstack.endRow();
+		m_outputPinsVstack.endRow();
 	}
-	outputPinsVstack.end();
+	m_outputPinsVstack.end();
 }
 
 void Sequence::popupContent(DIWNE::DrawInfo& context)

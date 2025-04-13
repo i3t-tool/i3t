@@ -21,6 +21,8 @@ using namespace Workspace;
 CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins /*=true*/)
     : CoreNode(diwne, nodebase), m_showDataOnPins(showDataOnPins)
 {
+	m_outputPinsVstack.setSpacing(0); // Pins add their own spacing so the drag areas are flush
+
 	const auto& inputPins = m_nodebase->getInputPins();
 	const auto& outputPins = m_nodebase->getOutputPins();
 
@@ -155,25 +157,26 @@ void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)
 		if (pin->allowDrawing())
 		{
 			pin->drawDiwne(context, m_drawMode);
+			DIWNE::DGui::NewLine(); // Remove y item spacing
 		}
 	}
 }
 
 void CoreNodeWithPins::drawOutputPins(DIWNE::DrawInfo& context)
 {
-	outputPinsVstack.begin();
+	m_outputPinsVstack.begin();
 	for (auto const& pin : m_rightPins) // subset of outputs, based of the level
 	{
 		updatePinStyle(*pin);
 		if (pin->allowDrawing())
 		{
-			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
 			row->spring(1.0f);
 			pin->drawDiwne(context);
-			outputPinsVstack.endRow();
+			m_outputPinsVstack.endRow();
 		}
 	}
-	outputPinsVstack.end();
+	m_outputPinsVstack.end();
 }
 void CoreNodeWithPins::updatePinStyle(CorePin& pin)
 {
@@ -187,6 +190,29 @@ void CoreNodeWithPins::updatePinStyle(CorePin& pin)
 	else
 		pin.m_pinStyle = static_cast<PinStyle>(WorkspaceModule::g_pinStyle);
 }
+bool CoreNodeWithPins::allowPress(const DIWNE::DrawInfo& context) const
+{
+	if (!Super::allowPress(context))
+		return false;
+
+	// TODO: Finish this if needed, NodeEditor SelectionRect needs to check that no logical update ocurred so that
+	//  selection rectangle cannot start from non interactive parts of nodes!
+	// Forbid press / drag when hovering near pins
+	// 	ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
+	// 	if (m_left.getRect().Contains(mousePos) || m_right.getRect().Contains(mousePos))
+	// 	{
+	// 		for (auto& pin : m_workspaceInputs)
+	// 		{
+	// 			if (pin->allowDrawing())
+	// 			{
+	// 				DIWNE::DMath::distanceToRect(pin->getDragRect(), )
+	// 			}
+	// 		}
+	// 		return false;
+	// 	}
+
+	return true;
+}
 
 void CoreNodeWithPins::onDestroy(bool logEvent)
 {
@@ -199,7 +225,7 @@ void CoreNodeWithPins::onDestroy(bool logEvent)
 
 void CoreNodeWithPins::translate(const ImVec2& vec)
 {
-	CoreNode::translate(vec);
+	Super::translate(vec);
 	// Pin rect's need to be moved as well
 	for (auto pin : m_workspaceInputs)
 		pin->translate(vec);

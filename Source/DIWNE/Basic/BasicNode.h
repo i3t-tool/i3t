@@ -33,7 +33,7 @@ protected:
 
 	// Style related stuff
 	bool m_headerSpacing = true; ///< Whether to add a gap between the node header and its content
-	bool m_bottomSpacing = true; ///< Whether to add a gap between the node content end the end.
+	bool m_bottomSpacing = true; ///< Whether to add a gap between the node content and the end.
 	float m_contentSpacing = -1; ///< Gap between left, center and right panels (-1 for default item spacing).
 
 public:
