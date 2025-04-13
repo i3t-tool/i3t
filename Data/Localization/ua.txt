@@ -1,3 +1,8 @@
+########################################################################################
+#           This file is auto-generated. Do not edit it manually.
+# If you want to modify it, do it in the CSV file (Data/Localization/localization.csv). 
+########################################################################################
+
 File=Файл
 New=Нова сцена
 Append=Додати сцену
