@@ -104,6 +104,7 @@ protected:
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
 
 	bool m_bringToFront{false}; ///< Request the object's rendering order to be moved to the front above other objects
+	bool m_forceDraw{true};     ///< Request the next draw of the object to have the ForceDraw DrawMode flag.
 	bool m_openPopup{false};    ///< Request to open popup
 
 	/// Sets the parent object of object, relevant in node container and hover hierarchy.
@@ -618,6 +619,11 @@ public:
 	/// For nodes, they are brought forward in rendering order next frame by the NodeEditor / NodeContainer.
 	void setBringToFront(bool val);
 	bool isToBeBroughtToFront();
+
+	/// When true, makes the object automatically add the ForceDraw DrawMode flag.
+	/// This flag is true by default and is reset after drawing.
+	/// Can be used to ensure that size information is obtained no matter the drawing criteria for the first frame.
+	void setForceDraw(bool val);
 
 	ID getId() const
 	{

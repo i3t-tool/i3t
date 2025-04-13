@@ -48,13 +48,13 @@ class NodeEditor : public DiwneObject, public NodeContainer
 public:
 	SettingsDiwne* mp_settingsDiwne;
 
-	std::vector<std::shared_ptr<Link>> m_links;
+	std::vector<std::shared_ptr<Link>> m_links; ///< List of links, nodes are stored in NodeContainer superclass
+
+	InteractionState interactionState; ///< State of multi-frame user operations
 
 	// TODO: (DR) Replace fully with mew context flag or something (isn't this a popup anyway?)
 	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
 	bool m_tooltipDrawn{false};
-
-	InteractionState interactionState;
 
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
 	//  this feature shouldn't be specific to our undo/redo system if it were to remain here
