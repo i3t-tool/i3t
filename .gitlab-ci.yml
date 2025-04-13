@@ -9,6 +9,7 @@ image: cvutdcgi/i3t-ci
 
 stages:
   - lint
+  - localization
   - build
   - test
   - pass
@@ -62,22 +63,22 @@ cppcheck:
     - bash Scripts/RunCppCheck.sh
 
 localization-check-keys-coverage-in-lang:
-  stage: lint
+  stage: localization
   allow_failure: true
   rules:
     - !reference [ .changes-rules, cpp ]
     - !reference [ .changes-rules, localization ]
   script:
-    - python3 Scripts/LocalizationTests/CheckLangFilesKeyCoverage.py
+    - python3 Scripts/Localization/Tests/CheckLangFilesKeyCoverage.py
 
 localization-check-unused-keys-in-lang:
-  stage: lint
+  stage: localization
   allow_failure: true
   rules:
     - !reference [ .changes-rules, cpp ]
     - !reference [ .changes-rules, localization ]
   script:
-    - python3 Scripts/LocalizationTests/CheckUnusedKeysInLocalization.py
+    - python3 Scripts/Localization/Tests/CheckUnusedKeysInLocalization.py
 
 ###
 

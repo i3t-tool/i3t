@@ -67,7 +67,7 @@ class BeforeExitSceneStrategy : public ConfirmModalStrategy
 
 public:
 	BeforeExitSceneStrategy(Action action)
-	    : ConfirmModalStrategy(BEFORE_EXIT_MODAL_TITLE, BEFORE_EXIT_MODAL_MESSAGE), m_action(action)
+	    : ConfirmModalStrategy(getBeforeExitModalTitle(), getBeforeExitModalMessage()), m_action(action)
 	{}
 
 private:

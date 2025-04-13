@@ -412,12 +412,12 @@ void CoreNode::drawMenuLevelOfDetail_builder(Ptr<CoreNode> node, const std::vect
 	if (I3TGui::BeginMenuWithLog(_t("Set display mode")))
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual level: {}",
-		// LevelOfDetailName[node->getLevelOfDetail()]).c_str());
+		// GetLevelOfDetailName.at(node->getLevelOfDetail())).c_str());
 		// ImGui::Separator();
 
 		for (auto const& levelOfDetail : levels_of_detail)
 		{
-			if (I3TGui::MenuItemWithLog(LevelOfDetailName[levelOfDetail].c_str(), NULL,
+			if (I3TGui::MenuItemWithLog(GetLevelOfDetailName().at(levelOfDetail).c_str(), NULL,
 			                            node->getLevelOfDetail() == levelOfDetail, true))
 			{
 				node->setLevelOfDetail(levelOfDetail);

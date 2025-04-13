@@ -1,0 +1,258 @@
+Key,Group name,en,cz,ru,ua
+,Main Menu Bar,,,,
+,File Menu,,,,
+File,,,Soubor,Файл,Файл
+New,,,Nová scéna,Новая Сцена,Нова сцена
+Append,,,Přidat scénu,Добавить Сцену,Додати сцену
+Open,,,Otevřít,Открыть,Відкрити
+Recent,,,Nedávné,Недавние,Нещодавні
+Save,,,Uložit,Сохранить,Зберегти
+Save As,,,Uložit jako,Сохранить Как,Зберегти як
+Manage Models,,,Správa modelů,Управление Моделями,Керування моделями
+Exit,,,Ukončit,Выход,Вихід
+,Edit Menu,,,,
+Edit,,,Úpravy,Правка,Редагування
+Undo,,,Zpět,Отменить,Скасувати
+Redo,,,Vpřed,Вернуть,Повернути
+Style Editor,,,Editor vzhledu,Редактор стиля,Редактор стилю
+Preferences,,,Nastavení,Настройки,Налаштування
+Change Language,,,Změnit jazyk,Изменить Язык,Змінити мову
+,Windows Menu,,,,
+Windows,,,Okna,Окна,Вікна
+Start window,,,Úvodní okno,Начальное окно,Початкове вікно
+Tutorial window,,,Okno tutoriálu,Учебное окно,Навчальне вікно
+Scene view window,,,Okno náhledu scény,Окно просмотра сцены,Вікно перегляду сцени
+Workspace window,,,Okno pracovní plochy,Окно рабочего пространства,Вікно робочого простору
+Console window,,,Konzolové okno,Консольное окно,Консольне вікно
+Log window,,,Logovací okno,Журнал,Журнал
+Layouts,,,Rozložení,Компоновка,Компонування
+Layouts As Submenu,,,Rozložení jako podnabídku,Компоновка Как Подменю,Компонування Як Підменю
+,Tutorial Menu,,,,
+Tutorials,,,Tutoriály,Туториалы,Туторіали
+Reload,,,Znovu načíst,Перезагрузить,Перезавантажити
+,Help Menu,,,,
+Help,,,Nápověda,Помощь,Допомога
+Description,,,Popis,Описание,Опис
+Diagnostic tools,,,Diagnostické nástroje,Диагностические инструменты,Діагностичні інструменти
+About,,,O programu,О программе,Про програму
+Show ImGui demo window,,,Zobrazit ukázkové okno ImGui,Показать окно демонстрации ImGui,Показати вікно демонстрації ImGui
+Debug,,,Ladění,Отладка,Налагодження
+,Tutorial window,,,,
+Tutorial,,,Tutoriál,Туториал,Туторіал
+No tutorial,,,Žádný tutoriál,Нет туториала,Немає туторіалу
+Empty tutorial,,,Prázdný tutoriál,Пустой туториал,Порожній туторіал
+Open Start Menu,,,Otevřít úvodní menu,Открыть Начальное Меню,Відкрити початкове меню
+< Back,,,< Zpět,< Назад,< Назад
+< Start Menu,,, < Úvodní menu,< Начальное Меню,< Початкове меню
+Next,,,Dále,Далее,Далі
+Finish,,,Dokončit,Завершить,Завершити
+Submit,,,Odeslat,Отправить,Надіслати
+Incorrect!,,,Nesprávně!,Неверно!,Неправильно!
+Correct!,,,Správně!,Верно!,Правильно!
+,Scene view window,,,,
+Scene View,,,Náhled scény,Просмотр Сцены,Перегляд сцени
+,Settings Menu,,,,
+Settings,,,Nastavení,Настройки,Налаштування
+Scene,,,Scéna,Сцена,Сцена
+World space lighting,,,Světové osvětlení,Мировое освещение,Світове освітлення
+Manipulators,,,Manipulátory,Манипуляторы,Маніпулятори
+Show manipulators,,,Zobrazit manipulátory,Показать манипуляторы,Показати маніпулятори
+Size,,,Velikost,Размер,Розмір
+MSAA,,,MSAA,MSAA,MSAA
+OFF,,,Vypnuto,Выкл,Вимкн.
+Highlight,,,Zvýraznění,Выделение,Виділення
+Ultra,,,Ultra,Ультра,Ультра
+High,,,Vysoké,Высокое,Високе
+Medium,,,Střední,Среднее,Середнє
+Low,,,Nízké,Низкое,Низьке
+Lowest,,,Minimální,Минимальное,Мінімальне
+Transparency,,,Průhlednost,Прозрачность,Прозорість
+Use WBOIT,,,Použít WBOIT,Использовать WBOIT,Використовувати WBOIT
+WBOIT weight function,,,Váhová funkce WBOIT,Функция веса WBOIT,Функція ваги WBOIT
+Reload shaders,,,Znovu načíst shadery,Перезагрузить шейдеры,Перезавантажити шейдери
+,View Menu,,,,
+View,,,Zobrazení,Вид,Вигляд
+Orbit camera,,,Orbitální kamera,Орбитальная камера,Орбітальна камера
+Trackball camera,,,Trackball kamera,Камера трекбола,Камера трекбола
+Smooth scroll,,,Plynulé posouvání,Плавная прокрутка,Плавне прокручування
+Camera fov,,,Fov kamery,Поле зрения камеры,Поле зору камери
+Show grid,,,Zobrazit mřížku,Показать сетку,Показати сітку
+Viewpoint right,,,Pohled zprava,Вид справа,Вигляд справа
+Viewpoint left,,,Pohled zleva,Вид слева,Вигляд зліва
+Viewpoint top,,,Pohled shora,Вид сверху,Вигляд зверху
+Viewpoint bottom,,,Pohled zdola,Вид снизу,Вигляд знизу
+Viewpoint front,,,Pohled zepředu,Вид спереди,Вигляд спереду
+Viewpoint back,,,Pohled zezadu,Вид сзади,Вигляд ззаду
+Center camera on selection,,,Vycentrovat kameru na výběr,Центрировать камеру на выделении,Центрувати камеру на вибраному
+Center camera on scene,,,Vycentrovat kameru na scénu,Центрировать камеру на сцене,Центрувати камеру на сцені
+Show objects,,,Zobrazit objekty,Показать объекты,Показати об'єкти
+Show axes,,,Zobrazit osy,Показать оси,Показати осі
+Show cameras,,,Zobrazit kamery,Показать камеры,Показати камери
+Show frustums,,,Zobrazit pohledové objemy,Показать усеченные пирамиды,Показати фруструми
+Object visibility toggle,,,Přepnout viditelnost objektů,Переключатель видимости объекта,Перемикач видимості об'єкта
+Object visibility,,,Viditelnost objektu,Видимость объекта,Видимість об'єкта
+Objects,,,Objekty,Объекты,Об'єкти
+Axes,,,Osy,Оси,Осі
+Grid,,,Mřížka,Сетка,Сітка
+Cameras,,,Kamery,Камеры,Камери
+Frustums,,,Pohledové objemy,Усеченная пирамида,Фруструми
+Toggle world lighting,,,Přepnout světové osvětlení,Переключить мировое освещение,Перемкнути світове освітлення
+Toggle manipulators,,,Přepnout manipulátory,Переключить манипуляторы,Перемкнути маніпулятори
+,Workspace window,,,,
+Workspace,,,Pracovní plocha,Рабочее Пространство,Робочий простір
+,Add Menu,,,,
+Add,,,Přidat,Добавить,Додати
+Model,,,Model,Модель,Модель
+Import models...,,,Nahrát modely...,Импортировать модели,Імпортувати моделі
+,Edit Menu,,,,
+Select all,,,Vybrat vše,Выбрать все,Вибрати все
+Invert,,,Invertovat,Инвертировать,Інвертувати
+To all,,,Na vše,Ко всем,До всього
+To selection,,,Na vybrané,К выбранным,До вибраного
+,View Menu,,,,
+Zoom all,,,Přiblížit vše,Увеличить все,Вибрати все
+Reset zoom,,,Resetovat zoom,Сбросить увеличение,Скинути масштаб
+Show,,,Zobrazit,Показать,Показати
+Use dots,,,Použít tečky,Использовать точки,Використовувати крапки
+,Add new nodes,,,,
+Add...,,,Přidat...,Добавить...,Додати...
+,Common node,,,,
+Choose value...,,,Zvolte hodnotu...,Выберете значение...,Виберіть значення...
+Angle,,,Úhel,Угол,Кут
+Delete,,,Odstranit,Удалить,Видалити
+Selected nodes,,,Vybrané uzly,Выбранные узлы,Вибрані вузли
+Selected links,,,Vybrané spoje,Выбранные связи,Вибрані зв'язки
+All nodes,,,Všechny uzly,Все узлы,Усі вузли
+All links,,,Všechny spoje,Все связи,Усі зв'язки
+Selection,,,Výběr,Выделение,Виділення
+Zoom,,,Přiblížit/Zoom,Увеличить,Збільшити
+Rename,,,Přejmenovat,Переименовать,Перейменувати
+Lock,,,Zamknout,Заблокировать,Заблокувати
+Unlock,,,Odemknout,Разблокировать,Розблокувати
+Enable synergies,,,Povolit synergii,Включить синергию,Увімкнути синергію
+Disable synergies,,,Zakázat synergii,Выключить синергию,Вимкнути синергію
+Value,,,Hodnoty,Значения,Значення
+Reset,,,Resetovat,Сбросить,Скинути
+Store,,,Uložit,Сохранить,Зберегти
+Restore,,,Obnovit,Восстановить,Відновити
+Decimal digits,,,Desetinné číslice,Десятичные разряды,Десяткові розряди
+Duplicate,,,Duplikovat,Дублировать,Дублювати
+Set display mode,,,Nastavit režim zobrazení,Установить режим отображения,Встановити режим відображення
+Expanded,,,Rozbalený,Развернутый,Розгорнутий
+Value setter,,,Nastavení hodnot,Установка значений,Встановлення значень
+Collapsed,,,Sbalený,Свернутый,Згорнутий
+Collapse node,,,Sbalit uzel,Свернуть узел,Згорнути вузол
+Expand node,,,Rozbalit uzel,Развернуть узел,Розгорнути вузол
+Set visibility,,,Nastavit viditelnost,Установить видимость,Встановити видимість
+Set value,,,Nastavit hodnotu,Установить значение,Встановити значення
+,Camera node,,,,
+Show camera,,,Zobrazit kameru,Показать камеру,Показати камеру
+Show frustum,,,Zobrazit pohledový objem,Показать усеченную пирамиду,Показати усічену піраміду
+Fill frustum,,,Naplnit pohledový objem,Заполнить усеченную пирамиду,Заповнити усічену піраміду
+Frustum fill color,,,Barva výplně pohledového objemu,Цвет заполнения усеченной пирамиды,Колір заповнення усіченої піраміди
+Default,,,Výchozí,По умолчанию,За замовчуванням
+Red,,,Červený,Красный,Червоний
+Blue,,,Modrý,Синий,Синій
+Green,,,Zelený,Зеленый,Зелений
+Yellow,,,Žlutý,Желтый,Жовтий
+Orange,,,Oranžový,Оранжевый,Помаранчевий
+Magenta,,,Magenta,Пурпурный,Пурпурний
+Teal,,,Tyrkysový,Бирюзовый,Бірюзовий
+Frustum outline color,,,Barva obrysu pohledového objemu,Цвет контура усеченной пирамиды,Колір контуру усіченої піраміди
+Change frustum color,,,Změnit barvu pohledového objemu,Изменить цвет усеченной пирамиды,Змінити колір усіченої піраміди
+,Model node,,,,
+Show model,,,Zobrazit model,Показать модель,Показати модель
+Opaque,,,Neprůhledný,Непрозрачный,Непрозорий
+Back-face culling,,,Back-face culling,Отбраковка задней поверхности(Back-face culling),Відсікання задньої поверхні(Back-face culling)
+Opacity,,,Neprůhlednost,Непрозрачность,Непрозорість
+None,,,Žádná,Отсутствует,Відсутній
+Brown,,,Hnědý,Коричневый,Коричневий
+Light Blue,,,Světle modrý,Голубой,Блакитний
+Strength,,,Síla,Сила,Сила
+Change model,,,Změnit model,Изменить модель,Змінити модель
+Stop tracking,,,Zastavit sledování,Остановить отслеживание,Зупинити відстеження
+Smooth tracking,,,Plynulé sledování,Плавное отслеживание,Плавне відстеження
+Start tracking from right,,,Začít sledovat zprava,Начать отслеживание справа,Почати відстеження справа
+Start tracking from left,,,Začít sledovat zleva,Начать отслеживание слева,Почати відстеження зліва
+Set opacity,,,Nastavit neprůhlednost,Установить непрозрачность,Встановити непрозорість
+Change color,,,Změnit barvu,Изменить цвет,Змінити колір
+Adjust tint,,,Upravit odstín,Настроить оттенок,Налаштувати відтінок
+Tracking,,,Krokování,Отслеживание,Відстеження
+,Cycle node,,,,
+   once   ,,,jednou,один раз,один раз
+   repeat   ,,,opakovat,повтор,повтор
+   ping-pong   ,,,ping-pong,пинг-понг,пінг-понг
+  smooth step: ,,, plynulý krok:,  плавный шаг:,  плавний крок:
+     step duration: ,,,      trvání kroku:, длительность шага:, тривалість кроку:
+Automatic step duration,,,Automatické trvání kroku,Автоматическая продолжительность шага,Автоматична тривалість кроку
+             single step: ,,,              jeden krok:,                один шаг:,                один крок:
+Step for manual Next/Prev,,,Krok pro ruční Další/Předchozí,Шаг для ручного управления Далее/Предыдущий,Крок для ручного керування Далі/Попередній
+,Start window,,,,
+Welcome,,,Vítejte,Добро пожаловать,Ласкаво просимо
+I3T is an educational application that allows the study of 3D transformations and,,,"I3T je vzdělávací aplikace, která umožňuje názorným způsobem studovat 3D transformace a","I3T - это учебное приложение, которое позволяет изучать 3D-трансформации и","I3T - це навчальний застосунок, який дозволяє вивчати 3D-трансформації та"
+ their hierarchy in an illustrative way.,,, jejich hierarchii., их иерархию наглядным образом., їх ієрархію наочно.
+Learn,,,Studium,Изучение,Вивчення
+Transformations,,,Transformace,Трансформации,Трансформації
+Your scene,,,Vaše scéna,Ваша Сцена,Ваша сцена
+Start with an empty scene or open your previous work.,,,Začněte s prázdnou scénou nebo otevřete svou předchozí práci.,Начните с пустой сцены или откройте свою предыдущую работу.,Розпочніть з порожньої сцени або відкрийте свою попередню роботу.
+No recent files,,,Žádné nedávné soubory,Нет недавних файлов,Немає нещодавніх файлів
+Start,,,Začít,Начать,Почати
+,Change Language modal,,,,
+Cancel,,,Storno,Отмена,Скасувати
+OK,,,OK,ОК,ОК
+You need to restart the application for all changes to take effect.,,,Pro uplatnění všech změn je třeba restartovat aplikaci.,Для применения всех изменений необходимо перезапустить приложение.,"Щоб застосувати всі зміни, потрібно перезапустити програму."
+,Log window,,,,
+Log View,,,Logovácí okno,Просмотр Журнала,Перегляд журналу
+Log output,,,Výstup logu,Вывод Журнала,Вивід журналу
+Switch fire action key,,,Přepnout akční klávesu,Переключить клавишу действия огня,Перемкнути клавішу дії вогню
+Current keys: %s,,,Aktuální klávesy: %s,Текущие клавиши: %s,Поточні клавіші: %s
+Switch,,,Přepnout,Переключить,Перемкнути
+,Console window,,,,
+Console,,,Konzolové okno,Консоль,Консоль
+,Statistics window,,,,
+Statistics,,,Statistiky,Статистика,Статистика
+"Frame %d, FPS %.1f",,,"Snímek %d, FPS %.1f","Кадр %d, FPS %.1f","Кадр %d, FPS %.1f"
+Framerate: %.3f,,,Framerate: %.3f,Частота кадров: %.3f,Частота кадрів: %.3f
+Frametime: %.3f,,,Frametime: %.3f,Время кадра: %.3f,Час кадру: %.3f
+CPU Timers:,,,Časovače CPU,Таймеры ЦП:,Таймери ЦП:
+GPU Timers:,,,Časovače GPU,Таймеры ГП:,Таймери ГП:
+Total GPU memory %d MB,,,Celková paměť GPU %d MB,Всего памяти ГП %d МБ,Всього пам'яті ГП %d МБ
+%u MB alloc.,,,%u MB alokováno.,%u МБ выделено.,%u МБ виділено.
+%u MB free.,,,%u MB volné.,%u МБ свободно.,%u МБ вільно.
+,Manage model window,,,,
+No models imported,,,Žádné modely nejsou importovány,Нет импортированных моделей,Немає імпортованих моделей
+Import,,,Importovat,Импортировать,Імпортувати
+Remove,,,Odstranit,Удалить,Видалити
+Normalize model size,,,Normalizovat velikost modelu,Нормализовать размер модели,Нормалізувати розмір моделі
+Model details:,,,Detail modelu:,Детали модели:,Деталі моделі:
+No model selected,,,Žádný model není vybrán,Нет выбранной модели,Не вибрано модель
+Import model(s),,,Importovat model(y),Импортировать модель(и),Імпортувати модель(і)
+,Style Editor window,,,,
+Custom theme,,,Vlastní téma,Пользовательская тема,Користувацька тема
+Use default theme,,,Použít výchozí téma,Использовать стандартную тему,Використовувати стандартну тему
+Revert changes,,,Vrátit změny,Отменить изменения,Скасувати зміни
+Reload all Themes,,,Znovu načíst všechna témata,Перезагрузить все темы,Перезавантажити всі теми
+(Discards all unsaved changes),,,(Odstraní všechny neuložené změny),(Отменит все несохраненные изменения),(Скасує всі незбережені зміни)
+Save current modifications to file (discards unsaved changes on other Themes),,,Uložit aktuální úpravy do souboru (odstraní neuložené změny na jiných tématech),Сохранить текущие изменения в файл (отменит несохраненные изменения в других темах),Зберегти поточні зміни у файл (скасує незбережені зміни в інших темах)
+Overwrite,,,Přepsat,Перезаписать,Перезаписати
+Save as,,,Uložit jako,Сохранить как,Зберегти як
+New theme name,,,Nový název tématu,Новое имя темы,Нова назва теми
+Reset to defaults,,,Resetovat na výchozí hodnoty,Сбросить на стандартные настройки,Скинути до стандартних налаштувань
+,Edit script window,,,,
+Edit script,,,Upravit skript,Редактировать скрипт,Редагувати скрипт
+Script Editor,,,Editor Skriptu,Редактор Cкриптов,Редактор скриптів
+Save and close,,,Uložit a zavřít,Сохранить и закрыть,Зберегти та закрити
+Reload script,,,Znovu načíst skript,Перезагрузить скрипт,Перезавантажити скрипт
+,Select Layout window,,,,
+Select Layout,,,Vybrat rozložení,Выбрать компоновку,Вибрати компонування
+new layout...,,,nové rozložení...,новая компоновка...,нова компоновка...
+,Before exit modal,,,,
+Save current scene?,,,Uložit aktuální scénu?,Сохранить текущую сцену?,Зберегти поточну сцену?
+"Any unsaved content will be discarded, do you want to save it?",,,"Jakýkoli neuložený obsah bude zahozen, chcete ho uložit?","Любой несохраненный контент будет утерян, хотите сохранить его?","Будь-який незбережений вміст буде втрачено, хочете зберегти його?"
+Yes,,,Ano,Да,Так
+No,,,Ne,Нет,Ні
+,Remove model modal,,,,
+The model '%s' is currently being used by %d model nodes.,,,"Model '%s' je aktuálně používán %d modelovými uzly.","Модель '%s' в настоящее время используется %d узлами модели.","Модель '%s' наразі використовується %d вузлами моделі."
+The model '%s' is currently being used by %d model node.,,,"Model '%s' je aktuálně používán %d modelovým uzlem.","Модель '%s' в настоящее время используется %d узлом модели.","Модель '%s' наразі використовується %d вузлом моделі."
+Remove model?,,,"Odstranit model?",Удалить модель?,Видалити модель?
+Are you sure you want to remove it?,,,"Opravdu chcete odstranit?","Вы уверены, что хотите удалить?","Ви впевнені, що хочете видалити?"

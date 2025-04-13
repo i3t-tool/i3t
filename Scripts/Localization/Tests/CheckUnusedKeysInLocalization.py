@@ -95,6 +95,7 @@ if __name__ == '__main__':
     localization_files = find_localization_files(LOCALIZATION_DIR)
     if not localization_files:
         print(f"No localization files found in {LOCALIZATION_DIR}.")
+        print("\nIMPORTANT! Do not forget to set working directory for this script to the root of the project.\n")
         exit(1)
 
     print(f"Localization files found: {', '.join(localization_files.keys())}")
