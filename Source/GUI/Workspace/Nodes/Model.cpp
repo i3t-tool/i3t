@@ -266,6 +266,7 @@ void Model::drawInputPins(DIWNE::DrawInfo& context)
 	{
 		m_left.vspring(0.4f);
 		pins[0]->drawDiwne(context);
+		DIWNE::DGui::NewLine();
 	}
 }
 

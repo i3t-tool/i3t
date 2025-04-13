@@ -127,6 +127,11 @@ void Pin::drawPinBackground()
 		offsetMax = ImVec2(eOffset.x, eOffset.y);
 	}
 	ImRect displayRectScreen = diwne.canvas().diwne2screenTrunc(m_dragRect);
+	if (style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
+	{
+		ImVec2 pinSpacing = style().size(Style::PIN_SPACING) * diwne.getZoom();
+		displayRectScreen.Max.y -= pinSpacing.y; // Reduce drag rect by the pin vertical spacing so it stays centered
+	}
 	ImGui::GetWindowDrawList()->AddRectFilled(displayRectScreen.Min + offsetMin, displayRectScreen.Max + offsetMax,
 	                                          ImGui::ColorConvertFloat4ToU32(style().color(Style::PIN_BG_COLOR)),
 	                                          style().decimal(Style::PIN_BG_ROUNDING) * diwne.getZoom(), cornerFlags);
@@ -341,6 +346,14 @@ bool Pin::isPlugged() const
 bool Pin::connectionChanged() const
 {
 	return m_connectionChanged;
+}
+const ImRect& Pin::getPinRect() const
+{
+	return m_pinRect;
+}
+const ImRect& Pin::getDragRect() const
+{
+	return m_dragRect;
 }
 
 bool Pin::allowConnection() const

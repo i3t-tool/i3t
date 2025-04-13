@@ -37,22 +37,24 @@ protected:
 
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
-	DIWNE::VStack outputPinsVstack{diwne, &m_right};
+	DIWNE::VStack m_outputPinsVstack{diwne, &m_right};
 
 public:
 	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
 	/**
-	 * \brief get vector of input pins
-	 * \return m_workspaceInputs
+	 * @brief get vector of input pins
+	 * @note Input pins don't always have to be on the left side of the node!
+	 * @return m_workspaceInputs
 	 */
 	const std::vector<Ptr<CorePin>>& getInputs() const
 	{
 		return m_workspaceInputs;
 	};
 	/**
-	 * \brief get vector of output pins
-	 * \return m_workspaceOutputs
+	 * @brief get vector of output pins
+	 * @note Output pins don't always have to be on the right side of the node!
+	 * @return m_workspaceOutputs
 	 */
 	const std::vector<Ptr<CorePin>>& getOutputs() const
 	{
@@ -67,6 +69,8 @@ public:
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
 	void updatePinStyle(CorePin& pin);
+
+	bool allowPress(const DIWNE::DrawInfo& context) const override;
 
 	void onDestroy(bool logEvent) override;
 

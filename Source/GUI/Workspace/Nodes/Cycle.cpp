@@ -269,6 +269,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_STEP})
 		{
 			m_workspaceInputs.at(i)->drawDiwne(context, m_drawMode);
+			DIWNE::DGui::NewLine();
 		}
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
@@ -330,6 +331,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:from", getId()), localData,
 		    pinInFrom->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
 		    m_labelDiwne);
+		DIWNE::DGui::NewLine();
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 		// if (ImGui::IsItemHovered())
 		// {
@@ -368,6 +370,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:to", getId()), localData,
 		    pinInTo->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
 		    m_labelDiwne);
+		DIWNE::DGui::NewLine();
 		ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
 
 		// if (ImGui::IsItemHovered())
@@ -405,6 +408,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		    diwne, context, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:step", getId()), localData,
 		    pinInStep->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable, valueChanged,
 		    m_labelDiwne);
+		DIWNE::DGui::NewLine();
 		if (interaction)
 			context.consumeInput();
 
@@ -432,6 +436,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 				auto& pin = m_workspaceInputs.at(i);
 				updatePinStyle(*pin);
 				pin->drawDiwne(context, m_drawMode);
+				DIWNE::DGui::NewLine();
 			}
 		}
 		else if (m_levelOfDetail == LevelOfDetail::SetValues)

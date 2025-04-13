@@ -45,6 +45,7 @@ public:
 	                                       ///< Determined from m_isInput by default (inputs are on the right)
 	PinIconDrawData m_pinIconData;         ///< Temporary data used while drawing the pin
 
+protected:
 	ImRect m_pinRect;  ///< Rect of the pin icon/socket. Links will connect to this.
 	ImRect m_dragRect; ///< Rect of the area that can be dragged to start a new connection
 
@@ -244,6 +245,9 @@ public:
 	Link* getLink(size_t index = 0);
 	bool isPlugged() const;
 	bool connectionChanged() const;
+
+	const ImRect& getPinRect() const;  ///< @see m_pinRect
+	const ImRect& getDragRect() const; ///< @see m_dragRect
 };
 
 } /* namespace DIWNE */

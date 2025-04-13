@@ -77,6 +77,15 @@ inline void DummyXY(const ImVec2& size)
 	ImGui::Dummy(size);
 	ImGui::SetCursorScreenPos(ImGui::GetItemRectMax());
 }
+inline void DummyXYSameLine(const ImVec2& size)
+{
+	ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+	if (window->SkipItems)
+		return;
+	ImGui::Dummy(size);
+	ImGui::SetCursorScreenPos(ImGui::GetItemRectMax());
+	ImGui::SameLine(0, 0);
+}
 /// Dummy that begins at the max cursor position. Expands current content by the size and starts a new line.
 inline void DummyMax(const ImVec2& size)
 {
@@ -85,7 +94,21 @@ inline void DummyMax(const ImVec2& size)
 		return;
 	ImGui::SetCursorScreenPos(window->DC.CursorMaxPos);
 	ImGui::Dummy(size);
+	NewLine();
 }
+/// Dummy that begins at the max cursor position. Expands current content by the size and continues the line
+inline void DummyMaxSameLine(const ImVec2& size)
+{
+	DummyMax(size);
+	ImGui::SameLine(0, 0);
+}
+/// Dummy that begins at the max cursor position. Expands current content by the size and starts a new line with no
+/// vertical spacing, can be used to add trailing padding.
+// inline void PaddingMax(const ImVec2& size)
+// {
+// 	DummyMax(size);
+// 	NewLine();
+// }
 inline void BeginVerticalAlign(float yOffset)
 {
 	ImGui::BeginGroup();
@@ -236,6 +259,12 @@ inline bool equals(float val1, float val2, float abs_error)
 inline bool equals(const ImVec2& a, const ImVec2& b, float abs_error)
 {
 	return equals(a.x, b.x, abs_error) && equals(a.y, b.y, abs_error);
+}
+inline float distanceToRect(const ImVec2& point, const ImRect& rect)
+{
+	float dx = std::max(std::max(rect.Min.x - point.x, 0.f), point.x - rect.Max.x);
+	float dy = std::max(std::max(rect.Min.y - point.y, 0.f), point.y - rect.Max.y);
+	sqrtf(dx * dx + dy * dy);
 }
 } // namespace DMath
 

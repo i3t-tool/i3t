@@ -63,9 +63,9 @@ public:
 
 	DIWNE::PinIconDrawData drawPin(bool left,
 	                               float alpha); ///< @return Offset by which the pin is sticking out of the node.
-	bool drawLabel(DIWNE::DrawInfo& context);    ///< @return Whether a new item was created
-	bool drawDataEx(DIWNE::DrawInfo& context);   ///< @return Whether a new item was created
-	bool drawData(DIWNE::DrawInfo& context);     ///< @return Whether a new item was created
+	void drawLabel(DIWNE::DrawInfo& context, const std::string& label); ///< @return Whether a ne;w item was created
+	bool drawDataEx(DIWNE::DrawInfo& context);                          ///< @return Whether a new item was created
+	bool drawData(DIWNE::DrawInfo& context);                            ///< @return Whether a new item was created
 	int maxLengthOfData();
 
 	void popupContent(DIWNE::DrawInfo& context) override;

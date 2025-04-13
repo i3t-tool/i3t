@@ -51,8 +51,10 @@ void BasicNode::content(DrawInfo& context)
 	rightContent(context);
 	m_right.end();
 
-	if (m_bottomSpacing)
-		ImGui::Spacing();
+	if (m_bottomSpacing) // Double bottom spacing
+	{
+		DGui::DummyMax({0.f, ImGui::GetStyle().ItemSpacing.y * 1.f});
+	}
 
 	m_middle.end();
 }

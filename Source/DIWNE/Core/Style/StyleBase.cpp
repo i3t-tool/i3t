@@ -39,7 +39,7 @@ StyleBase::StyleBase()
 	set<float>(PIN_LABEL_SPACING, 4.0f, true);
 	set<bool>(PIN_ENABLE_DRAG_LABEL, true);
 	set<bool>(PIN_ENABLE_HOVER_BG, true);
-	set<ImVec2>(PIN_BG_SPACING, {4.0f, 2.0f}, true);
+	set<ImVec2>(PIN_BG_SPACING, {0.0f, 2.0f}, true);
 	set<ImVec4>(PIN_BG_COLOR, {0.0, 0.0, 0.0, 0.14});
 	set<float>(PIN_BG_ROUNDING, 5.0f, true);
 	set<ImVec4>(PIN_HOVER_COLOR_SHIFT, {0.1f, 0.1f, 0.1f, 0.0f});

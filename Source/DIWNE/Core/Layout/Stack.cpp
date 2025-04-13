@@ -16,6 +16,7 @@ void Stack::begin()
 	origin = ImGui::GetCursorScreenPos();
 	m_currentIndex = 0;
 	m_maxFixedSize = 0;
+	m_springAdded = false;
 }
 
 void Stack::end()

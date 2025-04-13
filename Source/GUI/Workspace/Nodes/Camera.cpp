@@ -29,6 +29,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
       m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true))
 {
 	m_drawContextMenuButton = true;
+	m_contentSpacing = 0;
 
 	m_projAndView.push_back(m_projection);
 	m_projAndView.push_back(m_view);
@@ -281,16 +282,16 @@ void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 	auto& pins = m_rightPins;
 	assert(pins.size() == 2); // Camera has special pin handling, expecting matrix mul at 1
 
-	outputPinsVstack.begin();
+	m_outputPinsVstack.begin();
 	for (auto pin : {pins[0]})
 	{
 		updatePinStyle(*pin);
 		if (pin->allowDrawing())
 		{
-			DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+			DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
 			row->spring(1.0f);
 			pin->drawDiwne(context);
-			outputPinsVstack.endRow();
+			m_outputPinsVstack.endRow();
 		}
 	}
 
@@ -298,13 +299,13 @@ void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 	updatePinStyle(*pin);
 	if (pin->allowDrawing())
 	{
-		outputPinsVstack.spring(0.4f);
-		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
+		m_outputPinsVstack.spring(0.4f);
+		DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
 		row->spring(1.0f);
 		pin->drawDiwne(context);
-		outputPinsVstack.endRow();
+		m_outputPinsVstack.endRow();
 	}
-	outputPinsVstack.end();
+	m_outputPinsVstack.end();
 }
 
 void Camera::drawMenuLevelOfDetail()
