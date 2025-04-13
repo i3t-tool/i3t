@@ -17,20 +17,25 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/I3TGui.h"
+#include "Localization/Localization.h"
 
 RemoveModelModal::RemoveModelModal(std::string modelAlias, int usedCount, std::function<void()> onRemove)
-    : m_modelAlias(modelAlias), m_usedCount(usedCount), m_onRemove(onRemove), ModalWindow("Remove model?")
+    : m_modelAlias(modelAlias), m_usedCount(usedCount), m_onRemove(onRemove), ModalWindow(_t("Remove model?"))
 {}
 
 void RemoveModelModal::onImGui()
 {
-	ImGui::Text("The model '%s' is currently being used by %d model node%s.\n", m_modelAlias.c_str(), m_usedCount,
-	            (m_usedCount > 1 ? "s" : ""));
-	ImGui::Text("Are you sure you want to remove it?\n\n");
-
+	if (m_usedCount > 1)
+		ImGui::Text(_t("The model '%s' is currently being used by %d model nodes."), m_modelAlias.c_str(), m_usedCount);
+	else
+		ImGui::Text(_t("The model '%s' is currently being used by %d model node."), m_modelAlias.c_str(), m_usedCount);
+	ImGui::Text("");
+	ImGui::Text(_t("Are you sure you want to remove it?"));
+	ImGui::Text("");
+	ImGui::Text("");
 	ImGui::Separator();
 
-	if (I3TGui::ButtonWithLog("Yes", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog(_t("Yes"), ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		m_onRemove();
 		hide();
@@ -38,7 +43,7 @@ void RemoveModelModal::onImGui()
 	ImGui::SetItemDefaultFocus();
 
 	ImGui::SameLine();
-	if (I3TGui::ButtonWithLog("No", ImVec2(4 * ImGui::GetFontSize(), 0)))
+	if (I3TGui::ButtonWithLog(_t("No"), ImVec2(4 * ImGui::GetFontSize(), 0)))
 	{
 		hide();
 	}

@@ -367,7 +367,7 @@ void MainMenuBar::showHelpMenu()
 		}
 #endif
 		I3TGui::MenuItemWithLog(_t("About"), nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
-		if (I3TGui::BeginMenuWithLog(_tbd("Diagnostic tools")))
+		if (I3TGui::BeginMenuWithLog(_t("Diagnostic tools")))
 		{
 			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_DEBUG " ", "Statistics")))
 			{

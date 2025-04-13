@@ -17,10 +17,18 @@
 
 using namespace Workspace;
 
-std::map<LevelOfDetail, std::string> Workspace::LevelOfDetailName = {{LevelOfDetail::Full, _t("Expanded")},
-                                                                     {LevelOfDetail::SetValues, _t("Value setter")},
-                                                                     {LevelOfDetail::Label, _t("Collapsed")},
-                                                                     {LevelOfDetail::LightCycle, "Light cycle"}};
+namespace Workspace
+{
+// Used for lazy initialization of levelOfDetailName because of _t
+std::map<LevelOfDetail, std::string> GetLevelOfDetailName()
+{
+	return {{LevelOfDetail::Full, _t("Expanded")},
+	        {LevelOfDetail::SetValues, _t("Value setter")},
+	        {LevelOfDetail::Label, _t("Collapsed")},
+	        {LevelOfDetail::LightCycle, "Light cycle"}};
+}
+} // namespace Workspace
+
 
 Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne, label)
 {

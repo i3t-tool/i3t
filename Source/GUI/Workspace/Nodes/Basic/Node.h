@@ -54,7 +54,7 @@ enum FloatPopupMode
 	Value  ///< selected sin and cos values and numbers from 0 to 4
 };
 
-extern std::map<LevelOfDetail, std::string> LevelOfDetailName;
+extern std::map<LevelOfDetail, std::string> GetLevelOfDetailName();
 
 class Node : public DIWNE::BasicNode
 {

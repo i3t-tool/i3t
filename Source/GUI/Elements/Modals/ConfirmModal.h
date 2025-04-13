@@ -18,9 +18,14 @@
 #include "GUI/Elements/IWindow.h"
 #include "Localization/Localization.h"
 
-
-static const std::string BEFORE_EXIT_MODAL_TITLE = "Save current scene?";
-static const std::string BEFORE_EXIT_MODAL_MESSAGE = "Any unsaved content will be discarded, do you want to save it?";
+inline std::string getBeforeExitModalTitle()
+{
+	return _t("Save current scene?");
+}
+inline std::string getBeforeExitModalMessage()
+{
+	return _t("Any unsaved content will be discarded, do you want to save it?");
+}
 
 void askBeforeExitScene(std::function<void()> action);
 
