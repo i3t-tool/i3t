@@ -26,10 +26,13 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 
 	m_workspaceInputs.reserve(inputPins.size());
 	m_workspaceOutputs.reserve(outputPins.size());
+	m_leftPins.reserve(inputPins.size());
+	m_rightPins.reserve(outputPins.size());
 
 	for (Core::Pin const& corePin : inputPins)
 	{
 		Ptr<CorePin> pin = std::make_shared<CorePin>(diwne, corePin, this, true);
+		m_leftPins.push_back(pin.get());
 		m_workspaceInputs.push_back(std::move(pin));
 	}
 
@@ -38,6 +41,7 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 		Ptr<CorePin> pin = std::make_shared<CorePin>(diwne, corePin, this, false);
 		// default true, false for Camera and Sequence - they don't show data on their output pins
 		pin->m_showData = m_showDataOnPins;
+		m_rightPins.push_back(pin.get());
 		m_workspaceOutputs.push_back(std::move(pin));
 	}
 }
@@ -49,12 +53,12 @@ void CoreNodeWithPins::afterDraw(DIWNE::DrawInfo& context)
 	// If pin icons stick out of the node (when pin offset is negative), their drawing is deferred to us.
 	// Meaning this node will draw the pin icons using already prepared data from the pins.
 	// This is done so that any node borders or hover/selection indicators are drawn UNDER the pins.
-	for (auto& pin : m_workspaceInputs)
+	for (auto& pin : m_leftPins)
 	{
 		if (!pin->m_pinIconData.rendered)
 			pin->renderPinDiwne(pin->m_pinIconData);
 	}
-	for (auto& pin : m_workspaceOutputs)
+	for (auto& pin : m_rightPins)
 	{
 		if (!pin->m_pinIconData.rendered)
 			pin->renderPinDiwne(pin->m_pinIconData);
@@ -66,9 +70,9 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 	bool pinsVisible = false;
 
 	// todo (PF) effectivity???
-	for (auto pin : this->getNodebase()->getInputPins())
+	for (auto pin : m_leftPins)
 	{
-		if (pin.isRendered())
+		if (pin->allowDrawing())
 		{
 			pinsVisible = true;
 			break;
@@ -85,7 +89,7 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 			// Connect them to the middle of the box left side (showing just the label)
 			ImRect nodeRect = getRect();
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
-			for (auto const& pin : m_workspaceInputs)
+			for (auto const& pin : m_leftPins)
 			{
 				// if (!pin->getCorePin().isRendered()) // todo (PF) Label did not draw the wires!
 				{
@@ -104,9 +108,9 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 {
 	bool pinsVisible = false;
 
-	for (auto pin : this->getNodebase()->getOutputPins())
+	for (auto pin : m_rightPins)
 	{
-		if (pin.isRendered())
+		if (pin->allowDrawing())
 		{
 			pinsVisible = true;
 			break;
@@ -124,17 +128,13 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 			const ImRect nodeRect = getRect();
 			// todo (PF) pinConnectionPoint is wrong when output pulse pins are not drawn
 			const ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
-			for (auto const& pin : getOutputs())
+			for (auto const& pin : m_rightPins)
 			{
-				if (pin->getCorePin().isRendered())
-					pin->setConnectionPointDiwne(pinConnectionPoint);
-				else
-					int i = 7; // NOOP
+				pin->setConnectionPointDiwne(pinConnectionPoint);
 			}
 		}
 
 		// else - include SetValues
-		// uses getOutputsToShow()) = subset of outputs, based of the level. Override function in the WorkspaceCycle
 		if (m_levelOfDetail != LevelOfDetail::Label) // SetValues must draw the value pin
 		{
 			drawOutputPins(context);
@@ -149,7 +149,7 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 
 void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)
 {
-	for (auto const& pin : m_workspaceInputs)
+	for (auto const& pin : m_leftPins)
 	{
 		updatePinStyle(*pin);
 		if (pin->allowDrawing())
@@ -162,7 +162,7 @@ void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)
 void CoreNodeWithPins::drawOutputPins(DIWNE::DrawInfo& context)
 {
 	outputPinsVstack.begin();
-	for (auto const& pin : getOutputsToShow()) // subset of outputs, based of the level
+	for (auto const& pin : m_rightPins) // subset of outputs, based of the level
 	{
 		updatePinStyle(*pin);
 		if (pin->allowDrawing())

@@ -43,6 +43,7 @@ public:
 	bool buttonStepNext();
 	bool buttonStepBack();
 
+	void begin(DIWNE::DrawInfo& context) override;
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void leftContent(DIWNE::DrawInfo& context) override;
 	void rightContent(DIWNE::DrawInfo& context) override;
@@ -61,13 +62,5 @@ public:
 	 * \return true if this button was pressed - as a side effect, replace the current mode in \a *v by \a v_button
 	 */
 	bool myRadioButton(const char* label, int* v, int v_button);
-
-	std::vector<Ptr<CorePin>> getOutputsToShow() const override
-	{
-		if (m_levelOfDetail == LevelOfDetail::SetValues || m_levelOfDetail == LevelOfDetail::LightCycle)
-			return {getOutputs()[0]}; // output value only
-		else
-			return {getOutputs()}; // Float value and all Pulse outputs
-	};
 };
 } // namespace Workspace

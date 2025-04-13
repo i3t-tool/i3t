@@ -38,7 +38,6 @@ private:
 
 public:
 	Screen(DIWNE::NodeEditor& diwne);
-	~Screen();
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -48,18 +47,11 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	/////////////////////////////////////////////////////////////
-
-	// bool drawDataFull(, int index);
 	int maxLengthOfData() override;                        // todo
 	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
-	void drawMenuLevelOfDetail() override;                 // todo
-	void popupContent(DIWNE::DrawInfo& context) override;
 
-	std::vector<Ptr<CorePin>> getOutputsToShow() const override
-	{
-		return {getOutputs()[1]};
-	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
+	void drawMenuLevelOfDetail() override; // todo
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	/////////////////////////////////////////////////////////////
 
@@ -67,8 +59,6 @@ public:
 	void setAspect(ImVec2 aspect);
 
 private:
-	void init();
-
 	bool drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize);
 };
 } // namespace Workspace

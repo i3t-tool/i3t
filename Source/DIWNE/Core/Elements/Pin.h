@@ -197,6 +197,11 @@ public:
 	 */
 	bool unregisterLink(Link* link);
 
+	/// Called to initialize an input pin or to switch to being one.
+	void makeInput();
+	/// Called to initialize an output pin or to switch to being one.
+	void makeOutput();
+
 	// Pin drawing
 	// =============================================================================================================
 	/// Set the point to which connected links are attached
@@ -217,10 +222,13 @@ public:
 	 * They also force links to always end in them, meaning a link can't begin in an input pin.
 	 * Output pins have no such restrictions. They can be on either end of a link and have any amount of connections,
 	 * when m_allowMultipleConnections is enabled. For input pins that flag is forced to false.
-	 * @return
+	 * @see isLeft()
 	 */
 	bool isInput() const;
 
+	/// Whether the pin is rendered on the left side of a node.
+	/// Usually input pins are rendered on the left but they don't always have to.
+	/// Hence one shouldn't rely on this method returning the same as isInput()
 	bool isLeft() const;
 
 	virtual bool isDisabled() const; ///< /// Whether the pin is disabled or not. When disabled it cannot be plugged in.

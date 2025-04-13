@@ -32,7 +32,17 @@ void CoreLink::popupContent(DIWNE::DrawInfo& context)
 // TODO: Move this to DIWNE eventually
 void CoreLink::updateControlPoints()
 {
-	ImVec2 diff = getEndPoint() - getStartPoint();
+	bool rightToLeft = true;
+	if (auto* startPin = getStartPin())
+		rightToLeft = !startPin->isLeft();
+	else if (auto* endPin = getEndPin())
+		rightToLeft = endPin->isLeft();
+
+	ImVec2 diff;
+	if (rightToLeft)
+		diff = getEndPoint() - getStartPoint();
+	else
+		diff = getStartPoint() - getEndPoint();
 
 	// constexpr float maxAngle = 1 * I3_PI / 4;
 	// float angle = std::atan2f(diff.y, diff.x);
@@ -74,9 +84,8 @@ void CoreLink::updateControlPoints()
 	// if (abs(diff.y) < yDeadzone)
 	// 	offset *= (abs(diff.y) / yDeadzone);
 
-	// TODO: Probably swap based on some parameter if output pins on the left side were supported
-	m_controlPointStartDiwne = m_startDiwne + ImVec2(offset, 0);
-	m_controlPointEndDiwne = m_endDiwne + ImVec2(-offset, 0);
+	m_controlPointStartDiwne = m_startDiwne + ImVec2(rightToLeft ? offset : -offset, 0);
+	m_controlPointEndDiwne = m_endDiwne + ImVec2(rightToLeft ? -offset : offset, 0);
 }
 
 void CoreLink::initialize(DIWNE::DrawInfo& context)

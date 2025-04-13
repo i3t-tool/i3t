@@ -28,6 +28,7 @@
 
 #include "NodeData.h"
 
+; // namespace Core
 namespace Core
 {
 using PinGroup = std::vector<EValueType>;
@@ -208,6 +209,10 @@ static const std::array<std::string, 9> defaultIoNames = {
     "pointer" // Ptr
 };
 
+constexpr size_t I3T_SCREEN_IN_S = 0;       // screen in
+constexpr size_t I3T_SCREEN_OUT_S = 0;      // screen out (unused?)
+constexpr size_t I3T_SCREEN_OUT_ASPECT = 1; // float aspect ratio
+
 // variants of input and output pins
 static const PinGroup matrixInput = {EValueType::Matrix};
 static const PinGroup vectorInput = {EValueType::Vec4};
@@ -251,7 +256,7 @@ static const PinGroup floatMatrixInput = {EValueType::Float, EValueType::Matrix}
 static const PinGroup floatVectorInput = {EValueType::Float, EValueType::Vec4};
 static const PinGroup floatVector3Input = {EValueType::Float, EValueType::Vec3};
 static const PinGroup floatQuatInput = {EValueType::Float, EValueType::Quat};
-static const PinGroup screenFloatInput = {EValueType::Screen, EValueType::Float};
+static const PinGroup screenFloatInput = {EValueType::Screen, EValueType::Float}; // FIXME: This is used as output
 // static const PinGroup quatVector3Input = {EValueType::Quat, EValueType::Vec3};
 
 static const PinGroup matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
@@ -580,4 +585,4 @@ FORCE_INLINE const TransformMask& getTransformMap(const std::string& keyWord)
 		return getTransformOperation(*type).mask;
 	return noDefaults;
 }
-}; // namespace Core
+} // namespace Core

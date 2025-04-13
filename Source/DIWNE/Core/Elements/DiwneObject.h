@@ -368,6 +368,8 @@ public:
 	void setSelectable(bool selectable);
 	bool getSelectable();
 
+	// TODO: This could be a virtual method like allowDrawing()
+	//  allowDrawing() is more of an optimization, this is a toggle of existence
 	bool isRendered() const;
 	void setRendered(bool val);
 

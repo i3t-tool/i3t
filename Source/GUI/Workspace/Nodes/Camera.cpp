@@ -114,6 +114,14 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 			viewportCameraPtr->m_viewMatrix = cameraNode->m_viewMatrix;
 		}
 	});
+
+	// Move screen output to the input (left) side
+	auto it = std::next(m_rightPins.begin(), 0);
+	(*it)->m_isLeft = true;
+	(*it)->makeOutput();
+	(*it)->m_showData = false;
+	m_leftPins.insert(m_leftPins.begin(), *it);
+	m_rightPins.erase(it);
 }
 
 Camera::~Camera()
@@ -123,7 +131,7 @@ Camera::~Camera()
 
 void Camera::popupContent(DIWNE::DrawInfo& context)
 {
-	CoreNode::drawMenuSetEditable();
+	drawMenuSetEditable();
 
 	ImGui::Separator();
 
@@ -240,11 +248,11 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	}
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate(context);
+	drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Node::popupContent(context);
+	Super::popupContent(context);
 }
 
 glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
@@ -270,11 +278,11 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 }
 void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 {
-	std::vector<Ptr<CorePin>> pins = getOutputsToShow();
-	assert(pins.size() == 3); // Camera has special pin handling, expecting matrix mul at 2
+	auto& pins = m_rightPins;
+	assert(pins.size() == 2); // Camera has special pin handling, expecting matrix mul at 1
 
 	outputPinsVstack.begin();
-	for (auto pin : {pins[0], pins[1]})
+	for (auto pin : {pins[0]})
 	{
 		updatePinStyle(*pin);
 		if (pin->allowDrawing())
@@ -286,11 +294,11 @@ void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 		}
 	}
 
-	auto& pin = pins[2];
+	auto& pin = pins[1];
 	updatePinStyle(*pin);
 	if (pin->allowDrawing())
 	{
-		outputPinsVstack.spring(0.24f);
+		outputPinsVstack.spring(0.4f);
 		DIWNE::DiwnePanel* row = outputPinsVstack.beginRow();
 		row->spring(1.0f);
 		pin->drawDiwne(context);
@@ -330,12 +338,12 @@ void Camera::onDestroy(bool logEvent)
 {
 	m_projection->destroy(logEvent);
 	m_view->destroy(logEvent);
-	CoreNodeWithPins::onDestroy(logEvent);
+	Super::onDestroy(logEvent);
 }
 
 void Camera::onSelection(bool selected)
 {
-	Node::onSelection(selected);
+	Super::onSelection(selected);
 	auto model = m_viewportCamera.lock();
 	if (selected)
 	{

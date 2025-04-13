@@ -23,16 +23,6 @@ using namespace Workspace;
 Screen::Screen(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::Builder::createOperator<Core::EOperatorType::Screen>())
 {
-	init();
-}
-
-Screen::~Screen()
-{
-	// Empty
-}
-
-void Screen::init()
-{
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
 
 	m_displayOptions.showAxes = false;
@@ -44,15 +34,25 @@ void Screen::init()
 	m_renderOptions.framebufferAlpha = false;
 	m_renderOptions.wboit = false;
 	m_renderOptions.clearColor = Config::BACKGROUND_COLOR;
+
+	// Move screen input to the output (right) side
+	auto it = std::next(m_leftPins.begin(), 0);
+	(*it)->m_isLeft = false;
+	(*it)->makeInput();
+	(*it)->m_showData = m_showDataOnPins;
+	m_rightPins.insert(m_rightPins.begin(), *it);
+	m_leftPins.erase(it);
+
+	m_workspaceOutputs.at(Core::I3T_CAMERA_OUT_SCREEN)->setRendered(false); // Hide output screen pin
 }
 
 void Screen::popupContent(DIWNE::DrawInfo& context)
 {
-	CoreNode::drawMenuSetEditable();
+	drawMenuSetEditable();
 
 	ImGui::Separator();
 
-	CoreNode::drawMenuDuplicate(context);
+	drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
@@ -117,11 +117,10 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 		context.consumeInput();
 }
 
-int Screen::maxLengthOfData() // todo
+int Screen::maxLengthOfData()
 {
-	return Tools::numberOfCharWithDecimalPoint(getOutputs()[1]->getCorePin().data().getFloat(),
-	                                           getNumberOfVisibleDecimal()); /* \todo JH \todo MH not 1 but
-	                                                                            some Core::Pin_Code */
+	return Tools::numberOfCharWithDecimalPoint(
+	    getOutputs()[Core::I3T_SCREEN_OUT_ASPECT]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal());
 }
 
 void Screen::drawMenuLevelOfDetail() // todo

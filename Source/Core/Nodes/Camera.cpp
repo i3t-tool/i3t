@@ -37,9 +37,10 @@ void Camera::createComponents()
 	m_view = GraphManager::createSequence();
 	appendChildNode(m_view);
 
-	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)
+	ENodePlugResult result = GraphManager::plug(m_proj, m_view);
+	if (result != ENodePlugResult::Ok)
 	{
-		LOG_DEBUG("Components of a sequence could not be connected.");
+		LOG_DEBUG("Camera sequences could not be connected ({})!", EnumUtils::name(result));
 	}
 
 	getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);

@@ -109,8 +109,6 @@ void CorePin::content(DIWNE::DrawInfo& context)
 		m_pinIconData = drawPin(false, pinAlpha);
 		dragRect = DGui::EndRect(rectData);
 	}
-	if (ImGui::IsKeyDown(ImGuiKey_E))
-		int x = 5;
 	if (style().boolean(Style::PIN_ENABLE_DRAG_LABEL))
 	{
 		if (m_pinIconData.protrusion > 0) // Adjust drag rect if the pin is stickin out of the node
@@ -119,8 +117,6 @@ void CorePin::content(DIWNE::DrawInfo& context)
 			dragRect.Min.x += m_pinIconData.protrusion;
 		m_dragRect = diwne.canvas().screen2diwne(dragRect);
 	}
-	LOG_INFO("{}: drect: {}, {} ({}, {})", m_labelDiwne, m_dragRect.Min.x, m_dragRect.Min.y, m_dragRect.GetSize().x,
-	         m_dragRect.GetSize().y);
 
 	// End dimming
 	if (dimmingEnabled)
@@ -261,6 +257,10 @@ void CorePin::renderSquarePin(const ImVec2& pos, const ImVec2& size, float alpha
 		iconTypeFg = m_iconType;
 	else
 		iconTypeFg = PinShapeForeground[pinType];
+
+	// Adjust icon if the pin is on a different side than usually expected (inputs on the left)
+	if (iconTypeFg == DIWNE::IconType::TriangleRight && this->isInput() != this->isLeft())
+		iconTypeFg = DIWNE::IconType::TriangleLeft;
 
 	const ImColor iconColorFg = I3T::getColor(PinColorForeground[pinType]) * ImVec4(1.f, 1.f, 1.f, alpha);
 

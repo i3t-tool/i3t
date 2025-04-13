@@ -43,9 +43,9 @@ class Camera : public Node
 
 public:
 	/// Latest projection matrix value
-	glm::mat4 m_projectionMatrix;
+	glm::mat4 m_projectionMatrix{1.f};
 	/// Latest view matrix value
-	glm::mat4 m_viewMatrix;
+	glm::mat4 m_viewMatrix{1.f};
 
 	Camera();
 

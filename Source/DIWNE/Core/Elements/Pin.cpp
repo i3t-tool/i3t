@@ -26,10 +26,11 @@ Pin::Pin(NodeEditor& diwne, Node* node, bool isInput, std::string labelDiwne)
 	assert(node != nullptr);
 	setSelectable(false);
 	setParentObject(node);
+	m_isLeft = m_isInput;
 	if (m_isInput)
-		m_allowMultipleConnections = false;
+		Pin::makeInput();
 	else
-		m_isLeft = false;
+		Pin::makeOutput();
 }
 
 void Pin::initialize(DrawInfo& context)
@@ -47,9 +48,6 @@ void Pin::begin(DrawInfo& context)
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup();
 
-	if (ImGui::IsKeyDown(ImGuiKey_E))
-		int x = 5;
-
 	// Drawing pin hover background, uses hover information from the last frame
 	if (m_hovered && allowConnection())
 	{
@@ -61,8 +59,6 @@ void Pin::begin(DrawInfo& context)
 	{
 		m_previewPluggedInternal = false;
 	}
-	LOG_INFO("{} begin: drect: {}, {} ({}, {})", m_labelDiwne, m_dragRect.Min.x, m_dragRect.Min.y,
-	         m_dragRect.GetSize().x, m_dragRect.GetSize().y);
 }
 void Pin::content(DrawInfo& context)
 {
@@ -396,6 +392,17 @@ bool Pin::unregisterLink(Link* link)
 		return true;
 	}
 	return false;
+}
+
+void Pin::makeInput()
+{
+	m_allowMultipleConnections = false;
+	m_isInput = true;
+}
+void Pin::makeOutput()
+{
+	m_allowMultipleConnections = true;
+	m_isInput = false;
 }
 
 void Pin::translate(const ImVec2& vec)
