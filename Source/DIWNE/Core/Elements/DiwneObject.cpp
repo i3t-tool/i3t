@@ -65,6 +65,9 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	bool wasDrawnLastFrame = m_drawnThisFrame;
 	m_drawnThisFrame = false;
 
+	if (m_forceDraw)
+		mode |= DrawMode_ForceDraw;
+
 	initializeDiwne(context);
 	if (allowDrawing() || mode & DrawMode_ForceDraw)
 	{
@@ -79,6 +82,8 @@ void DiwneObject::drawDiwne(DrawInfo& context, DrawMode mode)
 	}
 	m_justHidden = wasDrawnLastFrame && !m_drawnThisFrame;
 	finalizeDiwne(context);
+
+	m_forceDraw = false;
 }
 
 void DiwneObject::initialize(DrawInfo& context) {}
@@ -808,5 +813,9 @@ void DiwneObject::setBringToFront(bool val)
 bool DiwneObject::isToBeBroughtToFront()
 {
 	return m_bringToFront;
+}
+void DiwneObject::setForceDraw(bool val)
+{
+	m_forceDraw = val;
 }
 } /* namespace DIWNE */
