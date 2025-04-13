@@ -4,6 +4,10 @@ from pathlib import Path
 FOLDER_WITH_SOURCE = Path('Source/')
 LOCALIZATION_DIR = Path('Data/Localization/')
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+RESET = "\033[0m"
 
 def find_localization_files(localization_dir):
     """
@@ -95,7 +99,7 @@ if __name__ == '__main__':
     localization_files = find_localization_files(LOCALIZATION_DIR)
     if not localization_files:
         print(f"No localization files found in {LOCALIZATION_DIR}.")
-        print("\nIMPORTANT! Do not forget to set working directory for this script to the root of the project.\n")
+        print(YELLOW + "\nIMPORTANT! Do not forget to set working directory for this script to the root of the project.\n" + RESET)
         exit(1)
 
     print(f"Localization files found: {', '.join(localization_files.keys())}")

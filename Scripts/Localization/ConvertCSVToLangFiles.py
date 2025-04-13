@@ -37,6 +37,11 @@ def parse_csv_to_lang_files(csv_filename, localization_dir):
     # Now create files for each language and write the collected strings into them
     for lang, lines in lang_data.items():
         with open(f"{localization_dir}/{lang}.txt", 'w', encoding='utf-8') as out_file:
+            out_file.write("########################################################################################\n")
+            out_file.write("#           This file is auto-generated. Do not edit it manually.\n")
+            out_file.write("# If you want to modify it, do it in the CSV file (Data/Localization/localization.csv). \n")
+            out_file.write("########################################################################################\n")
+            out_file.write("\n")
             for line in lines:
                 out_file.write(line + "\n")
         print(f"Created or rewrote {localization_dir}/{lang}.txt.")
