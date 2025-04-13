@@ -98,9 +98,9 @@ public:
 	int maxLengthOfData() override
 	{
 		int maxLen = 0;
-		for (auto const& pin : m_workspaceOutputs)
+		for (auto const& pin : m_rightPins)
 		{
-			maxLen = std::max(maxLen, std::dynamic_pointer_cast<CorePin>(pin)->maxLengthOfData());
+			maxLen = std::max(maxLen, pin->maxLengthOfData());
 		}
 		return maxLen;
 	}

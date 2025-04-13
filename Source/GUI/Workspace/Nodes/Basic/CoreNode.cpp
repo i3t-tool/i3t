@@ -53,7 +53,8 @@ CoreNode::~CoreNode()
 void CoreNode::begin(DIWNE::DrawInfo& context)
 {
 	Node::begin(context);
-	m_headerSpacing = m_bottomSpacing = getLevelOfDetail() != LevelOfDetail::Label;
+	if (getLevelOfDetail() == LevelOfDetail::Label)
+		m_headerSpacing = m_bottomSpacing = false;
 }
 
 void CoreNode::topContent(DIWNE::DrawInfo& context)

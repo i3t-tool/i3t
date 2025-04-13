@@ -116,6 +116,8 @@ private:
 	DIWNE::PinIconDrawData addPinItem(const ImVec2& size, bool left, float offset);
 
 public:
+	/// Internal method to render pin icon based on previously generated pin icon draw data.Ł
+	/// This method is public as the rendering is sometimes deferred to the parent node.
 	void renderPinDiwne(DIWNE::PinIconDrawData& data) const;
 
 private:

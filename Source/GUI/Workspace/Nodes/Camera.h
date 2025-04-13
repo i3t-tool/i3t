@@ -28,6 +28,8 @@ namespace Workspace
 {
 class Camera : public CoreNodeWithPins, public DIWNE::INodeContainer
 {
+	using Super = CoreNodeWithPins;
+
 protected:
 	// Projection and view are stored as two pointer kinds to support DIWNE::INodeContainer queries
 	// The projection and view getters could probably just use raw pointers

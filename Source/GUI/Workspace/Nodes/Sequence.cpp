@@ -85,7 +85,6 @@ void Sequence::begin(DIWNE::DrawInfo& context)
 
 void Sequence::centerContent(DIWNE::DrawInfo& context)
 {
-	int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
 	Ptr<TransformationBase> dragedNode;
 
 	if (m_levelOfDetail == LevelOfDetail::Label)
@@ -180,11 +179,10 @@ void Sequence::drawInputPins(DIWNE::DrawInfo& context)
 
 void Sequence::drawOutputPins(DIWNE::DrawInfo& context)
 {
-	std::vector<Ptr<CorePin>> pins = getOutputsToShow();
+	auto& pins = m_rightPins;
 	assert(pins.size() == 3); // Sequences have special pin handling, expecting matrix mul at 0; matrix data at 1 and 2
 
 	ImGui::Spacing(); // Manually add vertical spacing
-
 
 	updatePinStyle(*pins[1]);
 	updatePinStyle(*pins[2]);

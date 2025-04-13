@@ -228,6 +228,25 @@ bool Cycle::buttonStepBack()
 	}
 	return active;
 }
+void Cycle::begin(DIWNE::DrawInfo& context)
+{
+	CoreNodeWithPins::begin(context);
+
+	for (int i = 0; i < m_workspaceOutputs.size(); i++)
+	{
+		if (m_levelOfDetail == LevelOfDetail::SetValues || m_levelOfDetail == LevelOfDetail::LightCycle)
+		{
+			if (i == 0)
+				m_workspaceOutputs[i]->setRendered(true);
+			else
+				m_workspaceOutputs[i]->setRendered(false);
+		}
+		else
+		{
+			m_workspaceOutputs[i]->setRendered(true);
+		}
+	}
+}
 
 void Cycle::leftContent(DIWNE::DrawInfo& context)
 {

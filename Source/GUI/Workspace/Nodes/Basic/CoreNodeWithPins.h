@@ -31,6 +31,10 @@ private:
 protected:
 	std::vector<Ptr<CorePin>> m_workspaceInputs;
 	std::vector<Ptr<CorePin>> m_workspaceOutputs;
+
+	std::vector<CorePin*> m_leftPins;
+	std::vector<CorePin*> m_rightPins;
+
 	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
 
 	DIWNE::VStack outputPinsVstack{diwne, &m_right};
@@ -53,11 +57,7 @@ public:
 	const std::vector<Ptr<CorePin>>& getOutputs() const
 	{
 		return m_workspaceOutputs;
-	};
-	virtual std::vector<Ptr<CorePin>> getOutputsToShow() const
-	{
-		return getOutputs();
-	};
+	}
 
 	void afterDraw(DIWNE::DrawInfo& context) override;
 	void leftContent(DIWNE::DrawInfo& context) override;
