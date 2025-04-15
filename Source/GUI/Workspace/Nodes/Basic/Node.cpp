@@ -37,6 +37,7 @@ Node::Node(DIWNE::NodeEditor& diwne, std::string label) : DIWNE::BasicNode(diwne
 
 void Node::onDestroy(bool logEvent)
 {
+	BasicNode::onDestroy(logEvent);
 	LOG_EVENT_NODE_REMOVED(m_labelDiwne, diwne.m_labelDiwne);
 }
 
