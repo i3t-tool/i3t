@@ -321,11 +321,12 @@ void WorkspaceWindow::showDebugMenu()
 
 void WorkspaceWindow::showDiwneStyleMenu()
 {
-	// TODO: Temporary, remove and move into I3T themes!
+	// TODO: Temporary, remove and move into I3T themes / preferences!
 	if (ImGui::BeginMenu("Style"))
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 
+		ImGui::MenuItem("Create nodes on new scene", NULL, &WorkspaceModule::g_createNodesOnInit);
 		if (ImGui::BeginMenu("Pin style"))
 		{
 			if (ImGui::BeginMenu("General"))
@@ -432,6 +433,8 @@ void WorkspaceWindow::showDiwneStyleMenu()
 
 		ImGui::SeparatorText("Node icons");
 		ImGui::MenuItem("Use LOD icons", NULL, &CoreNode_useLODIcons);
+		ImGui::MenuItem("Use three dots for multi LODs (>2 modes)", NULL, &CoreNode_useDotsForMultiLOD);
+		ImGui::MenuItem("Shift LOD icons", NULL, &CoreNode_shiftLODIcons);
 		if (ImGui::BeginMenu("LOD expand/collapse"))
 		{
 			if (ImGui::MenuItem("Chevron", NULL, !(CoreNode_useAngleLODIcon || CoreNode_useCaretLODIcon)))
@@ -449,7 +452,6 @@ void WorkspaceWindow::showDiwneStyleMenu()
 			}
 			ImGui::EndMenu();
 		}
-		ImGui::MenuItem("Use three dots for multi LODs (>2 modes)", NULL, &CoreNode_useDotsForMultiLOD);
 		if (ImGui::BeginMenu("Set value mode icon (when three dots are off)"))
 		{
 			ImGui::MenuItem("Pen in box", NULL, &CoreNode_usePenInBoxIcon);

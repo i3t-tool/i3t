@@ -42,6 +42,8 @@ bool Canvas::applyZoomScaling()
 		return false;
 	}
 
+	m_unscaledFontSize = ImGui::GetFontSize();
+
 	m_zoomOriginalFontScale = applyZoomScalingToFont(font, 1.0f);
 	ImGui::PushFont(font);
 

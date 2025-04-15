@@ -52,9 +52,16 @@ CoreNode::~CoreNode()
 
 void CoreNode::begin(DIWNE::DrawInfo& context)
 {
+	if (m_updateDataItemsWidth)
+		updateDataItemsWidth();
+	m_updateDataItemsWidth = false;
+
 	Node::begin(context);
+
 	if (getLevelOfDetail() == LevelOfDetail::Label)
 		m_headerSpacing = m_bottomSpacing = false;
+	else
+		m_headerSpacing = m_bottomSpacing = m_topBottomSpacingDefault;
 }
 
 void CoreNode::topContent(DIWNE::DrawInfo& context)
@@ -170,27 +177,7 @@ const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 		if (detail == LevelOfDetail::Label)
 			return ">";
 	}
-	if (getLODCount() <= 2 || !CoreNode_useDotsForMultiLOD)
-	{
-		if (detail == LevelOfDetail::Full)
-		{
-			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_DOWN
-			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_DOWN
-			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_DOWN;
-		}
-		if (detail == LevelOfDetail::SetValues)
-		{
-			return CoreNode_usePenInBoxIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_PEN_TO_SQUARE
-			                                : ICON_FA_I3T_NSPACE_1 ICON_FA_PEN;
-		}
-		if (detail == LevelOfDetail::Label)
-		{
-			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_RIGHT
-			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_RIGHT
-			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_RIGHT;
-		}
-	}
-	else
+	if (getLODCount() >= 3 && CoreNode_useDotsForMultiLOD)
 	{
 		if (detail == LevelOfDetail::Full)
 		{
@@ -203,6 +190,44 @@ const char* CoreNode::getButtonSymbolFromLOD(const LevelOfDetail detail)
 		if (detail == LevelOfDetail::Label)
 		{
 			return ICON_FA_I3T_DOTS_3_3;
+		}
+	}
+	if (getLODCount() >= 3)
+	{
+		if ((detail == LevelOfDetail::Full && !CoreNode_shiftLODIcons) ||
+		    (CoreNode_shiftLODIcons && detail == LevelOfDetail::SetValues))
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_DOWN
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_DOWN
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_DOWN;
+		}
+		if ((detail == LevelOfDetail::SetValues && !CoreNode_shiftLODIcons) ||
+		    (CoreNode_shiftLODIcons && detail == LevelOfDetail::Full))
+		{
+			return CoreNode_usePenInBoxIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_PEN_TO_SQUARE
+			                                : ICON_FA_I3T_NSPACE_1 ICON_FA_PEN;
+		}
+		if ((detail == LevelOfDetail::Label && !CoreNode_shiftLODIcons) ||
+		    (CoreNode_shiftLODIcons && detail == LevelOfDetail::Label))
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_RIGHT
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_RIGHT
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_RIGHT;
+		}
+	}
+	else
+	{
+		if (detail == LevelOfDetail::Full)
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_DOWN
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_DOWN
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_DOWN;
+		}
+		if (detail == LevelOfDetail::Label)
+		{
+			return CoreNode_useAngleLODIcon   ? ICON_FA_I3T_NSPACE_1 ICON_FA_ANGLE_RIGHT
+			       : CoreNode_useCaretLODIcon ? ICON_FA_I3T_NSPACE_1 ICON_FA_CARET_RIGHT
+			                                  : ICON_FA_I3T_NSPACE_1 ICON_FA_CHEVRON_RIGHT;
 		}
 	}
 
@@ -316,7 +341,7 @@ int CoreNode::getNumberOfVisibleDecimal()
 void CoreNode::setNumberOfVisibleDecimal(int value)
 {
 	m_numberOfVisibleDecimal = (value >= 0 ? value : 0);
-	updateDataItemsWidth();
+	queueUpdateDataItemsWidth();
 }
 
 FloatPopupMode& CoreNode::getFloatPopupMode()
@@ -332,20 +357,25 @@ float CoreNode::getDataItemsWidth()
 {
 	return m_dataItemsWidth;
 }
+void CoreNode::queueUpdateDataItemsWidth()
+{
+	m_updateDataItemsWidth = true;
+}
 
 float CoreNode::updateDataItemsWidth()
 {
-	// TODO: It should be possible to determine scaled font size without actually swapping fonts / applying scaling
-	//  All we have to know is the original unscaled font size
-	const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(true);
-	const float fontSize = ImGui::GetFontSize();
+	// NOTE: This method might be called OUTSIDE of ImGui / DIWNE context
+	float fontSize;
+	if (diwne.canvas().m_zoomScalingApplied)
+		fontSize = diwne.canvas().m_unscaledFontSize * diwne.getZoom();
+	else
+		fontSize = ImGui::GetFontSize();
 	const float oneCharWidth = fontSize / 2;
 	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getZoom();
 	const float maxLength = static_cast<float>(maxLengthOfData());
 	m_dataItemsWidth = maxLength * oneCharWidth + 2 * padding;
-	// LOG_INFO("SetDataItemsWidth() in node: '{}'\nfS: {}, oCW: {}, mLOD: {}, dataWidth: {}",
-	//         this->getNodebase()->getLabel(), fontSize, oneCharWidth, maxLengthOfData, m_dataItemsWidth);
-	diwne.canvas().ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+	LOG_DEBUG("updateDataItemsWidth() in node '{}': fS: {}, oCW: {}, maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
+	          oneCharWidth, maxLength, m_dataItemsWidth);
 	return m_dataItemsWidth;
 }
 

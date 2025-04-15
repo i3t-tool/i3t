@@ -41,6 +41,7 @@ public:
 	float m_prevZoom;        ///< Last frame zoom factor
 
 	bool m_zoomScalingApplied = false; ///< Whether zoom UI scaling has been applied or not to Dear ImGui
+	float m_unscaledFontSize{16.f};    ///< Original font size
 protected:
 	float m_zoomOriginalFontScale;  ///< Original font scale
 	ImGuiStyle m_zoomOriginalStyle; ///< Original ImGui style

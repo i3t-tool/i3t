@@ -38,11 +38,11 @@ public:
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void end(DIWNE::DrawInfo& context) override;
 
-	virtual bool allowDrawing() override;
+	bool allowDrawing() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
-	virtual void drawMenuLevelOfDetail() override = 0;
+	void drawMenuLevelOfDetail() override = 0;
 	LevelOfDetail switchLevelOfDetail(LevelOfDetail oldLevel) override;
 	int getLODCount() override;
 
@@ -70,7 +70,7 @@ public:
 		return drawDataFull(context);
 	};
 
-	virtual int maxLengthOfData() override;
+	int maxLengthOfData() override;
 
 	void drawMenuStorevalues();
 

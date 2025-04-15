@@ -17,6 +17,7 @@
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Scripting/ScriptingModule.h"
 
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "I3TUtil.h"
 
 using WorkspaceScriptingTest = ApplicationTest;
@@ -26,6 +27,8 @@ TEST_F(WorkspaceScriptingTest, NodeData)
 	using namespace std::string_literals;
 
 	auto& scripting = App::getModule<ScriptingModule>();
+
+	App::getModule<WorkspaceModule>().clearScene(false); // Full clear scene
 
 	auto maybeErr = scripting.runScript(R"(
 	   local nodes_count = #I3T.get_all_nodes()
@@ -48,6 +51,8 @@ TEST_F(WorkspaceScriptingTest, FoltaScenes)
 	using namespace std::string_literals;
 
 	auto& scripting = App::getModule<ScriptingModule>();
+
+	App::getModule<WorkspaceModule>().clearScene(false);
 
 	for (const auto& file : fs::directory_iterator("Data/Scripts"))
 	{

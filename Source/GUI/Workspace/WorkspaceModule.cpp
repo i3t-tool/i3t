@@ -15,6 +15,7 @@ using namespace Workspace;
 Ptr<WorkspaceDiwne> WorkspaceModule::g_editor;
 WorkspaceSettings WorkspaceModule::g_settings;
 
+bool WorkspaceModule::g_createNodesOnInit = true;
 int WorkspaceModule::g_pinStyle = 1;
 int WorkspaceModule::g_pinStyleMul = 0;
 int WorkspaceModule::g_pinStylePulse = 0;
@@ -62,7 +63,7 @@ Memento WorkspaceModule::saveScene(Scene* scene)
 
 void WorkspaceModule::loadScene(const Memento& memento, Scene* scene)
 {
-	clearScene();
+	clearScene(false);
 
 	if (!memento.HasMember("workspace"))
 	{
@@ -95,9 +96,16 @@ void WorkspaceModule::appendScene(const Memento& memento, Scene* scene)
 }
 
 
-void WorkspaceModule::clearScene()
+void WorkspaceModule::clearScene(bool newScene)
 {
 	getNodeEditor().clear();
+
+	if (newScene && g_createNodesOnInit)
+	{
+		Ptr<Sequence> seq = addNodeToNodeEditorNoSave<Sequence>({220, 300});
+		Ptr<Model> mod = addNodeToNodeEditorNoSave<Model>({520, 320});
+		connectNodesNoSave(seq, mod, 0, 0);
+	}
 }
 
 Memento WorkspaceModule::saveGlobal()
@@ -144,8 +152,8 @@ bool WorkspaceModule::connectNodesNoSave(Ptr<CoreNode> lhs, Ptr<CoreNode> rhs, i
 		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
 		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
 	}
-	rhs->updateDataItemsWidth();
-	lhs->updateDataItemsWidth();
+	rhs->queueUpdateDataItemsWidth();
+	lhs->queueUpdateDataItemsWidth();
 	return success;
 }
 

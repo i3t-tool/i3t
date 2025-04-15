@@ -21,7 +21,6 @@ using namespace Workspace;
 
 TransformationBase::TransformationBase(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase) : CoreNode(diwne, nodebase)
 {
-	updateDataItemsWidth();
 	setStyleOverride(&I3T::getTheme().m_transformationStyle);
 }
 
@@ -186,6 +185,9 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 LevelOfDetail TransformationBase::switchLevelOfDetail(LevelOfDetail oldLevel)
 {
+	if (getLODCount() <= 2)
+		return Super::switchLevelOfDetail(oldLevel);
+
 	if (oldLevel == LevelOfDetail::Full)
 		return setLevelOfDetail(LevelOfDetail::SetValues);
 	if (oldLevel == LevelOfDetail::SetValues)
@@ -313,7 +315,7 @@ bool TransformationBase::drawDataFull(DIWNE::DrawInfo& context)
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
 		/// \todo see #111
 		// App::getModule<StateManager>().takeSnapshot();
-		updateDataItemsWidth();
+		queueUpdateDataItemsWidth();
 	}
 	return interaction_happen;
 }

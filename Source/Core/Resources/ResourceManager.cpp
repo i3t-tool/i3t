@@ -909,7 +909,7 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 		int failCounter = 0;
 		LOG_INFO("[RESOURCE MANAGER] Loading imported resources ...");
 
-		clearScene();
+		clearScene(false);
 
 		if (!memento.HasMember("resources"))
 		{
@@ -998,7 +998,7 @@ void ResourceManager::appendScene(const Memento& memento, State::Scene* scene)
 	}
 }
 
-void ResourceManager::clearScene()
+void ResourceManager::clearScene(bool newScene)
 {
 	// Clear imported resources
 	std::vector importedResourcesCopy = std::vector(m_importedResources);

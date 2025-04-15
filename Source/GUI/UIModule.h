@@ -122,7 +122,7 @@ private:
 	// Load layout and tutorial info from the file scene.
 	void loadScene(const Memento& memento, State::Scene* scene) override;
 	void appendScene(const Memento& memento, State::Scene* scene) override {}
-	void clearScene() override;
+	void clearScene(bool newScene) override;
 
 public:
 	Memento saveGlobal() override;

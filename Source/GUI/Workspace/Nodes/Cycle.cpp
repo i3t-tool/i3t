@@ -35,9 +35,6 @@ Cycle::Cycle(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase /*=Core::GraphMa
 	m_workspaceOutputs[Core::I3T_CYCLE_OUT_NEXT]->m_iconType = DIWNE::SkipForward2;
 	m_workspaceOutputs[Core::I3T_CYCLE_OUT_BEGIN]->m_iconType = DIWNE::Rewind;
 	m_workspaceOutputs[Core::I3T_CYCLE_OUT_END]->m_iconType = DIWNE::FastForward;
-
-	updateDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node
-	                        and run settings data width in it */
 }
 
 bool Cycle::isCycle()
@@ -340,7 +337,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setFrom(localData);
-			updateDataItemsWidth();
+			queueUpdateDataItemsWidth();
 
 			context.consumeInput();
 		}
@@ -380,7 +377,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setTo(localData);
-			updateDataItemsWidth();
+			queueUpdateDataItemsWidth();
 		}
 
 		//----------------
@@ -420,7 +417,7 @@ void Cycle::leftContent(DIWNE::DrawInfo& context)
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setStep(localData);
-			updateDataItemsWidth();
+			queueUpdateDataItemsWidth();
 		}
 
 		//-------------------------------------------------------------------
@@ -713,7 +710,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			if (valueChanged)
 			{
 				m_nodebase->as<Core::Cycle>()->setStepDuration(localData);
-				updateDataItemsWidth();
+				queueUpdateDataItemsWidth();
 			}
 
 
@@ -737,7 +734,7 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 			if (valueChanged)
 			{
 				m_nodebase->as<Core::Cycle>()->setManualStep(localData);
-				updateDataItemsWidth();
+				queueUpdateDataItemsWidth();
 			}
 
 			ImGui::SameLine();
