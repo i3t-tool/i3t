@@ -722,7 +722,7 @@ bool CorePin::drawBasicPinData(DIWNE::DrawInfo& context)
 	}
 	if (valueChanged)
 	{
-		node.updateDataItemsWidth();
+		node.queueUpdateDataItemsWidth();
 	}
 	if (interaction_happen)
 		context.consumeInput();

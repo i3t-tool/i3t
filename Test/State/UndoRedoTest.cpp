@@ -24,7 +24,6 @@
 TEST(UndoRedoTest, Basic)
 {
 	auto app = initI3T();
-	App::getModule<StateManager>().takeSnapshot();
 
 	auto castNode = [](const std::shared_ptr<DIWNE::Node>& node) -> Workspace::CoreNode* {
 		return node->as<Workspace::CoreNode>();
@@ -34,6 +33,10 @@ TEST(UndoRedoTest, Basic)
 	};
 
 	auto& workspace = I3T::getWorkspace();
+	workspace.clearScene(false); // Full clear scene
+
+	App::getModule<StateManager>().takeSnapshot();
+
 	const auto& nodes = workspace.getNodeEditor().getNodeList();
 	ASSERT_TRUE(nodes.empty());
 

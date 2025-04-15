@@ -485,7 +485,7 @@ void UIModule::loadScene(const Memento& memento, Scene* scene)
 		LOG_WARN("Cannot load scene tutorial data! No 'tutorialData' entry found!");
 	}
 }
-void UIModule::clearScene() {}
+void UIModule::clearScene(bool newScene) {}
 
 Memento UIModule::saveGlobal()
 {

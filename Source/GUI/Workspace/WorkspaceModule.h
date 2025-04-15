@@ -35,6 +35,7 @@ public:
 	static Ptr<Workspace::WorkspaceDiwne> g_editor;
 	static WorkspaceSettings g_settings;
 
+	static bool g_createNodesOnInit;
 	static int g_pinStyle;
 	static int g_pinStyleMul;
 	static int g_pinStylePulse;
@@ -70,13 +71,12 @@ public:
 
 	// State save/load
 	// =============================================================================================================
-private:
+public:
 	Memento saveScene(Scene* scene) override;
 	void loadScene(const Memento& memento, Scene* scene) override;
 	void appendScene(const Memento& memento, Scene* scene) override;
-	void clearScene() override;
+	void clearScene(bool newScene) override;
 
-public:
 	Memento saveGlobal() override;
 	void loadGlobal(const Memento& memento) override;
 	void clearGlobal() override;

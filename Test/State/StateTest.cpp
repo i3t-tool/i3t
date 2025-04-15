@@ -41,6 +41,8 @@ public:
 	}
 };
 
+#define NEW_SCENE_NODE_COUNT 2
+
 /// \todo This test may require the OpenGL context!
 TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 {
@@ -60,7 +62,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 	App::getModule<StateManager>().saveScene(emptyScenePath);
 
 	{
-		ASSERT_TRUE(getNodes(workspace).empty());
+		ASSERT_EQ(getNodes(workspace).size(), NEW_SCENE_NODE_COUNT); // New scene contains two nodes by default
 
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
@@ -86,8 +88,8 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
-		// workspace contains 3 operators.
-		ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
+		// workspace contains 3 operators + 2 default nodes.
+		ASSERT_EQ(getNodes(workspace).size(), nodes.size() + 2);
 
 		WorkspaceModule::connectNodesNoSave(nodes[0], nodes[1], 0, 0);
 		App::getModule<StateManager>().takeSnapshot();
@@ -110,7 +112,7 @@ TEST_F(StateTest, SceneCanBeSavedAndLoaded)
 		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
 		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
-		ASSERT_TRUE(getNodes(workspace).empty());
+		ASSERT_EQ(getNodes(workspace).size(), NEW_SCENE_NODE_COUNT);
 	}
 
 	{

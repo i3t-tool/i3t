@@ -60,8 +60,6 @@ public:
 		//	WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(4);
 		// }
 
-		CoreNode::updateDataItemsWidth();
-
 		setStyleOverride(&I3T::getTheme().m_operatorStyle);
 	}
 
@@ -83,7 +81,7 @@ public:
 	// ImDrawFlags_RoundCornersAll); 		return false;
 	//	}
 
-	virtual void inline centerContent(DIWNE::DrawInfo& context) override
+	void centerContent(DIWNE::DrawInfo& context) override
 	{
 		// Why is this empty?
 		// Because operators are essentially only made up of pins

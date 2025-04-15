@@ -33,6 +33,7 @@ constexpr const auto ONE_LINE_SCRIPT_ERROR_LINE_OFFSET = 6;
 
 //------------------------------------------------------------------------------------------------//
 
+// TODO: (DR) Move this to I3T Core!
 class ScriptingNode : public Core::Node
 {
 public:

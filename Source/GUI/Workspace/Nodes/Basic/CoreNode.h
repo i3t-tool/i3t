@@ -19,6 +19,7 @@ namespace Workspace
 {
 inline bool CoreNode_useLODIcons = true;
 inline bool CoreNode_useDotsForMultiLOD = true;
+inline bool CoreNode_shiftLODIcons = true;
 inline bool CoreNode_useAngleLODIcon = true;
 inline bool CoreNode_useCaretLODIcon = false;
 inline bool CoreNode_usePenInBoxIcon = true;
@@ -30,13 +31,14 @@ class CoreNode : public Node, public IVisitable
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
 	float m_dataItemsWidth;
-	float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
+	bool m_updateDataItemsWidth{true};
+	// float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
 	bool m_drawContextMenuButton = false;
 	bool m_isLabelBeingEdited = false;
 	bool m_isFirstDraw = true;
+	bool m_topBottomSpacingDefault = true; ///< Whether this node has spacing between content and header / end.
 	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};
 	LevelOfDetail m_levelOfDetail{LevelOfDetail::Full};
-
 	/**
 	 * @brief Reference to the I3T Core node
 	 * @description Each Workspace GUI node represents a single I3T Core node.
@@ -83,8 +85,13 @@ public:
 	virtual int maxLengthOfData() = 0;
 
 	float getDataItemsWidth();
+
+	void queueUpdateDataItemsWidth();
+
+protected:
 	virtual float updateDataItemsWidth();
 
+public:
 	// Level of detail
 	// =============================================================================================================
 	virtual void drawMenuLevelOfDetail() = 0;

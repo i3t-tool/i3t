@@ -22,15 +22,19 @@ namespace Workspace
 template <Core::ETransformType T>
 class Transformation : public TransformationBase
 {
+	using Super = TransformationBase;
+
 public:
 	Transformation(DIWNE::NodeEditor& diwne) : TransformationBase(diwne, Core::Builder::createTransform<T>())
 	{
 		init();
-		updateDataItemsWidth();
 	}
 
 	/// Called in the constructor.
-	void init() {}
+	void init()
+	{
+		// Used in templated specializations
+	}
 
 	/**
 	 * \brief helper function used for decision about showing the corrupted
@@ -40,7 +44,7 @@ public:
 	 *
 	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
 	 */
-	virtual bool isMatrixValid() override
+	bool isMatrixValid() override
 	{
 		return m_nodebase->as<Core::TransformImpl<T>>()->isValid();
 	}
@@ -77,6 +81,11 @@ public:
 		//                                                              LevelOfDetail::Label});
 	}
 
+	int getLODCount() override
+	{
+		return Super::getLODCount();
+	}
+
 	bool drawDataSetValues(DIWNE::DrawInfo& context) override
 	{
 		bool inner_interaction_happen = false, value_changed = false;
@@ -105,7 +114,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 					break;
 				}
@@ -123,7 +132,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 					break;
 				}
@@ -148,7 +157,7 @@ public:
 						// error 	else 		localData = glm::normalize(localData);
 						//           }
 						nodebase->setDefaultValue(key, localData);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 					break;
 				}
@@ -166,7 +175,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 					break;
 				}
@@ -190,6 +199,12 @@ inline void Transformation<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
 	I3TGui::MenuItemWithLog(_t("Lock"), NULL, false, false); /* no change DataMap in Free transformation */
 	I3TGui::MenuItemWithLog(_t("Enable synergies"), NULL, false, false);
+}
+
+template <>
+inline int Transformation<Core::ETransformType::Free>::getLODCount()
+{
+	return Super::getLODCount() - 1; // Free doesn't have SetValues mode
 }
 
 template <>
@@ -394,7 +409,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues(DIWNE
 						// nodebase->setDefaultValue(key, localData[0]);  // Sets float
 						// instead of vec3 - may be based on synergies??
 						nodebase->setDefaultUniformScale(localData.x);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 				}
 				else /* non-uniform */
@@ -408,7 +423,7 @@ inline bool Transformation<Core::ETransformType::Scale>::drawDataSetValues(DIWNE
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						updateDataItemsWidth();
+						queueUpdateDataItemsWidth();
 					}
 				}
 				break;
@@ -450,7 +465,7 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues(DIWN
 	{
 		index_of_change %= columnLabels.size(); /* move to index of nodebase data column */
 		nodebase->setDefaultValue(columnLabels[index_of_change], local_data[index_of_change]);
-		updateDataItemsWidth();
+		queueUpdateDataItemsWidth();
 	}
 
 	return inner_interaction_happen;

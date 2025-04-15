@@ -61,8 +61,9 @@ public:
 
 	/**
 	 * Set the scene state to some default empty state.
+	 * @param newScene Whether to perform basic new scene initialization.
 	 */
-	virtual void clearScene() = 0;
+	virtual void clearScene(bool newScene) = 0;
 
 	/**
 	 * Save shared global state.

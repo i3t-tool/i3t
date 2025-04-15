@@ -241,7 +241,7 @@ void Viewport::loadScene(const Memento& memento, State::Scene* scene)
 	m_mainScene->loadSettings(m_settings, true, false);
 }
 
-void Viewport::clearScene()
+void Viewport::clearScene(bool newScene)
 {
 	// Clear manipulators
 	m_manipulators->clearManipulators();

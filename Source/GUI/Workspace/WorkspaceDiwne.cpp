@@ -58,7 +58,7 @@ void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 		m_updateDataItemsWidth = false;
 		for (auto& node : getAllCoreNodes())
 		{
-			node.updateDataItemsWidth();
+			node.queueUpdateDataItemsWidth();
 		}
 	}
 	DIWNE::NodeEditor::begin(context);

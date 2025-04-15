@@ -24,6 +24,8 @@ TEST(NodeToolsTest, CopyNodes)
 {
 	auto app = initI3T();
 
+	App::getModule<WorkspaceModule>().clearScene(false);
+
 	const auto f1 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 	const auto f2 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatToFloat>>();
 	const auto f3 = WorkspaceModule::addNodeToNodeEditor<Workspace::Operator<EOperatorType::FloatAddFloat>>();

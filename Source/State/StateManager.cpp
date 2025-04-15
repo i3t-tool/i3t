@@ -22,10 +22,6 @@
 
 void StateManager::onInit()
 {
-	NewProjectCommand::addListener([]() {
-		App::getModule<StateManager>().newScene();
-	});
-
 	// Create UserData folder if it doesn't exist.
 	fs::create_directory(USER_DATA_DIR);
 
@@ -535,7 +531,7 @@ void StateManager::newScene(bool firstRun)
 {
 	for (const auto& originator : m_originators)
 	{
-		originator->clearScene();
+		originator->clearScene(true);
 	}
 
 	setCurrentScene(std::make_shared<Scene>(this, false));

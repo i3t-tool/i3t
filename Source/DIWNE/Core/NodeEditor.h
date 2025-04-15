@@ -215,7 +215,7 @@ public:
 	// TODO: Do we really need a template function for this?
 	// TODO: This method doesn't allow to create nodes with arbitrary constructors (no args passthrough)
 	template <class T>
-	auto inline createNode(const ImVec2 position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
+	auto createNode(const ImVec2 position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
 		auto node = std::make_shared<T>(*this);
 		addNode(node, position, shiftToLeftByNodeWidth);

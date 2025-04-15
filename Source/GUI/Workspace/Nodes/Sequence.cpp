@@ -23,11 +23,10 @@ using namespace Workspace;
 Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCameraSequence /*=false*/)
     : CoreNodeWithPins(diwne, nodebase, false), m_isCameraSequence(isCameraSequence)
 {
-	updateDataItemsWidth();
 	setStyleOverride(&I3T::getTheme().m_transformationStyle);
-	m_headerMinWidth = 120;
-	m_headerSpacing = false; // We want drop zone background to be flush with the header, handled in left/right panels.
-	m_bottomSpacing = false;
+	// m_headerMinWidth = 120;
+	// We want drop zone background to be flush with the header, handled in left/right panels.
+	m_topBottomSpacingDefault = false;
 	m_contentSpacing = 0;
 	m_drawContextMenuButton = true;
 }
@@ -78,7 +77,7 @@ void Sequence::begin(DIWNE::DrawInfo& context)
 		if (matrixInput->connectionChanged())
 		{
 			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
-			updateDataItemsWidth();
+			queueUpdateDataItemsWidth();
 		}
 	}
 }
@@ -136,7 +135,7 @@ void Sequence::setNumberOfVisibleDecimal(int value)
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
 		m_numberOfVisibleDecimal = value;
-		updateDataItemsWidth();
+		queueUpdateDataItemsWidth();
 	}
 	else
 	{
@@ -238,7 +237,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	Super::popupContent(context);
+	Node::popupContent(context);
 }
 
 void Sequence::popupContentTracking()
