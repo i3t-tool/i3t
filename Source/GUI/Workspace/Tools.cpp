@@ -37,13 +37,13 @@ std::optional<Ptr<GuiNode>> Tools::findNodeById(const std::vector<Ptr<GuiNode>>&
 Memento* Tools::copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 {
 	Memento* memento = new Memento();
-	for (auto node : nodes)
+	for (auto& node : nodes)
 	{
 		node->translate(ImVec2(offset, offset));
 	}
 	SerializationVisitor serializer(*memento);
 	serializer.dump(nodes);
-	for (auto node : nodes)
+	for (auto& node : nodes)
 	{
 		node->translate(ImVec2(-offset, -offset));
 	}

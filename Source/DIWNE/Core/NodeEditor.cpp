@@ -204,7 +204,7 @@ void NodeEditor::content(DrawInfo& context)
 
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
 		// Draw links, first in drawing order, last in logical order
-		for (auto link : m_links)
+		for (auto& link : m_links)
 		{
 			// Avoid drawing the dragged link if a new connection is being made
 			std::string draggedLinkLabel = "";

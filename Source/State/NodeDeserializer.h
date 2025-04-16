@@ -24,6 +24,7 @@ namespace NodeDeserializer
 {
 /// @pre DIWNE and WorkspaceWindow are initialized.
 /// @return Vector of Workspace::CoreNodes (casted to base type DIWNE::Node for perf reasons)
+/// Only top level nodes are returned, inner/child nodes are omitted from the list.
 std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll = false);
 
 std::optional<Ptr<GuiOperator>> createOperator(const rapidjson::Value& value, bool select);

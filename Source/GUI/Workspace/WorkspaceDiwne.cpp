@@ -299,14 +299,14 @@ void WorkspaceDiwne::toggleSelectedNodesVisibility()
 	auto selected = getSelectedNodesInnerIncluded().collectRaw();
 	if (selected.empty())
 	{
-		for (auto node : getAllNodesInnerIncluded())
+		for (auto& node : getAllNodesInnerIncluded())
 		{
 			node.setRendered(true);
 		}
 	}
 	else
 	{
-		for (auto node : selected)
+		for (auto& node : selected)
 		{
 			node->setRendered(false);
 			node->setSelected(false);
@@ -510,7 +510,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 	copiedNodes = Tools::copyNodes(nodes);
 
 	// Delete copied nodes
-	for (auto node : nodes)
+	for (auto& node : nodes)
 	{
 		node->destroy();
 	}
