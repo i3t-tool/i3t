@@ -212,7 +212,13 @@ void ScriptingNode::popupContent(DIWNE::DrawInfo& context)
 
 int ScriptingNode::maxLengthOfData()
 {
-	return 0;
+	// Same as Operator<T>, maybe unite the functionality in CoreNode or something
+	int maxLen = 0;
+	for (auto const& pin : m_rightPins)
+	{
+		maxLen = std::max(maxLen, pin->maxLengthOfData());
+	}
+	return maxLen;
 }
 
 void ScriptingNode::drawMenuLevelOfDetail()

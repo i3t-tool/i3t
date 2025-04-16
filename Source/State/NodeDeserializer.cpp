@@ -17,7 +17,6 @@
 #include "Core/Nodes/Transform.h"
 #include "GUI/Workspace/Builder.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
-#include "GUI/Workspace/Tools.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/JSON.h"
 #include "Viewport/entity/nodes/SceneModel.h"
@@ -33,7 +32,10 @@ namespace NodeDeserializer
 {
 std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 {
-	std::map<Core::ID, Ptr<Workspace::CoreNode>> createdNodes;
+	// Map of Core IDs <-> CoreNode ptr and a flag indicating whether its a top level node
+	// Map contains child nodes to allow easy connection of inner nodes
+	// The method however only returns top level nodes at the end
+	std::map<Core::ID, std::pair<Ptr<Workspace::CoreNode>, bool>> createdNodes;
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
@@ -43,7 +45,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 		{
 			const auto node = *maybeNode;
 			NodeDeserializer::assignCommon(value, node, selectAll);
-			createdNodes[value["id"].GetInt()] = node;
+			createdNodes[value["id"].GetInt()] = {node, false};
 		}
 	}
 
@@ -53,7 +55,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	{
 		const auto node = NodeDeserializer::createSequence(value, selectAll);
 		NodeDeserializer::assignCommon(value, node, selectAll);
-		createdNodes[value["id"].GetInt()] = node;
+		createdNodes[value["id"].GetInt()] = {node, false};
 	}
 
 	//
@@ -62,7 +64,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	{
 		const auto cycle = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Cycle>();
 		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
-		createdNodes[value["id"].GetInt()] = cycle;
+		createdNodes[value["id"].GetInt()] = {cycle, false};
 		NodeDeserializer::assignCommon(value, cycle, selectAll);
 
 		if (value.HasMember("from") && value["from"].IsFloat())
@@ -123,13 +125,15 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	{
 		const auto camera = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Camera>();
 		NodeDeserializer::assignCommon(value, camera, selectAll);
-		createdNodes[value["id"].GetInt()] = camera;
+		createdNodes[value["id"].GetInt()] = {camera, false};
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView(), selectAll);
+		createdNodes[viewValue["id"].GetInt()] = {camera->getView(), true};
 
 		const auto& projValue = value["sequences"].GetArray()[1];
 		NodeDeserializer::assignSequence(projValue, camera->getProjection(), selectAll);
+		createdNodes[projValue["id"].GetInt()] = {camera->getProjection(), true};
 	}
 
 	//
@@ -138,7 +142,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	{
 		const auto screen = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Screen>();
 		NodeDeserializer::assignCommon(value, screen, selectAll);
-		createdNodes[value["id"].GetInt()] = screen;
+		createdNodes[value["id"].GetInt()] = {screen, false};
 
 		if (value.HasMember("aspect"))
 		{
@@ -153,7 +157,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	{
 		const auto model = WorkspaceModule::addNodeToNodeEditorNoSave<Workspace::Model>();
 		NodeDeserializer::assignCommon(value, model, selectAll);
-		createdNodes[value["id"].GetInt()] = model;
+		createdNodes[value["id"].GetInt()] = {model, false};
 
 		auto mesh = model->viewportModel().lock();
 
@@ -211,7 +215,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 				if (auto newNode = node->setScript(value["script"].GetString()))
 				{
 					// Has to be here, node id gets changed by setScript.
-					createdNodes[value["id"].GetInt()] = newNode;
+					createdNodes[value["id"].GetInt()] = {newNode, false};
 				}
 			}
 		}
@@ -227,7 +231,7 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 		{
 			const auto transform = maybeTransform.value();
 			NodeDeserializer::assignCommon(value, transform, selectAll);
-			createdNodes[value["id"].GetInt()] = transform;
+			createdNodes[value["id"].GetInt()] = {transform, false};
 		}
 	}
 
@@ -243,8 +247,8 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 			continue;
 		}
 
-		auto lhs = createdNodes.at(edge[0].GetInt());
-		auto rhs = createdNodes.at(edge[2].GetInt());
+		auto lhs = createdNodes.at(edge[0].GetInt()).first;
+		auto rhs = createdNodes.at(edge[2].GetInt()).first;
 
 		auto lhsPin = edge[1].GetInt();
 		auto rhsPin = edge[3].GetInt();
@@ -253,9 +257,11 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 	}
 
 	std::vector<Ptr<DIWNE::Node>> result;
-	std::transform(createdNodes.begin(), createdNodes.end(), std::back_inserter(result), [](auto& pair) {
-		return pair.second;
-	});
+	for (auto& mapEntry : createdNodes)
+	{
+		if (!mapEntry.second.second)
+			result.emplace_back(mapEntry.second.first);
+	}
 	return result;
 }
 

@@ -100,7 +100,7 @@ void Pin::updateLayout(DrawInfo& context)
 
 void Pin::onDestroy(bool logEvent)
 {
-	for (auto link : m_links)
+	for (auto& link : m_links)
 		link->destroy(logEvent);
 	Super::onDestroy(logEvent);
 }

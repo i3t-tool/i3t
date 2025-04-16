@@ -72,7 +72,7 @@ void CoreNodeWithPins::leftContent(DIWNE::DrawInfo& context)
 	bool pinsVisible = false;
 
 	// todo (PF) effectivity???
-	for (auto pin : m_leftPins)
+	for (auto& pin : m_leftPins)
 	{
 		if (pin->allowDrawing())
 		{

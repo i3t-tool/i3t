@@ -308,7 +308,11 @@ bool ViewportWindow::showViewportMenu()
 
 		if (I3TGui::BeginMenuWithLog(_t("Scene")))
 		{
-			ImGui::Checkbox(_t("World space lighting"), &stg.scene().mainScene.lightFollowsCamera);
+			bool b = !stg.scene().mainScene.lightFollowsCamera;
+			if (ImGui::Checkbox(_t("World space lighting"), &b))
+			{
+				stg.scene().mainScene.lightFollowsCamera = !b;
+			}
 			ImGui::EndMenu();
 		}
 
