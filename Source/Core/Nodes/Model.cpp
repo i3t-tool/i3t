@@ -16,11 +16,6 @@
 
 namespace Core
 {
-Model::~Model()
-{
-	MatrixTracker::onModelDestroy(this);
-}
-
 void Model::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
@@ -38,6 +33,7 @@ void Model::onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIn
 {
 	m_modelMatrix = glm::mat4(1.0f);
 	Node::updateValues(toIndex);
+	Node::onUnplug(fromNode, toNode, fromIndex, toIndex);
 }
 
 void Model::resetModelPosition()

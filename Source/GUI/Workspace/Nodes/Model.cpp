@@ -67,14 +67,14 @@ void Model::initialize(DIWNE::DrawInfo& context)
 	Ptr<Vp::SceneModel> modelPtr = m_viewportModel.lock();
 
 	Core::Model* model = getNodebase()->asRaw<Core::Model>();
-	if (model->m_trackedModel != nullptr)
+	if (auto t = model->getTrackingData())
 	{
+		assert(t->modelData != nullptr && "Models should be carrying TrackedModelData");
 		Ptr<Vp::SceneModel> trackedPtr;
 		if (m_trackedModel.expired())
 		{
 			m_trackedModel = I3T::getViewport()->createModel(getNodebase()->getId());
 			trackedPtr = m_trackedModel.lock();
-			trackedPtr->m_showAxes = true;
 			trackedPtr->m_visible = true;
 			trackedPtr->m_selectable = true;
 			m_modelOrigOpaque = modelPtr->m_opaque;
@@ -83,7 +83,8 @@ void Model::initialize(DIWNE::DrawInfo& context)
 			modelPtr->m_opacity = std::min(m_modelOrigOpacity, 0.8f);
 		}
 		trackedPtr = m_trackedModel.lock();
-		trackedPtr->m_modelMatrix = model->m_trackedModel->m_interpolatedMatrix;
+		trackedPtr->m_showAxes = modelPtr->m_showAxes;
+		trackedPtr->m_modelMatrix = t->modelData->m_interpolatedMatrix;
 		trackedPtr->setHighlightColor(GUI::imToGlm(I3T::getColor(EColor::Nodes_Tracking_ColorActive)));
 		trackedPtr->setHighlighted(true);
 		trackedPtr->setModel(modelPtr->getModel());

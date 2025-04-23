@@ -33,7 +33,7 @@ constexpr const auto ONE_LINE_SCRIPT_ERROR_LINE_OFFSET = 6;
 
 //------------------------------------------------------------------------------------------------//
 
-// TODO: (DR) Move this to I3T Core!
+// TODO: (DR) Move this to I3T Core, but only if the lua stuff can be decoupled from it?
 class ScriptingNode : public Core::Node
 {
 public:

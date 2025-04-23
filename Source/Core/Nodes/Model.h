@@ -18,19 +18,13 @@
 
 namespace Core
 {
-struct TrackedModel;
-
 class Model : public Node
 {
 public:
 	Model() : Node(g_modelProperties){};
-	~Model() override;
 
 	/// Latest model matrix value
 	glm::mat4 m_modelMatrix{};
-
-	/// Reference to the corresponding tracked model entry when tracked, nullptr otherwise.
-	TrackedModel* m_trackedModel{nullptr};
 
 	void updateValues(int inputIndex = 0) override;
 	void resetModelPosition();

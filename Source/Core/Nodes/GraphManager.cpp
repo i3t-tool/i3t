@@ -128,6 +128,31 @@ Ptr<Node> GraphManager::getParent(const Ptr<Node>& node, size_t index)
 
 	return expected;
 }
+Ptr<Node> GraphManager::getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& isCamera, bool skipEmptySeq,
+                                                  bool skipEmptyCamera)
+{
+	isCamera = false;
+	auto parent = getParent(sequence, I3T_SEQ_IN_MUL);
+	while (parent != nullptr)
+	{
+		if (isCamera(parent.get()))
+		{
+			const auto parentCamera = parent->as<Camera>();
+			isCamera = true;
+			if (!skipEmptyCamera || !parentCamera->isEmpty())
+				return parentCamera;
+			return nullptr;
+		}
+		else
+		{
+			const auto parentSequence = parent->as<Sequence>();
+			if (!skipEmptySeq || !parentSequence->isEmpty())
+				return parentSequence;
+			parent = getParent(parentSequence, I3T_SEQ_IN_MUL);
+		}
+	}
+	return nullptr;
+}
 
 std::vector<Ptr<Node>> GraphManager::getAllOutputNodes(Ptr<Core::Node>& node)
 {

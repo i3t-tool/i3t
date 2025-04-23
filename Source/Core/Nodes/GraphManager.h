@@ -83,6 +83,14 @@ public:
 
 	static Ptr<Model> createModel();
 
+	// Inline static helper methods to unify node type queries.
+	// Type of nodes can be determined by inspecting their Operation keyword.
+	// This is a string comparision which isn't ideal, alternative is to use dynamic_cast which a lot of the code does.
+	// Either way having this check done in a method affords us some flexibility in the future.
+	inline static bool isCamera(Node* node);
+	inline static bool isModel(Node* node);
+	inline static bool isSequence(Node* node);
+
 	/**
 	 * \param tick in seconds.
 	 */
@@ -162,6 +170,10 @@ public:
 	 */
 	static Ptr<Node> getParent(const Ptr<Node>& node, size_t index = 0);
 
+	// TODO: Docs
+	static Ptr<Node> getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& isCamera, bool skipEmptySeq = false,
+										bool skipEmptyCamera = false);
+
 	/**
 	 * \return All nodes connected to given node inputs.
 	 */
@@ -214,5 +226,18 @@ inline Ptr<Core::Cycle> GraphManager::createCycle()
 	s_self->m_cycles.push_back(ret);
 
 	return ret;
+}
+
+inline bool GraphManager::isCamera(Node* node)
+{
+	return node->getOperation().keyWord == g_cameraProperties.keyWord;
+}
+inline bool GraphManager::isModel(Node* node)
+{
+	return node->getOperation().keyWord == g_modelProperties.keyWord;
+}
+inline bool GraphManager::isSequence(Node* node)
+{
+	return node->getOperation().keyWord == g_sequence.keyWord;
 }
 } // namespace Core

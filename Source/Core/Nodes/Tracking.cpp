@@ -15,15 +15,13 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Iterators.h"
 
+#include "Camera.h"
+#include "Sequence.h"
+
 namespace Core
 {
-ID TransformInfo::getTrackingID() const
-{
-	return !isExternal ? currentNode->getId() : sequence->getId();
-}
-
-TransformChain::TransformChain(Ptr<Sequence> sequence, bool skipEmptySequences)
-    : m_skipEmptySequences(skipEmptySequences)
+TransformChain::TransformChain(Ptr<Sequence> sequence, bool skipEmptySequences, bool ignoreCamera)
+    : m_skipEmptySequences(skipEmptySequences), m_ignoreCamera(ignoreCamera)
 {
 	if (sequence == nullptr)
 	{
@@ -37,6 +35,7 @@ TransformChain::TransformChainIterator TransformChain::begin()
 {
 	auto it = TransformChainIterator(m_beginSequence);
 	it.m_skipEmptySequences = m_skipEmptySequences;
+	it.m_ignoreCamera = m_ignoreCamera;
 	it.m_tree = this;
 	return it;
 }
@@ -45,14 +44,9 @@ TransformChain::TransformChainIterator TransformChain::end()
 {
 	auto it = TransformChainIterator();
 	it.m_skipEmptySequences = m_skipEmptySequences;
+	it.m_ignoreCamera = m_ignoreCamera;
 	it.m_tree = this;
 	return it;
-}
-
-TrackedModel::~TrackedModel()
-{
-	if (m_modelNode)
-		m_modelNode->m_trackedModel = nullptr;
 }
 
 TransformChain::TransformChainIterator::TransformChainIterator(Ptr<Sequence> sequence)
@@ -174,72 +168,55 @@ bool TransformChain::TransformChainIterator::operator!=(const TransformChain::Tr
 
 void TransformChain::TransformChainIterator::advance()
 {
-	bool hasNext = true;
-
-	Ptr<Node> parent;
-	if (m_skipEmptySequences)
-		parent = getNonemptyParentSequence(m_info.sequence);
-	else
-		parent = GraphManager::getParent(m_info.sequence, I3T_SEQ_IN_MUL);
-
+	// Check inner sequence state
 	const auto& matrices = m_info.sequence->getMatrices();
 
-	int index;
-	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
-	{
-		index = 0;
-		if (!parent)
-		{
-			hasNext = false;
-		}
-	}
-	else
+	if (!m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
 	{
 		const auto it = std::find(matrices.begin(), matrices.end(), m_info.currentNode);
-		index = std::distance(matrices.begin(), it);
-		if (index == 0 && !parent)
-			hasNext = false;
+		int index = std::distance(matrices.begin(), it);
+		assert(index >= 0);
+		if (index != 0)
+		{
+			// Move left in the current sequence
+			m_info.currentNode = matrices[--index];
+			return;
+		}
 	}
 
-	if (!hasNext)
+	// No inner datra, search for a parent
+	bool isCamera;
+	Ptr<Node> parent = GraphManager::getParentSequenceOrCamera(m_info.sequence, isCamera, m_skipEmptySequences, true);
+	if (!parent || (isCamera && m_ignoreCamera))
 	{
 		invalidate();
 		return;
 	}
 
-	assert(index >= 0);
-
 	m_info.isExternal = false;
 	m_info.dataIndex = 0;
-	if (index == 0)
-	{
-		// We are at the beginning of the sequence. Go to the next sequence connected to the input.
-		// TODO: Add a check for a Camera node, make a flag for it likely
-		m_info.sequence = parent->as<Sequence>();
 
-		// Check if the parent sequence is connected externally via matrix pin
-		if (const auto matrixPluggedIntoParent = GraphManager::getParent(m_info.sequence, I3T_SEQ_IN_MAT))
-		{
-			m_info.isExternal = true;
-			m_info.currentNode = m_info.sequence;
-			m_info.dataIndex = I3T_SEQ_MAT;
-		}
-		else
-		{
-			auto& parentMatrices = m_info.sequence->getMatrices();
-			if (parentMatrices.empty())
-				m_info.currentNode = nullptr;
-			else
-				m_info.currentNode = parentMatrices.back();
-		}
+
+	m_info.sequence = parent->as<Sequence>();
+
+	// Check if the parent sequence is connected externally via matrix pin
+	if (const auto matrixPluggedIntoParent = GraphManager::getParent(m_info.sequence, I3T_SEQ_IN_MAT))
+	{
+		m_info.isExternal = true;
+		m_info.currentNode = m_info.sequence; // Set the sequence has the transform data source
+		m_info.dataIndex = I3T_SEQ_MAT;
 	}
 	else
 	{
-		// Move left in the current sequence
-		m_info.currentNode = matrices[--index];
+		auto& parentMatrices = m_info.sequence->getMatrices();
+		if (parentMatrices.empty())
+			m_info.currentNode = nullptr;
+		else
+			m_info.currentNode = parentMatrices.back();
 	}
 }
 
+// TODO: Move to graph manager if used again
 // /// \pre parentSequence is direct or indirect parent of startSequence.
 // /// \return Nonempty child sequence of parentSequence or nullptr if there is no such sequence.
 // Ptr<Sequence> getNonemptyChildSequence(Ptr<Sequence> startSequence, Ptr<Sequence> parentSequence)
@@ -357,7 +334,7 @@ void MatrixTracker::updateChain()
 
 	// Create iterator for traversing sequence branch.
 	// TransformChain always traverses "right to left" towards root.
-	TransformChain st(beginSequence, false);
+	TransformChain st(beginSequence, false, false);
 
 	// Perform the traversal
 	auto transforms = st.begin().collectInfo();
@@ -566,11 +543,18 @@ void MatrixTracker::updateProgress()
 
 void MatrixTracker::updateModelTransforms()
 {
-	for (Ptr<TrackedModel>& model : m_models)
+	for (UPtr<TrackedNode>& model : m_models)
 	{
-		assert(model->m_modelNode != nullptr);
-		model->m_referenceSpace = glm::inverse(m_modelSubtreeRoot) * model->m_modelNode->m_modelMatrix;
-		model->m_interpolatedMatrix = m_interpolatedMatrix * model->m_referenceSpace;
+		if (model->node.expired())
+		{
+			LOG_ERROR("[TRACKING] Cannot update model transform of an expired model!");
+			assert(false);
+			continue;
+		}
+		assert(model->data.modelData != nullptr);
+		auto* modelNode = model->node.lock()->asRaw<Model>();
+		model->data.modelData->m_referenceSpace = glm::inverse(m_modelSubtreeRoot) * modelNode->m_modelMatrix;
+		model->data.modelData->m_interpolatedMatrix = m_interpolatedMatrix * model->data.modelData->m_referenceSpace;
 	}
 	m_modelTransformsNeedUpdate = false;
 	LOG_DEBUG("[TRACKING] Updated transforms for {} models.", m_models.size());
@@ -586,23 +570,25 @@ void MatrixTracker::updateModels()
 	for (; it != subTree.end(); ++it)
 	{
 		Node& node = *it;
-		if (node.getOperation().keyWord == g_modelProperties.keyWord)
+		if (GraphManager::isModel(&node))
 		{
-			Model* modelNode = static_cast<Model*>(&node);
-			m_models.emplace_back(std::make_shared<TrackedModel>(modelNode, this));
-			TrackedModel* trackedModel = m_models.back().get();
-			modelNode->m_trackedModel = trackedModel;
+			TrackedNodeData data(this);
+			data.modelSubtree = true;
+			data.modelData = std::make_unique<TrackedModelData>();
+			m_models.emplace_back(std::make_unique<TrackedNode>(node.getPtr(), std::move(data)));
 		}
 		else
 		{
-			assert(node.getOperation().keyWord == g_sequence.keyWord);
+			assert(GraphManager::isSequence(&node));
 			TrackedNodeData data(this);
 			data.modelSubtree = true;
 			m_modelSequences.emplace_back(std::make_unique<TrackedNode>(node.getPtr(), std::move(data)));
 		}
 	}
 	m_modelsNeedUpdate = false;
-	LOG_DEBUG("[TRACKING] Updating models. Found {} models.", m_models.size());
+	LOG_DEBUG("[TRACKING] Updated models. Found {} models.", m_models.size());
+
+	updateModelTransforms();
 }
 
 void MatrixTracker::reverseChain()
@@ -736,11 +722,11 @@ void MatrixTracker::onNodeUpdate(Node* node)
 	}
 }
 
-void MatrixTracker::onNodePlug(Node* node)
+void MatrixTracker::onNodeGraphChange(Node* node)
 {
 	if (node->m_trackingData == nullptr)
 		return;
-	if (node->m_trackingData->modelSubtree)
+	if (node->m_trackingData->modelSubtree || node->getId() == node->m_trackingData->tracker->getSequenceID())
 	{
 		// The node is in the subtree of begin sequence, search for new models
 		node->m_trackingData->tracker->m_modelsNeedUpdate = true;
@@ -749,15 +735,6 @@ void MatrixTracker::onNodePlug(Node* node)
 	{
 		node->m_trackingData->tracker->m_chainNeedsUpdate = true;
 	}
-}
-
-void MatrixTracker::onModelDestroy(Model* model)
-{
-	if (model->m_trackedModel == nullptr)
-		return;
-	model->m_trackedModel->m_modelNode = nullptr;
-	model->m_trackedModel->m_tracker->m_modelsNeedUpdate = true;
-	model->m_trackedModel = nullptr;
 }
 
 std::string MatrixTracker::getDebugString()

@@ -24,9 +24,10 @@ constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
 constexpr size_t I3T_SEQ_IN_MAT = 1; // owned by storage
 
 constexpr size_t I3T_SEQ_OUT_MUL = 0; // owned by multiplier
-constexpr size_t I3T_SEQ_OUT_MAT = 1; // owned by storage
-constexpr size_t I3T_SEQ_OUT_MOD = 2; // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MAT = 1; // owned by storage, local transform
+constexpr size_t I3T_SEQ_OUT_MOD = 2; // owned by multiplier, world transform
 
+// FIXME: Couldn't the OUT vars be used instead? Do pin indices ever not match internal data?
 constexpr size_t I3T_SEQ_MUL = 0;
 constexpr size_t I3T_SEQ_MAT = 1; // local transform
 constexpr size_t I3T_SEQ_MOD = 2; // world transform
@@ -124,12 +125,12 @@ public:
 
 	void updateValues(int inputIndex) override;
 
+	/// Whether the sequence holds no matrix data (no transformations and isn't connected externally)
+	bool isEmpty();
+
 private:
 	Storage m_storage;
 };
-
-/// \returns nullptr if there is no nonempty sequence in the parent chain.
-Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence);
 
 FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices)
 {

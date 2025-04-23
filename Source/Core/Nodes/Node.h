@@ -152,7 +152,7 @@ public:
 	{
 		static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node class.");
 		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()), "Cannot cast to Ptr<T>.");
-
+		// FIXME: (DR) This could be a static pointer cast as we don't expect it to fail
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
 

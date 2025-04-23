@@ -134,21 +134,13 @@ void Sequence::updateValues(int inputIndex)
 	Node::updateValues(inputIndex);
 }
 
-//===-- Helpers -----------------------------------------------------------===//
-Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence)
+bool Sequence::isEmpty()
 {
-	auto parent = GraphManager::getParent(sequence, I3T_SEQ_IN_MUL);
-	while (parent != nullptr)
+	const bool hasMatrixInput = getInput(I3T_SEQ_IN_MAT).isPluggedIn();
+	if (!getMatrices().empty() || hasMatrixInput)
 	{
-		const auto parentSequence = parent->as<Sequence>();
-		const bool hasMatrixInput = parentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn();
-		if (!parentSequence->getMatrices().empty() || hasMatrixInput)
-		{
-			return parentSequence;
-		}
-
-		parent = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MUL);
+		return false;
 	}
-	return nullptr;
+	return true;
 }
 } // namespace Core

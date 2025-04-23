@@ -95,7 +95,7 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 	ImVec4 color;
 	bool unplugged = !this->isPlugged() && !m_previewPlugged;
 	DIWNE::Pin* pin = getAnyPin();
-	Core::EValueType type;
+	Core::EValueType type = Core::EValueType::Pulse;
 	if (pin)
 	{
 		type = static_cast<CorePin*>(pin)->getType();
@@ -120,21 +120,21 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 
 	Core::TrackedNodeData* startTrackingData = nullptr;
 	Core::TrackedNodeData* endTrackingData = nullptr;
-	if (auto startPin = getStartPin())
+	if (auto* startPin = getStartPin())
 	{
-		if (auto node = startPin->getNode())
+		if (auto* node = startPin->getNode())
 		{
-			if (auto t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
+			if (auto* t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
 			{
 				startTrackingData = t;
 			}
 		}
 	}
-	if (auto endPin = getEndPin())
+	if (auto* endPin = getEndPin())
 	{
-		if (auto node = endPin->getNode())
+		if (auto* node = endPin->getNode())
 		{
-			if (auto t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
+			if (auto* t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
 			{
 				endTrackingData = t;
 			}
@@ -146,20 +146,14 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 		if (startTrackingData && endTrackingData)
 		{
 			if (startTrackingData->chain && endTrackingData->chain)
-				m_color = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+			{
+				if (startTrackingData->active && endTrackingData->active)
+					m_color = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+				else
+					m_color = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
+			}
 			if ((startTrackingData->modelSubtree || startTrackingData->chain) && endTrackingData->modelSubtree)
 				m_color = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
-		}
-		else
-		{
-			// Special case for models that dont have tracking data
-			if (startTrackingData && (startTrackingData->modelSubtree || startTrackingData->chain))
-			{
-				if (dynamic_cast<Model*>(getEndPin()->getNode()) != nullptr)
-				{
-					m_color = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
-				}
-			}
 		}
 	}
 }

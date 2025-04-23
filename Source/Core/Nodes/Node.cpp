@@ -57,8 +57,8 @@ void Node::init()
 		m_internalData.emplace_back(m_operation.outputTypes[i]);
 	}
 
-	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has
-	// no outputs. \todo MH How to create nodes which have no outputs?
+	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has no outputs.
+	// \todo MH How to create nodes which have no outputs?
 	if (m_operation.outputTypes.empty())
 	{
 		if (!m_operation.inputTypes.empty())
@@ -353,12 +353,13 @@ void Node::addUpdateCallback(std::function<void(Node*)> callback)
 
 void Node::onPlug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
 {
-	MatrixTracker::onNodePlug(this);
+	MatrixTracker::onNodeGraphChange(this);
 	triggerPlugCallback(fromNode, toNode, fromIndex, toIndex);
 }
 
 void Node::onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
 {
+	MatrixTracker::onNodeGraphChange(this);
 	triggerUnplugCallback(fromNode, toNode, fromIndex, toIndex);
 }
 

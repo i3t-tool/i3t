@@ -585,4 +585,5 @@ FORCE_INLINE const TransformMask& getTransformMap(const std::string& keyWord)
 		return getTransformOperation(*type).mask;
 	return noDefaults;
 }
+
 } // namespace Core

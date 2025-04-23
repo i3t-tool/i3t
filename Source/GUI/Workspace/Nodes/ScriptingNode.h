@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+
 static inline const Core::Operation DEFAULT_SCRIPTING_NODE_OPERATION = {"Script", "script"};
 
 namespace Workspace

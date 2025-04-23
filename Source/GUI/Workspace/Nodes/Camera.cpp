@@ -49,23 +49,14 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	// They are already plugged in Core!
 
 	m_projection->setSelectable(false);
-	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
-	{
-		if (i != 1)
-		{
-			m_projection->getNodebase()->getInputPins()[i].setRendered(false);
-		}
-	}
-	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
-	{
-		if (j != 1)
-		{
-			m_projection->getNodebase()->getOutputPins()[j].setRendered(false);
-		}
-	}
+	for (auto& pin : m_projection->getNodebase()->getInputPins())
+		pin.setRendered(false);
+	for (auto& pin : m_projection->getNodebase()->getOutputPins())
+		pin.setRendered(false);
+
 	// todo refactor - use the constant Core::I3T_CAMERA_OUT_MATRIX
-	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
-	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
+	m_projection->getNodebase()->getInputPins()[Core::I3T_SEQ_IN_MAT].setRendered(true);
+	m_projection->getNodebase()->getOutputPins()[Core::I3T_SEQ_OUT_MAT].setRendered(true);
 	m_projection->setTopLabel("projection");
 	m_projection->setFixed(true);
 	m_projection->setParentObject(this);
@@ -89,6 +80,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_view->m_draggable = false;
 	m_view->m_deletable = false;
 
+	// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Hide multiplication output to discourage interaction
 	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
 

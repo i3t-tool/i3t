@@ -37,7 +37,7 @@ class Model : public CoreNodeWithPins
 
 public:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;
-	std::weak_ptr<Vp::SceneModel> m_trackedModel; // TODO: Implement
+	std::weak_ptr<Vp::SceneModel> m_trackedModel;
 
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.

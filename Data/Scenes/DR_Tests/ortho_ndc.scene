@@ -1,0 +1,771 @@
+{
+    "resources": {
+        "imported": [
+            {
+                "name": "projection_test_scene",
+                "path": "scene_data/projection_test_scene/projection_test_scene.glb",
+                "type": "Model",
+                "normalize": false
+            }
+        ]
+    },
+    "viewport": {
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": false,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -116.96923065185548,
+                "orbitCameraRotationY": 16.819934844970703,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 10.824889183044434,
+                "iorbitCameraPivot": [
+                    -2.9726648330688477,
+                    1.4576267004013062,
+                    -4.5309977531433105
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023224,
+                "zFar": 270.0
+            }
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 222,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -615.0294189453125,
+                    23.782978057861328
+                ],
+                "transforms": [
+                    {
+                        "id": 228,
+                        "label": "negate z",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Label",
+                        "selected": false,
+                        "position": [
+                            -585.0693359375,
+                            55.876800537109375
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 229,
+                "label": "projection negator",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -381.313720703125,
+                    58.13065719604492
+                ],
+                "transforms": []
+            },
+            {
+                "id": 235,
+                "label": "translate only",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    546.7417602539063,
+                    400.51885986328125
+                ],
+                "transforms": []
+            },
+            {
+                "id": 241,
+                "label": "projection neg",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -92.45696258544922,
+                    144.20535278320313
+                ],
+                "transforms": [
+                    {
+                        "id": 247,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "selected": false,
+                        "position": [
+                            -77.44891357421875,
+                            116.68400573730469
+                        ],
+                        "type": "Perspective",
+                        "defaultValues": {
+                            "fovy": 1.0,
+                            "aspect": 1.2000000476837158,
+                            "near": 27.0,
+                            "far": 2.5
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.5254063606262207,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.8304877281188965,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.204081654548645,
+                                -1.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                5.510204315185547,
+                                0.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 248,
+                "label": "NDC -> flat near",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -1328.1663818359375,
+                    153.88165283203125
+                ],
+                "transforms": [
+                    {
+                        "id": 254,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1298.50048828125,
+                            186.12399291992188
+                        ],
+                        "type": "Free",
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0010000000474974513,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.9990000128746033,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 255,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -1013.2032470703125,
+                    151.28094482421875
+                ],
+                "transforms": []
+            },
+            {
+                "id": 268,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    265.9194030761719,
+                    205.5468292236328
+                ],
+                "transforms": [
+                    {
+                        "id": 274,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            295.7943115234375,
+                            238.1244659423828
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                -1.600000023841858,
+                                -7.800000190734863
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                -1.600000023841858,
+                                -7.800000190734863,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 261,
+                "label": "projection",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -112.35972595214844,
+                    330.9137878417969
+                ],
+                "transforms": [
+                    {
+                        "id": 267,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "selected": false,
+                        "position": [
+                            -82.14801025390625,
+                            363.49853515625
+                        ],
+                        "type": "Perspective",
+                        "defaultValues": {
+                            "fovy": 1.0,
+                            "aspect": 1.2000000476837158,
+                            "near": 2.5,
+                            "far": 27.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.5254063606262207,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.8304877281188965,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -1.204081654548645,
+                                -1.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -5.510204315185547,
+                                0.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 275,
+                "label": "projection source",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -640.004150390625,
+                    274.9077453613281
+                ],
+                "transforms": [
+                    {
+                        "id": 281,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "selected": false,
+                        "position": [
+                            -602.7879028320313,
+                            307.73297119140625
+                        ],
+                        "type": "Ortho",
+                        "defaultValues": {
+                            "left": -2.9019699096679688,
+                            "right": 2.9019699096679688,
+                            "bottom": -1.957927942276001,
+                            "top": 1.957927942276001,
+                            "near": 2.5,
+                            "far": 27.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.34459352493286133,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.510744035243988,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -0.08163265138864517,
+                                0.0
+                            ],
+                            [
+                                -0.0,
+                                -0.0,
+                                -1.204081654548645,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [
+            {
+                "id": 298,
+                "label": "camera NDC",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    769.6082763671875,
+                    649.914306640625
+                ],
+                "sequences": [
+                    {
+                        "id": 308,
+                        "label": "view",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            1005.1614990234375,
+                            679.4283447265625
+                        ],
+                        "transforms": []
+                    },
+                    {
+                        "id": 302,
+                        "label": "projection",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            791.913818359375,
+                            679.4283447265625
+                        ],
+                        "transforms": []
+                    }
+                ]
+            },
+            {
+                "id": 282,
+                "label": "camera World",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    256.32476806640625,
+                    649.2667236328125
+                ],
+                "sequences": [
+                    {
+                        "id": 292,
+                        "label": "view",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            492.18280029296875,
+                            679.4155883789063
+                        ],
+                        "transforms": []
+                    },
+                    {
+                        "id": 286,
+                        "label": "projection",
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            278.93511962890625,
+                            679.4155883789063
+                        ],
+                        "transforms": []
+                    }
+                ]
+            }
+        ],
+        "screens": [
+            {
+                "id": 314,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -552.91162109375,
+                    563.2518310546875
+                ],
+                "aspect": [
+                    466.1448059082031,
+                    398.5467529296875
+                ]
+            }
+        ],
+        "models": [
+            {
+                "id": 320,
+                "label": "NDC",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    825.2221069335938,
+                    217.01913452148438
+                ],
+                "model": "projection_test_scene",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 318,
+                "label": "World",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    825.3311157226563,
+                    393.09649658203125
+                ],
+                "model": "projection_test_scene",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [
+            {
+                "id": 322,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -1029.431884765625,
+                    -56.15837097167969
+                ],
+                "type": "Free",
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 323,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "SetValues",
+                "selected": false,
+                "position": [
+                    -866.9275512695313,
+                    412.668212890625
+                ],
+                "type": "Perspective",
+                "defaultValues": {
+                    "fovy": 1.0,
+                    "aspect": 1.2000000476837158,
+                    "near": 2.5,
+                    "far": 27.0
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.5254063606262207,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.8304877281188965,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        -1.204081654548645,
+                        -1.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        -5.510204315185547,
+                        0.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            }
+        ],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                222,
+                0,
+                229,
+                0
+            ],
+            [
+                275,
+                1,
+                229,
+                1
+            ],
+            [
+                268,
+                1,
+                235,
+                1
+            ],
+            [
+                255,
+                0,
+                241,
+                0
+            ],
+            [
+                229,
+                2,
+                241,
+                1
+            ],
+            [
+                241,
+                0,
+                268,
+                0
+            ],
+            [
+                282,
+                0,
+                314,
+                0
+            ],
+            [
+                268,
+                0,
+                320,
+                0
+            ],
+            [
+                235,
+                0,
+                318,
+                0
+            ],
+            [
+                261,
+                1,
+                286,
+                1
+            ],
+            [
+                275,
+                1,
+                261,
+                1
+            ]
+        ],
+        "zoom": 0.7901335954666138,
+        "workArea": {
+            "Min": [
+                -693.0524291992188,
+                -115.38673400878906
+            ],
+            "Max": [
+                673.8049926757813,
+                1128.7066650390625
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1009\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=838,983\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=840,26\nSize=1080,983\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ImportedModelsDialog]\nPos=720,312\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=152,342\n\n[Window][###ModalWindow]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=896,174\nSize=737,746\nCollapsed=0\n\n[Docking][Data]\nDockSpace   ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,983 Split=X Selected=0x8535E254\n  DockNode  ID=0x00000001 Parent=0x09EF459F SizeRef=838,983 CentralNode=1 Selected=0x8535E254\n  DockNode  ID=0x00000002 Parent=0x09EF459F SizeRef=1080,983 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
+    }
+}

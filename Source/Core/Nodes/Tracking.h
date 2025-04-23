@@ -19,19 +19,17 @@
 namespace Core
 {
 class Sequence;
+class Camera;
 class Transform;
 
-/// Cannot outlive the sequence.
+/// Data container for TransformChainIterator traversal metadata.
 struct TransformInfo
 {
 	bool isExternal = false; ///< Whether the sequence is supplied with external data, when true sequence == currentNode
+	Ptr<Camera> camera = nullptr;     ///< Optionally a camera which contains the sequence.
 	Ptr<Sequence> sequence = nullptr; ///< Sequence which contains the transform.
-	Ptr<Node> currentNode = nullptr;  ///< Node with matrix output.
+	Ptr<Node> currentNode = nullptr;  ///< Node with matrix output, a transformation or the sequence itself.
 	int dataIndex = 0;                ///< Data index of currentNode holding the transform
-
-	/// \returns !isExternal ? currentNode->getId() : sequence->getId();
-	///    If isExternal, then sequence is the sequence with currentNode as input.
-	ID getTrackingID() const;
 };
 
 /**
@@ -44,9 +42,10 @@ class TransformChain
 {
 	Ptr<Sequence> m_beginSequence; ///< The sequence the chain begins from.
 	bool m_skipEmptySequences = true;
+	bool m_ignoreCamera = true;
 
 public:
-	explicit TransformChain(Ptr<Sequence> sequence, bool skipEmptySequences = true);
+	explicit TransformChain(Ptr<Sequence> sequence, bool skipEmptySequences = true, bool ignoreCamera = true);
 
 	/**
 	 * Iterator for traversing the sequence chain.
@@ -66,6 +65,7 @@ public:
 
 	public:
 		bool m_skipEmptySequences = true;
+		bool m_ignoreCamera = true;
 
 		TransformChainIterator() = default; ///< Empty "past the end" iterator
 		explicit TransformChainIterator(Ptr<Sequence> sequence);
@@ -138,29 +138,21 @@ public:
 
 //----------------------------------------------------------------------------//
 
-/**
- * Data object holding information about a currently tracked model.
- * TrackedModel instances are held and managed by a MatrixTracker, and referenced by Core::Model nodes when they are
- * being actively tracked, this info is also provided and updated by the MatrixTracker.
- */
-struct TrackedModel
-{
-	MatrixTracker* m_tracker; ///< Non null reference to the corresponding tracker
+class MatrixTracker;
 
-	// TODO: This maybe should be a weak ptr?
-	Model* m_modelNode;                  ///< Reference to the corresponding model node. Can be null for a brief time.
+/// Data object holding extra information about a currently tracked model.
+struct TrackedModelData
+{
 	glm::mat4 m_interpolatedMatrix{1.f}; ///< Model matrix of the tracked model (result of tracker interpolation).
 	glm::mat4 m_referenceSpace{1.f};     ///< Reference space of the model, its "default" transformation.
 	                                     ///< This is applicable when the begin sequence of tracking is not
 	                                     ///< directly connected to a model.
-
-	explicit TrackedModel(Model* modelNode, MatrixTracker* tracker) : m_tracker(tracker), m_modelNode(modelNode) {}
-	~TrackedModel();
 };
 
-class MatrixTracker;
-
-/// Tracking data for individual nodes involved in a tracking operation.
+/**
+ * Tracking data for individual nodes involved in a tracking operation.
+ * Instances are held and managed by a MatrixTracker, and referenced by Core nodes when they are tracked.
+ */
 struct TrackedNodeData
 {
 	friend class MatrixTracker;
@@ -174,6 +166,8 @@ struct TrackedNodeData
 	bool active = false;       ///< Whether this node is part of the final tracked interpolated matrix.
 	bool modelSubtree = false; ///< Whether this node is part of the begin sequence subtree. Meaning it connects
 	                           ///< to a tracked model but itself is NOT being tracked.
+
+	UPtr<TrackedModelData> modelData = nullptr; ///< Extra model data held for models.
 
 	int seqIndex = -1; ///< Sequence index within the chain, -1 in model subtree. >= 0 indicates this is a sequence
 	int index = -1;    ///< Transform index within the chain, >= 0 indicates transform, a sequence CAN be a transform
@@ -248,14 +242,13 @@ class MatrixTracker final
 
 	struct TrackedTransform : TrackedNode
 	{
-		TrackedTransform(const Ptr<Node>& node, TrackedNodeData&& data) : TrackedNode(std::move(node), std::move(data))
-		{}
+		TrackedTransform(const Ptr<Node>& node, TrackedNodeData&& data) : TrackedNode(node, std::move(data)) {}
 		TrackedTransform(const TrackedTransform& other) = delete;
 		TrackedTransform(TrackedTransform&& other) = delete;
 
 		int dataIndex = 0; ///< Index of the matrix data storage holding the transform
 
-		glm::mat4 getMat() const
+		[[nodiscard]] glm::mat4 getMat() const
 		{
 			return node.lock()->data(dataIndex).getMat4();
 		}
@@ -263,9 +256,7 @@ class MatrixTracker final
 
 	struct TrackedSequence : TrackedTransform
 	{
-		TrackedSequence(const Ptr<Node>& node, TrackedNodeData&& data)
-		    : TrackedTransform(std::move(node), std::move(data))
-		{}
+		TrackedSequence(const Ptr<Node>& node, TrackedNodeData&& data) : TrackedTransform(node, std::move(data)) {}
 		TrackedSequence(const TrackedSequence& other) = delete;
 		TrackedSequence(TrackedSequence&& other) = delete;
 
@@ -299,13 +290,14 @@ class MatrixTracker final
 	std::vector<Ptr<TrackedTransform>> m_trackedTransforms;
 
 	/// Tracked models, managed and updated by the tracker itself based on the sequence chain.
-	std::vector<Ptr<TrackedModel>> m_models;
+	std::vector<UPtr<TrackedNode>> m_models;
 
 	/// Sequences forming the subtree of the begin sequence. These sequences are NOT tracked but do carry tracking
 	/// data indicating they are a part of the operation.
 	std::vector<UPtr<TrackedNode>> m_modelSequences;
 
-	glm::mat4 m_modelSubtreeRoot{1.f}; ///< Model transform from tracking root -> begin sequence (its world transform)
+	/// Model transform from scene graph root -> begin sequence (its world transform)
+	glm::mat4 m_modelSubtreeRoot{1.f};
 
 	bool m_chainNeedsUpdate = true; ///< Whether the tracked matrix chain needs update
 	bool m_modelsNeedUpdate = true; ///< Whether the tracked model list needs to be updated (due to a structural change)
@@ -364,11 +356,7 @@ public:
 	static void onNodeUpdate(Node* node);
 
 	/// Alerts the tracker of a structure change in the tracked nodes. Called in Core::Node::onPlug().
-	static void onNodePlug(Node* node);
-
-	/// Alerts the tracker that a model has been destroyed. Models currently don't own tracking data but a specific
-	/// tracked model reference. Hence why they are not handled by onNodeDestroy().
-	static void onModelDestroy(Model* model);
+	static void onNodeGraphChange(Node* node);
 
 	std::string getDebugString();
 

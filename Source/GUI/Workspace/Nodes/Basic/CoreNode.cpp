@@ -169,13 +169,6 @@ void CoreNode::endDiwne(DIWNE::DrawInfo& context)
 				trackingInfo = fmt::format("Tracking ({:.2f} {})\nidx: {}, c: {:d}, a: {:d}, i: {:d}, s: {:d}",
 				                           t->progress, t->interpolating ? "X" : "", t->index, t->chain, t->active,
 				                           t->interpolating, t->modelSubtree);
-			if (auto model = dynamic_cast<Core::Model*>(m_nodebase.get()))
-			{
-				if (model->m_trackedModel != nullptr)
-				{
-					trackingInfo = "Tracking";
-				}
-			}
 		}
 		ImGui::GetForegroundDrawList()->AddText(
 		    origin, IM_COL32_WHITE,

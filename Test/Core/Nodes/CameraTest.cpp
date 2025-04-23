@@ -40,6 +40,8 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 
 TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
 {
+	// TODO: This will not be true anymore for camera tracking! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  Test that an identity is provided instead
 	auto camera = GraphManager::createCamera();
 	auto sequence = GraphManager::createSequence();
 
