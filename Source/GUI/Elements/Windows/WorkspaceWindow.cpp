@@ -313,6 +313,7 @@ void WorkspaceWindow::showDebugMenu()
 		I3TGui::MenuItemWithLog("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
 		I3TGui::MenuItemWithLog("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
 		I3TGui::MenuItemWithLog("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
+		I3TGui::MenuItemWithLog("Core", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugCustom));
 		ImGui::PopItemFlag();
 		ImGui::EndMenu();
 	}

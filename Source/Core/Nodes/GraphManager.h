@@ -179,13 +179,20 @@ public:
 
 	static const Operation& getOperation(const Pin* pin);
 
-	static bool isTrackingEnabled();
+	static MatrixTracker* getTracker()
+	{
+		assert(s_self->m_tracker != nullptr);
+		return s_self->m_tracker.get();
+	}
+	static bool isTracking();
+	static bool isTrackingFromLeft();
+	static void startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction);
 	static void stopTracking();
 
 private:
 	static GraphManager* s_self;
 
-	MatrixTracker m_tracker;
+	UPtr<MatrixTracker> m_tracker = std::make_unique<MatrixTracker>(); ///< Should be non-null
 
 	/// References to created cycle nodes which need to be regularly updated.
 	std::vector<Ptr<Cycle>> m_cycles;

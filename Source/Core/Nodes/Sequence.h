@@ -13,13 +13,11 @@
  */
 #pragma once
 
+#include "Tracking.h"
 #include "Transform.h"
 
 namespace Core
 {
-class IModelProxy;
-class MatrixTracker;
-
 using Matrices = std::vector<Ptr<Transform>>;
 
 constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
@@ -37,14 +35,8 @@ class Sequence;
 
 namespace Builder
 {
-Ptr<Sequence> createSequence(MatrixTracker* tracker);
+Ptr<Sequence> createSequence();
 } // namespace Builder
-
-enum class TrackingDirection
-{
-	LeftToRight = -1,
-	RightToLeft = 1
-};
 
 /**
  * Sequence of matrices.
@@ -58,6 +50,7 @@ enum class TrackingDirection
 class Sequence : public Node
 {
 	friend class GraphManager;
+	friend class MatrixTracker;
 
 	using Matrix = Node;
 
@@ -86,8 +79,7 @@ class Sequence : public Node
 	};
 
 public:
-	Sequence(MatrixTracker* tracker);
-	~Sequence() override;
+	Sequence();
 
 	/**
 	 * Push \p matrix to the end of the sequence.
@@ -132,13 +124,8 @@ public:
 
 	void updateValues(int inputIndex) override;
 
-	MatrixTracker* startTracking(TrackingDirection direction, std::vector<UPtr<IModelProxy>> modelProxy);
-	void stopTracking();
-
 private:
 	Storage m_storage;
-
-	MatrixTracker* m_tracker;
 };
 
 /// \returns nullptr if there is no nonempty sequence in the parent chain.

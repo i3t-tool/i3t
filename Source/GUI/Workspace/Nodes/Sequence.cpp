@@ -12,6 +12,7 @@
  */
 #include "Sequence.h"
 
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
@@ -243,12 +244,12 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 void Sequence::popupContentTracking()
 {
 	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-	if (Core::GraphManager::isTrackingEnabled() &&
-	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
+	if (workspaceDiwne.isTracking() &&
+	    workspaceDiwne.getTracker()->getSequence()->getId() == this->getNodebase()->getId())
 	{
 		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
 		{
-			workspaceDiwne.trackingSwitchOff();
+			workspaceDiwne.stopTracking();
 		}
 		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
 		{
@@ -257,25 +258,15 @@ void Sequence::popupContentTracking()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(_t("Tracking")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
 		{
-			if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
 			{
-				if (Core::GraphManager::isTrackingEnabled())
-				{
-					workspaceDiwne.trackingSwitchOff();
-				}
-
-				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
+				workspaceDiwne.startTracking(this, false);
 			}
-			if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
 			{
-				if (Core::GraphManager::isTrackingEnabled())
-				{
-					workspaceDiwne.trackingSwitchOff();
-				}
-
-				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), false);
+				workspaceDiwne.startTracking(this, true);
 			}
 			ImGui::EndMenu();
 		}
@@ -290,7 +281,22 @@ void Sequence::drawMenuLevelOfDetail()
 
 void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
+	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	if (t)
+	{
+		if (t->index >= 0)
+		{
+			const ImRect& center = m_center.getRect();
+			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);
+			// dropZoneMargin += {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
+			drawTrackingCursor(ImRect(center.Min + dropZoneMargin, center.Max - dropZoneMargin), t);
+		}
+		if (t->chain || t->modelSubtree)
+			drawTrackingBorder(t->active, t->interpolating, t->progress);
+	}
+
 	Super::afterDraw(context);
+
 	DIWNE_DEBUG_OBJECTS((diwne), {
 		ImRect rect = getRect();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Min.y);

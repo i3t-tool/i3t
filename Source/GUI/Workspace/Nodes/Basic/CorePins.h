@@ -1,8 +1,8 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \author Dan Rakušan <rakusan.dan@gmail.com>, Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -66,7 +66,7 @@ public:
 	void drawLabel(DIWNE::DrawInfo& context, const std::string& label); ///< @return Whether a ne;w item was created
 	bool drawDataEx(DIWNE::DrawInfo& context);                          ///< @return Whether a new item was created
 	bool drawData(DIWNE::DrawInfo& context);                            ///< @return Whether a new item was created
-	int maxLengthOfData();
+	int maxLengthOfData();                                              ///< @see CoreNode::maxLengthOfData()
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 

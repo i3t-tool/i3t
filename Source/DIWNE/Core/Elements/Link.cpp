@@ -38,10 +38,15 @@ void Link::initializeDiwne(DrawInfo& context)
 	m_previewPlugged = false;
 }
 
+void Link::setInitialPositionDiwne()
+{
+	// no-op, position is entirely determined by the connection points
+}
+
 void Link::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
-		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Max.y);
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
 		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		                                        (std::string() + m_labelDiwne +

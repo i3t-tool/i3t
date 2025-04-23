@@ -36,6 +36,7 @@ void Node::finalize()
 	LOG_DEBUG("Finalizing node {}.", getSignature());
 	unplugAll();
 	triggerDeleteCallback(this);
+	MatrixTracker::onNodeDestroy(this);
 	finalized = true;
 }
 
@@ -115,7 +116,7 @@ ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsig
 			this->spreadSignal(fromIndex);
 		}
 
-		triggerPlugCallback(this, childNode.get(), fromIndex, toIndex);
+		onPlug(this, childNode.get(), fromIndex, toIndex);
 	}
 
 	return result;
@@ -323,9 +324,7 @@ void Node::unplugInput(size_t index)
 
 	m_inputs[index].unplug();
 
-	onUnplugInput(index);
-
-	triggerUnplugCallback(otherPinOwner, this, otherPinIndex, index);
+	onUnplug(otherPinOwner, this, otherPinIndex, index);
 }
 
 void Node::unplugOutput(size_t index)
@@ -344,13 +343,32 @@ void Node::unplugOutput(size_t index)
 
 void Node::updateValues(int inputIndex)
 {
-	triggerUpdateCallback(this);
+	onUpdate();
 }
 
 void Node::addUpdateCallback(std::function<void(Node*)> callback)
 {
 	this->m_updateCallbacks.push_back(callback);
 }
+
+void Node::onPlug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
+{
+	MatrixTracker::onNodePlug(this);
+	triggerPlugCallback(fromNode, toNode, fromIndex, toIndex);
+}
+
+void Node::onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
+{
+	triggerUnplugCallback(fromNode, toNode, fromIndex, toIndex);
+}
+
+void Node::onUpdate()
+{
+	// Notify the tracker of value change if tracking
+	MatrixTracker::onNodeUpdate(this);
+	triggerUpdateCallback(this);
+}
+
 void Node::triggerUpdateCallback(Node* node)
 {
 	for (const auto& callback : m_updateCallbacks)

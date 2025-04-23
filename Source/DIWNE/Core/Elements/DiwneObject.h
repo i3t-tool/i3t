@@ -727,7 +727,6 @@ public:
 	 */
 	std::unique_ptr<Actions::DiwneAction> action;
 
-	// TODO: Maybe rename to createAction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	template <typename T, typename... Args>
 	T* startAction(Args&&... args)
 	{

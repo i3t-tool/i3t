@@ -1,8 +1,8 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -38,6 +38,11 @@ CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
 	// Register core node calbacks
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.registerNodeCallbacks(m_nodebase.get());
+
+	m_nodebase->addUpdateCallback([this](Core::Node* node) {
+		this->queueUpdateDataItemsWidth();
+	});
+
 	// Set a bit flag identifying this node as a core node
 	setFlag(CORE_NODE_FLAG, true);
 	// I3T DIWNE styling
@@ -137,8 +142,46 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine(0, 0);
 		m_top.spring(1.0f);
 
+		auto coreNode = this->getNodebase();
+		if (auto t = coreNode->getTrackingData())
+		{
+			if (t->tracker->getSequenceID() == coreNode->getId())
+			{
+				ImGui::AlignTextToFramePadding();
+				ImGui::TextUnformatted(ICON_FA_CROSSHAIRS);
+				ImGui::SameLine();
+			}
+		}
+
 		drawContextMenuButton(context, contextButtonCornerFlag);
 	}
+}
+void CoreNode::endDiwne(DIWNE::DrawInfo& context)
+{
+	Node::endDiwne(context);
+	DIWNE_DEBUG_CUSTOM((diwne), {
+		ImVec2 origin = diwne.canvas().diwne2screen(ImVec2(getRect().Min.x, getRect().Max.y) +
+		                                            ImVec2(0, ImGui::GetFontSize() * 0.5f));
+		std::string trackingInfo;
+		if (m_nodebase)
+		{
+			if (auto t = m_nodebase->getTrackingData())
+				trackingInfo = fmt::format("Tracking ({:.2f} {})\nidx: {}, c: {:d}, a: {:d}, i: {:d}, s: {:d}",
+				                           t->progress, t->interpolating ? "X" : "", t->index, t->chain, t->active,
+				                           t->interpolating, t->modelSubtree);
+			if (auto model = dynamic_cast<Core::Model*>(m_nodebase.get()))
+			{
+				if (model->m_trackedModel != nullptr)
+				{
+					trackingInfo = "Tracking";
+				}
+			}
+		}
+		ImGui::GetForegroundDrawList()->AddText(
+		    origin, IM_COL32_WHITE,
+		    fmt::format("Core ID: {}\n{}", !m_nodebase ? "null" : std::to_string(m_nodebase->getId()), trackingInfo)
+		        .c_str());
+	});
 }
 
 void CoreNode::drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImDrawFlags cornerFlags)
@@ -321,7 +364,6 @@ void CoreNode::drawHeaderLabel(DIWNE::DrawInfo& context)
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 }
-
 
 Ptr<Core::Node> CoreNode::getNodebase() const
 {
@@ -527,6 +569,80 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	}
 
 	Super::onReleased(justReleased, context);
+}
+
+void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) const
+{
+	assert(t != nullptr);
+
+	ImVec2 min = rect.Min;
+	ImVec2 max = rect.Max;
+	ImVec2 c = min;
+
+	ImVec2 size = max - min;
+	float progress = t->progress;
+	bool trackingFromLeft = t->tracker->isTrackingFromLeft();
+
+	ImVec2 fMin;
+	ImVec2 fMax;
+	ImVec2 iMin;
+	ImVec2 iMax;
+	float startX;
+	if (!trackingFromLeft)
+	{
+		c.x = min.x + ((1.f - progress) * size.x);
+		fMin = c;
+		fMax = max;
+		iMin = min;
+		iMax = {c.x, max.y};
+		startX = max.x;
+	}
+	else
+	{
+		c.x = min.x + (progress * size.x);
+		fMin = min;
+		fMax = {c.x, max.y};
+		iMin = c;
+		iMax = max;
+		startX = min.x;
+	}
+
+	const ImVec4& inactiveCol = I3T::getColor(EColor::Nodes_Tracking_OverlayInactive);
+	if (inactiveCol.w > 0.f)
+		diwne.canvas().AddRectFilledDiwne(iMin, iMax, inactiveCol);
+
+	const ImVec4& activeCol = I3T::getColor(EColor::Nodes_Tracking_OverlayActive);
+	if (activeCol.w > 0.f)
+		diwne.canvas().AddRectFilledDiwne(fMin, fMax, activeCol);
+
+	const ImVec4& cursorCol = I3T::getColor(EColor::Nodes_Tracking_Cursor);
+	const float lW = 1;
+	diwne.canvas().AddLine(ImVec2(fMin.x, fMin.y + lW / 2), {fMax.x, fMin.y + lW / 2}, cursorCol, lW);
+	diwne.canvas().AddLine(ImVec2(fMin.x, fMax.y - lW / 2), {fMax.x, fMax.y - lW / 2}, cursorCol, lW);
+	if (t->index == 0)
+	{
+		diwne.canvas().AddLine(ImVec2(startX, fMin.y), {startX, fMax.y}, cursorCol, lW);
+	}
+
+	if (t->interpolating)
+	{
+		ImVec2 markCenter = ImVec2(c.x, rect.GetCenter().y);
+		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), size.y);
+		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2, cursorCol);
+	}
+}
+
+void CoreNode::drawTrackingBorder(bool active, bool interpolating, float progress) const
+{
+	DIWNE::Style& style = diwne.style();
+	float borderWidthMul = interpolating ? 2.2f : 1.5f;
+
+	const ImVec4& inactiveCol = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
+	const ImVec4& activeCol = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+	const ImRect& displayRect = getDisplayRect();
+	diwne.canvas().AddRectDiwne(displayRect.Min, displayRect.Max, active ? activeCol : inactiveCol,
+	                            style.decimal(DIWNE::Style::NODE_ROUNDING), ImDrawFlags_RoundCornersAll,
+	                            style.decimal(DIWNE::Style::SELECTED_BORDER_WIDTH) * borderWidthMul);
 }
 
 void CoreNode::onDestroy(bool logEvent)

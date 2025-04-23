@@ -81,6 +81,8 @@ void InputBindings::init()
 	InputManager::setInputAction("trackingJaggedLeft", Keys::left);
 	InputManager::setInputAction("trackingJaggedRight", Keys::right);
 	InputManager::setInputAction("trackingEscOff", Keys::esc);
+
+	// TODO: Outdated tracking shortcuts, commented out as they were never properly implemented and will be reworked
 	// InputManager::setInputAction("trackingSwitch", Keys::t, {Keys::ctrll});
 	// InputManager::setInputAction("trackingModeSwitch", Keys::p);
 	// InputManager::setInputAction("trackingSwitchOn", Keys::p);

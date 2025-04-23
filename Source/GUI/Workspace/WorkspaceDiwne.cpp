@@ -49,10 +49,7 @@ WorkspaceDiwne::~WorkspaceDiwne()
 
 void WorkspaceDiwne::begin(DIWNE::DrawInfo& context)
 {
-	// TODO: This system is tbh kinda stupid, why can't the nodes update themselves before drawing?
-	//  Why iterate over everything again? What am I missing?
-	//  On another node I think data items width could be updated every frame, its not that deep
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// NOTE: Could data items width be updated every frame? Is it premature op that they don't?
 	if (m_updateDataItemsWidth)
 	{
 		m_updateDataItemsWidth = false;
@@ -123,6 +120,19 @@ void WorkspaceDiwne::end(DIWNE::DrawInfo& context)
 {
 	NodeEditor::end(context);
 	m_viewportHighlightResolver.resolve();
+
+	DIWNE_DEBUG_CUSTOM(diwne, {
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
+		std::string str;
+		if (Core::GraphManager::isTracking())
+		{
+			str = Core::GraphManager::getTracker()->getDebugString();
+		}
+		if (!str.empty())
+		{
+			ImGui::GetForegroundDrawList()->AddText(m_canvas->diwne2screen(originPos), IM_COL32_WHITE, str.c_str());
+		}
+	});
 }
 
 void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
@@ -184,6 +194,19 @@ void WorkspaceDiwne::onDrag(DIWNE::DrawInfo& context, bool dragStart, bool dragE
 	}
 }
 
+// TODO: This is inconsistent with the getZoomDelta method!
+// bool WorkspaceDiwne::isZoomingDiwne()
+//{
+//	return InputManager::isAxisActive("scroll") != 0;
+//}
+
+void WorkspaceDiwne::onZoom()
+{
+	m_updateDataItemsWidth = true;
+	App::getModule<StateManager>().requestRewritableSnapshot();
+	NodeEditor::onZoom();
+}
+
 void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 {
 	NodeEditor::processInteractions(context);
@@ -203,7 +226,7 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
 			this->duplicateSelectedNodes();
 		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
-			this->trackingSwitchOff();
+			this->stopTracking();
 		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
 			this->trackingSmoothLeft();
 		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
@@ -212,51 +235,17 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 			this->trackingJaggedLeft();
 		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
 			this->trackingJaggedRight();
-		if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
-			this->trackingModeSwitch();
-		if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
-			this->trackingSwitch();
-		if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
-			this->trackingSwitchOn();
-		if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
-			this->trackingSwitchOff();
+		// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+		// 	this->trackingModeSwitch();
+		// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+		// 	this->trackingSwitch();
+		// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+		// 	this->trackingSwitchOn();
+		// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+		// 	this->trackingSwitchOff();
 		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
 			this->toggleSelectedNodesVisibility();
 		processTrackingMove();
-	}
-}
-
-void WorkspaceDiwne::manipulatorStartCheck3D()
-{
-	if (getNodesSelectionChanged())
-	{
-		I3T::getViewport()->getManipulators().clearManipulators();
-
-		auto selectedCoreNodes = getAllSelectedCoreNodes();
-		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
-		{
-			Ptr<TransformationBase> selected_transformation =
-			    std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
-			if (selected_transformation != nullptr)
-			{
-				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
-			}
-		}
-	}
-}
-
-void WorkspaceDiwne::processTrackingMove()
-{
-	if (Core::GraphManager::isTrackingEnabled())
-	{
-		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
-		{
-			this->trackingSmoothLeft();
-		}
-		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
-		{
-			this->trackingSmoothRight();
-		}
 	}
 }
 
@@ -311,147 +300,6 @@ void WorkspaceDiwne::toggleSelectedNodesVisibility()
 			node->setRendered(false);
 			node->setSelected(false);
 		}
-	}
-}
-void WorkspaceDiwne::trackingSmoothLeft()
-{
-	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
-	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
-
-		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() - step);
-		else
-			tracking->setParam(tracking->getParam() + step);
-	}
-}
-
-void WorkspaceDiwne::trackingSmoothRight()
-{
-	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
-	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
-
-
-		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() + step);
-		else
-			tracking->setParam(tracking->getParam() - step);
-	}
-}
-
-void WorkspaceDiwne::trackingJaggedLeft()
-{
-	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
-	{
-		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTrackingProgress().size();
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() - step);
-		else
-			tracking->setParam(tracking->getParam() + step);
-	}
-}
-
-void WorkspaceDiwne::trackingJaggedRight()
-{
-	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
-	{
-		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTrackingProgress().size();
-
-		if (m_trackingFromLeft)
-			tracking->setParam(tracking->getParam() + step);
-		else
-			tracking->setParam(tracking->getParam() - step);
-	}
-}
-
-void WorkspaceDiwne::trackingModeSwitch()
-{
-	smoothTracking = !smoothTracking;
-}
-
-void WorkspaceDiwne::trackingSwitch()
-{
-	LOG_INFO("TRACKING CALLED");
-	if (Core::GraphManager::isTrackingEnabled())
-		trackingSwitchOff();
-	else
-		trackingSwitchOn();
-}
-
-void WorkspaceDiwne::trackingSwitchOn(Ptr<Sequence> sequence, bool isRightToLeft)
-{
-	if (sequence == nullptr)
-	{
-		auto selectedNodes = getSelectedNodesInnerIncluded();
-		for (auto node = selectedNodes.begin(); node != selectedNodes.end(); ++node)
-		{
-			sequence = std::dynamic_pointer_cast<Sequence>(node.sharedPtr());
-			if (sequence)
-			{
-				const auto models = getSequenceModels(sequence);
-				if (models.empty())
-					continue;
-
-				trackingInit(sequence, models, isRightToLeft);
-
-				break;
-			}
-		}
-	}
-	else
-	{
-		const auto models = getSequenceModels(sequence);
-		if (models.empty())
-			return;
-
-		trackingInit(sequence, models, isRightToLeft);
-	}
-}
-
-void WorkspaceDiwne::trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft)
-{
-	LOG_DEBUG("TRACKING ON");
-
-	std::vector<UPtr<Core::IModelProxy>> proxy(models.size());
-	std::transform(models.begin(), models.end(), proxy.begin(), [](Ptr<Model> model) {
-		return std::make_unique<ModelProxy>(model);
-	});
-
-	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
-	if (isRightToLeft)
-	{
-		tracking = coreSeq->startTracking(Core::TrackingDirection::RightToLeft, std::move(proxy));
-	}
-	else
-	{
-		tracking = coreSeq->startTracking(Core::TrackingDirection::LeftToRight, std::move(proxy));
-	}
-	m_trackingFromLeft = !isRightToLeft;
-}
-
-void WorkspaceDiwne::trackingSwitchOff()
-{
-	LOG_DEBUG("TRACKING OFF CALLED"); // TODO: Remove
-	if (Core::GraphManager::isTrackingEnabled())
-	{
-		// TODO: (DR) This seems poorly done, couldn't we use the Core <-> GUI id map?
-		auto seq = Tools::findNodeById(getAllCoreNodes().collect(), tracking->getSequence()->getId()).value();
-		// TODO: (DR) This was never implemented
-		// std::dynamic_pointer_cast<Sequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
-		tracking->getSequence()->stopTracking();
 	}
 }
 
@@ -613,24 +461,6 @@ DIWNE::FilteredNodeRange<Model> WorkspaceDiwne::getAllModels()
 	    &m_nodes);
 }
 
-// TODO: Rewrite with filtered iterator
-//  This cannot really be done as seq passed here would need a capturing lambda as a predicate
-//  I could add a void user pointer or similar to the predicate function to allow passing additional data
-std::vector<Ptr<Model>> WorkspaceDiwne::getSequenceModels(Ptr<Sequence> seq)
-{
-	std::vector<Ptr<Model>> models;
-	for (const auto& node : m_nodes)
-	{
-		Ptr<Model> model = std::dynamic_pointer_cast<Model>(node);
-		if (!model)
-			continue;
-		if (Core::GraphManager::getParent(model->getNodebase()) != seq->getNodebase())
-			continue;
-		models.push_back(model);
-	}
-	return models;
-}
-
 // TODO: Could avoid dynamic_cast using node flags
 DIWNE::FilteredNodeRange<Sequence> WorkspaceDiwne::getAllInputFreeSequence()
 {
@@ -664,19 +494,6 @@ DIWNE::FilteredRecursiveNodeRange<ScriptingNode> WorkspaceDiwne::getAllScripting
 	    &m_nodes);
 }
 
-// TODO: This is inconsistent with the getZoomDelta method!
-// bool WorkspaceDiwne::isZoomingDiwne()
-//{
-//	return InputManager::isAxisActive("scroll") != 0;
-//}
-
-void WorkspaceDiwne::onZoom()
-{
-	m_updateDataItemsWidth = true;
-	App::getModule<StateManager>().requestRewritableSnapshot();
-	NodeEditor::onZoom();
-}
-
 bool WorkspaceEditorInputAdapter::selectAllNodes()
 {
 	return InputManager::isActionTriggered("selectAll", EKeyState::Pressed);
@@ -688,6 +505,138 @@ bool WorkspaceEditorInputAdapter::invertSelection()
 bool WorkspaceEditorInputAdapter::deleteSelectedNodes()
 {
 	return InputManager::isActionTriggered("delete", EKeyState::Pressed);
+}
+
+void WorkspaceDiwne::manipulatorStartCheck3D()
+{
+	if (getNodesSelectionChanged())
+	{
+		I3T::getViewport()->getManipulators().clearManipulators();
+
+		auto selectedCoreNodes = getAllSelectedCoreNodes();
+		for (auto node = selectedCoreNodes.begin(); node != selectedCoreNodes.end(); ++node)
+		{
+			Ptr<TransformationBase> selected_transformation =
+			    std::dynamic_pointer_cast<TransformationBase>(node.sharedPtr());
+			if (selected_transformation != nullptr)
+			{
+				I3T::getViewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
+			}
+		}
+	}
+}
+
+void WorkspaceDiwne::startTracking(Sequence* sequence, bool trackFromLeft)
+{
+	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
+	Core::GraphManager::startTracking(coreSeq, trackFromLeft ? Core::TrackingDirection::LeftToRight
+	                                                         : Core::TrackingDirection::RightToLeft);
+}
+
+void WorkspaceDiwne::stopTracking()
+{
+	Core::GraphManager::stopTracking();
+}
+
+Core::MatrixTracker* WorkspaceDiwne::getTracker() const
+{
+	return Core::GraphManager::getTracker();
+}
+
+bool WorkspaceDiwne::isTracking() const
+{
+	return Core::GraphManager::isTracking();
+}
+bool WorkspaceDiwne::isTrackingFromLeft() const
+{
+	return Core::GraphManager::isTrackingFromLeft();
+}
+
+void WorkspaceDiwne::processTrackingMove()
+{
+	if (isTracking())
+	{
+		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
+		{
+			this->trackingSmoothLeft();
+		}
+		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		{
+			this->trackingSmoothRight();
+		}
+	}
+}
+
+void WorkspaceDiwne::trackingSmoothLeft()
+{
+	if (isTracking() && smoothTracking)
+	{
+		if (timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
+
+		Core::MatrixTracker* tracking = getTracker();
+		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
+		if (isTrackingFromLeft())
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
+	}
+}
+
+void WorkspaceDiwne::trackingSmoothRight()
+{
+	if (isTracking() && smoothTracking)
+	{
+		if (timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
+
+		Core::MatrixTracker* tracking = getTracker();
+		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
+		if (isTrackingFromLeft())
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
+	}
+}
+
+void WorkspaceDiwne::trackingJaggedLeft()
+{
+	Core::MatrixTracker* tracking = getTracker();
+	if (tracking->isTracking() && !smoothTracking)
+	{
+		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
+		if (isTrackingFromLeft())
+			tracking->setParam(tracking->getParam() - step);
+		else
+			tracking->setParam(tracking->getParam() + step);
+	}
+}
+
+void WorkspaceDiwne::trackingJaggedRight()
+{
+	if (isTracking() && !smoothTracking)
+	{
+		Core::MatrixTracker* tracking = getTracker();
+		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
+
+		if (isTrackingFromLeft())
+			tracking->setParam(tracking->getParam() + step);
+		else
+			tracking->setParam(tracking->getParam() - step);
+	}
+}
+
+void WorkspaceDiwne::trackingModeSwitch()
+{
+	smoothTracking = !smoothTracking;
 }
 
 void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)

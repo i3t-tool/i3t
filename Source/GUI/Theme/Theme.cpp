@@ -307,8 +307,11 @@ void Theme::initDefaultClassic()
 	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f)); // for cross
 	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.8745f, 0.7686f, 0.8863f, 0.7686f)); // for hyphen
 
-	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
+	set(EColor::Nodes_Tracking_ColorActive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_ColorInactive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_Cursor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_OverlayActive, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
+	set(EColor::Nodes_Tracking_OverlayInactive, ImVec4(0.16f, 0.16f, 0.16f, 0.7f));
 
 	set(EColor::StartWindow_DescriptionBackground, createColor(255, 255, 255, 255));
 	set(EColor::StartWindow_WindowBackground, createColor(232, 232, 232, 255));
@@ -727,8 +730,11 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Transformation_ValidIcon_fgInner, "Nodes Transformation ValidIcon fgInner")
 	    .add(EColor::Nodes_Transformation_ValidIcon_padding, "Nodes Transformation ValidIcon padding",
 	         "Padding stored as color")
-	    .add(EColor::Nodes_Transformation_TrackingColor, "Nodes Transformation TrackingColor")
-	    .add(EColor::Nodes_Transformation_TrackingMarkColor, "Nodes Transformation TrackingMarkColor");
+	    .add(EColor::Nodes_Tracking_ColorActive, "Nodes Tracking Color Active")
+	    .add(EColor::Nodes_Tracking_ColorInactive, "Nodes Tracking Color Inactive")
+	    .add(EColor::Nodes_Tracking_Cursor, "Nodes Tracking Cursor")
+	    .add(EColor::Nodes_Tracking_OverlayActive, "Nodes Tracking Overlay Active")
+	    .add(EColor::Nodes_Tracking_OverlayInactive, "Nodes Tracking Overlay Inactive");
 
 	group("Node Editor Popups", "npop", 1)
 	    .add(EColor::Nodes_ConnectionPossible, "Connection is possible (text)")

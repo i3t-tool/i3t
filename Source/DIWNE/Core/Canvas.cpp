@@ -302,8 +302,8 @@ void Canvas::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, const 
 
 void Canvas::AddLine(const ImVec2& p1, const ImVec2& p2, const ImVec4& col, float thickness, bool ignoreZoom) const
 {
-	ImGui::GetWindowDrawList()->AddLine(diwne2screen(p1), diwne2screen(p2), ImGui::ColorConvertFloat4ToU32(col),
-	                                    thickness * (ignoreZoom ? 1.0f : m_zoom));
+	DDraw::AddLineRaw(ImGui::GetWindowDrawList(), diwne2screen(p1), diwne2screen(p2),
+	                  ImGui::ColorConvertFloat4ToU32(col), thickness * (ignoreZoom ? 1.0f : m_zoom));
 }
 
 void Canvas::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& col, float rounding,

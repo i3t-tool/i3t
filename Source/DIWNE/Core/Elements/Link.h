@@ -71,9 +71,9 @@ public:
 	// Lifecycle
 	// =============================================================================================================
 	void initialize(DrawInfo& context) override;
-	void begin(DrawInfo& context) override{}; /*!< link is not an ImGui element - it is just a drawn line */
+	void begin(DrawInfo& context) override {} ///< Link isn't an ImGui item, nothing to begin
 	void content(DrawInfo& context) override;
-	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering differently
+	void end(DrawInfo& context) override; ///< No need to set m_internalHover as we handle hovering ourself
 	void updateLayout(DrawInfo& context) override;
 
 	bool allowDrawing() override;
@@ -82,6 +82,7 @@ public:
 
 protected:
 	void initializeDiwne(DrawInfo& context) override;
+	void setInitialPositionDiwne() override;
 
 public:
 	// Interaction

@@ -70,6 +70,13 @@ void Node::updateLayout(DrawInfo& context)
 	updateRectFromImGuiItem();
 }
 
+void Node::afterDraw(DrawInfo& context)
+{
+	DiwneObject::afterDraw(context);
+
+	drawSelectionIndicator(context);
+}
+
 void Node::afterDrawDiwne(DrawInfo& context)
 {
 	// Adding an invisible ImGui blocking button to represent the logically opaque background of the node.
@@ -83,8 +90,6 @@ void Node::afterDrawDiwne(DrawInfo& context)
 	                       ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_NoHoldingActiveId);
 	m_internalHover = ImGui::IsItemHovered();
 	ImGui::PopID();
-
-	drawSelectionIndicator(context);
 
 	Super::afterDrawDiwne(context);
 }

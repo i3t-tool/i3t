@@ -136,6 +136,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
 	{
 		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, m_axisOn))
@@ -247,6 +248,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
+	ImGui::PopItemFlag();
 	ImGui::Separator();
 
 	drawMenuDuplicate(context);

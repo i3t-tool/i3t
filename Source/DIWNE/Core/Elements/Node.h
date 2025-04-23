@@ -43,6 +43,7 @@ public:
 	//        Node(const Node& other);
 
 	// TODO: Does this operator make sense? <<<<<<<<<<<<<<<<<<<<<<<<
+	//  A: no not really, its a no-op essentially
 	/** Assignment operator
 	 *  \param other Object to assign from
 	 *  \return A reference to this
@@ -55,6 +56,7 @@ public:
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
+	void afterDraw(DrawInfo& context) override;
 
 protected:
 	void afterDrawDiwne(DrawInfo& context) override;

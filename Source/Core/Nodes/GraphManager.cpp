@@ -41,7 +41,7 @@ Ptr<Sequence> GraphManager::createSequence()
 		GraphManager::init();
 	}
 
-	return Builder::createSequence(&(s_self->m_tracker));
+	return Builder::createSequence();
 }
 
 Ptr<Model> GraphManager::createModel()
@@ -164,7 +164,7 @@ void GraphManager::update(double tick)
 		cycle->update(tick);
 	}
 
-	s_self->m_tracker.update();
+	getTracker()->update();
 }
 
 const Operation& GraphManager::getOperation(const Pin* pin)
@@ -172,13 +172,25 @@ const Operation& GraphManager::getOperation(const Pin* pin)
 	return pin->Owner.getOperation();
 }
 
-bool GraphManager::isTrackingEnabled()
+bool GraphManager::isTracking()
 {
-	return s_self->m_tracker.getSequence() != nullptr;
+	return getTracker()->isTracking();
+}
+
+bool GraphManager::isTrackingFromLeft()
+{
+	return getTracker()->isTrackingFromLeft();
+}
+
+void GraphManager::startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction)
+{
+	stopTracking();
+	s_self->m_tracker = std::make_unique<MatrixTracker>(beginSequence, direction);
 }
 
 void GraphManager::stopTracking()
 {
-	s_self->m_tracker = MatrixTracker{};
+	if (isTracking())
+		s_self->m_tracker = std::make_unique<MatrixTracker>();
 }
 } // namespace Core

@@ -2,7 +2,7 @@
  * \file
  * \brief
  * \author Dan Rakušan <rakusan.dan@gmail.com>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -423,7 +423,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 	manipulator.m_referenceSpace = glm::mat4(1);
 
 	// Get reference space if applicable
-	auto sequence = node->as<Core::Transform>()->getCurrentSequence();
+	auto sequence = std::static_pointer_cast<Core::Sequence>(node->as<Core::Transform>()->getCurrentSequence());
 	if (sequence == nullptr)
 		return;
 
@@ -447,7 +447,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 
 	// Iterate over all transformations prior to this one to create reference space
 	glm::mat4 result = glm::mat4(1);
-	auto st = Core::SequenceTree(sequence);
+	auto st = Core::TransformChain(sequence);
 	auto it = st.begin();
 
 	// Move the iterator to the transformation before this one
@@ -467,7 +467,7 @@ void Manipulators::updateManipulatorMatrices(Manipulator& manipulator, std::shar
 	while (it != st.end())
 	{
 		auto n = *it;
-		result = n->data().getMat4() * result;
+		result = n->data(it.transformInfo().dataIndex).getMat4() * result;
 		++it;
 	}
 	manipulator.m_referenceSpace = result;

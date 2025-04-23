@@ -18,20 +18,25 @@
 
 namespace Core
 {
+struct TrackedModel;
+
 class Model : public Node
 {
 public:
 	Model() : Node(g_modelProperties){};
+	~Model() override;
 
 	/// Latest model matrix value
 	glm::mat4 m_modelMatrix{};
 
+	/// Reference to the corresponding tracked model entry when tracked, nullptr otherwise.
+	TrackedModel* m_trackedModel{nullptr};
+
 	void updateValues(int inputIndex = 0) override;
-
-	void onUnplugInput(size_t index) override;
-
-	/// \todo
 	void resetModelPosition();
+
+protected:
+	void onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex) override;
 };
 
 namespace Builder

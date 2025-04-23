@@ -404,7 +404,7 @@ colors:
     y: 0.768627465
     z: 0.886274517
     w: 0.768627465
-  ntrs_Nodes Transformation TrackingColor:
+  ntrs_Nodes Tracking Overlay Inactive:
     x: 0.160784319
     y: 0.160784319
     z: 0.160784319

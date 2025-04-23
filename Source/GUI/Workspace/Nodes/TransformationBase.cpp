@@ -108,55 +108,11 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 {
 	Super::end(context);
 
-	if (!Core::GraphManager::isTrackingEnabled())
+	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	if (t)
 	{
-		return;
-	}
-
-	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-
-	ImVec2 topleft = m_middle.getMin();
-	ImVec2 bottomright = m_middle.getMax();
-	bool trackingFromLeft = workspaceDiwne.m_trackingFromLeft;
-
-	Core::TrackingResult t = workspaceDiwne.tracking->result();
-
-	ImVec2 size = bottomright - topleft;
-	// TODO: <<<<<<<< Test if this works properly (was just this->getId())
-	float inactiveMark = t.trackingProgress[this->getNodebase()->getId()];
-
-	if (!trackingFromLeft)
-	{
-		bottomright.x = topleft.x;
-		bottomright.x += (1 - inactiveMark) * size.x;
-		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
-		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-	}
-	else
-	{ // Left tracking, top left moving left
-		topleft.x = bottomright.x;
-		topleft.x -= (1 - inactiveMark) * size.x;
-		diwne.canvas().AddRectFilledDiwne(topleft, bottomright,
-		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
-	}
-
-	auto maybeInterpolatedTransform =
-	    Tools::findNodeById(workspaceDiwne.getAllCoreNodes().collect(), t.interpolatedTransformID);
-
-	if (!maybeInterpolatedTransform)
-	{
-		Core::GraphManager::stopTracking();
-		return;
-	}
-
-	auto interpolatedTransform = std::dynamic_pointer_cast<TransformationBase>(maybeInterpolatedTransform.value());
-	if (interpolatedTransform.get() == this)
-	{
-		ImVec2 markCenter = ImVec2(!trackingFromLeft ? bottomright.x : topleft.x, m_middle.getRect().GetCenter().y);
-		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
-
-		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-		                                  I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
+		const ImVec2 ofst = {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
+		drawTrackingCursor(ImRect(m_center.getRect().Min - ofst, m_center.getRect().Max + ofst), t);
 	}
 }
 

@@ -51,39 +51,15 @@ class WorkspaceDiwne : public DIWNE::NodeEditor
 public:
 	ImDrawListSplitter m_channelSplitter;
 	Memento* copiedNodes = nullptr;
-	Core::MatrixTracker* tracking{nullptr};
-	float timeUntilNextTrack = 0;
-	bool smoothTracking{true};
 
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
-
 	ViewportHighlightResolver m_viewportHighlightResolver;
 
 	bool m_updateDataItemsWidth{false}; ///< Indicates a change in zoom level this frame
 
-	bool m_trackingFromLeft{false};
-
-	// TODO: The nodes should be mainly stored in the DIWNE::NodeEditor not in a subclass
-	//  Or a system where the storage can be specified by subclasses should be created
-	//  However this turns out to be very tricky since vectors of derived classes cannot be easily converted
-	//  into vectors of base class. There are hacky workarounds like reinterpret_cast but generally at least a shallow
-	//  O(n) copy and cast of pointers is required. That may be insignificant but I'm not sure (large node counts?)
-	//  - The simplest solution is to use a single base node vector in NodeEditor. Issue is that in subclasses everytime
-	//    a non base functionality is required the fetched node would need to be (pseudo-safely) static-casted.
-	//    That is a lot of boilerplate code though.
-	//  - More complicated but still clean solution is to create a generic getNodes method that subclasses override,
-	//  however its not clear what this method would return, it can't return a base class vector, it also can't return
-	//  a generic iterator since it is type specific. It could return a pair of pointers for read only access.
-	//
-	// TODO: I've moved the CoreNode vector to DIWNE::NodeEditor for the time being.
-	//  This way the code can be rewritten in DIWNE but still compile and be tested in Workspace
-	//  Will see how we go from there.
-	//	/**
-	//	 * \brief All WorkspaceNodes
-	//	 * \note Nodes inside Sequences are not directly in this vector (they are in Sequence)
-	//	 **/
-	//	std::vector<Ptr<CoreNode>> m_workspaceCoreNodes;
+	float timeUntilNextTrack = 0;
+	bool smoothTracking{true};
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.
@@ -133,27 +109,33 @@ public:
 
 	void manipulatorStartCheck3D();
 
+	// Tracking
+	// =============================================================================================================
+
+	void startTracking(Sequence* sequence, bool trackFromLeft);
+	void stopTracking();
+
+	Core::MatrixTracker* getTracker() const;
+
+	bool isTracking() const;
+	bool isTrackingFromLeft() const;
+
+	// Tracking progress
+	void processTrackingMove();
 	void trackingSmoothLeft();
 	void trackingSmoothRight();
 	void trackingJaggedLeft();
 	void trackingJaggedRight();
 	void trackingModeSwitch();
-	void trackingSwitch();
-	void trackingSwitchOn(Ptr<Sequence> sequence = nullptr, bool isRightToLeft = true);
 
-	/**
-	 * @pre @p sequence is not null.
-	 */
-	void trackingInit(Ptr<Sequence> sequence, std::vector<Ptr<Model>> models, bool isRightToLeft);
-	void trackingSwitchOff();
-	void toggleSelectedNodesVisibility();
-
-	void processTrackingMove();
-
+	// Node management
+	// =============================================================================================================
 	void zoomToAll();
 	void zoomToSelected();
 	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<DIWNE::Node>> nodes);
 	void zoomToRectangle(ImRect const& rect);
+
+	void toggleSelectedNodesVisibility();
 
 	void copySelectedNodes();
 	void pasteSelectedNodes();
@@ -257,7 +239,6 @@ public:
 
 	DIWNE::FilteredNodeRange<Camera> getAllCameras();
 	DIWNE::FilteredNodeRange<Model> getAllModels();
-	std::vector<Ptr<Model>> getSequenceModels(Ptr<Sequence> seq);
 	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence();
 	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();
 	DIWNE::FilteredRecursiveNodeRange<ScriptingNode> getAllScriptingNodes();

@@ -18,6 +18,7 @@
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
+#include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
 
@@ -104,6 +105,22 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
 		{
 			camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
 		}
+	});
+
+	m_input->bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
+		WorkspaceModule::g_editor->stopTracking();
+	});
+	m_input->bindAxis("trackingSmoothLeft", [&](float val) {
+		WorkspaceModule::g_editor->trackingSmoothLeft();
+	});
+	m_input->bindAxis("trackingSmoothRight", [&](float val) {
+		WorkspaceModule::g_editor->trackingSmoothRight();
+	});
+	m_input->bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
+		WorkspaceModule::g_editor->trackingJaggedLeft();
+	});
+	m_input->bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
+		WorkspaceModule::g_editor->trackingJaggedRight();
 	});
 
 	/// \todo MH This is example code, it can be removed anytime.

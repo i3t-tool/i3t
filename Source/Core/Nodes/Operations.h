@@ -60,11 +60,11 @@ static const PinNames matrixIndexNames()
  */
 struct Operation
 {
-	std::string keyWord;
-	std::string defaultLabel;
+	std::string keyWord;      ///< String identifier of the operation type
+	std::string defaultLabel; ///< Default UI name of the operation
 	PinGroup inputTypes;
 	PinGroup outputTypes;
-	std::string defaultTagText = NO_TAG;
+	std::string defaultTagText = NO_TAG;         // FIXME: No clue what this is, is it used?
 	PinNames defaultInputNames = DEFAULT_NAMES;  // if the names differ from the names of the valueType
 	PinNames defaultOutputNames = DEFAULT_NAMES; // if the names differ from the names of the valueType
 
@@ -555,7 +555,7 @@ static inline const std::vector<TransformOperation> g_transforms = {
       {"far", EValueType::Float}}},
     {{n(ETransformType::LookAt), "lookAt"},
      g_AllLocked,
-     {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}},
+     {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}, true},
 };
 // clang-format on
 

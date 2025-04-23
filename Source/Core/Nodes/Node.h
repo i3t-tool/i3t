@@ -32,6 +32,7 @@ namespace Core
 {
 class Node;
 class Pin;
+struct TrackedNodeData;
 
 struct SetValueResult
 {
@@ -67,6 +68,7 @@ inline constexpr size_t I3T_DATA2 = 2;
 class Node : public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
+	friend class MatrixTracker;
 	friend class Pin;
 
 	//===-- Lifecycle functions -----------------------------------------------===//
@@ -152,6 +154,16 @@ public:
 		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()), "Cannot cast to Ptr<T>.");
 
 		return std::dynamic_pointer_cast<T>(shared_from_this());
+	}
+
+	// NOTE: The "as" method above is used quite a lot but has overhead (dynamic cast + shared ptr construction)
+	//  This might be preferable in cases when nullptr isn't expected and shared ptr is not needed.
+	template <typename T>
+	T* asRaw()
+	{
+		static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node class.");
+		I3T_ASSERT(dynamic_cast<T*>(this), "Cannot cast to T*.");
+		return static_cast<T*>(this);
 	}
 
 	//===----------------------------------------------------------------------===//
@@ -396,6 +408,11 @@ public:
 		return fmt::format("{} #{}", m_operation.keyWord, m_id);
 	}
 
+	TrackedNodeData* getTrackingData()
+	{
+		return m_trackingData;
+	}
+
 private:
 	// TODO: (DR) Callbacks cannot be unregistered! That could cause issues when lifetime of listener ends before the
 	//   dispatcher.
@@ -409,6 +426,10 @@ private:
 	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_unplugCallbacks;
 
 protected:
+	virtual void onPlug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
+	virtual void onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
+	virtual void onUpdate();
+
 	void triggerUpdateCallback(Node* node);
 	void triggerDeleteCallback(Node* node);
 	void triggerPlugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
@@ -417,16 +438,17 @@ protected:
 public:
 	/**
 	 * Registers a callback that gets called on any updateValues() call.
-	 * Note that some derived nodes might not always call this callback.
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = node that has been updated<br>
+	 * @note The callback cannot be removed, meaning they are meant to last for the entire node lifetime.
 	 */
 	virtual void addUpdateCallback(std::function<void(Node*)> callback);
 
 	/**
 	 * <br><br>
 	 * The callback parameters:<br>
+	 * @note The callback cannot be removed, meaning they are meant to last for the entire node lifetime.
 	 * Node* = node that has been deleted<br>
 	 */
 	virtual void addDeleteCallback(std::function<void(Node*)> callback);
@@ -439,6 +461,7 @@ public:
 	 * Node* = End node<br>
 	 * size_t = Start node's output pin index<br>
 	 * size_t = End node's input pin index<br>
+	 * @note The callback cannot be removed, meaning they are meant to last for the entire node lifetime.
 	 */
 	virtual void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
@@ -450,6 +473,7 @@ public:
 	 * Node* = End node<br>
 	 * size_t = Start node's output pin index<br>
 	 * size_t = End node's input pin index<br>
+	 * @note The callback cannot be removed, meaning they are meant to last for the entire node lifetime.
 	 */
 	virtual void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
@@ -462,8 +486,6 @@ private:
 	void unplugOutput(size_t index);
 
 protected:
-	virtual void onUnplugInput(size_t index) {}
-
 	ID m_id{};
 
 	/// Operator node properties.
@@ -485,6 +507,10 @@ protected:
 	/// Nested nodes.
 	std::vector<Node*> m_children;
 
-	bool finalized = false;
+	/// Reference to additional tracking data if applicable, nullptr indicates no active tracking operation.
+	/// This pointer is managed by an active MatrixTracker.
+	TrackedNodeData* m_trackingData{nullptr};
+
+	bool finalized = false; /// Internal helper flag to keep track of Node::finalize() calls
 };
 } // namespace Core

@@ -205,8 +205,11 @@ enum class EColor
 	Nodes_Screen_noInput_background,
 	Nodes_Screen_noInput_text,
 
-	Nodes_Transformation_TrackingMarkColor,
-	Nodes_Transformation_TrackingColor,
+	Nodes_Tracking_ColorActive,
+	Nodes_Tracking_ColorInactive,
+	Nodes_Tracking_Cursor,
+	Nodes_Tracking_OverlayActive,
+	Nodes_Tracking_OverlayInactive,
 
 	Nodes_Transformation_ValidIcon_bgShape,
 	Nodes_Transformation_ValidIcon_bgInner,

@@ -17,9 +17,9 @@
 
 namespace Core
 {
-Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
+Ptr<Sequence> Builder::createSequence()
 {
-	auto ret = std::make_shared<Sequence>(tracker);
+	auto ret = std::make_shared<Sequence>();
 	ret->init();
 	ret->updateValues(0);
 
@@ -66,12 +66,7 @@ void Sequence::Storage::swap(int from, int to)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : Node(g_sequence), m_storage(*this), m_tracker(tracker) {}
-
-Sequence::~Sequence()
-{
-	stopTracking();
-}
+Sequence::Sequence() : Node(g_sequence), m_storage(*this) {}
 
 SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 {
@@ -136,23 +131,7 @@ void Sequence::updateValues(int inputIndex)
 	// When sequence is inside a camera.
 	notifyOwner();
 
-	m_tracker->update();
-}
-
-MatrixTracker* Sequence::startTracking(TrackingDirection direction, std::vector<UPtr<IModelProxy>> modelProxy)
-{
-	*m_tracker = MatrixTracker(this, direction, std::move(modelProxy));
-
-	return m_tracker;
-}
-
-void Sequence::stopTracking()
-{
-	// Called in destructor, cannot use shared_from_this() here.
-	if (m_tracker->getSequenceID() == getId())
-	{
-		*m_tracker = MatrixTracker();
-	}
+	Node::updateValues(inputIndex);
 }
 
 //===-- Helpers -----------------------------------------------------------===//
@@ -170,7 +149,6 @@ Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence)
 
 		parent = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MUL);
 	}
-
 	return nullptr;
 }
 } // namespace Core

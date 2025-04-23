@@ -36,6 +36,7 @@ class Pin;
 class Link;
 
 /**
+ * // TODO: Update docs
  * \brief The node editor object
  * In ancestor of this object you will probably store your nodes (links, pins)
  * It store inter-object interactions

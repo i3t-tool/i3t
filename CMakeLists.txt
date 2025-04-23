@@ -207,7 +207,7 @@ target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
         RAPIDJSON_HAS_STDSTRING=1)
 
 # DIWNE configuration
-target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h")
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC DIWNE_USER_CONFIG=\"GUI/Workspace/diwne_config.h\")
 
 # =============================================================
 
@@ -231,7 +231,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 
 # DIWNE configuration, force disable DIWNE debug in Release builds
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-        DIWNE_USER_CONFIG="GUI/Workspace/diwne_config.h"
+        DIWNE_USER_CONFIG=\"GUI/Workspace/diwne_config.h\"
         $<$<CONFIG:Release>:DIWNE_DEBUG_ENABLED=0>
 )
 

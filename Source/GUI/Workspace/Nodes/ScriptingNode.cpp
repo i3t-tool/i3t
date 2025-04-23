@@ -76,6 +76,7 @@ public:
 		{
 			m_interface->onUpdate();
 		}
+		Node::updateValues(inputIndex);
 	}
 
 	Workspace::ScriptInterface* getInterface() const
@@ -258,6 +259,7 @@ Ptr<ScriptingNode> ScriptingNode::reloadScript()
 
 	newNode->getNodebase()->as<::ScriptingNode>()->performInit();
 	newNode->setPosition(getPosition());
+	newNode->getNodebase()->updateValues();
 	return newNode;
 }
 
