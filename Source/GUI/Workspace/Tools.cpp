@@ -60,27 +60,6 @@ void Tools::pasteNodes(const Memento& memento)
 	WorkspaceModule::g_editor->shiftNodesToEnd(newNodes);
 }
 
-int Tools::numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
-{
-	int border = 10, result = 1, int_value;
-
-	if (value < 0)
-	{
-		value = -value;
-	}
-	result++; /* always space for sign to avoid changing size of / alternatively
-	             move it inside if above */
-
-	int_value = (int) value;
-	while (int_value >= border)
-	{
-		result++;
-		border *= 10;
-	}
-
-	return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal + 1 : 0); /* +1 for decimal point */
-}
-
 static auto findNode(Core::ID id) -> Result<Ptr<Workspace::CoreNode>, Error>
 {
 	auto& nodeEditor = I3T::getWorkspace().getNodeEditor();

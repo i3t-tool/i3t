@@ -639,7 +639,7 @@ void StateManager::loadUserData()
 		auto path = fs::path(*it);
 		if (!fs::exists(path))
 		{
-			LOG_INFO("[STATE MANAGER] Pruning non-existing recent file: {}", path.string())
+			LOG_INFO("[STATE MANAGER] Pruning non-existing recent file: {}", path.string());
 			it = data.recentFiles.erase(it);
 		}
 		else

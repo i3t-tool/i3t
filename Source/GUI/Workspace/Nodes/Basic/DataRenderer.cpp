@@ -59,7 +59,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 	    ImGui::DragFloat(label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 	                     1.0f); /* if power >1.0f the number changes logarithmic */
 
-	if (ImGui::IsItemActive()) // TODO: This seems odd, why in the world would we override IsItemActive??
+	if (ImGui::IsItemActive())
 		inner_interaction_happen = true;
 
 	if (ImGui::IsItemDeactivatedAfterEdit())
@@ -445,23 +445,6 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
 	return inner_interaction_happen;
 }
 
-int DataRenderer::maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
-{
-	int act, maximal = 0;
-	for (int column = 0; column < 4; column++)
-	{
-		for (int row = 0; row < 4; row++)
-		{
-			act = Tools::numberOfCharWithDecimalPoint(data[column][row], numberOfVisibleDecimal);
-			if (act > maximal)
-			{
-				maximal = act;
-			}
-		}
-	}
-	return maximal;
-}
-
 bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
                                 const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,
                                 FloatPopupMode& floatPopupMode, const glm::vec4& data,
@@ -505,7 +488,7 @@ int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisible
 
 	for (int column = 0; column < 4; column++)
 	{
-		act = Tools::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
+		act = GUI::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
 		if (act > maximal)
 		{
 			maximal = act;
@@ -553,7 +536,7 @@ int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisible
 
 	for (int column = 0; column < 3; column++)
 	{
-		act = Tools::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
+		act = GUI::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
 		if (act > maximal)
 		{
 			maximal = act;
@@ -588,7 +571,7 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& cont
 }
 int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDecimal)
 {
-	return Tools::numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
+	return GUI::numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
 }
 
 bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
@@ -649,7 +632,7 @@ int DataRenderer::maxLengthOfDataQuaternion(const glm::quat& data, int numberOfV
 
 	for (int column = 0; column < 4; column++)
 	{
-		act = Tools::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
+		act = GUI::numberOfCharWithDecimalPoint(data[column], numberOfVisibleDecimal);
 		if (act > maximal)
 		{
 			maximal = act;

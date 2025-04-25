@@ -28,7 +28,4 @@ void pasteNodes(const Memento& memento);
 
 bool plug(Core::ID from, int fromIdx, Core::ID to, int toIdx);
 
-//
-
-int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
 } // namespace Workspace::Tools

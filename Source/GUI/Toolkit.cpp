@@ -279,6 +279,143 @@ bool SliderFloatStepped(const char* label, float* v, float step, float v_min, fl
 	return false;
 }
 
+bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecimals, Core::EValueState const& valueState,
+               bool& valueChanged)
+{
+	bool inactive = (valueState == Core::EValueState::Locked || valueState == Core::EValueState::LockedSyn);
+	bool synergies = (valueState == Core::EValueState::EditableSyn || valueState == Core::EValueState::LockedSyn);
+	bool inner_interaction_happen = false, valueChangedByPopup = false;
+
+	if (synergies)
+	{
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, I3T::getColor(EColor::Synergies_FloatBg));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, I3T::getColor(EColor::Synergies_FloatBgHovered));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, I3T::getColor(EColor::Synergies_FloatBgActive));
+	}
+	if (inactive)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
+		                    ImGui::GetStyle().Alpha * I3T::getSize(ESize::Float_inactive_alphaMultiplicator));
+	}
+
+	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaultRatio);
+
+	valueChanged =
+	    ImGui::DragFloat(label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
+	                     1.0f); /* if power >1.0f the number changes logarithmic */
+
+	if (ImGui::IsItemActive())
+		inner_interaction_happen = true;
+
+	if (inactive)
+	{
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+	}
+
+	if (synergies)
+	{
+		ImGui::PopStyleColor(3);
+	}
+
+	return inner_interaction_happen || valueChanged;
+}
+
+int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
+{
+	int border = 10, result = 1, int_value;
+
+	if (value < 0)
+	{
+		value = -value;
+	}
+	result++; /* always space for sign to avoid changing size of / alternatively
+	             move it inside if above */
+
+	int_value = (int) value;
+	while (int_value >= border)
+	{
+		result++;
+		border *= 10;
+	}
+
+	return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal + 1 : 0); /* +1 for decimal point */
+}
+
+int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
+{
+	int act, maximal = 0;
+	for (int column = 0; column < 4; column++)
+	{
+		for (int row = 0; row < 4; row++)
+		{
+			act = numberOfCharWithDecimalPoint(data[column][row], numberOfVisibleDecimal);
+			if (act > maximal)
+			{
+				maximal = act;
+			}
+		}
+	}
+	return maximal;
+}
+
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
+                const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
+                int& rowOfChange, int& columnOfChange, float& valueOfChange)
+{
+	float dataWidth = maxLengthOfData4x4(data, numberOfVisibleDecimals);
+
+	bool inner_interaction_happen = false;
+	bool actualValueChanged = false;
+	float localData; /* user can change just one value at the moment */
+
+	ImGui::PushItemWidth(dataWidth);
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	valueChanged = false;
+
+	/* Drawing is row-wise */
+	ImGui::BeginGroup();
+	for (int rows = 0; rows < 4; rows++)
+	{
+		// To be quite honest I don't know why this call is necessary but window text baseline offset is alwazs set here
+		// to ~4 (FramePadding.y) when it really should be 0, causes any text to be too high and then it works fine
+		// after the next ImGui::SameLine() call. This created a vertical gap between the first and second matrix rows.
+		// JH solved this (haphazardly like me) by moving the Y cursor position by ItemSpacing which however broke down
+		// at other zoom levels.
+		ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0.0f;
+		for (int columns = 0; columns < 4; columns++)
+		{
+			localData = data[columns][rows]; /* Data are column-wise */
+
+			inner_interaction_happen |=
+			    DrawFloat(fmt::format("##{}:row-{},col-{}", label, rows, columns), localData, numberOfVisibleDecimals,
+			              dataState[rows][columns], actualValueChanged);
+
+			if (actualValueChanged)
+			{
+				valueChanged = true;
+				columnOfChange = columns;
+				rowOfChange = rows;
+				valueOfChange = localData;
+			}
+
+			if (columns < 3)
+			{
+				ImGui::SameLine();
+			}
+		}
+	}
+	ImGui::EndGroup();
+
+	ImGui::PopStyleVar();
+	ImGui::PopStyleVar();
+	ImGui::PopItemWidth();
+
+	return inner_interaction_happen;
+}
+
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {
 	drawList->AddRectFilled(ImVec2(pos.x - floor(thickness / 2), pos.y - floor(size / 2)),

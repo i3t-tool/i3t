@@ -348,8 +348,6 @@ void Theme::initDefaultClassic()
 
 	m_sizes[ESize::FloatingButtonRounding] = {2.0f, true};
 
-	m_sizes[ESize::Nodes_FloatMargin] = {1.0f, true};
-	m_sizes[ESize::Nodes_FloatWidth] = {25.0f, true};
 	m_sizes[ESize::Nodes_Rounding] = {5.0f, true};
 	m_sizes[ESize::Nodes_BorderWidth] = {0.0f, true};
 	m_sizes[ESize::Nodes_LabelIndent] = {3.0f, true};
@@ -358,6 +356,8 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Nodes_TrackBallSensitivity] = {5.0f, true};
 
 	m_sizes[ESize::Nodes_FloatInnerPadding] = {1.0f, true};
+	m_sizes[ESize::Nodes_FloatCharacterWidthMultiplier] = {0.4f, false};
+	m_sizes[ESize::Nodes_FloatMinCharacters] = {5.0f, false};
 
 	m_sizes[ESize::Nodes_dragSpeedDefaultRatio] = {0.015f, true};
 	m_sizes[ESize::Nodes_CtrlMultiplicator] = {0.1f, true};
@@ -693,8 +693,8 @@ void Theme::initNames()
 	    .add(ESize::Links_ControlpointsPositionMax, "Link Max Control Point X Distance")
 	    .add(ESize::Links_Thickness, "Link Thickness")
 	    .add(ESize::Links_ThicknessSelected, "Link Thickness when selected")
-	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
-	    .add(EColor::Links_selected_colorShift, "selected_colorShift");
+	    .addF01(ESize::Links_selected_alpha, "Link Selected Alpha")
+	    .addF01(EColor::Links_selected_colorShift, "selected_colorShift");
 
 	group("Node Editor Pins", "npin", 1)
 	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
@@ -742,16 +742,18 @@ void Theme::initNames()
 	    .add(EColor::Nodes_CreateNode, "Create node popup");
 
 	group("Node Editor Floats", "nflo", 1)
-	    .add(ESize::Nodes_FloatWidth, "Nodes Float Width")
-	    .add(ESize::Nodes_FloatMargin, "Nodes Float Margin")
 	    .add(EColor::FloatBg, "Float Background")
 	    .add(EColor::FloatBgHovered, "Float Background Hovered")
 	    .add(EColor::FloatBgActive, "Float Background Active")
 	    .add(EColor::Synergies_FloatBg, "Synergies FloatBg")
 	    .add(EColor::Synergies_FloatBgHovered, "Synergies FloatBgHovered")
 	    .add(EColor::Synergies_FloatBgActive, "Synergies FloatBgActive")
-	    .add(ESize::Float_inactive_alphaMultiplicator, "Float Inactive Alpha Factor")
-	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding")
+	    .addF01(ESize::Float_inactive_alphaMultiplicator, "Float Inactive Alpha Factor")
+	    .addF(ESize::Nodes_FloatCharacterWidthMultiplier, "Float Character Width Multiplier",
+	          "Factor of font size determining the width of a single character.")
+	    .addF1(ESize::Nodes_FloatMinCharacters, "Float Minimum Character Count")
+	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding",
+	         "Horizontal padding inside float data items (floats, vectors, matrices etc.).")
 	    .add(ESizeVec2::Nodes_FloatPadding, "Nodes Float Padding")
 	    .add(ESizeVec2::Nodes_FloatCycleButtonSize, "Nodes Float Cycle Button Size");
 

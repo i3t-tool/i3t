@@ -278,7 +278,7 @@ bool TransformationBase::drawDataFull(DIWNE::DrawInfo& context)
 
 int TransformationBase::maxLengthOfData()
 {
-	return DataRenderer::maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
+	return GUI::maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
 }
 
 /// labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below

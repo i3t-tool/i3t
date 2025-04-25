@@ -30,7 +30,7 @@ class CoreNode : public Node, public IVisitable
 
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
-	float m_dataItemsWidth;
+	float m_dataItemsWidth{32.f};
 	bool m_updateDataItemsWidth{true};
 	// float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
 	bool m_drawContextMenuButton = false;

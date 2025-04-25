@@ -14,6 +14,7 @@
 
 #include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "TransformationBase.h"
@@ -152,7 +153,7 @@ int Sequence::maxLengthOfData()
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
 		/*\todo JM HM better selection (index) of data*/
-		return DataRenderer::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
+		return GUI::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
 	}
 	return 0;
 }

@@ -28,11 +28,7 @@ using namespace Workspace;
 
 CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
     : Node(diwne, nodebase->getLabel()), m_nodebase(nodebase),
-      m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision)),
-      m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth) *
-                       diwne.getZoom()) /* just for safe if someone not call
-                                                   setDataItemsWidth() in constructor of
-                                                   child class... */
+      m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision))
 {
 	// Register connection between core node and gui node
 	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
@@ -405,10 +401,11 @@ float CoreNode::updateDataItemsWidth()
 		fontSize = diwne.canvas().m_unscaledFontSize * diwne.getZoom();
 	else
 		fontSize = ImGui::GetFontSize();
-	const float oneCharWidth = fontSize / 2;
+	const float oneCharWidth = fontSize * I3T::getSize(ESize::Nodes_FloatCharacterWidthMultiplier);
 	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getZoom();
+	const float minCharCount = I3T::getSize(ESize::Nodes_FloatMinCharacters);
 	const float maxLength = static_cast<float>(maxLengthOfData());
-	m_dataItemsWidth = maxLength * oneCharWidth + 2 * padding;
+	m_dataItemsWidth = std::max(maxLength, minCharCount) * oneCharWidth + 2 * padding;
 	LOG_DEBUG("updateDataItemsWidth() in node '{}': fS: {}, oCW: {}, maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
 	          oneCharWidth, maxLength, m_dataItemsWidth);
 	return m_dataItemsWidth;

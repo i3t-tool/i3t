@@ -281,9 +281,9 @@ enum class ESize
 	Nodes_trackballButtonHeight, // TODO: [Trackball]
 	Nodes_TrackBallSensitivity,  // TODO: [Trackball]
 
-	Nodes_FloatWidth,  // Sort of unused?
-	Nodes_FloatMargin, // Unused
 	Nodes_FloatInnerPadding,
+	Nodes_FloatCharacterWidthMultiplier,
+	Nodes_FloatMinCharacters,
 	Float_inactive_alphaMultiplicator,
 
 	Nodes_dragSpeedDefaultRatio,

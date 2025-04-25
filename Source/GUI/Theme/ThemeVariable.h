@@ -70,4 +70,36 @@ struct ThemeGroup
 	{
 		return add(std::move(key), name, desc, range, speed, format);
 	}
+
+	/// Add a theme variable to the group, restriced to <0, Inf) interval.
+	ThemeGroup& addF(const ThemeVariableKey&& key, const char* name, const char* desc = nullptr,
+	                 const std::optional<ImVec2>& range = ImVec2(0.0f, FLT_MAX), float speed = 0.01f,
+	                 const char* format = "%.2f")
+	{
+		return add(std::move(key), name, desc, range, speed, format);
+	}
+
+	/// Add a theme variable to the group, float restriced to <1, Inf) interval.
+	ThemeGroup& addF1(const ThemeVariableKey&& key, const char* name, const char* desc = nullptr,
+	                  const std::optional<ImVec2>& range = ImVec2(1.0f, FLT_MAX), float speed = 0.01f,
+	                  const char* format = "%.2f")
+	{
+		return add(std::move(key), name, desc, range, speed, format);
+	}
+
+	/// Add a theme variable to the group, unrestricted float
+	ThemeGroup& addFN(const ThemeVariableKey&& key, const char* name, const char* desc = nullptr,
+	                  const std::optional<ImVec2>& range = std::nullopt, float speed = 0.01f,
+	                  const char* format = "%.2f")
+	{
+		return add(std::move(key), name, desc, range, speed, format);
+	}
+
+	/// Add a theme variable to the group, float restriced to 0-1.
+	ThemeGroup& addF01(const ThemeVariableKey&& key, const char* name, const char* desc = nullptr,
+	                   const std::optional<ImVec2>& range = ImVec2(0.0f, 1.0f), float speed = 0.01f,
+	                   const char* format = "%.2f")
+	{
+		return add(std::move(key), name, desc, range, speed, format);
+	}
 };

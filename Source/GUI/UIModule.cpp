@@ -241,7 +241,7 @@ void UIModule::loadThemes()
 	{
 		if (m_allThemes.size() >= MAX_THEMES_COUNT)
 		{
-			LOG_WARN("Maximum number ({}) of loaded themes reached.", MAX_THEMES_COUNT)
+			LOG_WARN("Maximum number ({}) of loaded themes reached.", MAX_THEMES_COUNT);
 			break;
 		}
 

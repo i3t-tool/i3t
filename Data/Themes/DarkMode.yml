@@ -183,9 +183,9 @@ sizes:
   ngen_Header Label Indent: 2
   ngen_Trackball Button Height: 20
   ngen_TrackBall Sensitivity: 5
-  nflo_Nodes Float Width: 45
-  nflo_Nodes Float Margin: 5
   nflo_Float Inner Padding: 1
+  nflo_Float Character Width Multiplier: 0.400000006
+  nflo_Float Minimum Character Count: 5
   nflo_Float Inactive Alpha Factor: 0.5
   ngen_Drag Speed fo Float: 0.0149999997
   ngen_CTRL Multiplicator: 0.100000001

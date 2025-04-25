@@ -119,8 +119,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 int Screen::maxLengthOfData()
 {
-	return Tools::numberOfCharWithDecimalPoint(
-	    getOutputs()[Core::I3T_SCREEN_OUT_ASPECT]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal());
+	return GUI::numberOfCharWithDecimalPoint(getOutputs()[Core::I3T_SCREEN_OUT_ASPECT]->getCorePin().data().getFloat(),
+	                                         getNumberOfVisibleDecimal());
 }
 
 void Screen::drawMenuLevelOfDetail() // todo

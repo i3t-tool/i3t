@@ -14,6 +14,7 @@
 
 #include "Core/Input/InputManager.h"
 #include "DataRenderer.h"
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 
@@ -766,8 +767,8 @@ int CorePin::maxLengthOfData()
 	switch (m_pin.ValueType)
 	{
 	case Core::EValueType::Matrix:
-		return DataRenderer::maxLengthOfData4x4(getCorePin().data().getMat4(),
-		                                        static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+		return GUI::maxLengthOfData4x4(getCorePin().data().getMat4(),
+		                               static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
 	case Core::EValueType::Vec4:
 		return DataRenderer::maxLengthOfDataVec4(getCorePin().data().getVec4(),
 		                                         static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());

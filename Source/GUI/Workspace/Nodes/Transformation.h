@@ -13,6 +13,7 @@
 #pragma once
 
 #include "GUI/I3TGui.h"
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
 #include "Localization/Localization.h"
 #include "TransformationBase.h"
@@ -55,7 +56,7 @@ public:
 		//        return maxLengthOfDataQuaternion( m_nodebase->data().getQuat(),
 		//        m_numberOfVisibleDecimal);
 		//    else
-		return DataRenderer::maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
+		return GUI::maxLengthOfData4x4(m_nodebase->data().getMat4(), m_numberOfVisibleDecimal);
 	}
 
 	void drawMenuLevelOfDetail() override

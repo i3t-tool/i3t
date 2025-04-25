@@ -366,7 +366,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 
 void WorkspaceDiwne::duplicateSelectedNodes()
 {
-	LOG_INFO("Duplicating nodes")
+	LOG_INFO("Duplicating nodes");
 	for (auto& node : getAllSelectedCoreNodesWithoutNesting())
 	{
 		node.setDuplicateNode(true);
