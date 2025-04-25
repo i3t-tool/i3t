@@ -13,7 +13,6 @@
 #include "Sequence.h"
 
 #include "GraphManager.h"
-#include "Tracking.h"
 
 namespace Core
 {

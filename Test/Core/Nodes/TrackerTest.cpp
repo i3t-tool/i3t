@@ -60,28 +60,6 @@ MyTree arrange()
 	return ret;
 }
 
-class DummyModelProxy : public Core::IModelProxy
-{
-public:
-	DummyModelProxy()
-	{
-		m_model = GraphManager::createModel();
-	}
-	~DummyModelProxy() override {}
-
-	void update(const glm::mat4& transform) override
-	{
-		m_model->setValue(transform);
-	};
-	Ptr<Core::Model> getModel() override
-	{
-		return m_model;
-	};
-
-private:
-	Ptr<Model> m_model;
-};
-
 class TrackerTest : public ::testing::Test
 {
 protected:
@@ -107,11 +85,8 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 {
 	auto t = arrange();
 
-	std::vector<UPtr<IModelProxy>> proxy;
-	proxy.push_back(std::make_unique<DummyModelProxy>());
-
 	// Act
-	auto tracker = t.s2->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
+	auto* tracker = GraphManager::startTracking(t.s2, TrackingDirection::RightToLeft);
 
 	{
 		float trackingParam = 1.0f;
@@ -120,15 +95,14 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		auto expected =
 		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 4);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 1.0f);
 	}
 	{
 		float trackingParam = 0.85f;
@@ -138,14 +112,14 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		auto expected = glm::interpolate(glm::mat4(1.0f), t.mat1->data().getMat4(), interpParam) *
 		                t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 3);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), interpParam);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
+
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, interpParam);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 1.0f);
 	}
 	{
 		float trackingParam = 0.30f;
@@ -155,14 +129,13 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		auto expected =
 		    glm::interpolate(glm::mat4(1.0f), t.mat3->data().getMat4(), interpParam) * t.mat4->data().getMat4();
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 1);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), interpParam);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, interpParam);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 1.0f);
 	}
 	{
 		float trackingParam = 0.0f;
@@ -170,14 +143,13 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 
 		auto expected = glm::mat4(1.0f);
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 0);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 0);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 0.0f);
 	}
 }
 
@@ -185,11 +157,8 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 {
 	auto t = arrange();
 
-	std::vector<UPtr<IModelProxy>> proxy;
-	proxy.push_back(std::make_unique<DummyModelProxy>());
-
 	// Act
-	auto tracker = t.s2->startTracking(TrackingDirection::LeftToRight, std::move(proxy));
+	auto* tracker = GraphManager::startTracking(t.s2, TrackingDirection::LeftToRight);
 
 	{
 		float trackingParam = 0.0f;
@@ -197,15 +166,14 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 
 		glm::mat4 expected{1.0f};
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 0);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 0);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 0.0f);
 	}
 	{
 		float trackingParam = 0.30f;
@@ -215,14 +183,13 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		const auto expected =
 		    t.mat1->data().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->data().getMat4(), interpParam);
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 1);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), interpParam);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 0.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 0.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, interpParam);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 0.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 0.0f);
 	}
 	{
 		float trackingParam = 0.85f;
@@ -232,14 +199,13 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		const auto expected = t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() *
 		                      glm::interpolate(glm::mat4(1.0f), t.mat4->data().getMat4(), interpParam);
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 3);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 3);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), interpParam);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, interpParam);
 	}
 	{
 		float trackingParam = 1.0f;
@@ -248,14 +214,13 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		auto expected =
 		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
-		EXPECT_EQ(tracker->fullMatricesCount(), 4);
+		EXPECT_EQ(tracker->getFullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
-		const auto& progress = tracker->result().trackingProgress;
-		EXPECT_FLOAT_EQ(progress.at(t.mat1->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat2->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat3->getId()), 1.0f);
-		EXPECT_FLOAT_EQ(progress.at(t.mat4->getId()), 1.0f);
+		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat3->getTrackingData()->progress, 1.0f);
+		EXPECT_FLOAT_EQ(t.mat4->getTrackingData()->progress, 1.0f);
 	}
 }
 
@@ -264,11 +229,8 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	auto sequence = GraphManager::createSequence();
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
-	std::vector<UPtr<IModelProxy>> proxy;
-	proxy.push_back(std::make_unique<DummyModelProxy>());
-
 	// start full tracking
-	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
+	auto* tracker = GraphManager::startTracking(sequence, TrackingDirection::RightToLeft);
 	tracker->setParam(1.0f);
 
 	// add new matrix
@@ -282,43 +244,43 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 
 TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 {
-	EXPECT_FALSE(GraphManager::isTrackingEnabled());
+	EXPECT_FALSE(GraphManager::isTracking());
 	{
 		auto sequence = GraphManager::createSequence();
 		auto mat = Builder::createTransform<ETransformType::Translation>();
 		mat->setDefaultValue("translation", generateVec3());
 		sequence->pushMatrix(mat);
 
-		std::vector<UPtr<IModelProxy>> proxy;
-		proxy.push_back(std::make_unique<DummyModelProxy>());
-
 		// start full tracking
-		auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
+		auto* tracker = GraphManager::startTracking(sequence, TrackingDirection::RightToLeft);
 		tracker->setParam(1.0f);
 
-		EXPECT_TRUE(GraphManager::isTrackingEnabled());
+		EXPECT_TRUE(GraphManager::isTracking());
 
 		EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
 	}
 
-	EXPECT_FALSE(GraphManager::isTrackingEnabled());
+	EXPECT_FALSE(GraphManager::isTracking());
 }
 
-TEST_F(TrackerTest, EmptySequence)
+TEST_F(TrackerTest, EmptySequenceAfterTrackingStart)
 {
 	auto sequence = GraphManager::createSequence();
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 	sequence->pushMatrix(Builder::createTransform<ETransformType::Translation>());
 
-	std::vector<UPtr<IModelProxy>> proxy;
-	proxy.push_back(std::make_unique<DummyModelProxy>());
-
 	// start full tracking
-	auto tracker = sequence->startTracking(TrackingDirection::RightToLeft, std::move(proxy));
+	auto* tracker = GraphManager::startTracking(sequence, TrackingDirection::RightToLeft);
 	tracker->setParam(1.0f);
+
+	ASSERT_TRUE(tracker->isTracking());
 
 	sequence->popMatrix(0);
 	sequence->popMatrix(0);
 
+	ASSERT_TRUE(tracker->isTracking());
+
 	tracker->setParam(1.0f);
+
+	ASSERT_FALSE(tracker->isTracking());
 }

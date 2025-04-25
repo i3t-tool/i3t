@@ -172,7 +172,8 @@ public:
 
 	// TODO: Docs
 	static Ptr<Node> getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& isCamera, bool skipEmptySeq = false,
-										bool skipEmptyCamera = false);
+	                                           bool skipEmptyCamera = false);
+	static Ptr<Sequence> getParentSequence(Ptr<Sequence> sequence, bool skipEmptySeq = false);
 
 	/**
 	 * \return All nodes connected to given node inputs.
@@ -198,7 +199,7 @@ public:
 	}
 	static bool isTracking();
 	static bool isTrackingFromLeft();
-	static void startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction);
+	static MatrixTracker* startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction);
 	static void stopTracking();
 
 private:

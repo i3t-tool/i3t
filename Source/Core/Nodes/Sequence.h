@@ -13,7 +13,6 @@
  */
 #pragma once
 
-#include "Tracking.h"
 #include "Transform.h"
 
 namespace Core
@@ -51,7 +50,6 @@ Ptr<Sequence> createSequence();
 class Sequence : public Node
 {
 	friend class GraphManager;
-	friend class MatrixTracker;
 
 	using Matrix = Node;
 

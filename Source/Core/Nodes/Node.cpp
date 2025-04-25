@@ -21,10 +21,10 @@ static IdGenerator generator;
 
 Node::~Node()
 {
-	LOG_DEBUG("~Node called on {}.", getSignature());
+	LOG_DEBUG("~Node called on {} #{}.", m_operation.keyWord, m_id); // Avoid m_owner as it can be unalloced by now?
 	if (!finalized)
 	{
-		LOG_WARN("Core node not finalized before destruction! node {}.", getSignature());
+		LOG_WARN("Core node not finalized before destruction! node {} #{}.", m_operation.keyWord, m_id);
 #ifdef I3T_NTEST
 		assert(false);
 #endif

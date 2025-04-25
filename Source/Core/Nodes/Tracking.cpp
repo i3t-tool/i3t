@@ -20,155 +20,97 @@
 
 namespace Core
 {
-TransformChain::TransformChain(Ptr<Sequence> sequence, bool skipEmptySequences, bool ignoreCamera)
-    : m_skipEmptySequences(skipEmptySequences), m_ignoreCamera(ignoreCamera)
-{
-	if (sequence == nullptr)
-	{
-		m_beginSequence = nullptr;
-		return;
-	}
-	m_beginSequence = sequence;
-}
+TransformChain::TransformChain(const Ptr<Sequence>& sequence, const Ptr<Camera>& camera)
+    : m_beginSequence(sequence), m_beginCamera(camera)
+
+{}
 
 TransformChain::TransformChainIterator TransformChain::begin()
 {
-	auto it = TransformChainIterator(m_beginSequence);
-	it.m_skipEmptySequences = m_skipEmptySequences;
-	it.m_ignoreCamera = m_ignoreCamera;
-	it.m_tree = this;
+	auto it = TransformChainIterator(this, m_beginSequence, m_beginCamera, nullptr, m_skipEmptySequences,
+	                                 m_ignoreCamera, m_skipEmptyCamera);
 	return it;
 }
 
 TransformChain::TransformChainIterator TransformChain::end()
 {
-	auto it = TransformChainIterator();
-	it.m_skipEmptySequences = m_skipEmptySequences;
-	it.m_ignoreCamera = m_ignoreCamera;
-	it.m_tree = this;
-	return it;
+	// NOTE: Would need to pass all relevant data (seq/camera/flags) if the iterator could go backwards
+	return TransformChainIterator();
 }
 
-TransformChain::TransformChainIterator::TransformChainIterator(Ptr<Sequence> sequence)
+TransformChain::TransformChainIterator::TransformChainIterator(TransformChain* chain, const Ptr<Sequence>& sequence,
+                                                               const Ptr<Camera>& camera, const Ptr<Node>& node,
+                                                               bool skipEmptySequences, bool ignoreCamera,
+                                                               bool skipEmptyCamera)
+    : m_tree(chain), m_skipEmptySequences(skipEmptySequences), m_ignoreCamera(ignoreCamera),
+      m_skipEmptyCamera(skipEmptyCamera)
 {
-	m_info.sequence = sequence;
-
-	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+	// Cannot ignore camera if we begin in one.
+	if (m_ignoreCamera && camera != nullptr)
 	{
-		// there is matrix output plugged into this sequence)
-		m_info.isExternal = true;
-		m_info.currentNode = sequence;
-		m_info.dataIndex = I3T_SEQ_MAT;
+		return; // Return as invalid iterator
 	}
-	else
+	if (camera != nullptr && m_skipEmptyCamera)
 	{
-		// normal case
-		m_info.currentNode = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
-		m_info.dataIndex = 0;
+		if (camera->isEmpty())
+			return;
 	}
-}
 
-TransformChain::TransformChainIterator::TransformChainIterator(Ptr<Sequence> sequence, Ptr<Node> node)
-{
+	m_info.camera = camera;
 	m_info.sequence = sequence;
 	m_info.currentNode = node;
-}
 
-Sequence* TransformChain::TransformChainIterator::getSequence() const
-{
-	return m_info.sequence.get();
-}
-
-std::vector<Ptr<Node>> TransformChain::TransformChainIterator::collect()
-{
-	std::vector<Ptr<Node>> result;
-	auto it = *this;
-	while (it != m_tree->end())
+	if (m_info.camera != nullptr)
 	{
-		result.push_back(*it);
-		++it;
+		// TODO: [T-VIEWPORT]
+		auto seqs = {m_info.camera->getView(), m_info.camera->getProj()};
+		auto types = {TransformType::View, TransformType::Projection};
+		auto typeIt = types.begin();
+		for (auto seqIt = seqs.begin(); seqIt != seqs.end(); ++seqIt, ++typeIt)
+		{
+			if (*seqIt == m_info.sequence)
+			{
+				m_info.type = *typeIt;
+				break;
+			}
+		}
 	}
-	return result;
-}
 
-std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> TransformChain::TransformChainIterator::collectWithInfo()
-{
-	std::vector<Ptr<Node>> matrices;
-	std::vector<TransformInfo> info;
-	auto it = *this;
-	while (it != m_tree->end())
+	if (m_info.currentNode == nullptr)
 	{
-		matrices.push_back(*it);
-		info.push_back(it.m_info);
-		++it;
+		if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
+		{
+			// there is matrix output plugged into this sequence
+			m_info.isExternal = true;
+			m_info.currentNode = sequence;
+			m_info.dataIndex = I3T_SEQ_MAT;
+		}
+		else
+		{
+			if (sequence->getMatrices().empty())
+			{
+				if (sequence->getMatrices().empty() && m_skipEmptySequences)
+					this->next(); // Advance immediately
+			}
+			else
+			{
+				m_info.currentNode = sequence->getMatrices().back();
+			}
+		}
 	}
-	return {matrices, info};
 }
 
-std::vector<TransformInfo> TransformChain::TransformChainIterator::collectInfo()
+bool TransformChain::TransformChainIterator::equals(const Iterator& other) const
 {
-	std::vector<TransformInfo> info;
-	auto it = *this;
-	while (it != m_tree->end())
-	{
-		info.push_back(it.m_info);
-		++it;
-	}
-	return info;
+	return m_info.sequence == other.m_info.sequence && m_info.currentNode == other.m_info.currentNode;
+}
+bool TransformChain::TransformChainIterator::valid() const
+{
+	return m_info.sequence != nullptr;
 }
 
-TransformChain::TransformChainIterator& TransformChain::TransformChainIterator::operator++()
+bool TransformChain::TransformChainIterator::advanceWithinSequence()
 {
-	advance();
-	return *this;
-}
-
-TransformChain::TransformChainIterator TransformChain::TransformChainIterator::operator++(int)
-{
-	advance();
-	return *this;
-}
-
-TransformChain::TransformChainIterator TransformChain::TransformChainIterator::operator+(int a)
-{
-	for (int i = 0; i < a; ++i)
-	{
-		advance();
-	}
-	return *this;
-}
-
-// TransformChain::TransformChainIterator& TransformChain::TransformChainIterator::operator--()
-// {
-// 	withdraw();
-// 	return *this;
-// }
-//
-// TransformChain::TransformChainIterator TransformChain::TransformChainIterator::operator--(int)
-// {
-// 	withdraw();
-// 	return *this;
-// }
-
-Ptr<Node> TransformChain::TransformChainIterator::operator*() const
-{
-	I3T_ASSERT(m_info.currentNode != nullptr, "Iterator is at the end!");
-	return m_info.currentNode;
-}
-
-bool TransformChain::TransformChainIterator::operator==(const TransformChain::TransformChainIterator& rhs) const
-{
-	return m_info.currentNode == rhs.m_info.currentNode && m_info.sequence == rhs.m_info.sequence;
-}
-
-bool TransformChain::TransformChainIterator::operator!=(const TransformChain::TransformChainIterator& rhs) const
-{
-	return !(*this == rhs);
-}
-
-void TransformChain::TransformChainIterator::advance()
-{
-	// Check inner sequence state
 	const auto& matrices = m_info.sequence->getMatrices();
 
 	if (!m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
@@ -180,26 +122,71 @@ void TransformChain::TransformChainIterator::advance()
 		{
 			// Move left in the current sequence
 			m_info.currentNode = matrices[--index];
+			return true;
+		}
+	}
+	return false;
+}
+
+void TransformChain::TransformChainIterator::next()
+{
+	// Check inner sequence state
+	if (advanceWithinSequence())
+		return;
+
+	// No inner data, search for the next sequence
+	Ptr<Camera> nextCamera;
+	Ptr<Sequence> nextSequence;
+	if (m_info.camera != nullptr)
+	{
+		nextCamera = m_info.camera;
+		// Advance within a camera
+		// TODO: [T-VIEWPORT] Viewport sequence
+		if (m_info.sequence == m_info.camera->getView() && (!m_skipEmptySequences || !m_info.sequence->isEmpty()))
+		{
+			nextSequence = m_info.camera->getProj();
+			m_info.type = TransformType::Projection;
+		}
+		else
+		{
+			// End of camera, end of chain (unless we add matrix mul input to camera)
+			invalidate();
 			return;
 		}
 	}
 
-	// No inner datra, search for a parent
-	bool isCamera;
-	Ptr<Node> parent = GraphManager::getParentSequenceOrCamera(m_info.sequence, isCamera, m_skipEmptySequences, true);
-	if (!parent || (isCamera && m_ignoreCamera))
+	if (nextSequence == nullptr)
 	{
-		invalidate();
-		return;
+		// Advance in the graph
+		bool isCamera;
+		Ptr<Node> parent =
+		    GraphManager::getParentSequenceOrCamera(m_info.sequence, isCamera, m_skipEmptySequences, m_skipEmptyCamera);
+		if (!parent || (isCamera && m_ignoreCamera))
+		{
+			invalidate();
+			return;
+		}
+		if (isCamera)
+		{
+			nextCamera = std::static_pointer_cast<Camera>(parent);
+			nextSequence = nextCamera->getView();
+			m_info.type = TransformType::View;
+		}
+		else
+		{
+			nextSequence = std::static_pointer_cast<Sequence>(parent);
+			m_info.type = TransformType::Model;
+		}
 	}
 
+	m_info.camera = nextCamera;
+	m_info.sequence = nextSequence;
+
+	// Find the initial data source for the new sequence
 	m_info.isExternal = false;
 	m_info.dataIndex = 0;
 
-
-	m_info.sequence = parent->as<Sequence>();
-
-	// Check if the parent sequence is connected externally via matrix pin
+	// Check if the next sequence is connected externally via matrix pin
 	if (const auto matrixPluggedIntoParent = GraphManager::getParent(m_info.sequence, I3T_SEQ_IN_MAT))
 	{
 		m_info.isExternal = true;
@@ -290,10 +277,70 @@ void TransformChain::TransformChainIterator::advance()
 // 	}
 // }
 
+Sequence* TransformChain::TransformChainIterator::getSequence() const
+{
+	return m_info.sequence.get();
+}
+
+std::vector<Ptr<Node>> TransformChain::TransformChainIterator::collect()
+{
+	std::vector<Ptr<Node>> result;
+	auto it = *this;
+	while (it != m_tree->end())
+	{
+		result.push_back(*it);
+		++it;
+	}
+	return result;
+}
+
+std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> TransformChain::TransformChainIterator::collectWithInfo()
+{
+	std::vector<Ptr<Node>> matrices;
+	std::vector<TransformInfo> info;
+	auto it = *this;
+	while (it != m_tree->end())
+	{
+		matrices.push_back(*it);
+		info.push_back(it.m_info);
+		++it;
+	}
+	return {matrices, info};
+}
+
+std::vector<TransformInfo> TransformChain::TransformChainIterator::collectInfo()
+{
+	std::vector<TransformInfo> info;
+	auto it = *this;
+	while (it != m_tree->end())
+	{
+		info.push_back(it.m_info);
+		++it;
+	}
+	return info;
+}
+
+// TransformChain::TransformChainIterator& TransformChain::TransformChainIterator::operator--()
+// {
+// 	withdraw();
+// 	return *this;
+// }
+//
+// TransformChain::TransformChainIterator TransformChain::TransformChainIterator::operator--(int)
+// {
+// 	withdraw();
+// 	return *this;
+// }
+
+Ptr<Node> TransformChain::TransformChainIterator::operator*() const
+{
+	I3T_ASSERT(valid(), "Cannot dereference past the end TransformChainIterator!");
+	return m_info.currentNode;
+}
+
 void TransformChain::TransformChainIterator::invalidate()
 {
-	m_info.currentNode = nullptr;
-	m_info.sequence = nullptr;
+	m_info = TransformInfo();
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -334,7 +381,7 @@ void MatrixTracker::updateChain()
 
 	// Create iterator for traversing sequence branch.
 	// TransformChain always traverses "right to left" towards root.
-	TransformChain st(beginSequence, false, false);
+	TransformChain st = TransformChain(beginSequence).ignoreCamera(false).skipEmptySequences(false);
 
 	// Perform the traversal
 	auto transforms = st.begin().collectInfo();
@@ -586,7 +633,7 @@ void MatrixTracker::updateModels()
 		}
 	}
 	m_modelsNeedUpdate = false;
-	LOG_DEBUG("[TRACKING] Updated models. Found {} models.", m_models.size());
+	LOG_DEBUG("[TRACKING] Updated models. {} models found.", m_models.size());
 
 	updateModelTransforms();
 }
@@ -650,6 +697,22 @@ ID MatrixTracker::getSequenceID() const
 		return NIL_ID;
 	}
 	return m_beginSequence.lock()->getId();
+}
+
+std::vector<Ptr<Model>> MatrixTracker::getModels() const
+{
+	std::vector<Ptr<Model>> models;
+	for (auto& model : m_models)
+	{
+		if (model->node.expired())
+		{
+			assert(false);
+			continue;
+		}
+		auto modelPtr = model->node.lock()->as<Model>();
+		models.push_back(modelPtr);
+	}
+	return models;
 }
 
 // std::vector<Ptr<Model>> MatrixTracker::getModels() const

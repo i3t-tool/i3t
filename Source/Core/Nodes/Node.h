@@ -404,7 +404,6 @@ public:
 		{
 			return fmt::format("{} #{}", m_owner->m_operation.keyWord, m_owner->m_id);
 		}
-
 		return fmt::format("{} #{}", m_operation.keyWord, m_id);
 	}
 

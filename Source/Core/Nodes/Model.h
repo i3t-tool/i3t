@@ -18,6 +18,8 @@
 
 namespace Core
 {
+constexpr size_t I3T_MODEL_IN_MUL = 0;
+
 class Model : public Node
 {
 public:

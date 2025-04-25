@@ -128,6 +128,7 @@ Ptr<Node> GraphManager::getParent(const Ptr<Node>& node, size_t index)
 
 	return expected;
 }
+
 Ptr<Node> GraphManager::getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& isCamera, bool skipEmptySeq,
                                                   bool skipEmptyCamera)
 {
@@ -135,7 +136,7 @@ Ptr<Node> GraphManager::getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& 
 	auto parent = getParent(sequence, I3T_SEQ_IN_MUL);
 	while (parent != nullptr)
 	{
-		if (isCamera(parent.get()))
+		if (GraphManager::isCamera(parent.get()))
 		{
 			const auto parentCamera = parent->as<Camera>();
 			isCamera = true;
@@ -152,6 +153,15 @@ Ptr<Node> GraphManager::getParentSequenceOrCamera(Ptr<Sequence> sequence, bool& 
 		}
 	}
 	return nullptr;
+}
+
+Ptr<Sequence> GraphManager::getParentSequence(Ptr<Sequence> sequence, bool skipEmptySeq)
+{
+	bool isCamera;
+	auto ret = getParentSequenceOrCamera(sequence, isCamera, skipEmptySeq, true);
+	if (isCamera)
+		return nullptr;
+	return std::static_pointer_cast<Sequence>(ret);
 }
 
 std::vector<Ptr<Node>> GraphManager::getAllOutputNodes(Ptr<Core::Node>& node)
@@ -207,10 +217,11 @@ bool GraphManager::isTrackingFromLeft()
 	return getTracker()->isTrackingFromLeft();
 }
 
-void GraphManager::startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction)
+MatrixTracker* GraphManager::startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction)
 {
 	stopTracking();
 	s_self->m_tracker = std::make_unique<MatrixTracker>(beginSequence, direction);
+	return s_self->m_tracker.get();
 }
 
 void GraphManager::stopTracking()
