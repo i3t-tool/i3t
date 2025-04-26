@@ -755,7 +755,7 @@ void WorkspaceDiwne::addMenu()
 
 	ImGui::Separator();
 
-	if (I3TGui::MenuItemWithLog("Sequence"))
+	if (I3TGui::MenuItemWithLog("Matrix Sequence"))
 	{
 		addNodeToPositionOfPopup<Sequence>();
 	}
