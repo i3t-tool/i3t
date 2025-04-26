@@ -249,11 +249,11 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	}
 	ImGui::Separator();
 
-	drawMenuDuplicate(context);
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Super::popupContent(context);
+	Node::popupContent(context);
 }
 
 glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)

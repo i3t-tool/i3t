@@ -166,13 +166,13 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	drawMenuStorevalues();
-	Super::drawMenuSetPrecision();
-	drawMenuSetDataMap();
+	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
 
-	drawMenuLevelOfDetail();
+	drawMenuStorevalues();
+	Super::drawMenuSetPrecision();
+	drawMenuSetDataMap();
 
 	ImGui::Separator();
 

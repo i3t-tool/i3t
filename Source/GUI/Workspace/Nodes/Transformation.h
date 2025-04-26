@@ -472,6 +472,12 @@ inline bool Transformation<Core::ETransformType::LookAt>::drawDataSetValues(DIWN
 }
 
 template <>
+inline void Transformation<Core::ETransformType::LookAt>::init()
+{
+	setLevelOfDetail(LevelOfDetail::SetValues);
+}
+
+template <>
 inline void Transformation<Core::ETransformType::EulerX>::init()
 {
 	setFloatPopupMode(FloatPopupMode::Angle);

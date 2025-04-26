@@ -504,8 +504,11 @@ void CoreNode::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	drawMenuSetPrecision();
 	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	drawMenuSetPrecision();
 
 	ImGui::Separator();
 
