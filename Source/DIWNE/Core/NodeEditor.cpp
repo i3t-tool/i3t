@@ -359,15 +359,15 @@ void NodeEditor::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 		{
 			action->rect.Min.x = action->startPos.x;
 			action->rect.Max.x = action->startPos.x + dragDelta.x;
-			color = style().color(Style::SELECTION_RECT_FULL_COLOR);
-			action->touch = false;
+			color = style().color(Style::SELECTION_RECT_TOUCH_COLOR);
+			action->touch = true;
 		}
 		else
 		{
 			action->rect.Min.x = action->startPos.x + dragDelta.x;
 			action->rect.Max.x = action->startPos.x;
-			color = style().color(Style::SELECTION_RECT_TOUCH_COLOR);
-			action->touch = true;
+			color = style().color(Style::SELECTION_RECT_FULL_COLOR);
+			action->touch = false;
 		}
 		if (dragDelta.y > 0)
 		{

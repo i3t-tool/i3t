@@ -10,7 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#include "SetupDialog.h"
+#include "PreferencesWindow.h"
 
 #include "imgui.h"
 
@@ -26,9 +26,9 @@
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
-SetupDialog::SetupDialog() : IWindow(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")) {}
+PreferencesWindow::PreferencesWindow() : IWindow(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")) {}
 
-void SetupDialog::render()
+void PreferencesWindow::render()
 {
 	static int cameraMode;
 	static int angleUnits;
@@ -60,7 +60,7 @@ void SetupDialog::render()
 	ImGui::End();
 }
 
-void SetupDialog::showGeneralSettings()
+void PreferencesWindow::showGeneralSettings()
 {
 	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -85,7 +85,7 @@ void SetupDialog::showGeneralSettings()
 		ImGui::Spacing();
 	}
 }
-void SetupDialog::showWorkspaceSettings()
+void PreferencesWindow::showWorkspaceSettings()
 {
 	if (ImGui::CollapsingHeader("Workspace", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -101,7 +101,8 @@ void SetupDialog::showWorkspaceSettings()
 		ImGui::Spacing();
 	}
 }
-void SetupDialog::showViewportSettings()
+
+void PreferencesWindow::showViewportSettings()
 {
 	Vp::Viewport* viewport = I3T::getViewport();
 	Vp::ViewportSettings& stg = viewport->getSettings();
@@ -129,21 +130,20 @@ void SetupDialog::showViewportSettings()
 			ImGui::Unindent();
 		}
 
-		if (ImGui::CollapsingHeader("Grid"))
+		if (ImGui::CollapsingHeader("Grids"))
 		{
 			ImGui::Indent();
-			ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid.color), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid.axisXColor), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid.axisYColor), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid.axisZColor), ImGuiColorEditFlags_Float);
-
-			ImGui::SliderFloat("Size", &stg.global().grid.size, 0.01f, 2.f, "%.2f");
-			ImGui::SliderFloat("Strength", &stg.global().grid.strength, 0.01f, 1.f, "%.2f");
-			ImGui::SliderFloat("Line width", &stg.global().grid.lineWidth, 0.01f, 5.0f, "%.2f");
-			ImGui::SliderFloat("Fade 1 start", &stg.global().grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 1 end", &stg.global().grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 2 start", &stg.global().grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 2 end", &stg.global().grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
+			ImGui::PushID("world grid");
+			showGridSettings(stg.global().grid);
+			ImGui::PopID();
+			if (ImGui::CollapsingHeader("Local Grid"))
+			{
+				ImGui::Indent();
+				ImGui::PushID("local grid");
+				showGridSettings(stg.global().localGrid);
+				ImGui::PopID();
+				ImGui::Unindent();
+			}
 			ImGui::Unindent();
 		}
 
@@ -174,4 +174,20 @@ void SetupDialog::showViewportSettings()
 	//			static bool check = true;
 	//			ImGui::Checkbox("console", &check);
 	//		}
+}
+
+void PreferencesWindow::showGridSettings(Vp::GridSettings& grid)
+{
+	ImGui::ColorEdit3("Grid color", glm::value_ptr(grid.color), ImGuiColorEditFlags_Float);
+	ImGui::ColorEdit3("X axis color", glm::value_ptr(grid.axisXColor), ImGuiColorEditFlags_Float);
+	ImGui::ColorEdit3("Y axis color", glm::value_ptr(grid.axisYColor), ImGuiColorEditFlags_Float);
+	ImGui::ColorEdit3("Z axis color", glm::value_ptr(grid.axisZColor), ImGuiColorEditFlags_Float);
+
+	ImGui::SliderFloat("Size", &grid.size, 0.01f, 2.f, "%.2f");
+	ImGui::SliderFloat("Strength", &grid.strength, 0.01f, 1.f, "%.2f");
+	ImGui::SliderFloat("Line width", &grid.lineWidth, 0.01f, 5.0f, "%.2f");
+	ImGui::SliderFloat("Fade 1 start", &grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 1 end", &grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 2 start", &grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 2 end", &grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
 }

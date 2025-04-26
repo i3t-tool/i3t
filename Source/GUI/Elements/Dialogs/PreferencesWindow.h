@@ -14,18 +14,25 @@
 
 #include "GUI/Elements/IWindow.h"
 
-class SetupDialog : public IWindow
+namespace Vp
+{
+struct GridSettings;
+}
+// TODO: (DR) Rename to SetupWindow, or better PreferencesWindow
+class PreferencesWindow : public IWindow
 {
 	float m_uiScaleTmp;
 
 public:
-	I3T_WINDOW(SetupDialog)
+	I3T_WINDOW(PreferencesWindow)
 
-	SetupDialog();
+	PreferencesWindow();
 
 	virtual void render() override;
 
 	void showGeneralSettings();
 	void showViewportSettings();
 	void showWorkspaceSettings();
+
+	void showGridSettings(Vp::GridSettings& grid);
 };

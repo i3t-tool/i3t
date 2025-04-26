@@ -54,10 +54,10 @@ struct TransformInfo
 	{
 		return std::string() +                                                          //
 		       "currentNode: " + (currentNode ? currentNode->getSignature() : "null") + //
-		       " sequence: " + (sequence ? sequence->getSignature() : "null") +          //
-		       " camera: " + (camera ? camera->getSignature() : "null") +                //
-		       " isExternal: " + std::to_string(isExternal) +                            //
-		       " type: " + std::to_string(static_cast<int>(type)) +                                  //
+		       " sequence: " + (sequence ? sequence->getSignature() : "null") +         //
+		       " camera: " + (camera ? camera->getSignature() : "null") +               //
+		       " isExternal: " + std::to_string(isExternal) +                           //
+		       " type: " + std::to_string(static_cast<int>(type)) +                     //
 		       " dataIndex: " + std::to_string(dataIndex);
 	}
 };

@@ -19,7 +19,7 @@
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SelectLayoutDialog.h"
-#include "GUI/Elements/Dialogs/SetupDialog.h"
+#include "GUI/Elements/Dialogs/PreferencesWindow.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/ConfirmModal.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
@@ -287,7 +287,7 @@ void MainMenuBar::showEditMenu()
 		{}
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")))
 		{
-			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
+			I3T::getUI()->getWindowManager().showUniqueWindow<PreferencesWindow>();
 		}
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_LANG " ", "Change Language")))
 		{
