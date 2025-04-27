@@ -24,6 +24,7 @@
 
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
+#include "Viewport/entity/GridObject.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/shader/GridShader.h"
 
@@ -96,14 +97,14 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
 	m_input->bindAction("viewpoint-center-scene", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
-			camera->centerOnScene(*m_viewport->getMainScene().lock().get());
+			camera->centerOnScene(*m_viewport->getMainScene());
 		}
 	});
 	InputManager::setInputAction("viewpoint-center-selection", Keys::n0);
 	m_input->bindAction("viewpoint-center-selection", EKeyState::Pressed, [&]() {
 		if (auto camera = m_viewport->getMainViewportCamera().lock())
 		{
-			camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
+			camera->centerOnSelection(*m_viewport->getMainScene());
 		}
 	});
 
@@ -141,10 +142,6 @@ void ViewportWindow::render()
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650,
 	// main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 
-	// Update background according to color
-	ImVec4 bgColor = I3T::getUI()->getTheme().get(EColor::SceneViewBackground);
-	m_renderOptions.clearColor = glm::vec3(bgColor.x, bgColor.y, bgColor.z);
-
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, I3T::getTheme().getBorderSize());
@@ -159,10 +156,11 @@ void ViewportWindow::render()
 		// Get info about current window's dimensions
 		this->updateWindowInfo();
 
-		int windowWidth = m_windowSize.x;
-		int windowHeight = m_windowSize.y;
-		ImVec2 windowMin = GUI::glmToIm(m_windowMin);
-		ImVec2 windowMax = GUI::glmToIm(m_windowMax);
+		// Update render options
+		m_renderOptions.lightingModel = m_viewport->getSettings().global().lighting_lightingModel;
+		// Update background according to color
+		ImVec4 bgColor = I3T::getUI()->getTheme().get(EColor::SceneViewBackground);
+		m_renderOptions.clearColor = glm::vec3(bgColor.x, bgColor.y, bgColor.z);
 
 		bool menuInteraction = false;
 		if (ImGui::BeginMenuBar())
@@ -189,12 +187,16 @@ void ViewportWindow::render()
 			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
 		}
 
+		// Update reference space
+		updateSpace();
+		menuInteraction |= showSpaceIndicators();
+
 		// Viewport channel
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
 
+		// Process viewport input
 		// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but
-		// through
-		//  the InputManager's active input rather than asking the WindowManager
+		//  through the InputManager's active input rather than asking the WindowManager
 		if (InputManager::isInputActive(getInput()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
 		{
 			glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
@@ -202,10 +204,16 @@ void ViewportWindow::render()
 			m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 		}
 
-		m_renderOptions.lightingModel = m_viewport->getSettings().global().lighting_lightingModel;
-		m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
-		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
+		// Draw viewport
+		int windowWidth = m_windowSize.x;
+		int windowHeight = m_windowSize.y;
+		ImVec2 windowMin = GUI::glmToIm(m_windowMin);
+		ImVec2 windowMax = GUI::glmToIm(m_windowMax);
 
+		m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_space.m_referenceSpace, m_renderOptions,
+		                         m_displayOptions);
+
+		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 		if (framebuffer)
 		{
 			GLuint texture = framebuffer->getColorTexture();
@@ -227,6 +235,41 @@ void ViewportWindow::render()
 		ImGui::PopStyleVar(2);
 	}
 	ImGui::End();
+}
+
+void ViewportWindow::updateSpace()
+{
+	// Setup world and local grid
+	m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
+	if (m_space.standard)
+	{
+		m_space.label = "World space";
+		m_space.labelCol = ImVec4(1, 1, 1, 1);
+	}
+	else
+	{
+		m_space.label = "Local space";
+		m_space.labelCol = ImVec4(0.961, 0.922, 0.392, 1.0);
+	}
+
+	// TODO: Implement interpolation / switching
+	auto mainScene = m_viewport->getMainScene();
+	mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace);
+
+	mainScene->m_localGrid->m_visible = !m_space.standard;
+}
+
+bool ViewportWindow::showSpaceIndicators()
+{
+	int axesSize = 6.125f * ImGui::GetFontSize();
+	int padding = 0.5f * ImGui::GetFontSize();
+	ImVec2 axesPosition = ImVec2(m_windowPos.x + m_windowSize.x - axesSize - padding, m_windowPos.y + padding);
+
+	float tWidth = ImGui::CalcTextSize(m_space.label.c_str()).x;
+	ImGui::SetCursorScreenPos({m_windowPos.x + m_windowSize.x - axesSize / 2 - padding - tWidth / 2,
+	                           m_windowPos.y + padding + axesSize + padding});
+	ImGui::TextColored(m_space.labelCol, m_space.label.c_str());
+	return false;
 }
 
 bool ViewportWindow::showViewportButtons()
@@ -309,6 +352,21 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::PopItemFlag();
 	ImGui::PopStyleVar();
+
+	// TESTING BEGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	{
+		Core::EValueState valState = Core::EValueState::Editable;
+		const std::array<std::array<Core::EValueState, 4> const, 4>& dataState = {
+		    valState, valState, valState, valState, valState, valState, valState, valState,
+		    valState, valState, valState, valState, valState, valState, valState, valState};
+		bool valChanged = false;
+		int row, col;
+		float val;
+		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, dataState, valChanged, row, col, val);
+		if (valChanged)
+			m_space.m_referenceSpace[col][row] = val;
+	}
+
 	return interacted;
 }
 
@@ -573,7 +631,7 @@ bool ViewportWindow::showViewportMenu()
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
+				camera->centerOnSelection(*m_viewport->getMainScene());
 			}
 		}
 
@@ -581,7 +639,7 @@ bool ViewportWindow::showViewportMenu()
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->centerOnScene(*m_viewport->getMainScene().lock().get());
+				camera->centerOnScene(*m_viewport->getMainScene());
 			}
 		}
 
@@ -598,69 +656,4 @@ bool ViewportWindow::showViewportMenu()
 	ImGui::PopItemFlag();
 
 	return userInteractedWithMenus;
-
-	//	World* w = App::get().world();
-	//	if (I3TGui::BeginMenu("Viewports"))
-	//	{
-	//		// Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
-	//		if (I3TGui::MenuItemWithLog("View-x"))
-	//		{
-	//			// Num 1
-	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), false);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("View-y"))
-	//		{
-	//			// Num 2
-	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("View-z"))
-	//		{
-	//			// Num 3
-	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), false);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("World-x"))
-	//		{
-	//			// Num 4
-	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), true);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("World-y"))
-	//		{
-	//			// Num 5
-	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("World-z"))
-	//		{
-	//			// Num 6
-	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), true);
-	//		}
-	//
-	//		if (I3TGui::MenuItemWithLog("Center"))
-	//		{
-	//			// Num 0
-	//			// App::get().world()->scene->setCamToCenter();
-	//		}
-	//		ImGui::Separator();
-	//		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
-	//		if (I3TGui::MenuItemWithLog(action))
-	//		{
-	//			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
-	//			// Num 0
-	//			// App::get().world()->scene->setCamToCenter();
-	//		}
-	//		ImGui::EndMenu();
-	//	}
-	//	if (I3TGui::BeginMenu("Manipulators"))
-	//	{
-	//		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
-	//		if (I3TGui::MenuItemWithLog(action))
-	//		{
-	//			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
-	//		}
-	//		ImGui::EndMenu();
-	//	}
 }

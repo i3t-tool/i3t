@@ -76,19 +76,25 @@ public:
 	/**
 	 * Initialises the scene. Should be called before any draw operations.
 	 */
-	virtual void init(){};
+	virtual void init() {};
 
 	/**
 	 * Draw the scene using the scene's camera.
-	 * \param width Width of the
+	 * @param width Desired framebuffer pixel width
+	 * @param height Desired framebuffer pixel height
+	 * @param model Implicit model matrix, "reference space"
 	 */
-	virtual void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
+	virtual void draw(int width, int height, const glm::mat4& model, SceneRenderTarget& renderTarget,
+	                  const DisplayOptions& displayOptions);
 
 	/**
 	 * Draw the scene using the provided view and projection matrices.
+	 * @param width Desired framebuffer pixel width
+	 * @param height Desired framebuffer pixel height
+	 * @param model Implicit model matrix, "reference space"
 	 */
-	virtual void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
-	                  const DisplayOptions& displayOptions);
+	virtual void draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	                  SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
 
 	/**
 	 * Create and populates a SceneRenderTarget object with expected framebuffer objects for the scenes render pass.
@@ -189,14 +195,29 @@ public:
 	// State save/load
 	/////////////////////////////////////////
 
-	virtual void loadSettings(ViewportSettings& stg, bool scene, bool global){};
-	virtual void saveSettings(ViewportSettings& stg, bool scene, bool global){};
+	virtual void loadSettings(ViewportSettings& stg, bool scene, bool global) {};
+	virtual void saveSettings(ViewportSettings& stg, bool scene, bool global) {};
 
 protected:
+	void drawStandard(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	                  SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions,
+	                  RenderOptions renderOptions, bool alpha, glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO);
+
+	void drawWboit(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	               SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions, RenderOptions renderOptions,
+	               bool alpha, glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO,
+	               const Ptr<Framebuffer>& transparentFBO);
+
+	void drawHighlight(int width, int height, const glm::mat4& model, const glm::mat4& view,
+	                   const glm::mat4& projection, SceneRenderTarget& renderTarget,
+	                   const DisplayOptions& displayOptions, ViewportSettings& stg, const Ptr<Framebuffer>& mainFBO,
+	                   const Ptr<Framebuffer>& selectionFBO, const Ptr<Framebuffer>& selectionBlurFBO,
+	                   const Ptr<Framebuffer>& selectionBlurSecondPassFBO);
+
 	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);
 	void sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities);
 
-	void renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection,
+	void renderSortedTransparentEntities(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
 	                                     const std::vector<Entity*>& entities) const;
 };
 } // namespace Vp

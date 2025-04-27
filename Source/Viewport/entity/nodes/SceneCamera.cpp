@@ -32,6 +32,9 @@ void SceneCamera::update(Scene& scene)
 	// Calculate model matrix from the camera's view matrix
 	m_modelMatrix = glm::inverse(m_viewMatrix);
 
+	// TODO: CONTINUE HERE !!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  Add render method to frustum object which will multiply by reference space
+
 	auto frustumPtr = m_frustumOutline.lock();
 	frustumPtr->m_visible = m_showFrustum;
 	frustumPtr->m_frustumProjectionMatrix = m_projectionMatrix;
@@ -49,7 +52,7 @@ void SceneCamera::update(Scene& scene)
 
 void SceneCamera::onSceneAdd(Vp::Scene& scene)
 {
-	FrustumShader* frustumShader = Shaders::instance().m_frustumShader.get();
+	FrustumShader* frustumShader = SHADERS.getShaderPtr<FrustumShader>();
 
 	SceneModel::onSceneAdd(scene);
 	auto frustumOutline = std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitLineCube), frustumShader);

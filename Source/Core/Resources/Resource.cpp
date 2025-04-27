@@ -30,7 +30,7 @@ bool Resource::changeLocation(fs::path newDir, bool deleteOriginals)
 {
 	if (!resourceFiles)
 	{
-		LOG_WARN("[RESOURCE] Cannot change location of a Resource without an associated ResourceFiles instance!")
+		LOG_WARN("[RESOURCE] Cannot change location of a Resource without an associated ResourceFiles instance!");
 		return false;
 	}
 

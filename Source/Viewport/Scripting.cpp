@@ -10,6 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
+#include "I3T.h"
 #include "Scripting/Environment.h"
 
 #include "Core/Application.h"
@@ -43,22 +44,22 @@ LUA_REGISTRATION
 	// clang-format on
 
 	viewport["get_settings"] = []() -> Vp::CameraSettings& {
-		auto& viewport = Application::getModule<Vp::Viewport>();
+		auto viewport = I3T::getViewport();
 
-		return viewport.getSettings().scene().mainScene.camera;
+		return viewport->getSettings().scene().mainScene.camera;
 	};
 
 	viewport["set_settings"] = [](Vp::CameraSettings& settings) {
-		auto& viewport = Application::getModule<Vp::Viewport>();
+		auto viewport = I3T::getViewport();
 
-		viewport.getSettings().scene().mainScene.camera = settings;
-		auto mainScene = viewport.getMainScene().lock();
-		mainScene->loadSettings(viewport.getSettings(), false, true);
+		viewport->getSettings().scene().mainScene.camera = settings;
+		auto mainScene = viewport->getMainScene();
+		mainScene->loadSettings(viewport->getSettings(), false, true);
 	};
 
 	viewport["update_settings"] = []() {
-		auto& viewport = Application::getModule<Vp::Viewport>();
-		auto mainScene = viewport.getMainScene().lock();
-		mainScene->loadSettings(viewport.getSettings(), false, true);
+		auto viewport = I3T::getViewport();
+		auto mainScene = viewport->getMainScene();
+		mainScene->loadSettings(viewport->getSettings(), false, true);
 	};
 };

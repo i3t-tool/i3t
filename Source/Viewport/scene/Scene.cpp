@@ -21,7 +21,6 @@
 #include "Viewport/camera/AbstractCamera.h"
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/shader/BoxBlurShader.h"
-#include "Viewport/shader/GridShader.h"
 #include "Viewport/shader/PhongShader.h"
 #include "Viewport/shader/ScreenOverlayShader.h"
 #include "Viewport/shader/SelectionCompositeShader.h"
@@ -40,22 +39,18 @@ Scene::Scene(Viewport* viewport) : m_viewport(viewport)
 	m_selectStencil = std::make_shared<SelectStencil>();
 }
 
-void Scene::draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
+void Scene::draw(int width, int height, const glm::mat4& model, SceneRenderTarget& renderTarget,
+                 const DisplayOptions& displayOptions)
 {
 	m_camera->size(width, height);
 	m_camera->update();
 
-	return draw(width, height, m_camera->getView(), m_camera->getProjection(), renderTarget, displayOptions);
+	return draw(width, height, model, m_camera->getView(), m_camera->getProjection(), renderTarget, displayOptions);
 }
 
-void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
-                 const DisplayOptions& displayOptions)
+void Scene::draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                 SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
 {
-	// TODO: (DR) This method seems a LITTLE too long, maybe cut it up into more methods or some outright renderer
-	// class? 	On the other hand, what its doing is by principle somewhat related to each other and having the whole
-	// render
-	//  process in one place might be beneficial
-
 	ViewportSettings& stg = m_viewport->getSettings();
 
 	auto renderOptions = renderTarget.getRenderOptions();
@@ -91,97 +86,66 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 	// Draw the scene
 	if (renderOptions.wboit)
 	{
-		////////
-		// Weighted Blended Order Independent Transparency render (OpenGL 3 compatible)
-		////////
+		drawWboit(width, height, model, view, projection, renderTarget, displayOptions, renderOptions, alpha,
+		          clearColor, mainFBO, transparentFBO);
+	}
+	else
+	{
+		drawStandard(width, height, model, view, projection, renderTarget, displayOptions, renderOptions, alpha,
+		             clearColor, mainFBO);
+	}
 
-		// ### 1. Draw opaque objects into a regular texture
-		mainFBO->start(width, height);
+	// Note that the term "selection" and "highlight" is used interchangeably here
+	if (drawSelection)
+	{
+		drawHighlight(width, height, model, view, projection, renderTarget, displayOptions, stg, mainFBO, selectionFBO,
+		              selectionBlurFBO, selectionBlurSecondPassFBO);
+	}
+}
+
+void Scene::drawStandard(int width, int height, const glm::mat4& model, const glm::mat4& view,
+                         const glm::mat4& projection, SceneRenderTarget& renderTarget,
+                         const DisplayOptions& displayOptions, RenderOptions renderOptions, bool alpha,
+                         glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO)
+{
+	////////
+	// Standard ordered transparency render
+	////////
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0xFF);
+
+	mainFBO->start(width, height);
+	{
+		glClearColor(clearColor.r, clearColor.g, clearColor.b, alpha ? 0.0f : 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		// Setup phong shader, later, shaders are switched for each object
+		PhongShader* phongShader = SHADERS.getShaderPtr<PhongShader>();
+		phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
+		phongShader->use();
+		m_lighting->setUniforms(*phongShader);
+
+		m_unorderedTransparentEntities.clear();
+		m_explicitTransparencyOrderEntitiesFirst.clear();
+		m_explicitTransparencyOrderEntitiesLast.clear();
+		for (auto& entity : m_entities)
 		{
-			// Using regular depth test and no blending
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-			glDepthMask(GL_TRUE);
-			glDisable(GL_BLEND);
+			entity->m_wboit = false; // Not using wboit
+			if (!entity->m_visible)
+				continue;
+			if (!displayOptions.shouldDraw(*entity))
+				continue;
 
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-			glStencilMask(0xFF);
-
-			glClearColor(clearColor.r, clearColor.g, clearColor.b, alpha ? 0.0f : 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			// Setup phong shader, later, shaders are switched for each object
-			PhongShader* phongShader = Shaders::instance().m_phongShader.get();
-			phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
-			phongShader->use();
-			m_lighting->setUniforms(*phongShader);
-
-			m_unorderedTransparentEntities.clear();
-			for (auto& entity : m_entities)
+			// Render opaque entities
+			if (entity->m_opaque)
 			{
-				entity->m_wboit = false; // Not using wboit for opaque pass
-				if (!entity->m_visible)
-					continue;
-				if (!displayOptions.shouldDraw(*entity))
-					continue;
-				if (!entity->m_opaque)
-				{
-					m_unorderedTransparentEntities.push_back(entity.get());
-				}
-				else
-				{
-					if (entity->m_selectable)
-					{
-						glStencilMask(0xFF);
-						glStencilFunc(GL_ALWAYS, entity->m_selectionId, 0xFF);
-					}
-					else
-					{
-						glStencilMask(0x00);
-					}
-					entity->render(view, projection);
-				}
-			}
-		}
-		mainFBO->end(false);
-
-		// ### 2. Draw transparent objects into accumulation and revealage buffers
-
-		// Transparent fbo might not be initialized or resized yet, so ensure proper state here before depth copy
-		transparentFBO->update(width, height);
-
-		// Copy depth buffer from opaque pass to transparent pass
-		// Also copy stencil buffer for selection
-		// TODO: (DR) This could be potentially avoided by sharing the depth buffer with opaque fbo?
-		// 	(Framebuffer class currently doesn't support sharing of buffers)
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO->getId());
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, transparentFBO->getId());
-		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
-		                  GL_NEAREST);
-
-		transparentFBO->setDrawBuffers({1, 2});
-		transparentFBO->start(width, height);
-		{
-			glClear(GL_COLOR_BUFFER_BIT); // Only clear color as depth is copied from the main framebuffer
-
-			// Using depth test but not doing depth writes, special wboit blending enabled
-			glDepthMask(GL_FALSE);
-			glEnable(GL_BLEND);
-			glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-			glBlendEquation(GL_FUNC_ADD);
-
-			// Clear accumulation and revealage buffers to their respective initial values
-			// Note that the buffers are actually mixed
-			// Accumulation buffer holds RGB accumulation in its RGB components and revealage factor in its alpha.
-			// Revealage buffer holds accumulation alpha in its single channel.
-			glClearBufferfv(GL_COLOR, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
-			glClearBufferfv(GL_COLOR, 2, glm::value_ptr(glm::vec4(0.0f)));
-
-			// Render transparent objects with their WBOIT flag enabled (enabled after opaque pass)
-			for (auto& entity : m_unorderedTransparentEntities)
-			{
-				entity->m_wboit = true;
-				entity->m_wboitFunc = renderOptions.wboitFunc;
 				if (entity->m_selectable)
 				{
 					glStencilMask(0xFF);
@@ -191,331 +155,404 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 				{
 					glStencilMask(0x00);
 				}
-				entity->render(view, projection);
+				entity->render(model, view, projection);
+				continue;
+			}
+			// Store transparent entities for sorting
+			if (entity->m_explicitTransparencyOrder != 0)
+			{
+				// Entities with manually set transparency order
+				if (entity->m_explicitTransparencyOrder < 10000)
+				{
+					// Rendered BEFORE unordered ones
+					m_explicitTransparencyOrderEntitiesFirst.push_back(entity.get());
+				}
+				else
+				{
+					// Rendered AFTER unordered ones
+					m_explicitTransparencyOrderEntitiesLast.push_back(entity.get());
+				}
+			}
+			else
+			{
+				// Unordered entities
+				m_unorderedTransparentEntities.push_back(entity.get());
 			}
 		}
-		transparentFBO->end(false);
-		if (transparentFBO->isMultisampled())
-		{
-			transparentFBO->multisampleResolveColor(1); // Resolve accumulation buffer
-			transparentFBO->multisampleResolveColor(2); // Resolve revealage buffer
-		}
 
-		// ### 3. Composite transparent pass onto opaque pass
-		mainFBO->start(width, height);
-		{
-			// Depth test disabled, regular blending enabled
-			glDepthFunc(GL_ALWAYS);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// Sort transparent entities
+		// Entities are grouped into 3 lists and drawn in this order
+		// 1. Explicitly ordered entities (with manually set order) with order < 10000 (sorted in ascending order)
+		// 2. Unordered entities (with order = 0) (Sorted by distance to camera)
+		// 3. Explicitly ordered entities with order >= 10000 (sorted in ascending order)
 
-			auto wboitCompositeShader = Shaders::instance().m_wboitCompositeShader;
-			wboitCompositeShader->use();
-			wboitCompositeShader->accumulationTextureID = transparentFBO->getColorTexture(1);
-			wboitCompositeShader->revealageTextureID = transparentFBO->getColorTexture(2);
-			wboitCompositeShader->setUniforms();
+		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesFirst);
+		sortUnorderedTransparentEntities(view, m_unorderedTransparentEntities);
+		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesLast);
 
-			// Render transparent object overlay using a screen quad
-			RMI.meshByAlias(Shaper::screenQuad)->render();
-		}
-		mainFBO->end(true);
+		// Don't write depth, we want to see transparent entities through each other even when its wrong
+		glDepthMask(GL_FALSE);
 
-		// Return final composite image
-		renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBO));
+		renderSortedTransparentEntities(model, view, projection, m_explicitTransparencyOrderEntitiesFirst);
+		renderSortedTransparentEntities(model, view, projection, m_unorderedTransparentEntities);
+		renderSortedTransparentEntities(model, view, projection, m_explicitTransparencyOrderEntitiesLast);
 	}
-	else
-	{
-		////////
-		// Standard ordered transparency render
-		////////
+	mainFBO->end(true);
 
+	// Return framebuffer
+	renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBO));
+}
+
+void Scene::drawWboit(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                      SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions,
+                      RenderOptions renderOptions, bool alpha, glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO,
+                      const Ptr<Framebuffer>& transparentFBO)
+{
+	////////
+	// Weighted Blended Order Independent Transparency render (OpenGL 3 compatible)
+	////////
+
+	// ### 1. Draw opaque objects into a regular texture
+	mainFBO->start(width, height);
+	{
+		// Using regular depth test and no blending
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glDepthMask(GL_TRUE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_BLEND);
 
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		glStencilMask(0xFF);
 
-		mainFBO->start(width, height);
+		glClearColor(clearColor.r, clearColor.g, clearColor.b, alpha ? 0.0f : 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		// Setup phong shader, later, shaders are switched for each object
+		PhongShader* phongShader = SHADERS.getShaderPtr<PhongShader>();
+		phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
+		phongShader->use();
+		m_lighting->setUniforms(*phongShader);
+
+		m_unorderedTransparentEntities.clear();
+		for (auto& entity : m_entities)
 		{
-			glClearColor(clearColor.r, clearColor.g, clearColor.b, alpha ? 0.0f : 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			// Setup phong shader, later, shaders are switched for each object
-			PhongShader* phongShader = Shaders::instance().m_phongShader.get();
-			phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
-			phongShader->use();
-			m_lighting->setUniforms(*Shaders::instance().m_phongShader);
-
-			m_unorderedTransparentEntities.clear();
-			m_explicitTransparencyOrderEntitiesFirst.clear();
-			m_explicitTransparencyOrderEntitiesLast.clear();
-			for (auto& entity : m_entities)
+			entity->m_wboit = false; // Not using wboit for opaque pass
+			if (!entity->m_visible)
+				continue;
+			if (!displayOptions.shouldDraw(*entity))
+				continue;
+			if (!entity->m_opaque)
 			{
-				entity->m_wboit = false; // Not using wboit
-				if (!entity->m_visible)
-					continue;
-				if (!displayOptions.shouldDraw(*entity))
-					continue;
-
-				// Render opaque entities
-				if (entity->m_opaque)
+				m_unorderedTransparentEntities.push_back(entity.get());
+			}
+			else
+			{
+				if (entity->m_selectable)
 				{
-					if (entity->m_selectable)
-					{
-						glStencilMask(0xFF);
-						glStencilFunc(GL_ALWAYS, entity->m_selectionId, 0xFF);
-					}
-					else
-					{
-						glStencilMask(0x00);
-					}
-					entity->render(view, projection);
-					continue;
-				}
-				// Store transparent entities for sorting
-				if (entity->m_explicitTransparencyOrder != 0)
-				{
-					// Entities with manually set transparency order
-					if (entity->m_explicitTransparencyOrder < 10000)
-					{
-						// Rendered BEFORE unordered ones
-						m_explicitTransparencyOrderEntitiesFirst.push_back(entity.get());
-					}
-					else
-					{
-						// Rendered AFTER unordered ones
-						m_explicitTransparencyOrderEntitiesLast.push_back(entity.get());
-					}
+					glStencilMask(0xFF);
+					glStencilFunc(GL_ALWAYS, entity->m_selectionId, 0xFF);
 				}
 				else
 				{
-					// Unordered entities
-					m_unorderedTransparentEntities.push_back(entity.get());
+					glStencilMask(0x00);
 				}
+				entity->render(model, view, projection);
 			}
-
-			// Sort transparent entities
-			// Entities are grouped into 3 lists and drawn in this order
-			// 1. Explicitly ordered entities (with manually set order) with order < 10000 (sorted in ascending order)
-			// 2. Unordered entities (with order = 0) (Sorted by distance to camera)
-			// 3. Explicitly ordered entities with order >= 10000 (sorted in ascending order)
-
-			sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesFirst);
-			sortUnorderedTransparentEntities(view, m_unorderedTransparentEntities);
-			sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesLast);
-
-			// Don't write depth, we want to see transparent entities through each other even when its wrong
-			glDepthMask(GL_FALSE);
-
-			renderSortedTransparentEntities(view, projection, m_explicitTransparencyOrderEntitiesFirst);
-			renderSortedTransparentEntities(view, projection, m_unorderedTransparentEntities);
-			renderSortedTransparentEntities(view, projection, m_explicitTransparencyOrderEntitiesLast);
 		}
-		mainFBO->end(true);
+	}
+	mainFBO->end(false);
 
-		// Return framebuffer
-		renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBO));
+	// ### 2. Draw transparent objects into accumulation and revealage buffers
+
+	// Transparent fbo might not be initialized or resized yet, so ensure proper state here before depth copy
+	transparentFBO->update(width, height);
+
+	// Copy depth buffer from opaque pass to transparent pass
+	// Also copy stencil buffer for selection
+	// TODO: (DR) This could be potentially avoided by sharing the depth buffer with opaque fbo?
+	// 	(Framebuffer class currently doesn't support sharing of buffers)
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO->getId());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, transparentFBO->getId());
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
+	                  GL_NEAREST);
+
+	transparentFBO->setDrawBuffers({1, 2});
+	transparentFBO->start(width, height);
+	{
+		glClear(GL_COLOR_BUFFER_BIT); // Only clear color as depth is copied from the main framebuffer
+
+		// Using depth test but not doing depth writes, special wboit blending enabled
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
+
+		// Clear accumulation and revealage buffers to their respective initial values
+		// Note that the buffers are actually mixed
+		// Accumulation buffer holds RGB accumulation in its RGB components and revealage factor in its alpha.
+		// Revealage buffer holds accumulation alpha in its single channel.
+		glClearBufferfv(GL_COLOR, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+		glClearBufferfv(GL_COLOR, 2, glm::value_ptr(glm::vec4(0.0f)));
+
+		// Render transparent objects with their WBOIT flag enabled (enabled after opaque pass)
+		for (auto& entity : m_unorderedTransparentEntities)
+		{
+			entity->m_wboit = true;
+			entity->m_wboitFunc = renderOptions.wboitFunc;
+			if (entity->m_selectable)
+			{
+				glStencilMask(0xFF);
+				glStencilFunc(GL_ALWAYS, entity->m_selectionId, 0xFF);
+			}
+			else
+			{
+				glStencilMask(0x00);
+			}
+			entity->render(model, view, projection);
+		}
+	}
+	transparentFBO->end(false);
+	if (transparentFBO->isMultisampled())
+	{
+		transparentFBO->multisampleResolveColor(1); // Resolve accumulation buffer
+		transparentFBO->multisampleResolveColor(2); // Resolve revealage buffer
 	}
 
+	// ### 3. Composite transparent pass onto opaque pass
+	mainFBO->start(width, height);
+	{
+		// Depth test disabled, regular blending enabled
+		glDepthFunc(GL_ALWAYS);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		auto wboitCompositeShader = SHADERS.getShaderPtr<WBOITCompositeShader>();
+		wboitCompositeShader->use();
+		wboitCompositeShader->accumulationTextureID = transparentFBO->getColorTexture(1);
+		wboitCompositeShader->revealageTextureID = transparentFBO->getColorTexture(2);
+		wboitCompositeShader->setUniforms();
+
+		// Render transparent object overlay using a screen quad
+		RMI.meshByAlias(Shaper::screenQuad)->render();
+	}
+	mainFBO->end(true);
+
+	// Return final composite image
+	renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBO));
+}
+
+void Scene::drawHighlight(int width, int height, const glm::mat4& model, const glm::mat4& view,
+                          const glm::mat4& projection, SceneRenderTarget& renderTarget,
+                          const DisplayOptions& displayOptions, ViewportSettings& stg, const Ptr<Framebuffer>& mainFBO,
+                          const Ptr<Framebuffer>& selectionFBO, const Ptr<Framebuffer>& selectionBlurFBO,
+                          const Ptr<Framebuffer>& selectionBlurSecondPassFBO)
+{
 	////////
 	// Render selection / highlight
 	////////
 
-	// Note that the term "selection" and "highlight" is used interchangeably here
-	if (drawSelection)
+	bool useDepth = stg.global().highlight.useDepth;
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Selection fbo might not be initialized or resized yet, so ensure proper state here before depth copy
+	selectionFBO->update(width, height);
+
+	if (useDepth)
 	{
-		bool useDepth = stg.global().highlight.useDepth;
+		// TODO: (DR) Why are we resolving it? We don't want it to be resolved if ther selection fbo is also
+		// multisampled?! Add depth buffer sharing to fix this
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glDepthMask(GL_TRUE);
+		// Copy depth buffer from regular scene pass to selection pass, this might also resolve it
+		// TODO: (DR) This could be potentially avoided by sharing the depth buffer with the main fbo?
+		// 	(Framebuffer class currently doesn't support sharing of buffers)
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO->getId());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, selectionFBO->getId());
+		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	}
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Do not render the highlight overlay if nothing is actually highlighted
+	bool atLeastOneEntityHighlighted = false;
 
-		// Selection fbo might not be initialized or resized yet, so ensure proper state here before depth copy
-		selectionFBO->update(width, height);
+	// Do not render the highlight overlay if nothing is actually highlighted
+	bool atLeastOneEntityHighlightUsesDepth = false;
 
-		if (useDepth)
+	// ### 1. Draw entity silhouettes, save these silhouettes into the stencil buffer
+	selectionFBO->start(width, height);
+	{
+		// #### 1.1 Regular silhouette render
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		// Don't clear depth as we copied it from the regular render pass
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		glDepthFunc(GL_ALWAYS);
+		glDepthMask(GL_FALSE);
+
+		m_highlightedEntities.clear();
+		for (auto& entity : m_entities)
 		{
-			// TODO: (DR) Why are we resolving it? We don't want it to be resolved if ther selection fbo is also
-			// multisampled?! Add depth buffer sharing to fix this
+			entity->m_wboit = false; // Not using wboit since we don't care about transparency at all
+			if (!entity->m_visible)
+				continue;
+			if (!displayOptions.shouldDraw(*entity))
+				continue;
+			if (!entity->m_highlight)
+				continue;
 
-			// Copy depth buffer from regular scene pass to selection pass, this might also resolve it
-			// TODO: (DR) This could be potentially avoided by sharing the depth buffer with the main fbo?
-			// 	(Framebuffer class currently doesn't support sharing of buffers)
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO->getId());
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, selectionFBO->getId());
-			glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+			atLeastOneEntityHighlighted = true;
+			if (entity->m_highlightUseDepth && useDepth)
+			{
+				atLeastOneEntityHighlightUsesDepth = true;
+				m_highlightedEntities.push_back(entity.get());
+
+				// Render the whole silhouette with the "covered" color, the uncovered portions will be drawn later.
+				float darkenFactor = stg.global().highlight.useDepth_darkenFactor;
+				float saturationFactor = stg.global().highlight.useDepth_desaturateFactor;
+				auto coveredColor = HSLColor::fromRGB(glm::value_ptr(entity->m_highlightColor))
+				                        .desaturate(saturationFactor)
+				                        .darken(darkenFactor)
+				                        .getRGB();
+				auto originalColor = entity->m_highlightColor;
+				entity->m_highlightColor = glm::vec3(coveredColor[0], coveredColor[1], coveredColor[2]);
+
+				Entity::RenderContext context;
+				context.m_renderType = Entity::RenderType::SILHOUETTE;
+				entity->prepareRenderContext(context);
+				context.m_opacity = 1.f;
+				entity->render(model, view, projection, context);
+
+				entity->m_highlightColor = originalColor;
+			}
+			else
+			{
+				// Simply render the silhouette with the desired highlight color
+				Entity::RenderContext context;
+				context.m_renderType = Entity::RenderType::SILHOUETTE;
+				entity->prepareRenderContext(context);
+				context.m_opacity = 1.f;
+				entity->render(model, view, projection, context);
+			}
 		}
 
-		// Do not render the highlight overlay if nothing is actually highlighted
-		bool atLeastOneEntityHighlighted = false;
+		// #### 1.2 "Uncovered" depth-based silhouette render, render uncovered silhouette portions
+		//  Note that many attempts were made to make this effect happen within a single pass using a shader, but
+		//  ultimately this is the most simple and robust solution I've found.
+		// 	Unfortunately with multisampled buffers it requires the selection fbos are multisampled as well in order
+		// to
+		//  compare depth values properly.
+		if (atLeastOneEntityHighlightUsesDepth && useDepth)
+		{
+			// Iterate over highlighted entities that use depth and render their uncovered portions
+			glDepthFunc(GL_LEQUAL);
+			for (auto& entity : m_highlightedEntities)
+			{
+				Entity::RenderContext context;
+				context.m_renderType = Entity::RenderType::SILHOUETTE;
+				entity->prepareRenderContext(context);
+				context.m_opacity = 1.f;
+				entity->render(model, view, projection, context);
+			}
+		}
+	}
+	selectionFBO->end(true);
 
-		// Do not render the highlight overlay if nothing is actually highlighted
-		bool atLeastOneEntityHighlightUsesDepth = false;
+	if (atLeastOneEntityHighlighted)
+	{
+		auto boxBlurShader = SHADERS.getShaderPtr<BoxBlurShader>();
+		int kernelSize = stg.global().highlight.kernelSize;
+		float blurFactor = stg.global().highlight.downscaleFactor;
+		int blurWidth = width * blurFactor;
+		int blurHeight = height * blurFactor;
 
-		// ### 1. Draw entity silhouettes, save these silhouettes into the stencil buffer
+		// ### 2. Blur the render (1st vertical blur pass)
+		// The blur render can be done at a lower resolution specified by the blurDivisor
+		selectionBlurFBO->start(blurWidth, blurHeight);
+		{
+			glDisable(GL_BLEND);
+
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			boxBlurShader->use();
+			boxBlurShader->m_kernelSize = kernelSize;
+			boxBlurShader->m_vertical = true; // Vertical blur
+			boxBlurShader->m_sourceTextureId = selectionFBO->getColorTexture(0);
+			boxBlurShader->m_resolution = glm::vec2(blurWidth, blurHeight);
+			boxBlurShader->setUniforms();
+
+			// Render first box blur pass using a screen quad
+			RMI.meshByAlias(Shaper::screenQuad)->render();
+		}
+		selectionBlurFBO->end();
+
+		// ### 3. Blur the render again (2nd horizontal blur pass)
+		selectionBlurSecondPassFBO->start(blurWidth, blurHeight);
+		{
+			glDisable(GL_BLEND);
+
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			boxBlurShader->use();
+			boxBlurShader->m_vertical = false; // Horizontal blur
+			boxBlurShader->m_sourceTextureId = selectionBlurFBO->getColorTexture(0);
+			boxBlurShader->setUniforms();
+
+			// Render second box blur pass using a screen quad
+			RMI.meshByAlias(Shaper::screenQuad)->render();
+		}
+		selectionBlurSecondPassFBO->end();
+
+		// ### 4. Render back into the selection fbo and use its stencil to mask out the selection
 		selectionFBO->start(width, height);
 		{
-			// #### 1.1 Regular silhouette render
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilMask(0xFF);
+			glDisable(GL_BLEND);
+			glDisable(GL_DEPTH_TEST);
 
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			// Don't clear depth as we copied it from the regular render pass
-			glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT); // Clear color only
 
-			glDepthFunc(GL_ALWAYS);
-			glDepthMask(GL_FALSE);
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			glStencilMask(0x00);
 
-			m_highlightedEntities.clear();
-			for (auto& entity : m_entities)
-			{
-				entity->m_wboit = false; // Not using wboit since we don't care about transparency at all
-				if (!entity->m_visible)
-					continue;
-				if (!displayOptions.shouldDraw(*entity))
-					continue;
-				if (!entity->m_highlight)
-					continue;
+			auto selectionCompositeShader = SHADERS.getShaderPtr<SelectionCompositeShader>();
+			selectionCompositeShader->use();
+			selectionCompositeShader->m_sourceTextureId = selectionBlurSecondPassFBO->getColorTexture(0);
+			selectionCompositeShader->m_resolution = glm::vec2(width, height);
+			selectionCompositeShader->m_cutoff = stg.global().highlight.outlineCutoff;
+			selectionCompositeShader->setUniforms();
 
-				atLeastOneEntityHighlighted = true;
-				if (entity->m_highlightUseDepth && useDepth)
-				{
-					atLeastOneEntityHighlightUsesDepth = true;
-					m_highlightedEntities.push_back(entity.get());
+			// Upscale selection buffer and apply stencil
+			RMI.meshByAlias(Shaper::screenQuad)->render();
 
-					// Render the whole silhouette with the "covered" color, the uncovered portions will be drawn later.
-					float darkenFactor = stg.global().highlight.useDepth_darkenFactor;
-					float saturationFactor = stg.global().highlight.useDepth_desaturateFactor;
-					auto coveredColor = HSLColor::fromRGB(glm::value_ptr(entity->m_highlightColor))
-					                        .desaturate(saturationFactor)
-					                        .darken(darkenFactor)
-					                        .getRGB();
-					auto originalColor = entity->m_highlightColor;
-					entity->m_highlightColor = glm::vec3(coveredColor[0], coveredColor[1], coveredColor[2]);
-					entity->render(view, projection, true);
-					entity->m_highlightColor = originalColor;
-				}
-				else
-				{
-					// Simply render the silhouette with the desired highlight color
-					entity->render(view, projection, true);
-				}
-			}
-
-			// #### 1.2 "Uncovered" depth-based silhouette render, render uncovered silhouette portions
-			//  Note that many attempts were made to make this effect happen within a single pass using a shader, but
-			//  ultimately this is the most simple and robust solution I've found.
-			// 	Unfortunately with multisampled buffers it requires the selection fbos are multisampled as well in order
-			// to
-			//  compare depth values properly.
-			if (atLeastOneEntityHighlightUsesDepth && useDepth)
-			{
-				// Iterate over highlighted entities that use depth and render their uncovered portions
-				glDepthFunc(GL_LEQUAL);
-				for (auto& entity : m_highlightedEntities)
-				{
-					entity->render(view, projection, true);
-				}
-			}
+			// Restore stencil state (can mess up ImGui)
+			glStencilFunc(GL_ALWAYS, 0, 0xFF);
 		}
 		selectionFBO->end(true);
 
-		if (atLeastOneEntityHighlighted)
+		// ### 5. Overlay the final selection fbo on top of the main render
+		auto mainFBOResolved = mainFBO->getResolvedFramebuffer().lock();
+		mainFBOResolved->start(width, height);
 		{
-			auto boxBlurShader = Shaders::instance().m_boxBlurShader;
-			int kernelSize = stg.global().highlight.kernelSize;
-			float blurFactor = stg.global().highlight.downscaleFactor;
-			int blurWidth = width * blurFactor;
-			int blurHeight = height * blurFactor;
+			glEnable(GL_BLEND);
 
-			// ### 2. Blur the render (1st vertical blur pass)
-			// The blur render can be done at a lower resolution specified by the blurDivisor
-			selectionBlurFBO->start(blurWidth, blurHeight);
-			{
-				glDisable(GL_BLEND);
+			auto screenOverlayShader = SHADERS.getShaderPtr<ScreenOverlayShader>();
+			screenOverlayShader->use();
+			screenOverlayShader->m_sourceTextureId = selectionFBO->getColorTexture(0);
+			screenOverlayShader->setUniforms();
 
-				glClear(GL_COLOR_BUFFER_BIT);
-
-				boxBlurShader->use();
-				boxBlurShader->m_kernelSize = kernelSize;
-				boxBlurShader->m_vertical = true; // Vertical blur
-				boxBlurShader->m_sourceTextureId = selectionFBO->getColorTexture(0);
-				boxBlurShader->m_resolution = glm::vec2(blurWidth, blurHeight);
-				boxBlurShader->setUniforms();
-
-				// Render first box blur pass using a screen quad
-				RMI.meshByAlias(Shaper::screenQuad)->render();
-			}
-			selectionBlurFBO->end();
-
-			// ### 3. Blur the render again (2nd horizontal blur pass)
-			selectionBlurSecondPassFBO->start(blurWidth, blurHeight);
-			{
-				glDisable(GL_BLEND);
-
-				glClear(GL_COLOR_BUFFER_BIT);
-
-				boxBlurShader->use();
-				boxBlurShader->m_vertical = false; // Horizontal blur
-				boxBlurShader->m_sourceTextureId = selectionBlurFBO->getColorTexture(0);
-				boxBlurShader->setUniforms();
-
-				// Render second box blur pass using a screen quad
-				RMI.meshByAlias(Shaper::screenQuad)->render();
-			}
-			selectionBlurSecondPassFBO->end();
-
-			// ### 4. Render back into the selection fbo and use its stencil to mask out the selection
-			selectionFBO->start(width, height);
-			{
-				glDisable(GL_BLEND);
-				glDisable(GL_DEPTH_TEST);
-
-				glClear(GL_COLOR_BUFFER_BIT); // Clear color only
-
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				glStencilMask(0x00);
-
-				auto selectionCompositeShader = Shaders::instance().m_selectionCompositeShader;
-				selectionCompositeShader->use();
-				selectionCompositeShader->m_sourceTextureId = selectionBlurSecondPassFBO->getColorTexture(0);
-				selectionCompositeShader->m_resolution = glm::vec2(width, height);
-				selectionCompositeShader->m_cutoff = stg.global().highlight.outlineCutoff;
-				selectionCompositeShader->setUniforms();
-
-				// Upscale selection buffer and apply stencil
-				RMI.meshByAlias(Shaper::screenQuad)->render();
-
-				// Restore stencil state (can mess up ImGui)
-				glStencilFunc(GL_ALWAYS, 0, 0xFF);
-			}
-			selectionFBO->end(true);
-
-			// ### 5. Overlay the final selection fbo on top of the main render
-			auto mainFBOResolved = mainFBO->getResolvedFramebuffer().lock();
-			mainFBOResolved->start(width, height);
-			{
-				glEnable(GL_BLEND);
-
-				auto screenOverlayShader = Shaders::instance().m_screenOverlayShader;
-				screenOverlayShader->use();
-				screenOverlayShader->m_sourceTextureId = selectionFBO->getColorTexture(0);
-				screenOverlayShader->setUniforms();
-
-				// Render the selection overlay
-				RMI.meshByAlias(Shaper::screenQuad)->render();
-			}
-			mainFBOResolved->end();
-
-			renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBOResolved));
+			// Render the selection overlay
+			RMI.meshByAlias(Shaper::screenQuad)->render();
 		}
+		mainFBOResolved->end();
+
+		renderTarget.setOutputFramebuffer(WPtr<Framebuffer>(mainFBOResolved));
 	}
 }
 
@@ -599,7 +636,7 @@ void Scene::sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entit
 	          sortByExplicitTransparencyOrder);
 }
 
-void Scene::renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection,
+void Scene::renderSortedTransparentEntities(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
                                             const std::vector<Entity*>& entities) const
 {
 	for (const auto& entity : entities)
@@ -618,7 +655,7 @@ void Scene::renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection
 		{
 			glStencilMask(0x00);
 		}
-		entity->render(view, projection);
+		entity->render(model, view, projection);
 		if (entity->m_backFaceCull)
 		{
 			glDisable(GL_CULL_FACE);

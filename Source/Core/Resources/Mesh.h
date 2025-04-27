@@ -83,8 +83,8 @@ public:
 	 */
 	struct Material
 	{
-		glm::vec3 diffuse = glm::vec3(0.8, 0.8, 0.8);
-		glm::vec3 specular = glm::vec3(0.96);
+		glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+		glm::vec3 specular = glm::vec3(0.96f);
 		glm::vec3 ambient = diffuse * 0.1f;
 		float shininess = 20.0f;
 	};
@@ -169,6 +169,8 @@ public:
 	 */
 	void render() const;
 
+	void renderInstanced(int instances) const;
+
 	/**
 	 * Renders an individual mesh part.
 	 * <b>Note that prior to calling this method the mesh's VAO needs to be
@@ -177,6 +179,8 @@ public:
 	 * @param meshPart The mesh part to render.
 	 */
 	void renderMeshPart(const MeshPart& meshPart) const;
+
+	void renderMeshPartInstanced(const MeshPart& meshPart, int instances) const;
 
 	void dispose() const;
 

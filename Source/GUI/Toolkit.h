@@ -101,15 +101,24 @@ inline void Tooltip(const char* header, const char* description)
 	ImGui::EndTooltip();
 }
 
+/**
+ * Works out pixel width of data items based on the provided parameters.
+ * @param fontSize Current font size in pixels
+ * @param maxCharacters Max number of characters/numerals any data item value has
+ * @param zoom Zoom/scaling level
+ * @return The desired data item width in pixels
+ */
+float calculateDataItemsWidth(float fontSize, int maxCharacters, float zoom = 1.0f);
+
 bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecimals, Core::EValueState const& valueState,
-               bool& valueChanged);
+			   bool& valueChanged);
 
 int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
 int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
 bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
-                const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
-                int& rowOfChange, int& columnOfChange, float& valueOfChange);
+				const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
+				int& rowOfChange, int& columnOfChange, float& valueOfChange);
 
 /**
  * Sets style for the tab of a dockable window.

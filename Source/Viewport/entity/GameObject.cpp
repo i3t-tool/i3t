@@ -22,26 +22,62 @@ GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh)
 	m_shader = shader;
 }
 
-void GameObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
+void GameObject::prepareRenderContext(RenderContext& context)
 {
-	auto objectShader = static_cast<ObjectShader*>(shader);
+	switch (context.m_renderType)
+	{
+	case RenderType::SILHOUETTE:
+	case RenderType::NORMAL:
+	{
+		if (context.m_shader == nullptr)
+			context.m_shader = m_shader;
+
+		context.m_opaque = this->m_opaque;
+		context.m_opacity = this->m_opacity;
+		context.m_wboit = this->m_wboit;
+		context.m_wboitFunc = this->m_wboitFunc;
+		break;
+	}
+	// case RenderType::DEPTH:
+	// {
+	// 	DepthShader* depthShader = SHADERS.getShaderPtr<DepthShader>();
+	// 	context.m_shader = depthShader;
+	// 	break;
+	// }
+	default:
+		break;
+	}
+}
+
+void GameObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                        const RenderContext& context)
+{
+	assert(m_mesh != nullptr);
+
+	assert(dynamic_cast<ObjectShader*>(context.m_shader) != nullptr);
+	auto objectShader = static_cast<ObjectShader*>(context.m_shader);
+
 	objectShader->use();
-	objectShader->m_wboit = m_wboit;
-	objectShader->m_wboitFunc = m_wboitFunc;
-	objectShader->m_opacity = m_opaque || silhouette ? 1.0f : m_opacity;
-	objectShader->setWorldTransform(m_modelMatrix, view, projection);
+	objectShader->m_wboit = context.m_wboit;
+	objectShader->m_wboitFunc = context.m_wboitFunc;
+	objectShader->m_opacity = context.m_opaque ? 1.f : context.m_opacity;
+	objectShader->setWorldTransform(model * m_modelMatrix * m_modMatrix, view, projection);
 	objectShader->setUniforms();
 
-	if (m_mesh)
+	glBindVertexArray(m_mesh->m_vao);
+	for (auto& meshPart : m_mesh->m_meshParts)
 	{
-		glBindVertexArray(m_mesh->m_vao);
-		for (auto& meshPart : m_mesh->m_meshParts)
+		objectShader->setUniformsPerMeshPart(meshPart);
+		if (context.m_instanceCount <= 0)
 		{
-			objectShader->setUniformsPerMeshPart(meshPart);
 			m_mesh->renderMeshPart(meshPart);
 		}
-		glBindVertexArray(0);
+		else
+		{
+			m_mesh->renderMeshPartInstanced(meshPart, context.m_instanceCount);
+		}
 	}
+	glBindVertexArray(0);
 }
 
 void GameObject::update(Scene& scene)

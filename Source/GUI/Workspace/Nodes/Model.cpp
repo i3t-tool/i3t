@@ -308,6 +308,9 @@ void Model::popupContent_axis_showmodel()
 
 	if (I3TGui::BeginMenuWithLog(_t("Change model")))
 	{
+		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+		ImGui::SliderFloat(_t("Scale"), &model->m_scale, 0.01f, 10.0f, "%.01f");
+
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{
 			if (I3TGui::MenuItemWithLog(resource.alias.c_str(), nullptr, false, true, [&]() {

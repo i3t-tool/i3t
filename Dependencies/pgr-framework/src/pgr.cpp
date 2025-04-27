@@ -62,15 +62,15 @@ bool initialize(int glVerMajor, int glVerMinor, DebugLevel debugLevel) {
     debugEnabled = true;
     if(glDebugMessageControl) {
       // enable various severity levels according to debugLevel
-      const int nSeverities = 3;
-      GLenum severities[nSeverities] = { GL_DEBUG_SEVERITY_HIGH, GL_DEBUG_SEVERITY_MEDIUM, GL_DEBUG_SEVERITY_LOW };
+      const int nSeverities = 5;
+      GLenum severities[nSeverities] = { GL_DEBUG_SEVERITY_HIGH, GL_DEBUG_SEVERITY_MEDIUM, GL_DEBUG_SEVERITY_LOW, GL_DEBUG_SEVERITY_NOTIFICATION };
       for(int i = 0; i < nSeverities; ++i) {
-        glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
-        glDebugMessageControl(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
-        glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
-        glDebugMessageControl(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
-        glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
-        glDebugMessageControl(GL_DEBUG_SOURCE_OTHER, GL_DONT_CARE, severities[i], 0, NULL, debugLevel > i ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_OTHER, GL_DONT_CARE, severities[i], 0, NULL, i < debugLevel ? GL_TRUE : GL_FALSE);
       }
     }
   }

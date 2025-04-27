@@ -541,9 +541,13 @@ void Framebuffer::setDrawBuffers()
 	{
 		glDrawBuffers(colorBuffers.size(), &colorBuffers[0]);
 	}
+	else
+	{
+		glDrawBuffer(GL_NONE); // No color attachments to draw into
+	}
 }
 
-void Framebuffer::setDrawBuffers(std::vector<unsigned int> indices)
+void Framebuffer::setDrawBuffers(const std::vector<unsigned int>& indices)
 {
 	if (indices.empty() || indices.size() > m_colorAttachments.size())
 	{

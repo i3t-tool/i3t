@@ -16,6 +16,7 @@
 #include "GUI/Theme/Theme.h"
 #include "GUI/UIModule.h"
 
+
 class I3TApplication : public Application
 {
 public:
@@ -24,8 +25,8 @@ public:
 
 protected:
 	void onInit() override;
-	void onBeginFrame() override{};
-	void onEndFrame() override{};
+	void onBeginFrame() override {};
+	void onEndFrame() override {};
 	void onUpdate(double delta) override;
 	void onClose() override;
 };
@@ -41,6 +42,7 @@ class ResourceManager;
 }
 class UIModule;
 class WorkspaceModule;
+class ViewportModule;
 
 // Static util methods
 namespace I3T
@@ -51,6 +53,7 @@ I3TApplication& app();
 // Modules
 UIModule* getUI();
 Vp::Viewport* getViewport();
+ViewportModule& getViewportModule();
 Core::ResourceManager& getResourceManager();
 WorkspaceModule& getWorkspace();
 

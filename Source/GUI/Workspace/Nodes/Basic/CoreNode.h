@@ -90,10 +90,11 @@ public:
 	void queueUpdateDataItemsWidth();
 
 protected:
-	/// Calculates the final desired pixel width of data items. Calls maxLengthOfData() internally.
-	/// Despite this method not being particularly time intensive it is NOT called every frame.
-	/// A call to this method can be queued for the next frame via queueUpdateDataItemsWidth()
+	/// Calculates the final desired pixel width of data items (floats inside vectors, matrices etc.).
+	/// Calls maxLengthOfData() internally. Despite this method not being particularly time intensive it is NOT called
+	/// every frame. A call to this method can be queued for the next frame via queueUpdateDataItemsWidth()
 	/// @see maxLengthOfData(), queueUpdateDataItemsWidth()
+	/// @note Could it be called every frame? I don't know, someone profile it please -><-.
 	virtual float updateDataItemsWidth();
 
 	/// Calculates the largest number of characters/decimal places a data item has in this node.

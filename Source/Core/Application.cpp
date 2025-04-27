@@ -254,19 +254,6 @@ void Application::initWindow()
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
 	}
-
-	// Extra opengl 4.3 severity level which pgr framework doesn't account for
-	if (debugLevel != pgr::DEBUG_OFF)
-	{
-		GLuint severity = GL_DEBUG_SEVERITY_NOTIFICATION;
-		GLboolean toggle = debugLevel <= 1 ? GL_TRUE : GL_FALSE;
-		glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_OTHER, GL_DONT_CARE, severity, 0, NULL, toggle);
-	}
 }
 
 GLFWwindow* Application::getWindow()

@@ -78,7 +78,7 @@ class WBOITCompositeShader;
  *
  * Further, DisplayOptions are used to toggle visibility of certain objects.
  */
-class Viewport : public Module, public IStateful
+class Viewport
 {
 private:
 	friend class Scene;
@@ -107,7 +107,7 @@ public:
 	/**
 	 * Initializes scenes and loads assets.
 	 */
-	void onInit() override;
+	void init();
 
 	/**
 	 * Render viewport's main scene into a framebuffer using its own camera.
@@ -116,13 +116,14 @@ public:
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
+	 * @param model Implicit model matrix, world "reference space".
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
 	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
+	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
 	                  const RenderOptions& renderOptions = RenderOptions(),
 	                  const DisplayOptions& displayOptions = DisplayOptions());
 
@@ -133,6 +134,7 @@ public:
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
+	 * @param model Implicit model matrix, world "reference space".
 	 * @param view View matrix of the camera
 	 * @param projection Projection matrix of the camera
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
@@ -141,7 +143,8 @@ public:
 	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	void drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, glm::mat4 view, glm::mat4 projection,
+	void drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
+	                const glm::mat4& view, const glm::mat4& projection,
 	                const RenderOptions& renderOptions = RenderOptions(),
 	                const DisplayOptions& displayOptions = DisplayOptions());
 
@@ -164,7 +167,7 @@ public:
 	/**
 	 * Update scene logic
 	 */
-	void onUpdate(double dt) override;
+	void update(double dt);
 
 	// TODO: (DR) A little issue arises if this method were to be called multiple
 	// 	times per frame. I'm not sure if that ever happens (multiple scene viewports of the same scene?).
@@ -216,28 +219,15 @@ public:
 
 	ViewportSettings& getSettings();
 
-	WPtr<Scene> getMainScene()
+	MainScene* getMainScene()
 	{
-		return m_mainScene;
+		return m_mainScene.get();
 	};
-	WPtr<Scene> getPreviewScene()
+	Scene* getPreviewScene()
 	{
-		return m_previewScene;
+		return m_previewScene.get();
 	};
 
 	Manipulators& getManipulators();
-
-	/////////////////////////////////////////
-	// State save/load
-	/////////////////////////////////////////
-
-	Memento saveScene(State::Scene* scene) override;
-	void loadScene(const Memento& memento, State::Scene* scene) override;
-	void appendScene(const Memento& memento, State::Scene* scene) override {}
-	void clearScene(bool newScene) override;
-
-	Memento saveGlobal() override;
-	void loadGlobal(const Memento& memento) override;
-	void clearGlobal() override;
 };
 } // namespace Vp

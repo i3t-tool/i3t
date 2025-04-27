@@ -25,18 +25,15 @@ TexturedObject::TexturedObject(Core::Mesh* mesh, PhongShader* shader) : GameObje
 	// Empty
 }
 
-void TexturedObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
+void TexturedObject::prepareRenderContext(RenderContext& context)
 {
-	if (silhouette)
+	GameObject::prepareRenderContext(context);
+
+	switch (context.m_renderType)
 	{
-		auto colorShader = Shaders::instance().m_colorShader;
-		colorShader->m_useSingleColor = true;
-		colorShader->m_singleColor = m_highlightColor;
-		shader = colorShader.get();
-	}
-	else
+	case RenderType::NORMAL:
 	{
-		PhongShader* phongShader = static_cast<PhongShader*>(shader);
+		PhongShader* phongShader = static_cast<PhongShader*>(context.m_shader);
 		glm::vec3 color;
 		glm::vec3 hsl;
 		rgbToHsl(m_tint.r, m_tint.g, m_tint.b, &hsl.x, &hsl.y, &hsl.z);
@@ -44,5 +41,16 @@ void TexturedObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection
 		hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
 		phongShader->m_tint = color;
 	}
-	GameObject::render(shader, view, projection, silhouette);
+	break;
+	case RenderType::SILHOUETTE:
+	{
+		auto colorShader = SHADERS.getShader<ColorShader>();
+		colorShader->m_useSingleColor = true;
+		colorShader->m_singleColor = m_highlightColor;
+		context.m_shader = colorShader.get();
+	}
+	break;
+	default:
+		break;
+	}
 }

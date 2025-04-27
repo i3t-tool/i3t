@@ -13,6 +13,38 @@
 #include "Utils/Text.h"
 #include "gtest/gtest.h"
 
+TEST(TextTest, Hash4)
+{
+	size_t a = hash_string("hey", "there", "test", "hello");
+	size_t b = hash_string("hey", "there", "test", "hello");
+	ASSERT_EQ(a, b);
+
+	b = hash_string("hey", "test", "there", "hello");
+	size_t c = hash_string("test", "there", "hey", "hello");
+	ASSERT_EQ(b, c);
+	ASSERT_EQ(a, b);
+
+	a = hash_string("hey", "there", "test", "hello");
+	b = hash_string("ayey", "there", "test", "hello");
+	ASSERT_NE(a, b);
+	b = hash_string("hey", "there", "test", "helli");
+	ASSERT_NE(a, b);
+	b = hash_string("hey", "there", "test", "hellium");
+	ASSERT_NE(a, b);
+
+	a = hash_string("", "", "", "");
+	b = hash_string("", "", "", "");
+	ASSERT_EQ(a, b);
+
+	a = hash_string("", "", "", " ");
+	b = hash_string("", "", "", " ");
+	ASSERT_EQ(a, b);
+
+	a = hash_string(" ", "", "", "");
+	b = hash_string(" ", "", "", " ");
+	ASSERT_NE(a, b);
+}
+
 TEST(TextTest, Hash3)
 {
 	size_t a = hash_string("hey", "there", "test");

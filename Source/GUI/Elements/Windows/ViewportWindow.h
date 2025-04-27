@@ -14,6 +14,8 @@
 
 #include "imgui.h"
 
+#include "glm/matrix.hpp"
+
 #include "GUI/Elements/IWindow.h"
 
 #include "Viewport/data/DisplayOptions.h"
@@ -32,8 +34,19 @@ class ViewportWindow : public IWindow
 public:
 	I3T_WINDOW(ViewportWindow)
 
+	struct ViewportSpace
+	{
+		bool standard = true;
+		std::string label{"World space"};
+		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
+		glm::mat4 m_referenceSpace{1.f};
+	};
+	ViewportSpace m_space;
+
 	ViewportWindow(bool show, Vp::Viewport* viewport);
 	void render() override;
+
+	void updateSpace();
 
 private:
 	Vp::Viewport* m_viewport;
@@ -47,5 +60,6 @@ private:
 
 	bool showViewportButtons();
 	bool showViewportMenu();
+	bool showSpaceIndicators();
 };
 } // namespace UI

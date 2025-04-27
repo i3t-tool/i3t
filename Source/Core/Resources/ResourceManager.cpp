@@ -19,6 +19,7 @@
 #include "ModelResourceFiles.h"
 #include "State/StateManager.h"
 #include "Utils/Format.h"
+#include "Utils/GLUtils.h"
 #include "Utils/Text.h"
 
 // Used for method overloading to indicate no alias was specified
@@ -139,7 +140,19 @@ GLuint ResourceManager::shaderG(const std::string& vertShader, const std::string
 GLuint ResourceManager::shaderG(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
                                 const std::string& geoShader)
 {
-	size_t id = hash_string(vertShader, fragShader, geoShader);
+	return shaderGI(alias, vertShader, fragShader, geoShader, "");
+}
+
+GLuint ResourceManager::shaderGI(const std::string& vertShader, const std::string& fragShader,
+                                 const std::string& geoShader, const std::string& sourceToInject)
+{
+	return shaderGI(NO_ALIAS, vertShader, fragShader, geoShader, sourceToInject);
+}
+
+GLuint ResourceManager::shaderGI(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
+                                 const std::string& geoShader, const std::string& sourceToInject)
+{
+	size_t id = hash_string(vertShader, fragShader, geoShader, std::to_string(sourceToInject.size()));
 	bool success = false;
 	auto data = getData(alias, id, ResourceType::Shader, &success);
 	if (success)
@@ -147,7 +160,7 @@ GLuint ResourceManager::shaderG(const std::string& alias, const std::string& ver
 		if (data.get() == nullptr)
 		{
 			// Load shader
-			GLuint shaderId = loadShader(vertShader, fragShader, geoShader);
+			GLuint shaderId = loadShader(vertShader, fragShader, geoShader, sourceToInject);
 			if (shaderId)
 			{
 				std::string path = "Vert: " + vertShader + ", Frag: " + fragShader +
@@ -499,27 +512,29 @@ GLuint ResourceManager::loadTexture(const std::string& path)
 }
 
 GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader,
-                                   const std::string& geoShader)
+                                   const std::string& geoShader, const std::string& sourceToInject)
 {
-	GLuint id = 1;
+	GLuint id = -1;
 	std::vector<GLuint> shaderList;
 
-	std::string absVert = vertShader;
-	std::string absFrag = fragShader;
-	if (geoShader.empty())
+	bool vert = !vertShader.empty();
+	bool frag = !fragShader.empty();
+	bool geo = !geoShader.empty();
+
+	if (!vert)
 	{
-		LOG_INFO("[SHADER] Loading shader: vert: {}, frag: {}", absVert, absFrag);
-		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
-		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
+		LOG_ERROR("[SHADER] Cannot load shader, no vertex shader specified!");
+		return 0;
 	}
-	else
-	{
-		std::string absGeo = geoShader;
-		LOG_INFO("[SHADER] Loading shader: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
-		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
-		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
-		shaderList.push_back(pgr::createShaderFromFile(GL_GEOMETRY_SHADER, absGeo));
-	}
+
+	LOG_INFO("[SHADER] Loading shader: vert: {}, frag: {}, geo: {}, injected code: {}", vert ? vertShader : "none",
+	         frag ? fragShader : "none", geo ? geoShader : "none", sourceToInject.empty() ? "none" : sourceToInject);
+
+	shaderList.push_back(GLUtils::createShaderFromFile(GL_VERTEX_SHADER, vertShader, sourceToInject));
+	if (frag)
+		shaderList.push_back(GLUtils::createShaderFromFile(GL_FRAGMENT_SHADER, fragShader, sourceToInject));
+	if (geo)
+		shaderList.push_back(GLUtils::createShaderFromFile(GL_GEOMETRY_SHADER, geoShader, sourceToInject));
 
 	// Check for compilation error
 	for (const auto& stage : shaderList)
@@ -534,7 +549,7 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 	// Link if compilation was ok
 	if (id != 0)
 	{
-		id = pgr::createProgram(shaderList);
+		id = GLUtils::createProgram(shaderList);
 	}
 
 	if (id == 0)
@@ -646,7 +661,7 @@ bool ResourceManager::removeResource(std::shared_ptr<Resource>& resource, bool f
 		}
 		if (isDefaultResource)
 		{
-			LOG_WARN("[RESOURCE MANAGER] Attempted to remove default resource id '{}'!", resource->hashId)
+			LOG_WARN("[RESOURCE MANAGER] Attempted to remove default resource id '{}'!", resource->hashId);
 			return false;
 		}
 	}
@@ -914,7 +929,7 @@ void ResourceManager::loadScene(const Memento& memento, Scene* scene)
 		if (!memento.HasMember("resources"))
 		{
 			LOG_WARN(
-			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.")
+			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.");
 			return;
 		}
 
@@ -971,7 +986,7 @@ void ResourceManager::appendScene(const Memento& memento, State::Scene* scene)
 		if (!memento.HasMember("resources"))
 		{
 			LOG_WARN(
-			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.")
+			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.");
 			return;
 		}
 

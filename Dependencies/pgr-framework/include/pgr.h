@@ -21,6 +21,14 @@
 #ifndef PGR_H
 #define PGR_H
 
+// TODO: (DR) It has long been a good idea on the backburner to remove the pgr framework dependency entirely because
+//  most of the library is unused and the parts of ít that are used might be better off included in the project with
+//  a hooked up logger etc. Furthermore matvei then edited the library anyway to use glad instead of glew, meaning
+//  it is essentially already custom code and not an external "dependency". More reasons to remove it.
+//  Some essential shader loading code was already extracted into GLUtils.h, but that file still depends on pgr.h to
+//  bring in the glad/glew file. In the future we should extract these includes into a separate I3TGL.h (or such) file,
+//  which would replace "pgr.h" in many parts of the I3T code.
+
 /// how do we include opengl, do we use glad or glew?
 #define USE_GLAD 1
 
@@ -29,23 +37,23 @@
 #else
 #include <GL/glew.h>
 #endif
-//#include <GL/freeglut.h>
+// #include <GL/freeglut.h>
 
-#include <string>
 #include <math.h>
+#include <string>
 
 #include <glm/glm.hpp>                  // vec3 normalize cross
-#include <glm/gtc/type_ptr.hpp>         // value_ptr
 #include <glm/gtc/matrix_transform.hpp> // translate, rotate, scale
+#include <glm/gtc/type_ptr.hpp>         // value_ptr
 
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
-#include "Shader.h"  // createShaderFromSource, createProgram, deleteProgramAndShaders
-#include "Image.h" // createTexture
+#include "Image.h"    // createTexture
 #include "MeshData.h" // some built-in meshes (cube, teapot, ...)
-#include "gldebug.h" // debugging helpers, opengl error catching
+#include "Shader.h"   // createShaderFromSource, createProgram, deleteProgramAndShaders
+#include "gldebug.h"  // debugging helpers, opengl error catching
 
 #ifndef M_PI
 /// define Pi for compatibility issues (MSVC vs GCC)
@@ -61,14 +69,18 @@
 #define RADTODEG(a) ((a) * 180.0 / M_PI)
 #endif
 
-namespace pgr {
+namespace pgr
+{
 
 /// defines verbosity of the debug system, DEBUG_OFF turns the system off
-enum DebugLevel {
-  DEBUG_OFF = 0, ///< turn of the debug callbacks
-  DEBUG_LOW, ///< enables messages with hight severity
-  DEBUG_MEDIUM, ///< enables messages with hight and medium severities,
-  DEBUG_HIGH ///< enables messages with all severities
+enum DebugLevel
+{
+	// TODO: (DR) The comments/meaning is the wrong way around I swear, lower log level means MORE messages, not less
+	DEBUG_OFF = 0,    ///< turn of the debug callbacks
+	DEBUG_HIGH = 1,   ///< enables messages with high severity
+	DEBUG_MEDIUM = 2, ///< enables messages with medium and higher severities
+	DEBUG_LOW = 3,    ///< enables messages with low and higher severities
+	DEBUG_ALL = 4,    ///< enables messages with all severities
 };
 
 /** required opengl version - major number
@@ -85,12 +97,13 @@ const int OGL_VER_MINOR = 3;
 /** intializes gl functions, DevIL and checks opengl version
  *
  * Call this function after successful creation of OpenGL context (for example after glutCreateWindow).
- * \returns true if everything went ok, especially if opengl version is sufficient; false indicates error - you should exit the application
+ * \returns true if everything went ok, especially if opengl version is sufficient; false indicates error - you should
+ * exit the application
  * \param glVerMajor opengl major version to check (returns false if not available)
  * \param glVerMinor opengl minor version to check (returns false if not available)
- * \param debugLevel if not DEBUG_OFF initialize opengl debug callback (glDebugMessageCallback), works only with debug contexts!
+ * \param debugLevel if not DEBUG_OFF initialize opengl debug callback (glDebugMessageCallback), works only with debug
+ * contexts!
  */
-//bool initialize(int glVerMajor, int glVerMinor, DebugLevel debugLevel = DEBUG_MEDIUM);
 bool initialize(int glVerMajor, int glVerMinor, DebugLevel debugLevel = DEBUG_OFF);
 
 /** returns the value of the PGR_FRAMEWORK_ROOT system variable
@@ -107,7 +120,7 @@ std::string frameworkRoot();
  *
  * \return this function does not return
  */
-void dieWithError(const std::string & errMsg);
+void dieWithError(const std::string& errMsg);
 
 /** prints out pending opengl error
  *
@@ -116,14 +129,18 @@ void dieWithError(const std::string & errMsg);
  *
  * \see CHECK_GL_ERROR
  */
-void checkGLError(const char * where = 0, int line = 0);
+void checkGLError(const char* where = 0, int line = 0);
 
 /** helper macro involving the checkGLError function
  *
  * The macro uses __FUNCTION__ and __LINE__ as arguments to the checkGLError function.
  * Use it anywhere you like to catch opengl errors.
  */
-#define CHECK_GL_ERROR() do { pgr::checkGLError(__FUNCTION__, __LINE__); } while(0)
+#define CHECK_GL_ERROR()                                                                                               \
+	do                                                                                                                 \
+	{                                                                                                                  \
+		pgr::checkGLError(__FUNCTION__, __LINE__);                                                                     \
+	} while (0)
 
 } // end namespace pgr
 

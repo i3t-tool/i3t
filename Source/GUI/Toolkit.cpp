@@ -279,6 +279,54 @@ bool SliderFloatStepped(const char* label, float* v, float step, float v_min, fl
 	return false;
 }
 
+float calculateDataItemsWidth(float fontSize, int maxCharacters, float zoom)
+{
+	const float oneCharWidth = fontSize * I3T::getSize(ESize::Nodes_FloatCharacterWidthMultiplier);
+	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * zoom;
+	const float minCharCount = I3T::getSize(ESize::Nodes_FloatMinCharacters);
+	const float maxLength = static_cast<float>(maxCharacters);
+	return std::max(maxLength, minCharCount) * oneCharWidth + 2 * padding;
+}
+
+
+int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
+{
+	int border = 10, result = 1, int_value;
+
+	if (value < 0)
+	{
+		value = -value;
+	}
+	result++; /* always space for sign to avoid changing size of / alternatively
+	             move it inside if above */
+
+	int_value = (int) value;
+	while (int_value >= border)
+	{
+		result++;
+		border *= 10;
+	}
+
+	return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal + 1 : 0); /* +1 for decimal point */
+}
+
+int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
+{
+	int act, maximal = 0;
+	for (int column = 0; column < 4; column++)
+	{
+		for (int row = 0; row < 4; row++)
+		{
+			act = numberOfCharWithDecimalPoint(data[column][row], numberOfVisibleDecimal);
+			if (act > maximal)
+			{
+				maximal = act;
+			}
+		}
+	}
+	return maximal;
+}
+
 bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecimals, Core::EValueState const& valueState,
                bool& valueChanged)
 {
@@ -322,49 +370,13 @@ bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecima
 	return inner_interaction_happen || valueChanged;
 }
 
-int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
-{
-	int border = 10, result = 1, int_value;
-
-	if (value < 0)
-	{
-		value = -value;
-	}
-	result++; /* always space for sign to avoid changing size of / alternatively
-	             move it inside if above */
-
-	int_value = (int) value;
-	while (int_value >= border)
-	{
-		result++;
-		border *= 10;
-	}
-
-	return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal + 1 : 0); /* +1 for decimal point */
-}
-
-int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
-{
-	int act, maximal = 0;
-	for (int column = 0; column < 4; column++)
-	{
-		for (int row = 0; row < 4; row++)
-		{
-			act = numberOfCharWithDecimalPoint(data[column][row], numberOfVisibleDecimal);
-			if (act > maximal)
-			{
-				maximal = act;
-			}
-		}
-	}
-	return maximal;
-}
-
 bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
                 const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
                 int& rowOfChange, int& columnOfChange, float& valueOfChange)
 {
-	float dataWidth = maxLengthOfData4x4(data, numberOfVisibleDecimals);
+
+	float maxLength = maxLengthOfData4x4(data, numberOfVisibleDecimals);
+	float dataWidth = calculateDataItemsWidth(ImGui::GetFontSize(), maxLength);
 
 	bool inner_interaction_happen = false;
 	bool actualValueChanged = false;

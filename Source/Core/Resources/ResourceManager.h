@@ -171,6 +171,12 @@ public:
 	GLuint shaderG(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
 	               const std::string& geoShader);
 
+	GLuint shaderGI(const std::string& vertShader, const std::string& fragShader,
+	                const std::string& geoShader, const std::string& sourceToInject);
+
+	GLuint shaderGI(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
+	                const std::string& geoShader, const std::string& sourceToInject);
+
 	/**
 	 * Get existing model using an alias.
 	 * @return Pointer to the Mesh object.
@@ -306,7 +312,20 @@ private:
 	 * @param geoShader Optional path to geometry shader, or an empty string
 	 * @return OpenGL id of created shader program
 	 */
-	GLuint loadShader(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader);
+	GLuint loadShader(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader)
+	{
+		loadShader(vertShader, fragShader, geoShader, "");
+	}
+
+	/**
+	 * @param vertShader Path to vertex shader
+	 * @param fragShader Path to fragment shader
+	 * @param geoShader Optional path to geometry shader, or an empty string
+	 * @param sourceToInject Optional text to insert right after the glsl version declaration, does nothing if its an empty string
+	 * @return OpenGL id of created shader program
+	 */
+	GLuint loadShader(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader,
+	                  const std::string& sourceToInject);
 
 	Mesh* loadModel(const std::string& path);
 

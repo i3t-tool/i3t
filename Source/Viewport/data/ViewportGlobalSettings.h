@@ -51,8 +51,8 @@ public:
 
 struct GridSettings
 {
-public:
 	GridSettings();
+	GridSettings(bool localGrid);
 
 	glm::vec3 color;
 	glm::vec3 axisXColor;
@@ -89,6 +89,7 @@ public:
 	GlobalCameraSettings camera;
 	HighlightSettings highlight;
 	GridSettings grid;
+	GridSettings localGrid = GridSettings(true);
 };
 
 } // namespace Vp

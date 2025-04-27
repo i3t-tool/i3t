@@ -28,3 +28,17 @@ Entity::Entity()
 	m_highlightUseDepth = true;
 	m_highlightColor = glm::vec3(0.949, 0.682, 0.18);
 }
+
+void Entity::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection)
+{
+	RenderContext context;
+	prepareRenderContext(context);
+	render(model, view, projection, context);
+}
+
+Entity::RenderContext Entity::createRenderContext()
+{
+	RenderContext context;
+	prepareRenderContext(context);
+	return context;
+}

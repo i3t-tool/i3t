@@ -401,13 +401,11 @@ float CoreNode::updateDataItemsWidth()
 		fontSize = diwne.canvas().m_unscaledFontSize * diwne.getZoom();
 	else
 		fontSize = ImGui::GetFontSize();
-	const float oneCharWidth = fontSize * I3T::getSize(ESize::Nodes_FloatCharacterWidthMultiplier);
-	const float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getZoom();
-	const float minCharCount = I3T::getSize(ESize::Nodes_FloatMinCharacters);
-	const float maxLength = static_cast<float>(maxLengthOfData());
-	m_dataItemsWidth = std::max(maxLength, minCharCount) * oneCharWidth + 2 * padding;
-	LOG_DEBUG("updateDataItemsWidth() in node '{}': fS: {}, oCW: {}, maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
-	          oneCharWidth, maxLength, m_dataItemsWidth);
+
+	int maxLength = maxLengthOfData();
+	m_dataItemsWidth = GUI::calculateDataItemsWidth(fontSize, maxLength, diwne.getZoom());
+	LOG_DEBUG("updateDataItemsWidth() in node '{}': font: {} maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
+	          maxLength, m_dataItemsWidth);
 	return m_dataItemsWidth;
 }
 

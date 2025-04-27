@@ -18,6 +18,7 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
+#include "GUI/ViewportModule.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
@@ -54,9 +55,7 @@ void I3TApplication::onInit()
 	App::getModule<StateManager>().addOriginator(resourceManager);
 	App::getModule<ResourceManager>().loadDefaultResources(*configDoc);
 
-	Vp::Viewport* viewport = createModule<Vp::Viewport>();
-	App::getModule<StateManager>().addOriginator(viewport);
-
+	createModule<ViewportModule>();
 	createModule<ScriptingModule>();
 	createModule<WorkspaceModule>();
 	UIModule* uiModule = createModule<UIModule>();
@@ -94,7 +93,11 @@ UIModule* getUI()
 }
 Vp::Viewport* getViewport()
 {
-	return &App::get().getModule<Vp::Viewport>();
+	return &App::get().getModule<ViewportModule>().getViewport();
+}
+ViewportModule& getViewportModule()
+{
+	return App::get().getModule<ViewportModule>();
 }
 Core::ResourceManager& getResourceManager()
 {

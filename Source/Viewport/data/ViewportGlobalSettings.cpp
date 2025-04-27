@@ -61,7 +61,8 @@ RTTR_REGISTRATION
 	    .property("manipulator_size", &ViewportGlobalSettings::manipulator_size)
 	    .property("camera", &ViewportGlobalSettings::camera)
 	    .property("highlight", &ViewportGlobalSettings::highlight)
-	    .property("grid", &ViewportGlobalSettings::grid);
+	    .property("grid", &ViewportGlobalSettings::grid)
+	    .property("localGrid", &ViewportGlobalSettings::localGrid);
 
 	rttr::registration::enumeration<PhongShader::LightingModel>("LightingModel")(
 	    rttr::value("ORBIT", PhongShader::LightingModel::PHONG),
@@ -96,21 +97,41 @@ HighlightSettings::HighlightSettings()
 	highlightColor = glm::vec3(0.18, 0.784, 0.949);
 }
 
-GridSettings::GridSettings()
+GridSettings::GridSettings() : GridSettings(false) {}
+GridSettings::GridSettings(bool localGrid)
 {
-	color = glm::vec3(0.45, 0.49, 0.53);
-	axisXColor = glm::vec3(1.0, 0.49, 0.53);
-	axisYColor = glm::vec3(0.41, 0.96, 0.49);
-	axisZColor = glm::vec3(0.45, 0.49, 1.0);
+	if (!localGrid)
+	{
+		color = glm::vec3(0.45, 0.49, 0.53);
+		axisXColor = glm::vec3(1.0, 0.49, 0.53);
+		axisYColor = glm::vec3(0.41, 0.96, 0.49);
+		axisZColor = glm::vec3(0.45, 0.49, 1.0);
 
-	size = 1.0f;
-	strength = 0.5f;
-	lineWidth = 1.0f;
+		size = 1.0f;
+		strength = 0.51f;
+		lineWidth = 1.08f;
 
-	grid1FadeStart = 0.0f;
-	grid1FadeEnd = 0.23f;
-	grid2FadeStart = 0.0f;
-	grid2FadeEnd = 0.9f;
+		grid1FadeStart = 0.0f;
+		grid1FadeEnd = 0.23f;
+		grid2FadeStart = 0.0f;
+		grid2FadeEnd = 0.9f;
+	}
+	else
+	{
+		color = glm::vec3(0.412, 0.40, 0.211);
+		axisXColor = glm::vec3(0.87, 0.01, 1.0);
+		axisYColor = glm::vec3(0.60, 1.0, 0.02);
+		axisZColor = glm::vec3(0.00, 0.9, 1.0);
+
+		size = 1.0f;
+		strength = 0.5f;
+		lineWidth = 1.0f;
+
+		grid1FadeStart = 0.0f;
+		grid1FadeEnd = 0.12f;
+		grid2FadeStart = 0.0f;
+		grid2FadeEnd = 1.0f;
+	}
 }
 
 ViewportGlobalSettings::ViewportGlobalSettings()

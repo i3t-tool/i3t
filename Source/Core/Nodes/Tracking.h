@@ -206,6 +206,7 @@ class MatrixTracker;
 /// Data object holding extra information about a currently tracked model.
 struct TrackedModelData
 {
+	// TODO: I might need to separate interpolatedMatrix into P, V and M. As V might be omitted in view space 3d scene.
 	glm::mat4 m_interpolatedMatrix{1.f}; ///< Model matrix of the tracked model (result of tracker interpolation).
 	glm::mat4 m_referenceSpace{1.f};     ///< Reference space of the model, its "default" transformation.
 	                                     ///< This is applicable when the begin sequence of tracking is not

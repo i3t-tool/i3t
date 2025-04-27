@@ -18,13 +18,16 @@ using namespace Vp;
 
 GridShader::GridShader(GLuint id) : ObjectShader(id)
 {
+	m_pvm = false;
+	m_pvmSeparate = true;
+	m_normal = false;
 	init(false);
 }
 
 void GridShader::init(bool initSuperclass)
 {
 	if (initSuperclass)
-		ObjectShader::init(true);
+		Super::init(true);
 
 	m_nearId = glGetUniformLocation(m_id, "u_near");
 	m_farId = glGetUniformLocation(m_id, "u_far");
@@ -59,10 +62,10 @@ void GridShader::setUniforms()
 	glUniform1f(m_showYAxisId, m_showYAxis);
 	glUniform1f(m_showZAxisId, m_showZAxis);
 
-	glUniform3fv(m_gridColorId, 1, glm::value_ptr(m_gridColor));
-	glUniform3fv(m_axisXColorId, 1, glm::value_ptr(m_axisXColor));
-	glUniform3fv(m_axisYColorId, 1, glm::value_ptr(m_axisYColor));
-	glUniform3fv(m_axisZColorId, 1, glm::value_ptr(m_axisZColor));
+	glUniform3fv(m_gridColorId, 1, glm::value_ptr(*m_gridColor));
+	glUniform3fv(m_axisXColorId, 1, glm::value_ptr(*m_axisXColor));
+	glUniform3fv(m_axisYColorId, 1, glm::value_ptr(*m_axisYColor));
+	glUniform3fv(m_axisZColorId, 1, glm::value_ptr(*m_axisZColor));
 
 	glUniform1f(m_gridSizeId, m_gridSize);
 	glUniform1f(m_gridStrengthId, m_gridStrength);
@@ -79,4 +82,17 @@ void GridShader::setUniforms()
 	GfxUtils::extractZNearZFar(m_projection, nearVal, farVal);
 	glUniform1f(m_nearId, nearVal);
 	glUniform1f(m_farId, farVal);
+}
+void GridShaderGeneric::init(bool initSuperclass)
+{
+	if (initSuperclass)
+		Super::init(true);
+
+	modelMatrixInvId = glGetUniformLocation(m_id, "u_modelMatrixInv");
+}
+void GridShaderGeneric::setUniforms()
+{
+	Super::setUniforms();
+
+	glUniformMatrix4fv(modelMatrixInvId, 1, GL_FALSE, glm::value_ptr(m_modelInv));
 }

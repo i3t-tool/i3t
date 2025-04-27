@@ -79,8 +79,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 		Vp::Viewport* viewport = I3T::getViewport();
 		m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
-		viewport->drawScreen(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, screenValue.second,
-		                     screenValue.first, m_renderOptions, m_displayOptions);
+		viewport->drawScreen(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, glm::mat4(1.f),
+		                     screenValue.second, screenValue.first, m_renderOptions, m_displayOptions);
 		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 		if (framebuffer)

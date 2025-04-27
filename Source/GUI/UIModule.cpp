@@ -20,6 +20,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "State/StateManager.h"
 #include "UserData.h"
+#include "ViewportModule.h"
 
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
@@ -108,7 +109,9 @@ void UIModule::onInit()
 	m_menu = new MainMenuBar();
 	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
 	m_windowManager.addWindow(std::make_shared<StartWindow>(true));
-	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, I3T::getViewport()));
+
+	// Viewport window
+	m_windowManager.addWindow(I3T::getViewportModule().createViewportWindow());
 	m_windowManager.addWindow(std::make_shared<WorkspaceWindow>(true));
 	m_windowManager.addWindow(std::make_shared<Console>(false));
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
