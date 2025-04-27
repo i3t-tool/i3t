@@ -24,9 +24,9 @@ GridObject::GridObject() : GameObject(RMI.meshByAlias(Shaper::screenQuad), SHADE
 {
 	setDisplayType(DisplayType::Grid);
 }
-void GridObject::setReferenceSpace(const glm::mat4& referenceSpace)
+void GridObject::setReferenceSpace(const glm::mat4& referenceSpace, const glm::mat4& referenceSpaceInv)
 {
-	this->m_modelMatrix = glm::inverse(referenceSpace);
+	this->m_modelMatrix = referenceSpaceInv;
 	this->m_modelMatrixInv = referenceSpace;
 }
 

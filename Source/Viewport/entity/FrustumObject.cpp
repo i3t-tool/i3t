@@ -21,13 +21,6 @@ FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader) : ColoredO
 	setDisplayType(DisplayType::Frustum);
 }
 
-void FrustumObject::update(Scene& scene)
-{
-	Super::update(scene);
-	// Set model matrix to later retrieve position for transparency sorting
-	this->m_modelMatrix = glm::inverse(m_frustumViewMatrix);
-}
-
 void FrustumObject::prepareRenderContext(RenderContext& context)
 {
 	Super::prepareRenderContext(context);
@@ -36,4 +29,13 @@ void FrustumObject::prepareRenderContext(RenderContext& context)
 	FrustumShader* frustumShader = static_cast<FrustumShader*>(context.m_shader);
 	frustumShader->m_frustumProjectionMatrix = m_frustumProjectionMatrix;
 	frustumShader->m_frustumViewMatrix = m_frustumViewMatrix;
+}
+
+void FrustumObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                           const RenderContext& context)
+{
+	this->m_modelMatrix = glm::identity<glm::mat4>();
+	ColoredObject::render(model, view, projection, context);
+	// Set model matrix to later retrieve position for transparency sorting
+	this->m_modelMatrix = model * m_frustumViewMatrixInv;
 }

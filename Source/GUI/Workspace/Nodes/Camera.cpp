@@ -88,12 +88,6 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
 
 	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
-	auto cameraPtr = m_viewportCamera.lock();
-	cameraPtr->m_showAxes = m_axisOn;
-	cameraPtr->m_visible = m_showCamera;
-	cameraPtr->m_showFrustum = m_showFrustum;
-	cameraPtr->m_fillFrustum = m_fillFrustum;
-	cameraPtr->m_frustumColor = m_frustumColor;
 
 	// Callback that gets called when the underlying Camera node updates values
 	// The Camera node also updates public projection and view matrix variables
@@ -119,6 +113,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 
 Camera::~Camera()
 {
+	// TODO: Shouldn't this be in onDestroy?
 	I3T::getViewport()->removeEntity(m_viewportCamera);
 }
 
@@ -128,28 +123,26 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
+	auto cameraPtr = m_viewportCamera.lock();
+
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
 	{
-		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, m_axisOn))
+		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, cameraPtr->m_showAxes))
 		{
-			m_axisOn = !m_axisOn;
-			m_viewportCamera.lock()->m_showAxes = m_axisOn;
+			cameraPtr->m_showAxes = !cameraPtr->m_showAxes;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, m_showCamera))
+		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, cameraPtr->m_visible))
 		{
-			m_showCamera = !m_showCamera;
-			m_viewportCamera.lock()->m_visible = m_showCamera;
+			cameraPtr->m_visible = !cameraPtr->m_visible;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, m_showFrustum))
+		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, cameraPtr->m_showFrustum))
 		{
-			m_showFrustum = !m_showFrustum;
-			m_viewportCamera.lock()->m_showFrustum = m_showFrustum;
+			cameraPtr->m_showFrustum = !cameraPtr->m_showFrustum;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, m_fillFrustum))
+		if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, cameraPtr->m_fillFrustum))
 		{
-			m_fillFrustum = !m_fillFrustum;
-			m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
+			cameraPtr->m_fillFrustum = !cameraPtr->m_fillFrustum;
 		}
 		ImGui::EndMenu();
 	}
@@ -159,43 +152,35 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		{
 			if (I3TGui::MenuItemWithLog(_t("Default")))
 			{
-				m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Red")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::RED);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::RED);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Blue")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::BLUE);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::BLUE);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Green")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::GREEN);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::GREEN);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Yellow")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::YELLOW);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::YELLOW);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Orange")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::ORANGE);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::ORANGE);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Magenta")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::MAGENTA);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::MAGENTA);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Teal")))
 			{
-				m_frustumColor = calculateFrustumColor(Color::TEAL);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::TEAL);
 			}
 			ImGui::EndMenu();
 		}
@@ -203,38 +188,31 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		{
 			if (I3TGui::MenuItemWithLog(_t("Red")))
 			{
-				m_frustumOutlineColor = Color::RED;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::RED;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Blue")))
 			{
-				m_frustumOutlineColor = Color::BLUE;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::BLUE;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Green")))
 			{
-				m_frustumOutlineColor = Color::GREEN;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::GREEN;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Yellow")))
 			{
-				m_frustumOutlineColor = Color::YELLOW;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::YELLOW;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Orange")))
 			{
-				m_frustumOutlineColor = Color::ORANGE;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::ORANGE;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Magenta")))
 			{
-				m_frustumOutlineColor = Color::MAGENTA;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::MAGENTA;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Teal")))
 			{
-				m_frustumOutlineColor = Color::TEAL;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+				cameraPtr->m_frustumOutlineColor = Color::TEAL;
 			}
 			ImGui::EndMenu();
 		}

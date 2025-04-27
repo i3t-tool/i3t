@@ -52,6 +52,7 @@ Model::Model(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::
 
 Model::~Model()
 {
+	// TODO: Shouldn't this be in onDestroy?
 	const auto node = getNodebase()->as<Core::Model>();
 	node->resetModelPosition();
 

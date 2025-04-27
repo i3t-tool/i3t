@@ -187,7 +187,7 @@ void Scene::drawStandard(int width, int height, const glm::mat4& model, const gl
 		// 3. Explicitly ordered entities with order >= 10000 (sorted in ascending order)
 
 		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesFirst);
-		sortUnorderedTransparentEntities(view, m_unorderedTransparentEntities);
+		sortUnorderedTransparentEntities(model, view, m_unorderedTransparentEntities);
 		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesLast);
 
 		// Don't write depth, we want to see transparent entities through each other even when its wrong
@@ -612,7 +612,8 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 	return renderTarget;
 }
 
-void Scene::sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities)
+void Scene::sortUnorderedTransparentEntities(const glm::mat4& model, const glm::mat4& view,
+                                             std::vector<Entity*>& entities)
 {
 	// Sort by distance to camera
 	glm::vec3 cameraPos(glm::inverse(view)[3]);

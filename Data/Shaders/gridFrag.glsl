@@ -153,6 +153,20 @@ vec4 grid(vec4 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 	return grid(worldPos, firstAxis, secondAxis, drawFirstAxis, drawSecondAxis, false);
 }
 
+// TODO: General ray interection could be used in world space instead of transforming into the general basis beforehand
+// Computes distance 't' of ray with origin 'ro' with dir 'rd' and plane at 'p0' with normal 'n'.
+// Returns true on intersection, false otherwise (or when near parallel)
+//bool intersectRayPlane(vec3 ro, vec3 rd, vec3 p0, vec3 n, out float t) {
+//	float denom = dot(rd, n);
+//	if (abs(denom) > 1e-6) {
+//		t = dot(p0 - ro, n) / denom;
+//		if (t > 0.) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
+
 // Returns color and depths of a grid pixel
 // gridType = GRID_XY, GRID_XY, GRID_YZ
 // depth = depth for gl_FragCoord

@@ -61,7 +61,8 @@ void GameObject::render(const glm::mat4& model, const glm::mat4& view, const glm
 	objectShader->m_wboit = context.m_wboit;
 	objectShader->m_wboitFunc = context.m_wboitFunc;
 	objectShader->m_opacity = context.m_opaque ? 1.f : context.m_opacity;
-	objectShader->setWorldTransform(model * m_modelMatrix * m_modMatrix, view, projection);
+	this->m_lastModelMatrix = model * m_modelMatrix * m_modMatrix;
+	objectShader->setWorldTransform(m_lastModelMatrix, view, projection);
 	objectShader->setUniforms();
 
 	glBindVertexArray(m_mesh->m_vao);

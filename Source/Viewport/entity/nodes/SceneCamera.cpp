@@ -32,19 +32,18 @@ void SceneCamera::update(Scene& scene)
 	// Calculate model matrix from the camera's view matrix
 	m_modelMatrix = glm::inverse(m_viewMatrix);
 
-	// TODO: CONTINUE HERE !!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  Add render method to frustum object which will multiply by reference space
-
 	auto frustumPtr = m_frustumOutline.lock();
 	frustumPtr->m_visible = m_showFrustum;
 	frustumPtr->m_frustumProjectionMatrix = m_projectionMatrix;
 	frustumPtr->m_frustumViewMatrix = m_viewMatrix;
+	frustumPtr->m_frustumViewMatrixInv = m_modelMatrix;
 	frustumPtr->setColor(m_frustumOutlineColor);
 
 	frustumPtr = m_frustum.lock();
 	frustumPtr->m_visible = m_showFrustum && m_fillFrustum;
 	frustumPtr->m_frustumProjectionMatrix = m_projectionMatrix;
 	frustumPtr->m_frustumViewMatrix = m_viewMatrix;
+	frustumPtr->m_frustumViewMatrixInv = m_modelMatrix;
 	frustumPtr->setColor(m_frustumColor);
 
 	SceneModel::update(scene);

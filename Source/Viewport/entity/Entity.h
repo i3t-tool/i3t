@@ -38,6 +38,7 @@ protected:
 
 public:
 	glm::mat4 m_modelMatrix{1.f}; ///< Model "world" transformation of the entity
+	glm::mat4 m_lastModelMatrix{1.f}; ///< Potentially modifed model matrix last passed to the shader
 
 	/// Modification transformation, precedes any other transformations, modifies entity vertex data as if the modified
 	/// data came directly from a source (model file).

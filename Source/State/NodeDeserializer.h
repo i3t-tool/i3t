@@ -33,4 +33,5 @@ std::optional<Ptr<GuiTransform>> createTransform(const rapidjson::Value& value, 
 
 void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node, bool select);
 void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence, bool select);
+void assignCamera(const rapidjson::Value& value, Ptr<GuiCamera> camera);
 } // namespace NodeDeserializer

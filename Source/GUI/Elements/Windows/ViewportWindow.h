@@ -40,6 +40,7 @@ public:
 		std::string label{"World space"};
 		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
 		glm::mat4 m_referenceSpace{1.f};
+		glm::mat4 m_referenceSpaceInv{1.f};
 	};
 	ViewportSpace m_space;
 

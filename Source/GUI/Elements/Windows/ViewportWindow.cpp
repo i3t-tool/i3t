@@ -254,7 +254,7 @@ void ViewportWindow::updateSpace()
 
 	// TODO: Implement interpolation / switching
 	auto mainScene = m_viewport->getMainScene();
-	mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace);
+	mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
 
 	mainScene->m_localGrid->m_visible = !m_space.standard;
 }
@@ -364,7 +364,10 @@ bool ViewportWindow::showViewportButtons()
 		float val;
 		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, dataState, valChanged, row, col, val);
 		if (valChanged)
+		{
 			m_space.m_referenceSpace[col][row] = val;
+			m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
+		}
 	}
 
 	return interacted;
