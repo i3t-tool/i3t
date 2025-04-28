@@ -279,6 +279,35 @@ bool SliderFloatStepped(const char* label, float* v, float step, float v_min, fl
 	return false;
 }
 
+std::string TruncateText(const std::string& p_text, float p_truncated_width)
+{
+	std::string truncated_text = p_text;
+
+	const float text_width = ImGui::CalcTextSize(p_text.c_str(), nullptr, true).x;
+
+	if (text_width > p_truncated_width)
+	{
+		constexpr const char* ELLIPSIS = " ...";
+		const float ellipsis_size = ImGui::CalcTextSize(ELLIPSIS).x;
+
+		int visible_chars = 0;
+		for (size_t i = 0; i < p_text.size(); i++)
+		{
+			const float current_width = ImGui::CalcTextSize(p_text.substr(0, i).c_str(), nullptr, true).x;
+			if (current_width + ellipsis_size > p_truncated_width)
+			{
+				break;
+			}
+
+			visible_chars = i;
+		}
+
+		truncated_text = (p_text.substr(0, visible_chars) + ELLIPSIS).c_str();
+	}
+
+	return truncated_text;
+}
+
 float calculateDataItemsWidth(float fontSize, int maxCharacters, float zoom)
 {
 	const float oneCharWidth = fontSize * I3T::getSize(ESize::Nodes_FloatCharacterWidthMultiplier);

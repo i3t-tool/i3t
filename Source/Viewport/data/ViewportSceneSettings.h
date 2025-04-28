@@ -38,23 +38,5 @@ struct CameraSettings
 	float zFar;
 };
 
-struct MainSceneSettings
-{
-	MainSceneSettings();
-
-	bool lightFollowsCamera;
-
-	CameraSettings camera;
-};
-
-struct ViewportSceneSettings
-{
-	ViewportSceneSettings();
-
-	bool manipulator_enabled;
-
-	MainSceneSettings mainScene;
-};
-
 
 } // namespace Vp

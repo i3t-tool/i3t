@@ -16,337 +16,17 @@
 #include "Iterators.h"
 
 #include "Camera.h"
+#include "Model.h"
 #include "Sequence.h"
 
 namespace Core
 {
-TransformChain::TransformChain(const Ptr<Sequence>& sequence, const Ptr<Camera>& camera)
-    : m_beginSequence(sequence), m_beginCamera(camera)
-
-{}
-
-TransformChain::TransformChainIterator TransformChain::begin()
-{
-	auto it = TransformChainIterator(this, m_beginSequence, m_beginCamera, nullptr, m_skipEmptySequences,
-	                                 m_ignoreCamera, m_skipEmptyCamera);
-	return it;
-}
-
-TransformChain::TransformChainIterator TransformChain::end()
-{
-	// NOTE: Would need to pass all relevant data (seq/camera/flags) if the iterator could go backwards
-	return TransformChainIterator();
-}
-
-TransformChain::TransformChainIterator::TransformChainIterator(TransformChain* chain, const Ptr<Sequence>& sequence,
-                                                               const Ptr<Camera>& camera, const Ptr<Node>& node,
-                                                               bool skipEmptySequences, bool ignoreCamera,
-                                                               bool skipEmptyCamera)
-    : m_tree(chain), m_skipEmptySequences(skipEmptySequences), m_ignoreCamera(ignoreCamera),
-      m_skipEmptyCamera(skipEmptyCamera)
-{
-	// Cannot ignore camera if we begin in one.
-	if (m_ignoreCamera && camera != nullptr)
-	{
-		return; // Return as invalid iterator
-	}
-	if (camera != nullptr && m_skipEmptyCamera)
-	{
-		if (camera->isEmpty())
-			return;
-	}
-
-	m_info.camera = camera;
-	m_info.sequence = sequence;
-	m_info.currentNode = node;
-
-	if (m_info.camera != nullptr)
-	{
-		// TODO: [T-VIEWPORT]
-		auto seqs = {m_info.camera->getView(), m_info.camera->getProj()};
-		auto types = {TransformType::View, TransformType::Projection};
-		auto typeIt = types.begin();
-		for (auto seqIt = seqs.begin(); seqIt != seqs.end(); ++seqIt, ++typeIt)
-		{
-			if (*seqIt == m_info.sequence)
-			{
-				m_info.type = *typeIt;
-				break;
-			}
-		}
-	}
-
-	if (m_info.currentNode == nullptr)
-	{
-		if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
-		{
-			// there is matrix output plugged into this sequence
-			m_info.isExternal = true;
-			m_info.currentNode = sequence;
-			m_info.dataIndex = I3T_SEQ_MAT;
-		}
-		else
-		{
-			if (sequence->getMatrices().empty())
-			{
-				if (sequence->getMatrices().empty() && m_skipEmptySequences)
-					this->next(); // Advance immediately
-			}
-			else
-			{
-				m_info.currentNode = sequence->getMatrices().back();
-			}
-		}
-	}
-}
-
-bool TransformChain::TransformChainIterator::equals(const Iterator& other) const
-{
-	return m_info.sequence == other.m_info.sequence && m_info.currentNode == other.m_info.currentNode;
-}
-bool TransformChain::TransformChainIterator::valid() const
-{
-	return m_info.sequence != nullptr;
-}
-
-bool TransformChain::TransformChainIterator::advanceWithinSequence()
-{
-	const auto& matrices = m_info.sequence->getMatrices();
-
-	if (!m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
-	{
-		const auto it = std::find(matrices.begin(), matrices.end(), m_info.currentNode);
-		int index = std::distance(matrices.begin(), it);
-		assert(index >= 0);
-		if (index != 0)
-		{
-			// Move left in the current sequence
-			m_info.currentNode = matrices[--index];
-			return true;
-		}
-	}
-	return false;
-}
-
-void TransformChain::TransformChainIterator::next()
-{
-	// Check inner sequence state
-	if (advanceWithinSequence())
-		return;
-
-	// No inner data, search for the next sequence
-	Ptr<Camera> nextCamera;
-	Ptr<Sequence> nextSequence;
-	if (m_info.camera != nullptr)
-	{
-		nextCamera = m_info.camera;
-		// Advance within a camera
-		// TODO: [T-VIEWPORT] Viewport sequence
-		if (m_info.sequence == m_info.camera->getView() && (!m_skipEmptySequences || !m_info.sequence->isEmpty()))
-		{
-			nextSequence = m_info.camera->getProj();
-			m_info.type = TransformType::Projection;
-		}
-		else
-		{
-			// End of camera, end of chain (unless we add matrix mul input to camera)
-			invalidate();
-			return;
-		}
-	}
-
-	if (nextSequence == nullptr)
-	{
-		// Advance in the graph
-		bool isCamera;
-		Ptr<Node> parent =
-		    GraphManager::getParentSequenceOrCamera(m_info.sequence, isCamera, m_skipEmptySequences, m_skipEmptyCamera);
-		if (!parent || (isCamera && m_ignoreCamera))
-		{
-			invalidate();
-			return;
-		}
-		if (isCamera)
-		{
-			nextCamera = std::static_pointer_cast<Camera>(parent);
-			nextSequence = nextCamera->getView();
-			m_info.type = TransformType::View;
-		}
-		else
-		{
-			nextSequence = std::static_pointer_cast<Sequence>(parent);
-			m_info.type = TransformType::Model;
-		}
-	}
-
-	m_info.camera = nextCamera;
-	m_info.sequence = nextSequence;
-
-	// Find the initial data source for the new sequence
-	m_info.isExternal = false;
-	m_info.dataIndex = 0;
-
-	// Check if the next sequence is connected externally via matrix pin
-	if (const auto matrixPluggedIntoParent = GraphManager::getParent(m_info.sequence, I3T_SEQ_IN_MAT))
-	{
-		m_info.isExternal = true;
-		m_info.currentNode = m_info.sequence; // Set the sequence has the transform data source
-		m_info.dataIndex = I3T_SEQ_MAT;
-	}
-	else
-	{
-		auto& parentMatrices = m_info.sequence->getMatrices();
-		if (parentMatrices.empty())
-			m_info.currentNode = nullptr;
-		else
-			m_info.currentNode = parentMatrices.back();
-	}
-}
-
-// TODO: Move to graph manager if used again
-// /// \pre parentSequence is direct or indirect parent of startSequence.
-// /// \return Nonempty child sequence of parentSequence or nullptr if there is no such sequence.
-// Ptr<Sequence> getNonemptyChildSequence(Ptr<Sequence> startSequence, Ptr<Sequence> parentSequence)
-// {
-// 	Ptr<Sequence> sequence = startSequence;
-// 	Ptr<Sequence> prevSequence = nullptr;
-//
-// 	while (sequence != parentSequence)
-// 	{
-// 		if (!sequence->getMatrices().empty() || sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
-// 		{
-// 			prevSequence = sequence;
-// 		}
-// 		sequence = GraphManager::getParent(sequence->getPtr(), I3T_SEQ_IN_MUL)->as<Sequence>();
-// 	}
-//
-// 	return prevSequence;
-// }
-
-// TODO: I commented out backwards iteration as it is not needed yet, might be rewritten later.
-// void TransformChain::TransformChainIterator::withdraw()
-// {
-// 	bool hasPrevMatrix = true;
-// 	auto prevNonEmptySequence = getNonemptyChildSequence(m_tree->m_beginSequence->getPtr()->as<Sequence>(),
-// 	                                                     m_info.sequence->getPtr()->as<Sequence>());
-//
-// 	// Find index of current matrix in current sequence.
-// 	const auto& matrices = m_info.sequence->getMatrices();
-// 	const auto it = std::find(matrices.begin(), matrices.end(), m_info.currentNode);
-// 	auto index = std::distance(matrices.begin(), it);
-// 	if (m_info.sequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn())
-// 	{
-// 		// The sequence has matrix input plugged in. We are at the beginning of the sequence.
-// 		index = matrices.size() - 1;
-// 	}
-//
-// 	if (index == matrices.size() - 1 && prevNonEmptySequence == nullptr)
-// 	{
-// 		hasPrevMatrix = false;
-// 	}
-//
-// 	if (!hasPrevMatrix)
-// 	{
-// 		return;
-// 	}
-//
-// 	m_info.isExternal = false;
-// 	if (index == matrices.size() - 1)
-// 	{
-// 		const auto matrixPluggedIntoChild = GraphManager::getParent(prevNonEmptySequence, I3T_SEQ_IN_MAT);
-//
-// 		if (matrixPluggedIntoChild)
-// 		{
-// 			m_info.isExternal = true;
-// 			m_info.currentNode = matrixPluggedIntoChild;
-// 		}
-// 		else
-// 		{
-// 			m_info.currentNode = prevNonEmptySequence->getMatrices().front();
-// 		}
-// 		m_info.sequence = prevNonEmptySequence;
-// 	}
-// 	else if (m_info.currentNode == nullptr)
-// 	{
-// 		// iterator is at the end
-// 		m_info.currentNode = matrices.front();
-// 	}
-// 	else
-// 	{
-// 		m_info.currentNode = matrices[++index];
-// 	}
-// }
-
-Sequence* TransformChain::TransformChainIterator::getSequence() const
-{
-	return m_info.sequence.get();
-}
-
-std::vector<Ptr<Node>> TransformChain::TransformChainIterator::collect()
-{
-	std::vector<Ptr<Node>> result;
-	auto it = *this;
-	while (it != m_tree->end())
-	{
-		result.push_back(*it);
-		++it;
-	}
-	return result;
-}
-
-std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> TransformChain::TransformChainIterator::collectWithInfo()
-{
-	std::vector<Ptr<Node>> matrices;
-	std::vector<TransformInfo> info;
-	auto it = *this;
-	while (it != m_tree->end())
-	{
-		matrices.push_back(*it);
-		info.push_back(it.m_info);
-		++it;
-	}
-	return {matrices, info};
-}
-
-std::vector<TransformInfo> TransformChain::TransformChainIterator::collectInfo()
-{
-	std::vector<TransformInfo> info;
-	auto it = *this;
-	while (it != m_tree->end())
-	{
-		info.push_back(it.m_info);
-		++it;
-	}
-	return info;
-}
-
-// TransformChain::TransformChainIterator& TransformChain::TransformChainIterator::operator--()
-// {
-// 	withdraw();
-// 	return *this;
-// }
-//
-// TransformChain::TransformChainIterator TransformChain::TransformChainIterator::operator--(int)
-// {
-// 	withdraw();
-// 	return *this;
-// }
-
-Ptr<Node> TransformChain::TransformChainIterator::operator*() const
-{
-	I3T_ASSERT(valid(), "Cannot dereference past the end TransformChainIterator!");
-	return m_info.currentNode;
-}
-
-void TransformChain::TransformChainIterator::invalidate()
-{
-	m_info = TransformInfo();
-}
-
-//------------------------------------------------------------------------------------------------//
 
 MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, TrackingDirection direction)
-    : m_direction(direction), m_beginSequence(beginSequence)
+    : MatrixTracker(beginSequence, nullptr, direction)
+{}
+MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, Ptr<Camera> beginCamera, TrackingDirection direction)
+    : m_direction(direction), m_beginSequence(beginSequence), m_beginCamera(beginCamera)
 {
 	assert(beginSequence != nullptr);
 	update();
@@ -377,11 +57,20 @@ void MatrixTracker::updateChain()
 	clearTrackingData();
 
 	Ptr<Sequence> beginSequence = m_beginSequence.lock();
-	m_modelSubtreeRoot = beginSequence->data(I3T_SEQ_MOD).getMat4();
+	Ptr<Camera> beginCamera;
+	if (!m_beginCamera.expired())
+	{
+		beginCamera = m_beginCamera.lock();
+		m_modelSubtreeRoot = glm::identity<glm::mat4>();
+	}
+	else
+	{
+		m_modelSubtreeRoot = beginSequence->data(I3T_SEQ_MOD).getMat4();
+	}
 
 	// Create iterator for traversing sequence branch.
 	// TransformChain always traverses "right to left" towards root.
-	TransformChain st = TransformChain(beginSequence).ignoreCamera(false).skipEmptySequences(false);
+	TransformChain st = TransformChain(beginSequence, beginCamera).ignoreCamera(false).skipEmptySequences(false);
 
 	// Perform the traversal
 	auto transforms = st.begin().collectInfo();
@@ -399,20 +88,44 @@ void MatrixTracker::updateChain()
 	for (auto& transform : transforms)
 	{
 		ID sequenceID = transform.sequence->getId();
+
+		// Store tracking data for the enclosing camera
+		if (transform.camera != nullptr && m_trackedCamera == nullptr)
+		{
+			// No need for "lastCameraID" as camera will always be the last node in the chain
+			TrackedNodeData cameraData(this);
+			cameraData.chain = true;
+			cameraData.childrenIdxStart = m_trackedSequences.size();
+			cameraData.childrenIdxEnd = m_trackedSequences.size();
+			m_trackedCamera = std::make_unique<TrackedNode>(transform.camera, std::move(cameraData));
+		}
+
+		// Store tracking data for the enclosing sequence
 		if (lastSequenceID == NIL_ID || sequenceID != lastSequenceID)
 		{
-			// Store tracking data for the enclosing sequence
 			TrackedNodeData sequenceData(this);
 			sequenceData.chain = true;
 			sequenceData.seqIndex = m_trackedSequences.size();
-			m_trackedSequences
-			    .emplace_back(std::make_shared<TrackedSequence>(transform.sequence, std::move(sequenceData)))
-			    ->transformIdxStart = transformIdx;
+			sequenceData.space = transform.type;
+			sequenceData.childrenIdxStart = transformIdx;
+			sequenceData.childrenIdxEnd = transformIdx;
+			sequenceData.isInCamera = m_trackedCamera != nullptr;
+			m_trackedSequences.emplace_back(
+			    std::make_shared<TrackedTransform>(transform.sequence, std::move(sequenceData)));
+
+			// Assign to existing camera
+			if (m_trackedSequences.back()->data.isInCamera)
+			{
+				m_trackedCamera->data.childrenIdxEnd = m_trackedSequences.size();
+				assert(m_trackedCamera->data.childrenIdxStart >= 0);
+				assert(m_trackedCamera->data.childrenIdxEnd >= 0);
+			}
 		}
 
+		// Store tracking data for the transform
 		if (transform.currentNode != nullptr)
 		{
-			m_trackedSequences.back()->transformIdxEnd = transformIdx + 1;
+			m_trackedSequences.back()->data.childrenIdxEnd = transformIdx + 1;
 
 			if (transform.currentNode->getId() == sequenceID)
 			{
@@ -426,19 +139,16 @@ void MatrixTracker::updateChain()
 				// Store tracking data for the transform
 				TrackedNodeData transformData(this);
 				transformData.index = transformIdx;
+				transformData.space = transform.type;
 				auto& trackedTransform = m_trackedTransforms.emplace_back(
 				    std::make_shared<TrackedTransform>(transform.currentNode, std::move(transformData)));
 				trackedTransform->dataIndex = transform.dataIndex;
 			}
 			transformIdx++;
 		}
-		else
-		{
-			// Empty sequence with no transforms
-			m_trackedSequences.back()->transformIdxEnd = transformIdx;
-		}
-		assert(m_trackedSequences.back()->transformIdxStart >= 0);
-		assert(m_trackedSequences.back()->transformIdxEnd >= 0);
+
+		assert(m_trackedSequences.back()->data.childrenIdxStart >= 0);
+		assert(m_trackedSequences.back()->data.childrenIdxEnd >= 0);
 
 		lastSequenceID = transform.sequence->getId();
 	}
@@ -478,13 +188,15 @@ void MatrixTracker::updateProgress()
 		m_param = 1.0f;
 
 	const int matricesCount = m_trackedTransforms.size();
-	const float matFactor = 1.0f / (float) m_trackedTransforms.size();
+	const float matStep = 1.0f / (float) m_trackedTransforms.size();
 	const int matricesBefore = (int) (m_param * (float) matricesCount);
 	m_fullMatricesCount = matricesBefore;
 
-	float interpParam = fmod(m_param, matFactor) / matFactor;
+	float interpParam = fmod(m_param, matStep) / matStep;
 
 	glm::mat4 matrix(1.0f);
+	m_iViewMatrix = glm::identity<glm::mat4>();
+	m_iProjMatrix = glm::identity<glm::mat4>();
 
 	// Accumulate matrices up to the interpolation point
 	for (int i = 0; i < matricesBefore; ++i)
@@ -494,13 +206,23 @@ void MatrixTracker::updateProgress()
 		transform->data.interpolating = false;
 		transform->data.active = true;
 
-		if (m_direction == TrackingDirection::LeftToRight)
+		// TODO: Add special handling of left to right tracking
+
+		// View and projection transformations have special handling (and are always right to left)
+		if (!m_trackInWorldSpace && transform->data.space == TransformSpace::View)
 		{
-			matrix = matrix * transform->getMat();
+			m_iViewMatrix = transform->getMat() * m_iViewMatrix;
 		}
-		else if (m_direction == TrackingDirection::RightToLeft)
+		else if (!m_trackInWorldSpace && transform->data.space == TransformSpace::Projection)
 		{
-			matrix = transform->getMat() * matrix;
+			m_iProjMatrix = transform->getMat() * m_iProjMatrix;
+		}
+		else
+		{
+			if (m_direction == TrackingDirection::LeftToRight)
+				matrix = matrix * transform->getMat();
+			else if (m_direction == TrackingDirection::RightToLeft)
+				matrix = transform->getMat() * matrix;
 		}
 	}
 
@@ -527,13 +249,23 @@ void MatrixTracker::updateProgress()
 				useQuat = coreTransform->properties()->isRotation;
 			}
 
-			if (m_direction == TrackingDirection::LeftToRight)
+			glm::mat4 iMatrix = Math::lerp(lhs, rhs, interpParam, useQuat);
+
+			if (!m_trackInWorldSpace && trackedTransform->data.space == TransformSpace::View)
 			{
-				matrix = matrix * Math::lerp(lhs, rhs, interpParam, useQuat);
+				// View transformations have special handling
+				m_iViewMatrix = iMatrix * m_iViewMatrix;
 			}
-			else if (m_direction == TrackingDirection::RightToLeft)
+			else if (!m_trackInWorldSpace && trackedTransform->data.space == TransformSpace::Projection)
 			{
-				matrix = Math::lerp(lhs, rhs, interpParam, useQuat) * matrix;
+				m_iProjMatrix = iMatrix * m_iProjMatrix;
+			}
+			else
+			{
+				if (m_direction == TrackingDirection::LeftToRight)
+					matrix = matrix * iMatrix;
+				else if (m_direction == TrackingDirection::RightToLeft)
+					matrix = iMatrix * matrix;
 			}
 		}
 		m_interpolatedMatrix = matrix;
@@ -560,30 +292,52 @@ void MatrixTracker::updateProgress()
 		sequence->data.progress = 0.f;
 		sequence->data.active = false;
 
-		int seqTransformCount = sequence->transformIdxEnd - sequence->transformIdxStart;
+		int seqTransformCount = sequence->data.childrenIdxEnd - sequence->data.childrenIdxStart;
 		assert(seqTransformCount >= 0);
 		if (seqTransformCount > 0)
 		{
-			for (int j = sequence->transformIdxStart; j < sequence->transformIdxEnd; ++j)
+			for (int j = sequence->data.childrenIdxStart; j < sequence->data.childrenIdxEnd; ++j)
 			{
 				auto& tTransform = m_trackedTransforms[j];
 				sequence->data.interpolating |= tTransform->data.interpolating;
 				sequence->data.progress += tTransform->data.progress;
 				sequence->data.active |= tTransform->data.active;
 			}
-			sequence->data.progress /= sequence->transformIdxEnd - sequence->transformIdxStart;
+			sequence->data.progress /= seqTransformCount;
 		}
 		else
 		{
-			sequence->data.progress = sequence->transformIdxStart >= matricesBefore ? 0.f : 1.f;
-			sequence->data.active = sequence->transformIdxStart <= matricesBefore;
+			sequence->data.progress = sequence->data.childrenIdxStart >= matricesBefore ? 0.f : 1.f;
+			sequence->data.active = sequence->data.childrenIdxStart <= matricesBefore;
 		}
+	}
+
+	// Update tracked camera
+	if (m_trackedCamera)
+	{
+		auto& data = m_trackedCamera->data;
+		data.interpolating = false;
+		data.progress = 0.f;
+		data.active = false;
+
+		int cameraSeqCount = data.childrenIdxEnd - data.childrenIdxStart;
+		assert(cameraSeqCount >= 1 && "Camera should always have at least one sequence");
+
+		for (int j = data.childrenIdxStart; j < data.childrenIdxEnd; ++j)
+		{
+			auto& tSeq = m_trackedSequences[j];
+			data.interpolating |= tSeq->data.interpolating;
+			data.progress += tSeq->data.progress;
+			data.active |= tSeq->data.active;
+		}
+		data.progress /= cameraSeqCount;
 	}
 
 	assert(m_fullMatricesCount <= m_trackedTransforms.size());
 
-	LOG_DEBUG("[TRACKING] Updated progress t:{} ({}/{} transforms in {} sequences).", m_param, m_fullMatricesCount + 1,
-	          m_trackedTransforms.size(), m_trackedSequences.size());
+	LOG_DEBUG("[TRACKING] Updated progress t:{} ({}/{} transforms in {} sequences{}).", m_param,
+	          m_fullMatricesCount + 1, m_trackedTransforms.size(), m_trackedSequences.size(),
+	          m_trackedCamera ? " + camera" : "");
 
 	updateModelTransforms();
 }
@@ -611,7 +365,15 @@ void MatrixTracker::updateModels()
 {
 	clearModels();
 
-	SequenceTree subTree(m_beginSequence.lock().get());
+	auto* beginSequence = m_beginSequence.lock()->asRaw<Node>();
+	if (beginSequence->getTrackingData()->isInCamera)
+	{
+		// SequenceTree search must start from the camera itself when begin sequence is inside one.
+		assert(m_trackedCamera != nullptr);
+		beginSequence = m_trackedCamera->node.lock().get();
+	}
+
+	SequenceTree subTree(beginSequence);
 	auto it = subTree.begin();
 	++it; // Skip root
 	for (; it != subTree.end(); ++it)
@@ -648,12 +410,19 @@ void MatrixTracker::reverseChain()
 
 	for (auto& sequence : m_trackedSequences)
 	{
-		int start = sequence->transformIdxStart;
-		sequence->transformIdxStart = m_trackedTransforms.size() - sequence->transformIdxEnd;
-		sequence->transformIdxEnd = m_trackedTransforms.size() - start;
+		int start = sequence->data.childrenIdxStart;
+		sequence->data.childrenIdxStart = m_trackedTransforms.size() - sequence->data.childrenIdxEnd;
+		sequence->data.childrenIdxEnd = m_trackedTransforms.size() - start;
 		sequence->data.seqIndex = m_trackedSequences.size() - 1 - sequence->data.seqIndex;
 	}
 	std::reverse(m_trackedSequences.begin(), m_trackedSequences.end());
+
+	if (m_trackedCamera)
+	{
+		int start = m_trackedCamera->data.childrenIdxStart;
+		m_trackedCamera->data.childrenIdxStart = m_trackedSequences.size() - m_trackedCamera->data.childrenIdxEnd;
+		m_trackedCamera->data.childrenIdxEnd = m_trackedSequences.size() - start;
+	}
 }
 
 void MatrixTracker::clearTrackingData()
@@ -662,6 +431,7 @@ void MatrixTracker::clearTrackingData()
 	          m_trackedSequences.size());
 	m_trackedSequences.clear();
 	m_trackedTransforms.clear();
+	m_trackedCamera.reset();
 	m_chainNeedsUpdate = true;
 }
 
@@ -749,6 +519,14 @@ bool MatrixTracker::isTrackingFromLeft() const
 int MatrixTracker::getTransformCount() const
 {
 	return m_trackedTransforms.size();
+}
+const std::vector<Ptr<MatrixTracker::TrackedTransform>>& MatrixTracker::getTrackedSequences() const
+{
+	return m_trackedSequences;
+}
+const std::vector<Ptr<MatrixTracker::TrackedTransform>>& MatrixTracker::getTrackedTransforms() const
+{
+	return m_trackedTransforms;
 }
 
 void MatrixTracker::onNodeDestroy(Node* node)

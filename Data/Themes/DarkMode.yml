@@ -72,7 +72,7 @@ colors:
   nflo_Synergies FloatBg: [0.000, 0.270, 0.000, 1.000]
   nflo_Synergies FloatBgActive: [0.000, 0.703, 0.000, 1.000]
   nflo_Synergies FloatBgHovered: [0.057, 0.536, 0.057, 1.000]
-  ngen_Selected Node Border: [1.000, 0.914, 0.000, 0.510]
+  ngen_Selected Node Border: [0.904, 0.709, 0.072, 0.750]
   ngen_Hover Border Color: [0.000, 0.000, 0.000, 0.196]
   tuts_Background: [0.137, 0.137, 0.137, 1.000]
   tuts_Text: [0.902, 0.902, 0.902, 1.000]

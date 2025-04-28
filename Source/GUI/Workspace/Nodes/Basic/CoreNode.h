@@ -66,6 +66,8 @@ public:
 	void topContent(DIWNE::DrawInfo& context) override;
 	void endDiwne(DIWNE::DrawInfo& context) override;
 
+	bool allowDrawing() override;
+
 	void popupContent(DIWNE::DrawInfo& context) override;
 
 	void onDestroy(bool logEvent) override;

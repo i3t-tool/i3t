@@ -25,6 +25,7 @@
 #include "Viewport/scene/Scene.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/PhongShader.h"
+#include "Viewport/shader/Shaders.h"
 
 using namespace Vp;
 

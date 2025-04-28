@@ -18,8 +18,8 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
-#include "GUI/Elements/Dialogs/SelectLayoutDialog.h"
 #include "GUI/Elements/Dialogs/PreferencesWindow.h"
+#include "GUI/Elements/Dialogs/SelectLayoutDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/ConfirmModal.h"
 #include "GUI/Elements/Windows/AboutWindow.h"
@@ -33,6 +33,7 @@
 #include "GUI/Fonts/Icons.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Test/TestModule.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
 #include "Logger/Logger.h"
@@ -307,8 +308,19 @@ void MainMenuBar::showWindowsMenu()
 		                        I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_TUTORIAL " ", "Tutorial window"), nullptr,
 		                        I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_SCENE " ", "Scene view window"), nullptr,
-		                        I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_SCENE " ", "Scene view window")))
+		{
+			auto& viewportModule = I3T::getViewportModule();
+			auto& viewportWindows = viewportModule.m_viewportWindows;
+			for (int i = 0; i < viewportWindows.size(); i++)
+			{
+				auto& window = viewportWindows[i];
+				I3TGui::MenuItemWithLog((window->getTitle()).c_str(), nullptr, window->getShowPtr());
+			}
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_PLUS " ", "New")))
+				viewportModule.showNewViewportWindow();
+			ImGui::EndMenu();
+		}
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_WORKSPACE " ", "Workspace window"), nullptr,
 		                        I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 #ifdef I3T_DEBUG

@@ -5,6 +5,7 @@
 #include "State/StateManager.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+#include "Utils/JSON.h"
 
 #include "Viewport/Viewport.h"
 

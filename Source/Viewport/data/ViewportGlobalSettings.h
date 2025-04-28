@@ -19,10 +19,10 @@ namespace Vp
 
 struct GlobalCameraSettings
 {
-public:
 	GlobalCameraSettings();
 
 	bool smoothScroll;
+	float smoothScrollDamping;
 
 	float orbit_zoomSpeed;
 	float orbit_rotateSpeed;
@@ -83,7 +83,6 @@ public:
 
 	int lighting_lightingModel;
 
-	//	bool manipulator_enabled;
 	float manipulator_size;
 
 	GlobalCameraSettings camera;

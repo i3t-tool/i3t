@@ -14,6 +14,7 @@
 #include "Scripting/Environment.h"
 
 #include "Core/Application.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/data/ViewportSettings.h"
 
@@ -44,22 +45,20 @@ LUA_REGISTRATION
 	// clang-format on
 
 	viewport["get_settings"] = []() -> Vp::CameraSettings& {
-		auto viewport = I3T::getViewport();
-
-		return viewport->getSettings().scene().mainScene.camera;
+		auto& viewportModule = I3T::getViewportModule();
+		return viewportModule.m_viewportWindows[0]->m_settings.camera;
 	};
 
 	viewport["set_settings"] = [](Vp::CameraSettings& settings) {
-		auto viewport = I3T::getViewport();
-
-		viewport->getSettings().scene().mainScene.camera = settings;
-		auto mainScene = viewport->getMainScene();
-		mainScene->loadSettings(viewport->getSettings(), false, true);
+		auto& viewportModule = I3T::getViewportModule();
+		auto& viewportWindow = viewportModule.m_viewportWindows[0];
+		viewportWindow->m_settings.camera = settings;
+		viewportWindow->m_camera->loadSettings(viewportWindow->m_settings.camera);
 	};
 
 	viewport["update_settings"] = []() {
-		auto viewport = I3T::getViewport();
-		auto mainScene = viewport->getMainScene();
-		mainScene->loadSettings(viewport->getSettings(), false, true);
+		auto& viewportModule = I3T::getViewportModule();
+		auto& viewportWindow = viewportModule.m_viewportWindows[0];
+		viewportWindow->m_camera->loadSettings(viewportWindow->m_settings.camera);
 	};
 };

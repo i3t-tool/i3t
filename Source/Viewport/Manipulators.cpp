@@ -44,32 +44,27 @@ Manipulators::Manipulators(Viewport* viewport) : m_viewport(viewport)
 	m_operationMap.insert(std::make_pair("Free", ManipulatorType::UNIMPLEMENTED));
 }
 
-bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize)
+bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, glm::mat4& view, const glm::mat4& proj)
 {
-	glm::mat4 view = m_viewport->getMainViewportCamera().lock()->getView();
-	glm::mat4 projection = m_viewport->getMainViewportCamera().lock()->getProjection();
-
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-	// ImGuizmo::DrawGrid(glm::value_ptr(view), glm::value_ptr(projection), glm::value_ptr(glm::mat4(1)), 100.f);
-	// ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(projection), &objectMatrix[0][0], 1);
+	// ImGuizmo::DrawGrid(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(glm::mat4(1)), 100.f);
+	// ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), &objectMatrix[0][0], 1);
 
 	int axesSize = 6.125f * ImGui::GetFontSize();
 	int padding = 0.5f * ImGui::GetFontSize();
 	ImVec2 axesPosition = ImVec2(windowPos.x + windowSize.x - axesSize - padding, windowPos.y + padding);
 
 	// ImGuizmo::ViewManipulate(glm::value_ptr(view), 9, GUI::glmToIm(windowPos), ImVec2(128, 128), 0x10101010);
-	ImGuizmo::ViewAxes(glm::value_ptr(view), glm::value_ptr(projection), 9, axesPosition, ImVec2(axesSize, axesSize));
+	ImGuizmo::ViewAxes(glm::value_ptr(view), glm::value_ptr(proj), 9, axesPosition, ImVec2(axesSize, axesSize));
 
 	return false;
 }
 
-bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
+bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4& view,
+                                    const glm::mat4& proj)
 {
-	glm::mat4 view = m_viewport->getMainViewportCamera().lock()->getView();
-	glm::mat4 projection = m_viewport->getMainViewportCamera().lock()->getProjection();
-
 	glm::mat4 objectMatrix = glm::mat4(1);
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
@@ -115,7 +110,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 
 		if (type == ManipulatorType::LOOKAT)
 		{
-			if (drawLookAt(manipulator, view, projection))
+			if (drawLookAt(manipulator, view, proj))
 			{
 				interactedWithManipulator = true;
 			}
@@ -139,7 +134,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 		bool changeOccurred = false;
 		if (type == ManipulatorType::ORTHO || type == ManipulatorType::PERSPECTIVE || type == ManipulatorType::FRUSTUM)
 		{
-			ImGuizmo::ManipulateProjection(glm::value_ptr(view), glm::value_ptr(projection),
+			ImGuizmo::ManipulateProjection(glm::value_ptr(view), glm::value_ptr(proj),
 			                               glm::value_ptr(combinedMatrixMutable),
 			                               glm::value_ptr(manipulator->m_auxillaryMatrix), projectionParams);
 
@@ -182,7 +177,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 
 			// Draw and handle the manipulator
 			bool modified = ImGuizmo::Manipulate(
-			    glm::value_ptr(view), glm::value_ptr(projection), static_cast<ImGuizmo::OPERATION>(imGuizmoOperation),
+			    glm::value_ptr(view), glm::value_ptr(proj), static_cast<ImGuizmo::OPERATION>(imGuizmoOperation),
 			    ImGuizmo::LOCAL, glm::value_ptr(combinedMatrixMutable), glm::value_ptr(deltaMatrix), NULL, NULL, NULL);
 
 			changeOccurred = deltaMatrix != glm::mat4(1);

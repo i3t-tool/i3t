@@ -17,6 +17,7 @@
 #include "GUI/Fonts/Icons.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "GUI/WindowManager.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
@@ -32,16 +33,27 @@ using namespace UI;
 
 using CameraMode = Vp::AggregateCamera::CameraMode;
 
-ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
-    : IWindow(ICON_T(ICON_I3T_SCENE " ", "Scene View"), show)
+ViewportWindow::ViewportWindow(ViewportModule* module, int index, bool show)
+    : IWindow(ICON_TS(ICON_I3T_SCENE " ", "Scene View") + " " + std::to_string(index), index, show), m_module(module),
+      m_viewport(&module->getViewport())
 {
 	m_autoFocus = true;
-	m_viewport = viewport;
 	// TODO: (DR) Not sure if binding callbacks to an axis really makes sense
 	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport
 	//  window and its difficult to unbind stuff
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
 	// m_input->bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
+
+	assert(index >= 1);
+	if (index == 1)
+	{
+		assert(std::dynamic_pointer_cast<Vp::AggregateCamera>(m_viewport->getMainScene()->m_camera) != nullptr);
+		m_camera = std::static_pointer_cast<Vp::AggregateCamera>(m_viewport->getMainScene()->m_camera);
+	}
+	else
+	{
+		m_camera = std::make_shared<Vp::AggregateCamera>();
+	}
 
 	m_renderOptions.wboit = true;
 	m_renderOptions.wboitFunc = 0;
@@ -53,59 +65,35 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
 	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
 	m_input->bindAction("viewpoint-right", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 	});
 	InputManager::setInputAction("viewpoint-left", Keys::n3, {Keys::ctrll});
 	m_input->bindAction("viewpoint-left", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 	});
 	InputManager::setInputAction("viewpoint-top", Keys::n7);
 	m_input->bindAction("viewpoint-top", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 	});
 	InputManager::setInputAction("viewpoint-bottom", Keys::n7, {Keys::ctrll});
 	m_input->bindAction("viewpoint-bottom", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 	});
 	InputManager::setInputAction("viewpoint-front", Keys::n1);
 	m_input->bindAction("viewpoint-front", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 	});
 	InputManager::setInputAction("viewpoint-back", Keys::n1, {Keys::ctrll});
 	m_input->bindAction("viewpoint-back", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
-		}
+		m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 	});
 	InputManager::setInputAction("viewpoint-center-scene", Keys::home);
 	m_input->bindAction("viewpoint-center-scene", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->centerOnScene(*m_viewport->getMainScene());
-		}
+		m_camera->centerOnScene(*m_viewport->getMainScene());
 	});
 	InputManager::setInputAction("viewpoint-center-selection", Keys::n0);
 	m_input->bindAction("viewpoint-center-selection", EKeyState::Pressed, [&]() {
-		if (auto camera = m_viewport->getMainViewportCamera().lock())
-		{
-			camera->centerOnSelection(*m_viewport->getMainScene());
-		}
+		m_camera->centerOnSelection(*m_viewport->getMainScene());
 	});
 
 	m_input->bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
@@ -138,9 +126,24 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport)
 
 void ViewportWindow::render()
 {
-	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
-	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650,
-	// main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
+	// Update title if necessary
+	if (m_instanceIndex == 1)
+	{
+		bool showNum = false;
+		for (int i = 1; i < m_module->m_viewportWindows.size(); i++)
+		{
+			auto& window = m_module->m_viewportWindows[i];
+			if (window->isVisible())
+			{
+				showNum = true;
+				break;
+			}
+		}
+		if (showNum)
+			setTitle(ICON_TS(ICON_I3T_SCENE " ", "Scene View") + " " + std::to_string(m_instanceIndex));
+		else
+			setTitle(ICON_TS(ICON_I3T_SCENE " ", "Scene View"));
+	}
 
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 
@@ -181,10 +184,18 @@ void ViewportWindow::render()
 
 		// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
 		// interacting with them, hence we draw them beforehand using a channel splitter
-		bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
-		if (m_viewport->getSettings().scene().manipulator_enabled)
+		glm::mat4 view = m_camera->getView();
+
+		// if (ImGui::IsKeyDown(ImGuiKey_E))
+		// 	int x = 5;
+		bool manipulatorInteraction =
+		    m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize, view, m_camera->getProjection());
+
+		if (m_settings.manipulator_enabled && m_instanceIndex == 1)
+		// if (m_settings.manipulator_enabled)
 		{
-			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
+			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize, view,
+			                                                                       m_camera->getProjection());
 		}
 
 		// Update reference space
@@ -194,13 +205,15 @@ void ViewportWindow::render()
 		// Viewport channel
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
 
+		bool windowFocused = InputManager::isInputActive(getInput());
+
 		// Process viewport input
 		// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but
 		//  through the InputManager's active input rather than asking the WindowManager
-		if (InputManager::isInputActive(getInput()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
+		if (windowFocused && !menuInteraction && !manipulatorInteraction && m_renderTarget)
 		{
 			glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
-			m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
+			m_camera->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
 			m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 		}
 
@@ -210,8 +223,8 @@ void ViewportWindow::render()
 		ImVec2 windowMin = GUI::glmToIm(m_windowMin);
 		ImVec2 windowMax = GUI::glmToIm(m_windowMax);
 
-		m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_space.m_referenceSpace, m_renderOptions,
-		                         m_displayOptions);
+		m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_camera, m_space.m_referenceSpace,
+		                         m_renderOptions, m_displayOptions);
 
 		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 		if (framebuffer)
@@ -239,24 +252,50 @@ void ViewportWindow::render()
 
 void ViewportWindow::updateSpace()
 {
+	bool reset = true;
+
+	// React to active tracking
+	if (Core::GraphManager::isTracking() && m_instanceIndex == 1)
+	{
+		Core::MatrixTracker* tracker = Core::GraphManager::getTracker();
+		if (!tracker->m_trackInWorldSpace)
+		{
+			reset = false;
+			m_space.m_referenceSpace = tracker->m_iProjMatrix * tracker->m_iViewMatrix;
+		}
+	}
+
+	if (reset)
+		m_space.m_referenceSpace = glm::identity<glm::mat4>();
+
 	// Setup world and local grid
 	m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
 	if (m_space.standard)
 	{
 		m_space.label = "World space";
 		m_space.labelCol = ImVec4(1, 1, 1, 1);
+		m_space.m_referenceSpaceInv = m_space.m_referenceSpace;
 	}
 	else
 	{
 		m_space.label = "Local space";
 		m_space.labelCol = ImVec4(0.961, 0.922, 0.392, 1.0);
+		m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
 	}
 
 	// TODO: Implement interpolation / switching
-	auto mainScene = m_viewport->getMainScene();
-	mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
-
-	mainScene->m_localGrid->m_visible = !m_space.standard;
+	if (m_module->m_settings.keepWorldGridStatic)
+	{
+		auto mainScene = m_viewport->getMainScene();
+		mainScene->m_localGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
+		mainScene->m_localGrid->m_visible = !m_space.standard;
+	}
+	else
+	{
+		auto mainScene = m_viewport->getMainScene();
+		mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
+		mainScene->m_localGrid->m_visible = !m_space.standard;
+	}
 }
 
 bool ViewportWindow::showSpaceIndicators()
@@ -269,6 +308,10 @@ bool ViewportWindow::showSpaceIndicators()
 	ImGui::SetCursorScreenPos({m_windowPos.x + m_windowSize.x - axesSize / 2 - padding - tWidth / 2,
 	                           m_windowPos.y + padding + axesSize + padding});
 	ImGui::TextColored(m_space.labelCol, m_space.label.c_str());
+
+	// TODO: Better indicators (more prominent text, world space axes?, interpolation indicator, buttons to disable
+	//   either of the grids, perhaps even grid opacity control)
+
 	return false;
 }
 
@@ -321,9 +364,10 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::SameLine();
 
-	if (GUI::FloatingToggleButton(ICON_I3T_EARTH "###WorldLightingButton", stg.scene().mainScene.lightFollowsCamera,
+	if (GUI::FloatingToggleButton(ICON_I3T_EARTH "###WorldLightingButton", m_module->m_settings.lightFollowsCamera,
 	                              true))
 	{
+		m_viewport->getMainScene()->m_lightFollowsCamera = m_module->m_settings.lightFollowsCamera;
 		interacted = true;
 	}
 	else
@@ -337,7 +381,7 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::SameLine();
 
-	if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", stg.scene().manipulator_enabled))
+	if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", m_settings.manipulator_enabled))
 	{
 		interacted = true;
 	}
@@ -366,7 +410,6 @@ bool ViewportWindow::showViewportButtons()
 		if (valChanged)
 		{
 			m_space.m_referenceSpace[col][row] = val;
-			m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
 		}
 	}
 
@@ -386,17 +429,18 @@ bool ViewportWindow::showViewportMenu()
 
 		if (I3TGui::BeginMenuWithLog(_t("Scene")))
 		{
-			bool b = !stg.scene().mainScene.lightFollowsCamera;
+			bool b = !m_module->m_settings.lightFollowsCamera;
 			if (ImGui::Checkbox(_t("World space lighting"), &b))
 			{
-				stg.scene().mainScene.lightFollowsCamera = !b;
+				m_module->m_settings.lightFollowsCamera = !b;
+				m_viewport->getMainScene()->m_lightFollowsCamera = m_module->m_settings.lightFollowsCamera;
 			}
 			ImGui::EndMenu();
 		}
 
 		if (I3TGui::BeginMenuWithLog(_t("Manipulators")))
 		{
-			ImGui::Checkbox(_t("Show manipulators"), &stg.scene().manipulator_enabled);
+			ImGui::Checkbox(_t("Show manipulators"), &m_settings.manipulator_enabled);
 			ImGui::SliderFloat(_t("Size"), &stg.global().manipulator_size, 0.01f, 1.0f, "%.2f");
 			ImGui::EndMenu();
 		}
@@ -435,14 +479,14 @@ bool ViewportWindow::showViewportMenu()
 			if (I3TGui::MenuItemWithLog(_t("Ultra"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 1.0f;
-				stg.global().highlight.kernelSize = 4;
+				stg.global().highlight.kernelSize = 3;
 				stg.global().highlight.outlineCutoff = 0.15f;
 				stg.global().highlight.useDepth = true;
 			}
 			if (I3TGui::MenuItemWithLog(_t("High"), nullptr, nullptr))
 			{
-				stg.global().highlight.downscaleFactor = 0.8f;
-				stg.global().highlight.kernelSize = 4;
+				stg.global().highlight.downscaleFactor = 0.7f;
+				stg.global().highlight.kernelSize = 2;
 				stg.global().highlight.outlineCutoff = 0.18f;
 				stg.global().highlight.useDepth = true;
 			}
@@ -534,40 +578,24 @@ bool ViewportWindow::showViewportMenu()
 	if (I3TGui::BeginMenuWithLog(_t("View")))
 	{
 		userInteractedWithMenus = true;
-		if (I3TGui::MenuItemWithLog(_t("Orbit camera"), nullptr,
-		                            stg.scene().mainScene.camera.mode == CameraMode::ORBIT))
+		if (I3TGui::MenuItemWithLog(_t("Orbit camera"), nullptr, m_settings.camera.mode == CameraMode::ORBIT))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->switchMode(CameraMode::ORBIT);
-				stg.scene().mainScene.camera.mode = CameraMode::ORBIT;
-			}
+			m_settings.camera.mode = CameraMode::ORBIT;
+			m_camera->switchMode(CameraMode::ORBIT);
 		}
-		if (I3TGui::MenuItemWithLog(_t("Trackball camera"), nullptr,
-		                            stg.scene().mainScene.camera.mode == CameraMode::TRACKBALL))
+		if (I3TGui::MenuItemWithLog(_t("Trackball camera"), nullptr, m_settings.camera.mode == CameraMode::TRACKBALL))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->switchMode(CameraMode::TRACKBALL);
-				stg.scene().mainScene.camera.mode = CameraMode::TRACKBALL;
-			}
+			m_settings.camera.mode = CameraMode::TRACKBALL;
+			m_camera->switchMode(CameraMode::TRACKBALL);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Smooth scroll"), nullptr, stg.global().camera.smoothScroll))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				stg.global().camera.smoothScroll = !stg.global().camera.smoothScroll;
-				camera->getOrbitCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
-				camera->getTrackballCamera()->setSmoothScroll(stg.global().camera.smoothScroll);
-			}
+			stg.global().camera.smoothScroll = !stg.global().camera.smoothScroll;
+			m_module->updateGlobal();
 		}
-		if (ImGui::SliderFloat(_t("Camera fov"), &stg.scene().mainScene.camera.fov, 1, 180, "%.1f"))
+		if (ImGui::SliderFloat(_t("Camera fov"), &m_settings.camera.fov, 1, 180, "%.1f"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->getOrbitCamera()->setFov(stg.scene().mainScene.camera.fov);
-				camera->getTrackballCamera()->setFov(stg.scene().mainScene.camera.fov);
-			}
+			m_camera->setFov(m_settings.camera.fov);
 		}
 
 		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
@@ -587,63 +615,41 @@ bool ViewportWindow::showViewportMenu()
 
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint right"), "Num3"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
-			}
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint left"), "Ctrl+Num3"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
-			}
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint top"), "Num7"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
-			}
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint bottom"), "Ctrl+Num7"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
-			}
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint front"), "Num1"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
-			}
+
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Viewpoint back"), "Ctrl+Num1"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
-			}
+			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 		}
 
 		ImGui::Separator();
 
 		if (I3TGui::MenuItemWithLog(_t("Center camera on selection"), "Num0"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->centerOnSelection(*m_viewport->getMainScene());
-			}
+
+			m_camera->centerOnSelection(*m_viewport->getMainScene());
 		}
 
 		if (I3TGui::MenuItemWithLog(_t("Center camera on scene"), "Home"))
 		{
-			if (auto camera = m_viewport->getMainViewportCamera().lock())
-			{
-				camera->centerOnScene(*m_viewport->getMainScene());
-			}
+			m_camera->centerOnScene(*m_viewport->getMainScene());
 		}
 
 		ImGui::Separator();

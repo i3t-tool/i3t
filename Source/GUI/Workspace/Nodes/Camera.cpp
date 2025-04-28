@@ -249,6 +249,17 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 		m_view->drawDiwne(context, m_drawMode);
 	}
 }
+void Camera::afterDraw(DIWNE::DrawInfo& context)
+{
+	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	if (t)
+	{
+		if (t->chain)
+			drawTrackingBorder(t->active, t->interpolating, t->progress);
+	}
+
+	Super::afterDraw(context);
+}
 void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 {
 	auto& pins = m_rightPins;

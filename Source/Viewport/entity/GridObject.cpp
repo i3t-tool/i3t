@@ -38,6 +38,8 @@ void GridObject::updateGridShader()
 
 void GridObject::prepareRenderContext(RenderContext& context)
 {
+	updateGridShader();
+
 	Super::prepareRenderContext(context);
 
 	GridShader* gridShader = static_cast<GridShader*>(context.m_shader);
@@ -74,6 +76,5 @@ void GridObject::prepareRenderContext(RenderContext& context)
 void GridObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
                         const RenderContext& context)
 {
-	updateGridShader();
 	GameObject::render(glm::identity<glm::mat4>(), view, projection, context);
 }

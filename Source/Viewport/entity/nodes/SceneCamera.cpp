@@ -13,12 +13,12 @@
 #include "SceneCamera.h"
 
 #include "Viewport/Shaper.h"
-#include "Viewport/Viewport.h"
 #include "Viewport/entity/FrustumObject.h"
 #include "Viewport/shader/FrustumShader.h"
 
 #include "Core/Resources/ResourceManager.h"
 #include "Utils/Color.h"
+#include "Viewport/scene/Scene.h"
 
 using namespace Vp;
 

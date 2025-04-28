@@ -1,0 +1,154 @@
+{
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -36.349979400634766,
+                    "orbitCameraRotationY": 29.709999084472656,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 7.059032917022705,
+                    "iorbitCameraPivot": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            },
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -90.0,
+                    "orbitCameraRotationY": 30.0,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 12.0,
+                    "iorbitCameraPivot": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 33,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    220.0,
+                    300.0
+                ],
+                "transforms": []
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 39,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    520.0,
+                    320.0
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            }
+        ],
+        "transforms": [],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                33,
+                0,
+                39,
+                0
+            ]
+        ],
+        "zoom": 1.0,
+        "workArea": {
+            "Min": [
+                0.0,
+                0.0
+            ],
+            "Max": [
+                1134.0,
+                493.0
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1009\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=838,983\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][###WorkspaceWindow]\nPos=840,26\nSize=1080,983\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ModalWindow]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,312\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=152,342\n\n[Window][###SetupDialog]\nPos=896,174\nSize=737,746\nCollapsed=0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=57,272\nSize=1635,500\nCollapsed=0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nPos=1392,26\nSize=528,479\nCollapsed=0\nDockId=0x00000008,1\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nViewportPos=2737,14\nViewportId=0x4943A9B6\nSize=272,279\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=60,60\nSize=800,640\nCollapsed=0\n\n[Window][Dear ImGui Style Editor]\nViewportPos=218,20\nViewportId=0x6D551092\nSize=698,1026\nCollapsed=0\n\n[Window][Dear ImGui Metrics/Debugger]\nPos=1392,26\nSize=528,479\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=507,152\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=1047,26\nSize=873,983\nCollapsed=0\n\n[Window][###ViewportWindow:3]\nPos=0,26\nSize=784,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###WorkspaceWindow:5]\nPos=861,449\nSize=1059,560\nCollapsed=0\n\n[Window][###ViewportWindow:4]\nPos=861,26\nSize=1059,421\nCollapsed=0\n\n[Window][###StyleEditor:8]\nViewportPos=60,83\nViewportId=0x350BA107\nSize=729,1026\nCollapsed=0\n\n[Window][###ModalWindow:10]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:11]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][###WorkspaceWindow:4]\nPos=786,516\nSize=1134,493\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][###ModalWindow:9]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###StatisticsWindow:10]\nPos=860,26\nSize=530,479\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###ViewportWindow:9]\nPos=591,26\nSize=1329,528\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][###ViewportWindow:10]\nPos=786,26\nSize=1134,488\nCollapsed=0\nDockId=0x00000009,0\n\n[Window][###PreferencesWindow:11]\nPos=60,60\nSize=734,834\nCollapsed=0\n\n[Window][###PreferencesWindow:12]\nViewportPos=712,244\nViewportId=0x7C2A7915\nSize=548,770\nCollapsed=0\n\n[Window][###StyleEditor:7]\nViewportPos=220,99\nViewportId=0xA5B4BC96\nSize=729,1026\nCollapsed=0\n\n[Window][###ViewportWindow:11]\nPos=693,176\nSize=545,619\nCollapsed=0\nDockId=0x0000000F,0\n\n[Window][###ViewportWindow:12]\nPos=154,176\nSize=1084,619\nCollapsed=0\nDockId=0x0000000E,0\n\n[Window][###ModalWindow:13]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ViewportWindow:13]\nPos=231,185\nSize=600,300\nCollapsed=0\n\n[Window][###ModalWindow:14]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:12]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockNode          ID=0x0000000D Pos=154,199 Size=1084,619 Split=X\n  DockNode        ID=0x0000000E Parent=0x0000000D SizeRef=297,300 Selected=0x239D9FAF\n  DockNode        ID=0x0000000F Parent=0x0000000D SizeRef=301,300 Selected=0x643DE57F\nDockSpace         ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,983 Split=X Selected=0x8535E254\n  DockNode        ID=0x00000003 Parent=0x09EF459F SizeRef=784,983 Selected=0x26F5CA72\n  DockNode        ID=0x00000004 Parent=0x09EF459F SizeRef=1134,983 Split=X\n    DockNode      ID=0x00000001 Parent=0x00000004 SizeRef=838,983 Split=Y Selected=0x7701E8A0\n      DockNode    ID=0x00000005 Parent=0x00000001 SizeRef=1060,479 Split=X Selected=0x1DFCA2F0\n        DockNode  ID=0x00000007 Parent=0x00000005 SizeRef=530,479 Selected=0x1DFCA2F0\n        DockNode  ID=0x00000008 Parent=0x00000005 SizeRef=528,479 Selected=0x20E3C5EA\n      DockNode    ID=0x00000006 Parent=0x00000001 SizeRef=1060,502 Split=Y Selected=0x7701E8A0\n        DockNode  ID=0x00000009 Parent=0x00000006 SizeRef=1116,488 Selected=0x595DCCCF\n        DockNode  ID=0x0000000A Parent=0x00000006 SizeRef=1116,493 CentralNode=1 Selected=0x7701E8A0\n    DockNode      ID=0x00000002 Parent=0x00000004 SizeRef=1080,983 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
+    }
+}

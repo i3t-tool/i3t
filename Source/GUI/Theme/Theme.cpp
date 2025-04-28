@@ -310,6 +310,8 @@ void Theme::initDefaultClassic()
 	set(EColor::Nodes_Tracking_ColorActive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Tracking_ColorInactive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Tracking_Cursor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_CursorHovered, ImVec4(0.8f, 0.8f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_CursorActive, ImVec4(0.86f, 0.86f, 0.0f, 1.0f));
 	set(EColor::Nodes_Tracking_OverlayActive, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
 	set(EColor::Nodes_Tracking_OverlayInactive, ImVec4(0.16f, 0.16f, 0.16f, 0.7f));
 
@@ -733,6 +735,8 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Tracking_ColorActive, "Nodes Tracking Color Active")
 	    .add(EColor::Nodes_Tracking_ColorInactive, "Nodes Tracking Color Inactive")
 	    .add(EColor::Nodes_Tracking_Cursor, "Nodes Tracking Cursor")
+	    .add(EColor::Nodes_Tracking_CursorHovered, "Nodes Tracking Cursor Hovered")
+	    .add(EColor::Nodes_Tracking_CursorActive, "Nodes Tracking Cursor Active")
 	    .add(EColor::Nodes_Tracking_OverlayActive, "Nodes Tracking Overlay Active")
 	    .add(EColor::Nodes_Tracking_OverlayInactive, "Nodes Tracking Overlay Inactive");
 

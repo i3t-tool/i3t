@@ -208,6 +208,8 @@ enum class EColor
 	Nodes_Tracking_ColorActive,
 	Nodes_Tracking_ColorInactive,
 	Nodes_Tracking_Cursor,
+	Nodes_Tracking_CursorHovered,
+	Nodes_Tracking_CursorActive,
 	Nodes_Tracking_OverlayActive,
 	Nodes_Tracking_OverlayInactive,
 

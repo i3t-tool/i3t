@@ -78,6 +78,9 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 /// Uses std::format syntax for the format string, not printf (eg. {:.2f})
 bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format);
 
+/// Sourced from https://github.com/ocornut/imgui/issues/5267, credit to Gl1tchs
+std::string TruncateText(const std::string& p_text, float p_truncated_width);
+
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color);
 
 void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
@@ -111,14 +114,14 @@ inline void Tooltip(const char* header, const char* description)
 float calculateDataItemsWidth(float fontSize, int maxCharacters, float zoom = 1.0f);
 
 bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecimals, Core::EValueState const& valueState,
-			   bool& valueChanged);
+               bool& valueChanged);
 
 int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
 int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
 bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
-				const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
-				int& rowOfChange, int& columnOfChange, float& valueOfChange);
+                const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
+                int& rowOfChange, int& columnOfChange, float& valueOfChange);
 
 /**
  * Sets style for the tab of a dockable window.

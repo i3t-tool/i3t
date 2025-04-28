@@ -22,7 +22,7 @@ class TexturedObject : public GameObject
 {
 public:
 	glm::vec3 m_tint{1.0f};
-	float m_tintStrength{1.0f};
+	float m_tintStrength{.5f};
 
 	TexturedObject(Core::Mesh* mesh, PhongShader* shader);
 

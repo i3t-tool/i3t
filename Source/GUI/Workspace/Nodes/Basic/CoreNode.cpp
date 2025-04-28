@@ -172,6 +172,11 @@ void CoreNode::endDiwne(DIWNE::DrawInfo& context)
 		        .c_str());
 	});
 }
+bool CoreNode::allowDrawing()
+{
+	auto* t = getNodebase()->getTrackingData();
+	return (t != nullptr && t->interpolating) || Super::allowDrawing();
+}
 
 void CoreNode::drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImDrawFlags cornerFlags)
 {
@@ -617,6 +622,7 @@ void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) c
 		ImVec2 markCenter = ImVec2(c.x, rect.GetCenter().y);
 		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), size.y);
 		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2, cursorCol);
+		static_cast<WorkspaceDiwne&>(diwne).m_trackingCursorPos = diwne.canvas().diwne2screen(ImVec2(c.x, rect.Min.y));
 	}
 }
 

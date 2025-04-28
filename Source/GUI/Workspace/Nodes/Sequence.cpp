@@ -67,7 +67,7 @@ std::optional<Ptr<CoreNode>> Sequence::getTransform(int index) const
 bool Sequence::allowDrawing()
 {
 	// TODO: Why do we care if we're a Camera sequence? What's the reason?
-	return m_isCameraSequence || Super::allowDrawing();
+	return isCameraSequence() || Super::allowDrawing();
 }
 
 void Sequence::begin(DIWNE::DrawInfo& context)
@@ -312,6 +312,11 @@ void Sequence::onDestroy(bool logEvent)
 {
 	m_dropZone->destroy(logEvent);
 	Super::onDestroy(logEvent);
+}
+
+bool Sequence::isCameraSequence() const
+{
+	return m_isCameraSequence;
 }
 
 Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)

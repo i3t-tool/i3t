@@ -28,12 +28,10 @@
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 #include "Viewport/data/ViewportSettings.h"
-#include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/scene/Scene.h"
 #include "Viewport/scene/SceneRenderTarget.h"
 #include "Viewport/scene/scenes/MainScene.h"
 #include "Viewport/scene/scenes/PreviewScene.h"
-#include "Viewport/shader/Shaders.h"
 
 namespace Vp
 {
@@ -80,7 +78,6 @@ class WBOITCompositeShader;
  */
 class Viewport
 {
-private:
 	friend class Scene;
 	friend class MainScene;
 	friend class SceneModel;
@@ -116,7 +113,7 @@ public:
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
-	 * @param model Implicit model matrix, world "reference space".
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
@@ -128,13 +125,33 @@ public:
 	                  const DisplayOptions& displayOptions = DisplayOptions());
 
 	/**
+	 * Render viewport's main scene into a framebuffer using a provided camera.
+	 *
+	 * @param renderTarget A reference to a shared pointer containing the desired render target.
+	 * An empty pointer can be passed and it will be filled with an appropriate render target.
+	 * @param width Framebuffer width in pixels
+	 * @param height Framebuffer height in pixels
+	 * @param camera The camera to render the viewport with
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
+	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
+	 * renderOptions per frame.
+	 * @param displayOptions Optional display options. These can change without restriction.
+	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
+	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
+	 */
+	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
+	                  const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+	                  const RenderOptions& renderOptions = RenderOptions(),
+	                  const DisplayOptions& displayOptions = DisplayOptions());
+
+	/**
 	 * Render viewport's main scene into a framebuffer with the specified camera matrices.
 	 *
 	 * @param renderTarget A reference to a shared pointer containing the desired render target.
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
-	 * @param model Implicit model matrix, world "reference space".
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
 	 * @param view View matrix of the camera
 	 * @param projection Projection matrix of the camera
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
@@ -212,11 +229,6 @@ public:
 		m_mainScene->removeEntity(entity);
 	}
 
-	/**
-	 * Returns the viewport camera of the main scene.
-	 */
-	WPtr<AggregateCamera> getMainViewportCamera();
-
 	ViewportSettings& getSettings();
 
 	MainScene* getMainScene()
@@ -229,5 +241,8 @@ public:
 	};
 
 	Manipulators& getManipulators();
+
+private:
+	void prepareRenderTarget(std::shared_ptr<SceneRenderTarget>& renderTarget, const RenderOptions& renderOptions);
 };
 } // namespace Vp

@@ -38,15 +38,17 @@ inline void BeginGroup()
 	DIWNE_TRUNC_POS();
 	ImGui::BeginGroup();
 }
-/// Ensures a new ImGui line and moves the cursor so that no vertical item spacing is applied.
-inline void NewLine()
+/// Ensures a new ImGui line and moves the cursor so that no vertical item spacing is applied, or just a fraction of it.
+/// @param vSpacingFactor The factor of spacing applied, 0 by default (no spacing).
+inline void NewLine(float vSpacingFactor = 0.f)
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindowRead();
 	if (window->SkipItems)
 		return;
 	if (window->DC.IsSameLine)
 		ImGui::NewLine();
-	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetStyle().ItemSpacing.y);
+	float offH = ImGui::GetStyle().ItemSpacing.y * (vSpacingFactor == 0.f ? 1.f : (1.f - vSpacingFactor));
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - offH);
 }
 /// Limits the width of an ImGui line to not exceed a particular X coordinate.
 inline void LimitLine(float newMaxX)

@@ -25,8 +25,8 @@ public:
 
 protected:
 	void onInit() override;
-	void onBeginFrame() override {};
-	void onEndFrame() override {};
+	void onBeginFrame() override{};
+	void onEndFrame() override{};
 	void onUpdate(double delta) override;
 	void onClose() override;
 };

@@ -21,10 +21,8 @@
 #include "Viewport/entity/nodes/SceneCamera.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 #include "Viewport/scene/SceneRenderTarget.h"
-#include "Viewport/shader/ColorShader.h"
-#include "Viewport/shader/FrustumShader.h"
-#include "Viewport/shader/GridShader.h"
-#include "Viewport/shader/WBOITCompositeShader.h"
+#include "Viewport/scene/scenes/MainScene.h"
+#include "Viewport/shader/Shaders.h"
 
 using namespace Vp;
 
@@ -66,29 +64,24 @@ void Viewport::init()
 void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
                             const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
 {
-	if (!renderTarget)
-	{
-		renderTarget = m_mainScene->createRenderTarget(renderOptions);
-	}
-	else
-	{
-		renderTarget->setRenderOptions(renderOptions);
-	}
+	prepareRenderTarget(renderTarget, renderOptions);
+	SceneRenderTarget& rt = *renderTarget;
 	m_mainScene->draw(width, height, model, *renderTarget, displayOptions);
+}
+
+void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
+                            const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+                            const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
+{
+	prepareRenderTarget(renderTarget, renderOptions);
+	m_mainScene->draw(width, height, camera, model, *renderTarget, displayOptions);
 }
 
 void Viewport::drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
                           const glm::mat4& view, const glm::mat4& projection, const RenderOptions& renderOptions,
                           const DisplayOptions& displayOptions)
 {
-	if (!renderTarget)
-	{
-		renderTarget = m_mainScene->createRenderTarget(renderOptions);
-	}
-	else
-	{
-		renderTarget->setRenderOptions(renderOptions);
-	}
+	prepareRenderTarget(renderTarget, renderOptions);
 	m_mainScene->draw(width, height, model, view, projection, *renderTarget, displayOptions);
 }
 
@@ -182,14 +175,6 @@ WPtr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 	return sceneCamera;
 }
 
-// TODO: (DR) Should probably be something like viewport->getMainScene()->getCamera() since its not clear which camera
-//   we're actually getting here (without reading the doc)
-WPtr<AggregateCamera> Viewport::getMainViewportCamera()
-{
-	std::shared_ptr<AggregateCamera> camera = std::dynamic_pointer_cast<AggregateCamera>(m_mainScene->m_camera);
-	return camera;
-}
-
 ViewportSettings& Viewport::getSettings()
 {
 	return m_settings;
@@ -198,4 +183,15 @@ ViewportSettings& Viewport::getSettings()
 Manipulators& Viewport::getManipulators()
 {
 	return *m_manipulators;
+}
+void Viewport::prepareRenderTarget(std::shared_ptr<SceneRenderTarget>& renderTarget, const RenderOptions& renderOptions)
+{
+	if (!renderTarget)
+	{
+		renderTarget = m_mainScene->createRenderTarget(renderOptions);
+	}
+	else
+	{
+		renderTarget->setRenderOptions(renderOptions);
+	}
 }

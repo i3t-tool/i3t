@@ -219,8 +219,13 @@ bool GraphManager::isTrackingFromLeft()
 
 MatrixTracker* GraphManager::startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction)
 {
+	return startTracking(beginSequence, nullptr, direction);
+}
+MatrixTracker* GraphManager::startTracking(Ptr<Sequence> beginSequence, Ptr<Camera> beginCamera,
+                                           TrackingDirection direction)
+{
 	stopTracking();
-	s_self->m_tracker = std::make_unique<MatrixTracker>(beginSequence, direction);
+	s_self->m_tracker = std::make_unique<MatrixTracker>(beginSequence, beginCamera, direction);
 	return s_self->m_tracker.get();
 }
 

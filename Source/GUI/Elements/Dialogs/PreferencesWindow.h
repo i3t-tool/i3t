@@ -30,9 +30,11 @@ public:
 
 	virtual void render() override;
 
-	void showGeneralSettings();
+	void showUISettings();
 	void showViewportSettings();
 	void showWorkspaceSettings();
 
 	void showGridSettings(Vp::GridSettings& grid);
+
+	void showHelpTip(const char* text);
 };

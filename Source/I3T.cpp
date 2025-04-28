@@ -18,7 +18,7 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
-#include "GUI/ViewportModule.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"

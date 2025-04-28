@@ -33,9 +33,6 @@
 
 using namespace Workspace;
 
-/* ======================================== */
-/* ===== W o r k s p a c e  D i w n e ===== */
-/* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(const char* label, DIWNE::SettingsDiwne* settingsDiwne)
     : NodeEditor(label, settingsDiwne), m_viewportHighlightResolver(this)
 {
@@ -69,6 +66,7 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 
 	// TODO: Figure out what to do about all this
 	//  I feel like we are on the verge of removing this anyway so its not a priority
+	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	//		/* Cameras To Sequences links */
 	//		if (m_cameraLink == nullptr)
@@ -529,8 +527,14 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 void WorkspaceDiwne::startTracking(Sequence* sequence, bool trackFromLeft)
 {
 	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
-	Core::GraphManager::startTracking(coreSeq, trackFromLeft ? Core::TrackingDirection::LeftToRight
-	                                                         : Core::TrackingDirection::RightToLeft);
+	Ptr<Core::Camera> coreCam;
+	if (sequence->isCameraSequence())
+	{
+		assert(dynamic_cast<Camera*>(sequence->getParentObject()) != nullptr);
+		coreCam = static_cast<Sequence*>(sequence->getParentObject())->getNodebase()->as<Core::Camera>();
+	}
+	Core::GraphManager::startTracking(
+	    coreSeq, coreCam, trackFromLeft ? Core::TrackingDirection::LeftToRight : Core::TrackingDirection::RightToLeft);
 }
 
 void WorkspaceDiwne::stopTracking()

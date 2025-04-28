@@ -200,6 +200,8 @@ public:
 	static bool isTracking();
 	static bool isTrackingFromLeft();
 	static MatrixTracker* startTracking(Ptr<Sequence> beginSequence, TrackingDirection direction);
+	static MatrixTracker* startTracking(Ptr<Sequence> beginSequence, Ptr<Camera> beginCamera,
+	                                    TrackingDirection direction);
 	static void stopTracking();
 
 private:

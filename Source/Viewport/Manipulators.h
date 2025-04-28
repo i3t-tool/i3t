@@ -74,14 +74,14 @@ private:
 public:
 	explicit Manipulators(Viewport* viewport);
 
-	bool drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize);
+	bool drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, glm::mat4& view, const glm::mat4& proj);
 
 	/**
 	 * @param windowPos
 	 * @param windowSize
 	 * @return Whether manipulators have been interacted with.
 	 */
-	bool drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize);
+	bool drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4& view, const glm::mat4& proj);
 
 	// WIP method to set the active manipulator
 	void clearManipulators();

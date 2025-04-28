@@ -14,192 +14,14 @@
 
 #include "glm/matrix.hpp"
 
-#include "Camera.h"
-#include "Model.h"
-#include "Sequence.h"
+#include "Iterators.h"
 
 namespace Core
 {
 class Transform;
-
-enum class TransformType
-{
-	Model,     // World space
-	View,      // View space
-	Projection // Clip/NDC space
-	           // TODO: [T-VIEWPORT] Screen // Screen space
-};
-
-/// Data container for TransformChainIterator traversal metadata.
-struct TransformInfo
-{
-	Ptr<Node> currentNode = nullptr;  ///< Node with matrix output, a transformation or the sequence itself.
-	Ptr<Sequence> sequence = nullptr; ///< Sequence which contains the transform.
-	Ptr<Camera> camera = nullptr;     ///< Optionally a camera which contains the sequence.
-
-	bool isExternal = false; ///< Whether the sequence is supplied with external data, when true sequence == currentNode
-	TransformType type = TransformType::Model;
-	int dataIndex = 0; ///< Data index of currentNode holding the transform
-
-	friend bool operator==(const TransformInfo& lhs, const TransformInfo& rhs)
-	{
-		return lhs.sequence == rhs.sequence && lhs.currentNode == rhs.currentNode && lhs.camera == rhs.camera &&
-		       lhs.isExternal == rhs.isExternal && lhs.type == rhs.type && lhs.dataIndex == rhs.dataIndex;
-	}
-	friend bool operator!=(const TransformInfo& lhs, const TransformInfo& rhs)
-	{
-		return !(lhs == rhs);
-	}
-	std::string toString() const
-	{
-		return std::string() +                                                          //
-		       "currentNode: " + (currentNode ? currentNode->getSignature() : "null") + //
-		       " sequence: " + (sequence ? sequence->getSignature() : "null") +         //
-		       " camera: " + (camera ? camera->getSignature() : "null") +               //
-		       " isExternal: " + std::to_string(isExternal) +                           //
-		       " type: " + std::to_string(static_cast<int>(type)) +                     //
-		       " dataIndex: " + std::to_string(dataIndex);
-	}
-};
-
-/**
- * Iterable object representing a single chain of connected sequence nodes and their transform contents.
- * Iterates over individual transformations, contained within a sequence. The iterator returns the sequence itself when
- * it is plugged in externally using a matrix input.
- * @note Previously, the iterator returned the node connected to the sequence matrix input, rather than the sequence.
- */
-class TransformChain
-{
-	Ptr<Sequence> m_beginSequence; ///< The sequence the chain begins from.
-	Ptr<Camera> m_beginCamera;     ///< The camera the begin sequence is in, if any
-
-	bool m_skipEmptySequences = true; ///< Excludes empty sequences from the chain.
-	bool m_ignoreCamera = true;       ///< Excludes camera sequences from the chain.
-	bool m_skipEmptyCamera = true;    ///< Excludes camera if its empty
-public:
-	/**
-	 * Constructs a transform chain beginning at the specified sequence, ending at the scene graph root.
-	 * The scene graph root can be the last connected sequence or a sequence within a connected camera.
-	 * The starting sequence can itself be within a camera, but an enclosing camera must be specified.
-	 * @param sequence The begin/starting sequence. The chain will begin at the last (right-most) transformation.
-	 * @param camera The enclosing camera if the begin sequence is contained in one.
-	 * @note Further regarding skipping empty sequences and/or camera can be enabled using dedicated methods after
-	 * construction.
-	 */
-	explicit TransformChain(const Ptr<Sequence>& sequence, const Ptr<Camera>& camera = nullptr);
-
-	/**
-	 * Iterator for traversing the sequence / transform chain.
-	 * Advances from a leaf to root (from "right" to "left"), optionally including empty sequences and camera sequences.
-	 */
-	class TransformChainIterator
-	{
-		using Iterator = TransformChainIterator;
-		friend class TransformChain;
-		TransformChain* m_tree{nullptr};
-
-		/**
-		 * Current state, identifies a matrix node (transformation / operator) and an enclosing
-		 * sequence. When the enclosing sequence is null, the iterator is invalid. Non-null sequence but null current
-		 * node indicates an empty sequence.
-		 */
-		TransformInfo m_info;
-
-	public:
-		using iterator_category = std::forward_iterator_tag;
-		using difference_type = std::ptrdiff_t;
-		using value_type = Ptr<Node>;
-		using pointer = Ptr<Node>;
-		using reference = Ptr<Node>&;
-
-		bool m_skipEmptySequences = true;
-		bool m_ignoreCamera = true;
-		bool m_skipEmptyCamera = true;
-
-		TransformChainIterator() = default; ///< Empty "past the end" iterator
-		TransformChainIterator(TransformChain* chain, const Ptr<Sequence>& sequence, const Ptr<Camera>& camera,
-		                       const Ptr<Node>& node, bool mSkipEmptySequences, bool mIgnoreCamera,
-		                       bool mSkipEmptyCamera);
-
-		/// Advance the iterator. Move to the next matrix (to the root).
-		/// Eg. advancing "right to left"
-		void next();
-
-		bool equals(const Iterator& b) const;
-
-		/// Check whether the iterator is pointing at a valid element (eg. not the end of a container)
-		bool valid() const;
-
-		/// \returns Non-owned pointer to the current sequence.
-		///     Never null.
-		Sequence* getSequence() const;
-
-		/// Return the current transform metadata object carrying detailed information about the current transform.
-		const TransformInfo& transformInfo() const
-		{
-			return m_info;
-		}
-
-		/// \returns Non-owned pointer to the all matrices from start to the root,
-		///     note that Ptr<Node> may points to operator with matrix output,
-		///     not only to transformation.
-		std::vector<Ptr<Node>> collect();
-		std::pair<std::vector<Ptr<Node>>, std::vector<TransformInfo>> collectWithInfo();
-		std::vector<TransformInfo> collectInfo();
-
-		/// Get current matrix, can be a transformation or the sequence itself.
-		/// @note You have to extract data from the node by yourself.
-		Ptr<Node> operator*() const;
-
-		// clang-format off
-		Ptr<Node> operator->() const { return this->operator*(); }
-		Iterator& operator++() { next(); return *this; }
-		Iterator operator++(int) { TransformChainIterator tmp = *this; ++(*this); return tmp; }
-		friend bool operator==(const Iterator& a, const Iterator& b) { return a.equals(b); }
-		friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
-		// clang-format on
-
-	private:
-		// /// Move to the previous matrix (from the root).
-		// ///
-		// /// \todo Not implemented correctly for sequences with matrix input plugged.
-		// void withdraw();
-
-		/// Sets m_currentMatrix to nullptr.
-		void invalidate();
-
-		bool advanceWithinSequence();
-	};
-
-	/**
-	 * \return Iterator which points to starting sequence and its last matrix.
-	 */
-	TransformChainIterator begin();
-
-	/**
-	 * \return Points to the root sequence and matrix is nullptr,
-	 *     so it is not possible to decrement or dereference it (as any other STL iterator).
-	 */
-	TransformChainIterator end();
-
-	TransformChain& skipEmptySequences(bool val = true)
-	{
-		m_skipEmptySequences = val;
-		return *this;
-	}
-	TransformChain& ignoreCamera(bool val = true)
-	{
-		m_ignoreCamera = val;
-		return *this;
-	}
-	TransformChain& skipEmptyCamera(bool val = true)
-	{
-		m_skipEmptyCamera = val;
-		return *this;
-	}
-};
-
-//----------------------------------------------------------------------------//
+class Model;
+class Sequence;
+class Camera;
 
 class MatrixTracker;
 
@@ -216,6 +38,7 @@ struct TrackedModelData
 /**
  * Tracking data for individual nodes involved in a tracking operation.
  * Instances are held and managed by a MatrixTracker, and referenced by Core nodes when they are tracked.
+ * The struct contains common AND specific data for tracked Transforms, Sequences, Cameras and Models.
  */
 struct TrackedNodeData
 {
@@ -226,15 +49,21 @@ struct TrackedNodeData
 	bool interpolating = false; ///< Whether the "tracking cursor" is within this node.
 	float progress{0.f};        ///< Progress within this node
 
+	TransformSpace space{TransformSpace::Model}; ///< What stage along the PVM matrix chain this transform represents.
+
 	bool chain = false;        ///< Whether this node forms the top level of the tracked chain
 	bool active = false;       ///< Whether this node is part of the final tracked interpolated matrix.
 	bool modelSubtree = false; ///< Whether this node is part of the begin sequence subtree. Meaning it connects
 	                           ///< to a tracked model but itself is NOT being tracked.
+	bool isInCamera = false;
 
 	UPtr<TrackedModelData> modelData = nullptr; ///< Extra model data held for models.
 
 	int seqIndex = -1; ///< Sequence index within the chain, -1 in model subtree. >= 0 indicates this is a sequence
 	int index = -1;    ///< Transform index within the chain, >= 0 indicates transform, a sequence CAN be a transform
+
+	int childrenIdxStart = -1; ///< Index of the first contained sequence/transform (camera seqs, seqs transforms)
+	int childrenIdxEnd = -1;   ///< Index of the last contained sequence/transform (camera seqs, seqs transforms)
 
 	explicit TrackedNodeData(MatrixTracker* tracker) : tracker(tracker)
 	{
@@ -318,16 +147,6 @@ class MatrixTracker final
 		}
 	};
 
-	struct TrackedSequence : TrackedTransform
-	{
-		TrackedSequence(const Ptr<Node>& node, TrackedNodeData&& data) : TrackedTransform(node, std::move(data)) {}
-		TrackedSequence(const TrackedSequence& other) = delete;
-		TrackedSequence(TrackedSequence&& other) = delete;
-
-		int transformIdxStart = -1; ///< Index of the first contained transform
-		int transformIdxEnd = -1;   ///< Index of the last contained transform
-	};
-
 	float m_param = 0.0f; ///< Tracking time parameter (0..1),
 
 	/// Interpolated matrix corresponding to the current time parameter.
@@ -347,11 +166,18 @@ class MatrixTracker final
 	/// On sequence destruction, the tracker is destroyed too.
 	WPtr<Sequence> m_beginSequence;
 
+	/// If begin sequence is inside a camera a refernce to it must be provided in order for the tracker to function
+	/// properly. In other words, the search for the parent camera is deferred to the user.
+	WPtr<Camera> m_beginCamera;
+
 	/// List of all sequences involved in the tracking operation with supplemental tracking data for each.
-	std::vector<Ptr<TrackedSequence>> m_trackedSequences;
+	std::vector<Ptr<TrackedTransform>> m_trackedSequences;
 
 	/// List of all individual tracked transformation nodes, containing the matrix data.
 	std::vector<Ptr<TrackedTransform>> m_trackedTransforms;
+
+	/// The tracked camera if applicable, only one since a camera always ends the chain (has no matrix mul input)
+	UPtr<TrackedNode> m_trackedCamera;
 
 	/// Tracked models, managed and updated by the tracker itself based on the sequence chain.
 	std::vector<UPtr<TrackedNode>> m_models;
@@ -363,6 +189,19 @@ class MatrixTracker final
 	/// Model transform from scene graph root -> begin sequence (its world transform)
 	glm::mat4 m_modelSubtreeRoot{1.f};
 
+public:
+	// Camera tracking
+	// TODO: Docs
+	// Determines whether the view space transformation is ignored or not.
+	bool m_trackInWorldSpace{false};
+
+	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
+	glm::mat4 m_iViewMatrix{1.0f};
+
+	/// Interpolated projection matrix, relevant when m_trackInWorldSpace is false.
+	glm::mat4 m_iProjMatrix{1.0f};
+
+private:
 	bool m_chainNeedsUpdate = true; ///< Whether the tracked matrix chain needs update
 	bool m_modelsNeedUpdate = true; ///< Whether the tracked model list needs to be updated (due to a structural change)
 	bool m_modelTransformsNeedUpdate = true; ///< Whether the tracked model transforms need to be updated
@@ -371,6 +210,7 @@ public:
 	/// Constructs an empty / inactive tracker.
 	MatrixTracker() = default;
 	MatrixTracker(Ptr<Sequence> beginSequence, TrackingDirection direction);
+	MatrixTracker(Ptr<Sequence> beginSequence, Ptr<Camera> beginCamera, TrackingDirection direction);
 	~MatrixTracker();
 
 	bool setParam(float param);
@@ -405,6 +245,9 @@ public:
 		return m_fullMatricesCount;
 	}
 	int getTransformCount() const; ///< Returns the number of tracked matrices / transformations.
+
+	const std::vector<Ptr<TrackedTransform>>& getTrackedSequences() const;
+	const std::vector<Ptr<TrackedTransform>>& getTrackedTransforms() const;
 
 	std::vector<Ptr<Model>> getModels() const; ///< Returns a list of tracked model nodes.
 

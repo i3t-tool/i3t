@@ -28,6 +28,7 @@
 
 #include "SceneRenderTarget.h"
 #include "Utils/HSLColor.h"
+#include "Viewport/shader/Shaders.h"
 
 namespace Vp
 {
@@ -42,10 +43,16 @@ Scene::Scene(Viewport* viewport) : m_viewport(viewport)
 void Scene::draw(int width, int height, const glm::mat4& model, SceneRenderTarget& renderTarget,
                  const DisplayOptions& displayOptions)
 {
-	m_camera->size(width, height);
-	m_camera->update();
+	return draw(width, height, m_camera, model, renderTarget, displayOptions);
+}
 
-	return draw(width, height, model, m_camera->getView(), m_camera->getProjection(), renderTarget, displayOptions);
+void Scene::draw(int width, int height, const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+                 SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
+{
+	camera->size(width, height);
+	camera->update();
+
+	return draw(width, height, model, camera->getView(), camera->getProjection(), renderTarget, displayOptions);
 }
 
 void Scene::draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,

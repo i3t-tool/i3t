@@ -44,7 +44,6 @@ class WindowManager
 {
 	friend class IWindow;
 
-private:
 	/// Application subwindows/dockable windows such as Viewport, Node editor. A
 	/// window can be showed or hidden. <b>DON'T</b> remove elements from this
 	/// vector.

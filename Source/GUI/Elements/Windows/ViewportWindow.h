@@ -17,12 +17,16 @@
 #include "glm/matrix.hpp"
 
 #include "GUI/Elements/IWindow.h"
+#include "GUI/Viewport/ViewportWindowSettings.h"
 
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 
+
+class ViewportModule;
 namespace Vp
 {
+class AbstractCamera;
 class Viewport;
 class SceneRenderTarget;
 } // namespace Vp
@@ -34,6 +38,10 @@ class ViewportWindow : public IWindow
 public:
 	I3T_WINDOW(ViewportWindow)
 
+	ViewportWindowSettings m_settings;
+
+	ViewportModule* m_module;
+
 	struct ViewportSpace
 	{
 		bool standard = true;
@@ -44,7 +52,9 @@ public:
 	};
 	ViewportSpace m_space;
 
-	ViewportWindow(bool show, Vp::Viewport* viewport);
+	std::shared_ptr<Vp::AggregateCamera> m_camera;
+
+	ViewportWindow(ViewportModule* module, int index, bool show);
 	void render() override;
 
 	void updateSpace();

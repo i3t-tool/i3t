@@ -60,6 +60,7 @@ public:
 
 	float timeUntilNextTrack = 0;
 	bool smoothTracking{true};
+	ImVec2 m_trackingCursorPos;
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.

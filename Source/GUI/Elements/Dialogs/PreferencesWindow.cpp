@@ -45,7 +45,7 @@ void PreferencesWindow::render()
 			App::getModule<StateManager>().resetGlobal();
 		}
 
-		showGeneralSettings();
+		showUISettings();
 		showWorkspaceSettings();
 		showViewportSettings();
 	}
@@ -60,27 +60,38 @@ void PreferencesWindow::render()
 	ImGui::End();
 }
 
-void PreferencesWindow::showGeneralSettings()
+void PreferencesWindow::showUISettings()
 {
 	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 
+		UIModule* uiModule = I3T::getUI();
+
 		static float uiScaleTmp = 1.0f;
 		if (ImGui::IsWindowAppearing())
 		{
-			uiScaleTmp = I3T::getUI()->getUiScale();
+			uiScaleTmp = uiModule->getUiScale();
 		}
 		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-		GUI::SliderFloatStepped("UI Scale", &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
-		if (uiScaleTmp != I3T::getUI()->getUiScale())
+		GUI::SliderFloatStepped(_tbd("UI Scale"), &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
+		if (uiScaleTmp != uiModule->getUiScale())
 		{
 			ImGui::SameLine();
-			if (I3TGui::ButtonWithLog("Apply scale"))
+			if (I3TGui::ButtonWithLog(_tbd("Apply scale")))
 			{
-				I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
+				uiModule->applyUIScalingNextFrame(uiScaleTmp);
 			}
 		}
+
+		ImGui::Checkbox(_tbd("Show window tab buttons"), &uiModule->getSettings().useWindowMenuButtons);
+		ImGui::SameLine();
+		showHelpTip("Requires restart");
+
+		ImGui::Checkbox(_tbd("Auto hide tab bar"), &uiModule->getSettings().autoHideTabBars);
+		ImGui::SameLine();
+		showHelpTip("Requires restart");
+
 		ImGui::Unindent();
 		ImGui::Spacing();
 	}
@@ -190,4 +201,16 @@ void PreferencesWindow::showGridSettings(Vp::GridSettings& grid)
 	ImGui::SliderFloat("Fade 1 end", &grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
 	ImGui::SliderFloat("Fade 2 start", &grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
 	ImGui::SliderFloat("Fade 2 end", &grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
+}
+
+void PreferencesWindow::showHelpTip(const char* text)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(text);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }

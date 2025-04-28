@@ -58,11 +58,11 @@ void OrbitCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowS
 		m_dScroll = InputManager::m_mouseWheelOffset;
 	}
 
-	mouseWheel(m_dScroll * (m_smoothScroll ? 1 : 4));
+	mouseWheel(m_dScroll * 144.0f * dt * (m_smoothScroll ? 1 : 3));
 
-	m_dScroll *= std::min(std::max(-3.05 * dt + 0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
+	m_dScroll *= pow(m_smoothScrollDamping, 144.0f * dt) * (m_smoothScroll ? 1 : 0);
 
-	if (m_dScroll * m_dScroll < 0.0005f)
+	if (abs(m_dScroll) < 0.001f)
 	{
 		m_dScroll = 0.0f;
 	}
@@ -205,4 +205,12 @@ bool OrbitCamera::getSmoothScroll() const
 void OrbitCamera::setSmoothScroll(bool b)
 {
 	m_smoothScroll = b;
+}
+float OrbitCamera::getSmoothScrollDamping() const
+{
+	return m_smoothScrollDamping;
+}
+void OrbitCamera::setSmoothScrollDamping(float val)
+{
+	m_smoothScrollDamping = val;
 }

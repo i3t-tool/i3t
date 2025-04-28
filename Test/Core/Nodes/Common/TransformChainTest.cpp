@@ -242,7 +242,7 @@ TEST_F(TransformChainTest, MatrixInputPlugged)
 }
 
 TransformInfo tInfo(Ptr<Sequence> sequence = nullptr, Ptr<Node> currentNode = nullptr, Ptr<Camera> camera = nullptr,
-                    bool isExternal = false, TransformType type = TransformType::Model, int dataIndex = 0)
+                    bool isExternal = false, TransformSpace type = TransformSpace::Model, int dataIndex = 0)
 {
 	TransformInfo info;
 	info.currentNode = currentNode;
@@ -279,9 +279,9 @@ TEST_F(TransformChainTest, GeneralCamTree_IncludeCamera)
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
-	    tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformType::View),
-	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformType::Projection),
-	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformType::Projection)
+	    tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
+	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection)
 	};
 	// clang-format on
 
@@ -311,11 +311,11 @@ TEST_F(TransformChainTest, GeneralCamTree_IncludeDisconnectedCam)
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
-	    tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformType::View),
+	    tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
 	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false,
-	          TransformType::Projection),
+	          TransformSpace::Projection),
 	    tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false,
-	          TransformType::Projection)};
+	          TransformSpace::Projection)};
 
 	testChain(chain, expected);
 }
@@ -365,8 +365,8 @@ TEST_F(TransformChainTest, GeneralCamTree_IncludeEmptyCamAndEmptySeq)
 	            tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
 	            tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
 	            tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
-	            tInfo(tree.cam1->getView(), nullptr, tree.cam1, false, TransformType::View),
-	            tInfo(tree.cam1->getProj(), nullptr, tree.cam1, false, TransformType::Projection)};
+	            tInfo(tree.cam1->getView(), nullptr, tree.cam1, false, TransformSpace::View),
+	            tInfo(tree.cam1->getProj(), nullptr, tree.cam1, false, TransformSpace::Projection)};
 
 	testChain(chain, expected);
 }
@@ -386,9 +386,9 @@ TEST_F(TransformChainTest, GeneralCamTree_BeginInCamera)
 
 	// clang-format off
 	expected = {
-		tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformType::View),
-		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformType::Projection),
-		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformType::Projection)
+		tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection)
 	};
 	// clang-format on
 
@@ -398,8 +398,8 @@ TEST_F(TransformChainTest, GeneralCamTree_BeginInCamera)
 	chain = TransformChain(tree.cam1->getProj(), tree.cam1).ignoreCamera(false);
 	// clang-format off
 	expected = {
-		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformType::Projection),
-		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformType::Projection)
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection)
 	};
 	// clang-format on
 
@@ -449,7 +449,7 @@ TEST_F(TransformChainTest, GeneralCamTree_OperatorInBeginSeq)
 	TransformChain chain(TransformChain(tree.seq6));
 
 	std::vector<TransformInfo> expected = {
-	    tInfo(tree.seq6, tree.seq6, nullptr, true, TransformType::Model, I3T_SEQ_IN_MAT),
+	    tInfo(tree.seq6, tree.seq6, nullptr, true, TransformSpace::Model, I3T_SEQ_IN_MAT),
 	    tInfo(tree.seq3, tree.seq3->getMatrices()[1]),
 	    tInfo(tree.seq3, tree.seq3->getMatrices()[0]),
 	    tInfo(tree.seq2, tree.seq2->getMatrices()[1]),
@@ -505,8 +505,8 @@ TEST_F(TransformChainTest, GeneralCamTree_BeginInEmptyCameraSeq)
 
 	chain.skipEmptySequences(false);
 
-	expected = {tInfo(tree.cam1->getView(), nullptr, tree.cam1, false, TransformType::View),
-	            tInfo(tree.cam1->getProj(), nullptr, tree.cam1, false, TransformType::Projection)};
+	expected = {tInfo(tree.cam1->getView(), nullptr, tree.cam1, false, TransformSpace::View),
+	            tInfo(tree.cam1->getProj(), nullptr, tree.cam1, false, TransformSpace::Projection)};
 
 	testChain(chain, expected);
 }
@@ -523,8 +523,8 @@ TEST_F(TransformChainTest, GeneralCamTree_CameraWithExternalData)
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
 	    tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
-	    tInfo(tree.cam1->getView(), tree.cam1->getView(), tree.cam1, true, TransformType::View, I3T_SEQ_IN_MAT),
-	    tInfo(tree.cam1->getProj(), tree.cam1->getProj(), tree.cam1, true, TransformType::Projection, I3T_SEQ_IN_MAT)};
+	    tInfo(tree.cam1->getView(), tree.cam1->getView(), tree.cam1, true, TransformSpace::View, I3T_SEQ_IN_MAT),
+	    tInfo(tree.cam1->getProj(), tree.cam1->getProj(), tree.cam1, true, TransformSpace::Projection, I3T_SEQ_IN_MAT)};
 	testChain(chain, expected);
 }
 
@@ -535,7 +535,7 @@ TEST_F(TransformChainTest, GeneralCamTree_OperatorInBeginCamera)
 	chain.ignoreCamera(false);
 
 	std::vector<TransformInfo> expected = {
-	    tInfo(tree.cam1->getView(), tree.cam1->getView(), tree.cam1, true, TransformType::View, I3T_SEQ_IN_MAT),
-	    tInfo(tree.cam1->getProj(), tree.cam1->getProj(), tree.cam1, true, TransformType::Projection, I3T_SEQ_IN_MAT)};
+	    tInfo(tree.cam1->getView(), tree.cam1->getView(), tree.cam1, true, TransformSpace::View, I3T_SEQ_IN_MAT),
+	    tInfo(tree.cam1->getProj(), tree.cam1->getProj(), tree.cam1, true, TransformSpace::Projection, I3T_SEQ_IN_MAT)};
 	testChain(chain, expected);
 }

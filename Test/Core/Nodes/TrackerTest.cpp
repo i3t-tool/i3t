@@ -284,3 +284,8 @@ TEST_F(TrackerTest, EmptySequenceAfterTrackingStart)
 
 	ASSERT_FALSE(tracker->isTracking());
 }
+
+// TODO: New tracking requires new tests to test that TrackedNodeData is filled with correct data.
+// TODO: There are also new test scenarios with a connected camera
+// TODO: Test beginning of tracking inside a camera
+// TODO: Figure out how to handle and test LeftToRight tracking inside the camera

@@ -64,6 +64,8 @@ public:
 	};
 
 	void centerContent(DIWNE::DrawInfo& context) override;
+	void afterDraw(DIWNE::DrawInfo& context) override;
+
 	void drawOutputPins(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
@@ -73,8 +75,6 @@ public:
 	void popupContent(DIWNE::DrawInfo& context) override;
 
 	int maxLengthOfData() override;
-
-	// TODO: Move screen output to the left side
 
 	void onSelection(bool selected) override;
 	void onDestroy(bool logEvent) override;

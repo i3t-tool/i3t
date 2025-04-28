@@ -71,6 +71,8 @@ public:
 
 	void onDestroy(bool logEvent) override;
 
+	bool isCameraSequence() const;
+
 protected:
 	class SequenceDropZone : public DIWNE::NodeDropZone
 	{

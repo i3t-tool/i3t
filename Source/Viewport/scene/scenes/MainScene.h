@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include "Viewport/data/ViewportSceneSettings.h"
 #include "Viewport/scene/Scene.h"
 
 namespace Vp
@@ -37,16 +38,16 @@ public:
 	/// Grid representing current local/reference space
 	std::shared_ptr<GridObject> m_localGrid;
 
+	bool m_lightFollowsCamera = true;
+
 	explicit MainScene(Viewport* viewport);
 
 	void init() override;
 	void update(double dt) override;
+
+	using Scene::draw;
+
 	void draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
 	          SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions) override;
-	void draw(int width, int height, const glm::mat4& model, SceneRenderTarget& renderTarget,
-	          const DisplayOptions& displayOptions) override;
-
-	void loadSettings(ViewportSettings& stg, bool scene, bool global) override;
-	void saveSettings(ViewportSettings& stg, bool scene, bool global) override;
 };
 } // namespace Vp

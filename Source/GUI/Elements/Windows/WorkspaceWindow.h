@@ -55,10 +55,23 @@ private:
 
 	bool showQuickAddButtons();
 
+	float m_trackingSliderProgress = 0.f;
+	ImRect m_trackingBox;
+	bool showTrackingTimeline();
+
 	void showMenuBar();
 	void showEditMenu();
 	void showAddMenu();
 	void showViewMenu();
 	void showDebugMenu();
 	void showDiwneStyleMenu();
+
+	bool TrackingSlider(Core::MatrixTracker* tracker, const char* label, void* p_data, Core::TrackingDirection dir);
+	bool TrackingSlider(Core::MatrixTracker* tracker, const char* label, ImGuiDataType data_type, void* p_data,
+	                    const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0,
+	                    float minHeight = 0);
+	void TrackingSlider_drawTick(float tParam, const ImRect& trackRect, bool leftToRight, const ImVec4& tickColor);
+	void TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight, const ImVec4& color);
+	void TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, bool leftToRight,
+	                             const ImVec4& color);
 };

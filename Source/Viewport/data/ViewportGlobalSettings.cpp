@@ -23,6 +23,7 @@ RTTR_REGISTRATION
 {
 	rttr::registration::class_<GlobalCameraSettings>("GlobalCameraSettings")
 	    .property("smoothScroll", &GlobalCameraSettings::smoothScroll)
+	    .property("smoothScrollDamping", &GlobalCameraSettings::smoothScrollDamping)
 	    .property("orbitCamera_zoomSpeed", &GlobalCameraSettings::orbit_zoomSpeed)
 	    .property("orbitCamera_rotateSpeed", &GlobalCameraSettings::orbit_rotateSpeed)
 	    .property("orbitCamera_translateSpeed", &GlobalCameraSettings::orbit_translateSpeed)
@@ -73,7 +74,8 @@ RTTR_REGISTRATION
 
 GlobalCameraSettings::GlobalCameraSettings()
 {
-	smoothScroll = false;
+	smoothScroll = true;
+	smoothScrollDamping = 0.85f;
 
 	orbit_zoomSpeed = 0.8f;
 	orbit_rotateSpeed = 0.29f;
@@ -86,9 +88,9 @@ GlobalCameraSettings::GlobalCameraSettings()
 
 HighlightSettings::HighlightSettings()
 {
-	downscaleFactor = 0.5f;
+	downscaleFactor = 0.7f;
 	kernelSize = 2;
-	outlineCutoff = 0.2f;
+	outlineCutoff = 0.18f;
 	useDepth = true;
 	useDepth_darkenFactor = 0.5f;
 	useDepth_desaturateFactor = 0.4f;
@@ -142,7 +144,6 @@ ViewportGlobalSettings::ViewportGlobalSettings()
 
 	lighting_lightingModel = PhongShader::LightingModel::BLINN_PHONG;
 
-	//	manipulator_enabled = true;
 	manipulator_size = 0.14f;
 }
 
