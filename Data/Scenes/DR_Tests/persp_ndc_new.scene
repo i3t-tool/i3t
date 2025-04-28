@@ -2,8 +2,8 @@
     "resources": {
         "imported": [
             {
-                "name": "projection_test_scene",
-                "path": "scene_data/projection_test_scene/projection_test_scene.glb",
+                "name": "projection_test_scene_2",
+                "path": "scene_data/projection_test_scene_2/projection_test_scene_2.glb",
                 "type": "Model",
                 "normalize": false
             }
@@ -15,8 +15,8 @@
                 "manipulator_enabled": true,
                 "camera": {
                     "mode": "ORBIT",
-                    "orbitCameraRotationX": -120.56015014648438,
-                    "orbitCameraRotationY": 27.97007179260254,
+                    "orbitCameraRotationX": -121.14020538330078,
+                    "orbitCameraRotationY": 28.840068817138672,
                     "trackballCameraRotation": [
                         1.0,
                         0.0,
@@ -35,11 +35,11 @@
                         0.0,
                         1.0
                     ],
-                    "iorbitCameraRadius": 18.413516998291016,
+                    "iorbitCameraRadius": 22.4902400970459,
                     "iorbitCameraPivot": [
-                        3.912490129470825,
-                        1.879368543624878,
-                        2.0879571437835693
+                        4.207345008850098,
+                        2.9440720081329346,
+                        3.4846351146698
                     ],
                     "fov": 90.0,
                     "zNear": 0.20000000298023224,
@@ -72,9 +72,9 @@
                     ],
                     "iorbitCameraRadius": 40.32916641235352,
                     "iorbitCameraPivot": [
-                        8.339019775390625,
-                        -0.08796492218971252,
-                        1.062717318534851
+                        8.743656158447266,
+                        0.12574578821659088,
+                        1.1713145971298218
                     ],
                     "fov": 90.0,
                     "zNear": 0.20000000298023224,
@@ -497,8 +497,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            1014.7372436523438,
-                            135.61111450195313
+                            1015.0503540039063,
+                            135.26922607421875
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -558,8 +558,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            838.8178100585938,
-                            -49.16754150390625
+                            839.1309814453125,
+                            -49.50933837890625
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -606,8 +606,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            1005.0186767578125,
-                            -49.16754150390625
+                            1005.331787109375,
+                            -49.50933837890625
                         ],
                         "type": "Scale",
                         "defaultValues": {
@@ -656,8 +656,8 @@
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    721.6856079101563,
-                    304.4831237792969
+                    782.4347534179688,
+                    318.4046630859375
                 ],
                 "transforms": [
                     {
@@ -667,8 +667,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            751.490966796875,
-                            336.8426818847656
+                            812.5532836914063,
+                            351.6880187988281
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -715,8 +715,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            917.6917724609375,
-                            336.8426818847656
+                            978.7540893554688,
+                            351.6880187988281
                         ],
                         "type": "Scale",
                         "defaultValues": {
@@ -765,8 +765,8 @@
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    609.8131713867188,
-                    -296.76153564453125
+                    602.2194213867188,
+                    -301.8239440917969
                 ],
                 "transforms": [
                     {
@@ -776,8 +776,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            640.1175537109375,
-                            -264.32073974609375
+                            632.8370361328125,
+                            -269.7249450683594
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -824,8 +824,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            806.318359375,
-                            -264.32073974609375
+                            799.0379028320313,
+                            -269.7249450683594
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -868,8 +868,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            972.5192260742188,
-                            -264.32073974609375
+                            965.2387084960938,
+                            -269.7249450683594
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -949,8 +949,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            460.62042236328125,
-                            456.6689147949219
+                            459.66802978515625,
+                            456.3269958496094
                         ],
                         "transforms": []
                     },
@@ -962,8 +962,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            247.373046875,
-                            456.6689147949219
+                            246.42066955566406,
+                            456.3269958496094
                         ],
                         "transforms": []
                     }
@@ -1004,8 +1004,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            312.54437255859375,
-                            171.90731811523438
+                            312.8576354980469,
+                            172.83108520507813
                         ],
                         "transforms": [
                             {
@@ -1015,8 +1015,8 @@
                                 "LOD": "SetValues",
                                 "selected": false,
                                 "position": [
-                                    342.69989013671875,
-                                    205.21951293945313
+                                    343.01312255859375,
+                                    206.14328002929688
                                 ],
                                 "type": "LookAt",
                                 "defaultValues": {
@@ -1076,8 +1076,8 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            99.2970199584961,
-                            171.90731811523438
+                            99.61029052734375,
+                            172.83108520507813
                         ],
                         "transforms": []
                     }
@@ -1102,52 +1102,6 @@
             }
         ],
         "models": [
-            {
-                "id": 138,
-                "label": "NDC",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    1258.0010986328125,
-                    -291.35406494140625
-                ],
-                "model": "projection_test_scene",
-                "visible": true,
-                "showAxes": true,
-                "opaque": false,
-                "opacity": 0.5,
-                "tint": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "tintStrength": 1.0
-            },
-            {
-                "id": 140,
-                "label": "NDC",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    1269.0347900390625,
-                    93.75711822509766
-                ],
-                "model": "projection_test_scene",
-                "visible": true,
-                "showAxes": true,
-                "opaque": true,
-                "opacity": 0.5,
-                "tint": [
-                    0.0,
-                    1.0,
-                    0.0
-                ],
-                "tintStrength": 0.23999999463558197
-            },
             {
                 "id": 142,
                 "render": true,
@@ -1191,6 +1145,52 @@
                     1.0
                 ],
                 "tintStrength": 1.0
+            },
+            {
+                "id": 138,
+                "label": "NDC",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1258.0010986328125,
+                    -291.35406494140625
+                ],
+                "model": "projection_test_scene_2",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 140,
+                "label": "NDC",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1269.0347900390625,
+                    93.75711822509766
+                ],
+                "model": "projection_test_scene_2",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "tintStrength": 0.23999999463558197
             }
         ],
         "transforms": [
@@ -1292,18 +1292,6 @@
                 0
             ],
             [
-                92,
-                0,
-                138,
-                0
-            ],
-            [
-                69,
-                0,
-                140,
-                0
-            ],
-            [
                 76,
                 0,
                 142,
@@ -1316,26 +1304,38 @@
                 0
             ],
             [
+                92,
+                0,
+                138,
+                0
+            ],
+            [
+                69,
+                0,
+                140,
+                0
+            ],
+            [
                 117,
                 2,
                 92,
                 0
             ]
         ],
-        "zoom": 0.7901346683502197,
+        "zoom": 0.7901347875595093,
         "workArea": {
             "Min": [
-                168.90541076660156,
-                -501.3955993652344
+                332.48193359375,
+                -521.987060546875
             ],
             "Max": [
-                1381.35693359375,
-                79.51803588867188
+                1544.933349609375,
+                58.926513671875
             ]
         }
     },
     "layout": {
-        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1009\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=57,272\nSize=1635,500\nCollapsed=0\n\n[Window][###ViewportWindow1]\nPos=0,26\nSize=960,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][###WorkspaceWindow1]\nPos=1062,26\nSize=858,983\nCollapsed=0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=838,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###WorkspaceWindow]\nPos=962,26\nSize=958,459\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###ModalWindow]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=3730,64\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=896,174\nSize=737,746\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,312\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=152,342\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nViewportPos=2737,14\nViewportId=0x4943A9B6\nSize=272,279\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=60,60\nSize=800,640\nCollapsed=0\n\n[Window][Dear ImGui Style Editor]\nViewportPos=218,20\nViewportId=0x6D551092\nSize=698,1026\nCollapsed=0\n\n[Window][Dear ImGui Metrics/Debugger]\nPos=0,39\nSize=757,970\nCollapsed=0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=507,152\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=1047,26\nSize=873,983\nCollapsed=0\n\n[Window][###ViewportWindow:3]\nPos=0,26\nSize=960,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###WorkspaceWindow:5]\nPos=861,449\nSize=1059,560\nCollapsed=0\n\n[Window][###ViewportWindow:4]\nPos=861,26\nSize=1059,421\nCollapsed=0\n\n[Window][###StyleEditor:8]\nViewportPos=60,83\nViewportId=0x350BA107\nSize=729,1026\nCollapsed=0\n\n[Window][###ModalWindow:10]\nViewportPos=763,463\nViewportId=0x0805B321\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:11]\nPos=763,440\nSize=393,128\nCollapsed=0\n\n[Window][###WorkspaceWindow:4]\nPos=962,26\nSize=958,493\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###ModalWindow:9]\nPos=692,104\nSize=16,42\nCollapsed=0\n\n[Window][###StatisticsWindow:10]\nPos=860,26\nSize=530,479\nCollapsed=0\n\n[Window][###ViewportWindow:9]\nPos=0,26\nSize=922,983\nCollapsed=0\n\n[Window][###ViewportWindow:10]\nPos=962,521\nSize=958,488\nCollapsed=0\nDockId=0x00000006,0\n\n[Window][###PreferencesWindow:11]\nPos=60,60\nSize=734,834\nCollapsed=0\n\n[Window][###PreferencesWindow:12]\nViewportPos=712,244\nViewportId=0x7C2A7915\nSize=548,770\nCollapsed=0\n\n[Window][###StyleEditor:7]\nViewportPos=220,99\nViewportId=0xA5B4BC96\nSize=729,1026\nCollapsed=0\n\n[Window][###ViewportWindow:11]\nPos=763,404\nSize=997,498\nCollapsed=0\n\n[Window][###ViewportWindow:12]\nPos=154,176\nSize=1084,619\nCollapsed=0\n\n[Window][###ModalWindow:13]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ViewportWindow:13]\nPos=231,185\nSize=600,300\nCollapsed=0\n\n[Window][###ModalWindow:14]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:12]\nPos=1395,484\nSize=16,42\nCollapsed=0\n\n[Window][###ViewportWindow2]\nPos=962,487\nSize=958,522\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][Dear ImGui ID Stack Tool]\nViewportPos=1433,547\nViewportId=0x811A7A42\nSize=607,504\nCollapsed=0\n\n[Window][###PreferencesWindow:9]\nPos=60,60\nSize=229,526\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,983 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000001 Parent=0x09EF459F SizeRef=960,983 Split=X\n    DockNode    ID=0x00000003 Parent=0x00000001 SizeRef=960,983 CentralNode=1 Selected=0xFB5B01A1\n    DockNode    ID=0x00000004 Parent=0x00000001 SizeRef=958,983 Split=Y Selected=0x7701E8A0\n      DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=958,493 Selected=0x7701E8A0\n      DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=958,488 Selected=0x595DCCCF\n  DockNode      ID=0x00000002 Parent=0x09EF459F SizeRef=958,983 Split=Y Selected=0xCDB9512A\n    DockNode    ID=0x00000007 Parent=0x00000002 SizeRef=958,459 Selected=0xCDB9512A\n    DockNode    ID=0x00000008 Parent=0x00000002 SizeRef=958,522 Selected=0xBCFB7B71\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n"
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1009\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=57,272\nSize=1635,500\nCollapsed=0\n\n[Window][###ViewportWindow1]\nPos=0,26\nSize=960,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][###WorkspaceWindow1]\nPos=1062,26\nSize=858,983\nCollapsed=0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=838,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###WorkspaceWindow]\nPos=962,26\nSize=958,459\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###ModalWindow]\nPos=763,440\nSize=16,42\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=3730,64\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=896,174\nSize=737,746\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=430,146\nSize=919,706\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=177,664\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nViewportPos=2737,14\nViewportId=0x4943A9B6\nSize=272,279\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=60,60\nSize=800,640\nCollapsed=0\n\n[Window][Dear ImGui Style Editor]\nViewportPos=218,20\nViewportId=0x6D551092\nSize=698,1026\nCollapsed=0\n\n[Window][Dear ImGui Metrics/Debugger]\nPos=0,39\nSize=757,970\nCollapsed=0\n\n[Window][About Dear ImGui]\nPos=60,60\nSize=507,152\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=1047,26\nSize=873,983\nCollapsed=0\n\n[Window][###ViewportWindow:3]\nPos=0,26\nSize=960,983\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###WorkspaceWindow:5]\nPos=861,449\nSize=1059,560\nCollapsed=0\n\n[Window][###ViewportWindow:4]\nPos=861,26\nSize=1059,421\nCollapsed=0\n\n[Window][###StyleEditor:8]\nViewportPos=60,83\nViewportId=0x350BA107\nSize=729,1026\nCollapsed=0\n\n[Window][###ModalWindow:10]\nViewportPos=763,463\nViewportId=0x0805B321\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:11]\nPos=763,440\nSize=393,128\nCollapsed=0\n\n[Window][###WorkspaceWindow:4]\nPos=962,26\nSize=958,493\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###ModalWindow:9]\nPos=692,104\nSize=16,42\nCollapsed=0\n\n[Window][###StatisticsWindow:10]\nPos=860,26\nSize=530,479\nCollapsed=0\n\n[Window][###ViewportWindow:9]\nPos=0,26\nSize=922,983\nCollapsed=0\n\n[Window][###ViewportWindow:10]\nPos=962,521\nSize=958,488\nCollapsed=0\nDockId=0x00000006,0\n\n[Window][###PreferencesWindow:11]\nPos=60,60\nSize=734,834\nCollapsed=0\n\n[Window][###PreferencesWindow:12]\nViewportPos=712,244\nViewportId=0x7C2A7915\nSize=548,770\nCollapsed=0\n\n[Window][###StyleEditor:7]\nViewportPos=220,99\nViewportId=0xA5B4BC96\nSize=729,1026\nCollapsed=0\n\n[Window][###ViewportWindow:11]\nPos=763,404\nSize=997,498\nCollapsed=0\n\n[Window][###ViewportWindow:12]\nPos=154,176\nSize=1084,619\nCollapsed=0\n\n[Window][###ModalWindow:13]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ViewportWindow:13]\nPos=231,185\nSize=600,300\nCollapsed=0\n\n[Window][###ModalWindow:14]\nPos=60,60\nSize=16,42\nCollapsed=0\n\n[Window][###ModalWindow:12]\nPos=1395,484\nSize=16,42\nCollapsed=0\n\n[Window][###ViewportWindow2]\nPos=962,487\nSize=958,522\nCollapsed=0\nDockId=0x00000008,0\n\n[Window][Dear ImGui ID Stack Tool]\nViewportPos=1433,547\nViewportId=0x811A7A42\nSize=607,504\nCollapsed=0\n\n[Window][###PreferencesWindow:9]\nPos=60,60\nSize=229,526\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,983 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000001 Parent=0x09EF459F SizeRef=960,983 Split=X\n    DockNode    ID=0x00000003 Parent=0x00000001 SizeRef=960,983 CentralNode=1 Selected=0xFB5B01A1\n    DockNode    ID=0x00000004 Parent=0x00000001 SizeRef=958,983 Split=Y Selected=0x7701E8A0\n      DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=958,493 Selected=0x7701E8A0\n      DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=958,488 Selected=0x595DCCCF\n  DockNode      ID=0x00000002 Parent=0x09EF459F SizeRef=958,983 Split=Y Selected=0xCDB9512A\n    DockNode    ID=0x00000007 Parent=0x00000002 SizeRef=958,459 Selected=0xCDB9512A\n    DockNode    ID=0x00000008 Parent=0x00000002 SizeRef=958,522 Selected=0xBCFB7B71\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n"
     },
     "tutorialData": {
         "LanguageId": 0,

@@ -15,8 +15,6 @@ class ViewportModule : public Module, public IStateful
 	UPtr<Vp::Viewport> m_viewport;
 
 public:
-	// TODO: Implement
-
 	/// Vector containing all active viewport windows. New windows are added dynamically but there will always be at
 	/// least one window. The windows are also ordered, the first window is always the primary one with index 1, the
 	/// next one will be index 2 and so on. Closing a window will decrement the index of ones after it.
