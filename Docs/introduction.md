@@ -28,8 +28,8 @@ In I3T, a student can create a scene that he or she has seen in a book.
 To support learning, I3T offers prepared scenes demonstrating typical tasks and tutorials, short lectures demonstrating transformations in practice, step by step. But the main strength of I3T is its interactivity. All parameter values can be interactively manipulated and we can instantly see the result of their application on 3D models.
 
 ## Variants of I3T use
-- If you want to learn how to use geometric transformations, download the translated program.
-- If you are interested in how the program is made, download the source code. 
-- If you'd like to add something to the program yourself or would like to get involved in its further development, make a fork on github and go ahead. 
+- If you want to learn how to use geometric transformations, download the translated program for **[Windows](https://github.com/i3t-tool/i3t/releases/download/v2.0.0-rc.5/I3T-Windows-v2.0.0-rc.5.zip)** or **[Linux](https://github.com/i3t-tool/i3t/releases/download/v2.0.0-rc.5/I3T-Linux-v2.0.0-rc.5.zip)**.
+- If you are interested in how the program is made, download the source code as **[ZIP](https://github.com/i3t-tool/i3t/archive/refs/tags/v2.0.0-rc.5.zip)** or **[TAR.GZ](https://github.com/i3t-tool/i3t/archive/refs/tags/v2.0.0-rc.5.tar.gz)**.
+- If you'd like to add something to the program yourself or would like to get involved in its further development, **[make a fork on GitHub](https://github.com/i3t-tool/i3t/fork)** and go ahead.
 
-If you find a bug, or have an idea for improvement, drop us a note, preferably in the form of an issue.
+If you find a bug, or have an idea for improvement, drop us a note, preferably in the form of **[an issue](https://github.com/i3t-tool/i3t/issues/new)**.
