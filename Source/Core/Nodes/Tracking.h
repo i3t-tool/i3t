@@ -66,8 +66,15 @@ struct TrackedNodeData
 	ID seqID{NIL_ID}; ///< Sequence node id
 	ID tID{NIL_ID};   ///< Transform node id
 
-	int childrenIdxStart = -1; ///< Index of the first contained sequence/transform (camera seqs, seqs transforms)
-	int childrenIdxEnd = -1;   ///< Index of the last contained sequence/transform (camera seqs, seqs transforms)
+	/**
+	 * Index of the first contained sequence, transform or matrix.
+	 * Cameras contain sequences.
+	 * Sequences contain transforms, however, a sequence itself can BE a transform, in which case it holds indices
+	 * of matrices, not transforms. The isSequenceTransform() can be used to check for such sequences, a sequence
+	 * acts as a transform when it has external data plugged into it.
+	 */
+	int childrenIdxStart = -1;
+	int childrenIdxEnd = -1; ///< Index of the last contained sequence, transform or matrix @see childrenIdxStart
 
 	explicit TrackedNodeData(MatrixTracker* tracker) : tracker(tracker)
 	{
@@ -259,9 +266,10 @@ class MatrixTracker final
 	glm::mat4 m_modelSubtreeRoot{1.f};
 
 public:
-	// Camera tracking
-	// TODO: Docs
-	// Determines whether the view space transformation is ignored or not.
+	// When false, view nad projections transformations are excluded from the tracked matrix accumulation/interpolation
+	// and instead are saved into the m_iViewMatrix and m_iProjMatrix fields. These fields can be then applied globally
+	// to the whole world to visualize their local spaces.
+	// When enabled, view and projection matrices are accumulated and interpolated like any other world space matrix.
 	bool m_trackInWorldSpace{false};
 
 	// TODO: Implement, Docs

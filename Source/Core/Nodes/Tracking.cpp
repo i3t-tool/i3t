@@ -134,10 +134,12 @@ void MatrixTracker::updateChain()
 			if (transform.currentNode->getId() == sequenceID)
 			{
 				// The transform is the sequence, we already have tracking data for it
-				m_trackedSequences.back()->data.tIndex = transformIdx++;
-				m_trackedSequences.back()->data.seqIndex = m_trackedSequences.size() - 1;
-				m_trackedSequences.back()->dataIndex = transform.dataIndex;
-				m_trackedTransforms.emplace_back(m_trackedSequences.back());
+				auto& trackedSequence = m_trackedSequences.back();
+				trackedSequence->data.tID = sequenceID; // tID == seqID indicates a "sequence transform"
+				trackedSequence->data.tIndex = transformIdx++;
+				trackedSequence->data.seqIndex = m_trackedSequences.size() - 1;
+				trackedSequence->dataIndex = transform.dataIndex;
+				m_trackedTransforms.emplace_back(trackedSequence);
 			}
 			else
 			{

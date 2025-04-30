@@ -322,7 +322,8 @@ bool WorkspaceWindow::showTrackingTimeline()
 		               timelineWidth * (leftToRight ? m_trackingSliderProgress : 1.f - m_trackingSliderProgress),
 		           sliderRect.GetCenter().y),
 		    ImVec2(WorkspaceModule::g_editor->m_trackingCursorPos),
-		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor) * ImVec4(1.f, 1.f, 1.f, 0.7f)));
+		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor) * ImVec4(1.f, 1.f, 1.f, 0.7f)),
+		    dpiScale);
 	}
 
 	return interacted;
@@ -717,6 +718,9 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 		                              is_clamp_input ? p_max : NULL);
 	}
 
+	if (ImGui::IsItemHovered())
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+
 	// Draw frame
 	// ImGui::RenderFrame(frame_bb.Min, frame_bb.Max, frame_col, true, g.Style.FrameRounding);
 
@@ -843,7 +847,9 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	{
 		float grabWidthH = grab_bb.GetSize().x / 4.f;
 		window->DrawList->AddRectFilled(grab_bb.Min - ImVec2(grabWidthH, 0), grab_bb.Max - ImVec2(grabWidthH, 0),
-		                                ImGui::ColorConvertFloat4ToU32(g.ActiveId == id ? cursorColActive : cursorCol),
+		                                ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
+		                                                               : g.HoveredId == id ? cursorColHovered
+		                                                                                   : cursorCol),
 		                                rounding);
 	}
 
