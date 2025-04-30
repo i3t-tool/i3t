@@ -23,7 +23,7 @@ const char* IWindow::getName()
 	if (m_nameNeedsUpdate)
 	{
 		m_name = std::string(fmt::format("{}###{}{}", m_title.c_str(), getID(),
-		                                 m_instanceIndex >= 1 ? std::to_string(m_instanceIndex) : ""));
+		                                 m_instanceIndex > 1 ? std::to_string(m_instanceIndex) : ""));
 	}
 	m_nameNeedsUpdate = false;
 	return m_name.c_str();
