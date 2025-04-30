@@ -223,15 +223,15 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
 	popupContentTracking();
 
 	ImGui::Separator();
 
 	drawMenuSetPrecision();
-
-	ImGui::Separator();
-
-	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
 

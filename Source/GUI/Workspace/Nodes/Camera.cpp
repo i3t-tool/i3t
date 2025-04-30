@@ -227,11 +227,11 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	ImGui::PopItemFlag();
 	ImGui::Separator();
 
-	drawMenuDuplicate(context);
+	CoreNode::drawMenuDuplicate(context);
 
 	ImGui::Separator();
 
-	Super::popupContent(context);
+	Node::popupContent(context);
 }
 
 void Camera::popupContentTracking()

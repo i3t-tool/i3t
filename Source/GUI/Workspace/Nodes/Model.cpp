@@ -211,11 +211,11 @@ void Model::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	popupContent_axis_showmodel();
+	drawMenuLevelOfDetail();
 
 	ImGui::Separator();
 
-	drawMenuLevelOfDetail();
+	popupContent_axis_showmodel();
 
 	ImGui::Separator();
 
