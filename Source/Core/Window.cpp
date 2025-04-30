@@ -111,3 +111,7 @@ void Window::finalize()
 {
 	glfwTerminate();
 }
+void Window::setVSync(bool enable)
+{
+	glfwSwapInterval(enable);
+}

@@ -112,13 +112,18 @@ int Application::run()
 	{
 		if (!frame())
 			break;
+
+		if (m_appLoopManager.shouldLimitFPS())
+			m_appLoopManager.sleepUntilNextFrame();
 	}
 	return exitCode;
 }
 
 bool Application::frame()
 {
-	glfwPollEvents();
+	m_appLoopManager.startFrame();
+
+	glfwWaitEventsTimeout(m_appLoopManager.getFrameDurationOnIdle());
 
 	CommandDispatcher::get().execute();
 	if (m_shouldClose)
@@ -189,9 +194,7 @@ void Application::endFrame()
 void Application::update()
 {
 	// Get delta
-	double current = glfwGetTime();
-	double delta = current - m_lastFrameSeconds;
-	m_lastFrameSeconds = current;
+	double delta = getDeltaTime();
 
 	for (auto& m : m_modules)
 	{
@@ -299,4 +302,20 @@ const std::string& Application::getTitle()
 void Application::setTitle(const std::string& title)
 {
 	m_window->setTitle(title.c_str());
+}
+
+void Application::setVSync(bool enable)
+{
+	m_appLoopManager.setVSync(enable);
+	m_window->setVSync(enable);
+}
+
+AppLoopManager& Application::getAppLoopManager()
+{
+	return m_appLoopManager;
+}
+
+double Application::getDeltaTime() const
+{
+	return m_appLoopManager.getDeltaTime();
 }

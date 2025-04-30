@@ -12,22 +12,42 @@
  */
 #pragma once
 
+#include "ApplicationSettings.h"
 #include "Core/Application.h"
 #include "GUI/Theme/Theme.h"
 #include "GUI/UIModule.h"
 
-class I3TApplication : public Application
+class I3TApplication : public Application, IStateful
 {
 public:
+	~I3TApplication() override;
+
 	bool m_debugWindowManager = false; ///< Debug switch for WindowManager, toggled in Help > Debug window manager
 	bool m_debugTrackball = false;     ///< Debug switch for WindowManager, toggled in Help > Debug trackball
 
+	static ApplicationSettings g_settings;
+
 protected:
 	void onInit() override;
-	void onBeginFrame() override{};
-	void onEndFrame() override{};
+	void onBeginFrame() override {}
+	void onEndFrame() override {}
 	void onUpdate(double delta) override;
 	void onClose() override;
+
+	// State save/load
+	// =============================================================================================================
+public:
+	Memento saveScene(State::Scene* scene) override;
+	void loadScene(const Memento& memento, State::Scene* scene) override {}
+	void appendScene(const Memento& memento, State::Scene* scene) override {}
+	void clearScene(bool newScene) override {}
+
+	Memento saveGlobal() override;
+	void loadGlobal(const Memento& memento) override;
+	void clearGlobal() override;
+
+	void saveSettings();
+	void loadSettings();
 };
 
 // Forward declarations
