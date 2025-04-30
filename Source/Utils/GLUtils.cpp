@@ -5,7 +5,7 @@
 
 namespace GLUtils
 {
-bool GLUtils::loadTexImage2D(const std::string& fileName, GLenum target)
+bool loadTexImage2D(const std::string& fileName, GLenum target)
 {
 	bool result = false;
 
@@ -29,7 +29,7 @@ bool GLUtils::loadTexImage2D(const std::string& fileName, GLenum target)
 	return result;
 }
 
-GLuint GLUtils::createTexture(const std::string& fileName, bool mipmap)
+GLuint createTexture(const std::string& fileName, bool mipmap)
 {
 	// generate and bind one texture
 	GLuint tex = 0;

@@ -153,7 +153,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 4);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
@@ -196,7 +196,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		                t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 3);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, interpParam);
@@ -212,7 +212,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		auto expected = t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 2);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
@@ -254,7 +254,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		    glm::interpolate(glm::mat4(1.0f), t.mat3->data().getMat4(), interpParam) * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 1);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
@@ -293,7 +293,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		auto expected = glm::mat4(1.0f);
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 0);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 0.0f);
@@ -345,7 +345,7 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 0);
 		EXPECT_EQ(tracker->getMatrixCount(), 4);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 0.0f);
@@ -363,7 +363,7 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		    t.mat1->data().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->data().getMat4(), interpParam);
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 1);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, interpParam);
@@ -381,7 +381,7 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 3);
 		EXPECT_EQ(tracker->getMatrixCount(), 4);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
@@ -397,7 +397,7 @@ TEST_F(TrackerTest, TrackingLeftToRight)
 		    t.mat1->data().getMat4() * t.mat2->data().getMat4() * t.mat3->data().getMat4() * t.mat4->data().getMat4();
 
 		EXPECT_EQ(tracker->getFullMatricesCount(), 4);
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getTrackingData()->progress, 1.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getTrackingData()->progress, 1.0f);
@@ -426,10 +426,10 @@ TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 
 	tracker->update();
 
-	EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
+	EXPECT_TRUE(Math::compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
 	EXPECT_TRUE(
-	    compare(mat->data().getMat4(), tracker->getTrackedModels().back()->data.modelData->m_interpolatedMatrix));
-	EXPECT_TRUE(compare(mat->data().getMat4(), model->getTrackingData()->modelData->m_interpolatedMatrix));
+	    Math::compare(mat->data().getMat4(), tracker->getTrackedModels().back()->data.modelData->m_interpolatedMatrix));
+	EXPECT_TRUE(Math::compare(mat->data().getMat4(), model->getTrackingData()->modelData->m_interpolatedMatrix));
 	EXPECT_EQ(model.get(), tracker->getTrackedModels().back()->node.lock().get());
 }
 
@@ -449,7 +449,7 @@ TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 
 		EXPECT_TRUE(GraphManager::isTracking());
 
-		EXPECT_TRUE(compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(mat->data().getMat4(), tracker->getInterpolatedMatrix()));
 	}
 
 	EXPECT_FALSE(GraphManager::isTracking());
@@ -484,6 +484,10 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
+	tracker->m_smartProjectionInterpolation = true; // TODO: Better handling of these initial settings
+	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->requestProgressUpdate();
+	tracker->update();
 
 	std::vector trans = {t.translate, t.lookAt, t.persp};
 	std::vector seqs = {t.s1, t.c1->getView(), t.c1->getProj()};
@@ -505,7 +509,7 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 
 		auto expected = t.persp->data().getMat4() * t.lookAt->data().getMat4() * t.translate->data().getMat4();
 
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
 		// Check internal data of tracker
@@ -547,12 +551,15 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 	}
 }
 
-
 TEST_F(TrackerTest, SimpleCameraTrackingInsideCamera)
 {
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.c1->getView(), t.c1, TrackingDirection::RightToLeft);
+	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->requestProgressUpdate();
+	tracker->update();
 
 	ASSERT_EQ(tracker->getCameraID(), t.c1->getId());
 
@@ -576,7 +583,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingInsideCamera)
 
 		auto expected = t.persp->data().getMat4() * t.lookAt->data().getMat4();
 
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
 		// Check internal data of tracker
@@ -619,6 +626,10 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
+	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->requestProgressUpdate();
+	tracker->update();
 
 	std::vector trans = {t.translate, t.lookAt, t.persp};
 	std::vector seqs = {t.s1, t.c1->getView(), t.c1->getProj()};
@@ -639,13 +650,13 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 
 		auto expected = t.translate->data().getMat4();
 
-		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		EXPECT_TRUE(compare(t.persp->data().getMat4(), tracker->m_iProjMatrix));
+		EXPECT_TRUE(Math::compare(t.persp->data().getMat4(), tracker->m_iProjMatrix));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, t.persp->data().getMat4(), tracker->m_iProjMatrix);
 
-		EXPECT_TRUE(compare(t.lookAt->data().getMat4(), tracker->m_iViewMatrix));
+		EXPECT_TRUE(Math::compare(t.lookAt->data().getMat4(), tracker->m_iViewMatrix));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, t.lookAt->data().getMat4(), tracker->m_iViewMatrix);
 
 		// Check internal data of tracker
@@ -684,6 +695,78 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 		ASSERT_EQ(t.lookAt->getTrackingData()->childrenIdxEnd, 2);
 		ASSERT_EQ(t.persp->getTrackingData()->childrenIdxStart, 2);
 		ASSERT_EQ(t.persp->getTrackingData()->childrenIdxEnd, 4);
+	}
+}
+
+TEST_F(TrackerTest, SimpleCameraTrackingSmartPerspective)
+{
+	SimpleCamTree t;
+
+	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
+	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposePerspectiveIntoOrthoAndPersp = true;
+	tracker->requestProgressUpdate();
+	tracker->update();
+
+	std::vector trans = {t.translate, t.lookAt, t.persp};
+	std::vector seqs = {t.s1, t.c1->getView(), t.c1->getProj()};
+
+	{
+		float trackingParam = 1.0f;
+		tracker->setProgress(trackingParam);
+
+		EXPECT_EQ(tracker->getFullMatricesCount(), 0);
+		EXPECT_EQ(tracker->getMatrixCount(), 5);
+		EXPECT_EQ(tracker->getTransformCount(), 3);
+
+		tracker->m_trackInWorldSpace = true;
+		tracker->update();
+
+		EXPECT_EQ(tracker->getFullMatricesCount(), 5);
+		EXPECT_EQ(tracker->getMatrixCount(), 5);
+		EXPECT_EQ(tracker->getTransformCount(), 3);
+
+		// TODO: Check result, or don't, asserts would likely catch an issue in code
+		// auto expected = t.persp->data().getMat4() * t.lookAt->data().getMat4() * t.translate->data().getMat4();
+		// EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
+		// EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
+
+		// Check internal data of tracker
+		std::vector seqIdx = {0, 1, 2};
+		std::vector interpolating = {false, false, true};
+		std::vector progress = {1.f, 1.f, 1.f};
+		std::vector chain = {false, false, false};
+		std::vector active = {true, true, true};
+		std::vector modelSubtree = {false, false, false};
+		std::vector isInCamera = {false, true, true};
+		std::vector space = {TransformSpace::Model, TransformSpace::View, TransformSpace::Projection};
+
+		std::vector seqSeqIdx = {0, 1, 2};
+		std::vector seqInterpolating = {false, false, true};
+		std::vector seqProgress = {1.f, 1.f, 1.f};
+		std::vector seqChain = {true, true, true};
+		std::vector seqActive = {true, true, true};
+		std::vector seqModelSubtree = {false, false, false};
+		std::vector seqIsInCamera = {false, true, true};
+		std::vector seqSpace = {TransformSpace::Model, TransformSpace::View, TransformSpace::Projection};
+
+		checkInternalData(tracker, 5, trans, seqs, seqIdx, interpolating, progress, chain, active, space, modelSubtree,
+		                  isInCamera, seqSeqIdx, seqInterpolating, seqProgress, seqChain, seqActive, seqSpace,
+		                  seqModelSubtree, seqIsInCamera);
+
+		ASSERT_EQ(seqs[0]->getTrackingData()->childrenIdxStart, 0);
+		ASSERT_EQ(seqs[0]->getTrackingData()->childrenIdxEnd, 1);
+		ASSERT_EQ(seqs[1]->getTrackingData()->childrenIdxStart, 1);
+		ASSERT_EQ(seqs[1]->getTrackingData()->childrenIdxEnd, 2);
+		ASSERT_EQ(seqs[2]->getTrackingData()->childrenIdxStart, 2);
+		ASSERT_EQ(seqs[2]->getTrackingData()->childrenIdxEnd, 3);
+
+		ASSERT_EQ(t.translate->getTrackingData()->childrenIdxStart, 0);
+		ASSERT_EQ(t.translate->getTrackingData()->childrenIdxEnd, 1);
+		ASSERT_EQ(t.lookAt->getTrackingData()->childrenIdxStart, 1);
+		ASSERT_EQ(t.lookAt->getTrackingData()->childrenIdxEnd, 2);
+		ASSERT_EQ(t.persp->getTrackingData()->childrenIdxStart, 2);
+		ASSERT_EQ(t.persp->getTrackingData()->childrenIdxEnd, 5);
 	}
 }
 

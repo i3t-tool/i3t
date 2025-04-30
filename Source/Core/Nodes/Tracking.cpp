@@ -556,21 +556,42 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 	// TODO: Different types of decomposition depending on the matrix type, add some kind of a hinting
 	//  option that indicates what type of matrix it is (opengl? directx? vulkan?, ortho/persp, can inspect the node)
 
-	// assert(!transform->useInternalMatrices);
-
 	glm::mat4 transformMat = transform->getMat();
-	auto [neg, proj] = ProjectionUtils::constructPositiveZPerspective(transformMat);
-	if (m_direction == TrackingDirection::RightToLeft)
+
+	bool isPerspective = transformMat[2][3] != 0.f;
+
+	if (isPerspective && m_decomposePerspectiveIntoOrthoAndPersp)
 	{
-		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
-		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		auto [neg, ortho, persp] = ProjectionUtils::constructPiecewisePerspective(transformMat);
+		if (m_direction == TrackingDirection::RightToLeft)
+		{
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		}
+		else
+		{
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
+		}
+		return 3;
 	}
 	else
 	{
-		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
+		auto [neg, proj] = ProjectionUtils::constructZFlippedProjection(transformMat);
+		if (m_direction == TrackingDirection::RightToLeft)
+		{
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		}
+		else
+		{
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
+		}
+		return 2;
 	}
-	return 2;
 }
 
 Ptr<Sequence> MatrixTracker::getSequence() const
@@ -704,6 +725,14 @@ void MatrixTracker::onNodeGraphChange(Node* node)
 		node->m_trackingData->tracker->m_modelsNeedUpdate = true;
 	}
 	node->m_trackingData->tracker->m_chainNeedsUpdate |= !node->m_trackingData->modelSubtree;
+}
+void MatrixTracker::requestChainUpdate()
+{
+	m_chainNeedsUpdate = true;
+}
+void MatrixTracker::requestProgressUpdate()
+{
+	m_progressNeedsUpdate = true;
 }
 
 std::string MatrixTracker::getDebugString()

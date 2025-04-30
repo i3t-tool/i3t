@@ -231,7 +231,9 @@ bool WorkspaceWindow::showTrackingTimeline()
 	ImGui::BeginGroup();
 
 	float trackingTitleScale = 1.2f;
-	std::string trackingTitle = fmt::format(_tbd("Tracking") " {:.2f}%", tracker->getProgress() * 100.f);
+	std::string trackingTitle = fmt::format(_tbd(ICON_FA_CROSSHAIRS " "
+	                                                                "Tracking") " {:.2f}%",
+	                                        tracker->getProgress() * 100.f);
 	ImVec2 trackingTitleSize = ImGui::CalcTextSize(trackingTitle.c_str());
 
 	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
@@ -283,7 +285,14 @@ bool WorkspaceWindow::showTrackingTimeline()
 			interacted = true;
 			ImGui::TextDisabled(_tbd("Tracking settings"));
 			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
-			I3TGui::MenuItemWithLog(_tbd("Track in world space"), nullptr, &tracker->m_trackInWorldSpace);
+			if (I3TGui::MenuItemWithLog(_tbd("Track in world space"), nullptr, &tracker->m_trackInWorldSpace))
+				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(_tbd("Smart perspective tracking"), nullptr,
+			                            &tracker->m_smartProjectionInterpolation))
+				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(_tbd("Extract ortho matrix from perspective"), nullptr,
+			                            &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
+				tracker->requestProgressUpdate();
 
 			ImGui::EndPopup();
 		}
@@ -789,29 +798,38 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	// Draw progress overlay
 	TrackingSlider_drawProgress(grab_bb, tInnerRect, rounding, progressOverlay, frame_col_after, leftToRight);
 
-	// Draw matrix ticks
-	// for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ :
-	// i--)
-	// {
-	// 	auto& matrix = trackedMatrices[i];
-	// 	float param = i * matStep;
-	// 	TrackingSlider_drawTick(param, trackRect, tInnerRect.GetHeight(), leftToRight, tickColor);
-	// }
-
-	// Draw transform ticks
-	for (auto& transform : tracker->getTrackedTransforms())
-	{
-		float param = transform->data.mIndex * matStep;
-		TrackingSlider_drawTick(param, trackRect, tOuterRect.GetHeight(), leftToRight, tickColor);
-	}
+	std::vector<int> filledTickSlots(matricesCount);
 
 	// Draw sequence ticks
 	for (auto& seq : tracker->getTrackedSequences())
 	{
 		if (seq->data.getChildCount() <= 0)
 			continue;
-		float param = seq->data.mIndex * matStep;
+		int i = seq->data.mIndex;
+		float param = i * matStep;
 		TrackingSlider_drawTick(param, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
+		filledTickSlots[i] = true;
+	}
+
+	// Draw transform ticks
+	for (auto& transform : tracker->getTrackedTransforms())
+	{
+		int i = transform->data.mIndex;
+		if (filledTickSlots[i])
+			continue;
+		float param = i * matStep;
+		TrackingSlider_drawTick(param, trackRect, tOuterRect.GetHeight(), leftToRight, tickColor);
+		filledTickSlots[i] = true;
+	}
+
+	// Draw matrix ticks
+	for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ : i--)
+	{
+		if (filledTickSlots[i])
+			continue;
+		auto& matrix = trackedMatrices[i];
+		float param = i * matStep;
+		TrackingSlider_drawTick(param, trackRect, tInnerRect.GetHeight() * 0.2f, leftToRight, tickColor, true);
 	}
 
 	// Draw last tick and arrow
@@ -822,20 +840,33 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x)
-		window->DrawList->AddRectFilled(grab_bb.Min, grab_bb.Max,
+	{
+		float grabWidthH = grab_bb.GetSize().x / 4.f;
+		window->DrawList->AddRectFilled(grab_bb.Min - ImVec2(grabWidthH, 0), grab_bb.Max - ImVec2(grabWidthH, 0),
 		                                ImGui::ColorConvertFloat4ToU32(g.ActiveId == id ? cursorColActive : cursorCol),
 		                                rounding);
+	}
+
 
 	return value_changed;
 }
 
 void WorkspaceWindow::TrackingSlider_drawTick(float tParam, const ImRect& trackRect, float height, bool leftToRight,
-                                              const ImVec4& tickColor)
+                                              const ImVec4& tickColor, bool drawDot)
 {
 	float tickPosX = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam);
 	float cy = trackRect.GetCenter().y;
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(tickPosX, cy - height / 2), ImVec2(tickPosX, cy + height / 2),
-	                                    ImGui::ColorConvertFloat4ToU32(tickColor), 2.f * ImGui::GetWindowDpiScale());
+	if (!drawDot)
+	{
+		ImGui::GetWindowDrawList()->AddLine(ImVec2(tickPosX, cy - height / 2), ImVec2(tickPosX, cy + height / 2),
+		                                    ImGui::ColorConvertFloat4ToU32(tickColor),
+		                                    2.f * ImGui::GetWindowDpiScale());
+	}
+	else
+	{
+		ImGui::GetWindowDrawList()->AddCircleFilled(ImVec2(tickPosX, cy), height,
+		                                            ImGui::ColorConvertFloat4ToU32(tickColor));
+	}
 }
 void WorkspaceWindow::TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight,
                                                const ImVec4& color)

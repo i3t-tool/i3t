@@ -20,6 +20,13 @@ void ViewportModule::onUpdate(double deltaSeconds)
 {
 	m_viewport->update(deltaSeconds);
 	m_interactingWindowIndex = 0;
+
+	// React to active tracking
+	if (Core::GraphManager::isTracking())
+	{
+		// Scene view 1 must be visible
+		m_viewportWindows[0]->show();
+	}
 }
 
 Ptr<UI::ViewportWindow> ViewportModule::getOrCreateViewportWindow(int index)

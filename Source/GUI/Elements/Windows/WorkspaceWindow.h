@@ -72,7 +72,7 @@ private:
 	                    const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0,
 	                    float minHeight = 0);
 	void TrackingSlider_drawTick(float tParam, const ImRect& trackRect, float height, bool leftToRight,
-	                             const ImVec4& tickColor);
+	                             const ImVec4& tickColor, bool drawDot = false);
 	void TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight, const ImVec4& color);
 	void TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, float margin, bool leftToRight,
 	                             const ImVec4& color, float rounding, float borderThickness = 0.f,

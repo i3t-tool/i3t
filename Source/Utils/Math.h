@@ -247,6 +247,9 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float eps
 	return true;
 }
 
+// bool compare(const glm::mat4& lhs, const glm::mat4& rhs, float epsilon = 0.001f);
+bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor = Math::FACTOR_SIMILAR);
+
 template <typename T>
 bool isNormalized(const T& val)
 {

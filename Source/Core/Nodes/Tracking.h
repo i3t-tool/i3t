@@ -264,8 +264,6 @@ public:
 	// Determines whether the view space transformation is ignored or not.
 	bool m_trackInWorldSpace{false};
 
-	bool m_positiveProjection{true}; // TODO: Implement, Docs
-
 	// TODO: Implement, Docs
 	/// If the camera projection sequence has a single transform in it, we can make educated or user directed
 	/// assumptions about the matrix data and separate it into multiple transforms to be interpolated separately.
@@ -273,6 +271,7 @@ public:
 	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
 	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
 	bool m_smartProjectionInterpolation{true};
+	bool m_decomposePerspectiveIntoOrthoAndPersp{true}; // TODO: Docs
 
 	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};
@@ -358,6 +357,9 @@ public:
 	/// Alerts the tracker of a structure change in the tracked nodes. Called in Core::Node::onPlug().
 	/// @note MatrixTracker::update() must be called for changes to take effect.
 	static void onNodeGraphChange(Node* node);
+
+	void requestChainUpdate();
+	void requestProgressUpdate();
 
 	std::string getDebugString();
 

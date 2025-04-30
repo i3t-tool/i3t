@@ -13,8 +13,25 @@
 // crazy format error on #
 #include "Utils/Math.h"
 
+#include "Format.h"
+
 namespace Math
 {
+// bool compare(const glm::mat4& lhs, const glm::mat4& rhs, float epsilon)
+bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor)
+{
+	// auto result = Math::eq(lhs, rhs, epsilon);
+	auto result = Math::eq(lhs, rhs, factor);
+	if (!result)
+	{
+		std::cerr << Utils::toString(lhs) << std::endl;
+		std::cerr << "!=\n";
+		std::cerr << Utils::toString(rhs) << std::endl;
+	}
+
+	return result;
+}
+
 glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat)
 {
 	glm::mat4 result;

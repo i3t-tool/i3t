@@ -31,12 +31,9 @@ namespace ProjectionUtils
  * @return Returns array of L,R,B,T,N,F
  */
 std::array<float, 6> decomposePerspective(const glm::mat4& m);
-
-std::array<glm::mat4, 2> constructPositiveZPerspective(const glm::mat4& m);
-
-// TODO: Implement
-std::array<glm::mat4, 3> constructPiecewisePerspective(float l, float r, float b, float t, float n, float f);
-
 void extractZNearZFar(const glm::mat4& projectionMatrix, float& zNear, float& zFar);
+
+std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m);
+std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m);
 
 }; // namespace ProjectionUtils

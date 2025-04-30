@@ -57,7 +57,7 @@ public:
 	ViewportWindow(ViewportModule* module, int index, bool show);
 	void render() override;
 
-	void updateSpace();
+	void updateSpace(); ///< Update state of the viewport reference matrix based on app context
 
 private:
 	Vp::Viewport* m_viewport;

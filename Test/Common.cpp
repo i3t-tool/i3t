@@ -19,21 +19,6 @@
 
 // using namespace Core;
 
-// bool compare(const glm::mat4& lhs, const glm::mat4& rhs, float epsilon)
-bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor)
-{
-	// auto result = Math::eq(lhs, rhs, epsilon);
-	auto result = Math::eq(lhs, rhs, factor);
-	if (!result)
-	{
-		std::cerr << Utils::toString(lhs) << std::endl;
-		std::cerr << "!=\n";
-		std::cerr << Utils::toString(rhs) << std::endl;
-	}
-
-	return result;
-}
-
 // usage EXPECT_TRUE(assertionCompare(lhs, rhs, ))
 testing::AssertionResult assertionCompare(const glm::mat4& lhs, const glm::mat4& rhs, int factor)
 {
