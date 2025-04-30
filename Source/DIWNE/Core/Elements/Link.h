@@ -34,6 +34,7 @@ protected:
 	float m_squaredDistanceMouseFromLink{std::numeric_limits<float>::max()};
 
 	ImVec4 m_color;
+	float m_widthOffset{0.f};
 
 public:
 	bool m_previewPlugged{false}; ///< Style the link as if it was plugged in

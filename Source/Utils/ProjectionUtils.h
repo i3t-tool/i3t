@@ -1,0 +1,42 @@
+/**
+ * \file
+ * \brief Declares some math functions
+ * \authors Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
+#pragma once
+
+#include <array>
+
+#include <glm/matrix.hpp>
+
+namespace ProjectionUtils
+{
+/**
+ * Decomposes the standard OpenGL perspective projection matrix into 6 frustum parameters.
+ * m[0,0] = 2n/(R-L)
+ * m[1,1] = 2n/(T-B)
+ * m[2,0] = (R+L)/(R-L)
+ * m[2,1] = (T+B)/(T-B)
+ * m[2,2] = -(f+n)/(f-n) = A    (-1 for infinity f)
+ * m[3,2] = -(2fn)/(f-n) = B    (-2n for infinity f)
+ * m[2,3] = -1
+ * @param m The perspective matrix
+ * @return Returns array of L,R,B,T,N,F
+ */
+std::array<float, 6> decomposePerspective(const glm::mat4& m);
+
+std::array<glm::mat4, 2> constructPositiveZPerspective(const glm::mat4& m);
+
+// TODO: Implement
+std::array<glm::mat4, 3> constructPiecewisePerspective(float l, float r, float b, float t, float n, float f);
+
+void extractZNearZFar(const glm::mat4& projectionMatrix, float& zNear, float& zFar);
+
+}; // namespace ProjectionUtils

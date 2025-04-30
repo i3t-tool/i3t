@@ -17,7 +17,7 @@
 
 using namespace Core;
 
-class TransformChainTest : public GraphManagerTestFixture
+class TransformChainTest : public GraphManagerTestFixtureSuite
 {};
 
 void testChain(TransformChain& chain, const std::vector<TransformInfo>& expected)
@@ -211,14 +211,16 @@ TEST_F(TransformChainTest, GetNonEmptyParentSequence)
 
 	auto* t = GraphManager::startTracking(s3, TrackingDirection::LeftToRight);
 	const auto t3 = s3->getMatrices().back();
-	t->setParam(0.2f);
+	t->setProgress(0.2f);
+	t->update();
 	EXPECT_NE(t->getInterpolatedTransformID(), s1->getId());
 	EXPECT_EQ(t->getInterpolatedTransformID(), s2->getId());
 	EXPECT_NE(t->getInterpolatedTransformID(), s3->getId());
 	EXPECT_FLOAT_EQ(s2->getTrackingData()->progress, 2 * 0.2f);
 	EXPECT_FLOAT_EQ(t3->getTrackingData()->progress, 0.0f);
 
-	t->setParam(0.8f);
+	t->setProgress(0.8f);
+	t->update();
 	EXPECT_NE(t->getInterpolatedTransformID(), s1->getId());
 	EXPECT_NE(t->getInterpolatedTransformID(), s2->getId());
 	EXPECT_EQ(t->getInterpolatedTransformID(), t3->getId());

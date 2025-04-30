@@ -14,6 +14,10 @@
 
 #include "DIWNE/diwne_include.h"
 
+namespace Core
+{
+enum class EValueType;
+}
 namespace Workspace
 {
 
@@ -24,11 +28,16 @@ class CoreLink : public DIWNE::Link
 public:
 	CoreLink(DIWNE::NodeEditor& diwne);
 
-	void popupContent(DIWNE::DrawInfo& context) override;
 	void initialize(DIWNE::DrawInfo& context) override;
+	void content(DIWNE::DrawInfo& context) override;
+
+	void popupContent(DIWNE::DrawInfo& context) override;
 
 	bool allowSelectOnClick(const DIWNE::DrawInfo& context) const override;
 
 	void updateControlPoints() override;
+
+protected:
+	Core::EValueType m_coreType;
 };
 } // namespace Workspace

@@ -122,7 +122,6 @@ public:
 	bool isTrackingFromLeft() const;
 
 	// Tracking progress
-	void processTrackingMove();
 	void trackingSmoothLeft();
 	void trackingSmoothRight();
 	void trackingJaggedLeft();

@@ -245,8 +245,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 void Sequence::popupContentTracking()
 {
 	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-	if (workspaceDiwne.isTracking() &&
-	    workspaceDiwne.getTracker()->getSequence()->getId() == this->getNodebase()->getId())
+	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getSequenceID() == this->getNodebase()->getId())
 	{
 		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
 		{
@@ -285,7 +284,7 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
 	if (t)
 	{
-		if (t->index >= 0)
+		if (t->isSequenceTransform() || t->getChildCount() == 0)
 		{
 			const ImRect& center = m_center.getRect();
 			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);

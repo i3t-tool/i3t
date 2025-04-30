@@ -1,7 +1,7 @@
 #include "ViewportModule.h"
 
 #include "GUI/Fonts/Bindings/BindingFontAwesome.h"
-#include "GUI/Workspace/WorkspaceModule.h";
+#include "GUI/Workspace/WorkspaceModule.h"
 
 ViewportModule::ViewportModule()
 {

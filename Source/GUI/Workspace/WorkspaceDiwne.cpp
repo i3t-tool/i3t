@@ -223,27 +223,8 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 			this->cutSelectedNodes();
 		if (InputManager::isActionTriggered("duplicateSelected", EKeyState::Pressed))
 			this->duplicateSelectedNodes();
-		if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
-			this->stopTracking();
-		if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
-			this->trackingSmoothLeft();
-		if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
-			this->trackingSmoothRight();
-		if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
-			this->trackingJaggedLeft();
-		if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
-			this->trackingJaggedRight();
-		// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
-		// 	this->trackingModeSwitch();
-		// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
-		// 	this->trackingSwitch();
-		// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
-		// 	this->trackingSwitchOn();
-		// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
-		// 	this->trackingSwitchOff();
 		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
 			this->toggleSelectedNodesVisibility();
-		processTrackingMove();
 	}
 }
 
@@ -556,21 +537,6 @@ bool WorkspaceDiwne::isTrackingFromLeft() const
 	return Core::GraphManager::isTrackingFromLeft();
 }
 
-void WorkspaceDiwne::processTrackingMove()
-{
-	if (isTracking())
-	{
-		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
-		{
-			this->trackingSmoothLeft();
-		}
-		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
-		{
-			this->trackingSmoothRight();
-		}
-	}
-}
-
 void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (isTracking() && smoothTracking)
@@ -585,9 +551,9 @@ void WorkspaceDiwne::trackingSmoothLeft()
 		Core::MatrixTracker* tracking = getTracker();
 		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
 		if (isTrackingFromLeft())
-			tracking->setParam(tracking->getParam() - step);
+			tracking->setProgress(tracking->getProgress() - step);
 		else
-			tracking->setParam(tracking->getParam() + step);
+			tracking->setProgress(tracking->getProgress() + step);
 	}
 }
 
@@ -605,9 +571,9 @@ void WorkspaceDiwne::trackingSmoothRight()
 		Core::MatrixTracker* tracking = getTracker();
 		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
 		if (isTrackingFromLeft())
-			tracking->setParam(tracking->getParam() + step);
+			tracking->setProgress(tracking->getProgress() + step);
 		else
-			tracking->setParam(tracking->getParam() - step);
+			tracking->setProgress(tracking->getProgress() - step);
 	}
 }
 
@@ -618,9 +584,9 @@ void WorkspaceDiwne::trackingJaggedLeft()
 	{
 		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
 		if (isTrackingFromLeft())
-			tracking->setParam(tracking->getParam() - step);
+			tracking->setProgress(tracking->getProgress() - step);
 		else
-			tracking->setParam(tracking->getParam() + step);
+			tracking->setProgress(tracking->getProgress() + step);
 	}
 }
 
@@ -632,9 +598,9 @@ void WorkspaceDiwne::trackingJaggedRight()
 		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
 
 		if (isTrackingFromLeft())
-			tracking->setParam(tracking->getParam() + step);
+			tracking->setProgress(tracking->getProgress() + step);
 		else
-			tracking->setParam(tracking->getParam() - step);
+			tracking->setProgress(tracking->getProgress() - step);
 	}
 }
 

@@ -71,7 +71,7 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 {
 	const auto result = pushMatrix(matrix, m_storage.m_matrices.size());
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 
@@ -79,7 +79,7 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcep
 {
 	const auto result = m_storage.addMatrix(matrix, index);
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 
@@ -87,7 +87,7 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcep
 {
 	const auto result = m_storage.popMatrix(index);
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 

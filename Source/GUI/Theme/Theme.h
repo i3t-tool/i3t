@@ -326,7 +326,8 @@ enum class ESize
 	Nodes_Border_Rounding,
 	Nodes_Border_Thickness,
 
-	Nodes_Transformation_TrackingMarkSize,
+	Nodes_Tracking_CursorSize,
+	Nodes_Tracking_LinkWidth,
 
 	Default_VisiblePrecision,
 	Default_VisibleQuaternionPrecision,

@@ -104,6 +104,15 @@ inline void Tooltip(const char* header, const char* description)
 	ImGui::EndTooltip();
 }
 
+// ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_Stationary
+inline void TooltipItem(const char* header, const char* description,
+                        ImGuiHoveredFlags hoverFlags = ImGuiHoveredFlags_ForTooltip)
+{
+	if (!ImGui::IsItemHovered(hoverFlags))
+		return;
+	Tooltip(header, description);
+}
+
 /**
  * Works out pixel width of data items based on the provided parameters.
  * @param fontSize Current font size in pixels

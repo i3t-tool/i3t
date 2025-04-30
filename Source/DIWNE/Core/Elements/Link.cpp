@@ -85,6 +85,7 @@ void Link::onHover(DrawInfo& context)
 void Link::content(DrawInfo& context)
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
+
 	if (m_selected)
 	{
 		diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
@@ -102,7 +103,7 @@ void Link::content(DrawInfo& context)
 	}
 
 	diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH));
+	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH) + m_widthOffset);
 	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);

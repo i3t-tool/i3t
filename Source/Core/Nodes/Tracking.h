@@ -59,8 +59,12 @@ struct TrackedNodeData
 
 	UPtr<TrackedModelData> modelData = nullptr; ///< Extra model data held for models.
 
-	int seqIndex = -1; ///< Sequence index within the chain, -1 in model subtree. >= 0 indicates this is a sequence
-	int index = -1;    ///< Transform index within the chain, >= 0 indicates transform, a sequence CAN be a transform
+	int seqIndex = -1; ///< Sequence index within the chain, -1 in model subtree. Valid for sequences and transforms.
+	int tIndex = -1;   ///< Transform index within the chain, >= 0 indicates transform, a sequence CAN be a transform.
+	int mIndex = -1;   ///< Matrix index within the chain, a transform node can represent multiple matrices
+
+	ID seqID{NIL_ID}; ///< Sequence node id
+	ID tID{NIL_ID};   ///< Transform node id
 
 	int childrenIdxStart = -1; ///< Index of the first contained sequence/transform (camera seqs, seqs transforms)
 	int childrenIdxEnd = -1;   ///< Index of the last contained sequence/transform (camera seqs, seqs transforms)
@@ -69,6 +73,13 @@ struct TrackedNodeData
 	{
 		assert(tracker != nullptr);
 	}
+
+	/// Whether this node is both a sequence and a transform (eg. we're using the sequence data as transform)
+	bool isSequenceTransform() const;
+
+	/// Returns the number of children, what children are and if there are any depends on the particular node type.
+	/// Cameras contain sequences, sequences contain transforms, transforms contain tracked matrix objects.
+	int getChildCount() const;
 };
 
 enum class TrackingDirection
@@ -105,6 +116,8 @@ enum class TrackingDirection
  */
 class MatrixTracker final
 {
+	friend struct TrackedNodeData;
+
 	/**
 	 * Internal wrapper of core nodes for managing tracking data for each node involved in the tracking operation.
 	 * Sets and unsets the node's tracking data pointer using RAII. Is NOT copyable.
@@ -133,28 +146,77 @@ class MatrixTracker final
 		TrackedNode& operator=(TrackedNode other) = delete;
 	};
 
+	/**
+	 * Internal tracked node wrapper representing a "transform", a node containing matrix data.
+	 * Usually contains a single matrix but can contain multiple.
+	 * @note Matrix or matrices of the transform are held by TrackedMatrix object(s) corresponding to the
+	 * TrackedNodeData child indices.
+	 */
 	struct TrackedTransform : TrackedNode
 	{
 		TrackedTransform(const Ptr<Node>& node, TrackedNodeData&& data) : TrackedNode(node, std::move(data)) {}
 		TrackedTransform(const TrackedTransform& other) = delete;
 		TrackedTransform(TrackedTransform&& other) = delete;
 
-		int dataIndex = 0; ///< Index of the matrix data storage holding the transform
+		/// How many piecewise matrices this transform contains
+		/// A transfrom is usually a single matrix, but in special cases we might want to decompose this matrix
+		/// into multiple partial matrices and track them separately.
+		int getMatrixCount() const
+		{
+			return data.getChildCount();
+		}
 
-		[[nodiscard]] glm::mat4 getMat() const
+		[[nodiscard]] const glm::mat4& getMat() const
 		{
 			return node.lock()->data(dataIndex).getMat4();
 		}
+
+		int dataIndex = 0; ///< Index of the matrix data storage holding the transform
+	};
+
+	/**
+	 * Internal helper object representing a single matrix. Usually represents the single matrix of a transform, in
+	 * which case it simply retrieves the matrix of that transform's node. However it can carry its own data and
+	 * represent one of multiple matrices in a single transform.
+	 */
+	struct TrackedMatrix
+	{
+		TrackedTransform* transform;
+		glm::mat4 matrix{1.f}; ///< Matrix data, valid when useOwnData is true.
+
+		// Temporary tracking information later forwarded to a parent transform.
+		bool interpolating{false};
+		float progress{0.f};
+		bool active{false};
+
+		/// Tracked matrix representing matrix data of a tracked transform.
+		TrackedMatrix(TrackedTransform* transform) : transform(transform) {}
+
+		/// Tracked matrix holding an independent matrix
+		TrackedMatrix(TrackedTransform* transform, const glm::mat4& matrix)
+		    : transform(transform), matrix(matrix), useOwnData(true)
+		{}
+
+		[[nodiscard]] const glm::mat4& getMat() const
+		{
+			if (!useOwnData)
+				return transform->getMat();
+			return matrix;
+		}
+
+	private:
+		bool useOwnData{false};
 	};
 
 	float m_param = 0.0f; ///< Tracking time parameter (0..1),
 
 	/// Interpolated matrix corresponding to the current time parameter.
 	glm::mat4 m_interpolatedMatrix{1.0f};
+	ID m_interpolatedTransformID = NIL_ID; ///< ID of the currently interpolated transformation / operator
 
+	int m_matrixCount = 0; /// Total number of matrices
 	/// Number of fully accumulated matrices, eg. matrices prior to the interpolated one.
 	std::size_t m_fullMatricesCount = 0;
-	ID m_interpolatedTransformID = NIL_ID; ///< ID of the currently interpolated transformation / operator
 
 	/// Direction of tracking, the direction in which the multiplication of matrices is accumulated.
 	/// Or in other other words how parentheses are put into the multiplication chain.
@@ -170,11 +232,18 @@ class MatrixTracker final
 	/// properly. In other words, the search for the parent camera is deferred to the user.
 	WPtr<Camera> m_beginCamera;
 
-	/// List of all sequences involved in the tracking operation with supplemental tracking data for each.
-	std::vector<Ptr<TrackedTransform>> m_trackedSequences;
-
-	/// List of all individual tracked transformation nodes, containing the matrix data.
+	/// List of all individual tracked transformation nodes, contains one or more TrackedMatrix objects.
+	/// A transform can be a transformation node or a sequence. They usually contain a single matrix, but a transform
+	/// can be decomposed by the tracker into multiple matrices, hence transforms reference potentially multiple
+	/// TrackedMatrix objects, which are the objects the tracker actually works with during interpolation.
 	std::vector<Ptr<TrackedTransform>> m_trackedTransforms;
+
+	/// List of all tracked matrices, objects actually containing the matrix data. Owned by a single transform.
+	std::vector<UPtr<TrackedMatrix>> m_matrices;
+
+	/// List of all sequences involved in the tracking operation with supplemental tracking data for each.
+	/// Sequences always contain one or more transforms. A sequence can be its own transform when connected externally.
+	std::vector<Ptr<TrackedTransform>> m_trackedSequences;
 
 	/// The tracked camera if applicable, only one since a camera always ends the chain (has no matrix mul input)
 	UPtr<TrackedNode> m_trackedCamera;
@@ -195,6 +264,16 @@ public:
 	// Determines whether the view space transformation is ignored or not.
 	bool m_trackInWorldSpace{false};
 
+	bool m_positiveProjection{true}; // TODO: Implement, Docs
+
+	// TODO: Implement, Docs
+	/// If the camera projection sequence has a single transform in it, we can make educated or user directed
+	/// assumptions about the matrix data and separate it into multiple transforms to be interpolated separately.
+	///
+	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
+	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
+	bool m_smartProjectionInterpolation{true};
+
 	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};
 
@@ -202,8 +281,11 @@ public:
 	glm::mat4 m_iProjMatrix{1.0f};
 
 private:
-	bool m_chainNeedsUpdate = true; ///< Whether the tracked matrix chain needs update
+	float m_newParam = 0.0f; ///< Newly set tracking time parameter last set by setProgress().
+
+	bool m_chainNeedsUpdate = true; ///< Whether the tracked matrix chain needs update (due to graph structure changes).
 	bool m_modelsNeedUpdate = true; ///< Whether the tracked model list needs to be updated (due to a structural change)
+	bool m_progressNeedsUpdate = true;       ///< Whether tracked matrices need an update, called on matrix value change
 	bool m_modelTransformsNeedUpdate = true; ///< Whether the tracked model transforms need to be updated
 
 public:
@@ -213,8 +295,13 @@ public:
 	MatrixTracker(Ptr<Sequence> beginSequence, Ptr<Camera> beginCamera, TrackingDirection direction);
 	~MatrixTracker();
 
-	bool setParam(float param);
-	float getParam() const
+	/// Set the tracker's progress parameter, a value from 0 to 1.
+	/// The change will only take effect after the next MatrixTracker::update() call.
+	/// Meaning subsequent getProgress() calls will return the old value until update.
+	void setProgress(float param);
+
+	/// Returns the current processed time parameter of the tracker. The value might change after a call to update().
+	float getProgress() const
 	{
 		return m_param;
 	}
@@ -224,13 +311,16 @@ public:
 	TrackingDirection getDirection() const;
 	bool isTrackingFromLeft() const;
 
-	// TODO: Implement
 	void reverseDirection();
 
+	/// Updates the state of the tracker, reacts to any changes induced by other method calls.
+	/// This method is meant to be run frequently and does lazy evaluation based on internal flags.
 	void update();
 
-	Ptr<Sequence> getSequence() const;
-	ID getSequenceID() const;
+	Ptr<Sequence> getSequence() const; ///< Returns the begin sequence
+	Ptr<Camera> getCamera() const;     ///< Returns the begin camera (if provided)
+	ID getSequenceID() const;          ///< Returns the begin sequence ID
+	ID getCameraID() const;            ///< Returns the begin camera ID (if provided)
 
 	const glm::mat4& getInterpolatedMatrix() const
 	{
@@ -244,25 +334,34 @@ public:
 	{
 		return m_fullMatricesCount;
 	}
-	int getTransformCount() const; ///< Returns the number of tracked matrices / transformations.
+	int getTransformCount() const; ///< Returns the number of tracked transform nodes.
+	/// Returns the number of tracked matrices / transformations. Greater or equal to transform count.
+	int getMatrixCount() const;
 
+	/// Returns an internal list of tracked sequence objects. Use with care and DO NOT MODIFY.
 	const std::vector<Ptr<TrackedTransform>>& getTrackedSequences() const;
+	/// Returns an internal list of tracked transform objects. Use with care and DO NOT MODIFY.
 	const std::vector<Ptr<TrackedTransform>>& getTrackedTransforms() const;
-
-	std::vector<Ptr<Model>> getModels() const; ///< Returns a list of tracked model nodes.
+	/// Returns an internal list of tracked model objects. Use with care and DO NOT MODIFY.
+	const std::vector<UPtr<TrackedNode>>& getTrackedModels() const;
+	/// Returns an internal list of matrix objects. Use with care and DO NOT MODIFY.
+	const std::vector<UPtr<TrackedMatrix>>& getMatrices() const;
 
 	/// Alerts the tracker that a node has been destroyed. Called in Core::Node::finalize().
+	/// @note MatrixTracker::update() must be called for changes to take effect.
 	static void onNodeDestroy(Node* node);
 
 	/// Alerts the tracker that a tracked node has been updated. Called in Core::Node::onUpdate().
+	/// @note MatrixTracker::update() must be called for changes to take effect.
 	static void onNodeUpdate(Node* node);
 
 	/// Alerts the tracker of a structure change in the tracked nodes. Called in Core::Node::onPlug().
+	/// @note MatrixTracker::update() must be called for changes to take effect.
 	static void onNodeGraphChange(Node* node);
 
 	std::string getDebugString();
 
-private:
+protected:
 	/// Traverses the graph from the begin sequence, updating the sequence/matrix chain.
 	/// @note Should be called when the matrices along the chain change, be it due to change of structure or any value.
 	void updateChain();
@@ -289,5 +388,14 @@ private:
 
 	/// Reset the matrix tracker to empty / inactive state
 	void reset();
+
+private:
+	/// Handle smart decomposition of a projection transform
+	/// This method must initialize and add at least one TrackedMatrix object to the m_matrices list.
+	/// @return Number of added matrices
+	int handleProjectionTransform(const std::shared_ptr<TrackedTransform>& value);
+
+	void accumulateMatrix(glm::mat4& accMatrix, const TrackedTransform& trackedTransform,
+	                      const glm::mat4& transformMatrix);
 };
 } // namespace Core

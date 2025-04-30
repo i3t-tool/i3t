@@ -20,7 +20,7 @@
 
 using namespace Core;
 
-class ModelNodeTest : public GraphManagerTestFixture
+class ModelNodeTest : public GraphManagerTestFixtureSuite
 {};
 
 TEST_F(ModelNodeTest, ShouldConsumeTransformMatrix)

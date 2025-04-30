@@ -21,7 +21,6 @@ namespace Vp
 {
 namespace GfxUtils
 {
-void extractZNearZFar(glm::mat4 projectionMatrix, float& zNear, float& zFar);
 
 inline std::pair<glm::vec3, glm::vec3> createBoundingBox(std::vector<glm::vec3> points)
 {

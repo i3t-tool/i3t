@@ -63,7 +63,7 @@ protected:
 	}
 };
 
-class GraphManagerTestFixture : public ::testing::Test
+class GraphManagerTestFixtureSuite : public ::testing::Test
 {
 protected:
 	static void SetUpTestSuite()
@@ -72,6 +72,20 @@ protected:
 	}
 
 	static void TearDownTestSuite()
+	{
+		GraphManager::destroy();
+	}
+};
+
+class GraphManagerTestFixture : public ::testing::Test
+{
+protected:
+	void SetUp() override
+	{
+		GraphManager::init();
+	}
+
+	void TearDown() override
 	{
 		GraphManager::destroy();
 	}

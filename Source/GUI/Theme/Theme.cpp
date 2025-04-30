@@ -405,7 +405,8 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Nodes_Border_Rounding] = {5.0f, true};
 	m_sizes[ESize::Nodes_Border_Thickness] = {1.5f, true};
 
-	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = {5.f, true};
+	m_sizes[ESize::Nodes_Tracking_CursorSize] = {5.f, true};
+	m_sizes[ESize::Nodes_Tracking_LinkWidth] = {9.f, true};
 
 	m_sizes[ESize::Window_Rounding] = {0.0f, true};
 	m_sizes[ESize::Frame_Rounding] = {0.0f, true};
@@ -670,7 +671,8 @@ void Theme::initNames()
 	    .add(ESize::Nodes_OutputsAlignment, "Nodes Outputs Alignment")  // Unused?
 	    .add(ESize::Nodes_leftSideSpacing, "Nodes Left Side spacing")   // Unused?
 	    .add(ESize::Nodes_rightSideSpacing, "Nodes Right Side spacing") // Unused?
-	    .add(ESize::Nodes_Transformation_TrackingMarkSize, "Nodes Transformation TrackingMarkSize")
+	    .add(ESize::Nodes_Tracking_CursorSize, "Nodes Transformation TrackingMarkSize")
+	    .add(ESize::Nodes_Tracking_LinkWidth, "Nodes Tracking Link Width")
 	    .add(ESize::Default_VisiblePrecision, "Nodes Default Visible Precision")
 	    .add(ESize::Default_VisibleQuaternionPrecision, "Nodes Default Visible Precision For Quaternions")
 	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")

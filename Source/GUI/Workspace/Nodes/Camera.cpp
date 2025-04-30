@@ -12,8 +12,10 @@
  */
 #include "Camera.h"
 
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
+#include "GUI/Workspace/WorkspaceDiwne.h"
 
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneCamera.h"
@@ -123,6 +125,10 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
+	popupContentTracking();
+
+	ImGui::Separator();
+
 	auto cameraPtr = m_viewportCamera.lock();
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
@@ -226,6 +232,37 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	ImGui::Separator();
 
 	Super::popupContent(context);
+}
+
+void Camera::popupContentTracking()
+{
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
+	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getCameraID() == this->getNodebase()->getId())
+	{
+		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
+		{
+			workspaceDiwne.stopTracking();
+		}
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		{
+			workspaceDiwne.trackingModeSwitch();
+		}
+	}
+	else
+	{
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
+		{
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
+			{
+				workspaceDiwne.startTracking(getView().get(), false);
+			}
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+			{
+				workspaceDiwne.startTracking(getView().get(), true);
+			}
+			ImGui::EndMenu();
+		}
+	}
 }
 
 glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)

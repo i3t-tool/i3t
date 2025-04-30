@@ -73,6 +73,7 @@ public:
 	int getLODCount() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
+	void popupContentTracking();
 
 	int maxLengthOfData() override;
 

@@ -38,17 +38,22 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	EXPECT_EQ(expectedPV, cameraNode->data(1).getMat4());
 }
 
-TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
+TEST(CameraNodeTest, CameraAndSequenceCanBeConnected)
 {
-	// TODO: This will not be true anymore for camera tracking! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//  Test that an identity is provided instead
+	// This used to be 'CameraAndSequenceCannotBeConnected' but that got changed.
 	auto camera = GraphManager::createCamera();
 	auto sequence = GraphManager::createSequence();
 
-	EXPECT_TRUE(camera->getOutput(I3T_CAMERA_OUT_MUL).isDisabled());
+	camera->getProj()->pushMatrix(GraphManager::createTransform<ETransformType::Perspective>());
+	camera->getView()->pushMatrix(GraphManager::createTransform<ETransformType::LookAt>());
+
+	EXPECT_FALSE(camera->getOutput(I3T_CAMERA_OUT_MUL).isDisabled());
 
 	const auto result = GraphManager::plug(camera, sequence, I3T_CAMERA_OUT_MUL, I3T_SEQ_IN_MUL);
-	EXPECT_EQ(result, ENodePlugResult::Err_DisabledPin);
+	EXPECT_NE(result, ENodePlugResult::Err_DisabledPin);
+	EXPECT_EQ(result, ENodePlugResult::Ok);
+
+	EXPECT_EQ(glm::identity<glm::mat4>(), camera->getOutput(I3T_CAMERA_OUT_MUL).data().getMat4());
 }
 
 TEST(CameraNodeTest, AllowedCameraScreenProjectionLoop)

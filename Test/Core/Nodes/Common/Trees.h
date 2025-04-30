@@ -13,6 +13,7 @@
 #pragma once
 
 #include "Core/Nodes/GraphManager.h"
+#include "Generator.h"
 
 #include "../Utils.h"
 
@@ -346,5 +347,36 @@ struct GeneralTestTree
 		plug_expectOk(op1, op5, 0, 0);
 		plug_expectOk(op4, op2, 0, 0);
 		plug_expectOk(op2, op3, 0, 0);
+	}
+};
+
+/**
+ * |/ Cam /////////|     |/ Seq /////|
+ * | Proj | LookAt | --- | Translate |
+ * |///////////////|     |///////////|
+ */
+struct SimpleCamTree
+{
+	Ptr<Sequence> s1;
+	Ptr<Camera> c1;
+
+	Ptr<Transform> persp;
+	Ptr<Transform> lookAt;
+	Ptr<Transform> translate;
+
+	SimpleCamTree()
+	{
+		s1 = GraphManager::createSequence(), c1 = GraphManager::createCamera(),
+		lookAt = Builder::createTransform<ETransformType::LookAt>();
+		persp = Builder::createTransform<ETransformType::Perspective>();
+		translate = Builder::createTransform<ETransformType::Translation>();
+
+		s1->pushMatrix(translate);
+		c1->getProj()->pushMatrix(persp);
+		c1->getView()->pushMatrix(lookAt);
+
+		plug_expectOk(c1, s1, I3T_CAMERA_OUT_MUL, I3T_SEQ_IN_MUL);
+
+		translate->setDefaultValue("translation", generateVec3());
 	}
 };

@@ -162,9 +162,10 @@ void CoreNode::endDiwne(DIWNE::DrawInfo& context)
 		if (m_nodebase)
 		{
 			if (auto t = m_nodebase->getTrackingData())
-				trackingInfo = fmt::format("Tracking ({:.2f} {})\nidx: {}, c: {:d}, a: {:d}, i: {:d}, s: {:d}",
-				                           t->progress, t->interpolating ? "X" : "", t->index, t->chain, t->active,
-				                           t->interpolating, t->modelSubtree);
+				trackingInfo =
+				    fmt::format("Tracking ({:.2f} {})\nidx: {}, tIdx: {}, sIdx: {}, flags: c{:d}a{:d}i{:d}m:{:d}",
+				                t->progress, t->interpolating ? "X" : "", t->mIndex, t->tIndex, t->seqIndex, t->chain,
+				                t->active, t->interpolating, t->modelSubtree);
 		}
 		ImGui::GetForegroundDrawList()->AddText(
 		    origin, IM_COL32_WHITE,
@@ -612,7 +613,7 @@ void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) c
 	const float lW = 1;
 	diwne.canvas().AddLine(ImVec2(fMin.x, fMin.y + lW / 2), {fMax.x, fMin.y + lW / 2}, cursorCol, lW);
 	diwne.canvas().AddLine(ImVec2(fMin.x, fMax.y - lW / 2), {fMax.x, fMax.y - lW / 2}, cursorCol, lW);
-	if (t->index == 0)
+	if (t->mIndex == 0)
 	{
 		diwne.canvas().AddLine(ImVec2(startX, fMin.y), {startX, fMax.y}, cursorCol, lW);
 	}
@@ -620,7 +621,7 @@ void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) c
 	if (t->interpolating)
 	{
 		ImVec2 markCenter = ImVec2(c.x, rect.GetCenter().y);
-		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), size.y);
+		ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Tracking_CursorSize), size.y);
 		diwne.canvas().AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2, cursorCol);
 		static_cast<WorkspaceDiwne&>(diwne).m_trackingCursorPos = diwne.canvas().diwne2screen(ImVec2(c.x, rect.Min.y));
 	}

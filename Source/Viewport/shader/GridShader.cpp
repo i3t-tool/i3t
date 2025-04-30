@@ -12,6 +12,7 @@
  */
 #include "GridShader.h"
 
+#include "Utils/ProjectionUtils.h"
 #include "Viewport/GfxUtils.h"
 
 using namespace Vp;
@@ -79,7 +80,7 @@ void GridShader::setUniforms()
 
 	float nearVal;
 	float farVal;
-	GfxUtils::extractZNearZFar(m_projection, nearVal, farVal);
+	ProjectionUtils::extractZNearZFar(m_projection, nearVal, farVal);
 	glUniform1f(m_nearId, nearVal);
 	glUniform1f(m_farId, farVal);
 }

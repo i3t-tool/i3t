@@ -14,6 +14,7 @@
 
 #include "WorkspaceWindow.h"
 
+#include "Core/Input/InputManager.h"
 #include "GUI/Fonts/Icons.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
@@ -66,6 +67,8 @@ void WorkspaceWindow::render()
 
 		showMenuBar();
 
+		processTrackingInput();
+
 		m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
 
@@ -101,6 +104,39 @@ void WorkspaceWindow::render()
 	ImGui::End();
 
 	// Statistics::stopTimer("WorkspaceWindow::render");
+}
+
+void WorkspaceWindow::processTrackingInput()
+{
+	if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
+		WorkspaceModule::g_editor->stopTracking();
+	if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingSmoothLeft();
+	if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingSmoothRight();
+	if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedLeft();
+	if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedRight();
+	// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+	// 	this->trackingModeSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+	// 	this->trackingSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+	// 	this->trackingSwitchOn();
+	// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+	// 	this->trackingSwitchOff();
+	if (WorkspaceModule::g_editor->isTracking())
+	{
+		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothLeft();
+		}
+		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothRight();
+		}
+	}
 }
 
 bool WorkspaceWindow::showQuickAddButtons()
@@ -176,6 +212,9 @@ bool WorkspaceWindow::showTrackingTimeline()
 	ImVec2 padding = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
 
 	ImVec2 topLeft = GUI::glmToIm(this->m_windowMin) + padding;
+	ImVec2 topRight = ImVec2(this->m_windowMax.x - padding.x, this->m_windowMin.y + padding.y);
+	float timelineWidth = topRight.x - topLeft.x;
+
 	ImGui::SetCursorScreenPos(topLeft);
 
 	if (m_trackingBox.GetArea() > 0.f)
@@ -191,58 +230,91 @@ bool WorkspaceWindow::showTrackingTimeline()
 
 	ImGui::BeginGroup();
 
-	ImGui::SetWindowFontScale(1.2f);
-	ImGui::AlignTextToFramePadding();
-	ImGui::Text(_tbd("Tracking") " %.2f%%", tracker->getParam() * 100.f);
-	ImGui::SetWindowFontScale(1.f);
+	float trackingTitleScale = 1.2f;
+	std::string trackingTitle = fmt::format(_tbd("Tracking") " {:.2f}%", tracker->getProgress() * 100.f);
+	ImVec2 trackingTitleSize = ImGui::CalcTextSize(trackingTitle.c_str());
+
+	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
+
+	if (GUI::FloatingButton(ICON_FA_RIGHT_LEFT "##SwitchDirBtn", btnSize))
+	{
+		tracker->reverseDirection();
+		interacted = true;
+	}
 
 	ImGui::SameLine();
 
-	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
-	const char* trackingSettingsPopup = "tracking_settings";
-	if (GUI::FloatingButton(ICON_FA_GEAR "##TrackingSettings", btnSize))
+	// TODO: Maybe use DIWNE layout here in the future
+	float springWidth = (timelineWidth - trackingTitleSize.x * trackingTitleScale - btnSize.x * 2 -
+	                     ImGui::GetStyle().ItemSpacing.x * 2) /
+	                    2.f;
+	ImGui::Dummy(ImVec2(springWidth, 0.f));
+	ImGui::SameLine(0, 0);
+
+	float oldScale = ImGui::GetCurrentWindow()->FontWindowScale;
+	ImGui::SetWindowFontScale(trackingTitleScale);
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted(trackingTitle.c_str());
+	ImGui::SetWindowFontScale(oldScale);
+
+	ImGui::SameLine();
+
+	ImGui::Dummy(ImVec2(springWidth, 0.f));
+	ImGui::SameLine(0, 0);
+
 	{
-		interacted = true;
-		ImGui::OpenPopup(trackingSettingsPopup);
-	}
-	else
-	{
-		if (ImGui::IsItemHovered())
+		const char* trackingSettingsPopup = "tracking_settings";
+		if (GUI::FloatingButton(ICON_FA_GEAR "##TrackSettingsBtn", btnSize))
 		{
 			interacted = true;
-			GUI::Tooltip(_tbd("Tracking settings"), "");
+			ImGui::OpenPopup(trackingSettingsPopup);
 		}
-	}
+		else
+		{
+			if (ImGui::IsItemHovered())
+			{
+				interacted = true;
+				GUI::Tooltip(_tbd("Tracking settings"), "");
+			}
+		}
 
-	if (ImGui::BeginPopup(trackingSettingsPopup))
-	{
-		interacted = true;
-		ImGui::TextDisabled(_tbd("Tracking settings"));
-		ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
-		I3TGui::MenuItemWithLog(_tbd("Track in world space"), nullptr, &tracker->m_trackInWorldSpace);
+		if (ImGui::BeginPopup(trackingSettingsPopup))
+		{
+			interacted = true;
+			ImGui::TextDisabled(_tbd("Tracking settings"));
+			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
+			I3TGui::MenuItemWithLog(_tbd("Track in world space"), nullptr, &tracker->m_trackInWorldSpace);
 
-		ImGui::EndPopup();
+			ImGui::EndPopup();
+		}
 	}
 
 	DIWNE::DGui::NewLine(0.2f);
 
-	ImVec2 windowMax = GUI::glmToIm(this->m_windowMax);
-	ImVec2 topRight = windowMax - padding;
-	float sliderWidth = topRight.x - topLeft.x;
-	ImGui::SetNextItemWidth(sliderWidth);
-	m_trackingSliderProgress = tracker->getParam();
+	ImGui::SetNextItemWidth(timelineWidth);
+	m_trackingSliderProgress = tracker->getProgress();
 	if (TrackingSlider(tracker, "###trackingSlider", &m_trackingSliderProgress, tracker->getDirection()))
 	{
 		interacted = true;
-		tracker->setParam(m_trackingSliderProgress);
+		tracker->setProgress(m_trackingSliderProgress);
 	}
+	ImRect sliderRect = ImGui::GetCurrentContext()->LastItemData.Rect;
+	bool sliderActive = ImGui::IsItemHovered() || ImGui::IsItemActive();
 
 	ImGui::EndGroup();
 	m_trackingBox = ImGui::GetCurrentContext()->LastItemData.Rect;
 
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(topLeft.x + sliderWidth * (1.f - m_trackingSliderProgress), topLeft.y),
-	                                    ImVec2(WorkspaceModule::g_editor->m_trackingCursorPos),
-	                                    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor)));
+	if (sliderActive)
+	{
+		interacted = true;
+		bool leftToRight = tracker->getDirection() == Core::TrackingDirection::LeftToRight;
+		ImGui::GetWindowDrawList()->AddLine(
+		    ImVec2(sliderRect.Min.x +
+		               timelineWidth * (leftToRight ? m_trackingSliderProgress : 1.f - m_trackingSliderProgress),
+		           sliderRect.GetCenter().y),
+		    ImVec2(WorkspaceModule::g_editor->m_trackingCursorPos),
+		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor) * ImVec4(1.f, 1.f, 1.f, 0.7f)));
+	}
 
 	return interacted;
 }
@@ -564,7 +636,7 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	}
 	float minHeight = ImGui::GetFontSize() * 1.5f + ImGui::GetStyle().FramePadding.y * 2.0f;
 	return TrackingSlider(tracker, label, ImGuiDataType_Float, p_data, &p_min, &p_max, "%.3f",
-	                      ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput, minHeight);
+	                      ImGuiSliderFlags_AlwaysClamp, minHeight);
 }
 
 // Custom modified copy of ImGui::SliderScalar()
@@ -647,11 +719,29 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 		ImGui::MarkItemEdited(id);
 
 	// Render track
-	ImRect draw_bb = frame_bb;
 	float SliderContrast = 0.5f; // TODO: Hookup to a parameter or something
-	float SliderThickness = 0.4f;
+	float innerThickness = 0.22f;
+	float outerThickness = 0.36f;
+	float rounding = 6 * dpiScale;
+	float transformMargin = ImGui::GetFontSize() * 0.3f;
+
+	ImRect tOuterRect = frame_bb;
+	ImRect tInnerRect = frame_bb;
+	if (innerThickness != 1.0f)
+	{
+		float shrink_amount = (float) (int) ((frame_bb.Max.y - frame_bb.Min.y) * 0.5f * (1.0f - innerThickness));
+		tInnerRect.Min.y += shrink_amount;
+		tInnerRect.Max.y -= shrink_amount;
+	}
+	if (outerThickness != 1.0f)
+	{
+		float shrink_amount = (float) (int) ((frame_bb.Max.y - frame_bb.Min.y) * 0.5f * (1.0f - outerThickness));
+		tOuterRect.Min.y += shrink_amount;
+		tOuterRect.Max.y -= shrink_amount;
+	}
 
 	const ImVec4& colorActive = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+	const ImVec4& colorOverlay = I3T::getColor(EColor::Nodes_Tracking_OverlayActive);
 	const ImVec4& cursorCol = I3T::getColor(EColor::Nodes_Tracking_Cursor);
 	const ImVec4& cursorColHovered = I3T::getColor(EColor::Nodes_Tracking_CursorHovered);
 	const ImVec4& cursorColActive = I3T::getColor(EColor::Nodes_Tracking_CursorActive);
@@ -660,92 +750,91 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	// 										   : g.HoveredId == id ? ImGuiCol_FrameBgHovered
 	// 															   : ImGuiCol_FrameBg,
 	// 										   1.0f + SliderContrast);
-	const ImU32 frame_col = ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
-	                                                       : g.HoveredId == id ? cursorColHovered
-	                                                                           : cursorCol);
-	const ImU32 frame_col_after = ImGui::GetColorU32(g.ActiveId == id    ? ImGuiCol_FrameBgActive
-	                                                 : g.HoveredId == id ? ImGuiCol_FrameBgHovered
-	                                                                     : ImGuiCol_FrameBg,
-	                                                 1.0f - SliderContrast);
+	// const ImU32 frame_col = ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
+	//                                                        : g.HoveredId == id ? cursorColHovered
+	//                                                                            : cursorCol);
+	const ImU32 progressBg = ImColor(0.7f, 0.7f, 0.f, 1.0f);
+	const ImU32 progressOverlay = ImColor(0.75, 0.75f, 0.f, 0.4f);
+	const ImU32 frame_col_after = ImColor(0, 0, 0, 0);
+	// const ImU32 frame_col_after = ImGui::GetColorU32(g.ActiveId == id    ? ImGuiCol_FrameBgActive
+	//                                                  : g.HoveredId == id ? ImGuiCol_FrameBgHovered
+	//                                                                      : ImGuiCol_FrameBg,
+	//                                                  1.0f - SliderContrast);
 	ImGui::RenderNavHighlight(frame_bb, id);
-	if (SliderThickness != 1.0f)
-	{
-		float shrink_amount = (float) (int) ((frame_bb.Max.y - frame_bb.Min.y) * 0.5f * (1.0f - SliderThickness));
-		draw_bb.Min.y += shrink_amount;
-		draw_bb.Max.y -= shrink_amount;
-	}
 
 	Core::TrackingDirection dir = tracker->getDirection();
 	bool leftToRight = dir == Core::TrackingDirection::LeftToRight;
-	auto& trackedTransforms = tracker->getTrackedTransforms();
+	auto& trackedMatrices = tracker->getMatrices();
 	ImVec4 tickColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
 	ImRect trackRect = frame_bb;
 	ImVec2 trackSize = trackRect.GetSize();
-	float tParam = tracker->getParam();
-	const int matricesCount = trackedTransforms.size();
-	const float matStep = 1.0f / (float) trackedTransforms.size();
-	const int matricesBefore = (int) (tParam * (float) matricesCount);
+	float tParam = tracker->getProgress();
+	const int matricesCount = trackedMatrices.size();
+	const float matStep = 1.0f / (float) matricesCount;
 
-	// Draw space background
-	for (int i = leftToRight ? 0 : trackedTransforms.size() - 1; leftToRight ? i < matricesCount : i >= 0;
-	     leftToRight ? i++ : i--)
+	static std::array spaceColors = {ImVec4(0, 0, 1, 1), ImVec4(0, 1, 0, 1), ImVec4(1, 0, 0, 1)};
+
+	// Draw solid progress bg
+	TrackingSlider_drawProgress(grab_bb, tOuterRect, rounding, progressBg, frame_col_after, leftToRight);
+
+	// Draw a bar for each tracked matrix using color based on space type
+	for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ : i--)
 	{
-		auto& transform = trackedTransforms[i];
-		TrackingSlider_drawRect(transform->data.index * matStep, matStep, draw_bb, leftToRight, colorActive);
+		auto& matrix = trackedMatrices[i];
+		TrackingSlider_drawRect(i * matStep, matStep, tInnerRect, transformMargin, leftToRight,
+		                        spaceColors[static_cast<int>(matrix->transform->data.space)], rounding, 1.f * dpiScale,
+		                        I3T::getColor(EColor::BorderDim));
 	}
 
-	// 0.65f
-	window->DrawList->AddRectFilled(draw_bb.Min,
-	                                ImVec2(grab_bb.Min.x + (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, draw_bb.Max.y),
-	                                leftToRight ? frame_col : frame_col_after, 0, ImDrawFlags_RoundCornersLeft);
-	window->DrawList->AddRectFilled(ImVec2(grab_bb.Max.x - (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, draw_bb.Min.y),
-	                                draw_bb.Max, leftToRight ? frame_col_after : frame_col, 0,
-	                                ImDrawFlags_RoundCornersRight);
+	// Draw progress overlay
+	TrackingSlider_drawProgress(grab_bb, tInnerRect, rounding, progressOverlay, frame_col_after, leftToRight);
 
+	// Draw matrix ticks
+	// for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ :
+	// i--)
+	// {
+	// 	auto& matrix = trackedMatrices[i];
+	// 	float param = i * matStep;
+	// 	TrackingSlider_drawTick(param, trackRect, tInnerRect.GetHeight(), leftToRight, tickColor);
+	// }
 
-	// Draw ticks
-	for (int i = leftToRight ? 0 : trackedTransforms.size() - 1; leftToRight ? i < matricesCount : i >= 0;
-	     leftToRight ? i++ : i--)
+	// Draw transform ticks
+	for (auto& transform : tracker->getTrackedTransforms())
 	{
-		auto& transform = trackedTransforms[i];
-		float param = transform->data.index * matStep;
-		TrackingSlider_drawTick(param, trackRect, leftToRight, tickColor);
+		float param = transform->data.mIndex * matStep;
+		TrackingSlider_drawTick(param, trackRect, tOuterRect.GetHeight(), leftToRight, tickColor);
+	}
+
+	// Draw sequence ticks
+	for (auto& seq : tracker->getTrackedSequences())
+	{
+		if (seq->data.getChildCount() <= 0)
+			continue;
+		float param = seq->data.mIndex * matStep;
+		TrackingSlider_drawTick(param, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
 	}
 
 	// Draw last tick and arrow
-	TrackingSlider_drawTick(1.0f, trackRect, leftToRight, tickColor);
-	TrackingSlider_drawArrow(1.0f, trackRect, leftToRight, tickColor);
+	TrackingSlider_drawTick(1.0f, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
+	// TrackingSlider_drawArrow(1.0f, tInnerRect, leftToRight, tickColor);
 
 	/////
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x)
-		window->DrawList->AddRectFilled(
-		    grab_bb.Min, grab_bb.Max,
-		    ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
+		window->DrawList->AddRectFilled(grab_bb.Min, grab_bb.Max,
+		                                ImGui::ColorConvertFloat4ToU32(g.ActiveId == id ? cursorColActive : cursorCol),
+		                                rounding);
 
-	// Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
-	char value_buf[64];
-	const char* value_buf_end =
-	    value_buf + ImGui::DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
-	if (g.LogEnabled)
-		ImGui::LogSetNextTextDecoration("{", "}");
-	ImGui::RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, ImVec2(0.5f, 0.5f));
-
-	if (label_size.x > 0.0f)
-		ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y),
-		                  label);
-
-	IMGUI_TEST_ENGINE_ITEM_INFO(id, label,
-	                            g.LastItemData.StatusFlags | (temp_input_allowed ? ImGuiItemStatusFlags_Inputable : 0));
 	return value_changed;
 }
 
-void WorkspaceWindow::TrackingSlider_drawTick(float tParam, const ImRect& trackRect, bool leftToRight,
+void WorkspaceWindow::TrackingSlider_drawTick(float tParam, const ImRect& trackRect, float height, bool leftToRight,
                                               const ImVec4& tickColor)
 {
 	float tickPosX = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam);
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(tickPosX, trackRect.Min.y), ImVec2(tickPosX, trackRect.Max.y),
+	float cy = trackRect.GetCenter().y;
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(tickPosX, cy - height / 2), ImVec2(tickPosX, cy + height / 2),
 	                                    ImGui::ColorConvertFloat4ToU32(tickColor), 2.f * ImGui::GetWindowDpiScale());
 }
 void WorkspaceWindow::TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight,
@@ -766,11 +855,30 @@ void WorkspaceWindow::TrackingSlider_drawArrow(float tParam, const ImRect& track
 		    ImVec2(tickPosX + width, trackRect.Max.y), ImGui::ColorConvertFloat4ToU32(color));
 	}
 }
-void WorkspaceWindow::TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, bool leftToRight,
-                                              const ImVec4& color)
+void WorkspaceWindow::TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, float margin,
+                                              bool leftToRight, const ImVec4& color, float rounding,
+                                              float borderThickness, const ImVec4& borderCol)
 {
 	float posX1 = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam - tStep);
 	float posX2 = posX1 + tStep * trackRect.GetSize().x;
-	ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(posX1, trackRect.Min.y), ImVec2(posX2, trackRect.Max.y),
-	                                          ImGui::ColorConvertFloat4ToU32(color), 0);
+	ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(posX1 + margin, trackRect.Min.y),
+	                                          ImVec2(posX2 - margin, trackRect.Max.y),
+	                                          ImGui::ColorConvertFloat4ToU32(color), rounding);
+	if (borderThickness > 0.f)
+	{
+		ImGui::GetWindowDrawList()->AddRect(ImVec2(posX1 + margin, trackRect.Min.y),
+		                                    ImVec2(posX2 - margin, trackRect.Max.y),
+		                                    ImGui::ColorConvertFloat4ToU32(borderCol), rounding, 0, borderThickness);
+	}
+}
+
+void WorkspaceWindow::TrackingSlider_drawProgress(const ImRect& grab_bb, const ImRect& tOuterRect, float rounding,
+                                                  const ImU32 frame_col, const ImU32 frame_col_after, bool leftToRight)
+{
+	ImGui::GetWindowDrawList()->AddRectFilled(
+	    tOuterRect.Min, ImVec2(grab_bb.Min.x + (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, tOuterRect.Max.y),
+	    leftToRight ? frame_col : frame_col_after, rounding, ImDrawFlags_RoundCornersLeft);
+	ImGui::GetWindowDrawList()->AddRectFilled(
+	    ImVec2(grab_bb.Max.x - (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, tOuterRect.Min.y), tOuterRect.Max,
+	    leftToRight ? frame_col_after : frame_col, rounding, ImDrawFlags_RoundCornersRight);
 }

@@ -13,10 +13,14 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
+#include "Core/Nodes/Utils.h"
 
 using namespace Core;
 
-TEST(ValueStateTest, _)
+class ValueStateTest : public GraphManagerTestFixtureSuite
+{};
+
+TEST_F(ValueStateTest, _)
 {
 	auto leftNode = GraphManager::createNode<EOperatorType::Vector3ToVector3>();
 	EXPECT_EQ(leftNode->getState(0), EValueState::Editable);

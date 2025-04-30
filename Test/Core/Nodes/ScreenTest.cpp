@@ -19,7 +19,7 @@
 
 using namespace Core;
 
-class ScreenTest : public GraphManagerTestFixture
+class ScreenTest : public GraphManagerTestFixtureSuite
 {};
 
 TEST_F(ScreenTest, _)
@@ -34,7 +34,7 @@ TEST_F(ScreenTest, _)
 	camera->getView()->pushMatrix(t1);
 
 	// Check if camera contains t1.
-	EXPECT_TRUE(Math::eq(t1->data().getMat4(), camera->data(2).getMat4()));
+	EXPECT_TRUE(Math::eq(t1->data().getMat4(), camera->data(I3T_CAMERA_OUT_MATRIX).getMat4()));
 
 	// Unplugged screen has no parent node.
 	EXPECT_EQ(nullptr, GraphManager::getParent(screen));
