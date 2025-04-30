@@ -18,6 +18,13 @@
 
 RTTR_REGISTRATION
 {
+	rttr::registration::class_<WindowSettings>("WindowSettings")
+	    .property("windowMaximized", &WindowSettings::windowMaximized)
+	    .property("windowWidth", &WindowSettings::windowWidth)
+	    .property("windowHeight", &WindowSettings::windowHeight)
+	    .property("windowPosX", &WindowSettings::windowPosX)
+	    .property("windowPosY", &WindowSettings::windowPosY);
+
 	rttr::registration::class_<AppLoopSettings>("AppLoopSettings")
 	    .property("vsync", &AppLoopSettings::vsync)
 	    .property("shouldLimitFPS", &AppLoopSettings::shouldLimitFPS)
@@ -26,5 +33,6 @@ RTTR_REGISTRATION
 	    .property("targetFPSOnIdle", &AppLoopSettings::targetFPSOnIdle);
 
 	rttr::registration::class_<ApplicationSettings>("ApplicationSettings")
-	    .property("appLoopSettings", &ApplicationSettings::appLoopSettings);
+	    .property("appLoopSettings", &ApplicationSettings::appLoopSettings)
+	    .property("windowSettings", &ApplicationSettings::windowSettings);
 }

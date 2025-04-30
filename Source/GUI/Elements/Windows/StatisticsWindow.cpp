@@ -39,7 +39,7 @@ void StatisticsWindow::render()
 {
 	// Set the window size and create the GUI window
 	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 25, ImGui::GetFontSize() * 30);
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
 	GUI::dockTabStylePush();
 	if (ImGui::Begin(getName(), getShowPtr()))
 	{

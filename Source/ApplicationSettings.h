@@ -23,12 +23,26 @@ struct AppLoopSettings
 	int targetFPSOnIdle{20};
 };
 
+struct WindowSettings
+{
+	bool windowMaximized{false};
+	int windowWidth{1280};
+	int windowHeight{720};
+	int windowPosX{100};
+	int windowPosY{100};
+};
+
 struct ApplicationSettings
 {
 	AppLoopSettings appLoopSettings;
+	WindowSettings windowSettings;
 
 	AppLoopSettings& appLoop()
 	{
 		return appLoopSettings;
+	}
+	WindowSettings& window()
+	{
+		return windowSettings;
 	}
 };

@@ -90,6 +90,7 @@ bool Application::init()
 	// Call implementation of init() in derived class
 	onInit();
 
+	m_window->show();
 	return true;
 }
 
