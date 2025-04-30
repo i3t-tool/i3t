@@ -189,13 +189,7 @@ void PreferencesWindow::showViewportSettings()
 
 void PreferencesWindow::showGridSettings(Vp::GridSettings& grid)
 {
-	ImGui::ColorEdit3("Grid color", glm::value_ptr(grid.color), ImGuiColorEditFlags_Float);
-	ImGui::ColorEdit3("X axis color", glm::value_ptr(grid.axisXColor), ImGuiColorEditFlags_Float);
-	ImGui::ColorEdit3("Y axis color", glm::value_ptr(grid.axisYColor), ImGuiColorEditFlags_Float);
-	ImGui::ColorEdit3("Z axis color", glm::value_ptr(grid.axisZColor), ImGuiColorEditFlags_Float);
-
 	ImGui::SliderFloat("Size", &grid.size, 0.01f, 2.f, "%.2f");
-	ImGui::SliderFloat("Strength", &grid.strength, 0.01f, 1.f, "%.2f");
 	ImGui::SliderFloat("Line width", &grid.lineWidth, 0.01f, 5.0f, "%.2f");
 	ImGui::SliderFloat("Fade 1 start", &grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
 	ImGui::SliderFloat("Fade 1 end", &grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");

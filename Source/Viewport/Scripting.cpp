@@ -46,19 +46,19 @@ LUA_REGISTRATION
 
 	viewport["get_settings"] = []() -> Vp::CameraSettings& {
 		auto& viewportModule = I3T::getViewportModule();
-		return viewportModule.m_viewportWindows[0]->m_settings.camera;
+		return viewportModule.getWindow(0)->m_settings.camera;
 	};
 
 	viewport["set_settings"] = [](Vp::CameraSettings& settings) {
 		auto& viewportModule = I3T::getViewportModule();
-		auto& viewportWindow = viewportModule.m_viewportWindows[0];
+		auto& viewportWindow = viewportModule.getWindow(0);
 		viewportWindow->m_settings.camera = settings;
 		viewportWindow->m_camera->loadSettings(viewportWindow->m_settings.camera);
 	};
 
 	viewport["update_settings"] = []() {
 		auto& viewportModule = I3T::getViewportModule();
-		auto& viewportWindow = viewportModule.m_viewportWindows[0];
+		auto& viewportWindow = viewportModule.getWindow(0);
 		viewportWindow->m_camera->loadSettings(viewportWindow->m_settings.camera);
 	};
 };

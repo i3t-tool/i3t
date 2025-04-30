@@ -399,6 +399,24 @@ bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecima
 	return inner_interaction_happen || valueChanged;
 }
 
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals)
+{
+	bool valChanged = false;
+	int row, col;
+	float val;
+	return DrawMatrix(label, data, numberOfVisibleDecimals, Core::EValueState::Locked, valChanged, row, col, val);
+}
+
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals, Core::EValueState valState,
+                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange)
+{
+	const std::array<std::array<Core::EValueState, 4> const, 4>& dataState = {
+	    valState, valState, valState, valState, valState, valState, valState, valState,
+	    valState, valState, valState, valState, valState, valState, valState, valState};
+	return DrawMatrix(label, data, numberOfVisibleDecimals, dataState, valueChanged, rowOfChange, columnOfChange,
+	                  valueOfChange);
+}
+
 bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
                 const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
                 int& rowOfChange, int& columnOfChange, float& valueOfChange)

@@ -73,7 +73,7 @@ colors:
   nflo_Synergies FloatBgActive: [0.000, 0.703, 0.000, 1.000]
   nflo_Synergies FloatBgHovered: [0.057, 0.536, 0.057, 1.000]
   ngen_Selected Node Border: [0.904, 0.709, 0.072, 0.750]
-  ngen_Hover Border Color: [0.000, 0.000, 0.000, 0.196]
+  ngen_Hover Border Color: [0.000, 0.965, 1.000, 0.149]
   tuts_Background: [0.137, 0.137, 0.137, 1.000]
   tuts_Text: [0.902, 0.902, 0.902, 1.000]
   tuts_Bar Background: [0.200, 0.200, 0.200, 1.000]
@@ -91,6 +91,16 @@ colors:
   ngen_Selection rectangle full: [0.000, 0.000, 1.000, 0.100]
   ngen_Selection rectangle touch: [0.000, 1.000, 0.000, 0.100]
   sgen_Scene View Background: [0.137, 0.137, 0.137, 1.000]
+  sgen_Scene View Background Local Color Shift: [1.000, 1.000, 1.000, 1.000]
+  sgen_Scene View Background Tracking Color Shift: [1.000, 1.000, 1.000, 1.000]
+  sgen_Scene View Grid Color: [0.451, 0.490, 0.529, 0.337]
+  sgen_Scene View Grid X: [1.000, 0.129, 0.129, 0.918]
+  sgen_Scene View Grid Y: [0.512, 0.878, 0.079, 0.400]
+  sgen_Scene View Grid Z: [0.059, 0.447, 1.000, 0.882]
+  sgen_Scene View Grid Local Color: [0.800, 0.749, 0.302, 0.353]
+  sgen_Scene View Grid Local X: [1.000, 0.000, 0.988, 0.894]
+  sgen_Scene View Grid Local Y: [0.000, 1.000, 0.424, 0.733]
+  sgen_Scene View Grid Local Z: [0.000, 0.941, 1.000, 0.910]
   ngen_Node Editor Background: [0.135, 0.135, 0.135, 1.000]
   ngen_Node Editor Grid Color: [0.223, 0.223, 0.223, 0.470]
   ngen_Node Editor Grid Dots Color: [0.784, 0.784, 0.784, 0.156]
@@ -136,6 +146,8 @@ colors:
   ntrs_Nodes Tracking Color Active: [0.647, 0.048, 0.865, 0.843]
   ntrs_Nodes Tracking Color Inactive: [0.460, 0.165, 0.645, 0.643]
   ntrs_Nodes Tracking Cursor: [0.781, 0.750, 0.072, 1.000]
+  ntrs_Nodes Tracking Cursor Hovered: [0.800, 0.800, 0.000, 1.000]
+  ntrs_Nodes Tracking Cursor Active: [0.860, 0.860, 0.000, 1.000]
   ntrs_Nodes Tracking Overlay Active: [0.302, 0.302, 0.102, 0.196]
   ntrs_Nodes Tracking Overlay Inactive: [0.161, 0.161, 0.161, 0.761]
   ntrs_Nodes Transformation ValidIcon bgShape: [1.000, 0.000, 0.000, 1.000]
@@ -184,7 +196,7 @@ sizes:
   ngen_Trackball Button Height: 20
   ngen_TrackBall Sensitivity: 5
   nflo_Float Inner Padding: 1
-  nflo_Float Character Width Multiplier: 0.400000006
+  nflo_Float Character Width Multiplier: 0.409999996
   nflo_Float Minimum Character Count: 5
   nflo_Float Inactive Alpha Factor: 0.5
   ngen_Drag Speed fo Float: 0.0149999997
@@ -196,8 +208,8 @@ sizes:
   ngen_Nodes Outputs Alignment: 0
   ngen_Nodes Left Side spacing: 3
   ngen_Nodes Right Side spacing: 3
-  ngen_Selected Node Border Thickness: 2.5
-  ngen_Hover Border Thickness: 1.5
+  ngen_Selected Node Border Thickness: 3
+  ngen_Hover Border Thickness: 3
   tuts_Task Square X Padding: 10
   tuts_Frame Rounding: 5
   tuts_Scrollbar Size: 15
@@ -217,6 +229,7 @@ sizes:
   ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
+  ngen_Nodes Tracking Link Width: 9
   ngen_Nodes Default Visible Precision: 1
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0

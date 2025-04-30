@@ -31,10 +31,10 @@ public:
 	bool m_showYAxis = false;
 	bool m_showZAxis = true;
 
-	glm::vec3* m_gridColor;
-	glm::vec3* m_axisXColor;
-	glm::vec3* m_axisYColor;
-	glm::vec3* m_axisZColor;
+	const float* m_gridColor;
+	const float* m_axisXColor;
+	const float* m_axisYColor;
+	const float* m_axisZColor;
 
 	float m_gridSize{1.0f};
 	float m_gridStrength{0.5f};

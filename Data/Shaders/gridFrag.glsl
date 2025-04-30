@@ -29,8 +29,8 @@ uniform bool u_showXAxis = true;
 uniform bool u_showYAxis = true;
 uniform bool u_showZAxis = true;
 
-uniform vec3 u_gridColor = vec3(0.45, 0.49, 0.53);
-uniform vec3 u_axisColors[3];
+uniform vec4 u_gridColor = vec4(0.45, 0.49, 0.53, 1.0);
+uniform vec4 u_axisColors[3];
 
 uniform float u_gridSize = 1.0f;
 uniform float u_gridStrength = 0.5f;
@@ -42,7 +42,7 @@ uniform float u_grid1FadeEnd;
 uniform float u_grid2FadeStart;
 uniform float u_grid2FadeEnd;
 
-vec3 gridColor;
+vec4 gridColor;
 
 float gridSize;
 float gridStrength;
@@ -119,7 +119,7 @@ vec4 grid(vec4 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 	// Grid
 	vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative; // Visualize using (pow(worldPos.x, 2) / 100.0f)
 	float line = min(grid.x, grid.y);
-	vec4 color = vec4(gridColor, 1.0 - min(line, 1.0));
+	vec4 color = vec4(gridColor.xyz, gridColor.a * (1.0 - min(line, 1.0)));
 
 	if (!drawFirstAxis && !drawSecondAxis && !axisOnly) {
 		return color;
@@ -135,12 +135,13 @@ vec4 grid(vec4 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 		yAxis = 0;
 	float axisLine = max(xAxis, yAxis);
 
-	vec4 axisColor = vec4(1, 0, 1, axisLine);
+	vec4 axisColor;
 	if (xAxis > yAxis) {
-		axisColor.xyz = u_axisColors[firstAxis];
+		axisColor = u_axisColors[firstAxis];
 	} else {
-		axisColor.xyz = u_axisColors[secondAxis];
+		axisColor = u_axisColors[secondAxis];
 	}
+	axisColor.w *= axisLine;
 	if (axisOnly) {
 		return axisColor;
 	} else {

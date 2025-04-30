@@ -26,7 +26,7 @@ Screen::Screen(DIWNE::NodeEditor& diwne)
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
 
 	m_displayOptions.showAxes = false;
-	m_displayOptions.showGrid = false;
+	m_displayOptions.showGrids = false;
 	m_displayOptions.showCamera = false;
 	m_displayOptions.showFrustum = false;
 

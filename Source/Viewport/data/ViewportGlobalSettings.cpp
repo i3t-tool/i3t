@@ -42,12 +42,7 @@ RTTR_REGISTRATION
 	    .property("highlightColor", &HighlightSettings::highlightColor);
 
 	rttr::registration::class_<GridSettings>("GridSettings")
-	    .property("color", &GridSettings::color)
-	    .property("axisXColor", &GridSettings::axisXColor)
-	    .property("axisYColor", &GridSettings::axisYColor)
-	    .property("axisZColor", &GridSettings::axisZColor)
 	    .property("size", &GridSettings::size)
-	    .property("strength", &GridSettings::strength)
 	    .property("lineWidth", &GridSettings::lineWidth)
 	    .property("grid1FadeStart", &GridSettings::grid1FadeStart)
 	    .property("grid1FadeEnd", &GridSettings::grid1FadeEnd)
@@ -104,35 +99,23 @@ GridSettings::GridSettings(bool localGrid)
 {
 	if (!localGrid)
 	{
-		color = glm::vec3(0.45, 0.49, 0.53);
-		axisXColor = glm::vec3(1.0, 0.49, 0.53);
-		axisYColor = glm::vec3(0.41, 0.96, 0.49);
-		axisZColor = glm::vec3(0.45, 0.49, 1.0);
-
 		size = 1.0f;
-		strength = 0.51f;
 		lineWidth = 1.08f;
 
 		grid1FadeStart = 0.0f;
-		grid1FadeEnd = 0.23f;
+		grid1FadeEnd = 0.21f;
 		grid2FadeStart = 0.0f;
 		grid2FadeEnd = 0.9f;
 	}
 	else
 	{
-		color = glm::vec3(0.412, 0.40, 0.211);
-		axisXColor = glm::vec3(0.87, 0.01, 1.0);
-		axisYColor = glm::vec3(0.60, 1.0, 0.02);
-		axisZColor = glm::vec3(0.00, 0.9, 1.0);
-
 		size = 1.0f;
-		strength = 0.5f;
-		lineWidth = 1.0f;
+		lineWidth = 1.08f;
 
 		grid1FadeStart = 0.0f;
-		grid1FadeEnd = 0.12f;
+		grid1FadeEnd = 0.21f;
 		grid2FadeStart = 0.0f;
-		grid2FadeEnd = 1.0f;
+		grid2FadeEnd = 0.9f;
 	}
 }
 

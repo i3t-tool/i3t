@@ -125,6 +125,7 @@ class MatrixTracker final
 {
 	friend struct TrackedNodeData;
 
+public:
 	/**
 	 * Internal wrapper of core nodes for managing tracking data for each node involved in the tracking operation.
 	 * Sets and unsets the node's tracking data pointer using RAII. Is NOT copyable.
@@ -215,11 +216,13 @@ class MatrixTracker final
 		bool useOwnData{false};
 	};
 
+private:
 	float m_param = 0.0f; ///< Tracking time parameter (0..1),
 
 	/// Interpolated matrix corresponding to the current time parameter.
 	glm::mat4 m_interpolatedMatrix{1.0f};
-	ID m_interpolatedTransformID = NIL_ID; ///< ID of the currently interpolated transformation / operator
+	TrackedTransform* m_interpolatedTransform{nullptr}; ///< Reference to the internal interpolated transform
+	ID m_interpolatedTransformID = NIL_ID;              ///< ID of the currently interpolated transformation / operator
 
 	int m_matrixCount = 0; /// Total number of matrices
 	/// Number of fully accumulated matrices, eg. matrices prior to the interpolated one.
@@ -336,6 +339,10 @@ public:
 	ID getInterpolatedTransformID() const
 	{
 		return m_interpolatedTransformID;
+	}
+	const TrackedTransform* getInterpolatedTransform() const
+	{
+		return m_interpolatedTransform;
 	}
 	unsigned getFullMatricesCount() const
 	{

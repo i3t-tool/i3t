@@ -410,8 +410,8 @@ float CoreNode::updateDataItemsWidth()
 
 	int maxLength = maxLengthOfData();
 	m_dataItemsWidth = GUI::calculateDataItemsWidth(fontSize, maxLength, diwne.getZoom());
-	LOG_DEBUG("updateDataItemsWidth() in node '{}': font: {} maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
-	          maxLength, m_dataItemsWidth);
+	// LOG_DEBUG("updateDataItemsWidth() in node '{}': font: {} maxLen: {}, dataWidth: {}", m_labelDiwne, fontSize,
+	//           maxLength, m_dataItemsWidth);
 	return m_dataItemsWidth;
 }
 
@@ -568,7 +568,7 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	Super::onReleased(justReleased, context);
 }
 
-void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) const
+void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay) const
 {
 	assert(t != nullptr);
 
@@ -605,7 +605,7 @@ void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t) c
 	}
 
 	const ImVec4& inactiveCol = I3T::getColor(EColor::Nodes_Tracking_OverlayInactive);
-	if (inactiveCol.w > 0.f)
+	if (inactiveCol.w > 0.f && inactiveOverlay)
 		diwne.canvas().AddRectFilledDiwne(iMin, iMax, inactiveCol);
 
 	const ImVec4& activeCol = I3T::getColor(EColor::Nodes_Tracking_OverlayActive);

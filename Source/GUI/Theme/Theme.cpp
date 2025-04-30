@@ -200,6 +200,16 @@ void Theme::initDefaultClassic()
 	set(EColor::ButtonDimDark, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
 
 	set(EColor::SceneViewBackground, ImVec4(0.3f, 0.3f, 0.35f, 1.f));
+	set(EColor::SceneViewBackgroundLocalColorShift, ImVec4(0.9f, 0.9f, 0.3f, 1.f));
+	set(EColor::SceneViewBackgroundTrackingColorShift, ImVec4(0.7f, 0.7f, 0.7f, 1.f));
+	set(EColor::SceneViewGridColor, ImVec4(0.45, 0.49, 0.53, 1.f));
+	set(EColor::SceneViewGridX, ImVec4(1.0, 0.128, 0.128, 1.f));
+	set(EColor::SceneViewGridY, ImVec4(0.51f, 0.88f, 0.08f, 1.f));
+	set(EColor::SceneViewGridZ, ImVec4(0.06f, 0.6f, 1.0f, 1.f));
+	set(EColor::SceneViewGridLocalColor, ImVec4(0.8f, 0.75f, 0.3f, 1.f));
+	set(EColor::SceneViewGridLocalX, ImVec4(1.0f, 0.2f, 0.50f, 1.f));
+	set(EColor::SceneViewGridLocalY, ImVec4(0.2f, 1.0f, 0.4f, 1.f));
+	set(EColor::SceneViewGridLocalZ, ImVec4(0.4f, 0.6f, 1.00f, 1.f));
 
 	set(EColor::DockTab, ImVec4(0.309f, 0.309f, 0.318f, 1.f));
 	set(EColor::DockTabActive, ImVec4(0.258f, 0.334f, 0.427f, 1.f));
@@ -358,7 +368,7 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Nodes_TrackBallSensitivity] = {5.0f, true};
 
 	m_sizes[ESize::Nodes_FloatInnerPadding] = {1.0f, true};
-	m_sizes[ESize::Nodes_FloatCharacterWidthMultiplier] = {0.4f, false};
+	m_sizes[ESize::Nodes_FloatCharacterWidthMultiplier] = {0.41f, false};
 	m_sizes[ESize::Nodes_FloatMinCharacters] = {5.0f, false};
 
 	m_sizes[ESize::Nodes_dragSpeedDefaultRatio] = {0.015f, true};
@@ -630,7 +640,18 @@ void Theme::initNames()
 	    .add(EColor::AboutWindow_BackgroundRight, "AboutWindow BackgroundRight")
 	    .add(EColor::AboutWindow_Text, "AboutWindow Text");
 
-	group("Scene View", "sgen").add(EColor::SceneViewBackground, "Scene View Background");
+	group("Scene View", "sgen")
+	    .add(EColor::SceneViewBackground, "Scene View Background")
+	    .add(EColor::SceneViewBackgroundLocalColorShift, "Scene View Background Local Color Shift")
+	    .add(EColor::SceneViewBackgroundTrackingColorShift, "Scene View Background Tracking Color Shift")
+	    .add(EColor::SceneViewGridColor, "Scene View Grid Color")
+	    .add(EColor::SceneViewGridX, "Scene View Grid X")
+	    .add(EColor::SceneViewGridY, "Scene View Grid Y")
+	    .add(EColor::SceneViewGridZ, "Scene View Grid Z")
+	    .add(EColor::SceneViewGridLocalColor, "Scene View Grid Local Color")
+	    .add(EColor::SceneViewGridLocalX, "Scene View Grid Local X")
+	    .add(EColor::SceneViewGridLocalY, "Scene View Grid Local Y")
+	    .add(EColor::SceneViewGridLocalZ, "Scene View Grid Local Z");
 
 	group("Node Editor", "ngen")
 	    .add(EColor::NodeEditorBackground, "Node Editor Background")

@@ -44,28 +44,38 @@ Manipulators::Manipulators(Viewport* viewport) : m_viewport(viewport)
 	m_operationMap.insert(std::make_pair("Free", ManipulatorType::UNIMPLEMENTED));
 }
 
-bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, glm::mat4& view, const glm::mat4& proj)
+bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, const ImVec2& position, const ImVec2& size,
+                                const glm::mat4* model, glm::mat4& view, const glm::mat4& proj)
 {
+	// TODO: The ImGuizmo::ViewAxes should be able to modify the view matrix in the future
+
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
 	// ImGuizmo::DrawGrid(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(glm::mat4(1)), 100.f);
 	// ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), &objectMatrix[0][0], 1);
 
-	int axesSize = 6.125f * ImGui::GetFontSize();
-	int padding = 0.5f * ImGui::GetFontSize();
-	ImVec2 axesPosition = ImVec2(windowPos.x + windowSize.x - axesSize - padding, windowPos.y + padding);
+	// TODO: Add axes text color to ImGuizmo style
+	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(10, 10, 10, 0xFF));
+
+	// The view must be modified by the passed reference (model) space
+	glm::mat4 viewMod;
+	if (model != nullptr)
+	{
+		viewMod = view * *model;
+	}
 
 	// ImGuizmo::ViewManipulate(glm::value_ptr(view), 9, GUI::glmToIm(windowPos), ImVec2(128, 128), 0x10101010);
-	ImGuizmo::ViewAxes(glm::value_ptr(view), glm::value_ptr(proj), 9, axesPosition, ImVec2(axesSize, axesSize));
+	ImGuizmo::ViewAxes(glm::value_ptr(model == nullptr ? view : viewMod), glm::value_ptr(proj), 9, position, size);
 
 	return false;
 }
 
-bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4& view,
-                                    const glm::mat4& proj)
+bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4* model,
+                                    const glm::mat4& view, const glm::mat4& proj)
 {
-	glm::mat4 objectMatrix = glm::mat4(1);
+	// TODO: Implement reference model matrix <<<<<<<<<<<<<<<<<<<<<<<<<
+
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
@@ -106,7 +116,7 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, c
 		style.ScaleLineCircleSize = 6.0f * uiScale;
 		style.HatchedAxisLineThickness = 6.0f * uiScale;
 		style.CenterCircleSize = 6.0f * uiScale;
-		style.ProjectionCircleRadius = 5.0f * uiScale;
+		style.ProjectionHandleRadius = 8.0f * uiScale;
 
 		if (type == ManipulatorType::LOOKAT)
 		{

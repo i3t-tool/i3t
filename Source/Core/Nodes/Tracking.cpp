@@ -323,6 +323,9 @@ void MatrixTracker::updateProgress()
 			transform->data.active |= matrix->active;
 		}
 		transform->data.progress /= matrixCount;
+
+		if (transform->data.interpolating)
+			m_interpolatedTransform = transform.get();
 	}
 
 	// Update tracked sequences that aren't transforms
@@ -517,6 +520,9 @@ void MatrixTracker::clearTrackingData()
 	m_trackedTransforms.clear();
 	m_trackedCamera.reset();
 	m_chainNeedsUpdate = true;
+	m_interpolatedTransform = nullptr;
+	m_interpolatedTransformID = NIL_ID;
+	m_interpolatedMatrix = glm::identity<glm::mat4>();
 }
 
 void MatrixTracker::clearModels()

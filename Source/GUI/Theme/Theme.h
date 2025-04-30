@@ -145,6 +145,17 @@ enum class EColor
 
 	// Scene View (3D Viewport)
 	SceneViewBackground,
+	SceneViewBackgroundLocalColorShift,
+	SceneViewBackgroundTrackingColorShift,
+
+	SceneViewGridColor,
+	SceneViewGridX,
+	SceneViewGridY,
+	SceneViewGridZ,
+	SceneViewGridLocalColor,
+	SceneViewGridLocalX,
+	SceneViewGridLocalY,
+	SceneViewGridLocalZ,
 
 	// Node Editor
 	NodeEditorBackground,
@@ -504,6 +515,12 @@ public:
 			return m_defaultColor;
 
 		return m_colors[color];
+	}
+	/// Returns a color whose alpha is set to the provided valuea
+	ImVec4 get(EColor color, float alpha)
+	{
+		const ImVec4& col = get(color);
+		return ImVec4(col.x, col.y, col.z, alpha);
 	}
 	/// Returns a pointer to a color variable
 	ImVec4* getPtr(EColor color)

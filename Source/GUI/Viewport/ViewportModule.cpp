@@ -2,6 +2,7 @@
 
 #include "GUI/Fonts/Bindings/BindingFontAwesome.h"
 #include "GUI/Workspace/WorkspaceModule.h"
+#include "Viewport/entity/GridObject.h"
 
 ViewportModule::ViewportModule()
 {
@@ -27,6 +28,17 @@ void ViewportModule::onUpdate(double deltaSeconds)
 		// Scene view 1 must be visible
 		m_viewportWindows[0]->show();
 	}
+
+	Theme& theme = I3T::getTheme();
+	m_viewport->getMainScene()->m_worldGrid->m_gridColor = &theme.get(EColor::SceneViewGridColor).x;
+	m_viewport->getMainScene()->m_worldGrid->m_axisXColor = &theme.get(EColor::SceneViewGridX).x;
+	m_viewport->getMainScene()->m_worldGrid->m_axisYColor = &theme.get(EColor::SceneViewGridY).x;
+	m_viewport->getMainScene()->m_worldGrid->m_axisZColor = &theme.get(EColor::SceneViewGridZ).x;
+
+	m_viewport->getMainScene()->m_localGrid->m_gridColor = &theme.get(EColor::SceneViewGridLocalColor).x;
+	m_viewport->getMainScene()->m_localGrid->m_axisXColor = &theme.get(EColor::SceneViewGridLocalX).x;
+	m_viewport->getMainScene()->m_localGrid->m_axisYColor = &theme.get(EColor::SceneViewGridLocalY).x;
+	m_viewport->getMainScene()->m_localGrid->m_axisZColor = &theme.get(EColor::SceneViewGridLocalZ).x;
 }
 
 Ptr<UI::ViewportWindow> ViewportModule::getOrCreateViewportWindow(int index)
@@ -45,6 +57,24 @@ Ptr<UI::ViewportWindow> ViewportModule::getOrCreateViewportWindow(int index)
 Ptr<UI::ViewportWindow> ViewportModule::showNewViewportWindow()
 {
 	return getOrCreateViewportWindow(m_viewportWindows.size() + 1);
+}
+ViewportModuleSettings& ViewportModule::getSettings()
+{
+	return m_settings;
+}
+int ViewportModule::getWindowCount() const
+{
+	return m_viewportWindows.size();
+}
+const std::vector<Ptr<UI::ViewportWindow>> ViewportModule::getWindows()
+{
+	return m_viewportWindows;
+}
+const Ptr<UI::ViewportWindow>& ViewportModule::getWindow(int index)
+{
+	if (index < 0 || index >= m_viewportWindows.size())
+		return {};
+	return m_viewportWindows[index];
 }
 
 void ViewportModule::collectScene(UI::ViewportWindow* window)
@@ -103,6 +133,8 @@ Memento ViewportModule::saveScene(State::Scene* scene)
 	rapidjson::Document sceneSettingsDoc(&doc.GetAllocator());
 	auto result = JSON::serializeToDocument(m_settings, sceneSettingsDoc);
 	viewport.AddMember("scene", sceneSettingsDoc, doc.GetAllocator());
+
+	// TODO: (DR) Display options are not saved
 
 	doc.AddMember("viewport", viewport, doc.GetAllocator());
 

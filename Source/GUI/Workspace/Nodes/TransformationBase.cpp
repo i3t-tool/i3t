@@ -112,7 +112,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 	if (t)
 	{
 		const ImVec2 ofst = {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
-		drawTrackingCursor(ImRect(m_center.getRect().Min - ofst, m_center.getRect().Max + ofst), t);
+		drawTrackingCursor(ImRect(m_center.getRect().Min - ofst, m_center.getRect().Max + ofst), t, true);
 	}
 }
 

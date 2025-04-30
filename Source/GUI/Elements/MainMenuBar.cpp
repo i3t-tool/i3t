@@ -311,7 +311,7 @@ void MainMenuBar::showWindowsMenu()
 		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_SCENE " ", "Scene view window")))
 		{
 			auto& viewportModule = I3T::getViewportModule();
-			auto& viewportWindows = viewportModule.m_viewportWindows;
+			auto& viewportWindows = viewportModule.getWindows();
 			for (int i = 0; i < viewportWindows.size(); i++)
 			{
 				auto& window = viewportWindows[i];

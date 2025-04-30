@@ -6,4 +6,5 @@ struct ViewportWindowSettings
 {
 	Vp::CameraSettings camera;
 	bool manipulator_enabled{true};
+	bool showLocalGrid{true};
 };

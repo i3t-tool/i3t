@@ -63,10 +63,10 @@ void GridShader::setUniforms()
 	glUniform1f(m_showYAxisId, m_showYAxis);
 	glUniform1f(m_showZAxisId, m_showZAxis);
 
-	glUniform3fv(m_gridColorId, 1, glm::value_ptr(*m_gridColor));
-	glUniform3fv(m_axisXColorId, 1, glm::value_ptr(*m_axisXColor));
-	glUniform3fv(m_axisYColorId, 1, glm::value_ptr(*m_axisYColor));
-	glUniform3fv(m_axisZColorId, 1, glm::value_ptr(*m_axisZColor));
+	glUniform4fv(m_gridColorId, 1, m_gridColor);
+	glUniform4fv(m_axisXColorId, 1, m_axisXColor);
+	glUniform4fv(m_axisYColorId, 1, m_axisYColor);
+	glUniform4fv(m_axisZColorId, 1, m_axisZColor);
 
 	glUniform1f(m_gridSizeId, m_gridSize);
 	glUniform1f(m_gridStrengthId, m_gridStrength);

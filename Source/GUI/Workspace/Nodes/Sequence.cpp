@@ -12,9 +12,12 @@
  */
 #include "Sequence.h"
 
+#include "GUI/Elements/Windows/ViewportWindow.h"
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
 #include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "TransformationBase.h"
@@ -231,6 +234,64 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
+	// TODO: Finish <<<<<<<<<<<<<<<<<<<
+	auto& viewportModule = I3T::getViewportModule();
+
+	if (viewportModule.getWindowCount() == 1)
+	{
+		auto viewportWindow = viewportModule.getWindow(0);
+		if (!viewportWindow->m_space.customSource)
+		{
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Set as reference space")))
+			{
+				viewportWindow->m_space.customSource = true;
+				viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+			}
+		}
+		else
+		{
+			if (I3TGui::MenuItemWithLog(
+			        ICON_TBD(ICON_FA_SOLAR_PANEL ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
+			{
+				viewportWindow->m_space.customSource = false;
+				viewportWindow->m_space.sourceNode.reset();
+			}
+		}
+	}
+	else
+	{
+		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Reference space")))
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+			for (int i = 0; i < viewportModule.getWindowCount(); i++)
+			{
+				auto viewportWindow = viewportModule.getWindow(i);
+				if (!viewportWindow->m_space.customSource)
+				{
+					ImGui::TextDisabled("Set as reference space in window");
+					if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_SCENE " ", viewportWindow->getTitle())))
+					{
+						viewportWindow->m_space.customSource = true;
+						viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+					}
+				}
+				else
+				{
+					if (I3TGui::MenuItemWithLog(
+					        ICON_TBD(ICON_I3T_SCENE ICON_FA_ARROW_ROTATE_LEFT " ", viewportWindow->getTitle())))
+					{
+						viewportWindow->m_space.customSource = false;
+						viewportWindow->m_space.sourceNode.reset();
+					}
+				}
+			}
+			ImGui::PopItemFlag();
+			ImGui::EndMenu();
+		}
+	}
+
+	ImGui::Separator();
+
 	drawMenuSetPrecision();
 
 	ImGui::Separator();
@@ -281,7 +342,8 @@ void Sequence::drawMenuLevelOfDetail()
 
 void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
-	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	auto* coreSeq = this->getNodebase()->asRaw<Core::Sequence>();
+	const Core::TrackedNodeData* t = coreSeq->getTrackingData();
 	if (t)
 	{
 		if (t->isSequenceTransform() || t->getChildCount() == 0)
@@ -289,7 +351,8 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 			const ImRect& center = m_center.getRect();
 			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);
 			// dropZoneMargin += {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
-			drawTrackingCursor(ImRect(center.Min + dropZoneMargin, center.Max - dropZoneMargin), t);
+			drawTrackingCursor(ImRect(center.Min + dropZoneMargin, center.Max - dropZoneMargin), t,
+			                   coreSeq->getMatrices().size() != 0);
 		}
 		if (t->chain || t->modelSubtree)
 			drawTrackingBorder(t->active, t->interpolating, t->progress);

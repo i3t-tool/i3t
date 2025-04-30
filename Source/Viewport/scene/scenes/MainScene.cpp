@@ -163,25 +163,34 @@ void MainScene::init()
 void MainScene::draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
                      SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
 {
-	m_worldGrid->m_showGrid = displayOptions.showGridLines;
-	m_worldGrid->m_showXAxis = displayOptions.showGridXAxis;
-	m_worldGrid->m_showYAxis = displayOptions.showGridYAxis;
-	m_worldGrid->m_showZAxis = displayOptions.showGridZAxis;
-
-	m_worldGrid->m_visible = displayOptions.showGridLines || displayOptions.showGridXAxis ||
-	                         displayOptions.showGridYAxis || displayOptions.showGridZAxis;
-
 	ViewportSettings& stg = m_viewport->getSettings();
+
+	m_worldGrid->m_visible = displayOptions.grid.show && stg.global().grid.programShow;
+	m_worldGrid->m_showGrid = displayOptions.grid.showGridLines;
+	m_worldGrid->m_showXAxis = displayOptions.grid.showGridXAxis;
+	m_worldGrid->m_showYAxis = displayOptions.grid.showGridYAxis;
+	m_worldGrid->m_showZAxis = displayOptions.grid.showGridZAxis;
+	if (m_worldGrid->m_visible)
+	{
+		m_worldGrid->m_visible = displayOptions.grid.showGridLines || displayOptions.grid.showGridXAxis ||
+		                         displayOptions.grid.showGridYAxis || displayOptions.grid.showGridZAxis;
+	}
+
+	m_localGrid->m_visible = displayOptions.localGrid.show && stg.global().localGrid.programShow;
+	m_localGrid->m_showGrid = displayOptions.localGrid.showGridLines;
+	m_localGrid->m_showXAxis = displayOptions.localGrid.showGridXAxis;
+	m_localGrid->m_showYAxis = displayOptions.localGrid.showGridYAxis;
+	m_localGrid->m_showZAxis = displayOptions.localGrid.showGridZAxis;
+	if (m_localGrid->m_visible)
+	{
+		m_localGrid->m_visible = displayOptions.localGrid.showGridLines || displayOptions.localGrid.showGridXAxis ||
+		                         displayOptions.localGrid.showGridYAxis || displayOptions.localGrid.showGridZAxis;
+	}
 
 	// TODO: See comment in GridObject::prepareRenderContext()
 
-	m_worldGrid->m_gridColor = &stg.global().grid.color;
-	m_worldGrid->m_axisXColor = &stg.global().grid.axisXColor;
-	m_worldGrid->m_axisYColor = &stg.global().grid.axisYColor;
-	m_worldGrid->m_axisZColor = &stg.global().grid.axisZColor;
-
 	m_worldGrid->m_gridSize = stg.global().grid.size;
-	m_worldGrid->m_gridStrength = stg.global().grid.strength;
+	m_worldGrid->m_gridStrength = stg.global().grid.programStrength;
 	m_worldGrid->m_lineWidth = stg.global().grid.lineWidth;
 
 	m_worldGrid->m_grid1FadeStart = stg.global().grid.grid1FadeStart;
@@ -189,13 +198,8 @@ void MainScene::draw(int width, int height, const glm::mat4& model, const glm::m
 	m_worldGrid->m_grid2FadeStart = stg.global().grid.grid2FadeStart;
 	m_worldGrid->m_grid2FadeEnd = stg.global().grid.grid2FadeEnd;
 
-	m_localGrid->m_gridColor = &stg.global().localGrid.color;
-	m_localGrid->m_axisXColor = &stg.global().localGrid.axisXColor;
-	m_localGrid->m_axisYColor = &stg.global().localGrid.axisYColor;
-	m_localGrid->m_axisZColor = &stg.global().localGrid.axisZColor;
-
 	m_localGrid->m_gridSize = stg.global().localGrid.size;
-	m_localGrid->m_gridStrength = stg.global().localGrid.strength;
+	m_localGrid->m_gridStrength = stg.global().localGrid.programStrength;
 	m_localGrid->m_lineWidth = stg.global().localGrid.lineWidth;
 
 	m_localGrid->m_grid1FadeStart = stg.global().localGrid.grid1FadeStart;

@@ -18,6 +18,7 @@
 
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Viewport/ViewportWindowSettings.h"
+#include "GUI/Workspace/Nodes/Sequence.h"
 
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
@@ -44,11 +45,22 @@ public:
 
 	struct ViewportSpace
 	{
-		bool standard = true;
-		std::string label{"World space"};
-		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
 		glm::mat4 m_referenceSpace{1.f};
 		glm::mat4 m_referenceSpaceInv{1.f};
+
+		bool standard = true;
+		const std::string worldSpaceLabel = _tbd("World space");
+		std::string label{worldSpaceLabel};
+		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
+
+		// Reference space is set by tracking (takes priority)
+		bool tracking = false;
+		Core::TransformSpace trackingSpace{Core::TransformSpace::Model};
+		float trackingSpaceParam = 0.f; ///< 0..1 parameter indicating current space
+
+		// Reference space is set from a sequence node
+		bool customSource = false;
+		WPtr<Workspace::Sequence> sourceNode;
 	};
 	ViewportSpace m_space;
 
@@ -71,6 +83,6 @@ private:
 
 	bool showViewportButtons();
 	bool showViewportMenu();
-	bool showSpaceIndicators();
+	bool showSpaceIndicators(glm::mat4& view);
 };
 } // namespace UI

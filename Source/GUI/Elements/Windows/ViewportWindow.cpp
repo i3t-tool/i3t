@@ -130,9 +130,9 @@ void ViewportWindow::render()
 	if (m_instanceIndex == 1)
 	{
 		bool showNum = false;
-		for (int i = 1; i < m_module->m_viewportWindows.size(); i++)
+		for (int i = 1; i < m_module->getWindowCount(); i++)
 		{
-			auto& window = m_module->m_viewportWindows[i];
+			auto& window = m_module->getWindow(i);
 			if (window->isVisible())
 			{
 				showNum = true;
@@ -182,25 +182,21 @@ void ViewportWindow::render()
 
 		menuInteraction |= showViewportButtons();
 
-		// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
-		// interacting with them, hence we draw them beforehand using a channel splitter
 		glm::mat4 view = m_camera->getView();
-
-		// if (ImGui::IsKeyDown(ImGuiKey_E))
-		// 	int x = 5;
-		bool manipulatorInteraction =
-		    m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize, view, m_camera->getProjection());
-
-		if (m_settings.manipulator_enabled && m_instanceIndex == 1)
-		// if (m_settings.manipulator_enabled)
-		{
-			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize, view,
-			                                                                       m_camera->getProjection());
-		}
 
 		// Update reference space
 		updateSpace();
-		menuInteraction |= showSpaceIndicators();
+		menuInteraction |= showSpaceIndicators(view);
+
+		bool manipulatorInteraction = false;
+		// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
+		// interacting with them, hence we draw them beforehand using a channel splitter
+		if (m_settings.manipulator_enabled && m_instanceIndex == 1)
+		// if (m_settings.manipulator_enabled)
+		{
+			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(
+			    m_windowPos, m_windowSize, &m_space.m_referenceSpace, view, m_camera->getProjection());
+		}
 
 		// Viewport channel
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
@@ -252,67 +248,187 @@ void ViewportWindow::render()
 
 void ViewportWindow::updateSpace()
 {
-	bool reset = true;
+	Vp::ViewportSettings& stg = m_viewport->getSettings();
+
+	bool spaceSet = false;
+	bool labelSet = false;
+
+	// Reset some variables
+	stg.global().grid.programShow = true;         // Disabling world grid for projection spaces
+	stg.global().localGrid.programStrength = 1.f; // Fading local grid in view space
+
+	m_space.tracking = Core::GraphManager::isTracking() && m_instanceIndex == 1;
+	m_space.trackingSpaceParam = 0.f;
+	m_space.trackingSpace = Core::TransformSpace::Model;
+
+	// TODO: Dim scene view background when tracking or using ref space
 
 	// React to active tracking
-	if (Core::GraphManager::isTracking() && m_instanceIndex == 1)
+	if (m_space.tracking)
 	{
 		Core::MatrixTracker* tracker = Core::GraphManager::getTracker();
 		if (!tracker->m_trackInWorldSpace)
 		{
-			reset = false;
+			// TODO: Add interpolation slider or different progress indicator
+			//  The slider should indicate progress from one space to another
+			spaceSet = true;
 			m_space.m_referenceSpace = tracker->m_iProjMatrix * tracker->m_iViewMatrix;
+
+			const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
+			m_space.trackingSpaceParam = transform->data.progress;
+			m_space.trackingSpace = transform->data.space;
+
+			switch (m_space.trackingSpace)
+			{
+			case Core::TransformSpace::Model:
+				m_space.label = m_space.worldSpaceLabel;
+				break;
+			case Core::TransformSpace::View:
+				// TODO: Maybe add the name of the camera?
+				m_space.label = _tbd("View space");
+				stg.global().localGrid.programStrength = m_space.trackingSpaceParam;
+				break;
+			case Core::TransformSpace::Projection:
+			{
+				// TODO: Apply fade out shaders
+				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
+				m_space.label = _tbd("NDC space");
+				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
+			}
+			break;
+			}
+			labelSet = true;
+		}
+	}
+	else
+	{
+		// React to reference space set from a sequence/node
+		if (m_space.customSource)
+		{
+			if (m_space.sourceNode.expired())
+			{
+				m_space.customSource = false;
+				m_space.sourceNode.reset();
+			}
+			else
+			{
+				spaceSet = true;
+				m_space.m_referenceSpace =
+				    glm::inverse(m_space.sourceNode.lock()->getNodebase()->data(Core::I3T_SEQ_IN_MUL).getMat4());
+			}
 		}
 	}
 
-	if (reset)
+	if (!spaceSet)
 		m_space.m_referenceSpace = glm::identity<glm::mat4>();
 
 	// Setup world and local grid
 	m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
 	if (m_space.standard)
 	{
-		m_space.label = "World space";
-		m_space.labelCol = ImVec4(1, 1, 1, 1);
+		if (!labelSet)
+			m_space.label = _tbd("World space");
+		m_space.labelCol = ImGui::GetStyleColorVec4(ImGuiCol_Text);
 		m_space.m_referenceSpaceInv = m_space.m_referenceSpace;
 	}
 	else
 	{
-		m_space.label = "Local space";
-		m_space.labelCol = ImVec4(0.961, 0.922, 0.392, 1.0);
+		if (!labelSet)
+			m_space.label = _tbd("Local space");
+		m_space.labelCol = I3T::getTheme().get(EColor::SceneViewGridLocalColor, 1.f);
 		m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
 	}
 
 	// TODO: Implement interpolation / switching
-	if (m_module->m_settings.keepWorldGridStatic)
+	if (m_module->getSettings().keepWorldGridStatic)
 	{
 		auto mainScene = m_viewport->getMainScene();
-		mainScene->m_localGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
-		mainScene->m_localGrid->m_visible = !m_space.standard;
+		mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
 	}
 	else
 	{
 		auto mainScene = m_viewport->getMainScene();
-		mainScene->m_worldGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
-		mainScene->m_localGrid->m_visible = !m_space.standard;
+		mainScene->m_localGrid->setReferenceSpace(m_space.m_referenceSpace, m_space.m_referenceSpaceInv);
 	}
+
+	m_displayOptions.localGrid.show = !m_space.standard;
+	if (!m_settings.showLocalGrid)
+		m_displayOptions.localGrid.show = false;
 }
 
-bool ViewportWindow::showSpaceIndicators()
+bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 {
+	bool interacted = false;
 	int axesSize = 6.125f * ImGui::GetFontSize();
 	int padding = 0.5f * ImGui::GetFontSize();
 	ImVec2 axesPosition = ImVec2(m_windowPos.x + m_windowSize.x - axesSize - padding, m_windowPos.y + padding);
 
-	float tWidth = ImGui::CalcTextSize(m_space.label.c_str()).x;
-	ImGui::SetCursorScreenPos({m_windowPos.x + m_windowSize.x - axesSize / 2 - padding - tWidth / 2,
-	                           m_windowPos.y + padding + axesSize + padding});
-	ImGui::TextColored(m_space.labelCol, m_space.label.c_str());
+	Theme& theme = I3T::getTheme();
+
+	float oldAlpha = ImGui::GetStyle().Alpha;
+
+	if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Projection)
+		ImGui::GetStyle().Alpha = 1.f - m_space.trackingSpaceParam;
+
+	const float& alpha = ImGui::GetStyle().Alpha;
+
+	// Draw world space axes, except when tracking projection
+	ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_X] = theme.get(EColor::SceneViewGridX, alpha);
+	ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_Y] = theme.get(EColor::SceneViewGridY, alpha);
+	ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_Z] = theme.get(EColor::SceneViewGridZ, alpha);
+
+	// TODO: Add a theme variable for axes text color
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(10, 10, 10, 0xFF));
+	interacted |= m_viewport->m_manipulators->drawViewAxes(
+	    m_windowPos, m_windowSize, axesPosition, ImVec2(axesSize, axesSize),
+	    m_space.standard ? nullptr : &m_space.m_referenceSpace, view, m_camera->getProjection());
+	ImGui::PopStyleColor();
+
+	// Draw local space axes if applicable
+	if (!m_space.standard)
+	{
+		// Draw the world space label
+		float tWidth = ImGui::CalcTextSize(m_space.worldSpaceLabel.c_str()).x;
+		ImGui::SetCursorScreenPos({axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize});
+		ImGui::TextUnformatted(m_space.worldSpaceLabel.c_str());
+
+		if (m_space.tracking)
+		{
+			if (m_space.trackingSpace == Core::TransformSpace::Projection)
+				ImGui::GetStyle().Alpha = 1.0f;
+			if (m_space.trackingSpace == Core::TransformSpace::View)
+				ImGui::GetStyle().Alpha = m_space.trackingSpaceParam;
+		}
+
+		ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_X] = theme.get(EColor::SceneViewGridLocalX, alpha);
+		ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_Y] = theme.get(EColor::SceneViewGridLocalY, alpha);
+		ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_Z] = theme.get(EColor::SceneViewGridLocalZ, alpha);
+
+		float worldAxesSize = axesSize + padding + ImGui::GetTextLineHeightWithSpacing();
+		if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Projection)
+			worldAxesSize *= 1.f - m_space.trackingSpaceParam;
+
+		axesPosition =
+		    ImVec2(m_windowPos.x + m_windowSize.x - axesSize - padding, m_windowPos.y + padding + worldAxesSize);
+
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(10, 10, 10, 0xFF));
+		interacted |= m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize, axesPosition,
+		                                                       ImVec2(axesSize, axesSize), nullptr, view,
+		                                                       m_camera->getProjection());
+		ImGui::PopStyleColor();
+
+		tWidth = ImGui::CalcTextSize(m_space.label.c_str()).x;
+
+		ImGui::SetCursorScreenPos({axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize});
+		ImGui::TextColored(m_space.labelCol, m_space.label.c_str());
+	}
+
+	ImGui::GetStyle().Alpha = oldAlpha;
 
 	// TODO: Better indicators (more prominent text, world space axes?, interpolation indicator, buttons to disable
 	//   either of the grids, perhaps even grid opacity control)
 
-	return false;
+	return interacted;
 }
 
 bool ViewportWindow::showViewportButtons()
@@ -355,7 +471,7 @@ bool ViewportWindow::showViewportButtons()
 
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_MODEL " ", "Objects"), nullptr, &m_displayOptions.showDefault);
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_MANIPULATOR " ", "Axes"), nullptr, &m_displayOptions.showAxes);
-		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_GRID " ", "Grid"), nullptr, &m_displayOptions.showGrid);
+		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_GRID " ", "Grid"), nullptr, &m_displayOptions.showGrids);
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_CAMERA " ", "Cameras"), nullptr, &m_displayOptions.showCamera);
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_FRUSTUM " ", "Frustums"), nullptr, &m_displayOptions.showFrustum);
 
@@ -364,22 +480,24 @@ bool ViewportWindow::showViewportButtons()
 
 	ImGui::SameLine();
 
-	if (GUI::FloatingToggleButton(ICON_I3T_EARTH "###WorldLightingButton", m_module->m_settings.lightFollowsCamera,
-	                              true))
+	if (m_instanceIndex == 1)
 	{
-		m_viewport->getMainScene()->m_lightFollowsCamera = m_module->m_settings.lightFollowsCamera;
-		interacted = true;
-	}
-	else
-	{
-		if (ImGui::IsItemHovered())
+		if (GUI::FloatingToggleButton(ICON_I3T_EARTH "###WorldLightingButton",
+		                              m_module->getSettings().lightFollowsCamera, true))
 		{
+			m_viewport->getMainScene()->m_lightFollowsCamera = m_module->getSettings().lightFollowsCamera;
 			interacted = true;
-			GUI::Tooltip(_t("Toggle world lighting"), "");
 		}
+		else
+		{
+			if (ImGui::IsItemHovered())
+			{
+				interacted = true;
+				GUI::Tooltip(_t("Toggle world lighting"), "");
+			}
+		}
+		ImGui::SameLine();
 	}
-
-	ImGui::SameLine();
 
 	if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", m_settings.manipulator_enabled))
 	{
@@ -393,20 +511,35 @@ bool ViewportWindow::showViewportButtons()
 			GUI::Tooltip(_t("Toggle manipulators"), "");
 		}
 	}
+	ImGui::SameLine();
+
+	if (m_displayOptions.showGrids)
+	{
+		interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridBtn", m_displayOptions.grid.show);
+		interacted |= GUI::ItemTooltip(m_space.standard ? _tbd("Toggle grid") : _tbd("Toggle world grid"), "");
+		ImGui::SameLine();
+
+		if (!m_space.standard)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::SceneViewGridLocalColor, 1.f));
+			interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridNLocalBtn", m_settings.showLocalGrid);
+			ImGui::PopStyleColor();
+			interacted |= GUI::ItemTooltip(_tbd("Toggle local grid"), "");
+			ImGui::SameLine();
+		}
+	}
 
 	ImGui::PopItemFlag();
 	ImGui::PopStyleVar();
 
 	// TESTING BEGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// TODO: Move this into some kind of a popup / collapsible item below the local view axes
 	{
-		Core::EValueState valState = Core::EValueState::Editable;
-		const std::array<std::array<Core::EValueState, 4> const, 4>& dataState = {
-		    valState, valState, valState, valState, valState, valState, valState, valState,
-		    valState, valState, valState, valState, valState, valState, valState, valState};
 		bool valChanged = false;
 		int row, col;
 		float val;
-		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, dataState, valChanged, row, col, val);
+		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, Core::EValueState::Editable, valChanged, row, col,
+		                val);
 		if (valChanged)
 		{
 			m_space.m_referenceSpace[col][row] = val;
@@ -429,11 +562,11 @@ bool ViewportWindow::showViewportMenu()
 
 		if (I3TGui::BeginMenuWithLog(_t("Scene")))
 		{
-			bool b = !m_module->m_settings.lightFollowsCamera;
+			bool b = !m_module->getSettings().lightFollowsCamera;
 			if (ImGui::Checkbox(_t("World space lighting"), &b))
 			{
-				m_module->m_settings.lightFollowsCamera = !b;
-				m_viewport->getMainScene()->m_lightFollowsCamera = m_module->m_settings.lightFollowsCamera;
+				m_module->getSettings().lightFollowsCamera = !b;
+				m_viewport->getMainScene()->m_lightFollowsCamera = m_module->getSettings().lightFollowsCamera;
 			}
 			ImGui::EndMenu();
 		}
@@ -578,6 +711,20 @@ bool ViewportWindow::showViewportMenu()
 	if (I3TGui::BeginMenuWithLog(_t("View")))
 	{
 		userInteractedWithMenus = true;
+
+		if (I3TGui::MenuItemWithLog(_t("Center camera on selection"), "Num0"))
+		{
+
+			m_camera->centerOnSelection(*m_viewport->getMainScene());
+		}
+
+		if (I3TGui::MenuItemWithLog(_t("Center camera on scene"), "Home"))
+		{
+			m_camera->centerOnScene(*m_viewport->getMainScene());
+		}
+
+		ImGui::Separator();
+
 		if (I3TGui::MenuItemWithLog(_t("Orbit camera"), nullptr, m_settings.camera.mode == CameraMode::ORBIT))
 		{
 			m_settings.camera.mode = CameraMode::ORBIT;
@@ -599,17 +746,17 @@ bool ViewportWindow::showViewportMenu()
 		}
 
 		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
-		ImGui::Checkbox(_t("Show grid"), &m_displayOptions.showGrid);
+		ImGui::Checkbox(_t("Show grid"), &m_displayOptions.grid.show);
 		ImGui::SameLine();
-		GUI::ToggleButton("XZ", m_displayOptions.showGridLines, false, gridButtonSize);
+		GUI::ToggleButton("XZ", m_displayOptions.grid.showGridLines, false, gridButtonSize);
 		ImGui::SameLine();
 		ImGui::Dummy(ImVec2(4.0f, 0.0f));
 		ImGui::SameLine();
-		GUI::ToggleButton("X", m_displayOptions.showGridXAxis, false, gridButtonSize);
+		GUI::ToggleButton("X", m_displayOptions.grid.showGridXAxis, false, gridButtonSize);
 		ImGui::SameLine();
-		GUI::ToggleButton("Y", m_displayOptions.showGridYAxis, false, gridButtonSize);
+		GUI::ToggleButton("Y", m_displayOptions.grid.showGridYAxis, false, gridButtonSize);
 		ImGui::SameLine();
-		GUI::ToggleButton("Z", m_displayOptions.showGridZAxis, false, gridButtonSize);
+		GUI::ToggleButton("Z", m_displayOptions.grid.showGridZAxis, false, gridButtonSize);
 
 		ImGui::Separator();
 
@@ -639,26 +786,10 @@ bool ViewportWindow::showViewportMenu()
 			m_camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 		}
 
-		ImGui::Separator();
-
-		if (I3TGui::MenuItemWithLog(_t("Center camera on selection"), "Num0"))
-		{
-
-			m_camera->centerOnSelection(*m_viewport->getMainScene());
-		}
-
-		if (I3TGui::MenuItemWithLog(_t("Center camera on scene"), "Home"))
-		{
-			m_camera->centerOnScene(*m_viewport->getMainScene());
-		}
-
-		ImGui::Separator();
-
-		I3TGui::MenuItemWithLog(_t("Show objects"), nullptr, &m_displayOptions.showDefault);
-		I3TGui::MenuItemWithLog(_t("Show axes"), nullptr, &m_displayOptions.showAxes);
-		I3TGui::MenuItemWithLog(_t("Show grid"), nullptr, &m_displayOptions.showGrid);
-		I3TGui::MenuItemWithLog(_t("Show cameras"), nullptr, &m_displayOptions.showCamera);
-		I3TGui::MenuItemWithLog(_t("Show frustums"), nullptr, &m_displayOptions.showFrustum);
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Debug"))
+	{
 
 		ImGui::EndMenu();
 	}
