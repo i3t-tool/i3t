@@ -26,6 +26,16 @@
 
 using namespace Core;
 
+ApplicationSettings I3TApplication::g_settings;
+
+I3TApplication::~I3TApplication()
+{
+	if (!m_shouldClose)
+	{
+		close();
+	}
+}
+
 void I3TApplication::onInit()
 {
 	Core::GraphManager::init();
@@ -49,6 +59,7 @@ void I3TApplication::onInit()
 
 	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();
 	JSON::parse(Configuration::configFile, *configDoc, "Data/Schemas/Config.schema.json");
+	App::getModule<StateManager>().addOriginator(this);
 
 	ResourceManager* resourceManager = createModule<Core::ResourceManager>();
 	App::getModule<StateManager>().addOriginator(resourceManager);
@@ -79,6 +90,69 @@ void I3TApplication::onUpdate(double delta)
 }
 
 void I3TApplication::onClose() {}
+
+Memento I3TApplication::saveScene(Scene* scene)
+{
+	return emptyMemento();
+}
+
+Memento I3TApplication::saveGlobal()
+{
+
+	saveSettings();
+	rapidjson::Document doc;
+	doc.SetObject();
+
+	rapidjson::Document appDoc(&doc.GetAllocator());
+	auto result = JSON::serializeToDocument(g_settings, appDoc);
+	if (!result)
+	{
+		return emptyMemento();
+	}
+	doc.AddMember("application", appDoc, doc.GetAllocator());
+
+	return doc;
+}
+
+void I3TApplication::loadGlobal(const Memento& memento)
+{
+	if (!memento.HasMember("application"))
+	{
+		LOG_ERROR("Cannot load global application data! No 'application' entry found!");
+		loadSettings();
+		return;
+	}
+	LOG_INFO("Loaded global application data.");
+
+	JSON::deserializeDocument(memento["application"], g_settings);
+	loadSettings();
+}
+
+void I3TApplication::clearGlobal()
+{
+	g_settings.appLoopSettings = AppLoopSettings();
+	m_appLoopManager =
+	    AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS, g_settings.appLoop().targetFPS,
+	                   g_settings.appLoop().shouldLimitFPSOnIdle, g_settings.appLoop().targetFPSOnIdle);
+	m_window->setVSync(g_settings.appLoop().vsync);
+}
+
+void I3TApplication::saveSettings()
+{
+	g_settings.appLoop().vsync = m_appLoopManager.isVsync();
+	g_settings.appLoop().shouldLimitFPS = m_appLoopManager.shouldLimitFPS();
+	g_settings.appLoop().targetFPS = m_appLoopManager.getTargetFPS();
+	g_settings.appLoop().shouldLimitFPSOnIdle = m_appLoopManager.shouldLimitFPSOnIdle();
+	g_settings.appLoop().targetFPSOnIdle = m_appLoopManager.getTargetFPSOnIdle();
+}
+
+void I3TApplication::loadSettings()
+{
+	m_appLoopManager =
+	    AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS, g_settings.appLoop().targetFPS,
+	                   g_settings.appLoop().shouldLimitFPSOnIdle, g_settings.appLoop().targetFPSOnIdle);
+	m_window->setVSync(g_settings.appLoop().vsync);
+}
 
 //////////////////////////////////////////////
 

@@ -37,6 +37,8 @@ public:
 
 	void finalize();
 
+	void setVSync(bool enable);
+
 private:
 	bool m_closeDisabled = false;
 	std::string m_title;
