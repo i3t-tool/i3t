@@ -473,16 +473,12 @@ void StartWindow::render()
 
 	// const ImVec2 logoOffset = theme.get(ESizeVec2::StartWindow_LogoOffset);
 
-	// Set initial window size
-	static bool firstTime = true;
-	if (firstTime)
-	{
-		firstTime = false;
-		ImVec2 windowSize = theme.get(ESizeVec2::StartWindow_WinSize);
-		ImGui::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y));
-		ImGui::SetNextWindowPos(ImVec2(1000.0f, 500.0f), 0,
-		                        ImVec2(0.5f, 0.5f)); // \todo set pos to the main window center
-	}
+	ImGuiViewport* vp = ImGui::GetMainViewport();
+	ImVec2 center = ImVec2(vp->Pos.x + vp->Size.x * 0.5f, vp->Pos.y + vp->Size.y * 0.5f);
+	ImVec2 windowSize = theme.get(ESizeVec2::StartWindow_WinSize);
+	ImGui::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
+
 	ImGui::SetNextWindowSizeConstraints(ImVec2(minWinWidth, minWinHeight), ImVec2(FLT_MAX, FLT_MAX));
 	// todo change all color specifications to
 	// theme.get(EColor::DesiredColor) WINDOW

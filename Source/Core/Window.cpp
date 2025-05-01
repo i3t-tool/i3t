@@ -50,7 +50,8 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, oglVersionMinor);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, oglForwardCompat ? GLFW_TRUE : GLFW_FALSE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, oglDebug ? GLFW_TRUE : GLFW_FALSE);
 
 	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, BASE_WINDOW_TITLE.c_str(), nullptr, nullptr);
@@ -86,6 +87,11 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 	});
 }
 
+void Window::show() const
+{
+	glfwShowWindow(m_mainWindow);
+}
+
 GLFWwindow* Window::get()
 {
 	return m_mainWindow;
@@ -114,4 +120,64 @@ void Window::finalize()
 void Window::setVSync(bool enable)
 {
 	glfwSwapInterval(enable);
+}
+
+void Window::setWindowPosAndSize(int posX, int posY, int sizeX, int sizeY, bool maximized)
+{
+
+	int px = posX, py = posY;
+	int pw = sizeX, ph = sizeY;
+
+	int count;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+	bool insideAny = false;
+
+	// First, we find which monitor the window position is on
+	for (int i = 0; i < count; ++i)
+	{
+		int mx, my;
+		glfwGetMonitorPos(monitors[i], &mx, &my);
+		const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+		int mw = mode->width;
+		int mh = mode->height;
+		// Check position
+		if (px >= mx && px < mx + mw && py >= my && py < my + mh)
+		{
+			// Adjust the size to fit this monitor
+			pw = std::min(pw, mw);
+			ph = std::min(ph, mh);
+			insideAny = true;
+			break;
+		}
+	}
+
+	// If the position is outside all monitors, center it on the first one
+	if (!insideAny)
+	{
+		int mx, my;
+		glfwGetMonitorPos(monitors[0], &mx, &my);
+		const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+		int mw = mode->width;
+		int mh = mode->height;
+		// Adjust the size to fit this monitor
+		pw = std::min(pw, mw);
+		ph = std::min(ph, mh);
+		// Calculate centering
+		px = mx + (mw - pw) / 2;
+		py = my + (mh - ph) / 2;
+	}
+
+	glfwSetWindowSize(m_mainWindow, pw, ph);
+	glfwSetWindowPos(m_mainWindow, px, py);
+	if (maximized)
+		glfwMaximizeWindow(m_mainWindow);
+	else
+		glfwRestoreWindow(m_mainWindow);
+}
+
+void Window::getWindowPosAndSize(int& posX, int& posY, int& sizeX, int& sizeY, bool& maximized) const
+{
+	glfwGetWindowPos(m_mainWindow, &posX, &posY);
+	glfwGetWindowSize(m_mainWindow, &sizeX, &sizeY);
+	maximized = glfwGetWindowAttrib(m_mainWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
 }

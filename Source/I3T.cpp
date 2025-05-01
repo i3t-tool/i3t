@@ -57,13 +57,10 @@ void I3TApplication::onInit()
 	// Call loading of the localization file after the state manager is created
 	LOCALIZATION.loadLanguage(LOCALIZATION.currentLanguageID);
 
-	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();
-	JSON::parse(Configuration::configFile, *configDoc, "Data/Schemas/Config.schema.json");
 	App::getModule<StateManager>().addOriginator(this);
 
 	ResourceManager* resourceManager = createModule<Core::ResourceManager>();
 	App::getModule<StateManager>().addOriginator(resourceManager);
-	App::getModule<ResourceManager>().loadDefaultResources(*configDoc);
 
 	Vp::Viewport* viewport = createModule<Vp::Viewport>();
 	App::getModule<StateManager>().addOriginator(viewport);
@@ -75,6 +72,13 @@ void I3TApplication::onInit()
 
 	stateManager->loadGlobal();
 	stateManager->newScene(true);
+	// Show the window immediately after loading global config
+	// (Predominantly after loading window positions in Application loadGlobal)
+	m_window->show();
+
+	Ptr<rapidjson::Document> configDoc = std::make_shared<rapidjson::Document>();
+	JSON::parse(Configuration::configFile, *configDoc, "Data/Schemas/Config.schema.json");
+	App::getModule<ResourceManager>().loadDefaultResources(*configDoc);
 
 	createModule<TestModule>();
 
@@ -144,6 +148,10 @@ void I3TApplication::saveSettings()
 	g_settings.appLoop().targetFPS = m_appLoopManager.getTargetFPS();
 	g_settings.appLoop().shouldLimitFPSOnIdle = m_appLoopManager.shouldLimitFPSOnIdle();
 	g_settings.appLoop().targetFPSOnIdle = m_appLoopManager.getTargetFPSOnIdle();
+
+	m_window->getWindowPosAndSize(g_settings.window().windowPosX, g_settings.window().windowPosY,
+	                              g_settings.window().windowWidth, g_settings.window().windowHeight,
+	                              g_settings.window().windowMaximized);
 }
 
 void I3TApplication::loadSettings()
@@ -152,6 +160,9 @@ void I3TApplication::loadSettings()
 	    AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS, g_settings.appLoop().targetFPS,
 	                   g_settings.appLoop().shouldLimitFPSOnIdle, g_settings.appLoop().targetFPSOnIdle);
 	m_window->setVSync(g_settings.appLoop().vsync);
+	m_window->setWindowPosAndSize(g_settings.window().windowPosX, g_settings.window().windowPosY,
+	                              g_settings.window().windowWidth, g_settings.window().windowHeight,
+	                              g_settings.window().windowMaximized);
 }
 
 //////////////////////////////////////////////
