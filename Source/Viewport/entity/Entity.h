@@ -43,6 +43,8 @@ public:
 	/// Modification transformation, precedes any other transformations, modifies entity vertex data as if the modified
 	/// data came directly from a source (model file).
 	glm::mat4 m_modMatrix{1.f};
+	/// When true, the "global"/"reference space" model matrix passed to viewport drawing methods is ignored
+	bool m_ignoreReferenceSpace{false};
 
 	// Some basic properties
 	bool m_backFaceCull;

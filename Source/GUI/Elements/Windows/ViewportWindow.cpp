@@ -333,7 +333,6 @@ void ViewportWindow::updateSpace()
 	if (!spaceSet)
 		m_space.m_referenceSpace = glm::identity<glm::mat4>();
 
-	// Setup world and local grid
 	m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
 	if (m_space.standard)
 	{
@@ -350,7 +349,12 @@ void ViewportWindow::updateSpace()
 		m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
 	}
 
-	// TODO: Implement interpolation / switching
+	updateGrids();
+}
+
+void ViewportWindow::updateGrids()
+{
+	// Setup world and local grid
 	if (m_module->getSettings().keepWorldGridStatic)
 	{
 		auto mainScene = m_viewport->getMainScene();

@@ -288,16 +288,14 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Smart perspective tracking"), nullptr,
-			                            &tracker->m_smartProjectionInterpolation))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
+			                            &tracker->m_decomposeProjection))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(
-			        ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Extract ortho matrix from perspective (Shirley)"), nullptr,
-			        &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Shirley decomposition"), nullptr,
+			                            &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(
-			        ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Extract ortho matrix from perspective (Brown)"), nullptr,
-			        &tracker->m_decomposePerspectiveBrown))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown  decomposition"), nullptr,
+			                            &tracker->m_decomposePerspectiveBrown))
 				tracker->requestProgressUpdate();
 			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
 			                   ImGuiSliderFlags_Logarithmic);

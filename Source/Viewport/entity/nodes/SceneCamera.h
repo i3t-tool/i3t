@@ -38,8 +38,9 @@ public:
 
 	glm::vec3 m_frustumOutlineColor{1.0f, 0.0f, 0.0f};
 
-	glm::mat4 m_projectionMatrix{1};
-	glm::mat4 m_viewMatrix{1};
+	glm::mat4 m_projectionMatrix{1.f};
+	glm::mat4 m_viewMatrix{1.f};
+	bool m_inferTransfromFromView{true}; ///< When true, the model matrix is automatically deduced from the view matrix
 
 	SceneCamera(Core::Mesh* mesh, PhongShader* shader);
 

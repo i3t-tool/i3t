@@ -95,6 +95,12 @@ enum class TrackingDirection
 	RightToLeft = 1
 };
 
+enum class NDCType
+{
+	MinusOneToOne, // Standard OpenGL NDC space (-1, 1)
+	OneToMinusOne, // OpenGL NDC space prior to applying the projection, -z depth
+};
+
 // TODO: (DR) Implement camera tracking
 /**
  * The main tracking object, responsible for tracking a single chain of sequences.
@@ -192,13 +198,17 @@ public:
 		TrackedTransform* transform;
 		glm::mat4 matrix{1.f}; ///< Matrix data, valid when useOwnData is true.
 
-		/// Indicates that space after applying this matrix should use the left handed coordinate system
-		bool useLHS = false; // TODO: Implement <<<<<<<<<<<<<<<<<<<<<<<<
-
 		// Temporary tracking information later forwarded to a parent transform.
 		bool interpolating{false};
 		float progress{0.f};
 		bool active{false};
+
+		// Projection metadata
+		/// Indicates that space after applying this matrix should use the left handed coordinate system
+		bool useLHS = false;
+		NDCType ndcType = NDCType::OneToMinusOne;
+		bool moveCameraOutOfNDC = false;
+		float cameraNDCOffset = 0.f;
 
 		/// Tracked matrix representing matrix data of a tracked transform.
 		TrackedMatrix(TrackedTransform* transform) : transform(transform) {}
@@ -285,7 +295,7 @@ public:
 	///
 	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
 	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
-	bool m_smartProjectionInterpolation{true};
+	bool m_decomposeProjection{true};
 	bool m_decomposePerspectiveIntoOrthoAndPersp{true}; // TODO: Docs
 	bool m_decomposePerspectiveBrown{false};            // TODO: Docs
 

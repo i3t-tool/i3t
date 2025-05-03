@@ -73,6 +73,7 @@ public:
 	void render() override;
 
 	void updateSpace(); ///< Update state of the viewport reference matrix based on app context
+	void updateGrids();
 
 private:
 	Vp::Viewport* m_viewport;

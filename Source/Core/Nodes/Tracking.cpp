@@ -554,15 +554,19 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 	assert(transform->data.space == TransformSpace::Projection);
 	assert(m_trackedCamera != nullptr);
 
-	if (!m_smartProjectionInterpolation)
-		return 0;
+	if (!m_decomposeProjection)
+	{
+		// Apply defaults
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get()));
+		m_matrices.back()->useLHS = false;
+		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
+		m_matrices.back()->moveCameraOutOfNDC = true;
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		return 1;
+	}
 
 	// If this is the ONLY projection transform along the chain (that isn't the sequence itself),
 	// we will decompose it into multiple separate transforms to better visualize the transformation.
-
-	// TODO: (DR) Test if smart interp works with empty / externally plugged in sequence <<<<<<<<<<<<<<<<<<<<<<<<<
-	// if (transform->data.isSequenceTransform())
-	// 	return 0; // Is an externally plugged sequence
 
 	auto& parentSequence = m_trackedSequences[transform->data.seqIndex];
 	if (!transform->data.isSequenceTransform() &&
@@ -581,24 +585,43 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 
 	if (isPerspective && m_decomposePerspectiveBrown)
 	{
-		auto arr = ProjectionUtils::decomposePerspectiveBrown(transformMat);
-		for (int i = 0; i < arr.size(); i++)
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), arr[i]));
+		auto [ortho1, persp1, persp2, ortho2, neg] = ProjectionUtils::decomposePerspectiveBrown(transformMat);
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho1));
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp1));
+		m_matrices.back()->moveCameraOutOfNDC = true;
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp2));
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho2));
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
 		m_matrices.back()->useLHS = true;
-		return arr.size();
+		return 5;
 	}
 	if (isPerspective && m_decomposePerspectiveIntoOrthoAndPersp)
 	{
-		auto arr = ProjectionUtils::decomposePerspectiveShirley(transformMat);
-		for (int i = 0; i < arr.size(); i++)
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), arr[i]));
+		auto [persp, ortho, neg] = ProjectionUtils::decomposePerspectiveShirley(transformMat);
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho));
+		m_matrices.back()->moveCameraOutOfNDC = true;
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
 		m_matrices.back()->useLHS = true;
-		return arr.size();
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		return 3;
 	}
 	{
 		auto [neg, proj] = ProjectionUtils::constructZFlippedProjection(transformMat);
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
-		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg))->useLHS = true;
+		m_matrices.back()->moveCameraOutOfNDC = true;
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
+		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.back()->useLHS = true;
+		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
 		return 2;
 	}
 }

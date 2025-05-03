@@ -63,6 +63,8 @@ public:
 		return m_view;
 	};
 
+	void initialize(DIWNE::DrawInfo& context) override;
+
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void afterDraw(DIWNE::DrawInfo& context) override;
 

@@ -30,7 +30,8 @@ SceneCamera::SceneCamera(Core::Mesh* mesh, PhongShader* shader) : SceneModel(mes
 void SceneCamera::update(Scene& scene)
 {
 	// Calculate model matrix from the camera's view matrix
-	m_modelMatrix = glm::inverse(m_viewMatrix);
+	if (m_inferTransfromFromView)
+		m_modelMatrix = glm::inverse(m_viewMatrix);
 
 	auto frustumPtr = m_frustumOutline.lock();
 	frustumPtr->m_visible = m_showFrustum;

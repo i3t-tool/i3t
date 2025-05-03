@@ -58,10 +58,11 @@ std::array<float, 6> decomposePerspective(const glm::mat4& m)
 
 std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m)
 {
-	glm::mat4 negator(1.f);
-	negator[2][2] = -1; // Flip Z (NDC is +z forward)
-	negator[0][0] = -1; // Flip X (NDC ls LHS)
-	return {negator, negator * m};
+	glm::mat4 negZ(1.f);
+	negZ[2][2] = -1; // Flip Z (NDC is +z forward)
+	glm::mat4 negX(1.f);
+	negX[0][0] = -1; // Flip X (NDC ls LHS)
+	return {negX * negZ, negZ * m};
 }
 
 std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m)
@@ -75,52 +76,6 @@ std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m)
 		         "original!\nThis can be ignored if the original matrix is invalid.");
 	}
 #endif
-
-	// -- perspective matrix from Shirley FCG p. 152
-	// --'(has negative n and f)
-	// -- |  n   0   0    0  |
-	// -- |  0   n   0.   0  |
-	// -- |  0   0  n+f  -fn |
-	// -- |  0   0   1    0  |
-	//
-	// -- Modified for OpenGL with stored negative n and f as positive distances
-	// -- | -n   0   0    0  |
-	// -- |  0  -n   0.   0  |
-	// -- |  0   0 -n-f  -fn |
-	// -- |  0   0   1    0  |
-	//
-	// -- perspective matrix from Shirley FCG p. 152
-	// -- operator:set_value(Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, n + f, 1), Vec4.new(0,
-	// 0, -f * n, 0)))
-	//
-	// -- Modified for OpenGL with stored negative n and f as positive distances
-	// --  operator:set_value(Mat4.new(Vec4.new(-n, 0, 0, 0), Vec4.new(0, -n, 0, 0), Vec4.new(0, 0, -(n + f), 1),
-	// Vec4.new(0, 0, -f * n, 0)))
-	//
-	// -- Modified for OpenGL times (-1)
-	//    operator:set_value(Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, (n + f), -1),
-	//    Vec4.new(0, 0, f * n, 0)))
-
-	// Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, (n + f), -1), Vec4.new(0, 0, f * n, 0))
-
-	// glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
-	//                    {0, 2 / (t - b), 0, 0},
-	//                    {0, 0, 2.f / (f - n), 0},
-	//                    {(r + l) / (l - r), (t + b) / (b - t), (f + n) / (f - n), 1}};
-	//
-	// // glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
-	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, 1}, {0, 0, -f * n, 0}};
-
-	// Shirley
-	// glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
-	//                    {0, 2 / (t - b), 0, 0},
-	//                    {0, 0, 2.f / (n - f), 0},
-	//                    {-(r + l) / (r - l), -(t + b) / (t - b), (f + n) / (f - n), 1}};
-	//
-	// // glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
-	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, 1}, {0, 0, -f * n, 0}};
-	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
-	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, 1}, {0, 0, -f * n, 0}};
 
 	glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
 	                   {0, 2 / (t - b), 0, 0},
@@ -178,38 +133,21 @@ std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m)
 	}
 #endif
 
-	glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
-	                   {0, 2 / (t - b), 0, 0},
-	                   {0, 0, -2.f / (f - n), 0},
-	                   {-(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1}};
+	// glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
+	//                    {0, 2 / (t - b), 0, 0},
+	//                    {0, 0, -2.f / (f - n), 0},
+	//                    {-(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1}};
 
 	glm::mat4 ortho1 = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-(l + r) / 2, -(b + t) / 2, 0, 1}};
 
-	glm::mat4 persp1 = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, -((f + n) / (f - n)), -1}, {0, 0, 2 * f * n / (n - f), 0}};
+	glm::mat4 persp1 = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, ((f + n) / (f - n)), -1}, {0, 0, -2 * f * n / (n - f), 0}};
 
 	glm::mat4 persp2 = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
 	glm::mat4 ortho2 = {{2 / (r - l), 0, 0, 0}, {0, 2 / (t - b), 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
-	// #ifndef NDEBUG
-	// 	glm::mat4 orthoGlm = glm::ortho(l, r, b, t, n, f);
-	// 	assert(Math::compare(ortho, orthoGlm));
-	// #endif
-
-	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
-	//
-	// assert(Math::compare(ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
-	//
 	glm::mat4 neg(1.f);
-	// neg[2][2] = -1;
-	//
-	// ortho = neg * ortho;
-
-	// assert(Math::compare(neg * ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
-
-	// // TODO: Figure this out, is this worth rewriting stuff to support dynamic RH/LH switch?, probably not
-	// // We have to flip X because we are using a RH coordinate system, but Ogl NDC is LH ... so it won't work nicely,
-	// // flipping the X and then "pretending" the X axis is flipped is a close "emulation"
+	neg[2][2] = -1; // Flip Z (NDC is +z forward)
 	neg[0][0] = -1; // Flip X (NDC ls LHS)
 
 	return {ortho1, persp1, persp2, ortho2, neg};

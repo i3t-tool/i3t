@@ -119,6 +119,161 @@ Camera::~Camera()
 	I3T::getViewport()->removeEntity(m_viewportCamera);
 }
 
+glm::vec4 Camera::calculateFrustumColor(glm::vec3 color, float alpha)
+{
+	glm::vec3 hsl;
+	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
+	hsl.y = 0.9;
+	hsl.z = 0.25;
+	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
+	return glm::vec4(color, alpha);
+}
+
+void Camera::initialize(DIWNE::DrawInfo& context)
+{
+	Super::initialize(context);
+
+	auto cameraPtr = m_viewportCamera.lock();
+	cameraPtr->m_inferTransfromFromView = true;
+	cameraPtr->m_ignoreReferenceSpace = false;
+
+	// Camera model must be placed in a special manner when projection transform is tracked
+	if (auto t = this->getNodebase()->getTrackingData())
+	{
+		Core::MatrixTracker* tracker = t->tracker;
+		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
+		if (transform->data.space == Core::TransformSpace::Projection)
+		{
+			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
+			// Make camera ignore the projection transformation
+			cameraPtr->m_inferTransfromFromView = false;
+			cameraPtr->m_ignoreReferenceSpace = true;
+
+			float tt = transform->data.progress;
+			float mt = trackedMatrix->progress;
+
+			// Modify camera position so that it doesn't intefere with the frustum and is facing the near plane
+			cameraPtr->m_modelMatrix = glm::mat4(1.f);
+			if (abs(trackedMatrix->cameraNDCOffset > 0))
+			{
+				float zPos = trackedMatrix->moveCameraOutOfNDC ? mt * trackedMatrix->cameraNDCOffset
+				                                               : trackedMatrix->cameraNDCOffset;
+				cameraPtr->m_modelMatrix = glm::translate(cameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
+			}
+			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
+			{
+				// cameraPtr->m_modelMatrix = Math::flipAxis(cameraPtr->m_modelMatrix, 2);
+				glm::mat4 neg(1.f);
+				neg[2][2] = -1;
+				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
+				cameraPtr->m_modelMatrix = Math::lerp(glm::mat4(1.f), neg, mt, false) * cameraPtr->m_modelMatrix;
+			}
+		}
+	}
+}
+
+void Camera::centerContent(DIWNE::DrawInfo& context)
+{
+	// TODO: (DR) Investigate LOD behavior of the camera node <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
+	// Label LOD
+	{
+		m_projection->drawDiwne(context, m_drawMode);
+		ImGui::SameLine();
+		m_view->drawDiwne(context, m_drawMode);
+	}
+}
+void Camera::afterDraw(DIWNE::DrawInfo& context)
+{
+	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	if (t)
+	{
+		if (t->chain)
+			drawTrackingBorder(t->active, t->interpolating, t->progress);
+	}
+
+	Super::afterDraw(context);
+}
+void Camera::drawOutputPins(DIWNE::DrawInfo& context)
+{
+	auto& pins = m_rightPins;
+	assert(pins.size() == 2); // Camera has special pin handling, expecting matrix mul at 1
+
+	m_outputPinsVstack.begin();
+	for (auto pin : {pins[0]})
+	{
+		updatePinStyle(*pin);
+		if (pin->allowDrawing())
+		{
+			DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
+			row->spring(1.0f);
+			pin->drawDiwne(context);
+			m_outputPinsVstack.endRow();
+		}
+	}
+
+	auto& pin = pins[1];
+	updatePinStyle(*pin);
+	if (pin->allowDrawing())
+	{
+		m_outputPinsVstack.spring(0.4f);
+		DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
+		row->spring(1.0f);
+		pin->drawDiwne(context);
+		m_outputPinsVstack.endRow();
+	}
+	m_outputPinsVstack.end();
+}
+
+void Camera::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
+	                              {LevelOfDetail::Full, LevelOfDetail::Label});
+}
+LevelOfDetail Camera::switchLevelOfDetail(LevelOfDetail oldLevel)
+{
+	return LevelOfDetail::Full;
+}
+int Camera::getLODCount()
+{
+	return 0;
+}
+
+int Camera::maxLengthOfData()
+{
+	return 0;
+}
+
+DIWNE::NodeRange<> Camera::getNodes() const
+{
+	return DIWNE::NodeRange<>(&m_projAndView);
+}
+DIWNE::NodeList& Camera::getNodeList()
+{
+	return m_projAndView;
+}
+void Camera::onDestroy(bool logEvent)
+{
+	m_projection->destroy(logEvent);
+	m_view->destroy(logEvent);
+	Super::onDestroy(logEvent);
+}
+
+void Camera::onSelection(bool selected)
+{
+	Super::onSelection(selected);
+	auto model = m_viewportCamera.lock();
+	if (selected)
+	{
+		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+		model->m_highlight = true;
+	}
+	else
+	{
+		model->m_highlight = false;
+	}
+}
+
 void Camera::popupContent(DIWNE::DrawInfo& context)
 {
 	drawMenuSetEditable();
@@ -264,117 +419,5 @@ void Camera::popupContentTracking()
 			}
 			ImGui::EndMenu();
 		}
-	}
-}
-
-glm::vec4 Camera::calculateFrustumColor(glm::vec3 color, float alpha)
-{
-	glm::vec3 hsl;
-	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
-	hsl.y = 0.9;
-	hsl.z = 0.25;
-	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
-	return glm::vec4(color, alpha);
-}
-
-void Camera::centerContent(DIWNE::DrawInfo& context)
-{
-	// TODO: (DR) Investigate LOD behavior of the camera node <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
-	// Label LOD
-	{
-		m_projection->drawDiwne(context, m_drawMode);
-		ImGui::SameLine();
-		m_view->drawDiwne(context, m_drawMode);
-	}
-}
-void Camera::afterDraw(DIWNE::DrawInfo& context)
-{
-	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
-	if (t)
-	{
-		if (t->chain)
-			drawTrackingBorder(t->active, t->interpolating, t->progress);
-	}
-
-	Super::afterDraw(context);
-}
-void Camera::drawOutputPins(DIWNE::DrawInfo& context)
-{
-	auto& pins = m_rightPins;
-	assert(pins.size() == 2); // Camera has special pin handling, expecting matrix mul at 1
-
-	m_outputPinsVstack.begin();
-	for (auto pin : {pins[0]})
-	{
-		updatePinStyle(*pin);
-		if (pin->allowDrawing())
-		{
-			DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
-			row->spring(1.0f);
-			pin->drawDiwne(context);
-			m_outputPinsVstack.endRow();
-		}
-	}
-
-	auto& pin = pins[1];
-	updatePinStyle(*pin);
-	if (pin->allowDrawing())
-	{
-		m_outputPinsVstack.spring(0.4f);
-		DIWNE::DiwnePanel* row = m_outputPinsVstack.beginRow();
-		row->spring(1.0f);
-		pin->drawDiwne(context);
-		m_outputPinsVstack.endRow();
-	}
-	m_outputPinsVstack.end();
-}
-
-void Camera::drawMenuLevelOfDetail()
-{
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<CoreNode>(shared_from_this()),
-	                              {LevelOfDetail::Full, LevelOfDetail::Label});
-}
-LevelOfDetail Camera::switchLevelOfDetail(LevelOfDetail oldLevel)
-{
-	return LevelOfDetail::Full;
-}
-int Camera::getLODCount()
-{
-	return 0;
-}
-
-int Camera::maxLengthOfData()
-{
-	return 0;
-}
-
-DIWNE::NodeRange<> Camera::getNodes() const
-{
-	return DIWNE::NodeRange<>(&m_projAndView);
-}
-DIWNE::NodeList& Camera::getNodeList()
-{
-	return m_projAndView;
-}
-void Camera::onDestroy(bool logEvent)
-{
-	m_projection->destroy(logEvent);
-	m_view->destroy(logEvent);
-	Super::onDestroy(logEvent);
-}
-
-void Camera::onSelection(bool selected)
-{
-	Super::onSelection(selected);
-	auto model = m_viewportCamera.lock();
-	if (selected)
-	{
-		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
-		model->m_highlight = true;
-	}
-	else
-	{
-		model->m_highlight = false;
 	}
 }

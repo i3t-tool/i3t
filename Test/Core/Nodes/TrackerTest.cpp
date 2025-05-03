@@ -484,7 +484,7 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
-	tracker->m_smartProjectionInterpolation = true; // TODO: Better handling of these initial settings
+	tracker->m_decomposeProjection = true; // TODO: Better handling of these initial settings
 	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
@@ -556,7 +556,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingInsideCamera)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.c1->getView(), t.c1, TrackingDirection::RightToLeft);
-	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposeProjection = true;
 	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
@@ -626,7 +626,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
-	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposeProjection = true;
 	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
@@ -703,7 +703,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingSmartPerspective)
 	SimpleCamTree t;
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
-	tracker->m_smartProjectionInterpolation = true;
+	tracker->m_decomposeProjection = true;
 	tracker->m_decomposePerspectiveIntoOrthoAndPersp = true;
 	tracker->requestProgressUpdate();
 	tracker->update();
