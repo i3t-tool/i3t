@@ -55,7 +55,7 @@ public:
 	bool m_showYAxis = true;
 	bool m_showZAxis = true;
 
-	const float* m_gridColor; // vec4
+	const float* m_gridColor;  // vec4
 	const float* m_axisXColor; // vec4
 	const float* m_axisYColor; // vec4
 	const float* m_axisZColor; // vec4

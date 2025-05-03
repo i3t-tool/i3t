@@ -71,7 +71,10 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 	}
 	else
 	{
-		return glm::perspective(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
+		if (rightHanded)
+			return glm::perspectiveRH(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
+		else
+			return glm::perspectiveLH(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
 	}
 }
 

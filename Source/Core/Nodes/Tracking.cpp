@@ -73,9 +73,13 @@ void MatrixTracker::updateChain()
 		m_modelSubtreeRoot = beginSequence->data(I3T_SEQ_MOD).getMat4();
 	}
 
+	// TODO: (DR) Camera tracking isn't supported for LeftToRight tracking
+	//  It hasn't been thought through conceptually yet
+	bool ignoreCamera = m_direction == TrackingDirection::LeftToRight;
+
 	// Create iterator for traversing sequence branch.
 	// TransformChain always traverses "right to left" towards root.
-	TransformChain st = TransformChain(beginSequence, beginCamera).ignoreCamera(false).skipEmptySequences(false);
+	TransformChain st = TransformChain(beginSequence, beginCamera).ignoreCamera(ignoreCamera).skipEmptySequences(false);
 
 	// Perform the traversal
 	auto transforms = st.begin().collectInfo();
@@ -195,10 +199,11 @@ void MatrixTracker::updateProgress()
 
 	assert(m_trackedTransforms.size() > 0);
 
-	if (Math::eq(0.0f, m_param))
-		m_param = 0.0f;
-	else if (Math::eq(1.0f, m_param))
-		m_param = 1.0f;
+	// I think there is no need to round? It prevents very low smooth tracking speeds (stuck at 1/0)
+	// if (Math::eq(0.0f, m_param))
+	// 	m_param = 0.0f;
+	// else if (Math::eq(1.0f, m_param))
+	// 	m_param = 1.0f;
 
 	// NOTE: Number of tracked transforms does not necessarily determine to total number of interpolated matrices
 	//  This is because the projection transform can be decomposed into multiple matrices
@@ -294,6 +299,7 @@ void MatrixTracker::updateProgress()
 			accumulateMatrix(accMatrix, *matrix->transform, iMatrix);
 		}
 		m_interpolatedMatrix = accMatrix;
+		m_interpolatedMatrixObject = matrix.get();
 	}
 
 	// Finish iteration to the end to update progress values
@@ -523,6 +529,7 @@ void MatrixTracker::clearTrackingData()
 	m_interpolatedTransform = nullptr;
 	m_interpolatedTransformID = NIL_ID;
 	m_interpolatedMatrix = glm::identity<glm::mat4>();
+	m_interpolatedMatrixObject = nullptr;
 }
 
 void MatrixTracker::clearModels()
@@ -543,19 +550,23 @@ void MatrixTracker::reset()
 
 int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transform)
 {
+	assert(m_direction != TrackingDirection::LeftToRight && "Left to right camera tracking isn't supported!");
 	assert(transform->data.space == TransformSpace::Projection);
 	assert(m_trackedCamera != nullptr);
+
 	if (!m_smartProjectionInterpolation)
 		return 0;
 
 	// If this is the ONLY projection transform along the chain (that isn't the sequence itself),
 	// we will decompose it into multiple separate transforms to better visualize the transformation.
 
-	if (transform->data.isSequenceTransform())
-		return 0; // Is an externally plugged sequence
+	// TODO: (DR) Test if smart interp works with empty / externally plugged in sequence <<<<<<<<<<<<<<<<<<<<<<<<<
+	// if (transform->data.isSequenceTransform())
+	// 	return 0; // Is an externally plugged sequence
 
 	auto& parentSequence = m_trackedSequences[transform->data.seqIndex];
-	if (parentSequence->data.childrenIdxEnd - parentSequence->data.childrenIdxStart > 1)
+	if (!transform->data.isSequenceTransform() &&
+	    parentSequence->data.childrenIdxEnd - parentSequence->data.childrenIdxStart > 1)
 		return 0; // More than one perspective transform
 
 	// Right now, we simply assume it is a
@@ -568,36 +579,26 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 
 	bool isPerspective = transformMat[2][3] != 0.f;
 
+	if (isPerspective && m_decomposePerspectiveBrown)
+	{
+		auto arr = ProjectionUtils::decomposePerspectiveBrown(transformMat);
+		for (int i = 0; i < arr.size(); i++)
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), arr[i]));
+		m_matrices.back()->useLHS = true;
+		return arr.size();
+	}
 	if (isPerspective && m_decomposePerspectiveIntoOrthoAndPersp)
 	{
-		auto [neg, ortho, persp] = ProjectionUtils::constructPiecewisePerspective(transformMat);
-		if (m_direction == TrackingDirection::RightToLeft)
-		{
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-		}
-		else
-		{
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
-		}
-		return 3;
+		auto arr = ProjectionUtils::decomposePerspectiveShirley(transformMat);
+		for (int i = 0; i < arr.size(); i++)
+			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), arr[i]));
+		m_matrices.back()->useLHS = true;
+		return arr.size();
 	}
-	else
 	{
 		auto [neg, proj] = ProjectionUtils::constructZFlippedProjection(transformMat);
-		if (m_direction == TrackingDirection::RightToLeft)
-		{
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-		}
-		else
-		{
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-			m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
-		}
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg))->useLHS = true;
 		return 2;
 	}
 }

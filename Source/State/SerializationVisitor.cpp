@@ -336,7 +336,7 @@ void SerializationVisitor::dumpCamera(rapidjson::Value& target, const Ptr<GuiCam
 	frustum.SetObject();
 	frustum.AddMember("show", cameraPtr->m_showFrustum, alloc);
 	frustum.AddMember("fill", cameraPtr->m_fillFrustum, alloc);
-	JSON::addVector(frustum, "fillColor", cameraPtr->m_frustumColor, alloc);
+	JSON::addVector(frustum, "fillColor4", cameraPtr->m_frustumColor, alloc);
 	JSON::addVector(frustum, "outlineColor", cameraPtr->m_frustumOutlineColor, alloc);
 
 	target.AddMember("frustum", frustum, alloc);

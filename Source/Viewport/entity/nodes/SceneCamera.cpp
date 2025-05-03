@@ -46,6 +46,9 @@ void SceneCamera::update(Scene& scene)
 	frustumPtr->m_frustumViewMatrixInv = m_modelMatrix;
 	frustumPtr->setColor(m_frustumColor);
 
+	auto frustumFillPtr = m_frustum.lock();
+	frustumFillPtr->m_opacity = std::min(m_frustumColor.w, m_frustumProgramOpacity);
+
 	SceneModel::update(scene);
 }
 
@@ -61,7 +64,7 @@ void SceneCamera::onSceneAdd(Vp::Scene& scene)
 	auto frustumFilled = std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitCube), frustumShader);
 	frustumFilled->setColor(m_frustumColor);
 	frustumFilled->m_opaque = false;
-	frustumFilled->m_opacity = 0.22f;
+	frustumFilled->m_opacity = std::min(m_frustumColor.w, m_frustumProgramOpacity);
 	frustumFilled->m_visible = m_fillFrustum;
 	m_frustum = scene.addEntity(frustumFilled);
 }

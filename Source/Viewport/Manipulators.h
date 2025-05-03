@@ -75,7 +75,7 @@ public:
 	explicit Manipulators(Viewport* viewport);
 
 	bool drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, const ImVec2& position, const ImVec2& size,
-	                  const glm::mat4* model, glm::mat4& view, const glm::mat4& proj);
+	                  const glm::mat4* model, glm::mat4& view, const glm::mat4& proj, float* axisFactors = nullptr);
 
 	/**
 	 * @param windowPos

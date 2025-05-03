@@ -57,4 +57,12 @@ glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool use
 
 	return result;
 }
+
+glm::mat4 flipAxis(const glm::mat4& mat, int axisIndex)
+{
+	glm::mat4 neg(1.f);
+	neg[axisIndex][axisIndex] = -1;
+	return neg * mat * neg;
+}
+
 } // namespace Math

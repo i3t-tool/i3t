@@ -45,7 +45,7 @@ Manipulators::Manipulators(Viewport* viewport) : m_viewport(viewport)
 }
 
 bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, const ImVec2& position, const ImVec2& size,
-                                const glm::mat4* model, glm::mat4& view, const glm::mat4& proj)
+                                const glm::mat4* model, glm::mat4& view, const glm::mat4& proj, float* axisFactors)
 {
 	// TODO: The ImGuizmo::ViewAxes should be able to modify the view matrix in the future
 
@@ -66,7 +66,8 @@ bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, const
 	}
 
 	// ImGuizmo::ViewManipulate(glm::value_ptr(view), 9, GUI::glmToIm(windowPos), ImVec2(128, 128), 0x10101010);
-	ImGuizmo::ViewAxes(glm::value_ptr(model == nullptr ? view : viewMod), glm::value_ptr(proj), 9, position, size);
+	ImGuizmo::ViewAxes(glm::value_ptr(model == nullptr ? view : viewMod), glm::value_ptr(proj), 9, position, size,
+	                   axisFactors);
 
 	return false;
 }

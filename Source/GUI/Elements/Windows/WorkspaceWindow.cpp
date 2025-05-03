@@ -67,8 +67,6 @@ void WorkspaceWindow::render()
 
 		showMenuBar();
 
-		processTrackingInput();
-
 		m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
 
@@ -86,9 +84,11 @@ void WorkspaceWindow::render()
 
 		DIWNE::DrawMode drawMode = DIWNE::DrawMode_JustDraw;
 		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
-		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>() && !menuInteraction)
+		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
-			drawMode = DIWNE::DrawMode_Interactive;
+			processTrackingInput();
+			if (!menuInteraction)
+				drawMode = DIWNE::DrawMode_Interactive;
 		}
 
 		WorkspaceModule::g_editor->draw(drawMode);
@@ -110,13 +110,13 @@ void WorkspaceWindow::processTrackingInput()
 {
 	if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
 		WorkspaceModule::g_editor->stopTracking();
-	if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
-		WorkspaceModule::g_editor->trackingSmoothLeft();
-	if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
-		WorkspaceModule::g_editor->trackingSmoothRight();
+	// if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothLeft();
+	// if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothRight();
 	if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
 		WorkspaceModule::g_editor->trackingJaggedLeft();
-	if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+	else if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
 		WorkspaceModule::g_editor->trackingJaggedRight();
 	// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
 	// 	this->trackingModeSwitch();
@@ -132,7 +132,7 @@ void WorkspaceWindow::processTrackingInput()
 		{
 			WorkspaceModule::g_editor->trackingSmoothLeft();
 		}
-		if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		else if (InputManager::isAxisActive("trackingSmoothRight") != 0)
 		{
 			WorkspaceModule::g_editor->trackingSmoothRight();
 		}
@@ -285,14 +285,22 @@ bool WorkspaceWindow::showTrackingTimeline()
 			interacted = true;
 			ImGui::TextDisabled(_tbd("Tracking settings"));
 			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
-			if (I3TGui::MenuItemWithLog(_tbd("Track in world space"), nullptr, &tracker->m_trackInWorldSpace))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
+			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(_tbd("Smart perspective tracking"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Smart perspective tracking"), nullptr,
 			                            &tracker->m_smartProjectionInterpolation))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(_tbd("Extract ortho matrix from perspective"), nullptr,
-			                            &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
+			if (I3TGui::MenuItemWithLog(
+			        ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Extract ortho matrix from perspective (Shirley)"), nullptr,
+			        &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
 				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(
+			        ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Extract ortho matrix from perspective (Brown)"), nullptr,
+			        &tracker->m_decomposePerspectiveBrown))
+				tracker->requestProgressUpdate();
+			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
+			                   ImGuiSliderFlags_Logarithmic);
 
 			ImGui::EndPopup();
 		}
@@ -645,7 +653,7 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 		p_max = 1.f;
 	}
 	float minHeight = ImGui::GetFontSize() * 1.5f + ImGui::GetStyle().FramePadding.y * 2.0f;
-	return TrackingSlider(tracker, label, ImGuiDataType_Float, p_data, &p_min, &p_max, "%.3f",
+	return TrackingSlider(tracker, label, ImGuiDataType_Float, p_data, &p_min, &p_max, "%.6f",
 	                      ImGuiSliderFlags_AlwaysClamp, minHeight);
 }
 
@@ -839,8 +847,6 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	// Draw last tick and arrow
 	TrackingSlider_drawTick(1.0f, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
 	// TrackingSlider_drawArrow(1.0f, tInnerRect, leftToRight, tickColor);
-
-	/////
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x)

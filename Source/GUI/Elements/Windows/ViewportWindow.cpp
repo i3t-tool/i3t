@@ -260,6 +260,8 @@ void ViewportWindow::updateSpace()
 	m_space.tracking = Core::GraphManager::isTracking() && m_instanceIndex == 1;
 	m_space.trackingSpaceParam = 0.f;
 	m_space.trackingSpace = Core::TransformSpace::Model;
+	m_space.simulateLHS = false;
+	m_space.trackingMatrixProgress = 0.f;
 
 	// TODO: Dim scene view background when tracking or using ref space
 
@@ -278,6 +280,9 @@ void ViewportWindow::updateSpace()
 			m_space.trackingSpaceParam = transform->data.progress;
 			m_space.trackingSpace = transform->data.space;
 
+			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
+			m_space.trackingMatrixProgress = trackedMatrix->progress;
+
 			switch (m_space.trackingSpace)
 			{
 			case Core::TransformSpace::Model:
@@ -294,6 +299,12 @@ void ViewportWindow::updateSpace()
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
 				m_space.label = _tbd("NDC space");
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
+
+				// Switch view axes to LHS mode
+				if (tracker->getInterpolatedMatrixObject()->useLHS)
+				{
+					m_space.simulateLHS = true;
+				}
 			}
 			break;
 			}
@@ -368,7 +379,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 	float oldAlpha = ImGui::GetStyle().Alpha;
 
 	if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Projection)
-		ImGui::GetStyle().Alpha = 1.f - m_space.trackingSpaceParam;
+		ImGui::GetStyle().Alpha = pow(1.f - m_space.trackingSpaceParam, 4.f);
 
 	const float& alpha = ImGui::GetStyle().Alpha;
 
@@ -378,7 +389,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 	ImGuizmo::GetStyle().Colors[ImGuizmo::COLOR::DIRECTION_Z] = theme.get(EColor::SceneViewGridZ, alpha);
 
 	// TODO: Add a theme variable for axes text color
-	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(10, 10, 10, 0xFF));
+	ImGui::PushStyleColor(ImGuiCol_Text, theme.get(EColor::TextDark));
 	interacted |= m_viewport->m_manipulators->drawViewAxes(
 	    m_windowPos, m_windowSize, axesPosition, ImVec2(axesSize, axesSize),
 	    m_space.standard ? nullptr : &m_space.m_referenceSpace, view, m_camera->getProjection());
@@ -390,7 +401,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		// Draw the world space label
 		float tWidth = ImGui::CalcTextSize(m_space.worldSpaceLabel.c_str()).x;
 		ImGui::SetCursorScreenPos({axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize});
-		ImGui::TextUnformatted(m_space.worldSpaceLabel.c_str());
+		GUI::TextShadow(m_space.worldSpaceLabel.c_str());
 
 		if (m_space.tracking)
 		{
@@ -411,16 +422,45 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		axesPosition =
 		    ImVec2(m_windowPos.x + m_windowSize.x - axesSize - padding, m_windowPos.y + padding + worldAxesSize);
 
-		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(10, 10, 10, 0xFF));
+		ImGui::PushStyleColor(ImGuiCol_Text, theme.get(EColor::TextDark));
+
+		// glm::mat4* viewPtr = &view;
+		// glm::mat4 viewMod;
+		// if (m_space.simulateLHS)
+		// {
+		// 	viewMod = Math::flipAxis(view, 0);
+		// 	viewPtr = &viewMod;
+		// }
+
+		glm::vec3 aFacs;
+		float* axisFactors = nullptr;
+		if (m_space.simulateLHS)
+		{
+			aFacs = glm::vec3(Math::range(m_space.trackingMatrixProgress, 0, 1, 1, -1), 1.f, 1.f);
+			axisFactors = glm::value_ptr(aFacs);
+		}
+
 		interacted |= m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize, axesPosition,
 		                                                       ImVec2(axesSize, axesSize), nullptr, view,
-		                                                       m_camera->getProjection());
+		                                                       m_camera->getProjection(), axisFactors);
 		ImGui::PopStyleColor();
 
 		tWidth = ImGui::CalcTextSize(m_space.label.c_str()).x;
 
-		ImGui::SetCursorScreenPos({axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize});
-		ImGui::TextColored(m_space.labelCol, m_space.label.c_str());
+		ImVec2 textPos = {axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize};
+		ImGui::SetCursorScreenPos(textPos);
+		GUI::TextColoredShadow((m_space.label).c_str(), m_space.labelCol);
+
+		if (m_space.simulateLHS && m_space.trackingMatrixProgress >= 0.5f)
+		{
+			std::string str = _tbd("(Left handed)");
+			tWidth = ImGui::CalcTextSize(str.c_str()).x;
+
+			textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
+			           axesPosition.y + axesSize + ImGui::GetTextLineHeightWithSpacing()};
+			ImGui::SetCursorScreenPos(textPos);
+			GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
+		}
 	}
 
 	ImGui::GetStyle().Alpha = oldAlpha;
@@ -619,8 +659,8 @@ bool ViewportWindow::showViewportMenu()
 			if (I3TGui::MenuItemWithLog(_t("High"), nullptr, nullptr))
 			{
 				stg.global().highlight.downscaleFactor = 0.7f;
-				stg.global().highlight.kernelSize = 2;
-				stg.global().highlight.outlineCutoff = 0.18f;
+				stg.global().highlight.kernelSize = 3;
+				stg.global().highlight.outlineCutoff = 0.3f;
 				stg.global().highlight.useDepth = true;
 			}
 			if (I3TGui::MenuItemWithLog(_t("Medium"), nullptr, nullptr))

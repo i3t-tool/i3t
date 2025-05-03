@@ -14,9 +14,8 @@
 
 struct WorkspaceSettings
 {
-	float tracking_timeBetweenTracks{0.0005f};
-
-	float tracking_smoothScrollSpeed{0.03f};
+	float tracking_smoothScrollSpeed{0.2f};
+	float tracking_smoothScrollModifier{1.0f}; // Not serialized on purpose
 	float tracking_jaggedScrollSpeed{0.2f};
 
 	bool showQuickAddMenu{false};      // Option in preferences

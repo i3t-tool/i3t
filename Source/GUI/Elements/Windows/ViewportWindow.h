@@ -56,7 +56,10 @@ public:
 		// Reference space is set by tracking (takes priority)
 		bool tracking = false;
 		Core::TransformSpace trackingSpace{Core::TransformSpace::Model};
-		float trackingSpaceParam = 0.f; ///< 0..1 parameter indicating current space
+		float trackingSpaceParam = 0.f;     ///< 0..1 indicating progress through current space
+		float trackingMatrixProgress = 0.f; ///< 0..1 progress through the current matrix (can be != transform progress)
+
+		bool simulateLHS = false;
 
 		// Reference space is set from a sequence node
 		bool customSource = false;

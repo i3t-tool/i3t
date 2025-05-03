@@ -22,7 +22,8 @@ void OrbitCamera::update()
 {
 	glm::mat4 cameraTransform = glm::mat4(1.0f);
 	cameraTransform = glm::translate(cameraTransform, m_pivot);
-	cameraTransform = glm::rotate(cameraTransform, glm::radians(m_rotationX), glm::vec3(0.0f, 1.0f, 0.0f));
+	cameraTransform =
+	    glm::rotate(cameraTransform, glm::radians(m_rotationX), glm::vec3(0.0f, rightHanded ? 1.f : -1.f, 0.0f));
 	cameraTransform = glm::rotate(cameraTransform, glm::radians(m_rotationY), glm::vec3(0.0f, 0.0f, 1.0f));
 	cameraTransform = glm::translate(cameraTransform, glm::vec3(m_radius, 0.0f, 0.0f));
 
@@ -32,9 +33,12 @@ void OrbitCamera::update()
 	const glm::vec3 cameraPosWorld = glm::vec3(cameraTransform * cameraPos);
 	const glm::vec3 cameraUpWorld = glm::vec3(cameraTransform * cameraUp);
 
-	m_view = glm::lookAt(cameraPosWorld, m_pivot, cameraUpWorld);
+	if (rightHanded)
+		m_view = glm::lookAtRH(cameraPosWorld, m_pivot, cameraUpWorld);
+	else
+		m_view = glm::lookAtLH(cameraPosWorld, m_pivot, cameraUpWorld);
 
-	m_projection = createProjectionMatrix(true);
+	m_projection = createProjectionMatrix(false);
 
 	m_position = cameraPosWorld;
 	m_up = glm::normalize(cameraUpWorld);
@@ -104,7 +108,7 @@ void OrbitCamera::mouseDrag(float dx, float dy, bool rotate, bool pan)
 		glm::vec3 oldPivot = glm::vec3(m_pivot);
 
 		const float ratio = m_radius / m_zNear / 100.0f;
-		m_pivot += glm::vec3(m_right) * (m_translateSpeed * dx * ratio);
+		m_pivot += glm::vec3(rightHanded ? m_right : -m_right) * (m_translateSpeed * dx * ratio);
 		m_pivot += glm::vec3(m_up) * (m_translateSpeed * dy * ratio);
 	}
 }

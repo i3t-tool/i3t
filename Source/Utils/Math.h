@@ -312,6 +312,8 @@ static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
  */
 glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false);
 
+glm::mat4 flipAxis(const glm::mat4& mat, int axisIndex);
+
 /**
  * \brief Fifth order interpolation
  * \param a alpha

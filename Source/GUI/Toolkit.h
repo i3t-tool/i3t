@@ -50,6 +50,24 @@ inline void TextCentered(const char* text, ImRect rect, ImU32 col)
 	ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), textOrigin, col, text);
 }
 
+inline void TextColoredShadow(const char* text, const ImVec4& color)
+{
+	ImVec2 shadowOfst = {ImGui::GetWindowDpiScale(), ImGui::GetWindowDpiScale()};
+	const ImVec2 textPos = ImGui::GetCursorScreenPos();
+	ImGui::SetCursorScreenPos(textPos + shadowOfst);
+	ImGui::TextColored(I3T::getTheme().get(EColor::TextDark), text);
+	ImGui::SetCursorScreenPos(textPos);
+	ImGui::TextColored(color, text);
+}
+
+inline void TextShadow(const char* text)
+{
+	TextColoredShadow(text, ImGui::GetStyleColorVec4(ImGuiCol_Text));
+}
+
+/// Sourced from https://github.com/ocornut/imgui/issues/5267, credit to Gl1tchs
+std::string TruncateText(const std::string& p_text, float p_truncated_width);
+
 bool Button(const char* id, bool disabled = false, const ImVec2& size = ImVec2(0, 0));
 
 bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
@@ -78,9 +96,6 @@ void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool bor
 /// ImGui doesn't support this by default so this is actually an IntSlider that recalculates back into a float.
 /// Uses std::format syntax for the format string, not printf (eg. {:.2f})
 bool SliderFloatStepped(const char* label, float* v, float step, float v_min, float v_max, const std::string& format);
-
-/// Sourced from https://github.com/ocornut/imgui/issues/5267, credit to Gl1tchs
-std::string TruncateText(const std::string& p_text, float p_truncated_width);
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color);
 

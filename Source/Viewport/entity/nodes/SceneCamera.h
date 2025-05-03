@@ -32,7 +32,10 @@ protected:
 public:
 	bool m_showFrustum{true};
 	bool m_fillFrustum{true};
-	glm::vec3 m_frustumColor{0.35f, 0.27f, 0.06f};
+
+	glm::vec4 m_frustumColor{0.35f, 0.27f, 0.06f, 0.22f};
+	float m_frustumProgramOpacity{1.0f};
+
 	glm::vec3 m_frustumOutlineColor{1.0f, 0.0f, 0.0f};
 
 	glm::mat4 m_projectionMatrix{1};

@@ -103,8 +103,6 @@ void PreferencesWindow::showWorkspaceSettings()
 		ImGui::Indent();
 		ImGui::Checkbox("Show quick add menu", &WorkspaceModule::g_settings.showQuickAddMenu);
 		ImGui::SeparatorText("Tracking");
-		ImGui::DragFloat("Time between ticks", &WorkspaceModule::g_settings.tracking_timeBetweenTracks, 0.00005f,
-		                 0.00001f, 1.0f, "%.5f");
 		ImGui::DragFloat("Smooth scroll speed", &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f, 0.001f);
 		ImGui::DragFloat("Jagged scroll speed", &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f, 0.001f);
 

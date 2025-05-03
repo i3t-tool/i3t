@@ -250,8 +250,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 		}
 		else
 		{
-			if (I3TGui::MenuItemWithLog(
-			        ICON_TBD(ICON_FA_SOLAR_PANEL ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
 			{
 				viewportWindow->m_space.customSource = false;
 				viewportWindow->m_space.sourceNode.reset();
@@ -263,13 +262,13 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Reference space")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+			ImGui::TextDisabled(_tbd("Set as / Reset reference space in window"));
 			for (int i = 0; i < viewportModule.getWindowCount(); i++)
 			{
 				auto viewportWindow = viewportModule.getWindow(i);
 				if (!viewportWindow->m_space.customSource)
 				{
-					ImGui::TextDisabled("Set as reference space in window");
-					if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_SCENE " ", viewportWindow->getTitle())))
+					if (I3TGui::MenuItemWithLog(viewportWindow->getTitle().c_str()))
 					{
 						viewportWindow->m_space.customSource = true;
 						viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
@@ -277,8 +276,7 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 				}
 				else
 				{
-					if (I3TGui::MenuItemWithLog(
-					        ICON_TBD(ICON_I3T_SCENE ICON_FA_ARROW_ROTATE_LEFT " ", viewportWindow->getTitle())))
+					if (I3TGui::MenuItemWithLog((_ts("Reset ") + _ts(viewportWindow->getTitle())).c_str()))
 					{
 						viewportWindow->m_space.customSource = false;
 						viewportWindow->m_space.sourceNode.reset();

@@ -24,3 +24,5 @@
 #define ICON_FA_I3T_NSPACE_2 "\xee\xb8\x88" // U+ee08
 #define ICON_FA_I3T_NSPACE_3 "\xee\xb8\x89" // U+ee09
 #define ICON_FA_I3T_NSPACE_4 "\xee\xb8\x8A" // U+ee0A
+
+#define ICON_FA_I3T_MAT_DECOMPOSE "\xee\xb9\x8C" // U+ee4c

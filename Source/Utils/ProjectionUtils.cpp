@@ -59,15 +59,22 @@ std::array<float, 6> decomposePerspective(const glm::mat4& m)
 std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m)
 {
 	glm::mat4 negator(1.f);
-	negator[2][2] = -1;
+	negator[2][2] = -1; // Flip Z (NDC is +z forward)
+	negator[0][0] = -1; // Flip X (NDC ls LHS)
 	return {negator, negator * m};
 }
 
-std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m)
+std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m)
 {
 	auto [l, r, b, t, n, f] = decomposePerspective(m);
 
-	assert(Math::compare(glm::frustum(l, r, b, t, n, f), m, Math::FACTOR_ROUGHLY_SIMILAR));
+#ifndef NDEBUG
+	if (!Math::compare(glm::frustum(l, r, b, t, n, f), m, Math::FACTOR_ROUGHLY_SIMILAR))
+	{
+		LOG_WARN("[TRACKING] Parameter decomposition of the perspective matrix yielded a matrix not equal to the "
+		         "original!\nThis can be ignored if the original matrix is invalid.");
+	}
+#endif
 
 	// -- perspective matrix from Shirley FCG p. 152
 	// --'(has negative n and f)
@@ -81,23 +88,6 @@ std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m)
 	// -- |  0  -n   0.   0  |
 	// -- |  0   0 -n-f  -fn |
 	// -- |  0   0   1    0  |
-
-	// self.operation = Operation.new(
-	// 	-- inputs { name = type }
-	// 	{ n = ValueType.Float ,  f = ValueType.Float },
-	// 	-- outputs { name = type }
-	// 	{ result = ValueType.Matrix }
-	// )
-	// self.on_init = function()
-	// 	-- custom initialization code
-	// end
-	// self.on_update_values = function()
-	// 	-- custom on update values code, access the node using
-	// 	-- self.node reference.
-	//   local operator = self.node:as_operator()
-	//   if (operator:is_input_plugged(1) and operator:is_input_plugged(2)) then
-	// 	local f = operator:get_input_float(1)
-	// 	local n = operator:get_input_float(2)
 	//
 	// -- perspective matrix from Shirley FCG p. 152
 	// -- operator:set_value(Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, n + f, 1), Vec4.new(0,
@@ -110,14 +100,8 @@ std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m)
 	// -- Modified for OpenGL times (-1)
 	//    operator:set_value(Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, (n + f), -1),
 	//    Vec4.new(0, 0, f * n, 0)))
-	//
-	//   end
-	// end
 
 	// Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, (n + f), -1), Vec4.new(0, 0, f * n, 0))
-	//
-	// Mat4.new(Vec4.new(n, 0, 0, 0), Vec4.new(0, n, 0, 0), Vec4.new(0, 0, (n + f), -1), Vec4.new(0, 0, f * n, 0))
-	//
 
 	// glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
 	//                    {0, 2 / (t - b), 0, 0},
@@ -144,21 +128,91 @@ std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m)
 	                   {-(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1}};
 #ifndef NDEBUG
 	glm::mat4 orthoGlm = glm::ortho(l, r, b, t, n, f);
-	assert(Math::compare(ortho, orthoGlm));
+	if (!Math::compare(ortho, orthoGlm))
+	{
+		LOG_WARN("[TRACKING] Shirley ortho matrix does not equal to the standard glm::ortho matrix\nThis can be "
+		         "ignored if the provided perspective matrix is invalid.");
+	}
 #endif
 
 	glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
 
-	assert(Math::compare(ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
+#ifndef NDEBUG
+	if (!Math::compare(ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR))
+	{
+		LOG_WARN("[TRACKING] Shirley decomposition of the perspective matrix yielded a matrix not equal to the "
+		         "original!\nThis can be ignored if the original matrix is invalid. (1)");
+	}
+#endif
 
 	glm::mat4 neg(1.f);
-	neg[2][2] = -1;
+	neg[2][2] = -1; // Flip Z (NDC is +z forward)
 
 	ortho = neg * ortho;
 
-	assert(Math::compare(neg * ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
+#ifndef NDEBUG
+	if (!Math::compare(neg * ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR))
+	{
+		LOG_WARN("[TRACKING] Shirley decomposition of the perspective matrix yielded a matrix not equal to the "
+		         "original!\nThis can be ignored if the original matrix is invalid. (2)");
+	}
+#endif
 
-	return {neg, ortho, persp};
+	// TODO: Figure this out, is this worth rewriting stuff to support dynamic RH/LH switch?
+	// We have to flip X because we are using a RH coordinate system, but Ogl NDC is LH ... so it won't work nicely,
+	// flipping the X and then "pretending" the X axis is flipped is a close "emulation"
+	neg[0][0] = -1; // Flip X (NDC ls LHS)
+
+	return {persp, ortho, neg};
+}
+
+std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m)
+{
+	auto [l, r, b, t, n, f] = decomposePerspective(m);
+
+#ifndef NDEBUG
+	if (!Math::compare(glm::frustum(l, r, b, t, n, f), m, Math::FACTOR_ROUGHLY_SIMILAR))
+	{
+		LOG_WARN("[TRACKING] Parameter decomposition of the perspective matrix yielded a matrix not equal to the "
+		         "original!\nThis can be ignored if the original matrix is invalid.");
+	}
+#endif
+
+	glm::mat4 ortho = {{2 / (r - l), 0, 0, 0},
+	                   {0, 2 / (t - b), 0, 0},
+	                   {0, 0, -2.f / (f - n), 0},
+	                   {-(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1}};
+
+	glm::mat4 ortho1 = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-(l + r) / 2, -(b + t) / 2, 0, 1}};
+
+	glm::mat4 persp1 = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, -((f + n) / (f - n)), -1}, {0, 0, 2 * f * n / (n - f), 0}};
+
+	glm::mat4 persp2 = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+
+	glm::mat4 ortho2 = {{2 / (r - l), 0, 0, 0}, {0, 2 / (t - b), 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+
+	// #ifndef NDEBUG
+	// 	glm::mat4 orthoGlm = glm::ortho(l, r, b, t, n, f);
+	// 	assert(Math::compare(ortho, orthoGlm));
+	// #endif
+
+	// glm::mat4 persp = {{n, 0, 0, 0}, {0, n, 0, 0}, {0, 0, n + f, -1}, {0, 0, f * n, 0}};
+	//
+	// assert(Math::compare(ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
+	//
+	glm::mat4 neg(1.f);
+	// neg[2][2] = -1;
+	//
+	// ortho = neg * ortho;
+
+	// assert(Math::compare(neg * ortho * persp, m, Math::FACTOR_ROUGHLY_SIMILAR));
+
+	// // TODO: Figure this out, is this worth rewriting stuff to support dynamic RH/LH switch?, probably not
+	// // We have to flip X because we are using a RH coordinate system, but Ogl NDC is LH ... so it won't work nicely,
+	// // flipping the X and then "pretending" the X axis is flipped is a close "emulation"
+	neg[0][0] = -1; // Flip X (NDC ls LHS)
+
+	return {ortho1, persp1, persp2, ortho2, neg};
 }
 
 } // namespace ProjectionUtils

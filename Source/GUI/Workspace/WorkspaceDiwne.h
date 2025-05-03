@@ -58,7 +58,6 @@ public:
 
 	bool m_updateDataItemsWidth{false}; ///< Indicates a change in zoom level this frame
 
-	float timeUntilNextTrack = 0;
 	bool smoothTracking{true};
 	ImVec2 m_trackingCursorPos;
 

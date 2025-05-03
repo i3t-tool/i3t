@@ -81,6 +81,6 @@ public:
 	void onDestroy(bool logEvent) override;
 
 private:
-	glm::vec3 calculateFrustumColor(glm::vec3 color);
+	glm::vec4 calculateFrustumColor(glm::vec3 color, float alpha);
 };
 } // namespace Workspace

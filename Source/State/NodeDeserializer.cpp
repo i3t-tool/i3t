@@ -490,8 +490,8 @@ void assignCamera(const rapidjson::Value& value, Ptr<GuiCamera> camera)
 			cameraPtr->m_showFrustum = frustum["show"].GetBool();
 		if (frustum.HasMember("fill"))
 			cameraPtr->m_fillFrustum = frustum["fill"].GetBool();
-		if (frustum.HasMember("fillColor"))
-			cameraPtr->m_frustumColor = JSON::getVec3(frustum["fillColor"].GetArray());
+		if (frustum.HasMember("fillColor4"))
+			cameraPtr->m_frustumColor = JSON::getVec4(frustum["fillColor4"].GetArray());
 		if (frustum.HasMember("outlineColor"))
 			cameraPtr->m_frustumOutlineColor = JSON::getVec3(frustum["outlineColor"].GetArray());
 	}

@@ -137,6 +137,7 @@ void Theme::initDefaultClassic()
 	// ImGui dark style
 	set(EColor::Text, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
 	set(EColor::TextDisabled, ImVec4(0.50f, 0.50f, 0.50f, 1.00f));
+	set(EColor::TextDark, ImVec4(0.02f, 0.02f, 0.02f, 1.0f));
 	set(EColor::WindowBackground, ImVec4(0.06f, 0.06f, 0.06f, 0.94f));
 	set(EColor::ChildBackground, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
 	set(EColor::PopupBackground, ImVec4(0.08f, 0.08f, 0.08f, 0.94f));
@@ -489,6 +490,7 @@ void Theme::initNames()
 	group("Global", "glob")
 	    .add(EColor::Text, "Text")
 	    .add(EColor::TextDisabled, "Disabled Text")
+	    .add(EColor::TextDark, "Dark Text")
 	    .add(EColor::WindowBackground, "Window Background")
 	    .add(EColor::ChildBackground, "Child Window Background")
 	    .add(EColor::PopupBackground, "Popup Background")

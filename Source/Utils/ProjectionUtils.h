@@ -34,6 +34,17 @@ std::array<float, 6> decomposePerspective(const glm::mat4& m);
 void extractZNearZFar(const glm::mat4& projectionMatrix, float& zNear, float& zFar);
 
 std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m);
-std::array<glm::mat4, 3> constructPiecewisePerspective(const glm::mat4& m);
+
+/**
+ * Decomposition of an OpenGL perspective matrix into 3 submatrices described in the book Fundamentals of computer
+ * graphics, chapter 7 pg. 150. (SHIRLEY, Peter; ASHIKHMIN, Michael; MARSCHNER, Steve.)
+ */
+std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m);
+
+/**
+ * Decomposition of an OpenGL perspective matrix into 4 submatrices described by Wayne Brown at
+ * https://learnwebgl.brown37.net/08_projections/projections_perspective.html#the-perspective-calculation
+ */
+std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m);
 
 }; // namespace ProjectionUtils

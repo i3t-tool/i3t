@@ -84,8 +84,8 @@ GlobalCameraSettings::GlobalCameraSettings()
 HighlightSettings::HighlightSettings()
 {
 	downscaleFactor = 0.7f;
-	kernelSize = 2;
-	outlineCutoff = 0.18f;
+	kernelSize = 3;
+	outlineCutoff = 0.3f;
 	useDepth = true;
 	useDepth_darkenFactor = 0.5f;
 	useDepth_desaturateFactor = 0.4f;

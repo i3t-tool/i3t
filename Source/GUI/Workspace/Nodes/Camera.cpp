@@ -156,37 +156,39 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	{
 		if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
 		{
+			// ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+			ImGui::SliderFloat(_t("Opacity"), &cameraPtr->m_frustumColor.w, 0.0f, 1.0f, "%.2f");
 			if (I3TGui::MenuItemWithLog(_t("Default")))
 			{
-				cameraPtr->m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
+				cameraPtr->m_frustumColor = glm::vec4(0.35f, 0.27f, 0.06f, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Red")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::RED);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::RED, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Blue")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::BLUE);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::BLUE, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Green")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::GREEN);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::GREEN, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Yellow")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::YELLOW);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::YELLOW, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Orange")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::ORANGE);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::ORANGE, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Magenta")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::MAGENTA);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::MAGENTA, cameraPtr->m_frustumColor.w);
 			}
 			if (I3TGui::MenuItemWithLog(_t("Teal")))
 			{
-				cameraPtr->m_frustumColor = calculateFrustumColor(Color::TEAL);
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::TEAL, cameraPtr->m_frustumColor.w);
 			}
 			ImGui::EndMenu();
 		}
@@ -265,14 +267,14 @@ void Camera::popupContentTracking()
 	}
 }
 
-glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
+glm::vec4 Camera::calculateFrustumColor(glm::vec3 color, float alpha)
 {
 	glm::vec3 hsl;
 	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
 	hsl.y = 0.9;
 	hsl.z = 0.25;
 	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
-	return color;
+	return glm::vec4(color, alpha);
 }
 
 void Camera::centerContent(DIWNE::DrawInfo& context)

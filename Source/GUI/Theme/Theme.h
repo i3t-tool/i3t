@@ -39,6 +39,7 @@ enum class EColor
 	// ImGui standard colors, in the order of definition of ImGuiCol_ in imgui.h
 	Text,
 	TextDisabled,
+	TextDark, // Non-standard, used for "black" text and text shadows
 	WindowBackground,
 	ChildBackground,
 	PopupBackground,

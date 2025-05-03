@@ -192,6 +192,9 @@ public:
 		TrackedTransform* transform;
 		glm::mat4 matrix{1.f}; ///< Matrix data, valid when useOwnData is true.
 
+		/// Indicates that space after applying this matrix should use the left handed coordinate system
+		bool useLHS = false; // TODO: Implement <<<<<<<<<<<<<<<<<<<<<<<<
+
 		// Temporary tracking information later forwarded to a parent transform.
 		bool interpolating{false};
 		float progress{0.f};
@@ -221,7 +224,8 @@ private:
 
 	/// Interpolated matrix corresponding to the current time parameter.
 	glm::mat4 m_interpolatedMatrix{1.0f};
-	TrackedTransform* m_interpolatedTransform{nullptr}; ///< Reference to the internal interpolated transform
+	TrackedTransform* m_interpolatedTransform{nullptr}; ///< Reference to the internal interpolated transform object
+	TrackedMatrix* m_interpolatedMatrixObject{nullptr}; ///< Reference to the internal interpolated matrix object
 	ID m_interpolatedTransformID = NIL_ID;              ///< ID of the currently interpolated transformation / operator
 
 	int m_matrixCount = 0; /// Total number of matrices
@@ -283,6 +287,7 @@ public:
 	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
 	bool m_smartProjectionInterpolation{true};
 	bool m_decomposePerspectiveIntoOrthoAndPersp{true}; // TODO: Docs
+	bool m_decomposePerspectiveBrown{false};            // TODO: Docs
 
 	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};
@@ -332,14 +337,22 @@ public:
 	ID getSequenceID() const;          ///< Returns the begin sequence ID
 	ID getCameraID() const;            ///< Returns the begin camera ID (if provided)
 
+	/// Result of the tracking operation, returns the complete accumulated and interpolated matrix.
 	const glm::mat4& getInterpolatedMatrix() const
 	{
 		return m_interpolatedMatrix;
 	}
+	/// Reference to the internal interpolated matrix object
+	const TrackedMatrix* getInterpolatedMatrixObject() const
+	{
+		return m_interpolatedMatrixObject;
+	}
+	/// Core ID of the currently interpolated transform
 	ID getInterpolatedTransformID() const
 	{
 		return m_interpolatedTransformID;
 	}
+	/// Reference to the internal interpolated transform object
 	const TrackedTransform* getInterpolatedTransform() const
 	{
 		return m_interpolatedTransform;

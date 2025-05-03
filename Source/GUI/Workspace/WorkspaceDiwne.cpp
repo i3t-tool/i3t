@@ -541,19 +541,10 @@ void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (isTracking() && smoothTracking)
 	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
-
 		Core::MatrixTracker* tracking = getTracker();
-		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
-		if (isTrackingFromLeft())
-			tracking->setProgress(tracking->getProgress() - step);
-		else
-			tracking->setProgress(tracking->getProgress() + step);
+		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
+		              WorkspaceModule::g_settings.tracking_smoothScrollModifier;
+		tracking->setProgress(tracking->getProgress() + (isTrackingFromLeft() ? -delta : delta));
 	}
 }
 
@@ -561,19 +552,10 @@ void WorkspaceDiwne::trackingSmoothRight()
 {
 	if (isTracking() && smoothTracking)
 	{
-		if (timeUntilNextTrack > 0)
-		{
-			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
-			return;
-		}
-		timeUntilNextTrack = WorkspaceModule::g_settings.tracking_timeBetweenTracks;
-
 		Core::MatrixTracker* tracking = getTracker();
-		float step = WorkspaceModule::g_settings.tracking_smoothScrollSpeed / tracking->getTransformCount();
-		if (isTrackingFromLeft())
-			tracking->setProgress(tracking->getProgress() + step);
-		else
-			tracking->setProgress(tracking->getProgress() - step);
+		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
+		              WorkspaceModule::g_settings.tracking_smoothScrollModifier;
+		tracking->setProgress(tracking->getProgress() + (isTrackingFromLeft() ? delta : -delta));
 	}
 }
 
