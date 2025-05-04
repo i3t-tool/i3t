@@ -327,9 +327,10 @@ void Model::popupContent_axis_showmodel()
 
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{
-			if (I3TGui::MenuItemWithLog(resource.alias.c_str(), nullptr, false, true, [&]() {
-				    LOG_EVENT_OBJECT_ADDED(resource.alias, m_labelDiwne);
-			    }))
+			if (I3TGui::MenuItemWithLog(resource.alias.c_str(), nullptr, model->m_modelAlias == resource.alias, true,
+			                            [&]() {
+				                            LOG_EVENT_OBJECT_ADDED(resource.alias, m_labelDiwne);
+			                            }))
 			{
 				model->setModel(resource.alias);
 			}

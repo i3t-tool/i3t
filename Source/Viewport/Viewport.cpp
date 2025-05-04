@@ -157,8 +157,10 @@ void Viewport::processSelection(Ptr<SceneRenderTarget> renderTarget, glm::vec2 m
 
 WPtr<SceneModel> Viewport::createModel(Core::ID guiNodeId)
 {
-	Core::Mesh* mesh = RM::instance().mesh("default_cube", "Data/Models/CubeFixed.gltf");
-	auto sceneModel = std::make_shared<SceneModel>("default_cube", SHADERS.getShaderPtr<PhongShader>());
+	Core::Mesh* mesh = RM::instance().mesh("Cube", "Data/Models/CubeFixed.gltf");
+	auto sceneModel = std::make_shared<SceneModel>("Cube", SHADERS.getShaderPtr<PhongShader>());
+	// Ensure that "default_cube" is also an alias, backwards compatibility
+	RM::instance().mesh("default_cube", "Data/Models/CubeFixed.gltf");
 	sceneModel->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneModel);
 	return sceneModel;
