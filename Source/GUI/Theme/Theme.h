@@ -165,7 +165,7 @@ enum class EColor
 
 	// Pins
 	DisabledPinColor,
-
+	PinHoverColorShift,
 	PulsePin,
 	FloatPin,
 	Vec3Pin,
@@ -327,10 +327,10 @@ enum class ESize
 	Links_ControlpointsPositionMax,
 	Links_Thickness,
 	Links_ThicknessSelected,
-
 	Links_selected_alpha,
 
 	Pins_IconPadding,
+	Pins_DragAssistRadius,
 
 	Nodes_Operators_Rounding,
 	Nodes_Sequence_Rounding,
@@ -375,19 +375,14 @@ enum class ESizeVec2
 	Tooltip_Padding,
 
 	Nodes_ItemsSpacing,
-	Nodes_FloatPadding,   // Maybe rename to frame padding?
-	Nodes_PinSpacing,     // Unused
-	Nodes_PivotAlignment, // Unused
-	Nodes_PivotSize,      // Unused
-
-	Nodes_InputsSize,
-	Nodes_MiddleSize,
-	Nodes_OutputSize,
+	Nodes_FloatPadding, // Maybe rename to frame padding?
 
 	Nodes_LODButtonSize,
 
 	Nodes_PinSize,
 	Nodes_PinSize_MatrixMul,
+	Nodes_PinSquareHoverEnlarge,
+
 	Nodes_FloatCycleButtonSize,
 	Nodes_ScreenTextureSize,
 
@@ -398,8 +393,6 @@ enum class ESizeVec2
 	// Nodes_noPinsSpacing,
 
 	Nodes_NewPositionShift,
-
-	Builder_ItemSpacing,
 
 	StartWindow_WinSize,
 	StartWindow_LogoOffset,

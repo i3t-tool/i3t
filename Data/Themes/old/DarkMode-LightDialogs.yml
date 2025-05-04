@@ -531,25 +531,10 @@ size vectors:
   nflo_Nodes Float Padding:
     x: 0
     y: 1
-  ngen_Nodes Pin Spacing:
-    x: 0
-    y: 0
-  ngen_Nodes Pivot Alignment:
-    x: 0
-    y: 0.5
-  ngen_Nodes Inputs Size:
-    x: 0
-    y: 0
-  ngen_Nodes Middle Size:
-    x: 0
-    y: 0
-  ngen_Nodes Output Size:
-    x: 0
-    y: 0
   ngen_Nodes LOD Button Size:
     x: 27
     y: 27
-  ngen_Nodes Pin Size:
+  npin_Nodes Pin Size:
     x: 12
     y: 12
   nflo_Nodes Float Cycle Button Size:
@@ -558,9 +543,6 @@ size vectors:
   nscr_Nodes Screen Texture Size:
     x: 130
     y: 130
-  ngen_Builder Item Spacing:
-    x: 0
-    y: 0
   nscr_Screen Resize Button Size:
     x: 20
     y: 20

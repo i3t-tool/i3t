@@ -48,6 +48,49 @@ CoreNodeWithPins::CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nod
 	}
 }
 
+void CoreNodeWithPins::begin(DIWNE::DrawInfo& context)
+{
+	CoreNode::begin(context);
+
+	// Pin drag assist
+	if (context.inputFullyAvailable())
+		processPinDragAssist();
+}
+
+bool CoreNodeWithPins::processPinDragAssist()
+{
+	float dragAssistRadius = diwne.style().decimal(DIWNE::Style::PIN_DRAG_ASSIST_RADIUS);
+	if (dragAssistRadius <= 0)
+		return false;
+	float minInputDist;
+	float minOutputDist;
+	CorePin* closestInput = findPinClosestToTheMouse(m_workspaceInputs, minInputDist);
+	CorePin* closestOutput = findPinClosestToTheMouse(m_workspaceOutputs, minOutputDist);
+	CorePin* closestPin = minInputDist < minOutputDist ? closestInput : closestOutput;
+	float minDist = std::min(minInputDist, minOutputDist);
+	if (minDist > diwne.style().decimal(DIWNE::Style::PIN_DRAG_ASSIST_RADIUS))
+		return false;
+	closestPin->m_forceHoverDiwne = true;
+	return true;
+}
+
+CorePin* CoreNodeWithPins::findPinClosestToTheMouse(const std::vector<Ptr<CorePin>>& pins, float& minDistance)
+{
+	minDistance = FLT_MAX;
+	CorePin* closestPin = nullptr;
+	for (auto& pin : pins)
+	{
+		ImVec2 diff = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()) - pin->getPinRect().GetCenter();
+		float dist = DIWNE::DMath::len(diff);
+		if (dist < minDistance)
+		{
+			minDistance = dist;
+			closestPin = pin.get();
+		}
+	}
+	return closestPin;
+}
+
 void CoreNodeWithPins::afterDraw(DIWNE::DrawInfo& context)
 {
 	Super::afterDraw(context);
@@ -194,23 +237,6 @@ bool CoreNodeWithPins::allowPress(const DIWNE::DrawInfo& context) const
 {
 	if (!Super::allowPress(context))
 		return false;
-
-	// TODO: Finish this if needed, NodeEditor SelectionRect needs to check that no logical update ocurred so that
-	//  selection rectangle cannot start from non interactive parts of nodes!
-	// Forbid press / drag when hovering near pins
-	// 	ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
-	// 	if (m_left.getRect().Contains(mousePos) || m_right.getRect().Contains(mousePos))
-	// 	{
-	// 		for (auto& pin : m_workspaceInputs)
-	// 		{
-	// 			if (pin->allowDrawing())
-	// 			{
-	// 				DIWNE::DMath::distanceToRect(pin->getDragRect(), )
-	// 			}
-	// 		}
-	// 		return false;
-	// 	}
-
 	return true;
 }
 

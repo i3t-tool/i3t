@@ -46,14 +46,15 @@ public:
 		LINK_BORDER_WIDTH,    // float
 		LINK_BORDER_COLOR,    // ImVec4
 
-		PIN_SPACING,           // ImVec2, spacing around the pin
-		PIN_LABEL_SPACING,     // float, gap between the pin icon and the label
-		PIN_ENABLE_DRAG_LABEL, // bool, whether to include pin label in the "draggable" area
-		PIN_ENABLE_HOVER_BG,   // bool, whether to draw pin background on hover
-		PIN_BG_SPACING,        // ImVec2, extra visual spacing added to pin background, might overlap other elements!
-		PIN_BG_COLOR,          // ImVec4
-		PIN_BG_ROUNDING,       // float
-		PIN_HOVER_COLOR_SHIFT, // ImVec4, added to the pin color on hover
+		PIN_SPACING,            // ImVec2, spacing around the pin
+		PIN_LABEL_SPACING,      // float, gap between the pin icon and the label
+		PIN_ENABLE_DRAG_LABEL,  // bool, whether to include pin label in the "draggable" area
+		PIN_ENABLE_HOVER_BG,    // bool, whether to draw pin background on hover
+		PIN_BG_SPACING,         // ImVec2, extra visual spacing added to pin background, might overlap other elements!
+		PIN_BG_COLOR,           // ImVec4
+		PIN_BG_ROUNDING,        // float
+		PIN_HOVER_COLOR_SHIFT,  // ImVec4, added to the pin color on hover
+		PIN_DRAG_ASSIST_RADIUS, // float, additional mouse hover radius around pins to make dragging links out easier
 
 		PIN_SOCKET_OFFSET,          // float, offset between the pin socket and the edge of a node
 		PIN_SOCKET_BORDER_WIDTH,    // float, thickness of the socket pin border
@@ -65,10 +66,11 @@ public:
 		PIN_SOCKET_ROUNDING,        // float, rounding for square socket style
 		PIN_SOCKET_INNER_ROUNDING,  // float
 
-		PIN_SQUARE_OFFSET,       // float, offset between the pin icon and the edge of a node
-		PIN_SQUARE_BORDER_WIDTH, // float, thickness of the square pin border
-		PIN_SQUARE_BORDER_COLOR, // ImVec4, color of the square pin border
-		PIN_SQUARE_ROUNDING,     // float
+		PIN_SQUARE_OFFSET,        // float, offset between the pin icon and the edge of a node
+		PIN_SQUARE_BORDER_WIDTH,  // float, thickness of the square pin border
+		PIN_SQUARE_BORDER_COLOR,  // ImVec4, color of the square pin border
+		PIN_SQUARE_ROUNDING,      // float
+		PIN_SQUARE_HOVER_ENLARGE, // ImVec2, how much the size of the square pin visually increases on hover
 
 		PIN_CIRCLE_OFFSET,       // float
 		PIN_CIRCLE_BORDER_WIDTH, // float

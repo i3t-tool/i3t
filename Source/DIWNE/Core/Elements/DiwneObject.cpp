@@ -159,11 +159,15 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	processPopupDiwne(context);
 
 	processInteractions(context); // Process other user interactions
+
+	m_forceHoverDiwne = false;
 }
 
 void DiwneObject::processHoverDiwne(DrawInfo& context)
 {
-	bool hoveredTmp = isHoveredDiwne() && !context.hoverConsumed;
+	if (ImGui::IsKeyDown(ImGuiKey_E) && diwne.input().bypassIsMouseDragging0())
+		int x = 5;
+	bool hoveredTmp = (isHoveredDiwne() || m_forceHoverDiwne) && !context.hoverConsumed;
 	bool hovered = hoveredTmp && (context.state.hoverTarget.empty() || context.state.hoverTarget == m_labelDiwne);
 	m_hovered = hovered && allowHover();
 	if (m_hovered)
@@ -445,6 +449,16 @@ DrawInfo DrawInfo::findChange(const DrawInfo& other) const
 	change.inputConsumed = this->inputConsumed - other.inputConsumed;
 	change.hoverConsumed = this->hoverConsumed - other.hoverConsumed;
 	return change;
+}
+
+bool DrawInfo::inputAvailable()
+{
+	return !inputConsumed;
+}
+
+bool DrawInfo::inputFullyAvailable()
+{
+	return inputAvailable() && !state.dragging && !state.anyActionActive();
 }
 
 void DrawInfo::visualUpdate()
