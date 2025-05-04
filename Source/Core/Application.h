@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 
+#include "AppLoopManager.h"
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "Core/Window.h"
@@ -124,6 +125,11 @@ public:
 
 	const std::string& getTitle();
 	void setTitle(const std::string& title);
+	void setVSync(bool enable);
+
+	AppLoopManager& getAppLoopManager();
+
+	double getDeltaTime() const;
 
 protected:
 	virtual void onInit() {}
@@ -137,17 +143,19 @@ private:
 	// std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 	std::vector<std::unique_ptr<Module>> m_modules;
 
-	bool m_shouldClose = false;
-	double m_lastFrameSeconds{0.0}; // PF changed to double
-
-	Window* m_window;
-
 	/// Array of commands which the application is going to process in its main loop.
 	std::vector<ICommand*> m_commands;
 
 	static Application* s_instance;
 
 	std::unordered_map<std::size_t, std::size_t> m_modulesLookup;
+
+protected:
+	bool m_shouldClose = false;
+	// Default setting, will be overwritten by loadGlobal(), see ApplicationSettings.h
+	AppLoopManager m_appLoopManager;
+
+	Window* m_window;
 };
 
 template <typename T, typename... Args>

@@ -62,6 +62,51 @@ void PreferencesWindow::render()
 
 void PreferencesWindow::showUISettings()
 {
+	if (ImGui::CollapsingHeader("Loop settings", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent();
+		auto vsync = App::get().getAppLoopManager().isVsync();
+
+		if (ImGui::Checkbox("Use VSync", &vsync))
+		{
+			App::get().setVSync(vsync);
+		}
+		if (!vsync)
+		{
+			auto shouldLimitFPS = App::get().getAppLoopManager().shouldLimitFPS();
+			if (ImGui::Checkbox("Limit FPS", &shouldLimitFPS))
+			{
+				App::get().getAppLoopManager().enableFPSLimit(shouldLimitFPS);
+			}
+
+			if (shouldLimitFPS)
+			{
+				int fpsLimit = App::get().getAppLoopManager().getTargetFPS();
+				if (ImGui::SliderInt("FPS Limit", &fpsLimit, 10, 500))
+				{
+					App::get().getAppLoopManager().setTargetFPS(fpsLimit);
+				}
+			}
+		}
+
+		auto shouldLimitFPSOnIdle = App::get().getAppLoopManager().shouldLimitFPSOnIdle();
+		if (ImGui::Checkbox("Limit FPS during idle time", &shouldLimitFPSOnIdle))
+		{
+			App::get().getAppLoopManager().setShouldLimitFPSOnIdle(shouldLimitFPSOnIdle);
+		}
+		if (shouldLimitFPSOnIdle)
+		{
+			int fpsLimitOnIdle = App::get().getAppLoopManager().getTargetFPSOnIdle();
+			if (ImGui::SliderInt("FPS Limit during idle time", &fpsLimitOnIdle, 5, 500))
+			{
+				App::get().getAppLoopManager().setTargetFPSOnIdle(fpsLimitOnIdle);
+			}
+		}
+
+		ImGui::Unindent();
+		ImGui::Spacing();
+	}
+
 	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();

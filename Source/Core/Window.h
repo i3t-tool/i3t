@@ -29,6 +29,8 @@ public:
 	 */
 	void init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat);
 
+	void show() const;
+
 	const std::string& getTitle();
 	void setTitle(const char* title);
 
@@ -36,6 +38,12 @@ public:
 	GLFWwindow* get();
 
 	void finalize();
+
+	void setVSync(bool enable);
+
+	void setWindowPosAndSize(int posX, int posY, int sizeX, int sizeY, bool maximized);
+
+	void getWindowPosAndSize(int& posX, int& posY, int& sizeX, int& sizeY, bool& maximized) const;
 
 private:
 	bool m_closeDisabled = false;
