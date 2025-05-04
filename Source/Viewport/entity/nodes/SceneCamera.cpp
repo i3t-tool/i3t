@@ -63,8 +63,8 @@ void SceneCamera::update(Scene& scene)
 				m_isTracking = trackedCam->node.lock()->getId() == m_guiNodeId;
 		}
 	}
-	m_trackedCameraModel.lock()->m_visible = m_isTracking;
-	m_trackedFrustumNear.lock()->m_visible = m_isTracking;
+	m_trackedCameraModel.lock()->m_visible = m_isTracking && m_visible;
+	m_trackedFrustumNear.lock()->m_visible = m_isTracking && m_showFrustum;
 
 	SceneModel::update(scene);
 }
@@ -77,9 +77,10 @@ void SceneCamera::render(const glm::mat4& model, const glm::mat4& view, const gl
 	// Only render the camera when not tracking
 	if (!context.displayOptions || !context.displayOptions->showTracking)
 	{
-		m_frustumNear.lock()->m_visible = true;
-		m_axes.lock()->m_visible = true;
-		SceneModel::render(model, view, projection, context);
+		m_frustumNear.lock()->m_visible = m_showFrustum;
+		m_axes.lock()->m_visible = m_showAxes;
+		if (m_showCamera) // Avoid rendering of itself if m_showCamera is false
+			SceneModel::render(model, view, projection, context);
 	}
 	else
 	{

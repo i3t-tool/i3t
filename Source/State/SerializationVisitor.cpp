@@ -330,7 +330,8 @@ void SerializationVisitor::dumpCamera(rapidjson::Value& target, const Ptr<GuiCam
 
 	auto cameraPtr = node->m_viewportCamera.lock();
 
-	target.AddMember("showCamera", cameraPtr->m_visible, alloc);
+	target.AddMember("showCamera", cameraPtr->m_showCamera, alloc);
+	target.AddMember("showAxes", cameraPtr->m_showAxes, alloc);
 
 	rapidjson::Value frustum;
 	frustum.SetObject();

@@ -286,7 +286,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		{
 			cameraPtr->m_showAxes = !cameraPtr->m_showAxes;
 		}
-		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, cameraPtr->m_visible))
+		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, cameraPtr->m_showCamera))
 		{
 			cameraPtr->m_visible = !cameraPtr->m_visible;
 		}
