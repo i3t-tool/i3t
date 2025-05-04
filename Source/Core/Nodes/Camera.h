@@ -64,6 +64,8 @@ public:
 	void updateValues(int inputIndex) override;
 
 	// void isPlugCorrectMod(const Pin& input, const Pin& output);
+
+	bool isEmpty() const; ///< Whether the camera has any transformations in it
 };
 
 using CameraPtr = Ptr<Camera>;

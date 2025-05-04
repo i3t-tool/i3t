@@ -14,13 +14,20 @@
 
 #include "imgui.h"
 
+#include "glm/matrix.hpp"
+
 #include "GUI/Elements/IWindow.h"
+#include "GUI/Viewport/ViewportWindowSettings.h"
+#include "GUI/Workspace/Nodes/Sequence.h"
 
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 
+
+class ViewportModule;
 namespace Vp
 {
+class AbstractCamera;
 class Viewport;
 class SceneRenderTarget;
 } // namespace Vp
@@ -32,8 +39,41 @@ class ViewportWindow : public IWindow
 public:
 	I3T_WINDOW(ViewportWindow)
 
-	ViewportWindow(bool show, Vp::Viewport* viewport);
+	ViewportWindowSettings m_settings;
+
+	ViewportModule* m_module;
+
+	struct ViewportSpace
+	{
+		glm::mat4 m_referenceSpace{1.f};
+		glm::mat4 m_referenceSpaceInv{1.f};
+
+		bool standard = true;
+		const std::string worldSpaceLabel = _tbd("World space");
+		std::string label{worldSpaceLabel};
+		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
+
+		// Reference space is set by tracking (takes priority)
+		bool tracking = false;
+		Core::TransformSpace trackingSpace{Core::TransformSpace::Model};
+		float trackingSpaceParam = 0.f;     ///< 0..1 indicating progress through current space
+		float trackingMatrixProgress = 0.f; ///< 0..1 progress through the current matrix (can be != transform progress)
+
+		bool simulateLHS = false;
+
+		// Reference space is set from a sequence node
+		bool customSource = false;
+		WPtr<Workspace::Sequence> sourceNode;
+	};
+	ViewportSpace m_space;
+
+	std::shared_ptr<Vp::AggregateCamera> m_camera;
+
+	ViewportWindow(ViewportModule* module, int index, bool show);
 	void render() override;
+
+	void updateSpace(); ///< Update state of the viewport reference matrix based on app context
+	void updateGrids();
 
 private:
 	Vp::Viewport* m_viewport;
@@ -47,5 +87,6 @@ private:
 
 	bool showViewportButtons();
 	bool showViewportMenu();
+	bool showSpaceIndicators(glm::mat4& view);
 };
 } // namespace UI

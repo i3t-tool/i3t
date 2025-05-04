@@ -59,6 +59,8 @@ protected:
 	glm::vec3 m_up = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 m_right = glm::vec3(0.0f, 1.0f, 0.0f);
 
+	bool rightHanded = true;
+
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double>> interpolationStart{};
 	double interpolationPeriod{0.14f};
 	glm::mat4 interpolationFrom;

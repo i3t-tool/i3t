@@ -21,19 +21,27 @@ class Entity;
  */
 class DisplayOptions
 {
+	struct GridOptions
+	{
+		bool show{true};
+		bool showGridLines{true};
+		bool showGridXAxis{true};
+		bool showGridYAxis{false};
+		bool showGridZAxis{true};
+	};
+
 public:
 	// Entity visibility options
 	bool showDefault{true};
 	bool showAxes{true};
-	bool showGrid{true};
+	bool showGrids{true}; // Toggles visibility of all grids
 	bool showCamera{true};
 	bool showFrustum{true};
 
-	// Grid options
-	bool showGridLines{true};
-	bool showGridXAxis{true};
-	bool showGridYAxis{false};
-	bool showGridZAxis{true};
+	bool showTracking{false};
+
+	GridOptions grid;
+	GridOptions localGrid;
 
 	DisplayOptions() = default;
 

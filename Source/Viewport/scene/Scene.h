@@ -26,6 +26,7 @@
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/scene/Lighting.h"
+#include "Viewport/shader/Shaders.h"
 
 namespace Vp
 {
@@ -80,15 +81,31 @@ public:
 
 	/**
 	 * Draw the scene using the scene's camera.
-	 * \param width Width of the
+	 * @param width Desired framebuffer pixel width
+	 * @param height Desired framebuffer pixel height
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
 	 */
-	virtual void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
+	virtual void draw(int width, int height, const glm::mat4& model, SceneRenderTarget& renderTarget,
+	                  const DisplayOptions& displayOptions);
+
+	/**
+	 * Draw the scene using a provided camera.
+	 * @param width Desired framebuffer pixel width
+	 * @param height Desired framebuffer pixel height
+	 * @param camera The camera to render the scene with
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
+	 */
+	virtual void draw(int width, int height, const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+	                  SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
 
 	/**
 	 * Draw the scene using the provided view and projection matrices.
+	 * @param width Desired framebuffer pixel width
+	 * @param height Desired framebuffer pixel height
+	 * @param model Implicit model matrix, multiplies all model transforms from the left.
 	 */
-	virtual void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
-	                  const DisplayOptions& displayOptions);
+	virtual void draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	                  SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
 
 	/**
 	 * Create and populates a SceneRenderTarget object with expected framebuffer objects for the scenes render pass.
@@ -189,14 +206,28 @@ public:
 	// State save/load
 	/////////////////////////////////////////
 
-	virtual void loadSettings(ViewportSettings& stg, bool scene, bool global){};
-	virtual void saveSettings(ViewportSettings& stg, bool scene, bool global){};
-
 protected:
-	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);
+	void drawStandard(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	                  SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions,
+	                  RenderOptions renderOptions, bool alpha, glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO);
+
+	void drawWboit(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	               SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions, RenderOptions renderOptions,
+	               bool alpha, glm::vec3 clearColor, const Ptr<Framebuffer>& mainFBO,
+	               const Ptr<Framebuffer>& transparentFBO);
+
+	void drawHighlight(int width, int height, const glm::mat4& model, const glm::mat4& view,
+	                   const glm::mat4& projection, SceneRenderTarget& renderTarget,
+	                   const DisplayOptions& displayOptions, ViewportSettings& stg, const Ptr<Framebuffer>& mainFBO,
+	                   const Ptr<Framebuffer>& selectionFBO, const Ptr<Framebuffer>& selectionBlurFBO,
+	                   const Ptr<Framebuffer>& selectionBlurSecondPassFBO);
+
+	void sortUnorderedTransparentEntities(std::vector<Entity*>& entities, const glm::mat4& model,
+	                                      const glm::mat4& view);
 	void sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities);
 
-	void renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection,
-	                                     const std::vector<Entity*>& entities) const;
+	void renderSortedTransparentEntities(const std::vector<Entity*>& entities, const glm::mat4& model,
+	                                     const glm::mat4& view, const glm::mat4& projection,
+	                                     const DisplayOptions& displayOptions) const;
 };
 } // namespace Vp

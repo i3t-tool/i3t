@@ -42,7 +42,6 @@ public:
 	// floatPopupMode, const glm::mat4& data, const Core::DataMap&
 	// dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float&
 	// valueOfChange );
-	static int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
 	static bool drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
 	                         const std::string& nodeLabel, int numberOfVisibleDecimals, float dataWidth,

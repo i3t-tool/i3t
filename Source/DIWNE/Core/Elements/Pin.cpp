@@ -100,8 +100,11 @@ void Pin::updateLayout(DrawInfo& context)
 
 void Pin::onDestroy(bool logEvent)
 {
-	for (auto& link : m_links)
-		link->destroy(logEvent);
+	// Destroy links in reverse order as to not invalidate the iterator
+	for (int i = m_links.size() - 1; i >= 0; i--)
+	{
+		m_links[i]->destroy(logEvent);
+	}
 	Super::onDestroy(logEvent);
 }
 

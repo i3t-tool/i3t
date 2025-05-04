@@ -18,6 +18,7 @@
 #include "Core/Result.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Fonts/Bindings/BindingFontAwesome.h"
 #include "State/StateManager.h"
 #include "UserData.h"
 
@@ -28,16 +29,24 @@
 #include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
-#include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Theme/ThemeLoader.h"
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Tutorial/TutorialManager.h"
+#include "Viewport/ViewportModule.h"
 #include "Workspace/WorkspaceModule.h"
 
 using namespace UI;
+
+RTTR_REGISTRATION
+{
+	rttr::registration::class_<UISettings>("UISettings")
+	    .property("useWindowMenuButtons", &UISettings::useWindowMenuButtons)
+	    .property("autoHideTabBars", &UISettings::autoHideTabBars);
+}
+
 
 UIModule::~UIModule()
 {
@@ -108,7 +117,7 @@ void UIModule::onInit()
 	m_menu = new MainMenuBar();
 	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
 	m_windowManager.addWindow(std::make_shared<StartWindow>(true));
-	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, I3T::getViewport()));
+	I3T::getViewportModule().getOrCreateViewportWindow(1);
 	m_windowManager.addWindow(std::make_shared<WorkspaceWindow>(true));
 	m_windowManager.addWindow(std::make_shared<Console>(false));
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
@@ -182,6 +191,11 @@ void UIModule::onClose()
 	m_windowManager.clear();
 }
 
+UISettings& UIModule::getSettings()
+{
+	return m_settings;
+}
+
 float UIModule::getMainWindowDpiScaleFactor()
 {
 	float xscale, yscale;
@@ -241,7 +255,7 @@ void UIModule::loadThemes()
 	{
 		if (m_allThemes.size() >= MAX_THEMES_COUNT)
 		{
-			LOG_WARN("Maximum number ({}) of loaded themes reached.", MAX_THEMES_COUNT)
+			LOG_WARN("Maximum number ({}) of loaded themes reached.", MAX_THEMES_COUNT);
 			break;
 		}
 
@@ -352,7 +366,9 @@ void UIModule::buildDockspace()
 	// create dockspace -----------------------------
 	static bool opt_fullscreen_persistant = true;
 	bool opt_fullscreen = opt_fullscreen_persistant;
-	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoWindowMenuButton;
+	static ImGuiDockNodeFlags dockspace_flags =
+	    ImGuiDockNodeFlags_None | (!m_settings.useWindowMenuButtons ? ImGuiDockNodeFlags_NoWindowMenuButton : 0) |
+	    (m_settings.autoHideTabBars ? ImGuiDockNodeFlags_AutoHideTabBar : 0);
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window
 	// not dockable into, because it would be confusing to have two docking
@@ -489,7 +505,27 @@ void UIModule::clearScene(bool newScene) {}
 
 Memento UIModule::saveGlobal()
 {
-	return emptyMemento();
+	rapidjson::Document doc;
+	doc.SetObject();
+	rapidjson::Document uiDoc(&doc.GetAllocator());
+	auto result = JSON::serializeToDocument(m_settings, uiDoc);
+	if (!result)
+	{
+		return emptyMemento();
+	}
+	doc.AddMember("ui", uiDoc, doc.GetAllocator());
+	return doc;
 }
-void UIModule::loadGlobal(const Memento& memento) {}
-void UIModule::clearGlobal() {}
+void UIModule::loadGlobal(const Memento& memento)
+{
+	if (!memento.HasMember("ui"))
+	{
+		LOG_ERROR("Cannot load global UI data! No 'ui' entry found!");
+		return;
+	}
+	JSON::deserializeDocument(memento["ui"], m_settings);
+}
+void UIModule::clearGlobal()
+{
+	m_settings = UISettings();
+}

@@ -244,8 +244,19 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
+	/**
+	 * Sets the framebuffer to draw into all available color attachments at the same time.
+	 * If no attachments are present, the framebuffer is set to not to draw into any color buffers at all.
+	 * @see glDrawBuffer, glDrawBuffers
+	 */
 	void setDrawBuffers();
-	void setDrawBuffers(std::vector<unsigned int> indices);
+
+	/**
+	 * Specifies which color attachments are to be rendered into.
+	 * @param indices A list containing a list of color attachment indices. Other attachments will not be drawn into.
+	 * @see glDrawBuffer, glDrawBuffers
+	 */
+	void setDrawBuffers(const std::vector<unsigned int>& indices);
 
 private:
 	/**

@@ -14,15 +14,18 @@
 
 #include "glm/glm.hpp"
 
+// Just an empty macro used as a marker of transient (not serialized) fields
+#define VP_TRANSIENT
+
 namespace Vp
 {
 
 struct GlobalCameraSettings
 {
-public:
 	GlobalCameraSettings();
 
 	bool smoothScroll;
+	float smoothScrollDamping;
 
 	float orbit_zoomSpeed;
 	float orbit_rotateSpeed;
@@ -51,16 +54,14 @@ public:
 
 struct GridSettings
 {
-public:
 	GridSettings();
+	GridSettings(bool localGrid);
 
-	glm::vec3 color;
-	glm::vec3 axisXColor;
-	glm::vec3 axisYColor;
-	glm::vec3 axisZColor;
+	VP_TRANSIENT bool programShow{true};
+	VP_TRANSIENT float programStrength{1.0f};
 
+	// TODO: These should possibly be moved into I3T styles
 	float size;
-	float strength;
 	float lineWidth;
 
 	float grid1FadeStart;
@@ -83,12 +84,12 @@ public:
 
 	int lighting_lightingModel;
 
-	//	bool manipulator_enabled;
 	float manipulator_size;
 
 	GlobalCameraSettings camera;
 	HighlightSettings highlight;
 	GridSettings grid;
+	GridSettings localGrid = GridSettings(true);
 };
 
 } // namespace Vp

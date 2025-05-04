@@ -19,6 +19,7 @@
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Utils/JSON.h"
+#include "Viewport/entity/nodes/SceneCamera.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
 #ifdef WIN32
@@ -127,6 +128,8 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 		NodeDeserializer::assignCommon(value, camera, selectAll);
 		createdNodes[value["id"].GetInt()] = {camera, false};
 
+		NodeDeserializer::assignCamera(value, camera);
+
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView(), selectAll);
 		createdNodes[viewValue["id"].GetInt()] = {camera->getView(), true};
@@ -183,22 +186,22 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 
 		if (value.HasMember("opaque") && value["opaque"].IsBool())
 		{
-			mesh->m_opaque = value["opaque"].GetBool();
+			model->m_opaque = value["opaque"].GetBool();
 		}
 
 		if (value.HasMember("opacity") && value["opacity"].IsFloat())
 		{
-			mesh->m_opacity = value["opacity"].GetFloat();
+			model->m_opacity = value["opacity"].GetFloat();
 		}
 
 		if (value.HasMember("tint"))
 		{
-			mesh->m_tint = JSON::getVec3(value["tint"].GetArray());
+			model->m_tint = JSON::getVec3(value["tint"].GetArray());
 		}
 
 		if (value.HasMember("tintStrength") && value["tintStrength"].IsFloat())
 		{
-			mesh->m_tintStrength = value["tintStrength"].GetFloat();
+			model->m_tintStrength = value["tintStrength"].GetFloat();
 		}
 	}
 
@@ -470,6 +473,27 @@ void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence, bo
 	for (auto& transform : transforms)
 	{
 		sequence->moveNodeToSequence(transform);
+	}
+}
+
+void assignCamera(const rapidjson::Value& value, Ptr<GuiCamera> camera)
+{
+	auto cameraPtr = camera->m_viewportCamera.lock();
+
+	if (value.HasMember("showCamera"))
+		cameraPtr->m_visible = value["showCamera"].GetBool();
+
+	if (value.HasMember("frustum"))
+	{
+		auto frustum = value["frustum"].GetObject();
+		if (frustum.HasMember("show"))
+			cameraPtr->m_showFrustum = frustum["show"].GetBool();
+		if (frustum.HasMember("fill"))
+			cameraPtr->m_fillFrustum = frustum["fill"].GetBool();
+		if (frustum.HasMember("fillColor4"))
+			cameraPtr->m_frustumColor = JSON::getVec4(frustum["fillColor4"].GetArray());
+		if (frustum.HasMember("outlineColor"))
+			cameraPtr->m_frustumOutlineColor = JSON::getVec3(frustum["outlineColor"].GetArray());
 	}
 }
 } // namespace NodeDeserializer

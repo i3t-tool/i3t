@@ -22,7 +22,8 @@ const char* IWindow::getName()
 {
 	if (m_nameNeedsUpdate)
 	{
-		m_name = std::string(fmt::format("{}###{}", m_title.c_str(), getID()));
+		m_name = std::string(fmt::format("{}###{}{}", m_title.c_str(), getID(),
+		                                 m_instanceIndex > 1 ? std::to_string(m_instanceIndex) : ""));
 	}
 	m_nameNeedsUpdate = false;
 	return m_name.c_str();
@@ -117,7 +118,8 @@ void IWindow::updateWindowInfo()
 		                                        autoFocus.c_str());
 	}
 }
-IWindow::IWindow(std::string title, bool show) : m_show(show)
+IWindow::IWindow(std::string title, bool show) : IWindow(title, -1, show) {}
+IWindow::IWindow(std::string title, int instanceIndex, bool show) : m_instanceIndex(instanceIndex), m_show(show)
 {
 	setTitle(title.c_str());
 };

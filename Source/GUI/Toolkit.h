@@ -20,7 +20,13 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "Core/Nodes/NodeData.h"
 #include "I3T.h"
+
+namespace Core
+{
+enum class EValueState;
+}
 
 namespace GUI
 {
@@ -43,6 +49,24 @@ inline void TextCentered(const char* text, ImRect rect, ImU32 col)
 	ImVec2 textOrigin = center - ImVec2(textSize.x / 2, textSize.y / 2);
 	ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(), textOrigin, col, text);
 }
+
+inline void TextColoredShadow(const char* text, const ImVec4& color)
+{
+	ImVec2 shadowOfst = {ImGui::GetWindowDpiScale(), ImGui::GetWindowDpiScale()};
+	const ImVec2 textPos = ImGui::GetCursorScreenPos();
+	ImGui::SetCursorScreenPos(textPos + shadowOfst);
+	ImGui::TextColored(I3T::getTheme().get(EColor::TextDark), text);
+	ImGui::SetCursorScreenPos(textPos);
+	ImGui::TextColored(color, text);
+}
+
+inline void TextShadow(const char* text)
+{
+	TextColoredShadow(text, ImGui::GetStyleColorVec4(ImGuiCol_Text));
+}
+
+/// Sourced from https://github.com/ocornut/imgui/issues/5267, credit to Gl1tchs
+std::string TruncateText(const std::string& p_text, float p_truncated_width);
 
 bool Button(const char* id, bool disabled = false, const ImVec2& size = ImVec2(0, 0));
 
@@ -95,6 +119,47 @@ inline void Tooltip(const char* header, const char* description)
 	ImGui::PopTextWrapPos();
 	ImGui::EndTooltip();
 }
+
+/**
+ * Makes the last submitted ImGui item have a tooltip.
+ * By default, the standard tooltip settings are applied.
+ * Tooltip hover options can be modifed, for example to make the tooltip appearing delay longer:
+ * hoverFlags = ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_Stationary
+ * Tooltip hover delay (what normal / short delay means) can be set in ImGuiStyle.
+ * @return If the tooltip is showing.
+ */
+inline bool ItemTooltip(const char* header, const char* description,
+                        ImGuiHoveredFlags hoverFlags = ImGuiHoveredFlags_ForTooltip)
+{
+	if (!ImGui::IsItemHovered(hoverFlags))
+		return false;
+	Tooltip(header, description);
+	return true;
+}
+
+/**
+ * Works out pixel width of data items based on the provided parameters.
+ * @param fontSize Current font size in pixels
+ * @param maxCharacters Max number of characters/numerals any data item value has
+ * @param zoom Zoom/scaling level
+ * @return The desired data item width in pixels
+ */
+float calculateDataItemsWidth(float fontSize, int maxCharacters, float zoom = 1.0f);
+
+bool DrawFloat(const std::string& label, float& value, int numberOfVisibleDecimals, Core::EValueState const& valueState,
+               bool& valueChanged);
+
+int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
+int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
+
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals);
+
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals, Core::EValueState valState,
+                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange);
+
+bool DrawMatrix(const char* label, const glm::mat4& data, int numberOfVisibleDecimals,
+                const std::array<std::array<Core::EValueState, 4> const, 4>& dataState, bool& valueChanged,
+                int& rowOfChange, int& columnOfChange, float& valueOfChange);
 
 /**
  * Sets style for the tab of a dockable window.

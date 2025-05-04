@@ -18,7 +18,7 @@ Core::ModelResourceFiles::ModelResourceFiles(fs::path path, std::string name) : 
 bool Core::ModelResourceFiles::fetchFiles()
 {
 	// Load the mesh in order get texture info
-	LOG_INFO("[IMPORT] Temporarily loading model from the specified location.")
+	LOG_INFO("[IMPORT] Temporarily loading model from the specified location.");
 	RMI.m_forceMinimumLoad = true;
 	Mesh* importedMesh = RMI.mesh(m_path.string());
 	RMI.m_forceMinimumLoad = false;
@@ -102,7 +102,7 @@ bool Core::ModelResourceFiles::fetchFiles(void* data)
 		{
 			LOG_WARN("[IMPORT] Note: The model extension '{}' is not officially supported.\nThis may cause issues with "
 			         "some formats that use multiple files.",
-			         ext.string())
+			         ext.string());
 		}
 	}
 	else

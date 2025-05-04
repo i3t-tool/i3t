@@ -137,6 +137,7 @@ void Theme::initDefaultClassic()
 	// ImGui dark style
 	set(EColor::Text, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
 	set(EColor::TextDisabled, ImVec4(0.50f, 0.50f, 0.50f, 1.00f));
+	set(EColor::TextDark, ImVec4(0.02f, 0.02f, 0.02f, 1.0f));
 	set(EColor::WindowBackground, ImVec4(0.06f, 0.06f, 0.06f, 0.94f));
 	set(EColor::ChildBackground, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
 	set(EColor::PopupBackground, ImVec4(0.08f, 0.08f, 0.08f, 0.94f));
@@ -200,6 +201,16 @@ void Theme::initDefaultClassic()
 	set(EColor::ButtonDimDark, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
 
 	set(EColor::SceneViewBackground, ImVec4(0.3f, 0.3f, 0.35f, 1.f));
+	set(EColor::SceneViewBackgroundLocalColorShift, ImVec4(0.9f, 0.9f, 0.3f, 1.f));
+	set(EColor::SceneViewBackgroundTrackingColorShift, ImVec4(0.7f, 0.7f, 0.7f, 1.f));
+	set(EColor::SceneViewGridColor, ImVec4(0.45, 0.49, 0.53, 1.f));
+	set(EColor::SceneViewGridX, ImVec4(1.0, 0.128, 0.128, 1.f));
+	set(EColor::SceneViewGridY, ImVec4(0.51f, 0.88f, 0.08f, 1.f));
+	set(EColor::SceneViewGridZ, ImVec4(0.06f, 0.6f, 1.0f, 1.f));
+	set(EColor::SceneViewGridLocalColor, ImVec4(0.8f, 0.75f, 0.3f, 1.f));
+	set(EColor::SceneViewGridLocalX, ImVec4(1.0f, 0.2f, 0.50f, 1.f));
+	set(EColor::SceneViewGridLocalY, ImVec4(0.2f, 1.0f, 0.4f, 1.f));
+	set(EColor::SceneViewGridLocalZ, ImVec4(0.4f, 0.6f, 1.00f, 1.f));
 
 	set(EColor::DockTab, ImVec4(0.309f, 0.309f, 0.318f, 1.f));
 	set(EColor::DockTabActive, ImVec4(0.258f, 0.334f, 0.427f, 1.f));
@@ -307,8 +318,13 @@ void Theme::initDefaultClassic()
 	// set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f)); // for cross
 	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.8745f, 0.7686f, 0.8863f, 0.7686f)); // for hyphen
 
-	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
+	set(EColor::Nodes_Tracking_ColorActive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_ColorInactive, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_Cursor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_CursorHovered, ImVec4(0.8f, 0.8f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_CursorActive, ImVec4(0.86f, 0.86f, 0.0f, 1.0f));
+	set(EColor::Nodes_Tracking_OverlayActive, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
+	set(EColor::Nodes_Tracking_OverlayInactive, ImVec4(0.16f, 0.16f, 0.16f, 0.7f));
 
 	set(EColor::StartWindow_DescriptionBackground, createColor(255, 255, 255, 255));
 	set(EColor::StartWindow_WindowBackground, createColor(232, 232, 232, 255));
@@ -345,8 +361,6 @@ void Theme::initDefaultClassic()
 
 	m_sizes[ESize::FloatingButtonRounding] = {2.0f, true};
 
-	m_sizes[ESize::Nodes_FloatMargin] = {1.0f, true};
-	m_sizes[ESize::Nodes_FloatWidth] = {25.0f, true};
 	m_sizes[ESize::Nodes_Rounding] = {5.0f, true};
 	m_sizes[ESize::Nodes_BorderWidth] = {0.0f, true};
 	m_sizes[ESize::Nodes_LabelIndent] = {3.0f, true};
@@ -355,6 +369,8 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Nodes_TrackBallSensitivity] = {5.0f, true};
 
 	m_sizes[ESize::Nodes_FloatInnerPadding] = {1.0f, true};
+	m_sizes[ESize::Nodes_FloatCharacterWidthMultiplier] = {0.41f, false};
+	m_sizes[ESize::Nodes_FloatMinCharacters] = {5.0f, false};
 
 	m_sizes[ESize::Nodes_dragSpeedDefaultRatio] = {0.015f, true};
 	m_sizes[ESize::Nodes_CtrlMultiplicator] = {0.1f, true};
@@ -400,7 +416,8 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Nodes_Border_Rounding] = {5.0f, true};
 	m_sizes[ESize::Nodes_Border_Thickness] = {1.5f, true};
 
-	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = {5.f, true};
+	m_sizes[ESize::Nodes_Tracking_CursorSize] = {5.f, true};
+	m_sizes[ESize::Nodes_Tracking_LinkWidth] = {9.f, true};
 
 	m_sizes[ESize::Window_Rounding] = {0.0f, true};
 	m_sizes[ESize::Frame_Rounding] = {0.0f, true};
@@ -473,6 +490,7 @@ void Theme::initNames()
 	group("Global", "glob")
 	    .add(EColor::Text, "Text")
 	    .add(EColor::TextDisabled, "Disabled Text")
+	    .add(EColor::TextDark, "Dark Text")
 	    .add(EColor::WindowBackground, "Window Background")
 	    .add(EColor::ChildBackground, "Child Window Background")
 	    .add(EColor::PopupBackground, "Popup Background")
@@ -624,7 +642,18 @@ void Theme::initNames()
 	    .add(EColor::AboutWindow_BackgroundRight, "AboutWindow BackgroundRight")
 	    .add(EColor::AboutWindow_Text, "AboutWindow Text");
 
-	group("Scene View", "sgen").add(EColor::SceneViewBackground, "Scene View Background");
+	group("Scene View", "sgen")
+	    .add(EColor::SceneViewBackground, "Scene View Background")
+	    .add(EColor::SceneViewBackgroundLocalColorShift, "Scene View Background Local Color Shift")
+	    .add(EColor::SceneViewBackgroundTrackingColorShift, "Scene View Background Tracking Color Shift")
+	    .add(EColor::SceneViewGridColor, "Scene View Grid Color")
+	    .add(EColor::SceneViewGridX, "Scene View Grid X")
+	    .add(EColor::SceneViewGridY, "Scene View Grid Y")
+	    .add(EColor::SceneViewGridZ, "Scene View Grid Z")
+	    .add(EColor::SceneViewGridLocalColor, "Scene View Grid Local Color")
+	    .add(EColor::SceneViewGridLocalX, "Scene View Grid Local X")
+	    .add(EColor::SceneViewGridLocalY, "Scene View Grid Local Y")
+	    .add(EColor::SceneViewGridLocalZ, "Scene View Grid Local Z");
 
 	group("Node Editor", "ngen")
 	    .add(EColor::NodeEditorBackground, "Node Editor Background")
@@ -665,7 +694,8 @@ void Theme::initNames()
 	    .add(ESize::Nodes_OutputsAlignment, "Nodes Outputs Alignment")  // Unused?
 	    .add(ESize::Nodes_leftSideSpacing, "Nodes Left Side spacing")   // Unused?
 	    .add(ESize::Nodes_rightSideSpacing, "Nodes Right Side spacing") // Unused?
-	    .add(ESize::Nodes_Transformation_TrackingMarkSize, "Nodes Transformation TrackingMarkSize")
+	    .add(ESize::Nodes_Tracking_CursorSize, "Nodes Transformation TrackingMarkSize")
+	    .add(ESize::Nodes_Tracking_LinkWidth, "Nodes Tracking Link Width")
 	    .add(ESize::Default_VisiblePrecision, "Nodes Default Visible Precision")
 	    .add(ESize::Default_VisibleQuaternionPrecision, "Nodes Default Visible Precision For Quaternions")
 	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")
@@ -690,8 +720,8 @@ void Theme::initNames()
 	    .add(ESize::Links_ControlpointsPositionMax, "Link Max Control Point X Distance")
 	    .add(ESize::Links_Thickness, "Link Thickness")
 	    .add(ESize::Links_ThicknessSelected, "Link Thickness when selected")
-	    .add(ESize::Links_selected_alpha, "Link Selected Alpha")
-	    .add(EColor::Links_selected_colorShift, "selected_colorShift");
+	    .addF01(ESize::Links_selected_alpha, "Link Selected Alpha")
+	    .addF01(EColor::Links_selected_colorShift, "selected_colorShift");
 
 	group("Node Editor Pins", "npin", 1)
 	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
@@ -727,8 +757,13 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Transformation_ValidIcon_fgInner, "Nodes Transformation ValidIcon fgInner")
 	    .add(EColor::Nodes_Transformation_ValidIcon_padding, "Nodes Transformation ValidIcon padding",
 	         "Padding stored as color")
-	    .add(EColor::Nodes_Transformation_TrackingColor, "Nodes Transformation TrackingColor")
-	    .add(EColor::Nodes_Transformation_TrackingMarkColor, "Nodes Transformation TrackingMarkColor");
+	    .add(EColor::Nodes_Tracking_ColorActive, "Nodes Tracking Color Active")
+	    .add(EColor::Nodes_Tracking_ColorInactive, "Nodes Tracking Color Inactive")
+	    .add(EColor::Nodes_Tracking_Cursor, "Nodes Tracking Cursor")
+	    .add(EColor::Nodes_Tracking_CursorHovered, "Nodes Tracking Cursor Hovered")
+	    .add(EColor::Nodes_Tracking_CursorActive, "Nodes Tracking Cursor Active")
+	    .add(EColor::Nodes_Tracking_OverlayActive, "Nodes Tracking Overlay Active")
+	    .add(EColor::Nodes_Tracking_OverlayInactive, "Nodes Tracking Overlay Inactive");
 
 	group("Node Editor Popups", "npop", 1)
 	    .add(EColor::Nodes_ConnectionPossible, "Connection is possible (text)")
@@ -736,16 +771,18 @@ void Theme::initNames()
 	    .add(EColor::Nodes_CreateNode, "Create node popup");
 
 	group("Node Editor Floats", "nflo", 1)
-	    .add(ESize::Nodes_FloatWidth, "Nodes Float Width")
-	    .add(ESize::Nodes_FloatMargin, "Nodes Float Margin")
 	    .add(EColor::FloatBg, "Float Background")
 	    .add(EColor::FloatBgHovered, "Float Background Hovered")
 	    .add(EColor::FloatBgActive, "Float Background Active")
 	    .add(EColor::Synergies_FloatBg, "Synergies FloatBg")
 	    .add(EColor::Synergies_FloatBgHovered, "Synergies FloatBgHovered")
 	    .add(EColor::Synergies_FloatBgActive, "Synergies FloatBgActive")
-	    .add(ESize::Float_inactive_alphaMultiplicator, "Float Inactive Alpha Factor")
-	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding")
+	    .addF01(ESize::Float_inactive_alphaMultiplicator, "Float Inactive Alpha Factor")
+	    .addF(ESize::Nodes_FloatCharacterWidthMultiplier, "Float Character Width Multiplier",
+	          "Factor of font size determining the width of a single character.")
+	    .addF1(ESize::Nodes_FloatMinCharacters, "Float Minimum Character Count")
+	    .add(ESize::Nodes_FloatInnerPadding, "Float Inner Padding",
+	         "Horizontal padding inside float data items (floats, vectors, matrices etc.).")
 	    .add(ESizeVec2::Nodes_FloatPadding, "Nodes Float Padding")
 	    .add(ESizeVec2::Nodes_FloatCycleButtonSize, "Nodes Float Cycle Button Size");
 

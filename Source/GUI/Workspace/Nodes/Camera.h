@@ -38,13 +38,6 @@ protected:
 	DIWNE::NodeList m_projAndView;
 
 public:
-	bool m_axisOn{true};
-	bool m_showCamera{true};
-	bool m_showFrustum{true};
-	bool m_fillFrustum{true};
-	glm::vec3 m_frustumColor{0.35f, 0.27f, 0.06f};
-	glm::vec3 m_frustumOutlineColor{1.f, 0.f, 0.f};
-
 	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
 
 	Camera(DIWNE::NodeEditor& diwne);
@@ -64,13 +57,17 @@ public:
 	const Ptr<Sequence>& getProjection() const
 	{
 		return m_projection;
-	};
+	}
 	const Ptr<Sequence>& getView() const
 	{
 		return m_view;
-	};
+	}
+
+	void initialize(DIWNE::DrawInfo& context) override;
 
 	void centerContent(DIWNE::DrawInfo& context) override;
+	void afterDraw(DIWNE::DrawInfo& context) override;
+
 	void drawOutputPins(DIWNE::DrawInfo& context) override;
 
 	void drawMenuLevelOfDetail() override;
@@ -78,15 +75,16 @@ public:
 	int getLODCount() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
+	void popupContentTracking();
 
 	int maxLengthOfData() override;
-
-	// TODO: Move screen output to the left side
 
 	void onSelection(bool selected) override;
 	void onDestroy(bool logEvent) override;
 
 private:
-	glm::vec3 calculateFrustumColor(glm::vec3 color);
+	glm::vec4 calculateFrustumColor(glm::vec3 color, float alpha);
+
+	void updateTrackedCamera();
 };
 } // namespace Workspace

@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+
 static inline const Core::Operation DEFAULT_SCRIPTING_NODE_OPERATION = {"Script", "script"};
 
 namespace Workspace
@@ -71,6 +72,8 @@ public:
 	Ptr<ScriptingNode> reloadScript();
 
 private:
+	/// TODO: (DR) This collects neighbours on the core level, I wrote a similar function in DIWNE which replaced this
+	///   one, hence this is currently unused, maybe move it to GraphManager for future use.
 	/// \todo This can be somewhere else in the common code.
 	/// \returns fromId, fromIndex, toId, toIndex
 	std::vector<std::tuple<Core::ID, int, Core::ID, int>> collectNeighbours(Core::ID overrideId) const;

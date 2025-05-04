@@ -18,6 +18,8 @@
 
 namespace Core
 {
+constexpr size_t I3T_MODEL_IN_MUL = 0;
+
 class Model : public Node
 {
 public:
@@ -27,11 +29,10 @@ public:
 	glm::mat4 m_modelMatrix{};
 
 	void updateValues(int inputIndex = 0) override;
-
-	void onUnplugInput(size_t index) override;
-
-	/// \todo
 	void resetModelPosition();
+
+protected:
+	void onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex) override;
 };
 
 namespace Builder

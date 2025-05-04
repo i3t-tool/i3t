@@ -74,8 +74,7 @@ bool Application::init()
 
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
-	                                                    // Platform Windows
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Allocate path to the imgui ini file on heap.
@@ -91,6 +90,7 @@ bool Application::init()
 	onInit();
 
 	m_window->show();
+
 	return true;
 }
 
@@ -257,19 +257,6 @@ void Application::initWindow()
 	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, debugLevel))
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
-	}
-
-	// Extra opengl 4.3 severity level which pgr framework doesn't account for
-	if (debugLevel != pgr::DEBUG_OFF)
-	{
-		GLuint severity = GL_DEBUG_SEVERITY_NOTIFICATION;
-		GLboolean toggle = debugLevel <= 1 ? GL_TRUE : GL_FALSE;
-		glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DONT_CARE, severity, 0, NULL, toggle);
-		glDebugMessageControl(GL_DEBUG_SOURCE_OTHER, GL_DONT_CARE, severity, 0, NULL, toggle);
 	}
 }
 

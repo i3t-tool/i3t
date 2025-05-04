@@ -11,8 +11,12 @@ layout (location = 1) out vec4 AccumulationBuffer;
 layout (location = 2) out float RevealageBuffer;
 // END WBOIT
 
-in vec3 nearPoint;
-in vec3 farPoint;
+// Near and far points, already in local space if GENERIC_GRID is defined
+in vec4 nearPointG;
+in vec4 farPointG;
+
+uniform mat4 modelMatrix;
+uniform mat4 u_modelMatrixInv;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -25,8 +29,8 @@ uniform bool u_showXAxis = true;
 uniform bool u_showYAxis = true;
 uniform bool u_showZAxis = true;
 
-uniform vec3 u_gridColor = vec3(0.45, 0.49, 0.53);
-uniform vec3 u_axisColors[3];
+uniform vec4 u_gridColor = vec4(0.45, 0.49, 0.53, 1.0);
+uniform vec4 u_axisColors[3];
 
 uniform float u_gridSize = 1.0f;
 uniform float u_gridStrength = 0.5f;
@@ -38,7 +42,7 @@ uniform float u_grid1FadeEnd;
 uniform float u_grid2FadeStart;
 uniform float u_grid2FadeEnd;
 
-vec3 gridColor;
+vec4 gridColor;
 
 float gridSize;
 float gridStrength;
@@ -90,8 +94,9 @@ float linearize_depth(float d, float zNear, float zFar)
 	return 2.0 * zNear * zFar / (zFar + zNear - z_ndc * (zFar - zNear));
 }
 
-// int i = 0; vec3 v; v[i] <-- THIS created undefined behavior on a mobile rtx 3050Ti  for some reason, thus tthese functions
-// Get vector component at index, for compability reasons to avoid variable indexing issues
+// int i = 0; vec3 v; v[i] <-- THIS created undefined behavior on a mobile rtx 3050Ti  for some reason, thus these functions
+// get vector component at index, for compability reasons to avoid variable indexing issues
+// Update 2025: Could this be due to vec3 byte alignment issues or something? Maybe using vec4 will fix it.
 float vc(vec3 v, int i)
 {
 	return (i == 0) ? v.x : (i == 1) ? v.y : v.z;
@@ -103,7 +108,7 @@ float vc(vec4 v, int i)
 	return (i == 0) ? v.x : (i == 1) ? v.y : (i == 2) ? v.z : v.w;
 }
 
-vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis, bool axisOnly)
+vec4 grid(vec4 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis, bool axisOnly)
 {
 	vec2 coord;
 	coord.x = vc(worldPos, firstAxis) * gridSize;
@@ -114,7 +119,7 @@ vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 	// Grid
 	vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative; // Visualize using (pow(worldPos.x, 2) / 100.0f)
 	float line = min(grid.x, grid.y);
-	vec4 color = vec4(gridColor, 1.0 - min(line, 1.0));
+	vec4 color = vec4(gridColor.xyz, gridColor.a * (1.0 - min(line, 1.0)));
 
 	if (!drawFirstAxis && !drawSecondAxis && !axisOnly) {
 		return color;
@@ -130,12 +135,13 @@ vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 		yAxis = 0;
 	float axisLine = max(xAxis, yAxis);
 
-	vec4 axisColor = vec4(1, 0, 1, axisLine);
+	vec4 axisColor;
 	if (xAxis > yAxis) {
-		axisColor.xyz = u_axisColors[firstAxis];
+		axisColor = u_axisColors[firstAxis];
 	} else {
-		axisColor.xyz = u_axisColors[secondAxis];
+		axisColor = u_axisColors[secondAxis];
 	}
+	axisColor.w *= axisLine;
 	if (axisOnly) {
 		return axisColor;
 	} else {
@@ -143,10 +149,24 @@ vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 	}
 }
 
-vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis)
+vec4 grid(vec4 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis)
 {
 	return grid(worldPos, firstAxis, secondAxis, drawFirstAxis, drawSecondAxis, false);
 }
+
+// TODO: General ray interection could be used in world space instead of transforming into the general basis beforehand
+// Computes distance 't' of ray with origin 'ro' with dir 'rd' and plane at 'p0' with normal 'n'.
+// Returns true on intersection, false otherwise (or when near parallel)
+//bool intersectRayPlane(vec3 ro, vec3 rd, vec3 p0, vec3 n, out float t) {
+//	float denom = dot(rd, n);
+//	if (abs(denom) > 1e-6) {
+//		t = dot(p0 - ro, n) / denom;
+//		if (t > 0.) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 
 // Returns color and depths of a grid pixel
 // gridType = GRID_XY, GRID_XY, GRID_YZ
@@ -156,24 +176,32 @@ vec4 drawGrid(int gridType, bool drawFirstAxis, bool drawSecondAxis, bool axesOn
 {
 	int firstAxis;
 	int secondAxis;
-	int otherAxis;
+	int upAxis;
 	if (gridType == GRID_XY) {
 		firstAxis = 0;
 		secondAxis = 1;
-		otherAxis = 2;
+		upAxis = 2;
 	} else if (gridType == GRID_YZ) {
 		firstAxis = 1;
 		secondAxis = 2;
-		otherAxis = 0;
+		upAxis = 0;
 	} else {
 		firstAxis = 0;
 		secondAxis = 2;
-		otherAxis = 1;
+		upAxis = 1;
 	}
 
+
 	// Figure out where camera ray intersects world plane
-	float t = -vc(nearPoint, otherAxis) / (vc(farPoint, otherAxis) - vc(nearPoint, otherAxis));
-	vec3 worldPos = nearPoint + t * (farPoint - nearPoint);
+	vec4 rayDirG = farPointG - nearPointG;
+	float t = -vc(nearPointG, upAxis) / (vc(rayDirG, upAxis));
+	vec4 worldPosG = nearPointG + t * rayDirG;
+
+#ifdef GENERIC_GRID
+	vec4 worldPos = u_modelMatrixInv * worldPosG;
+#else
+	vec4 worldPos = worldPosG;
+#endif
 
 	// Compute depth from world position
 	vec4 clipSpacePos = projectionMatrix * viewMatrix * vec4(worldPos.xyz, 1.0);
@@ -182,7 +210,7 @@ vec4 drawGrid(int gridType, bool drawFirstAxis, bool drawSecondAxis, bool axesOn
 
 	vec4 color = vec4(0);
 	if (depth >= 0 && depth <= 1) { // Explicit depth clipping for when blending is used
-		color = grid(worldPos, firstAxis, secondAxis, drawFirstAxis, drawSecondAxis, axesOnly) * float(t > 0);
+		color = grid(worldPosG, firstAxis, secondAxis, drawFirstAxis, drawSecondAxis, axesOnly) * float(t > 0);
 
 		// Distance fade out
 		linearDepth = linearize_depth(clipSpaceDepth, u_near, u_far);
@@ -289,6 +317,7 @@ void main()
 		colorY = drawGrid(GRID_XY, false, true, true, depthY, linearDepthY);
 	}
 
+	// TODO: The larger grid SHOULD NOT be a separate grid call, it should be collapsed into a single one for perf reasons
 	// XZ grid
 	vec4 colorS = drawGrid(GRID_XZ, u_showXAxis, u_showZAxis, !u_showGrid, depth, linearDepth);
 

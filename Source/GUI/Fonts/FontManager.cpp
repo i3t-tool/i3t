@@ -214,7 +214,7 @@ const ImWchar* FontManager::getFontRanges_nodeEditorIcons()
 		builder.AddText(ICON_FA_CHEVRON_DOWN ICON_FA_CHEVRON_RIGHT ICON_FA_ANGLE_DOWN ICON_FA_ANGLE_RIGHT
 		                    ICON_FA_CARET_DOWN ICON_FA_CARET_RIGHT ICON_FA_PEN_TO_SQUARE ICON_FA_I3T_DOTS_3_1
 		                        ICON_FA_PEN ICON_FA_I3T_DOTS_3_2 ICON_FA_I3T_DOTS_3_3 ICON_FA_I3T_NSPACE_1
-		                            ICON_FA_I3T_NSPACE_2 ICON_FA_I3T_NSPACE_3 ICON_FA_I3T_NSPACE_4);
+		                            ICON_FA_I3T_NSPACE_2 ICON_FA_I3T_NSPACE_3 ICON_FA_I3T_NSPACE_4 ICON_FA_CROSSHAIRS);
 		builder.BuildRanges(&node_editor_icons_ranges);
 		loaded = true;
 	}

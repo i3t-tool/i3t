@@ -26,7 +26,7 @@ Screen::Screen(DIWNE::NodeEditor& diwne)
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
 
 	m_displayOptions.showAxes = false;
-	m_displayOptions.showGrid = false;
+	m_displayOptions.showGrids = false;
 	m_displayOptions.showCamera = false;
 	m_displayOptions.showFrustum = false;
 
@@ -79,8 +79,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 		Vp::Viewport* viewport = I3T::getViewport();
 		m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
-		viewport->drawScreen(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, screenValue.second,
-		                     screenValue.first, m_renderOptions, m_displayOptions);
+		viewport->drawScreen(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, glm::mat4(1.f),
+		                     screenValue.second, screenValue.first, m_renderOptions, m_displayOptions);
 		Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 		if (framebuffer)
@@ -119,8 +119,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 
 int Screen::maxLengthOfData()
 {
-	return Tools::numberOfCharWithDecimalPoint(
-	    getOutputs()[Core::I3T_SCREEN_OUT_ASPECT]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal());
+	return GUI::numberOfCharWithDecimalPoint(getOutputs()[Core::I3T_SCREEN_OUT_ASPECT]->getCorePin().data().getFloat(),
+	                                         getNumberOfVisibleDecimal());
 }
 
 void Screen::drawMenuLevelOfDetail() // todo

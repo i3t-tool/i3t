@@ -1,8 +1,8 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \author Dan Rakušan <rakusan.dan@gmail.com>, Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -14,6 +14,7 @@
 
 #include "Core/Input/InputManager.h"
 #include "DataRenderer.h"
+#include "GUI/Toolkit.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 
@@ -766,8 +767,8 @@ int CorePin::maxLengthOfData()
 	switch (m_pin.ValueType)
 	{
 	case Core::EValueType::Matrix:
-		return DataRenderer::maxLengthOfData4x4(getCorePin().data().getMat4(),
-		                                        static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
+		return GUI::maxLengthOfData4x4(getCorePin().data().getMat4(),
+		                               static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());
 	case Core::EValueType::Vec4:
 		return DataRenderer::maxLengthOfDataVec4(getCorePin().data().getVec4(),
 		                                         static_cast<CoreNode*>(getNode())->getNumberOfVisibleDecimal());

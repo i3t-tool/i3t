@@ -22,7 +22,7 @@
 // #include "Core/Nodes/Utils.h"
 
 /*
-class SerdeTest : public GraphManagerTestFixture {};
+class SerdeTest : public GraphManagerTestFixtureSuite {};
 
 TEST_F(SerdeTest, CorrectOrderOfTransformsInTheSequence)
 {

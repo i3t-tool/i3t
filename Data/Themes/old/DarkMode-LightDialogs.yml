@@ -379,7 +379,7 @@ colors:
     y: 0.768627465
     z: 0.886274517
     w: 0.768627465
-  ntrs_Nodes Transformation TrackingColor:
+  ntrs_Nodes Tracking Overlay Inactive:
     x: 0.300000012
     y: 0.300000012
     z: 0.100000001
@@ -470,8 +470,6 @@ colors:
     z: 0
     w: 0
 sizes:
-  nflo_Nodes Float Margin: 5
-  nflo_Nodes Float Width: 45
   star_Dot Spacing: 7
   ngen_Nodes Rounding: 7
   star_Dot Size: 10

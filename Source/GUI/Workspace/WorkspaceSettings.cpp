@@ -17,7 +17,6 @@
 RTTR_REGISTRATION
 {
 	rttr::registration::class_<WorkspaceSettings>("WorkspaceSettings")
-	    .property("tracking_timeBetweenTracks", &WorkspaceSettings::tracking_timeBetweenTracks)
 	    .property("tracking_smoothScrollSpeed", &WorkspaceSettings::tracking_smoothScrollSpeed)
 	    .property("tracking_jaggedScrollSpeeds", &WorkspaceSettings::tracking_jaggedScrollSpeed)
 	    .property("showQuickAddMenu", &WorkspaceSettings::showQuickAddMenu)

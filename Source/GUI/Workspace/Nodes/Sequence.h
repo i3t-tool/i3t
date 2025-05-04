@@ -67,9 +67,13 @@ public:
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 	void popupContentTracking();
+	void popupContentReferenceSpace();
+
 	void drawMenuLevelOfDetail() override;
 
 	void onDestroy(bool logEvent) override;
+
+	bool isCameraSequence() const;
 
 protected:
 	class SequenceDropZone : public DIWNE::NodeDropZone

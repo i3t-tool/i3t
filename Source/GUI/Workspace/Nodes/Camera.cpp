@@ -12,8 +12,10 @@
  */
 #include "Camera.h"
 
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
+#include "GUI/Workspace/WorkspaceDiwne.h"
 
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneCamera.h"
@@ -49,23 +51,14 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	// They are already plugged in Core!
 
 	m_projection->setSelectable(false);
-	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
-	{
-		if (i != 1)
-		{
-			m_projection->getNodebase()->getInputPins()[i].setRendered(false);
-		}
-	}
-	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
-	{
-		if (j != 1)
-		{
-			m_projection->getNodebase()->getOutputPins()[j].setRendered(false);
-		}
-	}
+	for (auto& pin : m_projection->getNodebase()->getInputPins())
+		pin.setRendered(false);
+	for (auto& pin : m_projection->getNodebase()->getOutputPins())
+		pin.setRendered(false);
+
 	// todo refactor - use the constant Core::I3T_CAMERA_OUT_MATRIX
-	m_projection->getNodebase()->getInputPins()[1].setRendered(true);
-	m_projection->getNodebase()->getOutputPins()[1].setRendered(true);
+	m_projection->getNodebase()->getInputPins()[Core::I3T_SEQ_IN_MAT].setRendered(true);
+	m_projection->getNodebase()->getOutputPins()[Core::I3T_SEQ_OUT_MAT].setRendered(true);
 	m_projection->setTopLabel("projection");
 	m_projection->setFixed(true);
 	m_projection->setParentObject(this);
@@ -89,19 +82,7 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_view->m_draggable = false;
 	m_view->m_deletable = false;
 
-	// Hide multiplication output to discourage interaction
-	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
-
-	// TODO: Use some flag to make it not interactive
-	//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
-
 	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
-	auto cameraPtr = m_viewportCamera.lock();
-	cameraPtr->m_showAxes = m_axisOn;
-	cameraPtr->m_visible = m_showCamera;
-	cameraPtr->m_showFrustum = m_showFrustum;
-	cameraPtr->m_fillFrustum = m_fillFrustum;
-	cameraPtr->m_frustumColor = m_frustumColor;
 
 	// Callback that gets called when the underlying Camera node updates values
 	// The Camera node also updates public projection and view matrix variables
@@ -127,143 +108,25 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 
 Camera::~Camera()
 {
+	// TODO: Shouldn't this be in onDestroy?
 	I3T::getViewport()->removeEntity(m_viewportCamera);
 }
 
-void Camera::popupContent(DIWNE::DrawInfo& context)
-{
-	drawMenuSetEditable();
-
-	ImGui::Separator();
-
-	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
-	{
-		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, m_axisOn))
-		{
-			m_axisOn = !m_axisOn;
-			m_viewportCamera.lock()->m_showAxes = m_axisOn;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, m_showCamera))
-		{
-			m_showCamera = !m_showCamera;
-			m_viewportCamera.lock()->m_visible = m_showCamera;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, m_showFrustum))
-		{
-			m_showFrustum = !m_showFrustum;
-			m_viewportCamera.lock()->m_showFrustum = m_showFrustum;
-		}
-		if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, m_fillFrustum))
-		{
-			m_fillFrustum = !m_fillFrustum;
-			m_viewportCamera.lock()->m_fillFrustum = m_fillFrustum;
-		}
-		ImGui::EndMenu();
-	}
-	if (I3TGui::BeginMenuWithLog(_t("Change frustum color")))
-	{
-		if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
-		{
-			if (I3TGui::MenuItemWithLog(_t("Default")))
-			{
-				m_frustumColor = glm::vec3(0.35f, 0.27f, 0.06f);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Red")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::RED);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Blue")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::BLUE);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Green")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::GREEN);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Yellow")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::YELLOW);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Orange")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::ORANGE);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Magenta")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::MAGENTA);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Teal")))
-			{
-				m_frustumColor = calculateFrustumColor(Color::TEAL);
-				m_viewportCamera.lock()->m_frustumColor = m_frustumColor;
-			}
-			ImGui::EndMenu();
-		}
-		if (I3TGui::BeginMenuWithLog(_t("Frustum outline color")))
-		{
-			if (I3TGui::MenuItemWithLog(_t("Red")))
-			{
-				m_frustumOutlineColor = Color::RED;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Blue")))
-			{
-				m_frustumOutlineColor = Color::BLUE;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Green")))
-			{
-				m_frustumOutlineColor = Color::GREEN;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Yellow")))
-			{
-				m_frustumOutlineColor = Color::YELLOW;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Orange")))
-			{
-				m_frustumOutlineColor = Color::ORANGE;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Magenta")))
-			{
-				m_frustumOutlineColor = Color::MAGENTA;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			if (I3TGui::MenuItemWithLog(_t("Teal")))
-			{
-				m_frustumOutlineColor = Color::TEAL;
-				m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
-			}
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenu();
-	}
-	ImGui::Separator();
-
-	CoreNode::drawMenuDuplicate(context);
-
-	ImGui::Separator();
-
-	Node::popupContent(context);
-}
-
-glm::vec3 Camera::calculateFrustumColor(glm::vec3 color)
+glm::vec4 Camera::calculateFrustumColor(glm::vec3 color, float alpha)
 {
 	glm::vec3 hsl;
 	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
 	hsl.y = 0.9;
 	hsl.z = 0.25;
 	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
-	return color;
+	return glm::vec4(color, alpha);
+}
+
+void Camera::initialize(DIWNE::DrawInfo& context)
+{
+	Super::initialize(context);
+
+	updateTrackedCamera();
 }
 
 void Camera::centerContent(DIWNE::DrawInfo& context)
@@ -276,6 +139,17 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine();
 		m_view->drawDiwne(context, m_drawMode);
 	}
+}
+void Camera::afterDraw(DIWNE::DrawInfo& context)
+{
+	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
+	if (t)
+	{
+		if (t->chain)
+			drawTrackingBorder(t->active, t->interpolating, t->progress);
+	}
+
+	Super::afterDraw(context);
 }
 void Camera::drawOutputPins(DIWNE::DrawInfo& context)
 {
@@ -354,5 +228,189 @@ void Camera::onSelection(bool selected)
 	else
 	{
 		model->m_highlight = false;
+	}
+}
+
+void Camera::updateTrackedCamera()
+{
+	// Camera model must be placed in a special manner when projection transform is tracked
+	if (auto t = this->getNodebase()->getTrackingData())
+	{
+		Core::MatrixTracker* tracker = t->tracker;
+		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
+		if (transform->data.space == Core::TransformSpace::Projection)
+		{
+			auto cameraPtr = m_viewportCamera.lock()->m_trackedCameraModel.lock();
+			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
+
+			float tt = transform->data.progress;
+			float mt = trackedMatrix->progress;
+
+			// Modify camera position so that it doesn't intefere with the frustum and is facing the near plane
+			// TODO: Modify tracking camera, not the world one
+			cameraPtr->m_modelMatrix = glm::mat4(1.f);
+			if (abs(trackedMatrix->cameraNDCOffset > 0))
+			{
+				float zPos = trackedMatrix->moveCameraOutOfNDC ? mt * trackedMatrix->cameraNDCOffset
+				                                               : trackedMatrix->cameraNDCOffset;
+				cameraPtr->m_modelMatrix = glm::translate(cameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
+			}
+			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
+			{
+				// cameraPtr->m_modelMatrix = Math::flipAxis(cameraPtr->m_modelMatrix, 2);
+				glm::mat4 neg(1.f);
+				neg[2][2] = -1;
+				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
+				cameraPtr->m_modelMatrix = Math::lerp(glm::mat4(1.f), neg, mt, false) * cameraPtr->m_modelMatrix;
+			}
+		}
+	}
+}
+
+void Camera::popupContent(DIWNE::DrawInfo& context)
+{
+	drawMenuSetEditable();
+
+	ImGui::Separator();
+
+	popupContentTracking();
+
+	ImGui::Separator();
+
+	auto cameraPtr = m_viewportCamera.lock();
+
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+	if (I3TGui::BeginMenuWithLog(_t("Set visibility")))
+	{
+		if (I3TGui::MenuItemWithLog(_t("Show axes"), NULL, cameraPtr->m_showAxes))
+		{
+			cameraPtr->m_showAxes = !cameraPtr->m_showAxes;
+		}
+		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, cameraPtr->m_visible))
+		{
+			cameraPtr->m_visible = !cameraPtr->m_visible;
+		}
+		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, cameraPtr->m_showFrustum))
+		{
+			cameraPtr->m_showFrustum = !cameraPtr->m_showFrustum;
+		}
+		if (I3TGui::MenuItemWithLog(_t("Fill frustum"), NULL, cameraPtr->m_fillFrustum))
+		{
+			cameraPtr->m_fillFrustum = !cameraPtr->m_fillFrustum;
+		}
+		ImGui::EndMenu();
+	}
+	if (I3TGui::BeginMenuWithLog(_t("Change frustum color")))
+	{
+		if (I3TGui::BeginMenuWithLog(_t("Frustum fill color")))
+		{
+			// ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+			ImGui::SliderFloat(_t("Opacity"), &cameraPtr->m_frustumColor.w, 0.0f, 1.0f, "%.2f");
+			if (I3TGui::MenuItemWithLog(_t("Default")))
+			{
+				cameraPtr->m_frustumColor = glm::vec4(0.35f, 0.27f, 0.06f, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Red")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::RED, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Blue")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::BLUE, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Green")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::GREEN, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Yellow")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::YELLOW, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Orange")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::ORANGE, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Magenta")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::MAGENTA, cameraPtr->m_frustumColor.w);
+			}
+			if (I3TGui::MenuItemWithLog(_t("Teal")))
+			{
+				cameraPtr->m_frustumColor = calculateFrustumColor(Color::TEAL, cameraPtr->m_frustumColor.w);
+			}
+			ImGui::EndMenu();
+		}
+		if (I3TGui::BeginMenuWithLog(_t("Frustum outline color")))
+		{
+			if (I3TGui::MenuItemWithLog(_t("Red")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::RED;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Blue")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::BLUE;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Green")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::GREEN;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Yellow")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::YELLOW;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Orange")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::ORANGE;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Magenta")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::MAGENTA;
+			}
+			if (I3TGui::MenuItemWithLog(_t("Teal")))
+			{
+				cameraPtr->m_frustumOutlineColor = Color::TEAL;
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenu();
+	}
+	ImGui::PopItemFlag();
+	ImGui::Separator();
+
+	CoreNode::drawMenuDuplicate(context);
+
+	ImGui::Separator();
+
+	Node::popupContent(context);
+}
+
+void Camera::popupContentTracking()
+{
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
+	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getCameraID() == this->getNodebase()->getId())
+	{
+		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
+		{
+			workspaceDiwne.stopTracking();
+		}
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		{
+			workspaceDiwne.trackingModeSwitch();
+		}
+	}
+	else
+	{
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
+		{
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
+			{
+				workspaceDiwne.startTracking(getView().get(), false);
+			}
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+			{
+				workspaceDiwne.startTracking(getView().get(), true);
+			}
+			ImGui::EndMenu();
+		}
 	}
 }

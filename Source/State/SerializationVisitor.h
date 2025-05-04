@@ -55,6 +55,7 @@ private:
 
 	void dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node);
 	void dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node);
+	void dumpCamera(rapidjson::Value& target, const Ptr<GuiCamera>& node);
 
 	void addData(rapidjson::Value& target, const char* key, const Core::Data& data);
 

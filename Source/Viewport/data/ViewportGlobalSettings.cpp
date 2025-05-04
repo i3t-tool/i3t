@@ -23,6 +23,7 @@ RTTR_REGISTRATION
 {
 	rttr::registration::class_<GlobalCameraSettings>("GlobalCameraSettings")
 	    .property("smoothScroll", &GlobalCameraSettings::smoothScroll)
+	    .property("smoothScrollDamping", &GlobalCameraSettings::smoothScrollDamping)
 	    .property("orbitCamera_zoomSpeed", &GlobalCameraSettings::orbit_zoomSpeed)
 	    .property("orbitCamera_rotateSpeed", &GlobalCameraSettings::orbit_rotateSpeed)
 	    .property("orbitCamera_translateSpeed", &GlobalCameraSettings::orbit_translateSpeed)
@@ -41,12 +42,7 @@ RTTR_REGISTRATION
 	    .property("highlightColor", &HighlightSettings::highlightColor);
 
 	rttr::registration::class_<GridSettings>("GridSettings")
-	    .property("color", &GridSettings::color)
-	    .property("axisXColor", &GridSettings::axisXColor)
-	    .property("axisYColor", &GridSettings::axisYColor)
-	    .property("axisZColor", &GridSettings::axisZColor)
 	    .property("size", &GridSettings::size)
-	    .property("strength", &GridSettings::strength)
 	    .property("lineWidth", &GridSettings::lineWidth)
 	    .property("grid1FadeStart", &GridSettings::grid1FadeStart)
 	    .property("grid1FadeEnd", &GridSettings::grid1FadeEnd)
@@ -61,7 +57,8 @@ RTTR_REGISTRATION
 	    .property("manipulator_size", &ViewportGlobalSettings::manipulator_size)
 	    .property("camera", &ViewportGlobalSettings::camera)
 	    .property("highlight", &ViewportGlobalSettings::highlight)
-	    .property("grid", &ViewportGlobalSettings::grid);
+	    .property("grid", &ViewportGlobalSettings::grid)
+	    .property("localGrid", &ViewportGlobalSettings::localGrid);
 
 	rttr::registration::enumeration<PhongShader::LightingModel>("LightingModel")(
 	    rttr::value("ORBIT", PhongShader::LightingModel::PHONG),
@@ -72,7 +69,8 @@ RTTR_REGISTRATION
 
 GlobalCameraSettings::GlobalCameraSettings()
 {
-	smoothScroll = false;
+	smoothScroll = true;
+	smoothScrollDamping = 0.85f;
 
 	orbit_zoomSpeed = 0.8f;
 	orbit_rotateSpeed = 0.29f;
@@ -85,9 +83,9 @@ GlobalCameraSettings::GlobalCameraSettings()
 
 HighlightSettings::HighlightSettings()
 {
-	downscaleFactor = 0.5f;
-	kernelSize = 2;
-	outlineCutoff = 0.2f;
+	downscaleFactor = 0.7f;
+	kernelSize = 3;
+	outlineCutoff = 0.3f;
 	useDepth = true;
 	useDepth_darkenFactor = 0.5f;
 	useDepth_desaturateFactor = 0.4f;
@@ -96,21 +94,29 @@ HighlightSettings::HighlightSettings()
 	highlightColor = glm::vec3(0.18, 0.784, 0.949);
 }
 
-GridSettings::GridSettings()
+GridSettings::GridSettings() : GridSettings(false) {}
+GridSettings::GridSettings(bool localGrid)
 {
-	color = glm::vec3(0.45, 0.49, 0.53);
-	axisXColor = glm::vec3(1.0, 0.49, 0.53);
-	axisYColor = glm::vec3(0.41, 0.96, 0.49);
-	axisZColor = glm::vec3(0.45, 0.49, 1.0);
+	if (!localGrid)
+	{
+		size = 1.0f;
+		lineWidth = 1.08f;
 
-	size = 1.0f;
-	strength = 0.5f;
-	lineWidth = 1.0f;
+		grid1FadeStart = 0.0f;
+		grid1FadeEnd = 0.21f;
+		grid2FadeStart = 0.0f;
+		grid2FadeEnd = 0.9f;
+	}
+	else
+	{
+		size = 1.0f;
+		lineWidth = 1.08f;
 
-	grid1FadeStart = 0.0f;
-	grid1FadeEnd = 0.23f;
-	grid2FadeStart = 0.0f;
-	grid2FadeEnd = 0.9f;
+		grid1FadeStart = 0.0f;
+		grid1FadeEnd = 0.21f;
+		grid2FadeStart = 0.0f;
+		grid2FadeEnd = 0.9f;
+	}
 }
 
 ViewportGlobalSettings::ViewportGlobalSettings()
@@ -121,7 +127,6 @@ ViewportGlobalSettings::ViewportGlobalSettings()
 
 	lighting_lightingModel = PhongShader::LightingModel::BLINN_PHONG;
 
-	//	manipulator_enabled = true;
 	manipulator_size = 0.14f;
 }
 

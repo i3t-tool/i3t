@@ -23,6 +23,7 @@
 #include "GUI/Workspace/Nodes/TransformationBase.h"
 #include "Logger/Logger.h"
 #include "Utils/JSON.h"
+#include "Viewport/entity/nodes/SceneCamera.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
 using namespace rapidjson;
@@ -79,6 +80,8 @@ void SerializationVisitor::visit(const Ptr<GuiCamera>& node)
 
 	rapidjson::Value camera(rapidjson::kObjectType);
 	dumpCommon(camera, node);
+
+	dumpCamera(camera, node);
 
 	rapidjson::Value sequences(kArrayType);
 	dumpSequence(sequences, node->getView());
@@ -193,10 +196,10 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 
 	model.AddMember("visible", mesh->m_visible, alloc);
 	model.AddMember("showAxes", mesh->m_showAxes, alloc);
-	model.AddMember("opaque", mesh->m_opaque, alloc);
-	model.AddMember("opacity", mesh->m_opacity, alloc);
-	JSON::addVector(model, "tint", mesh->m_tint, m_memento.GetAllocator());
-	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
+	model.AddMember("opaque", node->m_opaque, alloc);
+	model.AddMember("opacity", node->m_opacity, alloc);
+	JSON::addVector(model, "tint", node->m_tint, m_memento.GetAllocator());
+	model.AddMember("tintStrength", node->m_tintStrength, alloc);
 
 	models.PushBack(model, alloc);
 
@@ -317,6 +320,26 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 	JSON::addBool(transform, "locked", coreNode->isLocked(), m_memento.GetAllocator());
 
 	target.PushBack(transform, alloc);
+}
+
+void SerializationVisitor::dumpCamera(rapidjson::Value& target, const Ptr<GuiCamera>& node)
+{
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
+
+	auto& alloc = m_memento.GetAllocator();
+
+	auto cameraPtr = node->m_viewportCamera.lock();
+
+	target.AddMember("showCamera", cameraPtr->m_visible, alloc);
+
+	rapidjson::Value frustum;
+	frustum.SetObject();
+	frustum.AddMember("show", cameraPtr->m_showFrustum, alloc);
+	frustum.AddMember("fill", cameraPtr->m_fillFrustum, alloc);
+	JSON::addVector(frustum, "fillColor4", cameraPtr->m_frustumColor, alloc);
+	JSON::addVector(frustum, "outlineColor", cameraPtr->m_frustumOutlineColor, alloc);
+
+	target.AddMember("frustum", frustum, alloc);
 }
 
 //

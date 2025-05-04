@@ -5,6 +5,7 @@
 #include "State/StateManager.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNode.h"
+#include "Utils/JSON.h"
 
 #include "Viewport/Viewport.h"
 
@@ -30,7 +31,7 @@ WorkspaceModule::WorkspaceModule()
 	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback
-	I3T::getViewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
+	I3T::getViewport()->getMainScene()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
 		// Save information about this callback and perform actions based on it later while in workspace window context.
 		// This is a workaround due to viewport selection occurring in unknown order at unknown time.
 		g_editor->m_viewportSelectionChanged = true;

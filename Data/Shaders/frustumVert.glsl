@@ -22,6 +22,6 @@ void main()
 	gl_Position = projectionInverseMatrix * vec4(aPos, 1.0);
 	gl_Position /= gl_Position.w;
 
-	gl_Position = projectionMatrix * viewMatrix * gl_Position;
+	gl_Position = pvmMatrix * gl_Position;
 	Color = useSingleColor ? singleColor : aColor;
 }

@@ -25,11 +25,13 @@ bool DisplayOptions::shouldDraw(const Entity& entity) const
 	case DisplayType::Axes:
 		return showAxes;
 	case DisplayType::Grid:
-		return showGrid;
+		return showGrids;
 	case DisplayType::Camera:
 		return showCamera;
 	case DisplayType::Frustum:
 		return showFrustum;
+	case DisplayType::Tracking:
+		return showTracking;
 	default:
 		return true;
 	}

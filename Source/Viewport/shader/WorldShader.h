@@ -38,6 +38,11 @@ public:
 	GLint m_wboitNearId;
 	GLint m_wboitFarId;
 
+	// Flags
+	bool m_pvm{true};         ///< Whether to provide precalculated PVM matrix uniform
+	bool m_normal{true};      ///< Whether to provide normal matrix uniform
+	bool m_pvmSeparate{true}; ///< Whether to provide individual pvm matrices
+
 	explicit WorldShader(GLuint id);
 
 	void init(bool initSuperclass) override;

@@ -12,17 +12,17 @@
  */
 #pragma once
 
+#include "Viewport/data/ViewportSceneSettings.h"
 #include "Viewport/scene/Scene.h"
 
 namespace Vp
 {
 class SunLight;
+class GridObject;
 
 class MainScene : public Scene
 {
 protected:
-	std::shared_ptr<GameObject> m_gridObject;
-
 	SunLight* m_sun1;
 	SunLight* m_sun2;
 
@@ -32,15 +32,22 @@ protected:
 	float m_sun2_intensity;
 
 public:
+	/// Grid representing the world space standard basis
+	std::shared_ptr<GridObject> m_worldGrid;
+
+	/// Grid representing current local/reference space
+	std::shared_ptr<GridObject> m_localGrid;
+
+	bool m_lightFollowsCamera = true;
+
 	explicit MainScene(Viewport* viewport);
 
 	void init() override;
 	void update(double dt) override;
-	void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
-	          const DisplayOptions& displayOptions) override;
-	void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions) override;
 
-	void loadSettings(ViewportSettings& stg, bool scene, bool global) override;
-	void saveSettings(ViewportSettings& stg, bool scene, bool global) override;
+	using Scene::draw;
+
+	void draw(int width, int height, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	          SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions) override;
 };
 } // namespace Vp

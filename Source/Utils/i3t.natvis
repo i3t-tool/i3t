@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--A natvis file to ease DIWNE debugging in VS/CLion-->
+<!--https://learn.microsoft.com/en-us/visualstudio/debugger/create-custom-views-of-native-objects?view=vs-2022-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="Core::Node">
+        <DisplayString Condition="m_owner == nullptr">Core::Node {m_id,d} (no parent)</DisplayString>
+        <DisplayString Condition="m_owner != nullptr">Core::Node {m_id,d} ({m_owner->m_id,d})</DisplayString>
+    </Type>
+    <Type Name="Core::TransformChain::TransformChainIterator">
+        <DisplayString>TransformChainIterator {(m_info.isExternal)?"EXTERNAL":"",sb} {m_info.currentNode}</DisplayString>
+    </Type>
+</AutoVisualizer>

@@ -563,10 +563,10 @@ private:
 		m_stream << fmt::format("node_{}:set_model(\"{}\")\n", node->getId(), model->getModel());
 		m_stream << fmt::format("node_{}:set_visible({})\n", node->getId(), model->m_visible);
 		m_stream << fmt::format("node_{}:show_axes({})\n", node->getId(), model->m_showAxes);
-		m_stream << fmt::format("node_{}:set_opaque({})\n", node->getId(), model->m_opaque);
-		m_stream << fmt::format("node_{}:set_opacity({})\n", node->getId(), model->m_opacity);
-		m_stream << fmt::format("node_{}:set_tint({})\n", node->getId(), LuaSerializer::toConstructor(model->m_tint));
-		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), model->m_tintStrength);
+		m_stream << fmt::format("node_{}:set_opaque({})\n", node->getId(), node->m_opaque);
+		m_stream << fmt::format("node_{}:set_opacity({})\n", node->getId(), node->m_opacity);
+		m_stream << fmt::format("node_{}:set_tint({})\n", node->getId(), LuaSerializer::toConstructor(node->m_tint));
+		m_stream << fmt::format("node_{}:set_tint_strength({})\n", node->getId(), node->m_tintStrength);
 	}
 
 	void visit(const Ptr<Workspace::ScriptingNode>& node) override
@@ -813,16 +813,16 @@ LUA_REGISTRATION
 			self.m_viewportModel.lock()->m_showAxes = value;
 		},
 		"set_opaque", [](GuiModel& self, bool value) {
-			self.m_viewportModel.lock()->m_opaque = value;
+			self.m_opaque = value;
 		},
 		"set_opacity", [](GuiModel& self, float value) {
-			self.m_viewportModel.lock()->m_opacity = value;
+			self.m_opacity = value;
 		},
 		"set_tint", [](GuiModel& self, const glm::vec3& value) {
-			self.m_viewportModel.lock()->m_tint = value;
+			self.m_tint = value;
 		},
 		"set_tint_strength", [](GuiModel& self, float value) {
-			self.m_viewportModel.lock()->m_tintStrength = value;
+			self.m_tintStrength = value;
 		}
 	);
 

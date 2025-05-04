@@ -682,12 +682,12 @@ void DiwneObject::updateRectFromImGuiItem()
 
 void DiwneObject::setInitialPositionDiwne()
 {
-	// For everything but the nodes, we update m_rect so that its at cursor pos
-	// This causes m_rects to shift a little based on viewport (THIS is potentially a huge issue for multi-viewport)
+	// By default the rect's of DiwneObjects are fixed to the ImGui cursor position.
+	// NOTE: This causes m_rects to shift a little based on the view/zoom, as the cursor position is sometimes rounded.
 	// But nodes should always stay fixed at their position, their position is persistant and hence cannot be modified
 	// by ImGui layout drift
+	// Links have their position entirely determined by the connection points so this doesn't apply either.
 
-	// DiwneObjects are supposed to be drawn at the current ImGui cursor pos
 	const ImVec2 offset = diwne.canvas().screen2diwne(ImGui::GetCursorScreenPos()) - m_rect.Min;
 	translate(offset); // Move m_rect using the translate method so that derived classes can react accordingly
 }

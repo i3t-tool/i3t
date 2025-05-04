@@ -71,7 +71,10 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 	}
 	else
 	{
-		return glm::perspective(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
+		if (rightHanded)
+			return glm::perspectiveRH(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
+		else
+			return glm::perspectiveLH(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
 	}
 }
 
@@ -150,7 +153,13 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 		{
 			continue;
 		}
-		Ptr<SceneModel> model = modelNode.m_viewportModel.lock();
+		Ptr<SceneModel> model;
+		// Center on the tracked model mesh instead of the "real" model mesh when tracking
+		if (!modelNode.m_trackedModel.expired())
+			model = modelNode.m_trackedModel.lock();
+		else
+			model = modelNode.m_viewportModel.lock();
+
 		DisplayType type = model->getDisplayType();
 		if (type != DisplayType::Default && type != DisplayType::Camera)
 		{

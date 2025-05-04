@@ -18,6 +18,7 @@
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h" // TODO: (DR) Why is this include here? Some dependency spaghetti?
 #include "GUI/Test/TestModule.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Localization/Localization.h"
 #include "Scripting/ScriptingModule.h"
@@ -62,9 +63,7 @@ void I3TApplication::onInit()
 	ResourceManager* resourceManager = createModule<Core::ResourceManager>();
 	App::getModule<StateManager>().addOriginator(resourceManager);
 
-	Vp::Viewport* viewport = createModule<Vp::Viewport>();
-	App::getModule<StateManager>().addOriginator(viewport);
-
+	createModule<ViewportModule>();
 	createModule<ScriptingModule>();
 	createModule<WorkspaceModule>();
 	UIModule* uiModule = createModule<UIModule>();
@@ -72,6 +71,12 @@ void I3TApplication::onInit()
 
 	stateManager->loadGlobal();
 	stateManager->newScene(true);
+
+	// Clear the window with a dark color to prevent a bright white window popping up
+	glClearColor(0.135f, 0.135f, 0.135f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glfwSwapBuffers(m_window->get());
+
 	// Show the window immediately after loading global config
 	// (Predominantly after loading window positions in Application loadGlobal)
 	m_window->show();
@@ -179,7 +184,11 @@ UIModule* getUI()
 }
 Vp::Viewport* getViewport()
 {
-	return &App::get().getModule<Vp::Viewport>();
+	return &App::get().getModule<ViewportModule>().getViewport();
+}
+ViewportModule& getViewportModule()
+{
+	return App::get().getModule<ViewportModule>();
 }
 Core::ResourceManager& getResourceManager()
 {

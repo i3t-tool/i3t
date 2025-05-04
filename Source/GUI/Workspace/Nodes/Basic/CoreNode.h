@@ -30,7 +30,7 @@ class CoreNode : public Node, public IVisitable
 
 protected:
 	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
-	float m_dataItemsWidth;
+	float m_dataItemsWidth{32.f};
 	bool m_updateDataItemsWidth{true};
 	// float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
 	bool m_drawContextMenuButton = false;
@@ -55,14 +55,18 @@ public:
 	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
 
+	// TODO: (DR) Shouldn't this return a reference?
 	/// Returns the managed I3T Core node
 	Ptr<Core::Node> getNodebase() const;
-	const std::string& getKeyword() const;
+	const std::string& getKeyword() const; ///< Returns the string identifier of the core node type
 
-	// Lifecycle
+	// Lifecycle / Interaction
 	// =============================================================================================================
 	void begin(DIWNE::DrawInfo& context) override;
 	void topContent(DIWNE::DrawInfo& context) override;
+	void endDiwne(DIWNE::DrawInfo& context) override;
+
+	bool allowDrawing() override;
 
 	void popupContent(DIWNE::DrawInfo& context) override;
 
@@ -82,14 +86,22 @@ public:
 	FloatPopupMode& getFloatPopupMode();
 	void setFloatPopupMode(FloatPopupMode mode);
 
-	virtual int maxLengthOfData() = 0;
-
+	/// Returns the desired width of data items (ImGui number fields)
 	float getDataItemsWidth();
-
+	/// This call requests the data items width to be recalculated on the next draw of ths node.
 	void queueUpdateDataItemsWidth();
 
 protected:
+	/// Calculates the final desired pixel width of data items (floats inside vectors, matrices etc.).
+	/// Calls maxLengthOfData() internally. Despite this method not being particularly time intensive it is NOT called
+	/// every frame. A call to this method can be queued for the next frame via queueUpdateDataItemsWidth()
+	/// @see maxLengthOfData(), queueUpdateDataItemsWidth()
+	/// @note Could it be called every frame? I don't know, someone profile it please -><-.
 	virtual float updateDataItemsWidth();
+
+	/// Calculates the largest number of characters/decimal places a data item has in this node.
+	/// This call will often be delegated to the pins of the node.
+	virtual int maxLengthOfData() = 0;
 
 public:
 	// Level of detail
@@ -112,8 +124,13 @@ public:
 	void duplicate(DIWNE::DrawInfo& context, bool multiDuplication);
 	void onReleased(bool justReleased, DIWNE::DrawInfo& context) override;
 
+	// Tracking
 	// =============================================================================================================
+public:
+	void drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay) const;
+	void drawTrackingBorder(bool active, bool interpolating, float progress) const;
 
+	// =============================================================================================================
 private:
 	void drawLODButton(DIWNE::DrawInfo& context, LevelOfDetail detail, ImDrawFlags cornerFlags);
 	const char* getButtonSymbolFromLOD(LevelOfDetail detail);

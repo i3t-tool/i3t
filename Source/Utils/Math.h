@@ -247,6 +247,9 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float eps
 	return true;
 }
 
+// bool compare(const glm::mat4& lhs, const glm::mat4& rhs, float epsilon = 0.001f);
+bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor = Math::FACTOR_SIMILAR);
+
 template <typename T>
 bool isNormalized(const T& val)
 {
@@ -308,6 +311,8 @@ static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
  * \return linear interpolation of two matrices vectors [wrong for useQuat == false!]
  */
 glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false);
+
+glm::mat4 flipAxis(const glm::mat4& mat, int axisIndex);
 
 /**
  * \brief Fifth order interpolation

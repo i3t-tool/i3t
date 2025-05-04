@@ -38,10 +38,15 @@ void Link::initializeDiwne(DrawInfo& context)
 	m_previewPlugged = false;
 }
 
+void Link::setInitialPositionDiwne()
+{
+	// no-op, position is entirely determined by the connection points
+}
+
 void Link::end(DrawInfo& context)
 {
 	DIWNE_DEBUG_OBJECTS((diwne), {
-		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Min.y);
+		ImVec2 originPos = ImVec2(getRect().Min.x, getRect().Max.y);
 		ImGui::GetForegroundDrawList()->AddText(diwne.canvas().diwne2screen(originPos) + ImVec2(0, 0),
 		                                        m_destroy ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE,
 		                                        (std::string() + m_labelDiwne +
@@ -80,6 +85,7 @@ void Link::onHover(DrawInfo& context)
 void Link::content(DrawInfo& context)
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
+
 	if (m_selected)
 	{
 		diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
@@ -97,7 +103,7 @@ void Link::content(DrawInfo& context)
 	}
 
 	diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne,
-	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH));
+	                                   m_color, diwne.style().decimal(Style::LINK_WIDTH) + m_widthOffset);
 	DIWNE_DEBUG_GENERAL(diwne, {
 		diwne.canvas().AddLine(m_startDiwne, m_controlPointStartDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);
 		diwne.canvas().AddLine(m_controlPointStartDiwne, m_controlPointEndDiwne, ImVec4(1.f, 1.f, 1.f, 1.f), true);

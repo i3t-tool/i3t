@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include "rttr/registration.h"
+
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "Fonts/FontManager.h"
@@ -24,6 +26,12 @@
 
 class MainMenuBar;
 
+struct UISettings
+{
+	bool useWindowMenuButtons{false};
+	bool autoHideTabBars{false};
+};
+
 class UIModule final : public Module, public IStateful
 {
 	friend class Application;
@@ -31,6 +39,7 @@ class UIModule final : public Module, public IStateful
 public:
 	UIModule() = default;
 	~UIModule() override;
+
 
 private:
 	void onInit() override;
@@ -40,6 +49,7 @@ private:
 	static float getMainWindowDpiScaleFactor();
 
 public:
+	UISettings& getSettings();
 	Theme& getTheme()
 	{
 		auto* curr = m_currentTheme;
@@ -104,6 +114,8 @@ public:
 
 private:
 	void buildDockspace();
+
+	UISettings m_settings;
 
 	float m_uiScale;
 	float m_queuedUiScale = -1.0f;

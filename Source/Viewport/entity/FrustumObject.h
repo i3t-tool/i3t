@@ -20,13 +20,16 @@ class FrustumShader;
 
 class FrustumObject : public ColoredObject
 {
+	using Super = ColoredObject;
+
 public:
-	glm::mat4 m_frustumProjectionMatrix{1};
-	glm::mat4 m_frustumViewMatrix{1};
+	glm::mat4 m_frustumProjectionViewMatrixInv{1.f};
+	glm::mat4 m_frustumViewMatrixInv{1.f};
 
 	FrustumObject(Core::Mesh* mesh, FrustumShader* shader);
 
-	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
-	void update(Scene& scene) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
+	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	            const RenderContext& context) override;
 };
 } // namespace Vp

@@ -30,6 +30,11 @@ class Shader
 public:
 	GLuint m_id;
 
+	std::string m_vertSource;
+	std::string m_fragSource;
+	std::string m_geoSource;
+	std::string m_injectedSource;
+
 	/**
 	 * Whether to use weighted blended transparency for output if supported
 	 * \see supportsWboit()
@@ -62,6 +67,7 @@ public:
 
 	void bindTexture2D(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
 	void bindTexture2DMS(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
+	void bindTexture2DArray(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
 
 	bool hasUniform(GLint location);
 

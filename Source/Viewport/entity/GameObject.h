@@ -40,7 +40,12 @@ public:
 
 	GameObject(Core::Mesh* mesh, ObjectShader* shader);
 
-	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
+
+	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	            const RenderContext& context) override;
+	using Entity::render;
+
 	void update(Scene& scene) override;
 	void dispose() override;
 };

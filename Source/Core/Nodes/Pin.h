@@ -131,17 +131,15 @@ private:
 	bool m_isRendered = true; //< Render this pin. False in Camera P and V matrices ONLY.
 
 	/**
-	 * The box can have a single parent. Therefore, just a single input component
-	 * (a single connected wire) to output tab of the parent node).
-	 *
+	 * Corresponding output pin this pin is connected to.
+	 * An input pin can only be connected to one output pin.
 	 * \note Valid only for input pins.
 	 */
 	Pin* m_input = nullptr;
 
 	/**
-	 * Child boxes in the scene graph (coming out to the right).
-	 * A pointer to input pins of boxes connected to this box output.
-	 *
+	 * Child nodes in the scene graph (coming out to the right).
+	 * A pointer to input pins of nodes connected to this node's output pin.
 	 * \note Valid only for output pins.
 	 */
 	std::vector<Pin*> m_outputs;

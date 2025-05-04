@@ -27,7 +27,6 @@ namespace Workspace
 {
 class Model : public CoreNodeWithPins
 {
-private:
 	// Render texture size in font units
 	ImVec2 m_textureSize = {5.25f, 6.25f};
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
@@ -35,27 +34,31 @@ private:
 
 public:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;
+	std::weak_ptr<Vp::SceneModel> m_trackedModel;
+
+	// Model properties
+	float m_opacity{1.0f};
+	bool m_opaque{true};
+	glm::vec3 m_tint{1.0f};
+	float m_tintStrength{.5f};
 
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.
+
+	Model(DIWNE::NodeEditor& diwne);
+	~Model() override;
 
 	WPtr<Vp::SceneModel> viewportModel() const
 	{
 		return m_viewportModel;
 	}
 
-	Model(DIWNE::NodeEditor& diwne);
-	~Model();
-
-	// Double dispatch
-	void accept(NodeVisitor& visitor) override
-	{
-		visitor.visit(std::static_pointer_cast<Model>(shared_from_this()));
-	}
+	void initialize(DIWNE::DrawInfo& context) override;
+	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	void afterDraw(DIWNE::DrawInfo& context) override;
 
 	// bool drawDataFull(, int index);
-	int maxLengthOfData() override;                        // todo
-	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	int maxLengthOfData() override; // todo
 
 	void drawInputPins(DIWNE::DrawInfo& context) override;
 
@@ -67,21 +70,13 @@ public:
 	/// Overridden for viewport model selection highlight.
 	void onSelection(bool selected) override;
 
+	// Double dispatch
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<Model>(shared_from_this()));
+	}
+
 private:
-	void init();
 	glm::vec3 calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model);
-};
-
-class ModelProxy : public Core::IModelProxy
-{
-public:
-	ModelProxy(Ptr<Model> model);
-	~ModelProxy() override;
-
-	void update(const glm::mat4& transform) override;
-	Ptr<Core::Model> getModel() override;
-
-private:
-	Ptr<Model> m_model;
 };
 } // namespace Workspace

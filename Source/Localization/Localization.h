@@ -46,8 +46,32 @@
 /**
  * \def ICON_T(icon, key)
  * Macro for concatenating an icon with a translated string.
+ * \return const char*
  */
 #define ICON_T(icon, key) (std::string(icon) + _ts(key)).c_str()
+
+/**
+ * \def ICON_TS(icon, key)
+ * Macro for concatenating an icon with a translated string.
+ * \return std::string
+ */
+#define ICON_TS(icon, key) (std::string(icon) + _ts(key))
+
+/**
+ * \def ICON_TBD(icon, key)
+ * Macro for concatenating an icon with a net yet translated string.
+ * \return const char*
+ * \see _tbd(key)
+ */
+#define ICON_TBD(icon, key) (std::string(icon) + _tbd(key)).c_str()
+
+/**
+ * \def ICON_TBD(icon, key)
+ * Macro for concatenating an icon with a net yet translated string.
+ * \return std::string
+ * \see _tbd(key)
+ */
+#define ICON_TBDS(icon, key) (std::string(icon) + _tbd(key))
 
 /**
  * \struct AppLanguage

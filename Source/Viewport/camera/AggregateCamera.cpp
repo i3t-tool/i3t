@@ -12,6 +12,8 @@
  */
 #include "AggregateCamera.h"
 
+#include "Viewport/data/ViewportGlobalSettings.h"
+
 using namespace Vp;
 
 #include <cmath>
@@ -20,13 +22,14 @@ using namespace Vp;
 
 #include "Logger/Logger.h"
 #include "Utils/Math.h"
+#include "Viewport/data/ViewportSceneSettings.h"
 
 AggregateCamera::AggregateCamera()
 {
 	m_orbitCamera = std::make_shared<OrbitCamera>();
 	m_trackballCamera = std::make_shared<TrackballCamera>();
 
-	switchMode(CameraMode::TRACKBALL);
+	switchMode(CameraMode::ORBIT);
 }
 
 void AggregateCamera::switchMode(CameraMode newMode)
@@ -216,4 +219,101 @@ glm::vec3 AggregateCamera::getUp() const
 glm::vec3 AggregateCamera::getRight() const
 {
 	return m_activeCamera->getRight();
+}
+
+void AggregateCamera::loadSettings(CameraSettings& stg)
+{
+	switchMode(stg.mode);
+
+	getOrbitCamera()->setRotationX(stg.orbitCameraRotationX);
+	getOrbitCamera()->setRotationY(stg.orbitCameraRotationY);
+	getTrackballCamera()->setRotation(stg.trackballCameraRotation);
+
+	getOrbitCamera()->setRadius(stg.iorbitCameraRadius);
+	getTrackballCamera()->setRadius(stg.iorbitCameraRadius);
+
+	getOrbitCamera()->setPivot(stg.iorbitCameraPivot);
+	getTrackballCamera()->setPivot(stg.iorbitCameraPivot);
+
+	getOrbitCamera()->setFov(stg.fov);
+	getTrackballCamera()->setFov(stg.fov);
+
+	getOrbitCamera()->setZNear(stg.zNear);
+	getTrackballCamera()->setZNear(stg.zNear);
+
+	getOrbitCamera()->setZFar(stg.zFar);
+	getTrackballCamera()->setZFar(stg.zFar);
+}
+
+void AggregateCamera::saveSettings(CameraSettings& stg)
+{
+	stg.mode = getMode();
+
+	switch (getMode())
+	{
+	case AggregateCamera::CameraMode::ORBIT:
+		stg.orbitCameraRotationX = getOrbitCamera()->getRotationX();
+		stg.orbitCameraRotationY = getOrbitCamera()->getRotationY();
+
+		stg.iorbitCameraRadius = getOrbitCamera()->getRadius();
+		stg.iorbitCameraPivot = getOrbitCamera()->getPivot();
+
+		stg.fov = getOrbitCamera()->getFov();
+		stg.zNear = getOrbitCamera()->getZNear();
+		stg.zFar = getOrbitCamera()->getZFar();
+
+		break;
+	case AggregateCamera::CameraMode::TRACKBALL:
+		stg.trackballCameraRotation = getTrackballCamera()->getRotation();
+
+		stg.iorbitCameraRadius = getTrackballCamera()->getRadius();
+		stg.iorbitCameraPivot = getTrackballCamera()->getPivot();
+
+		stg.fov = getTrackballCamera()->getFov();
+		stg.zNear = getTrackballCamera()->getZNear();
+		stg.zFar = getTrackballCamera()->getZFar();
+
+		break;
+	default:
+		break;
+	}
+}
+
+void AggregateCamera::loadSettings(GlobalCameraSettings& stg)
+{
+	getOrbitCamera()->setSmoothScroll(stg.smoothScroll);
+	getTrackballCamera()->setSmoothScroll(stg.smoothScroll);
+	getOrbitCamera()->setSmoothScrollDamping(stg.smoothScrollDamping);
+	getTrackballCamera()->setSmoothScrollDamping(stg.smoothScrollDamping);
+
+	getOrbitCamera()->setRotateSpeed(stg.orbit_rotateSpeed);
+	getOrbitCamera()->setTranslateSpeed(stg.orbit_translateSpeed);
+	getOrbitCamera()->setZoomSpeed(stg.orbit_zoomSpeed);
+
+	getTrackballCamera()->setRotateSpeed(stg.trackball_rotateSpeed);
+	getTrackballCamera()->setTranslateSpeed(stg.trackball_translateSpeed);
+	getTrackballCamera()->setZoomSpeed(stg.trackball_zoomSpeed);
+}
+
+void AggregateCamera::saveSettings(GlobalCameraSettings& stg)
+{
+	switch (getMode())
+	{
+	case AggregateCamera::CameraMode::ORBIT:
+		stg.smoothScroll = getOrbitCamera()->getSmoothScroll();
+		stg.smoothScrollDamping = getOrbitCamera()->getSmoothScrollDamping();
+		stg.orbit_rotateSpeed = getOrbitCamera()->getRotateSpeed();
+		stg.orbit_translateSpeed = getOrbitCamera()->getTranslateSpeed();
+		stg.orbit_zoomSpeed = getOrbitCamera()->getZoomSpeed();
+		break;
+	case AggregateCamera::CameraMode::TRACKBALL:
+		stg.smoothScroll = getTrackballCamera()->getSmoothScroll();
+		stg.smoothScrollDamping = getTrackballCamera()->getSmoothScrollDamping();
+		stg.trackball_rotateSpeed = getTrackballCamera()->getRotateSpeed();
+		stg.trackball_translateSpeed = getTrackballCamera()->getTranslateSpeed();
+		stg.trackball_zoomSpeed = getTrackballCamera()->getZoomSpeed();
+		break;
+	default:
+		break;
+	}
 }

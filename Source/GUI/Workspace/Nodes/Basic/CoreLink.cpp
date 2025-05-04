@@ -16,6 +16,8 @@
 
 #include "CorePins.h"
 #include "GUI/I3TGui.h"
+#include "GUI/Workspace/Nodes/Model.h"
+#include "GUI/Workspace/WorkspaceDiwne.h"
 
 using namespace Workspace;
 
@@ -93,9 +95,11 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 	ImVec4 color;
 	bool unplugged = !this->isPlugged() && !m_previewPlugged;
 	DIWNE::Pin* pin = getAnyPin();
+	m_coreType = Core::EValueType::Pulse;
 	if (pin)
 	{
-		color = I3T::getTheme().get(PinColorBackground[static_cast<CorePin*>(pin)->getType()]);
+		m_coreType = static_cast<CorePin*>(pin)->getType();
+		color = I3T::getTheme().get(PinColorBackground[m_coreType]);
 		if (unplugged)
 			color.w = style().decimal(DIWNE::Style::LINK_UNPLUGGED_ALPHA);
 	}
@@ -109,6 +113,63 @@ void CoreLink::initialize(DIWNE::DrawInfo& context)
 	{
 		m_color = m_color + I3T::getColor(EColor::Links_selected_colorShift);
 	}
+}
+
+void CoreLink::content(DIWNE::DrawInfo& context)
+{
+	ImDrawList* idl = ImGui::GetWindowDrawList();
+
+	// Tracking border
+	m_widthOffset = 0.f;
+	if (static_cast<WorkspaceDiwne&>(diwne).isTracking() && m_coreType == Core::EValueType::MatrixMul)
+	{
+		ImVec4 trackingBorderColor;
+		Core::TrackedNodeData* startTrackingData = nullptr;
+		Core::TrackedNodeData* endTrackingData = nullptr;
+		if (auto* startPin = getStartPin())
+		{
+			if (auto* node = startPin->getNode())
+			{
+				if (auto* t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
+				{
+					startTrackingData = t;
+				}
+			}
+		}
+		if (auto* endPin = getEndPin())
+		{
+			if (auto* node = endPin->getNode())
+			{
+				if (auto* t = static_cast<CoreNode*>(node)->getNodebase()->getTrackingData())
+				{
+					endTrackingData = t;
+				}
+			}
+		}
+		if (this->isPlugged())
+		{
+			if (startTrackingData && endTrackingData)
+			{
+				if (startTrackingData->chain && endTrackingData->chain)
+				{
+					if (startTrackingData->active && endTrackingData->active)
+						trackingBorderColor = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+					else
+						trackingBorderColor = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
+				}
+				if ((startTrackingData->modelSubtree || startTrackingData->chain) && endTrackingData->modelSubtree)
+					trackingBorderColor = I3T::getColor(EColor::Nodes_Tracking_ColorInactive);
+			}
+		}
+		if (trackingBorderColor.w > 0)
+		{
+			float trackingLinkWidth = I3T::getSize(ESize::Nodes_Tracking_LinkWidth);
+			diwne.canvas().AddBezierCurveDiwne(idl, m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne,
+			                                   m_endDiwne, trackingBorderColor, trackingLinkWidth);
+			m_widthOffset = -style().decimal(DIWNE::Style::LINK_WIDTH) * 0.3f;
+		}
+	}
+	Link::content(context);
 }
 
 bool CoreLink::allowSelectOnClick(const DIWNE::DrawInfo& context) const

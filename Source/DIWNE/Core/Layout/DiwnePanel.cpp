@@ -218,7 +218,7 @@ bool DiwnePanel::spring(float relSize, bool horizontal)
 	{
 		DIWNE_LOG_DEBUG(std::string("[DiwnePanel] Submitted ") + (horizontal ? "horizontal" : "vertical") +
 		                " spring size doesn't correspond to the created ImGui item!\n" +
-		                "Spring size: " + std::to_string(springSizeF) + "\nReal size: " + std::to_string(diffF))
+		                "Spring size: " + std::to_string(springSizeF) + "\nReal size: " + std::to_string(diffF));
 	}
 	assert(test);
 #endif

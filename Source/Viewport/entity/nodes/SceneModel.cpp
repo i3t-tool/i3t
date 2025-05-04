@@ -25,6 +25,7 @@
 #include "Viewport/scene/Scene.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/PhongShader.h"
+#include "Viewport/shader/Shaders.h"
 
 using namespace Vp;
 
@@ -59,7 +60,8 @@ std::string SceneModel::getModel()
 	return m_modelAlias;
 }
 
-void SceneModel::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
+void SceneModel::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                        const RenderContext& context)
 {
 	// Ensure the model we're using hasn't been removed from the scene
 	if (!RMI.resourceExists(this->m_mesh->m_resourceId))
@@ -68,16 +70,20 @@ void SceneModel::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bo
 		m_mesh = RMI.meshByAlias("Cube");
 	}
 
-	TexturedObject::render(shader, view, projection, silhouette);
+	TexturedObject::render(model, view, projection, context);
 }
 
 
 void SceneModel::update(Scene& scene)
 {
 	TexturedObject::update(scene);
+
+	this->m_modMatrix = glm::scale(glm::mat4(1.f), glm::vec3(m_scale));
+
 	auto axesPtr = m_axes.lock();
 	axesPtr->m_visible = m_showAxes;
-	axesPtr->m_modelMatrix = this->m_modelMatrix * glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+	axesPtr->m_modMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+	axesPtr->m_modelMatrix = this->m_modelMatrix;
 
 #if SHOW_BOUNDING_BOX
 	auto boundingBoxPtr = m_boundingBox.lock();
@@ -89,13 +95,12 @@ void SceneModel::update(Scene& scene)
 void SceneModel::onSceneAdd(Scene& scene)
 {
 	TexturedObject::onSceneAdd(scene);
-	auto axes =
-	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::xyzAxes), Shaders::instance().m_colorShader.get());
+	auto axes = std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::xyzAxes), SHADERS.getShaderPtr<ColorShader>());
 	axes->setDisplayType(DisplayType::Axes);
 	m_axes = scene.addEntity(axes);
 
 #if SHOW_BOUNDING_BOX
-	auto boundingBox = std::make_shared<ColoredObject>(nullptr, Shaders::instance().m_colorShader.get());
+	auto boundingBox = std::make_shared<ColoredObject>(nullptr, SHADERS.getShaderPtr<ColorShader>());
 	boundingBox->setDisplayType(DisplayType::Axes);
 	m_boundingBox = scene.addEntity(boundingBox);
 	updateBoundingBox();

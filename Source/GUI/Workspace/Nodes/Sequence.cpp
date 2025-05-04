@@ -12,7 +12,12 @@
  */
 #include "Sequence.h"
 
+#include "GUI/Elements/Windows/ViewportWindow.h"
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
+#include "GUI/Toolkit.h"
+#include "GUI/Viewport/ViewportModule.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "TransformationBase.h"
@@ -65,7 +70,7 @@ std::optional<Ptr<CoreNode>> Sequence::getTransform(int index) const
 bool Sequence::allowDrawing()
 {
 	// TODO: Why do we care if we're a Camera sequence? What's the reason?
-	return m_isCameraSequence || Super::allowDrawing();
+	return isCameraSequence() || Super::allowDrawing();
 }
 
 void Sequence::begin(DIWNE::DrawInfo& context)
@@ -151,7 +156,7 @@ int Sequence::maxLengthOfData()
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
 		/*\todo JM HM better selection (index) of data*/
-		return DataRenderer::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
+		return GUI::maxLengthOfData4x4(m_nodebase->data(0).getMat4(), m_numberOfVisibleDecimal);
 	}
 	return 0;
 }
@@ -227,6 +232,8 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	popupContentTracking();
 
+	popupContentReferenceSpace();
+
 	ImGui::Separator();
 
 	drawMenuSetPrecision();
@@ -243,12 +250,11 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 void Sequence::popupContentTracking()
 {
 	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-	if (Core::GraphManager::isTrackingEnabled() &&
-	    workspaceDiwne.tracking->getSequence()->getId() == this->getNodebase()->getId())
+	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getSequenceID() == this->getNodebase()->getId())
 	{
 		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
 		{
-			workspaceDiwne.trackingSwitchOff();
+			workspaceDiwne.stopTracking();
 		}
 		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
 		{
@@ -257,26 +263,71 @@ void Sequence::popupContentTracking()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(_t("Tracking")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
 		{
-			if (I3TGui::MenuItemWithLog(_t("Start tracking from right"), ""))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
 			{
-				if (Core::GraphManager::isTrackingEnabled())
-				{
-					workspaceDiwne.trackingSwitchOff();
-				}
-
-				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), true);
+				workspaceDiwne.startTracking(this, false);
 			}
-			if (I3TGui::MenuItemWithLog(_t("Start tracking from left"), ""))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
 			{
-				if (Core::GraphManager::isTrackingEnabled())
-				{
-					workspaceDiwne.trackingSwitchOff();
-				}
-
-				workspaceDiwne.trackingSwitchOn(std::static_pointer_cast<Sequence>(shared_from_this()), false);
+				workspaceDiwne.startTracking(this, true);
 			}
+			ImGui::EndMenu();
+		}
+	}
+}
+
+void Sequence::popupContentReferenceSpace()
+{
+	auto& viewportModule = I3T::getViewportModule();
+	if (viewportModule.getWindowCount() == 1)
+	{
+		auto viewportWindow = viewportModule.getWindow(0);
+		if (!viewportWindow->m_space.customSource)
+		{
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Set as reference space")))
+			{
+				viewportWindow->m_space.customSource = true;
+				viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+			}
+		}
+		else
+		{
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
+			{
+				viewportWindow->m_space.customSource = false;
+				viewportWindow->m_space.sourceNode.reset();
+			}
+		}
+	}
+	else
+	{
+		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Reference space")))
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+			ImGui::TextDisabled(_tbd("Set as / Reset reference space in window"));
+			for (int i = 0; i < viewportModule.getWindowCount(); i++)
+			{
+				auto viewportWindow = viewportModule.getWindow(i);
+				if (!viewportWindow->m_space.customSource)
+				{
+					if (I3TGui::MenuItemWithLog(viewportWindow->getTitle().c_str()))
+					{
+						viewportWindow->m_space.customSource = true;
+						viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+					}
+				}
+				else
+				{
+					if (I3TGui::MenuItemWithLog((_ts("Reset ") + _ts(viewportWindow->getTitle())).c_str()))
+					{
+						viewportWindow->m_space.customSource = false;
+						viewportWindow->m_space.sourceNode.reset();
+					}
+				}
+			}
+			ImGui::PopItemFlag();
 			ImGui::EndMenu();
 		}
 	}
@@ -290,7 +341,24 @@ void Sequence::drawMenuLevelOfDetail()
 
 void Sequence::afterDraw(DIWNE::DrawInfo& context)
 {
+	auto* coreSeq = this->getNodebase()->asRaw<Core::Sequence>();
+	const Core::TrackedNodeData* t = coreSeq->getTrackingData();
+	if (t)
+	{
+		if (t->isSequenceTransform() || t->getChildCount() == 0)
+		{
+			const ImRect& center = m_center.getRect();
+			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);
+			// dropZoneMargin += {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
+			drawTrackingCursor(ImRect(center.Min + dropZoneMargin, center.Max - dropZoneMargin), t,
+			                   coreSeq->getMatrices().size() != 0);
+		}
+		if (t->chain || t->modelSubtree)
+			drawTrackingBorder(t->active, t->interpolating, t->progress);
+	}
+
 	Super::afterDraw(context);
+
 	DIWNE_DEBUG_OBJECTS((diwne), {
 		ImRect rect = getRect();
 		ImVec2 originPos = ImVec2(rect.Min.x, rect.Min.y);
@@ -305,6 +373,11 @@ void Sequence::onDestroy(bool logEvent)
 {
 	m_dropZone->destroy(logEvent);
 	Super::onDestroy(logEvent);
+}
+
+bool Sequence::isCameraSequence() const
+{
+	return m_isCameraSequence;
 }
 
 Sequence::SequenceDropZone::SequenceDropZone(DIWNE::NodeEditor& diwne, Sequence* sequence)

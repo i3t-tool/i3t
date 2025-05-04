@@ -39,6 +39,13 @@ inline std::size_t hash_range(It first, It last)
 	return seed;
 }
 
+inline size_t hash_string(const std::string& a, const std::string& b, const std::string& c, const std::string& d)
+{
+	std::string input[] = {a, b, c, d};
+	std::sort(input, input + (sizeof(input) / sizeof(*input)));
+	return hash_range(input, input + (sizeof(input) / sizeof(*input)));
+}
+
 inline size_t hash_string(const std::string& a, const std::string& b, const std::string& c)
 {
 	std::string input[] = {a, b, c};

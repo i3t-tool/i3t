@@ -17,10 +17,12 @@
 namespace Vp
 {
 /**
- * Shader for the infinite grid
+ * Shader for the infinite grid of the standard basis
  */
 class GridShader : public ObjectShader
 {
+	using Super = ObjectShader;
+
 protected:
 	GLint m_nearId;
 	GLint m_farId;
@@ -45,16 +47,18 @@ protected:
 	GLint m_grid2FadeStartId;
 	GLint m_grid2FadeEndId;
 
+	GLint modelMatrixInvId;
+
 public:
 	bool m_showGrid = true;
 	bool m_showXAxis = true;
 	bool m_showYAxis = true;
 	bool m_showZAxis = true;
 
-	glm::vec3 m_gridColor{glm::vec3(0.45, 0.49, 0.53)};
-	glm::vec3 m_axisXColor{glm::vec3(1.0, 0.49, 0.53)};
-	glm::vec3 m_axisYColor{glm::vec3(0.41, 0.96, 0.49)};
-	glm::vec3 m_axisZColor{glm::vec3(0.45, 0.49, 1.0)};
+	const float* m_gridColor;  // vec4
+	const float* m_axisXColor; // vec4
+	const float* m_axisYColor; // vec4
+	const float* m_axisZColor; // vec4
 
 	float m_gridSize{1.0f};
 	float m_gridStrength{0.5f};
@@ -66,10 +70,30 @@ public:
 	float m_grid2FadeStart{0.1f};
 	float m_grid2FadeEnd{1.0f};
 
+	glm::mat4 m_modelInv;
+
 public:
 	explicit GridShader(GLuint id);
 
 	void init(bool initSuperclass) override;
 	void setUniforms() override;
 };
+
+/**
+ * Shader for a generic infinite grid representing an affine space with any basis.
+ */
+class GridShaderGeneric : public GridShader
+{
+	using Super = GridShader;
+
+public:
+	explicit GridShaderGeneric(GLuint id) : GridShader(id)
+	{
+		init(false);
+	}
+
+	void init(bool initSuperclass) override;
+	void setUniforms() override;
+};
+
 } // namespace Vp

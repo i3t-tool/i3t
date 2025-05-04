@@ -20,7 +20,10 @@
 
 using namespace Core;
 
-TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
+class MakeTransformTest : public GraphManagerTestFixture
+{};
+
+TEST_F(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 {
 	auto vec3 = Core::Builder::createOperator<EOperatorType::Vector3ToVector3>();
 	auto initialTranslation = generateVec3();
@@ -35,7 +38,7 @@ TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 	EXPECT_EQ(expectedNodeValue, makeTranslation->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
+TEST_F(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 {
 	auto floatNode = Core::Builder::createOperator<EOperatorType::FloatToFloat>();
 	auto rotRads = generateFloat();
@@ -58,7 +61,7 @@ TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 	EXPECT_EQ(expectedRotZMat, makeRotZ->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
+TEST_F(MakeTransformTest, MakeAxisRotShouldBeValid)
 {
 	auto floatNode = Core::Builder::createOperator<EOperatorType::FloatToFloat>();
 	auto axisNode = Core::Builder::createOperator<EOperatorType::Vector3ToVector3>();
@@ -77,7 +80,7 @@ TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 	EXPECT_EQ(expectedNodeValue, makeAxisRotNode->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakeOrthoShouldBeValid)
+TEST_F(MakeTransformTest, MakeOrthoShouldBeValid)
 {
 	auto makeOrthoNode = Core::Builder::createOperator<EOperatorType::MakeOrtho>();
 
@@ -88,7 +91,7 @@ TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeOrthoNode->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
+TEST_F(MakeTransformTest, MakePerspectiveShouldBeValid)
 {
 	auto makePerspectiveNode = Core::Builder::createOperator<EOperatorType::MakePerspective>();
 
@@ -99,7 +102,7 @@ TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 	EXPECT_EQ(expectedMat, makePerspectiveNode->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakeFrustumShouldBeValid)
+TEST_F(MakeTransformTest, MakeFrustumShouldBeValid)
 {
 	auto makeFrustumNode = Core::Builder::createOperator<EOperatorType::MakeFrustum>();
 
@@ -110,7 +113,7 @@ TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeFrustumNode->data().getMat4());
 }
 
-TEST(MakeTransformTest, MakeLookAtShouldBeValid)
+TEST_F(MakeTransformTest, MakeLookAtShouldBeValid)
 {
 	auto makeLookAtNode = Builder::createOperator<EOperatorType::MakeLookAt>();
 

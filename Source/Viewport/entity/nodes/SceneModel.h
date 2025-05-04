@@ -32,10 +32,12 @@ class SceneModel : public TexturedObject
 public:
 	Core::ID m_guiNodeId; ///< ID of the gui node object is representing
 
-	bool m_showAxes{true};
-
 	std::string m_modelAlias{};
 
+	float m_scale{1.f};          ///< Optional scaling factor of the model, eg. an implicit model transformation.
+	float m_programOpacity{1.f}; ///< Runtime opacity factor
+
+	bool m_showAxes{true};
 	std::weak_ptr<ColoredObject> m_axes; ///< Visualisation of the basis vectors
 
 #if SHOW_BOUNDING_BOX
@@ -52,7 +54,8 @@ public:
 	void setModel(std::string modelAlias);
 	std::string getModel();
 
-	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
+	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	            const RenderContext& context) override;
 	void update(Scene& scene) override;
 
 #if SHOW_BOUNDING_BOX

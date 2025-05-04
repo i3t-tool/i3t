@@ -29,14 +29,6 @@ RTTR_REGISTRATION
 	    .property("zNear", &CameraSettings::zNear)
 	    .property("zFar", &CameraSettings::zFar);
 
-	rttr::registration::class_<MainSceneSettings>("MainSceneSettings")
-	    .property("lightFollowsCamera", &MainSceneSettings::lightFollowsCamera)
-	    .property("camera", &MainSceneSettings::camera);
-
-	rttr::registration::class_<ViewportSceneSettings>("ViewportSceneSettings")
-	    .property("manipulator_enabled", &ViewportSceneSettings::manipulator_enabled)
-	    .property("mainScene", &ViewportSceneSettings::mainScene);
-
 	rttr::registration::enumeration<AggregateCamera::CameraMode>("CameraMode")(
 	    rttr::value("ORBIT", AggregateCamera::CameraMode::ORBIT),
 	    rttr::value("TRACKBALL", AggregateCamera::CameraMode::TRACKBALL),
@@ -58,16 +50,6 @@ CameraSettings::CameraSettings()
 	fov = 90.0f;
 	zNear = 0.2f;
 	zFar = 270.0f;
-}
-
-MainSceneSettings::MainSceneSettings()
-{
-	lightFollowsCamera = true;
-}
-
-ViewportSceneSettings::ViewportSceneSettings()
-{
-	manipulator_enabled = true;
 }
 
 } // namespace Vp

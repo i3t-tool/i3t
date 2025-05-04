@@ -45,6 +45,9 @@ public:
 
 	WindowManager* m_windowManager{nullptr}; ///< Weak reference to a WindowManager set when this window is added to it
 
+	int m_instanceIndex{
+	    -1}; ///< Window instance identifier, for windows with multiple instances of same type, -1 default
+
 	// Window info (updated by updateWindowInfo())
 	bool m_autoFocus{false};         ///< When true the window will get focus immediately upon hovering over it.
 	                                 ///< It will, however, also immediately give up focus to other windows.
@@ -63,6 +66,7 @@ protected:
 
 public:
 	explicit IWindow(std::string title, bool show = false);
+	IWindow(std::string title, int instanceIndex, bool show);
 
 	/**
 	 * \pre Window cannot be destroyed at runtime. It may cause crash.

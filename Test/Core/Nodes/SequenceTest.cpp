@@ -19,7 +19,7 @@
 
 using namespace Core;
 
-class SequenceTest : public GraphManagerTestFixture
+class SequenceTest : public GraphManagerTestFixtureSuite
 {};
 
 TEST_F(SequenceTest, SequenceCanContainMatrices)

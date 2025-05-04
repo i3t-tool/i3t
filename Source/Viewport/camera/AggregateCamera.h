@@ -14,8 +14,6 @@
 
 #include <memory>
 
-#include "Viewport/data/DisplayOptions.h"
-
 #include "AbstractCamera.h"
 #include "OrbitCamera.h"
 #include "TrackballCamera.h"
@@ -24,6 +22,9 @@
 
 namespace Vp
 {
+struct GlobalCameraSettings;
+struct CameraSettings;
+
 /**
  * Camera with multiple modes that it can seamlessly switch between.
  * Delegates actual "camera work" to one of the cameras that corresponds to the current mode.
@@ -82,5 +83,11 @@ public:
 	void setFov(float fov) override;
 	int getWidth() const override;
 	int getHeight() const override;
+
+	void loadSettings(CameraSettings& stg);
+	void saveSettings(CameraSettings& stg);
+
+	void loadSettings(GlobalCameraSettings& stg);
+	void saveSettings(GlobalCameraSettings& stg);
 };
 } // namespace Vp

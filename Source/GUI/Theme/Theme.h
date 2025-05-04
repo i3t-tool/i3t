@@ -39,6 +39,7 @@ enum class EColor
 	// ImGui standard colors, in the order of definition of ImGuiCol_ in imgui.h
 	Text,
 	TextDisabled,
+	TextDark, // Non-standard, used for "black" text and text shadows
 	WindowBackground,
 	ChildBackground,
 	PopupBackground,
@@ -145,6 +146,17 @@ enum class EColor
 
 	// Scene View (3D Viewport)
 	SceneViewBackground,
+	SceneViewBackgroundLocalColorShift,
+	SceneViewBackgroundTrackingColorShift,
+
+	SceneViewGridColor,
+	SceneViewGridX,
+	SceneViewGridY,
+	SceneViewGridZ,
+	SceneViewGridLocalColor,
+	SceneViewGridLocalX,
+	SceneViewGridLocalY,
+	SceneViewGridLocalZ,
 
 	// Node Editor
 	NodeEditorBackground,
@@ -205,8 +217,13 @@ enum class EColor
 	Nodes_Screen_noInput_background,
 	Nodes_Screen_noInput_text,
 
-	Nodes_Transformation_TrackingMarkColor,
-	Nodes_Transformation_TrackingColor,
+	Nodes_Tracking_ColorActive,
+	Nodes_Tracking_ColorInactive,
+	Nodes_Tracking_Cursor,
+	Nodes_Tracking_CursorHovered,
+	Nodes_Tracking_CursorActive,
+	Nodes_Tracking_OverlayActive,
+	Nodes_Tracking_OverlayInactive,
 
 	Nodes_Transformation_ValidIcon_bgShape,
 	Nodes_Transformation_ValidIcon_bgInner,
@@ -278,9 +295,9 @@ enum class ESize
 	Nodes_trackballButtonHeight, // TODO: [Trackball]
 	Nodes_TrackBallSensitivity,  // TODO: [Trackball]
 
-	Nodes_FloatWidth,  // Sort of unused?
-	Nodes_FloatMargin, // Unused
 	Nodes_FloatInnerPadding,
+	Nodes_FloatCharacterWidthMultiplier,
+	Nodes_FloatMinCharacters,
 	Float_inactive_alphaMultiplicator,
 
 	Nodes_dragSpeedDefaultRatio,
@@ -321,7 +338,8 @@ enum class ESize
 	Nodes_Border_Rounding,
 	Nodes_Border_Thickness,
 
-	Nodes_Transformation_TrackingMarkSize,
+	Nodes_Tracking_CursorSize,
+	Nodes_Tracking_LinkWidth,
 
 	Default_VisiblePrecision,
 	Default_VisibleQuaternionPrecision,
@@ -498,6 +516,12 @@ public:
 			return m_defaultColor;
 
 		return m_colors[color];
+	}
+	/// Returns a color whose alpha is set to the provided valuea
+	ImVec4 get(EColor color, float alpha)
+	{
+		const ImVec4& col = get(color);
+		return ImVec4(col.x, col.y, col.z, alpha);
 	}
 	/// Returns a pointer to a color variable
 	ImVec4* getPtr(EColor color)

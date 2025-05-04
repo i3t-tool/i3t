@@ -28,6 +28,7 @@ protected:
 	float m_rotateSpeed = 0.29f;
 	float m_translateSpeed = 0.02f;
 	bool m_smoothScroll = true;
+	float m_smoothScrollDamping = 0.85f;
 
 	float m_dScroll = 0.0f;
 
@@ -48,6 +49,8 @@ public:
 	void setTranslateSpeed(float translateSpeed);
 	bool getSmoothScroll() const;
 	void setSmoothScroll(bool b);
+	float getSmoothScrollDamping() const;
+	void setSmoothScrollDamping(float val);
 
 protected:
 	virtual void mouseWheel(float scroll);

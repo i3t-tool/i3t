@@ -13,13 +13,12 @@
 #include "Sequence.h"
 
 #include "GraphManager.h"
-#include "Tracking.h"
 
 namespace Core
 {
-Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
+Ptr<Sequence> Builder::createSequence()
 {
-	auto ret = std::make_shared<Sequence>(tracker);
+	auto ret = std::make_shared<Sequence>();
 	ret->init();
 	ret->updateValues(0);
 
@@ -66,18 +65,13 @@ void Sequence::Storage::swap(int from, int to)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : Node(g_sequence), m_storage(*this), m_tracker(tracker) {}
-
-Sequence::~Sequence()
-{
-	stopTracking();
-}
+Sequence::Sequence() : Node(g_sequence), m_storage(*this) {}
 
 SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix) noexcept
 {
 	const auto result = pushMatrix(matrix, m_storage.m_matrices.size());
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 
@@ -85,7 +79,7 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcep
 {
 	const auto result = m_storage.addMatrix(matrix, index);
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 
@@ -93,7 +87,7 @@ SetValueResult Sequence::pushMatrix(Ptr<Transform> matrix, size_t index) noexcep
 {
 	const auto result = m_storage.popMatrix(index);
 	updateValues(-1);
-
+	MatrixTracker::onNodeGraphChange(this);
 	return result;
 }
 
@@ -136,41 +130,16 @@ void Sequence::updateValues(int inputIndex)
 	// When sequence is inside a camera.
 	notifyOwner();
 
-	m_tracker->update();
+	Node::updateValues(inputIndex);
 }
 
-MatrixTracker* Sequence::startTracking(TrackingDirection direction, std::vector<UPtr<IModelProxy>> modelProxy)
+bool Sequence::isEmpty()
 {
-	*m_tracker = MatrixTracker(this, direction, std::move(modelProxy));
-
-	return m_tracker;
-}
-
-void Sequence::stopTracking()
-{
-	// Called in destructor, cannot use shared_from_this() here.
-	if (m_tracker->getSequenceID() == getId())
+	const bool hasMatrixInput = getInput(I3T_SEQ_IN_MAT).isPluggedIn();
+	if (!getMatrices().empty() || hasMatrixInput)
 	{
-		*m_tracker = MatrixTracker();
+		return false;
 	}
-}
-
-//===-- Helpers -----------------------------------------------------------===//
-Ptr<Sequence> getNonemptyParentSequence(Ptr<Sequence> sequence)
-{
-	auto parent = GraphManager::getParent(sequence, I3T_SEQ_IN_MUL);
-	while (parent != nullptr)
-	{
-		const auto parentSequence = parent->as<Sequence>();
-		const bool hasMatrixInput = parentSequence->getInput(I3T_SEQ_IN_MAT).isPluggedIn();
-		if (!parentSequence->getMatrices().empty() || hasMatrixInput)
-		{
-			return parentSequence;
-		}
-
-		parent = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MUL);
-	}
-
-	return nullptr;
+	return true;
 }
 } // namespace Core

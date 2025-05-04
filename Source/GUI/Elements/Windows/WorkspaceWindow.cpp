@@ -14,6 +14,7 @@
 
 #include "WorkspaceWindow.h"
 
+#include "Core/Input/InputManager.h"
 #include "GUI/Fonts/Icons.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
@@ -66,27 +67,33 @@ void WorkspaceWindow::render()
 
 		showMenuBar();
 
+		m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
+
+		bool menuInteraction = false;
+
 		if (WorkspaceModule::g_settings.showQuickAddMenu)
+			menuInteraction |= showQuickAddButtons();
+
+		if (Core::GraphManager::isTracking())
 		{
-			m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
-			m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
-
-			showQuickAddButtons();
-
-			m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+			menuInteraction |= showTrackingTimeline();
 		}
+
+		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
 
 		DIWNE::DrawMode drawMode = DIWNE::DrawMode_JustDraw;
 		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
 		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
-			drawMode = DIWNE::DrawMode_Interactive;
+			processTrackingInput();
+			if (!menuInteraction)
+				drawMode = DIWNE::DrawMode_Interactive;
 		}
 
 		WorkspaceModule::g_editor->draw(drawMode);
 
-		if (WorkspaceModule::g_settings.showQuickAddMenu)
-			m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
 	else
 	{
@@ -97,6 +104,39 @@ void WorkspaceWindow::render()
 	ImGui::End();
 
 	// Statistics::stopTimer("WorkspaceWindow::render");
+}
+
+void WorkspaceWindow::processTrackingInput()
+{
+	if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
+		WorkspaceModule::g_editor->stopTracking();
+	// if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothLeft();
+	// if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothRight();
+	if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedLeft();
+	else if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedRight();
+	// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+	// 	this->trackingModeSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+	// 	this->trackingSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+	// 	this->trackingSwitchOn();
+	// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+	// 	this->trackingSwitchOff();
+	if (WorkspaceModule::g_editor->isTracking())
+	{
+		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothLeft();
+		}
+		else if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothRight();
+		}
+	}
 }
 
 bool WorkspaceWindow::showQuickAddButtons()
@@ -158,6 +198,139 @@ bool WorkspaceWindow::showQuickAddButtons()
 		ImGui::EndGroup();
 
 	ImGui::SetCursorScreenPos(originalPos);
+
+	return interacted;
+}
+
+bool WorkspaceWindow::showTrackingTimeline()
+{
+	bool interacted = false;
+
+	Core::MatrixTracker* tracker = Core::GraphManager::getTracker();
+
+	float dpiScale = I3T::getTheme().getDpiScale();
+	ImVec2 padding = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
+
+	ImVec2 topLeft = GUI::glmToIm(this->m_windowMin) + padding;
+	ImVec2 topRight = ImVec2(this->m_windowMax.x - padding.x, this->m_windowMin.y + padding.y);
+	float timelineWidth = topRight.x - topLeft.x;
+
+	ImGui::SetCursorScreenPos(topLeft);
+
+	if (m_trackingBox.GetArea() > 0.f)
+	{
+		float rounding = 6;
+		const ImVec2 boxPadding = ImVec2(ImGui::GetFontSize() * 0.5f, ImGui::GetFontSize() * 0.5f);
+		ImGui::GetWindowDrawList()->AddRectFilled(m_trackingBox.Min - boxPadding, m_trackingBox.Max + boxPadding,
+		                                          ImColor(0.f, 0.f, 0.f, 0.4f), rounding, ImDrawFlags_RoundCornersAll);
+		ImGui::GetWindowDrawList()->AddRect(m_trackingBox.Min - boxPadding, m_trackingBox.Max + boxPadding,
+		                                    ImGui::GetColorU32(ImGuiCol_Border, 0.7f), rounding,
+		                                    ImDrawFlags_RoundCornersAll);
+	}
+
+	ImGui::BeginGroup();
+
+	float trackingTitleScale = 1.2f;
+	std::string trackingTitle = fmt::format(_tbd(ICON_FA_CROSSHAIRS " "
+	                                                                "Tracking") " {:.2f}%",
+	                                        tracker->getProgress() * 100.f);
+	ImVec2 trackingTitleSize = ImGui::CalcTextSize(trackingTitle.c_str());
+
+	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
+
+	if (GUI::FloatingButton(ICON_FA_RIGHT_LEFT "##SwitchDirBtn", btnSize))
+	{
+		tracker->reverseDirection();
+		interacted = true;
+	}
+
+	ImGui::SameLine();
+
+	// TODO: Maybe use DIWNE layout here in the future
+	float springWidth = (timelineWidth - trackingTitleSize.x * trackingTitleScale - btnSize.x * 2 -
+	                     ImGui::GetStyle().ItemSpacing.x * 2) /
+	                    2.f;
+	ImGui::Dummy(ImVec2(springWidth, 0.f));
+	ImGui::SameLine(0, 0);
+
+	float oldScale = ImGui::GetCurrentWindow()->FontWindowScale;
+	ImGui::SetWindowFontScale(trackingTitleScale);
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted(trackingTitle.c_str());
+	ImGui::SetWindowFontScale(oldScale);
+
+	ImGui::SameLine();
+
+	ImGui::Dummy(ImVec2(springWidth, 0.f));
+	ImGui::SameLine(0, 0);
+
+	{
+		const char* trackingSettingsPopup = "tracking_settings";
+		if (GUI::FloatingButton(ICON_FA_GEAR "##TrackSettingsBtn", btnSize))
+		{
+			interacted = true;
+			ImGui::OpenPopup(trackingSettingsPopup);
+		}
+		else
+		{
+			if (ImGui::IsItemHovered())
+			{
+				interacted = true;
+				GUI::Tooltip(_tbd("Tracking settings"), "");
+			}
+		}
+
+		if (ImGui::BeginPopup(trackingSettingsPopup))
+		{
+			interacted = true;
+			ImGui::TextDisabled(_tbd("Tracking settings"));
+			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
+			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
+			                   ImGuiSliderFlags_Logarithmic);
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
+			                            &tracker->m_decomposeProjection))
+				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Shirley decomposition"), nullptr,
+			                            &tracker->m_decomposePerspectiveShirley))
+				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown  decomposition"), nullptr,
+			                            &tracker->m_decomposePerspectiveBrown))
+				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
+			                            &tracker->m_trackInWorldSpace))
+				tracker->requestProgressUpdate();
+
+			ImGui::EndPopup();
+		}
+	}
+
+	DIWNE::DGui::NewLine(0.2f);
+
+	ImGui::SetNextItemWidth(timelineWidth);
+	m_trackingSliderProgress = tracker->getProgress();
+	if (TrackingSlider(tracker, "###trackingSlider", &m_trackingSliderProgress, tracker->getDirection()))
+	{
+		interacted = true;
+		tracker->setProgress(m_trackingSliderProgress);
+	}
+	ImRect sliderRect = ImGui::GetCurrentContext()->LastItemData.Rect;
+	bool sliderActive = ImGui::IsItemHovered() || ImGui::IsItemActive();
+
+	ImGui::EndGroup();
+	m_trackingBox = ImGui::GetCurrentContext()->LastItemData.Rect;
+
+	if (sliderActive)
+	{
+		interacted = true;
+		bool leftToRight = tracker->getDirection() == Core::TrackingDirection::LeftToRight;
+		ImGui::GetWindowDrawList()->AddLine(
+		    ImVec2(sliderRect.Min.x +
+		               timelineWidth * (leftToRight ? m_trackingSliderProgress : 1.f - m_trackingSliderProgress),
+		           sliderRect.GetCenter().y),
+		    ImVec2(WorkspaceModule::g_editor->m_trackingCursorPos),
+		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor) * ImVec4(1.f, 1.f, 1.f, 0.7f)),
+		    dpiScale);
+	}
 
 	return interacted;
 }
@@ -313,6 +486,7 @@ void WorkspaceWindow::showDebugMenu()
 		I3TGui::MenuItemWithLog("Layout", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugLayout));
 		I3TGui::MenuItemWithLog("Interaction", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugInteractions));
 		I3TGui::MenuItemWithLog("Objects", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugObjects));
+		I3TGui::MenuItemWithLog("Core", nullptr, &(WorkspaceModule::g_editor->m_diwneDebugCustom));
 		ImGui::PopItemFlag();
 		ImGui::EndMenu();
 	}
@@ -461,4 +635,291 @@ void WorkspaceWindow::showDiwneStyleMenu()
 		ImGui::PopItemFlag();
 		ImGui::EndMenu();
 	}
+}
+bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* label, void* p_data,
+                                     Core::TrackingDirection direction)
+{
+	float p_min, p_max;
+	if (direction == Core::TrackingDirection::RightToLeft)
+	{
+		p_min = 1.f;
+		p_max = 0.f;
+	}
+	else
+	{
+		p_min = 0.f;
+		p_max = 1.f;
+	}
+	float minHeight = ImGui::GetFontSize() * 1.5f + ImGui::GetStyle().FramePadding.y * 2.0f;
+	return TrackingSlider(tracker, label, ImGuiDataType_Float, p_data, &p_min, &p_max, "%.6f",
+	                      ImGuiSliderFlags_AlwaysClamp, minHeight);
+}
+
+// Custom modified copy of ImGui::SliderScalar()
+// Will likely need to be updated sometimes during ImGui upgrades.
+// Uses rendering modifications from unmerged pull request !3599 (https://github.com/ocornut/imgui/pull/3599)
+// Note: p_data, p_min and p_max are _pointers_ to a memory address holding the data. For a slider, they are all
+// required. Read code of e.g. SliderFloat(), SliderInt() etc. or examples in 'Demo->Widgets->Data Types' to understand
+// how to use this function directly.
+bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* label, ImGuiDataType data_type,
+                                     void* p_data, const void* p_min, const void* p_max, const char* format,
+                                     ImGuiSliderFlags flags, float minHeight)
+{
+	float dpiScale = ImGui::GetWindowDpiScale();
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+	const ImGuiID id = window->GetID(label);
+	const float w = ImGui::CalcItemWidth();
+
+	const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
+	float frame_height = ImMax(minHeight > 0.f ? minHeight : 0.f, label_size.y + style.FramePadding.y * 2.0f);
+	const ImRect frame_bb(window->DC.CursorPos, window->DC.CursorPos + ImVec2(w, frame_height));
+	const ImRect total_bb(frame_bb.Min,
+	                      frame_bb.Max +
+	                          ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+
+	const bool temp_input_allowed = (flags & ImGuiSliderFlags_NoInput) == 0;
+	ImGui::ItemSize(total_bb, style.FramePadding.y);
+	if (!ImGui::ItemAdd(total_bb, id, &frame_bb, temp_input_allowed ? ImGuiItemFlags_Inputable : 0))
+		return false;
+
+	// Default format string when passing NULL
+	if (format == NULL)
+		format = ImGui::DataTypeGetInfo(data_type)->PrintFmt;
+
+	const bool hovered = ImGui::ItemHoverable(frame_bb, id, g.LastItemData.InFlags);
+	bool temp_input_is_active = temp_input_allowed && ImGui::TempInputIsActive(id);
+	if (!temp_input_is_active)
+	{
+		// Tabbing or CTRL-clicking on Slider turns it into an input box
+		const bool input_requested_by_tabbing =
+		    temp_input_allowed && (g.LastItemData.StatusFlags & ImGuiItemStatusFlags_FocusedByTabbing) != 0;
+		const bool clicked = hovered && ImGui::IsMouseClicked(0, id);
+		const bool make_active = (input_requested_by_tabbing || clicked || g.NavActivateId == id);
+		if (make_active && clicked)
+			ImGui::SetKeyOwner(ImGuiKey_MouseLeft, id);
+		if (make_active && temp_input_allowed)
+			if (input_requested_by_tabbing || (clicked && g.IO.KeyCtrl) ||
+			    (g.NavActivateId == id && (g.NavActivateFlags & ImGuiActivateFlags_PreferInput)))
+				temp_input_is_active = true;
+
+		if (make_active && !temp_input_is_active)
+		{
+			ImGui::SetActiveID(id, window);
+			ImGui::SetFocusID(id, window);
+			ImGui::FocusWindow(window);
+			g.ActiveIdUsingNavDirMask |= (1 << ImGuiDir_Left) | (1 << ImGuiDir_Right);
+		}
+	}
+
+	if (temp_input_is_active)
+	{
+		// Only clamp CTRL+Click input when ImGuiSliderFlags_AlwaysClamp is set
+		const bool is_clamp_input = (flags & ImGuiSliderFlags_AlwaysClamp) != 0;
+		return ImGui::TempInputScalar(frame_bb, id, label, data_type, p_data, format, is_clamp_input ? p_min : NULL,
+		                              is_clamp_input ? p_max : NULL);
+	}
+
+	if (ImGui::IsItemHovered())
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+
+	// Draw frame
+	// ImGui::RenderFrame(frame_bb.Min, frame_bb.Max, frame_col, true, g.Style.FrameRounding);
+
+	// Slider behavior
+	ImRect grab_bb;
+	const bool value_changed =
+	    ImGui::SliderBehavior(frame_bb, id, data_type, p_data, p_min, p_max, format, flags, &grab_bb);
+	if (value_changed)
+		ImGui::MarkItemEdited(id);
+
+	// Render track
+	float SliderContrast = 0.5f; // TODO: Hookup to a parameter or something
+	float innerThickness = 0.22f;
+	float outerThickness = 0.36f;
+	float rounding = 6 * dpiScale;
+	float transformMargin = ImGui::GetFontSize() * 0.3f;
+
+	ImRect tOuterRect = frame_bb;
+	ImRect tInnerRect = frame_bb;
+	if (innerThickness != 1.0f)
+	{
+		float shrink_amount = (float) (int) ((frame_bb.Max.y - frame_bb.Min.y) * 0.5f * (1.0f - innerThickness));
+		tInnerRect.Min.y += shrink_amount;
+		tInnerRect.Max.y -= shrink_amount;
+	}
+	if (outerThickness != 1.0f)
+	{
+		float shrink_amount = (float) (int) ((frame_bb.Max.y - frame_bb.Min.y) * 0.5f * (1.0f - outerThickness));
+		tOuterRect.Min.y += shrink_amount;
+		tOuterRect.Max.y -= shrink_amount;
+	}
+
+	const ImVec4& colorActive = I3T::getColor(EColor::Nodes_Tracking_ColorActive);
+	const ImVec4& colorOverlay = I3T::getColor(EColor::Nodes_Tracking_OverlayActive);
+	const ImVec4& cursorCol = I3T::getColor(EColor::Nodes_Tracking_Cursor);
+	const ImVec4& cursorColHovered = I3T::getColor(EColor::Nodes_Tracking_CursorHovered);
+	const ImVec4& cursorColActive = I3T::getColor(EColor::Nodes_Tracking_CursorActive);
+
+	// const ImU32 frame_col = ImGui::GetColorU32(g.ActiveId == id    ? ImGuiCol_FrameBgActive
+	// 										   : g.HoveredId == id ? ImGuiCol_FrameBgHovered
+	// 															   : ImGuiCol_FrameBg,
+	// 										   1.0f + SliderContrast);
+	// const ImU32 frame_col = ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
+	//                                                        : g.HoveredId == id ? cursorColHovered
+	//                                                                            : cursorCol);
+	const ImU32 progressBg = ImColor(0.7f, 0.7f, 0.f, 1.0f);
+	const ImU32 progressOverlay = ImColor(0.75, 0.75f, 0.f, 0.4f);
+	const ImU32 frame_col_after = ImColor(0, 0, 0, 0);
+	// const ImU32 frame_col_after = ImGui::GetColorU32(g.ActiveId == id    ? ImGuiCol_FrameBgActive
+	//                                                  : g.HoveredId == id ? ImGuiCol_FrameBgHovered
+	//                                                                      : ImGuiCol_FrameBg,
+	//                                                  1.0f - SliderContrast);
+	ImGui::RenderNavHighlight(frame_bb, id);
+
+	Core::TrackingDirection dir = tracker->getDirection();
+	bool leftToRight = dir == Core::TrackingDirection::LeftToRight;
+	auto& trackedMatrices = tracker->getMatrices();
+	ImVec4 tickColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
+	ImRect trackRect = frame_bb;
+	ImVec2 trackSize = trackRect.GetSize();
+	float tParam = tracker->getProgress();
+	const int matricesCount = trackedMatrices.size();
+	const float matStep = 1.0f / (float) matricesCount;
+
+	static std::array spaceColors = {ImVec4(0, 0, 1, 1), ImVec4(0, 1, 0, 1), ImVec4(1, 0, 0, 1)};
+
+	// Draw solid progress bg
+	TrackingSlider_drawProgress(grab_bb, tOuterRect, rounding, progressBg, frame_col_after, leftToRight);
+
+	// Draw a bar for each tracked matrix using color based on space type
+	for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ : i--)
+	{
+		auto& matrix = trackedMatrices[i];
+		TrackingSlider_drawRect(i * matStep, matStep, tInnerRect, transformMargin, leftToRight,
+		                        spaceColors[static_cast<int>(matrix->transform->data.space)], rounding, 1.f * dpiScale,
+		                        I3T::getColor(EColor::BorderDim));
+	}
+
+	// Draw progress overlay
+	TrackingSlider_drawProgress(grab_bb, tInnerRect, rounding, progressOverlay, frame_col_after, leftToRight);
+
+	std::vector<int> filledTickSlots(matricesCount);
+
+	// Draw sequence ticks
+	for (auto& seq : tracker->getTrackedSequences())
+	{
+		if (seq->data.getChildCount() <= 0)
+			continue;
+		int i = seq->data.mIndex;
+		float param = i * matStep;
+		TrackingSlider_drawTick(param, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
+		filledTickSlots[i] = true;
+	}
+
+	// Draw transform ticks
+	for (auto& transform : tracker->getTrackedTransforms())
+	{
+		int i = transform->data.mIndex;
+		if (filledTickSlots[i])
+			continue;
+		float param = i * matStep;
+		TrackingSlider_drawTick(param, trackRect, tOuterRect.GetHeight(), leftToRight, tickColor);
+		filledTickSlots[i] = true;
+	}
+
+	// Draw matrix ticks
+	for (int i = leftToRight ? 0 : matricesCount - 1; leftToRight ? i < matricesCount : i >= 0; leftToRight ? i++ : i--)
+	{
+		if (filledTickSlots[i])
+			continue;
+		auto& matrix = trackedMatrices[i];
+		float param = i * matStep;
+		TrackingSlider_drawTick(param, trackRect, tInnerRect.GetHeight() * 0.2f, leftToRight, tickColor, true);
+	}
+
+	// Draw last tick and arrow
+	TrackingSlider_drawTick(1.0f, trackRect, frame_bb.GetHeight(), leftToRight, tickColor);
+	// TrackingSlider_drawArrow(1.0f, tInnerRect, leftToRight, tickColor);
+
+	// Render grab
+	if (grab_bb.Max.x > grab_bb.Min.x)
+	{
+		float grabWidthH = grab_bb.GetSize().x / 4.f;
+		window->DrawList->AddRectFilled(grab_bb.Min - ImVec2(grabWidthH, 0), grab_bb.Max - ImVec2(grabWidthH, 0),
+		                                ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
+		                                                               : g.HoveredId == id ? cursorColHovered
+		                                                                                   : cursorCol),
+		                                rounding);
+	}
+
+
+	return value_changed;
+}
+
+void WorkspaceWindow::TrackingSlider_drawTick(float tParam, const ImRect& trackRect, float height, bool leftToRight,
+                                              const ImVec4& tickColor, bool drawDot)
+{
+	float tickPosX = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam);
+	float cy = trackRect.GetCenter().y;
+	if (!drawDot)
+	{
+		ImGui::GetWindowDrawList()->AddLine(ImVec2(tickPosX, cy - height / 2), ImVec2(tickPosX, cy + height / 2),
+		                                    ImGui::ColorConvertFloat4ToU32(tickColor),
+		                                    2.f * ImGui::GetWindowDpiScale());
+	}
+	else
+	{
+		ImGui::GetWindowDrawList()->AddCircleFilled(ImVec2(tickPosX, cy), height,
+		                                            ImGui::ColorConvertFloat4ToU32(tickColor));
+	}
+}
+void WorkspaceWindow::TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight,
+                                               const ImVec4& color)
+{
+	float tickPosX = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam);
+	float width = ImGui::GetFontSize();
+	if (leftToRight)
+	{
+		ImGui::GetWindowDrawList()->AddTriangleFilled(
+		    ImVec2(tickPosX, trackRect.GetCenter().y), ImVec2(tickPosX - width, trackRect.Max.y),
+		    ImVec2(tickPosX - width, trackRect.Min.y), ImGui::ColorConvertFloat4ToU32(color));
+	}
+	else
+	{
+		ImGui::GetWindowDrawList()->AddTriangleFilled(
+		    ImVec2(tickPosX, trackRect.GetCenter().y), ImVec2(tickPosX + width, trackRect.Min.y),
+		    ImVec2(tickPosX + width, trackRect.Max.y), ImGui::ColorConvertFloat4ToU32(color));
+	}
+}
+void WorkspaceWindow::TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, float margin,
+                                              bool leftToRight, const ImVec4& color, float rounding,
+                                              float borderThickness, const ImVec4& borderCol)
+{
+	float posX1 = trackRect.Min.x + trackRect.GetSize().x * (leftToRight ? tParam : 1.f - tParam - tStep);
+	float posX2 = posX1 + tStep * trackRect.GetSize().x;
+	ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(posX1 + margin, trackRect.Min.y),
+	                                          ImVec2(posX2 - margin, trackRect.Max.y),
+	                                          ImGui::ColorConvertFloat4ToU32(color), rounding);
+	if (borderThickness > 0.f)
+	{
+		ImGui::GetWindowDrawList()->AddRect(ImVec2(posX1 + margin, trackRect.Min.y),
+		                                    ImVec2(posX2 - margin, trackRect.Max.y),
+		                                    ImGui::ColorConvertFloat4ToU32(borderCol), rounding, 0, borderThickness);
+	}
+}
+
+void WorkspaceWindow::TrackingSlider_drawProgress(const ImRect& grab_bb, const ImRect& tOuterRect, float rounding,
+                                                  const ImU32 frame_col, const ImU32 frame_col_after, bool leftToRight)
+{
+	ImGui::GetWindowDrawList()->AddRectFilled(
+	    tOuterRect.Min, ImVec2(grab_bb.Min.x + (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, tOuterRect.Max.y),
+	    leftToRight ? frame_col : frame_col_after, rounding, ImDrawFlags_RoundCornersLeft);
+	ImGui::GetWindowDrawList()->AddRectFilled(
+	    ImVec2(grab_bb.Max.x - (grab_bb.Max.x - grab_bb.Min.x) * 0.5f, tOuterRect.Min.y), tOuterRect.Max,
+	    leftToRight ? frame_col_after : frame_col, rounding, ImDrawFlags_RoundCornersRight);
 }

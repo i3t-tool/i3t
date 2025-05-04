@@ -26,8 +26,7 @@ class FrustumShader : public ColorShader
 public:
 	GLint inverseProjectionMatrixId;
 
-	glm::mat4 m_frustumProjectionMatrix;
-	glm::mat4 m_frustumViewMatrix;
+	glm::mat4 m_projectionViewMatrixInv{1.f};
 
 	explicit FrustumShader(GLuint id);
 

@@ -48,6 +48,7 @@ public:
 public:
 	Application& m_wholeApplication;
 
+	void processTrackingInput();
 	void render() override;
 
 private:
@@ -55,10 +56,27 @@ private:
 
 	bool showQuickAddButtons();
 
+	float m_trackingSliderProgress = 0.f;
+	ImRect m_trackingBox;
+	bool showTrackingTimeline();
+
 	void showMenuBar();
 	void showEditMenu();
 	void showAddMenu();
 	void showViewMenu();
 	void showDebugMenu();
 	void showDiwneStyleMenu();
+
+	bool TrackingSlider(Core::MatrixTracker* tracker, const char* label, void* p_data, Core::TrackingDirection dir);
+	bool TrackingSlider(Core::MatrixTracker* tracker, const char* label, ImGuiDataType data_type, void* p_data,
+	                    const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0,
+	                    float minHeight = 0);
+	void TrackingSlider_drawTick(float tParam, const ImRect& trackRect, float height, bool leftToRight,
+	                             const ImVec4& tickColor, bool drawDot = false);
+	void TrackingSlider_drawArrow(float tParam, const ImRect& trackRect, bool leftToRight, const ImVec4& color);
+	void TrackingSlider_drawRect(float tParam, float tStep, const ImRect& trackRect, float margin, bool leftToRight,
+	                             const ImVec4& color, float rounding, float borderThickness = 0.f,
+	                             const ImVec4& borderCol = ImVec4(0.f, 0.f, 0.f, 1.f));
+	void TrackingSlider_drawProgress(const ImRect& grab_bb, const ImRect& tOuterRect, float rounding,
+	                                 const ImU32 frame_col, const ImU32 frame_col_after, bool leftToRight);
 };

@@ -10,7 +10,7 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
-#include "SetupDialog.h"
+#include "PreferencesWindow.h"
 
 #include "imgui.h"
 
@@ -26,9 +26,9 @@
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
-SetupDialog::SetupDialog() : IWindow(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")) {}
+PreferencesWindow::PreferencesWindow() : IWindow(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")) {}
 
-void SetupDialog::render()
+void PreferencesWindow::render()
 {
 	static int cameraMode;
 	static int angleUnits;
@@ -45,7 +45,7 @@ void SetupDialog::render()
 			App::getModule<StateManager>().resetGlobal();
 		}
 
-		showGeneralSettings();
+		showUISettings();
 		showWorkspaceSettings();
 		showViewportSettings();
 	}
@@ -60,21 +60,21 @@ void SetupDialog::render()
 	ImGui::End();
 }
 
-void SetupDialog::showGeneralSettings()
+void PreferencesWindow::showUISettings()
 {
-	if (ImGui::CollapsingHeader("Loop settings", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("Application settings"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		auto vsync = App::get().getAppLoopManager().isVsync();
 
-		if (ImGui::Checkbox("Use VSync", &vsync))
+		if (ImGui::Checkbox(_tbd("Use VSync"), &vsync))
 		{
 			App::get().setVSync(vsync);
 		}
 		if (!vsync)
 		{
 			auto shouldLimitFPS = App::get().getAppLoopManager().shouldLimitFPS();
-			if (ImGui::Checkbox("Limit FPS", &shouldLimitFPS))
+			if (ImGui::Checkbox(_tbd("Limit FPS"), &shouldLimitFPS))
 			{
 				App::get().getAppLoopManager().enableFPSLimit(shouldLimitFPS);
 			}
@@ -82,7 +82,7 @@ void SetupDialog::showGeneralSettings()
 			if (shouldLimitFPS)
 			{
 				int fpsLimit = App::get().getAppLoopManager().getTargetFPS();
-				if (ImGui::SliderInt("FPS Limit", &fpsLimit, 10, 500))
+				if (ImGui::SliderInt(_tbd("FPS Limit"), &fpsLimit, 10, 500))
 				{
 					App::get().getAppLoopManager().setTargetFPS(fpsLimit);
 				}
@@ -90,14 +90,14 @@ void SetupDialog::showGeneralSettings()
 		}
 
 		auto shouldLimitFPSOnIdle = App::get().getAppLoopManager().shouldLimitFPSOnIdle();
-		if (ImGui::Checkbox("Limit FPS during idle time", &shouldLimitFPSOnIdle))
+		if (ImGui::Checkbox(_tbd("Limit FPS during idle time"), &shouldLimitFPSOnIdle))
 		{
 			App::get().getAppLoopManager().setShouldLimitFPSOnIdle(shouldLimitFPSOnIdle);
 		}
 		if (shouldLimitFPSOnIdle)
 		{
 			int fpsLimitOnIdle = App::get().getAppLoopManager().getTargetFPSOnIdle();
-			if (ImGui::SliderInt("FPS Limit during idle time", &fpsLimitOnIdle, 5, 500))
+			if (ImGui::SliderInt(_tbd("FPS Limit during idle time"), &fpsLimitOnIdle, 5, 500))
 			{
 				App::get().getAppLoopManager().setTargetFPSOnIdle(fpsLimitOnIdle);
 			}
@@ -107,51 +107,63 @@ void SetupDialog::showGeneralSettings()
 		ImGui::Spacing();
 	}
 
-	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("User interface"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
+
+		UIModule* uiModule = I3T::getUI();
 
 		static float uiScaleTmp = 1.0f;
 		if (ImGui::IsWindowAppearing())
 		{
-			uiScaleTmp = I3T::getUI()->getUiScale();
+			uiScaleTmp = uiModule->getUiScale();
 		}
 		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-		GUI::SliderFloatStepped("UI Scale", &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
-		if (uiScaleTmp != I3T::getUI()->getUiScale())
+		GUI::SliderFloatStepped(_tbd("UI Scale"), &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
+		if (uiScaleTmp != uiModule->getUiScale())
 		{
 			ImGui::SameLine();
-			if (I3TGui::ButtonWithLog("Apply scale"))
+			if (I3TGui::ButtonWithLog(_tbd("Apply scale")))
 			{
-				I3T::getUI()->applyUIScalingNextFrame(uiScaleTmp);
+				uiModule->applyUIScalingNextFrame(uiScaleTmp);
 			}
 		}
-		ImGui::Unindent();
-		ImGui::Spacing();
-	}
-}
-void SetupDialog::showWorkspaceSettings()
-{
-	if (ImGui::CollapsingHeader("Workspace", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		ImGui::Indent();
-		ImGui::Checkbox("Show quick add menu", &WorkspaceModule::g_settings.showQuickAddMenu);
-		ImGui::SeparatorText("Tracking");
-		ImGui::DragFloat("Time between ticks", &WorkspaceModule::g_settings.tracking_timeBetweenTracks, 0.00005f,
-		                 0.00001f, 1.0f, "%.5f");
-		ImGui::DragFloat("Smooth scroll speed", &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f, 0.001f);
-		ImGui::DragFloat("Jagged scroll speed", &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f, 0.001f);
+
+		ImGui::Checkbox(_tbd("Show window tab buttons"), &uiModule->getSettings().useWindowMenuButtons);
+		ImGui::SameLine();
+		showHelpTip(_tbd("Requires restart"));
+
+		ImGui::Checkbox(_tbd("Auto hide tab bar"), &uiModule->getSettings().autoHideTabBars);
+		ImGui::SameLine();
+		showHelpTip(_tbd("Requires restart"));
 
 		ImGui::Unindent();
 		ImGui::Spacing();
 	}
 }
-void SetupDialog::showViewportSettings()
+void PreferencesWindow::showWorkspaceSettings()
+{
+	if (ImGui::CollapsingHeader(_tbd("Workspace"), ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent();
+		ImGui::Checkbox(_tbd("Show quick add menu"), &WorkspaceModule::g_settings.showQuickAddMenu);
+		ImGui::SeparatorText(_tbd("Tracking"));
+		ImGui::DragFloat(_tbd("Smooth scroll speed"), &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f,
+		                 0.001f);
+		ImGui::DragFloat(_tbd("Jagged scroll speed"), &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f,
+		                 0.001f);
+
+		ImGui::Unindent();
+		ImGui::Spacing();
+	}
+}
+
+void PreferencesWindow::showViewportSettings()
 {
 	Vp::Viewport* viewport = I3T::getViewport();
 	Vp::ViewportSettings& stg = viewport->getSettings();
 
-	if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("Scene view"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");
@@ -174,21 +186,20 @@ void SetupDialog::showViewportSettings()
 			ImGui::Unindent();
 		}
 
-		if (ImGui::CollapsingHeader("Grid"))
+		if (ImGui::CollapsingHeader("Grids"))
 		{
 			ImGui::Indent();
-			ImGui::ColorEdit3("Grid color", glm::value_ptr(stg.global().grid.color), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("X axis color", glm::value_ptr(stg.global().grid.axisXColor), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("Y axis color", glm::value_ptr(stg.global().grid.axisYColor), ImGuiColorEditFlags_Float);
-			ImGui::ColorEdit3("Z axis color", glm::value_ptr(stg.global().grid.axisZColor), ImGuiColorEditFlags_Float);
-
-			ImGui::SliderFloat("Size", &stg.global().grid.size, 0.01f, 2.f, "%.2f");
-			ImGui::SliderFloat("Strength", &stg.global().grid.strength, 0.01f, 1.f, "%.2f");
-			ImGui::SliderFloat("Line width", &stg.global().grid.lineWidth, 0.01f, 5.0f, "%.2f");
-			ImGui::SliderFloat("Fade 1 start", &stg.global().grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 1 end", &stg.global().grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 2 start", &stg.global().grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
-			ImGui::SliderFloat("Fade 2 end", &stg.global().grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
+			ImGui::PushID("world grid");
+			showGridSettings(stg.global().grid);
+			ImGui::PopID();
+			if (ImGui::CollapsingHeader("Local Grid"))
+			{
+				ImGui::Indent();
+				ImGui::PushID("local grid");
+				showGridSettings(stg.global().localGrid);
+				ImGui::PopID();
+				ImGui::Unindent();
+			}
 			ImGui::Unindent();
 		}
 
@@ -219,4 +230,26 @@ void SetupDialog::showViewportSettings()
 	//			static bool check = true;
 	//			ImGui::Checkbox("console", &check);
 	//		}
+}
+
+void PreferencesWindow::showGridSettings(Vp::GridSettings& grid)
+{
+	ImGui::SliderFloat("Size", &grid.size, 0.01f, 2.f, "%.2f");
+	ImGui::SliderFloat("Line width", &grid.lineWidth, 0.01f, 5.0f, "%.2f");
+	ImGui::SliderFloat("Fade 1 start", &grid.grid1FadeStart, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 1 end", &grid.grid1FadeEnd, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 2 start", &grid.grid2FadeStart, 0.0f, 1.f, "%.2f");
+	ImGui::SliderFloat("Fade 2 end", &grid.grid2FadeEnd, 0.0f, 1.f, "%.2f");
+}
+
+void PreferencesWindow::showHelpTip(const char* text)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(text);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }

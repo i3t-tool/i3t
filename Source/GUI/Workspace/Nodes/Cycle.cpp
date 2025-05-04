@@ -768,8 +768,8 @@ void Cycle::centerContent(DIWNE::DrawInfo& context)
 int Cycle::maxLengthOfData()
 {
 	Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
-	return std::max({Tools::numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal),
-	                 Tools::numberOfCharWithDecimalPoint(nodebase->getTo(), m_numberOfVisibleDecimal),
-	                 Tools::numberOfCharWithDecimalPoint(nodebase->getManualStep(), m_numberOfVisibleDecimal),
-	                 Tools::numberOfCharWithDecimalPoint(nodebase->getStep(), m_numberOfVisibleDecimal)});
+	return std::max({GUI::numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal),
+	                 GUI::numberOfCharWithDecimalPoint(nodebase->getTo(), m_numberOfVisibleDecimal),
+	                 GUI::numberOfCharWithDecimalPoint(nodebase->getManualStep(), m_numberOfVisibleDecimal),
+	                 GUI::numberOfCharWithDecimalPoint(nodebase->getStep(), m_numberOfVisibleDecimal)});
 }

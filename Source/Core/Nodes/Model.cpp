@@ -29,10 +29,11 @@ void Model::updateValues(int inputIndex)
 	Node::updateValues(inputIndex); // Callback
 }
 
-void Model::onUnplugInput(size_t index)
+void Model::onUnplug(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
 {
 	m_modelMatrix = glm::mat4(1.0f);
-	Node::updateValues(index);
+	Node::updateValues(toIndex);
+	Node::onUnplug(fromNode, toNode, fromIndex, toIndex);
 }
 
 void Model::resetModelPosition()

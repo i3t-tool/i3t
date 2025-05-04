@@ -20,6 +20,8 @@
 
 namespace Vp
 {
+// TODO: In Dengine, framebuffers are indexed by a string in a hashmap, so that reacting to changes
+//  in code is easier, it does however bring a runtime cost, likely negligible though
 /**
  * A set of framebuffers and their settings into which a Scene can draw.
  * This is a separate class to allow rendering a single scene with different settings

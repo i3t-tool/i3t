@@ -18,14 +18,14 @@
 // The inherit iterator traits macros just bring into scope the iterator typedefs from the parent class.
 // This is needed because when inheriting from a templated class, members aren't brought into scope by default.
 // See https://isocpp.org/wiki/faq/templates#nondependent-name-lookup-members
-#define INHERIT_ITERATOR_TRAITS_ALL(T)                                                                                 \
+#define DIWNE_INHERIT_ITERATOR_TRAITS_ALL(T)                                                                           \
 	using iterator_category = T::iterator_category;                                                                    \
 	using difference_type = T::difference_type;                                                                        \
 	using value_type = T::value_type;                                                                                  \
 	using pointer = T::pointer;                                                                                        \
 	using reference = T::reference;
 
-#define INHERIT_ITERATOR_TRAITS_BASIC(T)                                                                               \
+#define DIWNE_INHERIT_ITERATOR_TRAITS_BASIC(T)                                                                         \
 	using difference_type = T::difference_type;                                                                        \
 	using value_type = T::value_type;                                                                                  \
 	using pointer = T::pointer;                                                                                        \
@@ -39,12 +39,13 @@ class ForwardIteratorBase
 public:
 	using iterator_category = std::forward_iterator_tag;
 	using difference_type = std::ptrdiff_t;
-	using value_type = std::conditional<IsConst, const Value, Value>::type;
-	using pointer = std::conditional<IsConst, const Value*, Value*>::type;
-	using reference = std::conditional<IsConst, const Value&, Value&>::type;
+	using value_type = typename std::conditional<IsConst, const Value, Value>::type;
+	using pointer = typename std::conditional<IsConst, const Value*, Value*>::type;
+	using reference = typename std::conditional<IsConst, const Value&, Value&>::type;
 
 protected:
 	ForwardIteratorBase() {}
+	virtual ~ForwardIteratorBase() = default;
 
 	// clang-format off
 	Iterator* self() { return static_cast<Iterator*>(this); } ///< CRTP self pointer (pointer to the derived type)
@@ -96,7 +97,7 @@ public:
  *
  * The iterators attempt to comply with C++ legacy (pre C++20) iterator named requirements, but aren't necessarily
  * guaranteed to work well with the rest of the standard library.
- * @tparam T The CRTP derived iterator
+ * @tparam Iterator The CRTP derived iterator
  * @note Both regular dynamic and CRTP static inheritance is used in the iterators. For performance reasons iterators
  * often rely on static (compile time) inheritance to avoid virtual call overhead. For clarity virtual calls are used.
  */
@@ -107,7 +108,7 @@ protected:
 	using Super = ForwardIteratorBase<Iterator, NodeType, IsConst>;
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
 
 	//	using Container =
 	//	    std::conditional<IsConst, const NodeList*,
@@ -119,7 +120,7 @@ public:
 
 protected:
 	Container _nodes{nullptr}; ///< Reference to the node list
-	std::size_t _idx{0};       ///< Current node index
+	std::size_t _idx{0};       ///< Current node index // TODO: Should probably be an int
 
 public:
 	ForwardNodeIterator() {} // Default constructible to adhere to STD requirements
@@ -153,8 +154,8 @@ protected:
 
 public:
 	using iterator_category = std::bidirectional_iterator_tag;
-	INHERIT_ITERATOR_TRAITS_BASIC(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_BASIC(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	BidirectionalNodeIterator() {}
 	BidirectionalNodeIterator(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
@@ -179,11 +180,11 @@ protected:
 
 public:
 	using iterator_category = std::random_access_iterator_tag;
-	INHERIT_ITERATOR_TRAITS_BASIC(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_BASIC(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	NodeIteratorImpl() {}
-	NodeIteratorImpl(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	NodeIteratorImpl(typename Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
 
 	// clang-format off
 	// Random access operators
@@ -207,11 +208,11 @@ protected:
 
 public:
 	using iterator_category = std::random_access_iterator_tag;
-	INHERIT_ITERATOR_TRAITS_BASIC(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_BASIC(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	NodeIterator() {}
-	NodeIterator(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	NodeIterator(typename Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
 };
 
 template <typename NodeType = Node>
@@ -222,17 +223,17 @@ protected:
 
 public:
 	using iterator_category = std::random_access_iterator_tag;
-	INHERIT_ITERATOR_TRAITS_BASIC(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_BASIC(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	ConstNodeIterator() {}
-	ConstNodeIterator(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	ConstNodeIterator(typename Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
 };
 
 /**
  * Node iterator that returns only nodes that pass a specified condition.
  * Unlike the regular NodeIterator, it does not have random access, but it can move forwards and backwards.
- * @tparam T Iterator type returned by begin()/end() (the CRTP derived iterator)
+ * @tparam Iterator Type returned by begin()/end() (the CRTP derived iterator)
  * @see NodeIterator, FilteredRecursiveNodeIterator
  */
 template <typename Iterator, typename NodeType, bool IsConst>
@@ -241,14 +242,14 @@ class FilteredNodeIteratorImpl : public BidirectionalNodeIterator<Iterator, Node
 protected:
 	using Super = BidirectionalNodeIterator<Iterator, NodeType, IsConst>;
 	using Predicate = bool (*)(const Node*);
-	Predicate _predicate;
+	Predicate _predicate{nullptr};
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	FilteredNodeIteratorImpl() {}
-	FilteredNodeIteratorImpl(Predicate predicate, Super::Container nodes, std::size_t idx)
+	FilteredNodeIteratorImpl(Predicate predicate, typename Super::Container nodes, std::size_t idx)
 	    : _predicate(predicate), Super(nodes, idx)
 	{
 		if (this->_idx < this->_nodes->size() && !valid())
@@ -268,11 +269,11 @@ protected:
 	using Super = FilteredNodeIteratorImpl<FilteredNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	FilteredNodeIterator() {}
-	FilteredNodeIterator(Super::Predicate predicate, Super::Container nodes, std::size_t idx)
+	FilteredNodeIterator(typename Super::Predicate predicate, typename Super::Container nodes, std::size_t idx)
 	    : Super(predicate, nodes, idx)
 	{}
 };
@@ -300,12 +301,12 @@ protected:
 	Predicate _divePredicate{nullptr};
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	RecursiveNodeIteratorImpl() {}
-	RecursiveNodeIteratorImpl(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
-	RecursiveNodeIteratorImpl(Predicate divePredicate, Super::Container nodes, std::size_t idx)
+	RecursiveNodeIteratorImpl(typename Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	RecursiveNodeIteratorImpl(Predicate divePredicate, typename Super::Container nodes, std::size_t idx)
 	    : _divePredicate(divePredicate), Super(nodes, idx)
 	{}
 
@@ -376,11 +377,11 @@ protected:
 	using Super = RecursiveNodeIteratorImpl<RecursiveNodeIterator, NodeType>;
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	RecursiveNodeIterator() {}
-	RecursiveNodeIterator(Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
+	RecursiveNodeIterator(typename Super::Container nodes, std::size_t idx) : Super(nodes, idx) {}
 };
 
 /**
@@ -406,14 +407,15 @@ protected:
 	Predicate _predicate;
 
 public:
-	INHERIT_ITERATOR_TRAITS_ALL(Super)
-	using shared_pointer = Super::shared_pointer;
+	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
+	using shared_pointer = typename Super::shared_pointer;
 
 	FilteredRecursiveNodeIterator() {}
-	FilteredRecursiveNodeIterator(Predicate predicate, Super::Container nodes, std::size_t idx)
+	FilteredRecursiveNodeIterator(Predicate predicate, typename Super::Container nodes, std::size_t idx)
 	    : FilteredRecursiveNodeIterator(predicate, nullptr, nodes, idx)
 	{}
-	FilteredRecursiveNodeIterator(Predicate predicate, Predicate divePredicate, Super::Container nodes, std::size_t idx)
+	FilteredRecursiveNodeIterator(Predicate predicate, Predicate divePredicate, typename Super::Container nodes,
+	                              std::size_t idx)
 	    : _predicate(predicate), Super(divePredicate, nodes, idx)
 	{
 		if (this->_idx < this->_nodes->size() && !valid())
@@ -431,7 +433,7 @@ public:
 //	using Super = RecursiveNodeIteratorImpl<RNodeIterator<NodeType>, false, NodeType>;
 //
 // public:
-//	INHERIT_ITERATOR_TRAITS_ALL(Super)
+//	DIWNE_INHERIT_ITERATOR_TRAITS_ALL(Super)
 //
 //	RNodeIterator() {}
 //	RNodeIterator(NodeList* nodes, std::size_t idx) : Super(nodes, idx) {}
@@ -452,7 +454,7 @@ template <typename Range, typename Iterator, typename NodeType, bool IsConst>
 class NodeRangeBase
 {
 public:
-	using Container = Iterator::Container;
+	using Container = typename Iterator::Container;
 
 protected:
 	Container _nodes;
@@ -513,7 +515,7 @@ class NodeRangeImpl : public NodeRangeBase<Range, Iterator, NodeType, IsConst>
 	using Super = NodeRangeBase<Range, Iterator, NodeType, IsConst>;
 
 public:
-	NodeRangeImpl(Super::Container nodes) : Super(nodes) {}
+	NodeRangeImpl(typename Super::Container nodes) : Super(nodes) {}
 	// clang-format off
 	Iterator begin() { return Iterator(this->_nodes, 0); }
 	Iterator end() { return Iterator(this->_nodes, this->_nodes->size()); }
@@ -529,7 +531,7 @@ protected:
 	Predicate _predicate;
 
 public:
-	FilteredNodeRangeImpl(Predicate predicate, Super::Container nodes) : _predicate(predicate), Super(nodes) {}
+	FilteredNodeRangeImpl(Predicate predicate, typename Super::Container nodes) : _predicate(predicate), Super(nodes) {}
 	// clang-format off
 	Iterator begin() { return Iterator(_predicate, this->_nodes, 0); }
 	Iterator end() { return Iterator(_predicate, this->_nodes, this->_nodes->size()); }
@@ -541,11 +543,14 @@ class FilteredRecursiveNodeRangeImpl : public FilteredNodeRangeImpl<Range, Itera
 {
 protected:
 	using Super = FilteredNodeRangeImpl<Range, Iterator, NodeType, IsConst>;
-	Super::Predicate _divePredicate{nullptr};
+	typename Super::Predicate _divePredicate{nullptr};
 
 public:
-	FilteredRecursiveNodeRangeImpl(Super::Predicate predicate, Super::Container nodes) : Super(predicate, nodes) {}
-	FilteredRecursiveNodeRangeImpl(Super::Predicate predicate, Super::Predicate divePredicate, Super::Container nodes)
+	FilteredRecursiveNodeRangeImpl(typename Super::Predicate predicate, typename Super::Container nodes)
+	    : Super(predicate, nodes)
+	{}
+	FilteredRecursiveNodeRangeImpl(typename Super::Predicate predicate, typename Super::Predicate divePredicate,
+	                               typename Super::Container nodes)
 	    : _divePredicate(divePredicate), Super(predicate, nodes)
 	{}
 	// clang-format off
@@ -580,7 +585,7 @@ class FilteredNodeRange
 	using Super = FilteredNodeRangeImpl<FilteredNodeRange<NodeType>, FilteredNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	FilteredNodeRange(Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
+	FilteredNodeRange(typename Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
 };
 
 template <typename NodeType = Node>
@@ -602,8 +607,9 @@ class FilteredRecursiveNodeRange
 	                                             FilteredRecursiveNodeIterator<NodeType>, NodeType, false>;
 
 public:
-	FilteredRecursiveNodeRange(Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
-	FilteredRecursiveNodeRange(Super::Predicate predicate, Super::Predicate divePredicate, const NodeList* nodes)
+	FilteredRecursiveNodeRange(typename Super::Predicate predicate, const NodeList* nodes) : Super(predicate, nodes) {}
+	FilteredRecursiveNodeRange(typename Super::Predicate predicate, typename Super::Predicate divePredicate,
+	                           const NodeList* nodes)
 	    : Super(predicate, divePredicate, nodes)
 	{}
 };

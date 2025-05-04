@@ -11,7 +11,7 @@
         <DisplayString Condition="m_parentObject != nullptr">NodeEditor {m_labelDiwne} ({m_parentObject-&gt;m_labelDiwne}) [{(m_destroy)?"DESTROYED":"",sb}]</DisplayString>
     </Type>
     <Type Name="DIWNE::ForwardNodeIterator&lt;*,*,*&gt;">
-        <DisplayString>DiwneIterator (idx={_idx})</DisplayString>
+        <DisplayString>DiwneIterator (idx={_idx,d})</DisplayString>
     </Type>
     <Type Name="DIWNE::DiwnePanel">
         <DisplayString>DiwnePanel {m_label} [pos=({m_rect.Min.x,g},{m_rect.Min.y,g}) size=({m_rect.Max.x-m_rect.Min.x,g},{m_rect.Max.y-m_rect.Min.y,g})]</DisplayString>

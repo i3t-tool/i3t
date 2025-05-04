@@ -61,6 +61,7 @@ class ResourceManager;
 }
 class UIModule;
 class WorkspaceModule;
+class ViewportModule;
 
 // Static util methods
 namespace I3T
@@ -71,6 +72,7 @@ I3TApplication& app();
 // Modules
 UIModule* getUI();
 Vp::Viewport* getViewport();
+ViewportModule& getViewportModule();
 Core::ResourceManager& getResourceManager();
 WorkspaceModule& getWorkspace();
 

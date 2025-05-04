@@ -43,7 +43,7 @@ void Camera::createComponents()
 		LOG_DEBUG("Camera sequences could not be connected ({})!", EnumUtils::name(result));
 	}
 
-	getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);
+	// getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);
 }
 
 void Camera::updateValues(int inputIndex)
@@ -53,11 +53,16 @@ void Camera::updateValues(int inputIndex)
 
 	setInternalValue(std::make_pair(projMat, viewMat), I3T_CAMERA_OUT_SCREEN);
 	setInternalValue(projMat * viewMat, I3T_CAMERA_OUT_MATRIX);
-	setInternalValue(viewMat, I3T_CAMERA_OUT_MUL);
+	setInternalValue(glm::mat4(1.f), I3T_CAMERA_OUT_MUL);
 
 	m_projectionMatrix = projMat;
 	m_viewMatrix = viewMat;
 
 	Node::updateValues(inputIndex); // Callback
+}
+
+bool Camera::isEmpty() const
+{
+	return m_proj->isEmpty() && m_view->isEmpty();
 }
 } // namespace Core

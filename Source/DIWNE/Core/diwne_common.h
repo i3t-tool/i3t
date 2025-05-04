@@ -62,7 +62,8 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 	bool m_diwneDebug = false;                                                                                         \
 	bool m_diwneDebugLayout = false;                                                                                   \
 	bool m_diwneDebugObjects = false;                                                                                  \
-	bool m_diwneDebugInteractions = false;
+	bool m_diwneDebugInteractions = false;                                                                             \
+	bool m_diwneDebugCustom = false;
 #define DIWNE_DEBUG_TEMPLATE(editor, debugCode, debugVar)                                                              \
 	do                                                                                                                 \
 	{                                                                                                                  \
@@ -75,6 +76,7 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugLayout)
 #define DIWNE_DEBUG_OBJECTS(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugObjects)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugInteractions)
+#define DIWNE_DEBUG_CUSTOM(editor, debugCode) DIWNE_DEBUG_TEMPLATE(editor, debugCode, m_diwneDebugCustom)
 
 #else
 #define DIWNE_BREAKPOINT()
@@ -83,6 +85,7 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 #define DIWNE_DEBUG_LAYOUT(editor, debugCode)
 #define DIWNE_DEBUG_OBJECTS(editor, debugCode)
 #define DIWNE_DEBUG_INTERACTIONS(editor, debugCode)
+#define DIWNE_DEBUG_CUSTOM(editor, debugCode)
 #endif
 
 // Diwne logging macros, can be modified from outside of the library to integrate with existing loggers
@@ -104,8 +107,9 @@ static constexpr ImVec4 DIWNE_ORANGE_50 = ImVec4(1.f, 0.5f, 0.f, .5f);
 
 #ifdef DIWNE_USER_CONFIG
 #include DIWNE_USER_CONFIG
-#endif
+#else
 #include "DIWNE/diwne_config.h"
+#endif
 
 #ifdef NDEBUG
 #undef DIWNE_LOG_DEBUG

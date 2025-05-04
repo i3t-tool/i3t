@@ -81,7 +81,7 @@ colors:
   nscr_Nodes Screen resizeBtn fgInner: [0.400, 0.400, 0.600, 0.600]
   nscr_Nodes_Screen_noInput_background: [0.000, 0.000, 0.000, 0.650]
   nscr_Nodes_Screen_noInput_text: [1.000, 1.000, 1.000, 0.650]
-  ntrs_Nodes Transformation TrackingColor: [0.300, 0.300, 0.100, 0.600]
+  ntrs_Nodes Tracking Overlay Inactive: [0.300, 0.300, 0.100, 0.600]
   ntrs_Nodes Transformation ValidIcon bgShape: [1.000, 0.000, 0.000, 1.000]
   ntrs_Nodes Transformation ValidIcon bgInner: [1.000, 0.000, 0.000, 1.000]
   ntrs_Nodes Transformation ValidIcon fgShape: [1.000, 1.000, 1.000, 1.000]
@@ -118,8 +118,6 @@ colors:
   ncyc_RadioButtonBackground: [0.129, 0.129, 0.129, 1.000]
 sizes:
   ngen_Nodes Rounding: 7
-  nflo_Nodes Float Width: 45
-  nflo_Nodes Float Margin: 5
   ngen_Nodes BorderWidth: 0
   ngen_Pin Label Indent: 12
   ngen_Header Label Indent: 2

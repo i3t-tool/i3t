@@ -135,6 +135,16 @@ void Mesh::render() const
 	glBindVertexArray(0);
 }
 
+void Mesh::renderInstanced(int instances) const
+{
+	glBindVertexArray(m_vao);
+	for (auto& meshPart : m_meshParts)
+	{
+		renderMeshPartInstanced(meshPart, instances);
+	}
+	glBindVertexArray(0);
+}
+
 void Mesh::renderMeshPart(const MeshPart& meshPart) const
 {
 	switch (m_drawType)
@@ -169,6 +179,27 @@ void Mesh::renderMeshPart(const MeshPart& meshPart) const
 		break;
 	default:
 		throw std::invalid_argument("[MESH] Invalid mesh draw type!");
+	}
+}
+
+void Mesh::renderMeshPartInstanced(const MeshPart& meshPart, int instances) const
+{
+	switch (m_drawType)
+	{
+	case ELEMENTS:
+		switch (m_primitiveType)
+		{
+		case TRIANGLES:
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, meshPart.nIndices, GL_UNSIGNED_INT,
+			                                  (void*) (meshPart.startIndex * sizeof(unsigned int)), instances,
+			                                  meshPart.baseVertex);
+			break;
+		default:
+			throw std::invalid_argument("Mesh (instanced): Invalid mesh primitive type!");
+		}
+		break;
+	default:
+		throw std::invalid_argument("Mesh (instanced): Invalid mesh draw type!");
 	}
 }
 
@@ -217,13 +248,13 @@ Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 
 	if (!scn)
 	{
-		LOG_ERROR("[MESH] Failed to load the file '{}': {}", path, importer.GetErrorString());
+		LOG_ERROR("[MESH] Failed to load the scene file '{}': {}", path, importer.GetErrorString());
 		return nullptr;
 	}
 
 	if (scn->mNumMeshes < 1)
 	{
-		LOG_ERROR("[MESH] No meshes found in the file '{}'", path);
+		LOG_ERROR("[MESH] No meshes found in the scene file '{}'", path);
 		return nullptr;
 	}
 
@@ -244,7 +275,7 @@ Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
 	{
-		LOG_INFO("[MESH] No triangles found in the file '{}'", path);
+		LOG_INFO("[MESH] No triangles found in the scene file '{}'", path);
 		return nullptr;
 	}
 
@@ -612,7 +643,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 			// TODO: (DR) Pass resource manager instance to the load method to avoid App:: calls
 			if (!minimalLoad)
 			{
-				texId = App::getModule<ResourceManager>().texture(texPath.string());
+				texId = RMI.texture(texPath.string());
 			}
 		}
 		else
