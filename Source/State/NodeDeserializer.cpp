@@ -481,7 +481,9 @@ void assignCamera(const rapidjson::Value& value, Ptr<GuiCamera> camera)
 	auto cameraPtr = camera->m_viewportCamera.lock();
 
 	if (value.HasMember("showCamera"))
-		cameraPtr->m_visible = value["showCamera"].GetBool();
+		cameraPtr->m_showCamera = value["showCamera"].GetBool();
+	if (value.HasMember("showAxes"))
+		cameraPtr->m_showAxes = value["showAxes"].GetBool();
 
 	if (value.HasMember("frustum"))
 	{

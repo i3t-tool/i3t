@@ -42,6 +42,7 @@ protected:
 	bool m_isTracking{false};
 
 public:
+	bool m_showCamera{true}; ///< Show/Hide the camera model, use this instead of this->m_visible.
 	bool m_showFrustum{true};
 	bool m_fillFrustum{true};
 
