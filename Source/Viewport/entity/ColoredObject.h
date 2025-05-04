@@ -26,7 +26,7 @@ public:
 
 	ColoredObject(Core::Mesh* mesh, ColorShader* shader);
 
-	void prepareRenderContext(RenderContext& context) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
 
 	const glm::vec3& getColor() const;
 	void setColor(const glm::vec3* color);

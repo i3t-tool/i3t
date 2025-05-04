@@ -32,6 +32,8 @@ Model::Model(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder::
 	auto modelPtr = m_viewportModel.lock();
 	modelPtr->m_showAxes = true;
 	modelPtr->m_visible = true;
+	modelPtr->m_opacity = m_opacity;
+	modelPtr->m_opaque = m_opaque;
 
 	// Setup preview render options
 	m_renderOptions.framebufferAlpha = true;
@@ -65,6 +67,7 @@ void Model::initialize(DIWNE::DrawInfo& context)
 {
 	CoreNodeWithPins::initialize(context);
 
+	// Update tracked model
 	Ptr<Vp::SceneModel> modelPtr = m_viewportModel.lock();
 
 	Core::Model* model = getNodebase()->asRaw<Core::Model>();
@@ -78,10 +81,6 @@ void Model::initialize(DIWNE::DrawInfo& context)
 			trackedPtr = m_trackedModel.lock();
 			trackedPtr->m_visible = true;
 			trackedPtr->m_selectable = true;
-			m_modelOrigOpaque = modelPtr->m_opaque;
-			m_modelOrigOpacity = modelPtr->m_opacity;
-			modelPtr->m_opaque = false;
-			modelPtr->m_opacity = std::min(m_modelOrigOpacity, 0.8f);
 		}
 		trackedPtr = m_trackedModel.lock();
 		trackedPtr->m_showAxes = modelPtr->m_showAxes;
@@ -89,6 +88,11 @@ void Model::initialize(DIWNE::DrawInfo& context)
 		trackedPtr->setHighlightColor(GUI::imToGlm(I3T::getColor(EColor::Nodes_Tracking_ColorActive)));
 		trackedPtr->setHighlighted(true);
 		trackedPtr->setModel(modelPtr->getModel());
+
+		modelPtr->m_opaque = false;
+		modelPtr->m_opacity = std::min(m_opacity, 0.8f);
+		modelPtr->m_tint = m_tint * glm::vec3(0.28f);
+		// modelPtr->m_tintStrength = std::max(m_tintStrength, 1.0f);
 	}
 	else
 	{
@@ -96,9 +100,11 @@ void Model::initialize(DIWNE::DrawInfo& context)
 		{
 			I3T::getViewport()->removeEntity(m_trackedModel);
 			m_trackedModel.reset();
-			modelPtr->m_opaque = m_modelOrigOpaque;
-			modelPtr->m_opacity = m_modelOrigOpacity;
 		}
+		modelPtr->m_opaque = m_opaque;
+		modelPtr->m_opacity = m_opacity;
+		modelPtr->m_tint = m_tint;
+		modelPtr->m_tintStrength = m_tintStrength;
 	}
 
 	// TODO: Some kind of tint or transparency / highlight effect on the real model
@@ -120,8 +126,13 @@ void Model::centerContent(DIWNE::DrawInfo& context)
 
 	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
+	auto modelPtr = m_viewportModel.lock();
+	float origOpacity = modelPtr->m_opacity;
+	modelPtr->m_opacity = 1.f;
 	I3T::getViewport()->drawPreview(m_renderTarget, zoomedTextureSize.x, zoomedTextureSize.y, m_viewportModel,
 	                                m_renderOptions);
+	modelPtr->m_opacity = origOpacity;
+
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
@@ -244,11 +255,11 @@ void Model::popupContent_axis_showmodel()
 		if (I3TGui::BeginMenuWithLog(_t("Set opacity")))
 		{
 			ImGui::Checkbox(_t("Back-face culling"), &model->m_backFaceCull);
-			ImGui::Checkbox(_t("Opaque"), &model->m_opaque);
-			if (!model->m_opaque)
+			ImGui::Checkbox(_t("Opaque"), &m_opaque);
+			if (!m_opaque)
 			{
 				ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-				ImGui::SliderFloat(_t("Opacity"), &model->m_opacity, 0.0f, 1.0f, "%.2f");
+				ImGui::SliderFloat(_t("Opacity"), &m_opacity, 0.0f, 1.0f, "%.2f");
 			}
 			ImGui::EndMenu();
 		}
@@ -259,48 +270,48 @@ void Model::popupContent_axis_showmodel()
 	{
 		if (I3TGui::MenuItemWithLog(_t("None")))
 		{
-			model->m_tint = glm::vec3(1.0f);
+			m_tint = glm::vec3(1.0f);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Red")))
 		{
-			model->m_tint = calculateTint(Color::RED, model);
+			m_tint = calculateTint(Color::RED, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Green")))
 		{
-			model->m_tint = calculateTint(Color::GREEN, model);
+			m_tint = calculateTint(Color::GREEN, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Blue")))
 		{
-			model->m_tint = calculateTint(Color::BLUE, model);
+			m_tint = calculateTint(Color::BLUE, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Yellow")))
 		{
-			model->m_tint = calculateTint(Color::YELLOW, model);
+			m_tint = calculateTint(Color::YELLOW, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Teal")))
 		{
-			model->m_tint = calculateTint(Color::TEAL, model);
+			m_tint = calculateTint(Color::TEAL, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Magenta")))
 		{
-			model->m_tint = calculateTint(Color::MAGENTA, model);
+			m_tint = calculateTint(Color::MAGENTA, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Light Blue")))
 		{
-			model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
+			m_tint = calculateTint(Color::LIGHT_BLUE, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Orange")))
 		{
-			model->m_tint = calculateTint(Color::ORANGE, model);
+			m_tint = calculateTint(Color::ORANGE, model);
 		}
 		if (I3TGui::MenuItemWithLog(_t("Brown")))
 		{
-			model->m_tint = calculateTint(Color::BROWN, model);
+			m_tint = calculateTint(Color::BROWN, model);
 		}
 		if (I3TGui::BeginMenuWithLog(_t("Adjust tint")))
 		{
 			ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-			ImGui::SliderFloat(_t("Strength"), &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
+			ImGui::SliderFloat(_t("Strength"), &m_tintStrength, 0.0f, 1.0f, "%.2f");
 
 			ImGui::EndMenu();
 		}
@@ -310,7 +321,9 @@ void Model::popupContent_axis_showmodel()
 	if (I3TGui::BeginMenuWithLog(_t("Change model")))
 	{
 		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-		ImGui::SliderFloat(_t("Scale"), &model->m_scale, 0.01f, 10.0f, "%.01f");
+
+		// TODO: (DR) Polish scale factor impl (serialization + adjust preview radius)
+		// ImGui::SliderFloat(_t("Scale"), &model->m_scale, 0.01f, 10.0f, "%.01f");
 
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{

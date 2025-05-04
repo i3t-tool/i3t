@@ -57,11 +57,11 @@ public:
 	const Ptr<Sequence>& getProjection() const
 	{
 		return m_projection;
-	};
+	}
 	const Ptr<Sequence>& getView() const
 	{
 		return m_view;
-	};
+	}
 
 	void initialize(DIWNE::DrawInfo& context) override;
 
@@ -84,5 +84,7 @@ public:
 
 private:
 	glm::vec4 calculateFrustumColor(glm::vec3 color, float alpha);
+
+	void updateTrackedCamera();
 };
 } // namespace Workspace

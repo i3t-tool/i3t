@@ -30,6 +30,8 @@ bool DisplayOptions::shouldDraw(const Entity& entity) const
 		return showCamera;
 	case DisplayType::Frustum:
 		return showFrustum;
+	case DisplayType::Tracking:
+		return showTracking;
 	default:
 		return true;
 	}

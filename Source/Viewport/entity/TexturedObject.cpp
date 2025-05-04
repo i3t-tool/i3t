@@ -25,9 +25,9 @@ TexturedObject::TexturedObject(Core::Mesh* mesh, PhongShader* shader) : GameObje
 	// Empty
 }
 
-void TexturedObject::prepareRenderContext(RenderContext& context)
+void TexturedObject::prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions)
 {
-	GameObject::prepareRenderContext(context);
+	GameObject::prepareRenderContext(context, displayOptions);
 
 	switch (context.m_renderType)
 	{

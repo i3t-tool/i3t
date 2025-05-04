@@ -543,7 +543,7 @@ void WorkspaceDiwne::trackingSmoothLeft()
 	{
 		Core::MatrixTracker* tracking = getTracker();
 		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
-		              WorkspaceModule::g_settings.tracking_smoothScrollModifier;
+		              WorkspaceModule::g_settings.tracking_smoothScrollModifier * 5.f / tracking->getMatrixCount();
 		tracking->setProgress(tracking->getProgress() + (isTrackingFromLeft() ? -delta : delta));
 	}
 }
@@ -554,7 +554,7 @@ void WorkspaceDiwne::trackingSmoothRight()
 	{
 		Core::MatrixTracker* tracking = getTracker();
 		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
-		              WorkspaceModule::g_settings.tracking_smoothScrollModifier;
+		              WorkspaceModule::g_settings.tracking_smoothScrollModifier * 5.f / tracking->getMatrixCount();
 		tracking->setProgress(tracking->getProgress() + (isTrackingFromLeft() ? delta : -delta));
 	}
 }

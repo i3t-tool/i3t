@@ -22,8 +22,9 @@ GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh)
 	m_shader = shader;
 }
 
-void GameObject::prepareRenderContext(RenderContext& context)
+void GameObject::prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions)
 {
+	context.displayOptions = &displayOptions;
 	switch (context.m_renderType)
 	{
 	case RenderType::SILHOUETTE:
@@ -52,7 +53,7 @@ void GameObject::prepareRenderContext(RenderContext& context)
 void GameObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
                         const RenderContext& context)
 {
-	assert(m_mesh != nullptr);
+	assert(m_mesh != nullptr && "Cannot draw an object with no mesh assigned");
 
 	assert(dynamic_cast<ObjectShader*>(context.m_shader) != nullptr);
 	auto objectShader = static_cast<ObjectShader*>(context.m_shader);

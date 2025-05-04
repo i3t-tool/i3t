@@ -26,6 +26,6 @@ public:
 
 	TexturedObject(Core::Mesh* mesh, PhongShader* shader);
 
-	void prepareRenderContext(RenderContext& context) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
 };
 } // namespace Vp

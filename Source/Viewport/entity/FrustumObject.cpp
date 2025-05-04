@@ -21,14 +21,13 @@ FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader) : ColoredO
 	setDisplayType(DisplayType::Frustum);
 }
 
-void FrustumObject::prepareRenderContext(RenderContext& context)
+void FrustumObject::prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions)
 {
-	Super::prepareRenderContext(context);
+	Super::prepareRenderContext(context, displayOptions);
 
 	assert(dynamic_cast<FrustumShader*>(context.m_shader) != nullptr);
 	FrustumShader* frustumShader = static_cast<FrustumShader*>(context.m_shader);
-	frustumShader->m_frustumProjectionMatrix = m_frustumProjectionMatrix;
-	frustumShader->m_frustumViewMatrix = m_frustumViewMatrix;
+	frustumShader->m_projectionViewMatrixInv = m_frustumProjectionViewMatrixInv;
 }
 
 void FrustumObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,

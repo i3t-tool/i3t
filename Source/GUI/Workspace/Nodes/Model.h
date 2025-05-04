@@ -32,12 +32,15 @@ class Model : public CoreNodeWithPins
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 	Vp::RenderOptions m_renderOptions;
 
-	bool m_modelOrigOpaque{true};
-	float m_modelOrigOpacity{1.0f};
-
 public:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;
 	std::weak_ptr<Vp::SceneModel> m_trackedModel;
+
+	// Model properties
+	float m_opacity{1.0f};
+	bool m_opaque{true};
+	glm::vec3 m_tint{1.0f};
+	float m_tintStrength{.5f};
 
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.

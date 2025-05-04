@@ -222,11 +222,12 @@ protected:
 	                   const Ptr<Framebuffer>& selectionFBO, const Ptr<Framebuffer>& selectionBlurFBO,
 	                   const Ptr<Framebuffer>& selectionBlurSecondPassFBO);
 
-	void sortUnorderedTransparentEntities(const glm::mat4& model, const glm::mat4& view,
-	                                      std::vector<Entity*>& entities);
+	void sortUnorderedTransparentEntities(std::vector<Entity*>& entities, const glm::mat4& model,
+	                                      const glm::mat4& view);
 	void sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities);
 
-	void renderSortedTransparentEntities(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
-	                                     const std::vector<Entity*>& entities) const;
+	void renderSortedTransparentEntities(const std::vector<Entity*>& entities, const glm::mat4& model,
+	                                     const glm::mat4& view, const glm::mat4& projection,
+	                                     const DisplayOptions& displayOptions) const;
 };
 } // namespace Vp

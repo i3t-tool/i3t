@@ -23,16 +23,13 @@ class FrustumObject : public ColoredObject
 	using Super = ColoredObject;
 
 public:
-	glm::mat4 m_frustumProjectionMatrix{1.f};
-	glm::mat4 m_frustumViewMatrix{1.f};
+	glm::mat4 m_frustumProjectionViewMatrixInv{1.f};
 	glm::mat4 m_frustumViewMatrixInv{1.f};
 
 	FrustumObject(Core::Mesh* mesh, FrustumShader* shader);
 
-	void prepareRenderContext(RenderContext& context) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
 	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
 	            const RenderContext& context) override;
-
-	// TODO: Custom render method to take reference space into account
 };
 } // namespace Vp

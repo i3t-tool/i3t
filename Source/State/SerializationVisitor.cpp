@@ -196,10 +196,10 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 
 	model.AddMember("visible", mesh->m_visible, alloc);
 	model.AddMember("showAxes", mesh->m_showAxes, alloc);
-	model.AddMember("opaque", mesh->m_opaque, alloc);
-	model.AddMember("opacity", mesh->m_opacity, alloc);
-	JSON::addVector(model, "tint", mesh->m_tint, m_memento.GetAllocator());
-	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
+	model.AddMember("opaque", node->m_opaque, alloc);
+	model.AddMember("opacity", node->m_opacity, alloc);
+	JSON::addVector(model, "tint", node->m_tint, m_memento.GetAllocator());
+	model.AddMember("tintStrength", node->m_tintStrength, alloc);
 
 	models.PushBack(model, alloc);
 

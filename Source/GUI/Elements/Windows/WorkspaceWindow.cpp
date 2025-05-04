@@ -285,9 +285,8 @@ bool WorkspaceWindow::showTrackingTimeline()
 			interacted = true;
 			ImGui::TextDisabled(_tbd("Tracking settings"));
 			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
-			                            &tracker->m_trackInWorldSpace))
-				tracker->requestProgressUpdate();
+			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
+			                   ImGuiSliderFlags_Logarithmic);
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
 			                            &tracker->m_decomposeProjection))
 				tracker->requestProgressUpdate();
@@ -297,8 +296,9 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown  decomposition"), nullptr,
 			                            &tracker->m_decomposePerspectiveBrown))
 				tracker->requestProgressUpdate();
-			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
-			                   ImGuiSliderFlags_Logarithmic);
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
+			                            &tracker->m_trackInWorldSpace))
+				tracker->requestProgressUpdate();
 
 			ImGui::EndPopup();
 		}

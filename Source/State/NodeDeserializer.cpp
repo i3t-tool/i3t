@@ -186,22 +186,22 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 
 		if (value.HasMember("opaque") && value["opaque"].IsBool())
 		{
-			mesh->m_opaque = value["opaque"].GetBool();
+			model->m_opaque = value["opaque"].GetBool();
 		}
 
 		if (value.HasMember("opacity") && value["opacity"].IsFloat())
 		{
-			mesh->m_opacity = value["opacity"].GetFloat();
+			model->m_opacity = value["opacity"].GetFloat();
 		}
 
 		if (value.HasMember("tint"))
 		{
-			mesh->m_tint = JSON::getVec3(value["tint"].GetArray());
+			model->m_tint = JSON::getVec3(value["tint"].GetArray());
 		}
 
 		if (value.HasMember("tintStrength") && value["tintStrength"].IsFloat())
 		{
-			mesh->m_tintStrength = value["tintStrength"].GetFloat();
+			model->m_tintStrength = value["tintStrength"].GetFloat();
 		}
 	}
 

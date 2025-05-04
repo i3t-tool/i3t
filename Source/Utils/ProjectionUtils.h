@@ -47,4 +47,6 @@ std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m);
  */
 std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m);
 
+glm::vec4 divide(const glm::vec4& v);
+
 }; // namespace ProjectionUtils

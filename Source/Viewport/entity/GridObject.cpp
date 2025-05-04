@@ -36,11 +36,11 @@ void GridObject::updateGridShader()
 	m_shader = isStandard ? SHADERS.getShaderPtr<GridShader>() : SHADERS.getShaderPtr<GridShaderGeneric>();
 }
 
-void GridObject::prepareRenderContext(RenderContext& context)
+void GridObject::prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions)
 {
 	updateGridShader();
 
-	Super::prepareRenderContext(context);
+	Super::prepareRenderContext(context, displayOptions);
 
 	GridShader* gridShader = static_cast<GridShader*>(context.m_shader);
 	gridShader->m_modelInv = m_modelMatrixInv;

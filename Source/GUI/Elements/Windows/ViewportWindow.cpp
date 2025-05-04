@@ -263,12 +263,15 @@ void ViewportWindow::updateSpace()
 	m_space.simulateLHS = false;
 	m_space.trackingMatrixProgress = 0.f;
 
+	m_displayOptions.showTracking = false;
+
 	// TODO: Dim scene view background when tracking or using ref space
+
+	Core::MatrixTracker* tracker = Core::GraphManager::getTracker();
 
 	// React to active tracking
 	if (m_space.tracking)
 	{
-		Core::MatrixTracker* tracker = Core::GraphManager::getTracker();
 		if (!tracker->m_trackInWorldSpace)
 		{
 			// TODO: Add interpolation slider or different progress indicator
@@ -299,6 +302,8 @@ void ViewportWindow::updateSpace()
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
 				m_space.label = _tbd("NDC space");
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
+
+				m_displayOptions.showTracking = true; // Show manually controlled camera
 
 				// Switch view axes to LHS mode
 				if (tracker->getInterpolatedMatrixObject()->useLHS)
@@ -333,7 +338,15 @@ void ViewportWindow::updateSpace()
 	if (!spaceSet)
 		m_space.m_referenceSpace = glm::identity<glm::mat4>();
 
-	m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
+	if (m_space.tracking)
+	{
+		m_space.standard = m_space.m_referenceSpace == glm::identity<glm::mat4>();
+	}
+	else
+	{
+		m_space.standard = !m_space.customSource;
+	}
+
 	if (m_space.standard)
 	{
 		if (!labelSet)
@@ -559,9 +572,13 @@ bool ViewportWindow::showViewportButtons()
 
 	if (m_displayOptions.showGrids)
 	{
-		interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridBtn", m_displayOptions.grid.show);
-		interacted |= GUI::ItemTooltip(m_space.standard ? _tbd("Toggle grid") : _tbd("Toggle world grid"), "");
-		ImGui::SameLine();
+		if (m_space.trackingSpace != Core::TransformSpace::Projection)
+		{
+			// World grid is always hidden during projection tracking
+			interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridBtn", m_displayOptions.grid.show);
+			interacted |= GUI::ItemTooltip(m_space.standard ? _tbd("Toggle grid") : _tbd("Toggle world grid"), "");
+			ImGui::SameLine();
+		}
 
 		if (!m_space.standard)
 		{
@@ -576,18 +593,25 @@ bool ViewportWindow::showViewportButtons()
 	ImGui::PopItemFlag();
 	ImGui::PopStyleVar();
 
-	// TESTING BEGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// TODO: Move this into some kind of a popup / collapsible item below the local view axes
+	if (!m_space.standard)
 	{
+		ImGui::NewLine();
+		ImGui::Spacing();
+		DIWNE::DGui::DummyXY({topLeftButtonsOffset.x, 0.f});
+		ImGui::BeginGroup();
+		GUI::TextShadow(_tbd("Reference space matrix:"));
+
 		bool valChanged = false;
 		int row, col;
 		float val;
-		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, Core::EValueState::Editable, valChanged, row, col,
+		GUI::DrawMatrix("refSpaceMat", m_space.m_referenceSpace, 2, Core::EValueState::Locked, valChanged, row, col,
 		                val);
 		if (valChanged)
 		{
 			m_space.m_referenceSpace[col][row] = val;
 		}
+		ImGui::EndGroup();
 	}
 
 	return interacted;

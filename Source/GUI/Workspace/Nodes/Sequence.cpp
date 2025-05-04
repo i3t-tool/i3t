@@ -232,11 +232,55 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	popupContentTracking();
 
+	popupContentReferenceSpace();
+
 	ImGui::Separator();
 
-	// TODO: Finish <<<<<<<<<<<<<<<<<<<
-	auto& viewportModule = I3T::getViewportModule();
+	drawMenuSetPrecision();
 
+	ImGui::Separator();
+
+	drawMenuDuplicate(context);
+
+	ImGui::Separator();
+
+	Node::popupContent(context);
+}
+
+void Sequence::popupContentTracking()
+{
+	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
+	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getSequenceID() == this->getNodebase()->getId())
+	{
+		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
+		{
+			workspaceDiwne.stopTracking();
+		}
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		{
+			workspaceDiwne.trackingModeSwitch();
+		}
+	}
+	else
+	{
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
+		{
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
+			{
+				workspaceDiwne.startTracking(this, false);
+			}
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+			{
+				workspaceDiwne.startTracking(this, true);
+			}
+			ImGui::EndMenu();
+		}
+	}
+}
+
+void Sequence::popupContentReferenceSpace()
+{
+	auto& viewportModule = I3T::getViewportModule();
 	if (viewportModule.getWindowCount() == 1)
 	{
 		auto viewportWindow = viewportModule.getWindow(0);
@@ -284,49 +328,6 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 				}
 			}
 			ImGui::PopItemFlag();
-			ImGui::EndMenu();
-		}
-	}
-
-	ImGui::Separator();
-
-	drawMenuSetPrecision();
-
-	ImGui::Separator();
-
-	drawMenuDuplicate(context);
-
-	ImGui::Separator();
-
-	Node::popupContent(context);
-}
-
-void Sequence::popupContentTracking()
-{
-	auto& workspaceDiwne = static_cast<WorkspaceDiwne&>(diwne);
-	if (workspaceDiwne.isTracking() && workspaceDiwne.getTracker()->getSequenceID() == this->getNodebase()->getId())
-	{
-		if (I3TGui::MenuItemWithLog(_t("Stop tracking"), ""))
-		{
-			workspaceDiwne.stopTracking();
-		}
-		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
-		{
-			workspaceDiwne.trackingModeSwitch();
-		}
-	}
-	else
-	{
-		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
-		{
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
-			{
-				workspaceDiwne.startTracking(this, false);
-			}
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
-			{
-				workspaceDiwne.startTracking(this, true);
-			}
 			ImGui::EndMenu();
 		}
 	}

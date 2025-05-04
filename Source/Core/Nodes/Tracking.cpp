@@ -706,6 +706,10 @@ const std::vector<UPtr<MatrixTracker::TrackedMatrix>>& MatrixTracker::getMatrice
 {
 	return m_matrices;
 }
+const UPtr<MatrixTracker::TrackedNode>& MatrixTracker::getTrackedCamera() const
+{
+	return m_trackedCamera;
+}
 
 void MatrixTracker::onNodeDestroy(Node* node)
 {

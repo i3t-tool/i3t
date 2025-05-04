@@ -162,7 +162,7 @@ void Scene::drawStandard(int width, int height, const glm::mat4& model, const gl
 				{
 					glStencilMask(0x00);
 				}
-				entity->render(model, view, projection);
+				entity->render(model, view, projection, displayOptions);
 				continue;
 			}
 			// Store transparent entities for sorting
@@ -194,15 +194,17 @@ void Scene::drawStandard(int width, int height, const glm::mat4& model, const gl
 		// 3. Explicitly ordered entities with order >= 10000 (sorted in ascending order)
 
 		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesFirst);
-		sortUnorderedTransparentEntities(model, view, m_unorderedTransparentEntities);
+		sortUnorderedTransparentEntities(m_unorderedTransparentEntities, model, view);
 		sortExplicitlyOrderedTransparentEntities(m_explicitTransparencyOrderEntitiesLast);
 
 		// Don't write depth, we want to see transparent entities through each other even when its wrong
 		glDepthMask(GL_FALSE);
 
-		renderSortedTransparentEntities(model, view, projection, m_explicitTransparencyOrderEntitiesFirst);
-		renderSortedTransparentEntities(model, view, projection, m_unorderedTransparentEntities);
-		renderSortedTransparentEntities(model, view, projection, m_explicitTransparencyOrderEntitiesLast);
+		renderSortedTransparentEntities(m_explicitTransparencyOrderEntitiesFirst, model, view, projection,
+		                                displayOptions);
+		renderSortedTransparentEntities(m_unorderedTransparentEntities, model, view, projection, displayOptions);
+		renderSortedTransparentEntities(m_explicitTransparencyOrderEntitiesLast, model, view, projection,
+		                                displayOptions);
 	}
 	mainFBO->end(true);
 
@@ -263,7 +265,7 @@ void Scene::drawWboit(int width, int height, const glm::mat4& model, const glm::
 				{
 					glStencilMask(0x00);
 				}
-				entity->render(model, view, projection);
+				entity->render(model, view, projection, displayOptions);
 			}
 		}
 	}
@@ -315,7 +317,7 @@ void Scene::drawWboit(int width, int height, const glm::mat4& model, const glm::
 			{
 				glStencilMask(0x00);
 			}
-			entity->render(model, view, projection);
+			entity->render(model, view, projection, displayOptions);
 		}
 	}
 	transparentFBO->end(false);
@@ -433,7 +435,7 @@ void Scene::drawHighlight(int width, int height, const glm::mat4& model, const g
 
 				Entity::RenderContext context;
 				context.m_renderType = Entity::RenderType::SILHOUETTE;
-				entity->prepareRenderContext(context);
+				entity->prepareRenderContext(context, displayOptions);
 				context.m_opacity = 1.f;
 				entity->render(model, view, projection, context);
 
@@ -444,7 +446,7 @@ void Scene::drawHighlight(int width, int height, const glm::mat4& model, const g
 				// Simply render the silhouette with the desired highlight color
 				Entity::RenderContext context;
 				context.m_renderType = Entity::RenderType::SILHOUETTE;
-				entity->prepareRenderContext(context);
+				entity->prepareRenderContext(context, displayOptions);
 				context.m_opacity = 1.f;
 				entity->render(model, view, projection, context);
 			}
@@ -464,7 +466,7 @@ void Scene::drawHighlight(int width, int height, const glm::mat4& model, const g
 			{
 				Entity::RenderContext context;
 				context.m_renderType = Entity::RenderType::SILHOUETTE;
-				entity->prepareRenderContext(context);
+				entity->prepareRenderContext(context, displayOptions);
 				context.m_opacity = 1.f;
 				entity->render(model, view, projection, context);
 			}
@@ -619,8 +621,8 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 	return renderTarget;
 }
 
-void Scene::sortUnorderedTransparentEntities(const glm::mat4& model, const glm::mat4& view,
-                                             std::vector<Entity*>& entities)
+void Scene::sortUnorderedTransparentEntities(std::vector<Entity*>& entities, const glm::mat4& model,
+                                             const glm::mat4& view)
 {
 	// Sort by distance to camera
 	glm::vec3 cameraPos(glm::inverse(view)[3]);
@@ -644,8 +646,9 @@ void Scene::sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entit
 	          sortByExplicitTransparencyOrder);
 }
 
-void Scene::renderSortedTransparentEntities(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
-                                            const std::vector<Entity*>& entities) const
+void Scene::renderSortedTransparentEntities(const std::vector<Entity*>& entities, const glm::mat4& model,
+                                            const glm::mat4& view, const glm::mat4& projection,
+                                            const DisplayOptions& displayOptions) const
 {
 	for (const auto& entity : entities)
 	{
@@ -663,7 +666,7 @@ void Scene::renderSortedTransparentEntities(const glm::mat4& model, const glm::m
 		{
 			glStencilMask(0x00);
 		}
-		entity->render(model, view, projection);
+		entity->render(model, view, projection, displayOptions);
 		if (entity->m_backFaceCull)
 		{
 			glDisable(GL_CULL_FACE);

@@ -12,6 +12,8 @@
  */
 #include "Entity.h"
 
+#include "Viewport/data/DisplayOptions.h"
+
 using namespace Vp;
 
 Entity::Entity()
@@ -29,16 +31,17 @@ Entity::Entity()
 	m_highlightColor = glm::vec3(0.949, 0.682, 0.18);
 }
 
-void Entity::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection)
+void Entity::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+                    const DisplayOptions& displayOptions)
 {
 	RenderContext context;
-	prepareRenderContext(context);
+	prepareRenderContext(context, displayOptions);
 	render(model, view, projection, context);
 }
 
-Entity::RenderContext Entity::createRenderContext()
+Entity::RenderContext Entity::createRenderContext(const DisplayOptions& displayOptions)
 {
 	RenderContext context;
-	prepareRenderContext(context);
+	prepareRenderContext(context, displayOptions);
 	return context;
 }

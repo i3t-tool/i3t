@@ -50,7 +50,7 @@ public:
 
 	void setReferenceSpace(const glm::mat4& referenceSpace, const glm::mat4& referenceSpaceInv);
 
-	void prepareRenderContext(RenderContext& context) override;
+	void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) override;
 	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
 	            const RenderContext& context) override;
 

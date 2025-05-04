@@ -38,6 +38,8 @@ public:
 	bool showCamera{true};
 	bool showFrustum{true};
 
+	bool showTracking{false};
+
 	GridOptions grid;
 	GridOptions localGrid;
 

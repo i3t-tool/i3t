@@ -12,6 +12,8 @@
  */
 #include "ColoredObject.h"
 
+#include "Viewport/data/DisplayOptions.h"
+
 using namespace Vp;
 
 #include "Viewport/shader/ColorShader.h"
@@ -21,9 +23,9 @@ ColoredObject::ColoredObject(Core::Mesh* mesh, ColorShader* shader) : GameObject
 	// Empty
 }
 
-void ColoredObject::prepareRenderContext(RenderContext& context)
+void ColoredObject::prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions)
 {
-	GameObject::prepareRenderContext(context);
+	GameObject::prepareRenderContext(context, displayOptions);
 
 	switch (context.m_renderType)
 	{

@@ -133,43 +133,7 @@ void Camera::initialize(DIWNE::DrawInfo& context)
 {
 	Super::initialize(context);
 
-	auto cameraPtr = m_viewportCamera.lock();
-	cameraPtr->m_inferTransfromFromView = true;
-	cameraPtr->m_ignoreReferenceSpace = false;
-
-	// Camera model must be placed in a special manner when projection transform is tracked
-	if (auto t = this->getNodebase()->getTrackingData())
-	{
-		Core::MatrixTracker* tracker = t->tracker;
-		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
-		if (transform->data.space == Core::TransformSpace::Projection)
-		{
-			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
-			// Make camera ignore the projection transformation
-			cameraPtr->m_inferTransfromFromView = false;
-			cameraPtr->m_ignoreReferenceSpace = true;
-
-			float tt = transform->data.progress;
-			float mt = trackedMatrix->progress;
-
-			// Modify camera position so that it doesn't intefere with the frustum and is facing the near plane
-			cameraPtr->m_modelMatrix = glm::mat4(1.f);
-			if (abs(trackedMatrix->cameraNDCOffset > 0))
-			{
-				float zPos = trackedMatrix->moveCameraOutOfNDC ? mt * trackedMatrix->cameraNDCOffset
-				                                               : trackedMatrix->cameraNDCOffset;
-				cameraPtr->m_modelMatrix = glm::translate(cameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
-			}
-			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
-			{
-				// cameraPtr->m_modelMatrix = Math::flipAxis(cameraPtr->m_modelMatrix, 2);
-				glm::mat4 neg(1.f);
-				neg[2][2] = -1;
-				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
-				cameraPtr->m_modelMatrix = Math::lerp(glm::mat4(1.f), neg, mt, false) * cameraPtr->m_modelMatrix;
-			}
-		}
-	}
+	updateTrackedCamera();
 }
 
 void Camera::centerContent(DIWNE::DrawInfo& context)
@@ -271,6 +235,42 @@ void Camera::onSelection(bool selected)
 	else
 	{
 		model->m_highlight = false;
+	}
+}
+
+void Camera::updateTrackedCamera()
+{
+	// Camera model must be placed in a special manner when projection transform is tracked
+	if (auto t = this->getNodebase()->getTrackingData())
+	{
+		Core::MatrixTracker* tracker = t->tracker;
+		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
+		if (transform->data.space == Core::TransformSpace::Projection)
+		{
+			auto cameraPtr = m_viewportCamera.lock()->m_trackedCameraModel.lock();
+			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
+
+			float tt = transform->data.progress;
+			float mt = trackedMatrix->progress;
+
+			// Modify camera position so that it doesn't intefere with the frustum and is facing the near plane
+			// TODO: Modify tracking camera, not the world one
+			cameraPtr->m_modelMatrix = glm::mat4(1.f);
+			if (abs(trackedMatrix->cameraNDCOffset > 0))
+			{
+				float zPos = trackedMatrix->moveCameraOutOfNDC ? mt * trackedMatrix->cameraNDCOffset
+				                                               : trackedMatrix->cameraNDCOffset;
+				cameraPtr->m_modelMatrix = glm::translate(cameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
+			}
+			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
+			{
+				// cameraPtr->m_modelMatrix = Math::flipAxis(cameraPtr->m_modelMatrix, 2);
+				glm::mat4 neg(1.f);
+				neg[2][2] = -1;
+				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
+				cameraPtr->m_modelMatrix = Math::lerp(glm::mat4(1.f), neg, mt, false) * cameraPtr->m_modelMatrix;
+			}
+		}
 	}
 }
 

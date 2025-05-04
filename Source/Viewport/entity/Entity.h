@@ -16,6 +16,7 @@
 
 namespace Vp
 {
+class DisplayOptions;
 class Scene;
 class Shader;
 
@@ -25,7 +26,8 @@ enum class DisplayType
 	Axes,
 	Grid,
 	Camera,
-	Frustum
+	Frustum,
+	Tracking
 };
 
 /**
@@ -113,10 +115,11 @@ public:
 	 * @param view View matrix
 	 * @param projection Projection matrix
 	 */
-	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
+	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
+	            const DisplayOptions& displayOptions);
 
-	virtual void prepareRenderContext(RenderContext& context) = 0;
-	RenderContext createRenderContext();
+	virtual void prepareRenderContext(RenderContext& context, const DisplayOptions& displayOptions) = 0;
+	RenderContext createRenderContext(const DisplayOptions& displayOptions);
 
 public:
 	virtual void dispose() = 0;
@@ -164,6 +167,7 @@ public:
 	struct RenderContext
 	{
 		RenderType m_renderType{RenderType::NORMAL};
+		const DisplayOptions* displayOptions{nullptr};
 
 		/**
 		 * Whether to use weighted blended transparency for output if supported

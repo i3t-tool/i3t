@@ -383,6 +383,7 @@ public:
 	const std::vector<UPtr<TrackedNode>>& getTrackedModels() const;
 	/// Returns an internal list of matrix objects. Use with care and DO NOT MODIFY.
 	const std::vector<UPtr<TrackedMatrix>>& getMatrices() const;
+	const UPtr<TrackedNode>& getTrackedCamera() const;
 
 	/// Alerts the tracker that a node has been destroyed. Called in Core::Node::finalize().
 	/// @note MatrixTracker::update() must be called for changes to take effect.

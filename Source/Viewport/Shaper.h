@@ -117,15 +117,17 @@ public:
 	void clear();
 
 	/**
-	 * Create a line mesh from current shaper state and register it with ResourceManager
-	 * @param alias Unique shape identifier
+	 * Create a line mesh from current shaper state.
+	 * @param alias Unique shape identifier, registered with ResourceManager if not empty
+	 * @note Dynamic meshes should not provide an alias, as they would persist in ResourceManager.
 	 * @return
 	 */
 	Core::Mesh* createLineMesh(const std::string& alias = "");
 
 	/**
-	 * Create a triangle mesh from current shaper state and register it with ResourceManager
-	 * @param alias Unique shape identifier
+	 * Create a triangle mesh from current shaper state.
+	 * @param alias Unique shape identifier, registered with ResourceManager if not empty
+	 * @note Dynamic meshes should not provide an alias, as they would persist in ResourceManager.
 	 * @return
 	 */
 	Core::Mesh* createMesh(const std::string& alias = "");

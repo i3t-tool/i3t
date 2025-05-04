@@ -34,7 +34,8 @@ public:
 
 	std::string m_modelAlias{};
 
-	float m_scale{1.f}; ///< Optional scaling factor of the model, eg. an implicit model transformation.
+	float m_scale{1.f};          ///< Optional scaling factor of the model, eg. an implicit model transformation.
+	float m_programOpacity{1.f}; ///< Runtime opacity factor
 
 	bool m_showAxes{true};
 	std::weak_ptr<ColoredObject> m_axes; ///< Visualisation of the basis vectors

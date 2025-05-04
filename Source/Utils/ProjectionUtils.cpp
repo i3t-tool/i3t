@@ -153,4 +153,9 @@ std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m)
 	return {ortho1, persp1, persp2, ortho2, neg};
 }
 
+glm::vec4 divide(const glm::vec4& v)
+{
+	return v / v.w;
+}
+
 } // namespace ProjectionUtils
