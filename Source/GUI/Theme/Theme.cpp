@@ -256,6 +256,7 @@ void Theme::initDefaultClassic()
 	set(EColor::Workspace_HoverBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
 
 	set(EColor::DisabledPinColor, createColor(93, 93, 93, 85));
+	set(EColor::PinHoverColorShift, createColor(26, 26, 26, 0));
 
 	// pin colors (background)
 	set(EColor::PulsePin, createColor(164, 58, 190, 255));
@@ -404,9 +405,10 @@ void Theme::initDefaultClassic()
 	m_sizes[ESize::Links_ControlpointsPositionMax] = {350.0f, true};
 	m_sizes[ESize::Links_Thickness] = {5.0f, true};
 	m_sizes[ESize::Links_ThicknessSelected] = {7.0f, true};
+	m_sizes[ESize::Links_selected_alpha] = {0.8f, false};
 
 	m_sizes[ESize::Pins_IconPadding] = {2.0f, true};
-	m_sizes[ESize::Links_selected_alpha] = {0.8f, false};
+	m_sizes[ESize::Pins_DragAssistRadius] = {29.0f, true};
 
 	m_sizes[ESize::Float_inactive_alphaMultiplicator] = {0.5f, false};
 
@@ -448,22 +450,15 @@ void Theme::initDefaultClassic()
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = {{2.0f, 3.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = {{0.0f, 1.0f}, true};
-	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = {{0.0f, 0.0f}, true};
-	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = {{0.0f, 0.5f}, false};
-	m_sizesVec2[ESizeVec2::Nodes_PivotSize] = {{0.0f, 0.0f}, true};
-
-	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = {{0.0f, 0.0f}, true};
-	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = {{0.0f, 0.0f}, true};
-	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = {{0.0f, 0.0f}, true};
 
 	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = {{25.0f, 25.0f}, true};
 
 	m_sizesVec2[ESizeVec2::Nodes_PinSize] = {{15.0f, 15.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_PinSize_MatrixMul] = {{16.0f, 16.0f}, true};
+	m_sizesVec2[ESizeVec2::Nodes_PinSquareHoverEnlarge] = {{1.0f, 1.0f}, false};
+
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = {{32.0f, 32.0f}, true};
 	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = {{130.0f, 130.0f}, true};
-
-	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = {{0.0f, 0.0f}, true};
 
 	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = {{20.f, 20.f}, true};
 
@@ -700,17 +695,8 @@ void Theme::initNames()
 	    .add(ESize::Default_VisibleQuaternionPrecision, "Nodes Default Visible Precision For Quaternions")
 	    .add(ESize::Default_InactiveMark, "Nodes Default Inactive Part Marker")
 	    .addN(ESizeVec2::Nodes_NewPositionShift, "New Node Position Shift")
-	    .add1(ESizeVec2::Nodes_PinSize, "Nodes Pin Size")
-	    .add1(ESizeVec2::Nodes_PinSize_MatrixMul, "Nodes Pin Size Matrix Mul")
-	    .add(ESizeVec2::Nodes_PivotAlignment, "Nodes Pivot Alignment")
-	    .add(ESizeVec2::Nodes_PinSpacing, "Nodes Pin Spacing")
 	    .add(ESizeVec2::Nodes_ItemsSpacing, "Nodes Items Spacing")
-	    .add(ESizeVec2::Nodes_PivotSize, "Nodes Pivot Size")
-	    .add(ESizeVec2::Nodes_InputsSize, "Nodes Inputs Size")
-	    .add(ESizeVec2::Nodes_MiddleSize, "Nodes Middle Size")
-	    .add(ESizeVec2::Nodes_OutputSize, "Nodes Output Size")
-	    .add(ESizeVec2::Nodes_LODButtonSize, "Nodes LOD Button Size")
-	    .add(ESizeVec2::Builder_ItemSpacing, "Builder Item Spacing");
+	    .add(ESizeVec2::Nodes_LODButtonSize, "Nodes LOD Button Size");
 
 	group("Node Editor Links", "nlnk", 1)
 	    .add(ESize::Links_ControlpointsPositionFraction, "Link Control Point Distance Scaling Factor",
@@ -724,8 +710,15 @@ void Theme::initNames()
 	    .addF01(EColor::Links_selected_colorShift, "selected_colorShift");
 
 	group("Node Editor Pins", "npin", 1)
+	    .add1(ESizeVec2::Nodes_PinSize, "Nodes Pin Size")
+	    .add1(ESizeVec2::Nodes_PinSize_MatrixMul, "Nodes Pin Size Matrix Mul")
 	    .add(ESize::Pins_IconPadding, "Pin Icon Padding")
+	    .add(ESize::Pins_DragAssistRadius, "Pin Drag Assist Radius",
+	         "Radius around pins that counts as hover, makes dragging out links easier. The radius is specified in "
+	         "node editor coordinates.")
+	    .add(ESizeVec2::Nodes_PinSquareHoverEnlarge, "Nodes Pin Square Hover Enlarge")
 	    .add(EColor::DisabledPinColor, "Disabled Pin Color")
+	    .add(EColor::PinHoverColorShift, "Pin Hover Color Shift")
 	    .add(EColor::PulsePin, "Pulse Pin")
 	    .add(EColor::FloatPin, "Float Pin")
 	    .add(EColor::MatrixPin, "Matrix Pin")
@@ -873,6 +866,11 @@ void Theme::updateDiwneStyleFromTheme() const
 
 	style.set(Style::LINK_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_Thickness), true);
 	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected), true);
+
+	style.set(Style::PIN_DRAG_ASSIST_RADIUS, I3T::getUI()->getTheme().getPtr(ESize::Pins_DragAssistRadius), false);
+	style.set(Style::PIN_HOVER_COLOR_SHIFT, I3T::getUI()->getTheme().getPtr(EColor::PinHoverColorShift));
+	style.set(Style::PIN_SQUARE_HOVER_ENLARGE, I3T::getUI()->getTheme().getPtr(ESizeVec2::Nodes_PinSquareHoverEnlarge),
+	          false);
 
 	style.set(Style::SELECTION_RECT_FULL_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectFull));
 	style.set(Style::SELECTION_RECT_TOUCH_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectTouch));

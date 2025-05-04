@@ -133,10 +133,10 @@ public:
 	bool m_isDragged{false}; ///< Is the object dragged? Returns false immediately on drag end (unlike isDragging()).
 	bool m_draggable{true};  ///< Whether dragging of the object is allowed by default
 
-	bool m_hovered{false};   ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
-	bool m_hoverRoot{false}; ///< Whether hovering this object should prevent other objects from hovering
-	bool m_hoverable{true};  ///< Whether hovering is enabled by default
-
+	bool m_hovered{false};         ///< Is the object hovered (usually by the mouse or whatever isHoveredDiwne() tracks)
+	bool m_hoverRoot{false};       ///< Whether hovering this object should prevent other objects from hovering
+	bool m_hoverable{true};        ///< Whether hovering is enabled by default
+	bool m_forceHoverDiwne{false}; ///< Special flag that can be used to enforce hover state, used by pin drag assist
 protected:
 	bool m_internalHover{false}; ///< Temporary storage for an internal ImGui::IsItemHovered() check
 	                             ///< Can be set in the end() method to determine if object is hovered if applicable
@@ -919,6 +919,10 @@ public:
 	 * @return New context representing the only change between this context and the other one.
 	 */
 	DrawInfo findChange(const DrawInfo& other) const;
+
+	// Generic state queries
+	bool inputAvailable();      ///< Shorthand for checking that input wasn't consumed.
+	bool inputFullyAvailable(); ///< Input is available, nothing is being dragged and no action is active.
 };
 
 /**

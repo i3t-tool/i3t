@@ -36,19 +36,9 @@ public:
 
 	Node(NodeEditor& diwne, std::string labelDiwne = "DiwneNode");
 
-	// TODO: Why was copy constuctor commented out? Is it ever used?
-	//        /** Copy constructor
-	//         *  \param other Object to copy from
-	//         */
-	//        Node(const Node& other);
-
-	// TODO: Does this operator make sense? <<<<<<<<<<<<<<<<<<<<<<<<
-	//  A: no not really, its a no-op essentially
-	/** Assignment operator
-	 *  \param other Object to assign from
-	 *  \return A reference to this
-	 */
-	Node& operator=(const Node& other);
+	// Copy construction / asignment was never needed so its deleted to avoid any bugs, needs to be yet implemented
+	Node(const Node& other) = delete;
+	Node& operator=(const Node& other) = delete;
 
 	// Lifecycle
 	// =============================================================================================================

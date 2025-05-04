@@ -278,7 +278,9 @@ void CorePin::renderSquarePin(const ImVec2& pos, const ImVec2& size, float alpha
 
 	Core::EValueType pinType = getType();
 	const DIWNE::IconType iconTypeBg = PinShapeBackground[pinType];
-	const ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]) * ImVec4(1.f, 1.f, 1.f, alpha);
+	ImColor iconColorBg = I3T::getColor(PinColorBackground[pinType]) * ImVec4(1.f, 1.f, 1.f, alpha);
+	if (m_previewPlugged)
+		iconColorBg = iconColorBg + style().color(Style::PIN_HOVER_COLOR_SHIFT);
 
 	DIWNE::IconType iconTypeFg;
 	if (m_iconType != DIWNE::IconType::NoIcon)
@@ -296,9 +298,17 @@ void CorePin::renderSquarePin(const ImVec2& pos, const ImVec2& size, float alpha
 	const float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getZoom();
 	const float rounding = style().decimal(Style::PIN_SQUARE_ROUNDING) * diwne.getZoom();
 
+	ImVec2 iconSize = size;
 	ImVec2 origPos = ImGui::GetCursorScreenPos();
 	ImGui::SetCursorScreenPos(pos);
-	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, size,
+	if (m_previewPlugged)
+	{
+		// Make the icon a visually little bigger on hover
+		ImVec2 ofst = diwne.canvas().diwne2screenSize(style().size(Style::PIN_SQUARE_HOVER_ENLARGE));
+		ImGui::SetCursorScreenPos(pos - ofst);
+		iconSize += ofst * 2.f;
+	}
+	diwne.canvas().DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 	                        ImVec4(padding, padding, padding, padding), filled, {1, 1}, rounding);
 
 	ImDrawList* idl = ImGui::GetWindowDrawList();

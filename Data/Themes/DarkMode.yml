@@ -2,6 +2,7 @@ mode: dark
 colors:
   glob_Text: [0.949, 0.949, 0.949, 1.000]
   glob_Disabled Text: [0.500, 0.500, 0.500, 1.000]
+  glob_Dark Text: [0.020, 0.020, 0.020, 1.000]
   glob_Window Background: [0.135, 0.135, 0.135, 1.000]
   glob_Child Window Background: [0.000, 0.000, 0.000, 0.000]
   glob_Popup Background: [0.102, 0.102, 0.102, 0.863]
@@ -223,6 +224,7 @@ sizes:
   nlnk_Link Thickness when selected: 7
   nlnk_Link Selected Alpha: 0.800000012
   npin_Pin Icon Padding: 2
+  npin_Pin Drag Assist Radius: 29
   ngen_Nodes Operators Rounding: 7
   ngen_Nodes Sequence Rounding: 7
   ngen_Nodes LOD Button Rounding: 7
@@ -257,21 +259,14 @@ size vectors:
   glob_Tooltip Padding: [10, 10]
   ngen_Nodes Items Spacing: [4, 4]
   nflo_Nodes Float Padding: [0, 1]
-  ngen_Nodes Pin Spacing: [0, 0]
-  ngen_Nodes Pivot Alignment: [0, 0.5]
-  ngen_Nodes Pivot Size: [0, 0]
-  ngen_Nodes Inputs Size: [0, 0]
-  ngen_Nodes Middle Size: [0, 0]
-  ngen_Nodes Output Size: [0, 0]
   ngen_Nodes LOD Button Size: [27, 27]
-  ngen_Nodes Pin Size: [15, 15]
-  ngen_Nodes Pin Size Matrix Mul: [16, 16]
+  npin_Nodes Pin Size: [15, 15]
+  npin_Nodes Pin Size Matrix Mul: [16, 16]
   nflo_Nodes Float Cycle Button Size: [32, 32]
   nscr_Nodes Screen Texture Size: [130, 130]
   nscr_Screen Resize Button Size: [20, 20]
   ntrs_Sequence Dummy Space Size: [100, 1]
   ngen_New Node Position Shift: [10, 0]
-  ngen_Builder Item Spacing: [0, 0]
   star_Window Size: [1020, 800]
   star_Logo Offset: [5, -20]
   star_Window Padding: [0, 0]

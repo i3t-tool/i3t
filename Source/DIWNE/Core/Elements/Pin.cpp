@@ -453,6 +453,8 @@ bool Pin::isDragAreaHovered() const
 {
 	if (!m_hovered)
 		return false;
+	if (m_forceHoverDiwne) // Special case of forced hovering
+		return true;
 	const ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
 	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
 		return m_dragRect.Contains(mousePos);

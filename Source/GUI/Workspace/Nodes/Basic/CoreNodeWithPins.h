@@ -42,6 +42,31 @@ protected:
 public:
 	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
+	// Lifecycle
+	// =============================================================================================================
+	void begin(DIWNE::DrawInfo& context) override;
+	void leftContent(DIWNE::DrawInfo& context) override;
+	void rightContent(DIWNE::DrawInfo& context) override;
+	void afterDraw(DIWNE::DrawInfo& context) override;
+
+	void onDestroy(bool logEvent) override;
+
+	// Interaction
+	// =============================================================================================================
+	bool allowPress(const DIWNE::DrawInfo& context) const override;
+
+protected:
+	/**
+	 * Inspects mouse position relative to all pins within the node and forces a pin hover operation on the nearest pin
+	 * of the mouse is close enough, this allows pins to be (un)plugged more easily, not requiring the mouse to be
+	 * directly over them.
+	 * @return Whether hover event was forced on one of the pins.
+	 */
+	bool processPinDragAssist();
+
+public:
+	// Pins
+	// =============================================================================================================
 	/**
 	 * @brief get vector of input pins
 	 * @note Input pins don't always have to be on the left side of the node!
@@ -61,27 +86,16 @@ public:
 		return m_workspaceOutputs;
 	}
 
-	void afterDraw(DIWNE::DrawInfo& context) override;
-	void leftContent(DIWNE::DrawInfo& context) override;
-	void rightContent(DIWNE::DrawInfo& context) override;
-
 	virtual void drawInputPins(DIWNE::DrawInfo& context);
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 
 	void updatePinStyle(CorePin& pin);
 
-	bool allowPress(const DIWNE::DrawInfo& context) const override;
-
-	void onDestroy(bool logEvent) override;
+	// =============================================================================================================
 
 	void translate(const ImVec2& vec) override;
+
+private:
+	CorePin* findPinClosestToTheMouse(const std::vector<Ptr<CorePin>>& pins, float& minDistance);
 };
 } // namespace Workspace
-
-/* \todo maybe create from this function class "WithPins" and inherit other
- * class from "WithPins" */
-// extern void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData&
-// workspaceNode, Core::Node::ConstPinListRef coreInputPins,
-// Core::Node::ConstPinListRef coreOutputPins,
-// std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins,
-// std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins);

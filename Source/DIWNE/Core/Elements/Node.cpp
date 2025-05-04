@@ -19,14 +19,6 @@ namespace DIWNE
 {
 Node::Node(DIWNE::NodeEditor& diwne, std::string labelDiwne) : DiwneObject(diwne, labelDiwne) {}
 
-Node& Node::operator=(const Node& rhs)
-{
-	if (this == &rhs)
-		return *this; // handle self assignment
-	// assignment operator
-	return *this;
-}
-
 bool Node::allowDrawing()
 {
 	ImRect viewportRect = diwne.canvas().getViewportRectDiwne();

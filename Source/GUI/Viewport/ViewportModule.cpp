@@ -73,7 +73,7 @@ const std::vector<Ptr<UI::ViewportWindow>> ViewportModule::getWindows()
 const Ptr<UI::ViewportWindow>& ViewportModule::getWindow(int index)
 {
 	if (index < 0 || index >= m_viewportWindows.size())
-		return {};
+		throw std::invalid_argument("Invalid viewport window index");
 	return m_viewportWindows[index];
 }
 

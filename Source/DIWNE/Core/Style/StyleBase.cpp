@@ -43,6 +43,7 @@ StyleBase::StyleBase()
 	set<ImVec4>(PIN_BG_COLOR, {0.0, 0.0, 0.0, 0.14});
 	set<float>(PIN_BG_ROUNDING, 5.0f, true);
 	set<ImVec4>(PIN_HOVER_COLOR_SHIFT, {0.1f, 0.1f, 0.1f, 0.0f});
+	set<float>(PIN_DRAG_ASSIST_RADIUS, 29.f, true);
 
 	set<float>(PIN_SOCKET_OFFSET, 4.0f, true);
 	set<float>(PIN_SOCKET_BORDER_WIDTH, 0.0f, true);
@@ -58,6 +59,7 @@ StyleBase::StyleBase()
 	set<float>(PIN_SQUARE_BORDER_WIDTH, 0.0f, true);
 	set<ImVec4>(PIN_SQUARE_BORDER_COLOR, {0.f, 0.f, 0.f, 0.25f});
 	set<float>(PIN_SQUARE_ROUNDING, 2.0f, true);
+	set<ImVec2>(PIN_SQUARE_HOVER_ENLARGE, {1.0f, 1.0f}, false);
 
 	set<float>(PIN_CIRCLE_OFFSET, -7.0f, true);
 	set<float>(PIN_CIRCLE_BORDER_WIDTH, 1.0f, true);
