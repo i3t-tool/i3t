@@ -62,19 +62,19 @@ void PreferencesWindow::render()
 
 void PreferencesWindow::showUISettings()
 {
-	if (ImGui::CollapsingHeader("Loop settings", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("Application settings"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		auto vsync = App::get().getAppLoopManager().isVsync();
 
-		if (ImGui::Checkbox("Use VSync", &vsync))
+		if (ImGui::Checkbox(_tbd("Use VSync"), &vsync))
 		{
 			App::get().setVSync(vsync);
 		}
 		if (!vsync)
 		{
 			auto shouldLimitFPS = App::get().getAppLoopManager().shouldLimitFPS();
-			if (ImGui::Checkbox("Limit FPS", &shouldLimitFPS))
+			if (ImGui::Checkbox(_tbd("Limit FPS"), &shouldLimitFPS))
 			{
 				App::get().getAppLoopManager().enableFPSLimit(shouldLimitFPS);
 			}
@@ -82,7 +82,7 @@ void PreferencesWindow::showUISettings()
 			if (shouldLimitFPS)
 			{
 				int fpsLimit = App::get().getAppLoopManager().getTargetFPS();
-				if (ImGui::SliderInt("FPS Limit", &fpsLimit, 10, 500))
+				if (ImGui::SliderInt(_tbd("FPS Limit"), &fpsLimit, 10, 500))
 				{
 					App::get().getAppLoopManager().setTargetFPS(fpsLimit);
 				}
@@ -90,14 +90,14 @@ void PreferencesWindow::showUISettings()
 		}
 
 		auto shouldLimitFPSOnIdle = App::get().getAppLoopManager().shouldLimitFPSOnIdle();
-		if (ImGui::Checkbox("Limit FPS during idle time", &shouldLimitFPSOnIdle))
+		if (ImGui::Checkbox(_tbd("Limit FPS during idle time"), &shouldLimitFPSOnIdle))
 		{
 			App::get().getAppLoopManager().setShouldLimitFPSOnIdle(shouldLimitFPSOnIdle);
 		}
 		if (shouldLimitFPSOnIdle)
 		{
 			int fpsLimitOnIdle = App::get().getAppLoopManager().getTargetFPSOnIdle();
-			if (ImGui::SliderInt("FPS Limit during idle time", &fpsLimitOnIdle, 5, 500))
+			if (ImGui::SliderInt(_tbd("FPS Limit during idle time"), &fpsLimitOnIdle, 5, 500))
 			{
 				App::get().getAppLoopManager().setTargetFPSOnIdle(fpsLimitOnIdle);
 			}
@@ -107,7 +107,7 @@ void PreferencesWindow::showUISettings()
 		ImGui::Spacing();
 	}
 
-	if (ImGui::CollapsingHeader("User interface", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("User interface"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 
@@ -131,11 +131,11 @@ void PreferencesWindow::showUISettings()
 
 		ImGui::Checkbox(_tbd("Show window tab buttons"), &uiModule->getSettings().useWindowMenuButtons);
 		ImGui::SameLine();
-		showHelpTip("Requires restart");
+		showHelpTip(_tbd("Requires restart"));
 
 		ImGui::Checkbox(_tbd("Auto hide tab bar"), &uiModule->getSettings().autoHideTabBars);
 		ImGui::SameLine();
-		showHelpTip("Requires restart");
+		showHelpTip(_tbd("Requires restart"));
 
 		ImGui::Unindent();
 		ImGui::Spacing();
@@ -143,13 +143,15 @@ void PreferencesWindow::showUISettings()
 }
 void PreferencesWindow::showWorkspaceSettings()
 {
-	if (ImGui::CollapsingHeader("Workspace", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("Workspace"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
-		ImGui::Checkbox("Show quick add menu", &WorkspaceModule::g_settings.showQuickAddMenu);
-		ImGui::SeparatorText("Tracking");
-		ImGui::DragFloat("Smooth scroll speed", &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f, 0.001f);
-		ImGui::DragFloat("Jagged scroll speed", &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f, 0.001f);
+		ImGui::Checkbox(_tbd("Show quick add menu"), &WorkspaceModule::g_settings.showQuickAddMenu);
+		ImGui::SeparatorText(_tbd("Tracking"));
+		ImGui::DragFloat(_tbd("Smooth scroll speed"), &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f,
+		                 0.001f);
+		ImGui::DragFloat(_tbd("Jagged scroll speed"), &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f,
+		                 0.001f);
 
 		ImGui::Unindent();
 		ImGui::Spacing();
@@ -161,7 +163,7 @@ void PreferencesWindow::showViewportSettings()
 	Vp::Viewport* viewport = I3T::getViewport();
 	Vp::ViewportSettings& stg = viewport->getSettings();
 
-	if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_tbd("Scene view"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");

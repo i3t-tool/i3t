@@ -485,7 +485,7 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
 	tracker->m_decomposeProjection = true; // TODO: Better handling of these initial settings
-	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->m_decomposePerspectiveShirley = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
 
@@ -508,6 +508,9 @@ TEST_F(TrackerTest, SimpleCameraTracking)
 		EXPECT_EQ(tracker->getTransformCount(), 3);
 
 		auto expected = t.persp->data().getMat4() * t.lookAt->data().getMat4() * t.translate->data().getMat4();
+		glm::mat4 neg(1.f);
+		neg[0][0] = -1; // We expect X to be flipped to "simulate" LHS coord system
+		expected = neg * expected;
 
 		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
@@ -557,7 +560,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingInsideCamera)
 
 	auto* tracker = GraphManager::startTracking(t.c1->getView(), t.c1, TrackingDirection::RightToLeft);
 	tracker->m_decomposeProjection = true;
-	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->m_decomposePerspectiveShirley = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
 
@@ -582,6 +585,9 @@ TEST_F(TrackerTest, SimpleCameraTrackingInsideCamera)
 		EXPECT_EQ(tracker->getTransformCount(), 2);
 
 		auto expected = t.persp->data().getMat4() * t.lookAt->data().getMat4();
+		glm::mat4 neg(1.f);
+		neg[0][0] = -1; // We expect X to be flipped to "simulate" LHS coord system
+		expected = neg * expected;
 
 		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
@@ -627,7 +633,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
 	tracker->m_decomposeProjection = true;
-	tracker->m_decomposePerspectiveIntoOrthoAndPersp = false;
+	tracker->m_decomposePerspectiveShirley = false;
 	tracker->requestProgressUpdate();
 	tracker->update();
 
@@ -653,8 +659,11 @@ TEST_F(TrackerTest, SimpleCameraTrackingReferenceSpace)
 		EXPECT_TRUE(Math::compare(expected, tracker->getInterpolatedMatrix()));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
-		EXPECT_TRUE(Math::compare(t.persp->data().getMat4(), tracker->m_iProjMatrix));
-		EXPECT_PRED_FORMAT2(AssertEqualMatrices, t.persp->data().getMat4(), tracker->m_iProjMatrix);
+		glm::mat4 neg(1.f);
+		neg[0][0] = -1; // We expect X to be flipped to "simulate" LHS coord system
+
+		EXPECT_TRUE(Math::compare(t.persp->data().getMat4(), neg * tracker->m_iProjMatrix));
+		EXPECT_PRED_FORMAT2(AssertEqualMatrices, t.persp->data().getMat4(), neg * tracker->m_iProjMatrix);
 
 		EXPECT_TRUE(Math::compare(t.lookAt->data().getMat4(), tracker->m_iViewMatrix));
 		EXPECT_PRED_FORMAT2(AssertEqualMatrices, t.lookAt->data().getMat4(), tracker->m_iViewMatrix);
@@ -704,7 +713,7 @@ TEST_F(TrackerTest, SimpleCameraTrackingSmartPerspective)
 
 	auto* tracker = GraphManager::startTracking(t.s1, TrackingDirection::RightToLeft);
 	tracker->m_decomposeProjection = true;
-	tracker->m_decomposePerspectiveIntoOrthoAndPersp = true;
+	tracker->m_decomposePerspectiveShirley = true;
 	tracker->requestProgressUpdate();
 	tracker->update();
 

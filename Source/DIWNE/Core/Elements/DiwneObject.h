@@ -95,7 +95,6 @@ public:
 	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
 	bool m_rendered{true};
 
-	bool m_interactive{true}; // TODO: "Force" JustDraw DrawMode (implement change of draw mode) <<<<<<<<<<<<<<<<<<<<<<<
 	bool m_drawnThisFrame{false};
 	bool m_justHidden{false};
 

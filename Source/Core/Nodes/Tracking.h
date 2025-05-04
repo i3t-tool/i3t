@@ -296,8 +296,8 @@ public:
 	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
 	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
 	bool m_decomposeProjection{true};
-	bool m_decomposePerspectiveIntoOrthoAndPersp{true}; // TODO: Docs
-	bool m_decomposePerspectiveBrown{false};            // TODO: Docs
+	bool m_decomposePerspectiveShirley{true}; // TODO: Docs
+	bool m_decomposePerspectiveBrown{false};  // TODO: Docs
 
 	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};

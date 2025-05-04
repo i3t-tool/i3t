@@ -75,8 +75,7 @@ namespace pgr
 /// defines verbosity of the debug system, DEBUG_OFF turns the system off
 enum DebugLevel
 {
-	// TODO: (DR) The comments/meaning is the wrong way around I swear, lower log level means MORE messages, not less
-	DEBUG_OFF = 0,    ///< turn of the debug callbacks
+	DEBUG_OFF = 0,    ///< turn off the debug callbacks
 	DEBUG_HIGH = 1,   ///< enables messages with high severity
 	DEBUG_MEDIUM = 2, ///< enables messages with medium and higher severities
 	DEBUG_LOW = 3,    ///< enables messages with low and higher severities

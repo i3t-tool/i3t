@@ -71,6 +71,12 @@ void I3TApplication::onInit()
 
 	stateManager->loadGlobal();
 	stateManager->newScene(true);
+
+	// Clear the window with a dark color to prevent a bright white window popping up
+	glClearColor(0.135f, 0.135f, 0.135f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glfwSwapBuffers(m_window->get());
+
 	// Show the window immediately after loading global config
 	// (Predominantly after loading window positions in Application loadGlobal)
 	m_window->show();

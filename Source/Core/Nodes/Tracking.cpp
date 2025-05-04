@@ -410,8 +410,6 @@ void MatrixTracker::updateProgress()
 void MatrixTracker::accumulateMatrix(glm::mat4& accMatrix, const TrackedTransform& trackedTransform,
                                      const glm::mat4& transformMatrix)
 {
-	// TODO: Add special handling of camera transforms with left to right tracking <<<<<<<<<<<<<<<<<<<<<<<<<
-
 	// View and projection transformations have special handling (and are always right to left)
 	if (!m_trackInWorldSpace && trackedTransform.data.space == TransformSpace::View)
 	{
@@ -600,7 +598,7 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 		m_matrices.back()->useLHS = true;
 		return 5;
 	}
-	if (isPerspective && m_decomposePerspectiveIntoOrthoAndPersp)
+	if (isPerspective && m_decomposePerspectiveShirley)
 	{
 		auto [persp, ortho, neg] = ProjectionUtils::decomposePerspectiveShirley(transformMat);
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));

@@ -22,7 +22,7 @@ class ViewportModule : public Module, public IStateful
 
 public:
 	// TODO: Implement this properly, manipulators are disabled in secondary viewport windows for now
-	/// Index of the window that is being interacted with, 0 for none <<<<<<<<<<<<<<<<<<<<<<
+	/// Index of the window that is being interacted with, 0 for none
 	int m_interactingWindowIndex = 0;
 
 	ViewportModule();

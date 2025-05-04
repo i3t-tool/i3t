@@ -274,8 +274,6 @@ void ViewportWindow::updateSpace()
 	{
 		if (!tracker->m_trackInWorldSpace)
 		{
-			// TODO: Add interpolation slider or different progress indicator
-			//  The slider should indicate progress from one space to another
 			spaceSet = true;
 			m_space.m_referenceSpace = tracker->m_iProjMatrix * tracker->m_iViewMatrix;
 

@@ -291,7 +291,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 			                            &tracker->m_decomposeProjection))
 				tracker->requestProgressUpdate();
 			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Shirley decomposition"), nullptr,
-			                            &tracker->m_decomposePerspectiveIntoOrthoAndPersp))
+			                            &tracker->m_decomposePerspectiveShirley))
 				tracker->requestProgressUpdate();
 			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown  decomposition"), nullptr,
 			                            &tracker->m_decomposePerspectiveBrown))

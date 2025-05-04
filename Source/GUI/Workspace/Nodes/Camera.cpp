@@ -82,13 +82,6 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	m_view->m_draggable = false;
 	m_view->m_deletable = false;
 
-	// TODO: Remove <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// Hide multiplication output to discourage interaction
-	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRendered(false);
-
-	// TODO: Use some flag to make it not interactive
-	//	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_interactive = false;
-
 	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
 
 	// Callback that gets called when the underlying Camera node updates values
