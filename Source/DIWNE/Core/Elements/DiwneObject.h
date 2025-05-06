@@ -494,6 +494,7 @@ public:
 	 */
 	virtual bool allowSelectOnClick(const DrawInfo& context) const;
 
+protected:
 	// Input trigger methods (Formerly bypass methods)
 	// =============================================================================================================
 	/**
@@ -505,11 +506,8 @@ public:
 	virtual bool isHoveredDiwne();
 	virtual bool isDraggedDiwne(); ///< Is the object being dragged? (usually by mouse or some key combo)
 
-	// TODO: Maybe rename to isDownDiwne() or isKeyDownDiwne()
-	//  Begs the question which key, well that depends on the impl
-	//  The full verbose name is more like isAnyOfTheAllowedKeysPressed()
 	/**
-	 * @brief Determine whether a key is pressed down over the object.
+	 * @brief Determine whether a key/s of interest is/are pressed down over the object.
 	 *
 	 * While the key is down this method should return true until the key is released.<br>
 	 * When this method returns true and other conditions are met (hovered, press allowed), the object pressed flag
@@ -522,14 +520,20 @@ public:
 	virtual bool isPressedDiwne();
 
 	/**
-	 * Determine whether a key was just pressed. For the press action to be carried out this method must return
-	 * true at least once during the key press and release cycle. This method is needed to avoid starting the press and
-	 * release cycle when the key was not pressed initially over this object (Dragging pressed mouse over the object).
+	 * Determine whether a key/s of interest was/were just pressed. For the press action to be carried out this method
+	 * must return true at least once during the key press and release cycle. This method is needed to avoid starting
+	 * the press and release cycle when the key was not pressed initially over this object (Dragging pressed mouse over
+	 * the object).
 	 * @see isPressedDiwne()
 	 */
 	virtual bool isJustPressedDiwne();
 
-protected:
+	/**
+	 * Determine whether a popup should be opened, that is, by default, that right mouse button was pressed and isn't
+	 * dragging.
+	 */
+	virtual bool popupShouldBeOpenedDiwne() const;
+
 	// Interaction internal processing methods
 	// =============================================================================================================
 
