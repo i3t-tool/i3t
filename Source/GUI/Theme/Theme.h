@@ -288,6 +288,8 @@ enum class ESize
 
 	FloatingButtonRounding,
 
+	MouseDragThreshold,
+
 	Nodes_Rounding,
 	Nodes_BorderWidth,           // Unused // TODO: Impl
 	Nodes_LabelIndent,           // Unused // TODO: What does this mean?

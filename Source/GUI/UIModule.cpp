@@ -224,8 +224,6 @@ void UIModule::applyUIScaling(float scale)
 	m_fontManager.generateFonts(scale);
 
 	WorkspaceModule::g_editor->m_updateDataItemsWidth = true; // Prompt resize of data items
-
-	// TODO: Maybe scale ImGui::GetIO().MouseDragThreshold?
 }
 
 void UIModule::applyUIScalingNextFrame(float scale)

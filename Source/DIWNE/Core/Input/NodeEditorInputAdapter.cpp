@@ -25,15 +25,17 @@ ImVec2 NodeEditorInputAdapter::selectionRectangleStartPosition()
 
 bool NodeEditorInputAdapter::panKeyDown()
 {
-	return bypassIsMouseDown2();
+	// Allow panning by holding middle or right mouse buttons
+	return bypassIsMouseDown2() || bypassIsMouseDown1();
 }
 bool NodeEditorInputAdapter::panKeyPressed()
 {
-	return bypassIsMouseClicked2();
+	// Allow panning by holding middle or right mouse buttons
+	return bypassIsMouseClicked2() || bypassIsMouseClicked1();
 }
 bool NodeEditorInputAdapter::panDragging()
 {
-	return bypassIsMouseDragging2();
+	return bypassIsMouseDragging2() || bypassIsMouseDragging1();
 }
 
 bool NodeEditorInputAdapter::selectAllNodes()

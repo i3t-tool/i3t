@@ -360,6 +360,8 @@ void Theme::initDefaultClassic()
 	set(EColor::Cycle_RadioButtonSelectedText, createColor(0, 0, 0, 255));
 	set(EColor::Cycle_RadioButtonBackground, createColor(33, 33, 33, 255));
 
+	m_sizes[ESize::MouseDragThreshold] = {6.0f, true}; // 6 is imgui default
+
 	m_sizes[ESize::FloatingButtonRounding] = {2.0f, true};
 
 	m_sizes[ESize::Nodes_Rounding] = {5.0f, true};
@@ -569,6 +571,10 @@ void Theme::initNames()
 	    .add(ESizeVec2::FramePadding, "Window Frame Padding")
 	    .add(ESize::Tooltip_Rounding, "Tooltip Rounding")
 	    .add(ESizeVec2::Tooltip_Padding, "Tooltip Padding")
+	    .add(ESize::MouseDragThreshold, "Mouse Drag Threshold",
+	         "Distance in pixels the mouse has to travel while being held down to register as being dragged. High "
+	         "values induce a kind of drag lag, low value makes it harder to trigger click operations (like opening a "
+	         "popup).")
 	    .add(ESize::FloatingButtonRounding, "Floating Button Rounding");
 
 	group("Start Window", "star")
@@ -848,6 +854,8 @@ void Theme::updateDiwneStyleFromTheme() const
 
 	using DIWNE::Style;
 	DIWNE::StyleBase& style = editor.styleBase();
+
+	style.set(Style::MOUSE_DRAG_THRESHOLD, I3T::getUI()->getTheme().getPtr(ESize::MouseDragThreshold), true);
 
 	style.set(Style::GRID_COLOR, I3T::getUI()->getTheme().getPtr(EColor::NodeEditorGridColor));
 	style.set(Style::GRID_DOTS_COLOR, I3T::getUI()->getTheme().getPtr(EColor::NodeEditorGridDotsColor));

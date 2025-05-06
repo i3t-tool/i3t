@@ -122,7 +122,7 @@ public:
 	 * @return Whether the link is ready to be plugged in.
 	 * @see canPlug()
 	 */
-	virtual bool preparePlug(Pin* otherPin, Link* link, bool hovering);
+	virtual bool preparePlug(Pin* otherPin, Link* link, bool hovering, DIWNE::DrawInfo& context);
 
 	/**
 	 * Create a new link between this pin and the other pin.

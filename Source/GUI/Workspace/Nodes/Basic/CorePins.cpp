@@ -54,8 +54,19 @@ std::map<Core::EValueType, EColor> Workspace::PinColorForeground = {
     {Core::EValueType::Vec3, EColor::InnerVec3Pin},           {Core::EValueType::Vec4, EColor::InnerVec4Pin}};
 
 CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node, bool isInput, const std::string& label)
-    : DIWNE::Pin(diwne, node, isInput, label), m_pin(pin)
-{}
+    : Pin(diwne, node, isInput, label), m_pin(pin)
+{
+	if (pin.ValueType == Core::EValueType::MatrixMul)
+	{
+		setTooltipEnabled(true);
+		setTooltip(_tbd("Matrix multiplication"));
+	}
+	if (pin.ValueType == Core::EValueType::Screen)
+	{
+		setTooltipEnabled(true);
+		setTooltip(_tbd("Screen display data"));
+	}
+}
 
 void CorePin::content(DIWNE::DrawInfo& context)
 {
@@ -161,6 +172,11 @@ void CorePin::content(DIWNE::DrawInfo& context)
 bool CorePin::allowDrawing()
 {
 	return Pin::allowDrawing() && getCorePin().isRendered();
+}
+
+void CorePin::tooltipContent(DIWNE::DrawInfo& context)
+{
+	ImGui::TextDisabled(!m_tooltipText.empty() ? m_tooltipText.c_str() : "No tooltip set");
 }
 
 DIWNE::PinIconDrawData CorePin::drawPin(bool left, float alpha)
@@ -467,9 +483,7 @@ void CorePin::drawLabel(DIWNE::DrawInfo& context, const std::string& label)
 		ImGui::EndGroup();
 }
 
-void CorePin::popupContent(DIWNE::DrawInfo& context) {}
-
-bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering)
+bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering, DIWNE::DrawInfo& context)
 {
 	assert(this != otherPin && "Pin cannot be plugged into itself");
 
@@ -493,33 +507,48 @@ bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering)
 	switch (Core::GraphManager::isPlugCorrect(coreInput, coreOutput))
 	{
 	case Core::ENodePlugResult::Ok:
-		// diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
+		// showTooltip("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
 		if (!hovering)
 		{
 			input->plugLink(output, link, true);
 		}
 		return true;
 	case Core::ENodePlugResult::Err_MismatchedPinTypes:
-		diwne.showTooltipLabel("Mismatched pin Types (matrix/float/vec/...)",
-		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
-		break;
+	{
+		// Special handling of connecting matrix data into matrix mul
+		bool inputIsMatrixOrMul =
+		    coreInput.ValueType == Core::EValueType::MatrixMul || coreInput.ValueType == Core::EValueType::Matrix;
+		bool outputIsMatirxOrMul =
+		    coreOutput.ValueType == Core::EValueType::MatrixMul || coreOutput.ValueType == Core::EValueType::Matrix;
+		if (inputIsMatrixOrMul || outputIsMatirxOrMul)
+		{
+			showTooltip("Mismatched pin types!",
+			            "Matrix data (red) cannot be plugged into matrix multiplication "
+			            "(green) directly, use a matrix sequence node.",
+			            I3T::getColor(EColor::Nodes_ConnectionNotPossible), context, 20.f);
+			break;
+		}
+		showTooltip(_tbd("Mismatched pin types (matrix/float/vec/...)"),
+		            I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+	}
+	break;
 	case Core::ENodePlugResult::Err_MismatchedPinKind:
-		diwne.showTooltipLabel("Mismatched pin Kinds (in/out)", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Mismatched pin kinds (in/out)"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_Loopback: /// Same nodes.
-		diwne.showTooltipLabel("Loop to the same node", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Loop to the same node"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_NonexistentPin:
-		diwne.showTooltipLabel("Pin does not exist :-D", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Pin does not exist"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_Loop:
-		diwne.showTooltipLabel("Loop not allowed", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Loop not allowed"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_DisabledPin:
-		diwne.showTooltipLabel("Pin is disabled", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Pin is disabled"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	default: // unreachable - all enum values are covered
-		diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		showTooltip(_tbd("Connection not possible"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 	}
 	return false;
 }

@@ -51,7 +51,7 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 	       !this->weak_from_this().expired());
 	// clang-format on
 
-	m_tooltipDrawn = m_takeSnap = false; // TODO: (DR) Remove some of these
+	m_takeSnap = false;
 
 	// TODO: Unify bringToFront/shifting behavior across pasting, dragging and last active node
 	//   - Last active node should use the bringToFront marking system same as any others
@@ -63,7 +63,7 @@ void NodeEditor::initializeDiwne(DrawInfo& context)
 		bringLastActiveNodeToFront();
 		m_lastActiveNodeChanged = false;
 	}
-	// TODO: (Dr) This requires an extra O(n) pass, could be merged with object purging
+	// TODO: (DR) This requires an extra O(n) pass, could be merged with object purging
 	bringMarkedNodesToFront();
 
 	purgeObjects(); // Erase objects marked for destruction or removal in the previous frame
@@ -420,7 +420,7 @@ bool NodeEditor::processZoom()
 
 bool NodeEditor::processPan()
 {
-	if (m_input->bypassIsMouseDown2())
+	if (m_input->panKeyDown())
 	{
 		m_canvas->moveViewportZoomed(m_input->bypassGetMouseDelta() * -1);
 		return true;

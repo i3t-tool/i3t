@@ -507,13 +507,22 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 
 void WorkspaceDiwne::startTracking(Sequence* sequence, bool trackFromLeft)
 {
-	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
 	Ptr<Core::Camera> coreCam;
+	// Test if the starting sequence is part of a camera
 	if (sequence->isCameraSequence())
 	{
 		assert(dynamic_cast<Camera*>(sequence->getParentObject()) != nullptr);
-		coreCam = static_cast<Sequence*>(sequence->getParentObject())->getNodebase()->as<Core::Camera>();
+		auto* camera = static_cast<Camera*>(sequence->getParentObject());
+		// When tracking is started from the projection sequence, it should instead start from view sequence
+		if (*sequence == *camera->getProjection().get())
+			sequence = camera->getView().get();
+		// TODO: [T-VIEWPORT] Same exception
+
+		coreCam = camera->getNodebase()->as<Core::Camera>();
 	}
+
+	const auto coreSeq = sequence->getNodebase()->as<Core::Sequence>();
+
 	Core::GraphManager::startTracking(
 	    coreSeq, coreCam, trackFromLeft ? Core::TrackingDirection::LeftToRight : Core::TrackingDirection::RightToLeft);
 }

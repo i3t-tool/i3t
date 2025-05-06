@@ -55,19 +55,19 @@ class DrawInfo;
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
+protected:
+	static unsigned long long g_diwneIDCounter; ///< Static unique ID generator, unique only for current application run
+
 public:
 	// TODO: Might be better to have a pointer here, imagine cases where nodes are moved between editors / copy / move
-	DIWNE::NodeEditor& diwne; /**< Every object have access to Diwne - is used for share information if needed */
+	NodeEditor& diwne; ///< Reference to the NodeEditor instance (also named 'editor' in some classes)
 	// TODO: Do we need id and label to be separate?
 	//  Pros: Easy lookup / comparsion using unique ID
 	//  Cons: Somewhat confusing? Both label and id are UNIQUE identifiers
 	//   label includes ID at the end which isn't too clear
 	//  Perhaps keep this and make clear in docs
-	static unsigned long long g_diwneIDCounter;
-	DIWNE::ID m_idDiwne;      /**< Used for creating ImGui id/labels */
-	std::string m_labelDiwne; /**< Used for identifying object and creating ImGui id/labels */
-	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
-	std::string m_popupIDDiwne; /**< Used for identifying what element raise popup */
+	ID m_idDiwne;             ///< Unique numeric identifier of the object
+	std::string m_labelDiwne; ///< Unique string identifier, consists of <some string>:<m_idDiwne>.
 
 	ImRect m_rect;        ///< Rectangle bounds of the object in diwne coordinates. @see getRect()
 	ImRect m_displayRect; ///< Rectangle bounds aligned with the last viewport. @see getDisplayRect()
@@ -75,11 +75,12 @@ public:
 	StyleOverride* m_styleOverride{nullptr}; ///< Style override to allow uniquely styled object types
 
 	bool m_destroy{false};  ///< Indicates the object is to be deleted (and deallocated)
-	bool m_deletable{true}; ///< Whether the object can be deleted by the user
+	bool m_deletable{true}; ///< Whether the object can be destroyed by the user
 
-	// TODO: (DR) Implement (true for most inner nodes, like in sequences)
-	//  In theory drag operations could affect sequences but ONLY when only same sequence ndoes are selected
 	bool m_fixed{false}; ///< Whether the object can be moved by user operations @see isFixed()
+
+	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
+	bool m_rendered{true};
 
 	/// Read-only flag thats updated on each drawDiwne().
 	/// Essentially just a way to avoid passing this along everywhere as it should stay constant for each object.
@@ -92,19 +93,25 @@ public:
 	//  As for the m_rendered flag below, it could be replaced with a LOD level like "Hidden" or "DoNotRender".
 	//  Although that might be unnecessary as a basic rendered boolean flag is probably useful anyway.
 
-	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
-	bool m_rendered{true};
-
-	bool m_drawnThisFrame{false};
-	bool m_justHidden{false};
+	bool m_drawnThisFrame{false}; ///< Read only flag indicating whether the object has been drawn this frame
+	bool m_justHidden{false};     ///< Read only flag indicating that this object was drawn last frame, but not this one
 
 protected:
+	// Tooltips and popups
+	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
+	std::string m_popupLabelDiwne; ///< ImGui popup identifier
+	bool m_popupEnabled{true};     ///< Whether this object has popup enabled
+	bool m_openPopup{false};       ///< Request to open popup
+	bool m_tooltipEnabled{false};  ///< Whether this object has tooltip enabled
+	std::string m_tooltipText;
+	bool m_openTooltip{false}; ///< Request to open tooltip
+
+
 	bool m_selectable{true}; ///< Should not be accessed directly. @see setSelectable()
 	bool m_selected{false};  ///< Should not be accessed directly. @see setSelected()
 
 	bool m_bringToFront{false}; ///< Request the object's rendering order to be moved to the front above other objects
 	bool m_forceDraw{true};     ///< Request the next draw of the object to have the ForceDraw DrawMode flag.
-	bool m_openPopup{false};    ///< Request to open popup
 
 	/// Sets the parent object of object, relevant in node container and hover hierarchy.
 	DiwneObject* m_parentObject{nullptr};
@@ -249,10 +256,6 @@ public:
 	 * The final method to be called, gets called every frame and doesn't do any drawing.
 	 */
 	virtual void finalize(DrawInfo& context);
-
-	// Popups
-	// =============================================================================================================
-	virtual void popupContent(DrawInfo& context); ///< Content of popup menu raised on this object
 
 protected:
 	// Internal implementation methods, can still be overriden if needed
@@ -484,13 +487,6 @@ public:
 	virtual bool allowDragStart() const;
 
 	/**
-	 * Determines whether a popup can be raised over the object.
-	 * Allowed by default.
-	 * @see processPopupDiwne()
-	 */
-	virtual bool allowPopup() const;
-
-	/**
 	 * Determines whether the object can be selected by clicking it (eg. pressing and then releasing it).
 	 * This is a type of interaction and not related to whether the object is "selectable" or not.
 	 * Programmatical selection using DiwneObject::setSelected() is not affected.
@@ -498,48 +494,6 @@ public:
 	 */
 	virtual bool allowSelectOnClick(const DrawInfo& context) const;
 
-protected:
-	// Interaction internal processing methods
-	// =============================================================================================================
-
-	virtual void processHoverDiwne(DrawInfo& context);
-
-	/**
-	 * Processes whether the object is currently pressed (held) and further if it was just pressed or released.
-	 * By default, being pressed means that the mouse is pressed down when hovering over it.
-	 * The first frame of the press is considered just pressed, same for the last with just released.
-	 * <br><br>
-	 * What key or keys trigger the pressed state depends on the implementation of isPressedDiwne()
-	 * and isJustPressedDiwne().
-	 * <br><br>
-	 * Regarding clicks or key presses:
-	 * The concept of a "click" is often ambiguous. In ImGui it generally means the moment the mouse is just pressed.
-	 * However clicks are more traditionally considered to be a rapid sequence of press and release.
-	 * In DIWNE the click terminology isn't really used, an equivalent would be just released whilist *not* dragging.
-	 * Meaning if you want to react to a click put an if (!context.state.dragging) in the onReleased() callback.
-	 */
-	virtual void processPressAndReleaseDiwne(DrawInfo& context);
-
-	virtual void processDragDiwne(DrawInfo& context);
-
-	/**
-	 * Processes whether a popup should be opened over this object. If it is, the popupContent() method is called.
-	 * @param context
-	 */
-	virtual void processPopupDiwne(DrawInfo& context);
-	virtual void onPopup();
-
-	/**
-	 * Processes any interactions related to whether the object should be selected.
-	 * The default behavior is selection when the object is pressed and then released (clicked).
-	 * @note This is not the only method which can select the object.
-	 * @param context
-	 * @return Whether selection processing should end. Can be used to exit early from derived methods.
-	 * @see processPressAndReleaseDiwne()
-	 */
-	virtual bool processSelectDiwne(DrawInfo& context);
-
-public:
 	// Input trigger methods (Formerly bypass methods)
 	// =============================================================================================================
 	/**
@@ -575,19 +529,94 @@ public:
 	 */
 	virtual bool isJustPressedDiwne();
 
+protected:
+	// Interaction internal processing methods
+	// =============================================================================================================
+
+	/**
+	 * Processes whether the object is currently hovered. Hover is a prerequisite for most other interactions.
+	 * Hover processing is often delegated to ImGui items forming the objects using the m_internalHover flag.
+	 * Otherwise a manual mouse intersection test is needed.
+	 * Hover state can also be forced using the m_forceHoverDiwne flag, which gets reset every frame.
+	 * @see isHoveredDiwne(), allowHover()
+	 */
+	virtual void processHoverDiwne(DrawInfo& context);
+
+	/**
+	 * Processes whether the object is currently pressed (held) and further if it was just pressed or released.
+	 * By default, being pressed means that the mouse is pressed down when hovering over it.
+	 * The first frame of the press is considered just pressed, same for the last with just released.
+	 * <br><br>
+	 * What key or keys trigger the pressed state depends on the implementation of isPressedDiwne()
+	 * and isJustPressedDiwne().
+	 * <br><br>
+	 * Regarding clicks or key presses:
+	 * The concept of a "click" is often ambiguous. In ImGui it generally means the moment the mouse is just pressed.
+	 * However clicks are more traditionally considered to be a rapid sequence of press and release.
+	 * In DIWNE the click terminology isn't really used, an equivalent would be just released whilist *not* dragging.
+	 * Meaning if you want to react to a click put an if (!context.state.dragging) in the onReleased() callback.
+	 */
+	virtual void processPressAndReleaseDiwne(DrawInfo& context);
+
+	virtual void processDragDiwne(DrawInfo& context);
+
+	/**
+	 * Processes any interactions related to whether the object should be selected.
+	 * The default behavior is selection when the object is pressed and then released (clicked).
+	 * @note This is not the only method which can select the object.
+	 * @param context
+	 * @return Whether selection processing should end. Can be used to exit early from derived methods.
+	 * @see processPressAndReleaseDiwne()
+	 */
+	virtual bool processSelectDiwne(DrawInfo& context);
+
+	/**
+	 * Processes whether a popup should be opened over this object. If it is, the popupContent() method is called.
+	 * @param context
+	 */
+	virtual void processPopupAndTooltipDiwne(DrawInfo& context);
+
+public:
 	// Popups and tooltips
 	// =============================================================================================================
+	virtual void popupContent(DrawInfo& context); ///< Content of popup menu raised on this objec
+
+	virtual void onPopup() {}
+
+	/**
+	 * Determines whether a popup can be raised over the object.
+	 * Allowed by default.
+	 * @see processPopupDiwne()
+	 */
+	virtual bool allowPopup() const;
+
+	void setPopupEnabled(bool val);
 
 	/// Request to open the object's popup if possible.
 	void openPopup();
 
-	// TODO: Elevate to the same status as popupContent -> tooltipContent
-	// TODO: Should probably be moved into some util class to keep the DiwneObject concise
-	/** \brief Show a colored text for example for immediate hints
-	 * \param label is the text to show
+	virtual void tooltipContent(DrawInfo& context); ///< Content of the object's tooltip
+
+	/**
+	 * Immediately show a tooltip next to the mouse cursor with the specified text.
+	 * Prevents other tooltips from showing this frame.
+	 * \param label Text to show
 	 * \param color is the color of the tooltip
 	 */
-	void showTooltipLabel(const std::string& label, const ImColor&& color);
+	void showTooltip(const std::string& label, const ImColor&& color, DrawInfo& context);
+	/**
+	 * Immediately show a tooltip next to the mouse cursor with the specified text.
+	 * Prevents other tooltips from showing this frame.
+	 * @param label Text to show
+	 * @param desc Smaller text description
+	 * @param color Color of the tooltip
+	 * @param wrapWidth Max number of characters before text wrap.
+	 */
+	void showTooltip(const std::string& label, const std::string& desc, const ImColor&& color, DrawInfo& context,
+	                 float wrapWidth = 35.f);
+
+	void setTooltipEnabled(bool val);
+	void setTooltip(const std::string& text);
 
 	// Miscellaneous
 	// =============================================================================================================
@@ -711,7 +740,7 @@ private:
 };
 
 // TODO: (DR) Should be moved to NodeEditor or to a separate class
-/*
+/**
  * A persistent state storage holding information about multi-frame interactions.
  * Each NodeEditor holds an instance of this state and sets a reference to it in the non-persistent DrawInfo context.
  * By persistence we mean persistence across multiple frames.
@@ -903,6 +932,9 @@ public:
 
 	unsigned short popupOpened{0};
 	inline void popup() { popupOpened++; }
+
+	unsigned short tooltipOpened{0};
+	inline void tooltip() { tooltipOpened++; }
 
 	// clang-format on
 

@@ -176,16 +176,16 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 		return ENodePlugResult::Err_DisabledPin;
 	}
 
-	if (input.ValueType != output.ValueType)
-	{
-		// Do the input and output data types match?
-		return ENodePlugResult::Err_MismatchedPinTypes;
-	}
-
 	if (input.IsInput == output.IsInput)
 	{
 		// Do the input and output kind match?
 		return ENodePlugResult::Err_MismatchedPinKind;
+	}
+
+	if (input.ValueType != output.ValueType)
+	{
+		// Do the input and output data types match?
+		return ENodePlugResult::Err_MismatchedPinTypes;
 	}
 
 	if (input.ValueType == EValueType::Pulse)

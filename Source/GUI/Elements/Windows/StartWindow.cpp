@@ -402,15 +402,15 @@ void StartWindow::renderRightPanel()
 					// Show tooltip when description doesn't fit
 					if (!willTextFit && ImGui::IsItemHovered())
 					{
-						ImGui::BeginTooltip();
+						if (ImGui::BeginTooltip())
 						{
 							ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
 							ImGui::PushStyleColor(ImGuiCol_Text, theme.get(EColor::StartWindow_DescriptionFont));
 							ImGui::TextUnformatted(header->m_description.c_str());
 							ImGui::PopTextWrapPos();
 							ImGui::PopStyleColor();
+							ImGui::EndTooltip();
 						}
-						ImGui::EndTooltip();
 					}
 					ImGui::PopStyleColor();
 					ImGui::SetWindowFontScale(1.0f);

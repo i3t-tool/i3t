@@ -28,7 +28,7 @@ unsigned long long DiwneObject::g_diwneIDCounter = 1; // 0 is reserved for no/in
 
 DiwneObject::DiwneObject(DIWNE::NodeEditor& diwne, std::string labelDiwne)
     : diwne(diwne), m_idDiwne(g_diwneIDCounter++), m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne)),
-      m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
+      m_popupLabelDiwne(fmt::format("popup_{}", m_labelDiwne))
 {}
 
 DiwneObject::~DiwneObject()
@@ -156,7 +156,7 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 	processPressAndReleaseDiwne(context);
 	processDragDiwne(context);
 	processSelectDiwne(context);
-	processPopupDiwne(context);
+	processPopupAndTooltipDiwne(context);
 
 	processInteractions(context); // Process other user interactions
 
@@ -165,8 +165,6 @@ void DiwneObject::processInteractionsDiwne(DrawInfo& context)
 
 void DiwneObject::processHoverDiwne(DrawInfo& context)
 {
-	if (ImGui::IsKeyDown(ImGuiKey_E) && diwne.input().bypassIsMouseDragging0())
-		int x = 5;
 	bool hoveredTmp = (isHoveredDiwne() || m_forceHoverDiwne) && !context.hoverConsumed;
 	bool hovered = hoveredTmp && (context.state.hoverTarget.empty() || context.state.hoverTarget == m_labelDiwne);
 	m_hovered = hovered && allowHover();
@@ -527,7 +525,12 @@ bool DiwneObject::isDraggedDiwne()
 }
 void DiwneObject::popupContent(DrawInfo& context)
 {
-	ImGui::MenuItem("Override this method with content of popup menu of your object");
+	ImGui::MenuItem("popupContent() is empty");
+}
+
+void DiwneObject::tooltipContent(DrawInfo& context)
+{
+	ImGui::TextUnformatted(!m_tooltipText.empty() ? m_tooltipText.c_str() : "No tooltip set");
 }
 
 void DiwneObject::onHover(DrawInfo& context)
@@ -615,39 +618,54 @@ bool DiwneObject::allowPopup() const
 {
 	return true;
 }
-void DiwneObject::processPopupDiwne(DrawInfo& context)
+void DiwneObject::setPopupEnabled(bool val)
 {
-	if (context.state.anyActionActive())
+	m_popupEnabled = val;
+}
+void DiwneObject::processPopupAndTooltipDiwne(DrawInfo& context)
+{
+	// Ignore tooltips when input is consumed, or we're dragging or an action is active
+	if (!context.inputFullyAvailable())
 		return;
 
-	// TODO: What about dragging? Will popup open at the end of a drag?
 	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
-	if (m_openPopup || (m_hovered && diwne.input().bypassIsMouseReleased1()))
+	if (m_popupEnabled && (m_openPopup || (m_hovered && diwne.input().bypassIsMouseReleased1())))
 	{
 		if (!context.popupOpened && allowPopup())
 		{
-			ImGui::OpenPopup(m_popupIDDiwne.c_str());
+			ImGui::OpenPopup(m_popupLabelDiwne.c_str());
 			context.update(true, true, true);
 			context.popup();
 			// Store popup position for stuff like adding nodes at the popup location
 			diwne.setPopupPosition(diwne.input().bypassGetMousePos());
 			onPopup();
 		}
-		m_openPopup = false;
 	}
+	m_openPopup = false;
 
-	if (ImGui::IsPopupOpen(m_popupIDDiwne.c_str()))
+	if (ImGui::IsPopupOpen(m_popupLabelDiwne.c_str()))
 	{
 		// TODO: Stopping and starting zoom scaling DOES NOT create a backup of the current style
 		//  Meaning any pushed style variables will get reset when zoom scaling is applied again
 		const bool zoomScalingWasActive = diwne.canvas().ensureZoomScaling(false);
-		if (ImGui::BeginPopup(m_popupIDDiwne.c_str()))
+		if (ImGui::BeginPopup(m_popupLabelDiwne.c_str()))
 		{
 			popupContent(context);
 			ImGui::EndPopup();
 		}
 		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
 	}
+
+	if (m_tooltipEnabled && m_openTooltip)
+	{
+		context.tooltip();
+		if (ImGui::BeginTooltip())
+		{
+			tooltipContent(context);
+			ImGui::EndTooltip();
+		}
+	}
+	m_openTooltip = false;
 }
 
 void DiwneObject::openPopup()
@@ -655,17 +673,36 @@ void DiwneObject::openPopup()
 	m_openPopup = true;
 }
 
-void DiwneObject::onPopup() {}
-
-void DiwneObject::showTooltipLabel(const std::string& label, const ImColor&& color)
+void DiwneObject::showTooltip(const std::string& label, const ImColor&& color, DIWNE::DrawInfo& context)
 {
-	if (!diwne.m_tooltipDrawn)
+	if (!context.tooltipOpened)
 	{
-		diwne.m_tooltipDrawn = true;
-		ImGui::BeginTooltip();
-		ImGui::TextColored(color, label.c_str());
-		ImGui::EndTooltip();
+		context.tooltip();
+		if (ImGui::BeginTooltip())
+		{
+			ImGui::TextColored(color, label.c_str());
+			ImGui::EndTooltip();
+		}
 	}
+}
+void DiwneObject::showTooltip(const std::string& label, const std::string& desc, const ImColor&& color,
+                              DrawInfo& context, float wrapWidth)
+{
+	if (!context.tooltipOpened)
+	{
+		context.tooltip();
+		DGui::Tooltip(label.c_str(), desc.c_str(), color, wrapWidth);
+	}
+}
+void DiwneObject::setTooltipEnabled(bool val)
+{
+	m_tooltipEnabled = val;
+}
+void DiwneObject::setTooltip(const std::string& text)
+{
+	m_tooltipText = text;
+	if (!m_tooltipText.empty())
+		setTooltipEnabled(true);
 }
 
 void DiwneObject::setStyleOverride(StyleOverride* styleOverride)

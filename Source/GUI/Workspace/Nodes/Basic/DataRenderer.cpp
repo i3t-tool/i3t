@@ -28,7 +28,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 {
 	bool inactive = (valueState == Core::EValueState::Locked || valueState == Core::EValueState::LockedSyn);
 	bool synergies = (valueState == Core::EValueState::EditableSyn || valueState == Core::EValueState::LockedSyn);
-	bool inner_interaction_happen = false, valueChangedByPopup = false;
+	bool interacted = false, valueChangedByPopup = false;
 
 	if (synergies)
 	{
@@ -58,9 +58,14 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 	valueChanged =
 	    ImGui::DragFloat(label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 	                     1.0f); /* if power >1.0f the number changes logarithmic */
+	bool hovered = ImGui::IsItemHovered();
+	bool active = ImGui::IsItemActive();
 
-	if (ImGui::IsItemActive())
-		inner_interaction_happen = true;
+	if (active)
+		interacted = true;
+
+	if (hovered && !active)
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
 
 	if (ImGui::IsItemDeactivatedAfterEdit())
 	{
@@ -70,7 +75,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 
 	if (!inactive && !context.popupOpened)
 	{
-		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		if (!context.state.dragging && hovered && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
 		{
 			ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
 			diwne.setPopupPosition(ImGui::GetMousePos());
@@ -78,8 +83,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 			context.popup();
 		}
 
-		inner_interaction_happen |=
-		    DIWNE::popupDiwne(diwne, label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+		interacted |= DIWNE::popupDiwne(diwne, label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 
 		if (valueChangedByPopup)
 		{
@@ -103,7 +107,7 @@ bool DataRenderer::drawDragFloatWithMap_Inline(DIWNE::NodeEditor& diwne, DIWNE::
 
 	//	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
 
-	return inner_interaction_happen || valueChanged;
+	return interacted || valueChanged;
 }
 
 void DataRenderer::popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& valueSelected)
@@ -358,7 +362,7 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
                                const std::array<std::array<Core::EValueState, 4> const, 4>& dataState,
                                bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange)
 {
-	bool inner_interaction_happen = false;
+	bool interacted = false;
 	bool actualValueChanged = false;
 	float localData; /* user can change just one value at the moment */
 
@@ -383,7 +387,7 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
 		{
 			localData = data[columns][rows]; /* Data are column-wise */
 
-			inner_interaction_happen |=
+			interacted |=
 			    drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
 			                                fmt::format("##{}:row-{},col-{}", node_id, rows, columns), localData,
 			                                dataState[rows][columns], actualValueChanged, nodeLabel);
@@ -416,7 +420,7 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
 	//                localData = data[columns][rows]; /* Data are column-wise */
 	//
 	//                ImGui::PushItemWidth(dataWidth); /* \todo JH maybe some
-	//                better settings of width */ inner_interaction_happen |=
+	//                better settings of width */ interacted |=
 	//                drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals,
 	//                floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows,
 	//                columns),
@@ -442,7 +446,7 @@ bool DataRenderer::drawData4x4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& contex
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
-	return inner_interaction_happen;
+	return interacted;
 }
 
 bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& context, DIWNE::ID node_id,
@@ -455,7 +459,7 @@ bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	//    const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 
 	bool actualValueChanged = false;
-	bool inner_interaction_happen = false;
+	bool interacted = false;
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
@@ -468,9 +472,9 @@ bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	{
 		valueOfChange[columns] = data[columns]; /* \todo JH \todo MH copy whole data directly - not in
 		                                           for see lines above */
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, columns),
-		    valueOfChange[columns], dataState[columns], actualValueChanged, nodeLabel);
+		interacted |= drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
+		                                          fmt::format("##{}:col-{}", node_id, columns), valueOfChange[columns],
+		                                          dataState[columns], actualValueChanged, nodeLabel);
 		if (actualValueChanged)
 			valueChanged = true;
 	}
@@ -479,7 +483,7 @@ bool DataRenderer::drawDataVec4(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
-	return inner_interaction_happen;
+	return interacted;
 }
 
 int DataRenderer::maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal)
@@ -505,7 +509,7 @@ bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
                                 glm::vec3& valueOfChange)
 {
 	bool actualValueChanged = false;
-	bool inner_interaction_happen = false;
+	bool interacted = false;
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
@@ -516,9 +520,9 @@ bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	for (int columns = 0; columns < 3; columns++)
 	{
 		valueOfChange[columns] = data[columns];
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, columns),
-		    valueOfChange[columns], dataState[columns], actualValueChanged, nodeLabel);
+		interacted |= drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
+		                                          fmt::format("##{}:col-{}", node_id, columns), valueOfChange[columns],
+		                                          dataState[columns], actualValueChanged, nodeLabel);
 		;
 		if (actualValueChanged)
 			valueChanged = true;
@@ -528,7 +532,7 @@ bool DataRenderer::drawDataVec3(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& conte
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
-	return inner_interaction_happen;
+	return interacted;
 }
 int DataRenderer::maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal)
 {
@@ -551,7 +555,7 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& cont
                                  FloatPopupMode& floatPopupMode, const float& data, const Core::EValueState& dataState,
                                  bool& valueChanged, float& valueOfChange)
 {
-	bool inner_interaction_happen = false;
+	bool interacted = false;
 
 	ImGui::PushItemWidth(dataWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getZoom());
@@ -559,7 +563,7 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& cont
 
 	valueChanged = false;
 	valueOfChange = data;
-	inner_interaction_happen |=
+	interacted |=
 	    drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
 	                                fmt::format("##{}:_", node_id), valueOfChange, dataState, valueChanged, nodeLabel);
 
@@ -567,7 +571,7 @@ bool DataRenderer::drawDataFloat(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo& cont
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
-	return inner_interaction_happen;
+	return interacted;
 }
 int DataRenderer::maxLengthOfDataFloat(const float& data, int numberOfVisibleDecimal)
 {
@@ -580,7 +584,7 @@ bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo&
                                       const std::array<Core::EValueState, 4>& dataState, bool& valueChanged,
                                       glm::quat& valueOfChange)
 {
-	bool inner_interaction_happen = false;
+	bool interacted = false;
 	bool actualValueChanged = false;
 
 	ImGui::PushItemWidth(dataWidth);
@@ -608,9 +612,9 @@ bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo&
 	for (int column = 0; column < 4; column++)
 	{
 		valueOfChange[column] = data[column];
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, context, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:col-{}", node_id, column),
-		    valueOfChange[column], dataState[column], actualValueChanged, nodeLabel);
+		interacted |= drawDragFloatWithMap_Inline(diwne, context, numberOfVisibleDecimals, floatPopupMode,
+		                                          fmt::format("##{}:col-{}", node_id, column), valueOfChange[column],
+		                                          dataState[column], actualValueChanged, nodeLabel);
 
 		if (actualValueChanged)
 			valueChanged = true;
@@ -623,7 +627,7 @@ bool DataRenderer::drawDataQuaternion(DIWNE::NodeEditor& diwne, DIWNE::DrawInfo&
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
-	return inner_interaction_happen;
+	return interacted;
 }
 
 int DataRenderer::maxLengthOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal)

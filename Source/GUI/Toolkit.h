@@ -104,20 +104,20 @@ void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDra
 
 inline void Tooltip(const char* header, const char* description)
 {
-	ImGui::BeginTooltip();
-	ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-	ImGui::TextUnformatted(header);
-
-	if (strlen(description) != 0)
+	if (ImGui::BeginTooltip())
 	{
-		ImGui::Dummy({0.0f, 1.0f});
-		ImGui::PushStyleColor(ImGuiCol_Text, {0.7f, 0.7f, 0.7f, 1.0f});
-		ImGui::TextUnformatted(description);
-		ImGui::PopStyleColor();
-	}
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(header);
 
-	ImGui::PopTextWrapPos();
-	ImGui::EndTooltip();
+		if (strlen(description) != 0)
+		{
+			ImGui::Dummy({0.0f, 1.0f * ImGui::GetWindowDpiScale()});
+			ImGui::TextDisabled(description);
+		}
+
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 }
 
 /**
@@ -136,6 +136,9 @@ inline bool ItemTooltip(const char* header, const char* description,
 	Tooltip(header, description);
 	return true;
 }
+
+// A trick to make hover delay even longer?
+// IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal) && g.HoveredIdTimer > 0.5f
 
 /**
  * Works out pixel width of data items based on the provided parameters.

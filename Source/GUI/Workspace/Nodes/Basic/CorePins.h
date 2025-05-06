@@ -60,6 +60,7 @@ public:
 
 	bool allowDrawing() override;
 
+	void tooltipContent(DIWNE::DrawInfo& context) override;
 
 	DIWNE::PinIconDrawData drawPin(bool left,
 	                               float alpha); ///< @return Offset by which the pin is sticking out of the node.
@@ -68,12 +69,10 @@ public:
 	bool drawData(DIWNE::DrawInfo& context);                            ///< @return Whether a new item was created
 	int maxLengthOfData();                                              ///< @see CoreNode::maxLengthOfData()
 
-	void popupContent(DIWNE::DrawInfo& context) override;
-
 	bool allowConnection() const override;
 	bool isDisabled() const override;
 
-	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering) override;
+	bool preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering, DIWNE::DrawInfo& context) override;
 	bool canPlug(Pin* other) const override;
 	bool plugLink(DIWNE::Pin* startPin, DIWNE::Link* link, bool logEvent = true) override;
 	void onPlug(DIWNE::Pin* otherPin, DIWNE::Link* link, bool isStartPin, bool logEvent = true) override;
