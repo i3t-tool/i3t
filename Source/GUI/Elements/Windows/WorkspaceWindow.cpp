@@ -273,7 +273,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 		}
 		else
 		{
-			if (ImGui::IsItemHovered())
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal))
 			{
 				interacted = true;
 				GUI::Tooltip(_tbd("Tracking settings"), "");
@@ -299,6 +299,8 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_XMARK " ", "Stop tracking"), "Esc", nullptr))
+				Core::GraphManager::stopTracking();
 
 			ImGui::EndPopup();
 		}

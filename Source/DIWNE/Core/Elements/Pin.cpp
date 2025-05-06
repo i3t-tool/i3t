@@ -75,6 +75,10 @@ void Pin::end(DrawInfo& context)
 	m_internalHover = ImGui::IsItemHovered();
 	m_internalHover |= m_pinIconData.hovered; // Allow pins sticking outside the node to be hovered
 
+	// Test for tooltip hover
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal))
+		m_openTooltip = true;
+
 	m_previewPlugged = m_previewPluggedInternal;
 }
 
@@ -193,14 +197,14 @@ void Pin::processInteractions(DrawInfo& context)
 				// the drag has ended the previous frame, but we MUST avoid plugging the link twice, hence on the next
 				// frame we must ensure the link wasn't plugged in already by inspecting our m_connectionChanged flag.
 				bool linkReleased = context.state.dragEnd || context.state.dragEndedLastFrame;
-				action->validConnection = preparePlug(otherPin, action->draggedLink, !linkReleased);
+				action->validConnection = preparePlug(otherPin, action->draggedLink, !linkReleased, context);
 				action->connectionPoint = getConnectionPoint();
 			}
 		}
 		else
 		{
 			if (isDisabled() && isDragAreaHovered())
-				diwne.showTooltipLabel("Pin is disabled!", ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+				showTooltip("Pin is disabled!", ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled), context);
 		}
 	}
 }
@@ -272,7 +276,7 @@ void Pin::onDrag(DrawInfo& context, bool dragStart, bool dragEnd)
 }
 
 // TODO: (DR) Not tested standalone
-bool Pin::preparePlug(Pin* otherPin, Link* link, bool hovering)
+bool Pin::preparePlug(Pin* otherPin, Link* link, bool hovering, DIWNE::DrawInfo& context)
 {
 	assert(this != otherPin && "Pin cannot be plugged into itself");
 	if (!hovering)

@@ -20,7 +20,7 @@ StyleBase::StyleBase()
 	set<ImVec2>(NODE_PADDING, {8.0f, 4.0f}, true);
 
 	set<float>(SELECTION_ROUNDING, 0.0f, true);
-	set<float>(MOUSE_DRAG_THRESHOLD, 2.0f, true); // 6.0 is ImGui default
+	set<float>(MOUSE_DRAG_THRESHOLD, 6.0f, true); // 6.0 is ImGui default
 	set<float>(SELECTED_BORDER_WIDTH, 2.5f, true);
 	set<ImVec4>(SELECTED_BORDER_COLOR, {1.0f, 0.9f, 0.4f, 0.6f});
 	set<float>(HOVER_BORDER_WIDTH, 1.5f, true);

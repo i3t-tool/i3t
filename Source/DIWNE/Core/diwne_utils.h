@@ -196,6 +196,23 @@ inline ImRect EndRect(RectData& data)
 	return ImRect(data.BackupCursorPos, ImMax(window->DC.CursorMaxPos, data.BackupCursorPos));
 }
 
+inline void Tooltip(const char* header, const char* description, const ImColor& color, float wrapWidth = 35.0f)
+{
+	if (ImGui::BeginTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * wrapWidth);
+		ImGui::TextColored(color, header);
+
+		if (strlen(description) != 0)
+		{
+			ImGui::TextDisabled(description);
+		}
+
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 } // namespace DGui
 namespace DMath
 {

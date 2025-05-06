@@ -53,10 +53,6 @@ public:
 
 	InteractionState interactionState; ///< State of multi-frame user operations
 
-	// TODO: (DR) Replace fully with mew context flag or something (isn't this a popup anyway?)
-	/// not draw tooltip two times \todo maybe unused when every object is drawn just one time
-	bool m_tooltipDrawn{false};
-
 	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
 	//  this feature shouldn't be specific to our undo/redo system if it were to remain here
 
@@ -333,21 +329,31 @@ static void expandPopupContent(T& object) /**< \brief used for popupContent() fu
 	object.popupContent();
 }
 
+template <class T, typename... Args>
+void NodeEditor::setInputAdapter(Args&&... args)
+{
+	m_input = std::make_unique<T>(*this, std::forward<Args>(args)...);
+}
+
 /**
- * \brief Function showing popup
- * Opens ImGui popup at a given position, fills in your content and closes it
+ * Shows an unscaled ImGui popup at the current mouse position with the provided content.
+ * The provided popup ID popup must be previously opened outside of this method.
+ * This can be used to open custom popups that aren't associated with a particular DiwneObject.
+ * Otherwise the preferred method of opening popups for DiwneObjects is overridng the popupContent() method.
  *
- * \param popupID is identification of popup that have been raised (so is open
- * and should be drawn) \param popupPos position of popup in screen coords
- * \param popupContent is function with content of popup - it can take any
- * (number of) arguments \param args arguments that will be passed to
- * popupContent function \return true if popup is drawn, false otherwise
- *
+ * @param popupID is identification of popup that have been raised (so is open
+ * and should be drawn)
+ * @param popupContent is function with content of popup - it can take any
+ * (number of) arguments
+ * @param args arguments that will be passed to
+ * popupContent function
+ * @return true if popup is drawn, false otherwise
+ * @note This method resets the ImGui style stack, any pushed styles will get reset after this call.
  */
 template <typename... Args>
 static bool popupDiwne(NodeEditor& diwne, std::string popupID, void (*popupContent)(Args...), Args&&... args)
 {
-	bool interaction_happen = false;
+	bool interacted = false;
 
 	if (ImGui::IsPopupOpen(popupID.c_str()))
 	{
@@ -356,7 +362,7 @@ static bool popupDiwne(NodeEditor& diwne, std::string popupID, void (*popupConte
 
 		if (ImGui::BeginPopup(popupID.c_str()))
 		{
-			interaction_happen = true;
+			interacted = true;
 
 			popupContent(std::forward<Args>(args)...);
 			ImGui::EndPopup();
@@ -365,13 +371,7 @@ static bool popupDiwne(NodeEditor& diwne, std::string popupID, void (*popupConte
 		diwne.canvas().ensureZoomScaling(zoomScalingWasActive);
 		ImGui::GetCurrentContext()->Style = styleBackup;
 	}
-	return interaction_happen;
-}
-
-template <class T, typename... Args>
-void NodeEditor::setInputAdapter(Args&&... args)
-{
-	m_input = std::make_unique<T>(*this, std::forward<Args>(args)...);
+	return interacted;
 }
 
 } /* namespace DIWNE */

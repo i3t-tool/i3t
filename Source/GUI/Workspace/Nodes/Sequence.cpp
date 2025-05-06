@@ -34,6 +34,11 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 	m_topBottomSpacingDefault = false;
 	m_contentSpacing = 0;
 	m_drawContextMenuButton = true;
+
+	// Setup tooltip for the model matrix output
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)
+	    ->setTooltip("Model matrix of the sequence.\nResult of multiplying matrices of all connected sequences.");
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltipEnabled(true);
 }
 
 void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)
@@ -232,7 +237,10 @@ void Sequence::popupContent(DIWNE::DrawInfo& context)
 
 	popupContentTracking();
 
-	popupContentReferenceSpace();
+	if (!isCameraSequence())
+	{
+		popupContentReferenceSpace();
+	}
 
 	ImGui::Separator();
 
@@ -269,9 +277,12 @@ void Sequence::popupContentTracking()
 			{
 				workspaceDiwne.startTracking(this, false);
 			}
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+			if (!isCameraSequence())
 			{
-				workspaceDiwne.startTracking(this, true);
+				if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+				{
+					workspaceDiwne.startTracking(this, true);
+				}
 			}
 			ImGui::EndMenu();
 		}
@@ -306,7 +317,7 @@ void Sequence::popupContentReferenceSpace()
 		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Reference space")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			ImGui::TextDisabled(_tbd("Set as / Reset reference space in window"));
+			ImGui::TextDisabled(_tbd("Set as reference space in scene view"));
 			for (int i = 0; i < viewportModule.getWindowCount(); i++)
 			{
 				auto viewportWindow = viewportModule.getWindow(i);
