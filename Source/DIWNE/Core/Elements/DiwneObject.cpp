@@ -496,8 +496,6 @@ DrawInfo ContextTracker::end(const DrawInfo& context)
 	return context.findChange(*m_contextCopy);
 }
 
-//
-
 /**
  * This implementation assumes that the last ImGui item represents the entirety of the object.
  * This method is indirectly called from processInteractionsDiwne() which is called right after end() method.
@@ -518,6 +516,11 @@ bool DiwneObject::isJustPressedDiwne()
 {
 	// Note: ImGui "click" is the same as just a press. See https://github.com/ocornut/imgui/issues/2385.
 	return diwne.input().bypassIsMouseClicked0();
+}
+bool DiwneObject::popupShouldBeOpenedDiwne() const
+{
+	return diwne.input().bypassIsMouseReleased1() &&
+	       !ImGui::IsMouseDragPastThreshold(ImGuiMouseButton_Right, diwne.style().decimal(Style::MOUSE_DRAG_THRESHOLD));
 }
 bool DiwneObject::isDraggedDiwne()
 {
@@ -628,8 +631,7 @@ void DiwneObject::processPopupAndTooltipDiwne(DrawInfo& context)
 	if (!context.inputFullyAvailable())
 		return;
 
-	// TODO: Make bypassIsMouseReleased1 a triggerPopup() or something method
-	if (m_popupEnabled && (m_openPopup || (m_hovered && diwne.input().bypassIsMouseReleased1())))
+	if (m_popupEnabled && (m_openPopup || (m_hovered && popupShouldBeOpenedDiwne())))
 	{
 		if (!context.popupOpened && allowPopup())
 		{
