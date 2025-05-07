@@ -59,6 +59,7 @@ public:
 	std::weak_ptr<TexturedObject> m_trackedCameraModel;
 
 	SceneCamera(Core::Mesh* mesh, PhongShader* shader);
+	~SceneCamera() override;
 
 	void update(Scene& scene) override;
 	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,

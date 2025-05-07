@@ -272,11 +272,11 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 			Mesh* mesh = nullptr;
 			if (useIndices)
 			{
-				mesh = Mesh::create(primitiveType, verts, nVertices, indices, nIndices, colors, nColors);
+				mesh = Mesh::create(primitiveType, verts, nVertices, indices, nIndices, colors, nColors, Mesh::STATIC);
 			}
 			else
 			{
-				mesh = Mesh::create(primitiveType, verts, nVertices, colors, nColors);
+				mesh = Mesh::create(primitiveType, verts, nVertices, colors, nColors, Mesh::STATIC);
 			}
 
 			if (mesh)

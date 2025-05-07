@@ -23,5 +23,6 @@ class ManagedResource
 public:
 	size_t m_resourceId{0}; ///< Resource ID of an object
 	                        ///< An identifier used by a ResourceManager
+	virtual ~ManagedResource() = default;
 };
 } // namespace Core

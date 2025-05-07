@@ -216,7 +216,7 @@ const std::vector<float>& Shaper::getColors() const
 	return colors;
 }
 
-Core::Mesh* Shaper::createLineMesh(const std::string& alias)
+Core::Mesh* Shaper::createLineMesh(const std::string& alias, Core::Mesh::BufferType bufferType)
 {
 	if (getVertices().empty() || getColors().empty())
 	{
@@ -227,17 +227,25 @@ Core::Mesh* Shaper::createLineMesh(const std::string& alias)
 	if (alias.empty())
 	{
 		mesh = Core::Mesh::create(Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
-		                          getColors().size() / 3);
+		                          getColors().size() / 3, bufferType);
 	}
 	else
 	{
+		// Resource Manager stores only static meshes
+		assert(bufferType == Core::Mesh::BufferType::STATIC);
 		mesh = RMI.mesh(alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
 		                getColors().size() / 3);
 	}
 	return mesh;
 }
 
-Core::Mesh* Shaper::createMesh(const std::string& alias)
+void Shaper::updateLineMesh(Core::Mesh* mesh)
+{
+	mesh->update(Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+	             getColors().size() / 3);
+}
+
+Core::Mesh* Shaper::createMesh(const std::string& alias, Core::Mesh::BufferType bufferType)
 {
 	if (getVertices().empty() || getColors().empty())
 	{
@@ -248,12 +256,19 @@ Core::Mesh* Shaper::createMesh(const std::string& alias)
 	if (alias.empty())
 	{
 		mesh = Core::Mesh::create(Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
-		                          getColors().size() / 3);
+		                          getColors().size() / 3, bufferType);
 	}
 	else
 	{
+		// Resource Manager stores only static meshes
+		assert(bufferType == Core::Mesh::BufferType::STATIC);
 		mesh = RMI.mesh(alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
 		                getColors().size() / 3);
 	}
 	return mesh;
+}
+void Shaper::updateMesh(Core::Mesh* mesh)
+{
+	mesh->update(Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+	             getColors().size() / 3);
 }

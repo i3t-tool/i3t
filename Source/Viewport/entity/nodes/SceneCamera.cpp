@@ -28,6 +28,13 @@ SceneCamera::SceneCamera(Core::Mesh* mesh, PhongShader* shader) : SceneModel(mes
 {
 	setDisplayType(DisplayType::Camera);
 }
+SceneCamera::~SceneCamera()
+{
+	if (m_frustumNearMesh)
+		m_frustumNearMesh->dispose();
+	if (m_trackedFrustumNearMesh)
+		m_trackedFrustumNearMesh->dispose();
+}
 
 void SceneCamera::update(Scene& scene)
 {
@@ -95,9 +102,6 @@ void SceneCamera::updateNearFrustumIndicator(const glm::mat4& model, const glm::
 	frustumNear->m_modelMatrix = glm::mat4(1.0f);
 
 	// Construct a new mesh and replace the old one
-	// TODO: Mesh should support partial dynamic VBO reupload in the future as a tiny optim (avoid full vbo realloc)
-	std::vector<glm::vec3> points;
-
 	glm::vec3 worldCameraPos = m_modelMatrix[3];
 
 	glm::vec4 ntl = glm::vec4(-1, 1, -1, 1.f);
@@ -117,7 +121,11 @@ void SceneCamera::updateNearFrustumIndicator(const glm::mat4& model, const glm::
 	worldShaper.line(worldCameraPos, nbl);
 	worldShaper.line(worldCameraPos, ntl);
 
-	m_frustumNearMesh = std::shared_ptr<Core::Mesh>(worldShaper.createLineMesh());
+	if (!m_frustumNearMesh)
+		m_frustumNearMesh = std::shared_ptr<Core::Mesh>(worldShaper.createLineMesh("", Core::Mesh::STREAM));
+	else
+		worldShaper.updateLineMesh(m_frustumNearMesh.get());
+
 	frustumNear->m_mesh = m_frustumNearMesh.get();
 
 	if (m_isTracking)
@@ -133,7 +141,11 @@ void SceneCamera::updateNearFrustumIndicator(const glm::mat4& model, const glm::
 		ndcShaper.line(ndcCameraPos, ProjectionUtils::divide(model * nbl));
 		ndcShaper.line(ndcCameraPos, ProjectionUtils::divide(model * ntl));
 
-		m_trackedFrustumNearMesh = std::shared_ptr<Core::Mesh>(ndcShaper.createLineMesh());
+		if (!m_trackedFrustumNearMesh)
+			m_trackedFrustumNearMesh = std::shared_ptr<Core::Mesh>(ndcShaper.createLineMesh("", Core::Mesh::STREAM));
+		else
+			ndcShaper.updateLineMesh(m_trackedFrustumNearMesh.get());
+
 		trackedFrustumNear->m_mesh = m_trackedFrustumNearMesh.get();
 	}
 }

@@ -203,7 +203,7 @@ inline void Tooltip(const char* header, const char* description, const ImColor& 
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * wrapWidth);
 		ImGui::TextColored(color, header);
 
-		if (strlen(description) != 0)
+		if (description != nullptr && strlen(description) != 0)
 		{
 			ImGui::TextDisabled(description);
 		}
