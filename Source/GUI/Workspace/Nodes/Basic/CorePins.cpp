@@ -516,11 +516,7 @@ bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering, DIWNE
 	case Core::ENodePlugResult::Err_MismatchedPinTypes:
 	{
 		// Special handling of connecting matrix data into matrix mul
-		bool inputIsMatrixOrMul =
-		    coreInput.ValueType == Core::EValueType::MatrixMul || coreInput.ValueType == Core::EValueType::Matrix;
-		bool outputIsMatirxOrMul =
-		    coreOutput.ValueType == Core::EValueType::MatrixMul || coreOutput.ValueType == Core::EValueType::Matrix;
-		if (inputIsMatrixOrMul || outputIsMatirxOrMul)
+		if (coreOutput.ValueType == Core::EValueType::Matrix && coreInput.ValueType == Core::EValueType::MatrixMul)
 		{
 			showTooltip("Mismatched pin types!",
 			            "Matrix data (red) cannot be plugged into matrix multiplication "
