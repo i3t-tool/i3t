@@ -48,9 +48,8 @@ TransformChain::TransformChainIterator::TransformChainIterator(TransformChain* c
 
 	if (m_info.camera != nullptr)
 	{
-		// TODO: [T-VIEWPORT]
-		auto seqs = {m_info.camera->getView(), m_info.camera->getProj()};
-		auto types = {TransformSpace::View, TransformSpace::Projection};
+		auto seqs = {m_info.camera->getView(), m_info.camera->getProj(), m_info.camera->getViewport()};
+		auto types = {TransformSpace::View, TransformSpace::Projection, TransformSpace::Screen};
 		auto typeIt = types.begin();
 		for (auto seqIt = seqs.begin(); seqIt != seqs.end(); ++seqIt, ++typeIt)
 		{
@@ -113,6 +112,34 @@ bool TransformChain::TransformChainIterator::advanceWithinSequence()
 	}
 	return false;
 }
+bool TransformChain::TransformChainIterator::advanceWithinCamera(bool begin)
+{
+	// If we've just entered the camera, make sure that view isn't empty when empty seqs are ignored
+	if (begin)
+	{
+		if (!m_skipEmptySequences || !m_info.camera->getView()->isEmpty())
+			return false;
+	}
+
+	if (m_info.sequence == m_info.camera->getView() && (!m_skipEmptySequences || !m_info.camera->getProj()->isEmpty()))
+	{
+		m_info.sequence = m_info.camera->getProj();
+		m_info.type = TransformSpace::Projection;
+	}
+	else if (m_info.sequence == m_info.camera->getProj() && m_info.camera->m_viewportEnabled &&
+	         (!m_skipEmptySequences || !m_info.camera->getViewport()->isEmpty()))
+	{
+		m_info.sequence = m_info.camera->getViewport();
+		m_info.type = TransformSpace::Screen;
+	}
+	else
+	{
+		// End of camera, end of chain (unless we add matrix mul input to camera)
+		invalidate();
+		return true;
+	}
+	return false;
+}
 
 void TransformChain::TransformChainIterator::next()
 {
@@ -121,27 +148,12 @@ void TransformChain::TransformChainIterator::next()
 		return;
 
 	// No inner data, search for the next sequence
-	Ptr<Camera> nextCamera;
-	Ptr<Sequence> nextSequence;
 	if (m_info.camera != nullptr)
 	{
-		nextCamera = m_info.camera;
-		// Advance within a camera
-		// TODO: [T-VIEWPORT] Viewport sequence
-		if (m_info.sequence == m_info.camera->getView() && (!m_skipEmptySequences || !m_info.sequence->isEmpty()))
-		{
-			nextSequence = m_info.camera->getProj();
-			m_info.type = TransformSpace::Projection;
-		}
-		else
-		{
-			// End of camera, end of chain (unless we add matrix mul input to camera)
-			invalidate();
+		if (advanceWithinCamera(false))
 			return;
-		}
 	}
-
-	if (nextSequence == nullptr)
+	else
 	{
 		// Advance in the graph
 		bool isCamera;
@@ -154,19 +166,18 @@ void TransformChain::TransformChainIterator::next()
 		}
 		if (isCamera)
 		{
-			nextCamera = std::static_pointer_cast<Camera>(parent);
-			nextSequence = nextCamera->getView();
+			m_info.camera = std::static_pointer_cast<Camera>(parent);
+			m_info.sequence = m_info.camera->getView();
 			m_info.type = TransformSpace::View;
+			advanceWithinCamera(true);
 		}
 		else
 		{
-			nextSequence = std::static_pointer_cast<Sequence>(parent);
+			m_info.camera = nullptr;
+			m_info.sequence = std::static_pointer_cast<Sequence>(parent);
 			m_info.type = TransformSpace::Model;
 		}
 	}
-
-	m_info.camera = nextCamera;
-	m_info.sequence = nextSequence;
 
 	// Find the initial data source for the new sequence
 	m_info.isExternal = false;

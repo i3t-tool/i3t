@@ -432,6 +432,19 @@ public:
 	SetValueResult setValue(float val, glm::ivec2 coords) override;
 };
 
+template <>
+class TransformImpl<ETransformType::Viewport> : public Transform
+{
+public:
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Viewport)) {}
+
+	bool isValid() const override;
+	void initDefaults() override;
+
+	SetValueResult setValue(float val, glm::ivec2 coords) override;
+
+	void resetMatrixFromDefaults() override;
+};
 
 /**
  * Same as perspective projection node, but all values are locked.

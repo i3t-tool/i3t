@@ -98,9 +98,10 @@ private:
 	// TODO: Maybe make this virtual in DIWNE::Pin?
 	ImVec2 getPinSize() const;
 
-	void createNodeFromPin();
+	void createNodeFromInputPin();
+	void createNodeFromOutputPin();
 	template <typename T>
-	void createNodeFromPinImpl();
+	void createNodeFromPinImpl(bool inputPin, bool leftSide = true);
 
 	bool drawBasicPinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created
 	bool drawPulsePinData(DIWNE::DrawInfo& context); ///< @return Whether a new item was created

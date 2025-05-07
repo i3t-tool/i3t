@@ -137,6 +137,13 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 		const auto& projValue = value["sequences"].GetArray()[1];
 		NodeDeserializer::assignSequence(projValue, camera->getProjection(), selectAll);
 		createdNodes[projValue["id"].GetInt()] = {camera->getProjection(), true};
+
+		if (value["sequences"].GetArray().Size() > 2)
+		{
+			const auto& viewportValue = value["sequences"].GetArray()[2];
+			NodeDeserializer::assignSequence(viewportValue, camera->getViewport(), selectAll);
+			createdNodes[viewportValue["id"].GetInt()] = {camera->getViewport(), true};
+		}
 	}
 
 	//
@@ -484,6 +491,8 @@ void assignCamera(const rapidjson::Value& value, Ptr<GuiCamera> camera)
 		cameraPtr->m_showCamera = value["showCamera"].GetBool();
 	if (value.HasMember("showAxes"))
 		cameraPtr->m_showAxes = value["showAxes"].GetBool();
+	if (value.HasMember("showViewport"))
+		camera->setViewportEnabled(value["showViewport"].GetBool());
 
 	if (value.HasMember("frustum"))
 	{

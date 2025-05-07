@@ -173,12 +173,13 @@ enum class EOperatorType
 	MakePerspective,
 	MakeFrustum,
 	MakeLookAt,
+	MakeViewport,
 
 	Screen,
-
 	// todo trackball (trackcube)
 };
 
+// IMPORTANT: The enum value DETERMINES the index of the transform within the g_transforms vector! TransformOperation
 enum class ETransformType
 {
 	// This is for a sequence.
@@ -194,6 +195,7 @@ enum class ETransformType
 	Perspective, // 9  PREP-
 	Frustum,     // 10 PREP-
 	LookAt,      // 11 PREP-
+	Viewport,    // 12 PREP-
 };
 
 // default string name for each EValueType (enum class defined in NodeData.h)
@@ -277,6 +279,7 @@ static const PinNames eulerInputNames = {"angle"};
 static const PinNames orthoFrustrumInputNames = {"left", "right", "bottom", "top", "near", "far"};
 static const PinNames PerspectiveInputNames = {"fovy", "aspect", "near", "far"};
 static const PinNames lookAtInputNames = {"eye", "center", "up"};
+static const PinNames viewportInputNames = {"x", "y", "width", "height", "near", "far"};
 
 /**
  * \brief Table with configuration parameters for OPERATORS. Must be in the same order as in EOperatorType!!!
@@ -396,6 +399,7 @@ static const std::vector<Operation> operations = {
      PerspectiveInputNames}, // perspective
     {n(EOperatorType::MakeFrustum), "frustum", sixFloatInput, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", threeVector3Input, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
+    {n(EOperatorType::MakeViewport), "viewport", sixFloatInput, matrixInput, NO_TAG, viewportInputNames},
     {n(EOperatorType::Screen), "screen", screenInput, screenFloatInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, false,
      true}};
 
@@ -443,7 +447,10 @@ inline static const Operation g_modelProperties = {
 
 FORCE_INLINE const Operation* getOperationProps(EOperatorType type)
 {
-	return &operations[static_cast<size_t>(type)];
+	const Operation& op = operations[static_cast<unsigned int>(type)];
+	// NOTE: EOperatorType int value corresponds to the index in the operations vector
+	assert(n(type) == op.keyWord && "Operation keyword must match the enum name!");
+	return &op;
 }
 
 //===-- TRANSFORMS --------------------------------------------------------===//
@@ -485,36 +492,34 @@ constexpr TransformMask g_AllUnlocked = 0b1111111111111111;
 /// All entries must be in the same order as ETransformType enum entries.
 // clang-format off
 static inline const std::vector<TransformOperation> g_transforms = {
-    {{n(ETransformType::Free), "free"}, g_AllUnlocked, {}},
-    {{n(ETransformType::Translation), "translate"},
-     0b0001000100010000, // the last column
-     {{"translation", EValueType::Vec3}}},
     {
-        {n(ETransformType::EulerX), "eulerAngleX"},
-        0b0000011001100000,
+        {n(ETransformType::Free), "free"}, g_AllUnlocked, {}
+    },
+    {
+        {n(ETransformType::Translation), "translate"}, 0b0001000100010000, // the last column
+        {{"translation", EValueType::Vec3}}
+    },
+    {
+        {n(ETransformType::EulerX), "eulerAngleX"}, 0b0000011001100000,
         {{"angle", EValueType::Float}},
         true
     },
     {
-        {n(ETransformType::EulerY), "eulerAngleY"},
-        0b1010000010100000,
+        {n(ETransformType::EulerY), "eulerAngleY"}, 0b1010000010100000,
         {{"angle", EValueType::Float}},
         true
     },
     {
-        {n(ETransformType::EulerZ), "eulerAngleZ"},
-        0b1100110000000000,
+        {n(ETransformType::EulerZ), "eulerAngleZ"}, 0b1100110000000000,
         {{"angle", EValueType::Float}},
         true
     },
     {
-        {n(ETransformType::Scale), "scale"},
-     0b1000010000100000, // the diagonal
-     {{"scale", EValueType::Vec3}}
+        {n(ETransformType::Scale), "scale"}, 0b1000010000100000, // the diagonal
+        {{"scale", EValueType::Vec3}}
     },
     {
-        {n(ETransformType::AxisAngle), "axisAngle"},
-        0b1110111011100000,
+        {n(ETransformType::AxisAngle), "axisAngle"}, 0b1110111011100000,
         {
             {"axis", EValueType::Vec3},
             {"angle", EValueType::Float}
@@ -529,39 +534,65 @@ static inline const std::vector<TransformOperation> g_transforms = {
         },
         true
     },
-    {{n(ETransformType::Ortho), "ortho"},
-     0b1001010100110000,
-     {{"left", EValueType::Float},
-      {"right", EValueType::Float},
-      {"bottom", EValueType::Float},
-      {"top", EValueType::Float},
-      {"near", EValueType::Float},
-      {"far", EValueType::Float}}},
-    {{n(ETransformType::Perspective), "perspective"},
-     // 0b1000010000110010,
-     0b1000010000110000, // forbid to edit -1 in the last row
-     {{"fovy", EValueType::Float},
-      {"aspect", EValueType::Float},
-      {"near", EValueType::Float},
-      {"far", EValueType::Float}}},
-    {{n(ETransformType::Frustum), "frustum"},
-     // 0b1010011000110010,       // forbid to edit -1 in the last row
-     0b1010011000110000,
-     {{"left", EValueType::Float},
-      {"right", EValueType::Float},
-      {"bottom", EValueType::Float},
-      {"top", EValueType::Float},
-      {"near", EValueType::Float},
-      {"far", EValueType::Float}}},
-    {{n(ETransformType::LookAt), "lookAt"},
-     g_AllLocked,
-     {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}, true},
+    {
+        {n(ETransformType::Ortho), "ortho"}, 0b1001010100110000,
+        {
+            {"left", EValueType::Float},
+            {"right", EValueType::Float},
+            {"bottom", EValueType::Float},
+            {"top", EValueType::Float},
+            {"near", EValueType::Float},
+            {"far", EValueType::Float}}
+    },
+    {
+        {n(ETransformType::Perspective), "perspective"}, 0b1000010000110000, // forbid to edit -1 in the last row
+        {
+            {"fovy", EValueType::Float},
+            {"aspect", EValueType::Float},
+            {"near", EValueType::Float},
+            {"far", EValueType::Float}
+        }
+    },
+    {
+        {n(ETransformType::Frustum), "frustum"}, 0b1010011000110000, // forbid to edit -1 in the last row
+        {
+            {"left", EValueType::Float},
+            {"right", EValueType::Float},
+            {"bottom", EValueType::Float},
+            {"top", EValueType::Float},
+            {"near", EValueType::Float},
+            {"far", EValueType::Float}
+        }
+    },
+    {
+        {n(ETransformType::LookAt), "lookAt"}, g_AllLocked,
+        {
+            {"eye", EValueType::Vec3},
+            {"center", EValueType::Vec3},
+            {"up", EValueType::Vec3}
+        },
+        true
+    },
+	{
+		{n(ETransformType::Viewport), "viewport"}, 0b1001010100110000,
+		{
+            {"x", EValueType::Float},
+			{"y", EValueType::Float},
+			{"width", EValueType::Float},
+			{"height", EValueType::Float},
+			{"near", EValueType::Float},
+			{"far", EValueType::Float}
+		}
+	},
 };
 // clang-format on
 
 FORCE_INLINE const TransformOperation& getTransformOperation(ETransformType type)
 {
-	return g_transforms[static_cast<size_t>(type)];
+	const TransformOperation& op = g_transforms[static_cast<size_t>(type)];
+	// NOTE: ETransformType int value corresponds to the index in the g_transform vector
+	assert(n(type) == op.operation.keyWord && "Transform operation keyword must match the enum name!");
+	return op;
 }
 
 std::optional<TransformOperation*> getTransformOperation(const std::string& keyWord);

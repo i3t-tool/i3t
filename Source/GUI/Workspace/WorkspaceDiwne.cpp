@@ -24,6 +24,8 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/ScriptingNode.h"
 #include "Localization/Localization.h"
@@ -516,7 +518,8 @@ void WorkspaceDiwne::startTracking(Sequence* sequence, bool trackFromLeft)
 		// When tracking is started from the projection sequence, it should instead start from view sequence
 		if (*sequence == *camera->getProjection().get())
 			sequence = camera->getView().get();
-		// TODO: [T-VIEWPORT] Same exception
+		if (*sequence == *camera->getViewport().get())
+			sequence = camera->getView().get();
 
 		coreCam = camera->getNodebase()->as<Core::Camera>();
 	}
@@ -716,25 +719,35 @@ void WorkspaceDiwne::addMenu()
 		//                addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Scale>>();
 		//                m_workspaceCoreNodes.back()->getNodebase()->as<Core::Transformation>()->disableSynergies();
 		//            }
-		if (I3TGui::MenuItemWithLog("lookAt"))
+		if (I3TGui::MenuItemWithLog(ICON_FA_EYE " "
+		                                        "lookAt"))
 		{
 			addNodeToPositionOfPopup<Transformation<Core::ETransformType::LookAt>>();
 		}
-		if (I3TGui::BeginMenuWithLog("projection"))
+		if (I3TGui::BeginMenuWithLog(ICON_I3T_FRUSTUM " "
+		                                              "projection"))
 		{
-			if (I3TGui::MenuItemWithLog("ortho"))
+			if (I3TGui::MenuItemWithLog(ICON_FA_SQUARE " "
+			                                           "ortho"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Ortho>>();
 			}
-			if (I3TGui::MenuItemWithLog("perspective"))
+			if (I3TGui::MenuItemWithLog(ICON_I3T_FRUSTUM " "
+			                                             "perspective"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Perspective>>();
 			}
-			if (I3TGui::MenuItemWithLog("frustum"))
+			if (I3TGui::MenuItemWithLog(ICON_I3T_FRUSTUM " "
+			                                             "frustum"))
 			{
 				addNodeToPositionOfPopup<Transformation<Core::ETransformType::Frustum>>();
 			}
 			ImGui::EndMenu();
+		}
+		if (I3TGui::MenuItemWithLog(ICON_FA_DISPLAY " "
+		                                            "viewport"))
+		{
+			addNodeToPositionOfPopup<Transformation<Core::ETransformType::Viewport>>();
 		}
 		ImGui::EndMenu();
 	}
@@ -810,6 +823,10 @@ void WorkspaceDiwne::addMenu()
 			if (I3TGui::MenuItemWithLog("lookAt"))
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeLookAt>>();
+			}
+			if (I3TGui::MenuItemWithLog("viewport"))
+			{
+				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MakeViewport>>();
 			}
 			ImGui::EndMenu();
 		}

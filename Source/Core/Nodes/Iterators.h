@@ -290,10 +290,10 @@ public:
 
 enum class TransformSpace
 {
-	Model,     // World space
-	View,      // View space
-	Projection // Clip/NDC space
-	           // TODO: [T-VIEWPORT] Screen // Screen space
+	Model,      // World space
+	View,       // View space
+	Projection, // Clip/NDC space
+	Screen      // Screen space
 };
 
 /// Data container for TransformChainIterator traversal metadata.
@@ -435,6 +435,7 @@ public:
 		void invalidate();
 
 		bool advanceWithinSequence();
+		bool advanceWithinCamera(bool begin);
 	};
 
 	/**

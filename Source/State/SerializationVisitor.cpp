@@ -86,6 +86,7 @@ void SerializationVisitor::visit(const Ptr<GuiCamera>& node)
 	rapidjson::Value sequences(kArrayType);
 	dumpSequence(sequences, node->getView());
 	dumpSequence(sequences, node->getProjection());
+	dumpSequence(sequences, node->getViewport());
 	camera.AddMember("sequences", sequences.Move(), alloc);
 
 	cameras.PushBack(camera, alloc);
@@ -332,6 +333,7 @@ void SerializationVisitor::dumpCamera(rapidjson::Value& target, const Ptr<GuiCam
 
 	target.AddMember("showCamera", cameraPtr->m_showCamera, alloc);
 	target.AddMember("showAxes", cameraPtr->m_showAxes, alloc);
+	target.AddMember("showViewport", node->getViewportEnabled(), alloc);
 
 	rapidjson::Value frustum;
 	frustum.SetObject();
