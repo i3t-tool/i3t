@@ -17,6 +17,8 @@
 
 // #include "pgr.h"
 #include "Utils/Format.h"
+#include "Utils/ProjectionUtils.h"
+
 #include <glm/gtx/matrix_interpolation.hpp> // AxisAngle
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
@@ -70,6 +72,11 @@ constexpr ValueMask g_PerspectiveMask = {
 constexpr ValueMask g_FrustumMask = {
     VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,       VM_ZERO,
     VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
+};
+
+constexpr ValueMask g_ViewportMask = {
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_LookAtMask = {
@@ -1575,6 +1582,90 @@ SetValueResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 	}
 
 	return SetValueResult{};
+}
+
+//===-- Viewport
+//------------------------------------------------------------===//
+
+SetValueResult TransformImpl<ETransformType::Viewport>::setValue(float val, glm::ivec2 coords)
+{
+	if (!canSetValue(g_ViewportMask, coords, val))
+	{
+		return SetValueResult{SetValueResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
+	}
+
+	setInternalValue(val, coords);
+	notifySequence();
+
+	// OGL viewport matrix:
+	// w/2   0    0     x + w/2
+	// 0    h/2   0     y + h/2
+	// 0     0  (f-n)/2 (f+n)/2
+	// 0     0    0       1.0
+
+	auto& mat = m_internalData[0].getMat4();
+
+	if (coords == glm::ivec2(0, 0))
+	{
+		setDefaultValueNoUpdate("width", val * 2.f);
+	}
+	else if (coords == glm::ivec2(1, 1))
+	{
+		setDefaultValueNoUpdate("height", val * 2.f);
+	}
+	else if (coords == glm::ivec2(2, 2))
+	{
+		float oldFar = getDefaultValue("far").getFloat();
+		float newFar = 2 * mat[3][2] + 2 * val - oldFar;
+		float newNear = -2 * val + newFar;
+		setDefaultValueNoUpdate("far", newFar);
+		setDefaultValueNoUpdate("near", newNear);
+	}
+	else if (coords == glm::ivec2(2, 3))
+	{
+		float oldFar = getDefaultValue("far").getFloat();
+		float newFar = 2 * val + 2 * mat[2][2] - oldFar;
+		float newNear = -2 * mat[2][2] + newFar;
+		setDefaultValueNoUpdate("far", newFar);
+		setDefaultValueNoUpdate("near", newNear);
+	}
+	else if (coords == glm::ivec2(3, 0))
+	{
+		float x = val - mat[0][0];
+		setDefaultValueNoUpdate("x", x);
+	}
+	else if (coords == glm::ivec2(3, 1))
+	{
+		float y = val - mat[1][1];
+		setDefaultValueNoUpdate("y", y);
+	}
+
+	return SetValueResult{};
+}
+
+bool TransformImpl<ETransformType::Viewport>::isValid() const
+{
+	return true;
+}
+void TransformImpl<ETransformType::Viewport>::initDefaults()
+{
+	setDefaultValueNoUpdate("x", 0.f);
+	setDefaultValueNoUpdate("y", 0.f);
+	setDefaultValueNoUpdate("width", 640.f);
+	setDefaultValueNoUpdate("height", 480.f);
+	setDefaultValueNoUpdate("near", 0.0f);
+	setDefaultValueNoUpdate("far", 1.0f);
+}
+void TransformImpl<ETransformType::Viewport>::resetMatrixFromDefaults()
+{
+	m_isLocked = true;
+	// TODO: (DR) [T-VIEWPORT] Synergies?
+
+	setInternalValue(ProjectionUtils::viewport(
+	    getDefaultValue("x").getFloat(), getDefaultValue("y").getFloat(), getDefaultValue("width").getFloat(),
+	    getDefaultValue("height").getFloat(), getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	notifySequence();
 }
 
 //===-- Look At -----------------------------------------------------------===//

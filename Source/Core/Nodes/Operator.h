@@ -17,6 +17,7 @@
 #include <variant>
 
 #include "Core/Nodes/Node.h"
+#include "Utils/ProjectionUtils.h"
 
 namespace Core
 {
@@ -89,7 +90,7 @@ public:
 //------------------------------===//
 
 template <EOperatorType T>
-Operator<T>::Operator() : Node(operations[static_cast<unsigned>(T)])
+Operator<T>::Operator() : Node(*getOperationProps(T))
 {}
 
 //===-----------------------------------------------------------------------===//
@@ -1688,6 +1689,19 @@ FORCE_INLINE bool Operator<EOperatorType::MakeLookAt>::updateValuesImpl(int inpu
 	{
 		setInternalValue(
 		    glm::lookAt(m_inputs[0].data().getVec3(), m_inputs[1].data().getVec3(), m_inputs[2].data().getVec3()));
+		return true;
+	}
+	return false;
+}
+
+template <>
+FORCE_INLINE bool Operator<EOperatorType::MakeViewport>::updateValuesImpl(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(ProjectionUtils::viewport(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
+		                                           m_inputs[2].data().getFloat(), m_inputs[3].data().getFloat(),
+		                                           m_inputs[4].data().getFloat(), m_inputs[5].data().getFloat()));
 		return true;
 	}
 	return false;

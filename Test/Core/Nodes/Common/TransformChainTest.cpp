@@ -290,6 +290,77 @@ TEST_F(TransformChainTest, GeneralCamTree_IncludeCamera)
 	testChain(chain, expected);
 }
 
+TEST_F(TransformChainTest, GeneralCamTree_IncludeCameraNoViewButProj)
+{
+	GeneralCamTree tree(false);
+	tree.cam1->getView()->popMatrix(0);
+	EXPECT_EQ(tree.cam1->getView()->getMatrices().size(), 0);
+
+	TransformChain chain = TransformChain(tree.seq5).skipEmptySequences().ignoreCamera(false);
+
+	// clang-format off
+	std::vector<TransformInfo> expected = {
+		tInfo(tree.seq5, tree.seq5->getMatrices()[0]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[1]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[0]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
+		// tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection)
+	};
+	// clang-format on
+
+	testChain(chain, expected);
+}
+
+TEST_F(TransformChainTest, GeneralCamTree_IncludeCameraAndViewport)
+{
+	GeneralCamTree tree(false);
+	tree.cam1->m_viewportEnabled = true;
+
+	TransformChain chain = TransformChain(tree.seq5).skipEmptySequences().ignoreCamera(false);
+
+	// clang-format off
+	std::vector<TransformInfo> expected = {
+		tInfo(tree.seq5, tree.seq5->getMatrices()[0]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[1]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[0]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
+		tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection)
+	};
+	// clang-format on
+
+	testChain(chain, expected);
+
+	auto viewport = Builder::createTransform<ETransformType::Viewport>();
+	tree.cam1->getViewport()->pushMatrix(viewport);
+
+	chain = TransformChain(tree.seq5).skipEmptySequences().ignoreCamera(false);
+
+	// clang-format off
+	expected = {
+		tInfo(tree.seq5, tree.seq5->getMatrices()[0]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[1]),
+		tInfo(tree.seq2, tree.seq2->getMatrices()[0]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[2]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[1]),
+		tInfo(tree.seq1, tree.seq1->getMatrices()[0]),
+		tInfo(tree.cam1->getView(), tree.cam1->getView()->getMatrices()[0], tree.cam1, false, TransformSpace::View),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[1], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getProj(), tree.cam1->getProj()->getMatrices()[0], tree.cam1, false, TransformSpace::Projection),
+		tInfo(tree.cam1->getViewport(), tree.cam1->getViewport()->getMatrices()[0], tree.cam1, false, TransformSpace::Screen)
+	};
+	// clang-format on
+
+	testChain(chain, expected);
+}
+
 TEST_F(TransformChainTest, GeneralCamTree_IncludeDisconnectedCam)
 {
 	GeneralCamTree tree(false);

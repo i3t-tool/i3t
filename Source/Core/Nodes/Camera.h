@@ -40,12 +40,18 @@ class Camera : public Node
 
 	Ptr<Sequence> m_proj;
 	Ptr<Sequence> m_view;
+	Ptr<Sequence> m_viewport;
 
 public:
 	/// Latest projection matrix value
 	glm::mat4 m_projectionMatrix{1.f};
 	/// Latest view matrix value
 	glm::mat4 m_viewMatrix{1.f};
+	/// Latest viewport matrix value
+	glm::mat4 m_viewportMatrix{1.f};
+
+	/// Whether the viewport transformation should be taken into account (it is optional)
+	bool m_viewportEnabled = false;
 
 	Camera();
 
@@ -59,6 +65,11 @@ public:
 	const Ptr<Sequence>& getView()
 	{
 		return m_view;
+	}
+
+	const Ptr<Sequence>& getViewport()
+	{
+		return m_viewport;
 	}
 
 	void updateValues(int inputIndex) override;

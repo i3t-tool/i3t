@@ -845,9 +845,9 @@ void CorePin::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	// Create a new appropriate node for this pin when it is Ctrl clicked.
 	if (justReleased && !context.inputConsumed && !context.state.dragging && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
-		if (isInput() && !isPlugged())
+		if (!isPlugged())
 		{
-			createNodeFromPin();
+			isInput() ? createNodeFromInputPin() : createNodeFromOutputPin();
 			context.consumeInput();
 		}
 	}
@@ -861,41 +861,52 @@ ImVec2 CorePin::getPinSize() const
 	return I3T::getSize(ESizeVec2::Nodes_PinSize) * diwne.getZoom();
 }
 
-void CorePin::createNodeFromPin()
+void CorePin::createNodeFromInputPin()
 {
 	switch (getType())
 	{
 	case Core::EValueType::Pulse:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::PulseToPulse>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::PulseToPulse>>(true);
 		break;
 	case Core::EValueType::Float:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::FloatToFloat>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::FloatToFloat>>(true);
 		break;
 	case Core::EValueType::Vec3:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector3ToVector3>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector3ToVector3>>(true);
 		break;
 	case Core::EValueType::Vec4:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector4ToVector4>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::Vector4ToVector4>>(true);
 		break;
 	case Core::EValueType::Matrix:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::MatrixToMatrix>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::MatrixToMatrix>>(true);
 		break;
 	case Core::EValueType::Quat:
-		createNodeFromPinImpl<Operator<Core::EOperatorType::QuatToQuat>>();
+		createNodeFromPinImpl<Operator<Core::EOperatorType::QuatToQuat>>(true);
 		break;
 	case Core::EValueType::MatrixMul:
-		createNodeFromPinImpl<Sequence>();
+		createNodeFromPinImpl<Sequence>(true);
 		break;
+	}
+}
+void CorePin::createNodeFromOutputPin()
+{
+	switch (getType())
+	{
 	case Core::EValueType::Screen:
-		createNodeFromPinImpl<Camera>();
+		createNodeFromPinImpl<Screen>(false);
 		break;
 	}
 }
 
 template <typename T>
-void CorePin::createNodeFromPinImpl()
+void CorePin::createNodeFromPinImpl(bool inputPin, bool leftSide)
 {
 	std::shared_ptr<T> node;
-	node = diwne.createNode<T>(this->getConnectionPoint(), true);
-	this->plug(node->getOutputs().at(0).get());
+	node = diwne.createNode<T>(leftSide ? this->getConnectionPoint()
+	                                    : this->getConnectionPoint() + ImVec2(ImGui::GetFontSize() * 2.f, 0.f),
+	                           leftSide);
+	if (inputPin)
+		this->plug(node->getOutputs().at(0).get());
+	else
+		node->getInputs().at(0)->plug(this);
 }

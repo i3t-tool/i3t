@@ -28,13 +28,16 @@ using namespace Workspace;
 Camera::Camera(DIWNE::NodeEditor& diwne)
     : CoreNodeWithPins(diwne, Core::GraphManager::createCamera(), false),
       m_projection(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true)),
-      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true))
+      m_view(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true)),
+      m_viewport(std::make_shared<Sequence>(diwne, m_nodebase->as<Core::Camera>()->getViewport(), true))
+
 {
 	m_drawContextMenuButton = true;
 	m_contentSpacing = 0;
 
-	m_projAndView.push_back(m_projection);
-	m_projAndView.push_back(m_view);
+	m_sequences.push_back(m_viewport);
+	m_sequences.push_back(m_projection);
+	m_sequences.push_back(m_view);
 
 	// connect matrix P to matrix V internally
 	// TODO: Figure out how to draw this link manually and not from the editor
@@ -50,37 +53,11 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	// view0->plug(proj0, false);
 	// They are already plugged in Core!
 
-	m_projection->setSelectable(false);
-	for (auto& pin : m_projection->getNodebase()->getInputPins())
-		pin.setRendered(false);
-	for (auto& pin : m_projection->getNodebase()->getOutputPins())
-		pin.setRendered(false);
+	setupInnerSequence(m_projection, "projection");
+	setupInnerSequence(m_view, "view");
+	setupInnerSequence(m_viewport, "viewport");
 
-	// todo refactor - use the constant Core::I3T_CAMERA_OUT_MATRIX
-	m_projection->getNodebase()->getInputPins()[Core::I3T_SEQ_IN_MAT].setRendered(true);
-	m_projection->getNodebase()->getOutputPins()[Core::I3T_SEQ_OUT_MAT].setRendered(true);
-	m_projection->setTopLabel("projection");
-	m_projection->setFixed(true);
-	m_projection->setParentObject(this);
-	m_projection->m_draggable = false;
-	m_projection->m_deletable = false;
-
-	m_view->setSelectable(false);
-	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
-	{
-		m_view->getNodebase()->getInputPins()[k].setRendered(false);
-	}
-	for (int l = 0; l < m_view->getNodebase()->getOutputPins().size(); l++)
-	{
-		m_view->getNodebase()->getOutputPins()[l].setRendered(false);
-	}
-	m_view->getNodebase()->getInputPins()[1].setRendered(true);
-	m_view->getNodebase()->getOutputPins()[1].setRendered(true);
-	m_view->setTopLabel("view");
-	m_view->setFixed(true);
-	m_view->setParentObject(this);
-	m_view->m_draggable = false;
-	m_view->m_deletable = false;
+	m_viewport->setRendered(false); // Hidden by default
 
 	m_viewportCamera = I3T::getViewport()->createCamera(getNodebase()->getId());
 
@@ -104,6 +81,22 @@ Camera::Camera(DIWNE::NodeEditor& diwne)
 	(*it)->m_showData = false;
 	m_leftPins.insert(m_leftPins.begin(), *it);
 	m_rightPins.erase(it);
+}
+
+void Camera::setupInnerSequence(Ptr<Sequence>& sequence, const std::string& label)
+{
+	sequence->setSelectable(false);
+	for (auto& pin : sequence->getNodebase()->getInputPins())
+		pin.setRendered(false);
+	for (auto& pin : sequence->getNodebase()->getOutputPins())
+		pin.setRendered(false);
+	sequence->getNodebase()->getInputPins()[Core::I3T_SEQ_IN_MAT].setRendered(true);
+	sequence->getNodebase()->getOutputPins()[Core::I3T_SEQ_OUT_MAT].setRendered(true);
+	sequence->setTopLabel(label);
+	sequence->setFixed(true);
+	sequence->setParentObject(this);
+	sequence->m_draggable = false;
+	sequence->m_deletable = false;
 }
 
 Camera::~Camera()
@@ -135,6 +128,11 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 	// if (m_levelOfDetail == LevelOfDetail::Full) // todo it is not so simple - input wires are missing in
 	// Label LOD
 	{
+		if (m_viewport->isRendered())
+		{
+			m_viewport->drawDiwne(context, m_drawMode);
+			ImGui::SameLine();
+		}
 		m_projection->drawDiwne(context, m_drawMode);
 		ImGui::SameLine();
 		m_view->drawDiwne(context, m_drawMode);
@@ -203,17 +201,30 @@ int Camera::maxLengthOfData()
 
 DIWNE::NodeRange<> Camera::getNodes() const
 {
-	return DIWNE::NodeRange<>(&m_projAndView);
+	return DIWNE::NodeRange<>(&m_sequences);
 }
 DIWNE::NodeList& Camera::getNodeList()
 {
-	return m_projAndView;
+	return m_sequences;
 }
 void Camera::onDestroy(bool logEvent)
 {
 	m_projection->destroy(logEvent);
 	m_view->destroy(logEvent);
+	m_viewport->destroy(logEvent);
 	Super::onDestroy(logEvent);
+}
+
+void Camera::setViewportEnabled(bool val)
+{
+	m_viewportEnabled = val;
+	auto* coreSeq = getNodebase()->asRaw<Core::Camera>();
+	coreSeq->m_viewportEnabled = m_viewportEnabled;
+	m_viewport->setRendered(m_viewportEnabled);
+}
+bool Camera::getViewportEnabled() const
+{
+	return m_viewportEnabled;
 }
 
 void Camera::onSelection(bool selected)
@@ -238,7 +249,7 @@ void Camera::updateTrackedCamera()
 	{
 		Core::MatrixTracker* tracker = t->tracker;
 		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
-		if (transform->data.space == Core::TransformSpace::Projection)
+		if (transform->data.space >= Core::TransformSpace::Projection)
 		{
 			auto cameraPtr = m_viewportCamera.lock()->m_trackedCameraModel.lock();
 			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
@@ -261,7 +272,10 @@ void Camera::updateTrackedCamera()
 				glm::mat4 neg(1.f);
 				neg[2][2] = -1;
 				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
-				cameraPtr->m_modelMatrix = Math::lerp(glm::mat4(1.f), neg, mt, false) * cameraPtr->m_modelMatrix;
+				cameraPtr->m_modelMatrix =
+				    Math::lerp(glm::mat4(1.f), neg, trackedMatrix->space == Core::TransformSpace::Screen ? 1.f : mt,
+				               false) *
+				    cameraPtr->m_modelMatrix;
 			}
 		}
 	}
@@ -274,6 +288,15 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 	ImGui::Separator();
 
 	popupContentTracking();
+
+	ImGui::Separator();
+
+	if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_DISPLAY " ", "Show viewport"), NULL, &m_viewportEnabled))
+	{
+		setViewportEnabled(m_viewportEnabled);
+		if (Core::GraphManager::isTracking())
+			Core::GraphManager::getTracker()->requestChainUpdate();
+	}
 
 	ImGui::Separator();
 
@@ -406,10 +429,10 @@ void Camera::popupContentTracking()
 			{
 				workspaceDiwne.startTracking(getView().get(), false);
 			}
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
-			{
-				workspaceDiwne.startTracking(getView().get(), true);
-			}
+			// if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_RIGHT " ", "Start tracking from left"), ""))
+			// {
+			// 	workspaceDiwne.startTracking(getView().get(), true);
+			// }
 			ImGui::EndMenu();
 		}
 	}

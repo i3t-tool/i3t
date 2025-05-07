@@ -275,7 +275,7 @@ void ViewportWindow::updateSpace()
 		if (!tracker->m_trackInWorldSpace)
 		{
 			spaceSet = true;
-			m_space.m_referenceSpace = tracker->m_iProjMatrix * tracker->m_iViewMatrix;
+			m_space.m_referenceSpace = tracker->m_iViewportMatrix * tracker->m_iProjMatrix * tracker->m_iViewMatrix;
 
 			const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
 			m_space.trackingSpaceParam = transform->data.progress;
@@ -299,17 +299,22 @@ void ViewportWindow::updateSpace()
 				// TODO: Apply fade out shaders
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
 				m_space.label = _tbd("NDC space");
-				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
 
-				m_displayOptions.showTracking = true; // Show manually controlled camera
-
-				// Switch view axes to LHS mode
-				if (tracker->getInterpolatedMatrixObject()->useLHS)
-				{
+				stg.global().grid.programShow = false;              // Disabling world grid for projection spaces
+				m_displayOptions.showTracking = true;               // Show manually controlled camera
+				if (tracker->getInterpolatedMatrixObject()->useLHS) // Switch view axes to LHS mode
 					m_space.simulateLHS = true;
-				}
 			}
 			break;
+			case Core::TransformSpace::Screen:
+				m_space.label = std::string(_tbd("Screen space\n(1:") +
+				                            std::to_string(TRACKING_VIEWPORT_SCALING_FACTOR) + " scale)");
+
+				stg.global().grid.programShow = false;              // Disabling world grid for projection spaces
+				m_displayOptions.showTracking = true;               // Show manually controlled camera
+				if (tracker->getInterpolatedMatrixObject()->useLHS) // Switch view axes to LHS mode
+					m_space.simulateLHS = true;
+				break;
 			}
 			labelSet = true;
 		}
@@ -395,6 +400,8 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 
 	if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Projection)
 		ImGui::GetStyle().Alpha = pow(1.f - m_space.trackingSpaceParam, 4.f);
+	if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Screen)
+		ImGui::GetStyle().Alpha = 0.f;
 
 	const float& alpha = ImGui::GetStyle().Alpha;
 
@@ -420,7 +427,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 
 		if (m_space.tracking)
 		{
-			if (m_space.trackingSpace == Core::TransformSpace::Projection)
+			if (m_space.trackingSpace >= Core::TransformSpace::Projection)
 				ImGui::GetStyle().Alpha = 1.0f;
 			if (m_space.trackingSpace == Core::TransformSpace::View)
 				ImGui::GetStyle().Alpha = m_space.trackingSpaceParam;
@@ -433,6 +440,8 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		float worldAxesSize = axesSize + padding + ImGui::GetTextLineHeightWithSpacing();
 		if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Projection)
 			worldAxesSize *= 1.f - m_space.trackingSpaceParam;
+		if (m_space.tracking && m_space.trackingSpace == Core::TransformSpace::Screen)
+			worldAxesSize *= 0.f;
 
 		axesPosition =
 		    ImVec2(m_windowPos.x + m_windowSize.x - axesSize - padding, m_windowPos.y + padding + worldAxesSize);
@@ -451,7 +460,10 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		float* axisFactors = nullptr;
 		if (m_space.simulateLHS)
 		{
-			aFacs = glm::vec3(Math::range(m_space.trackingMatrixProgress, 0, 1, 1, -1), 1.f, 1.f);
+			if (m_space.trackingSpace == Core::TransformSpace::Projection)
+				aFacs = glm::vec3(Math::range(m_space.trackingMatrixProgress, 0, 1, 1, -1), 1.f, 1.f);
+			else if (m_space.trackingSpace == Core::TransformSpace::Screen)
+				aFacs = glm::vec3(-1.f, 1.f, 1.f);
 			axisFactors = glm::value_ptr(aFacs);
 		}
 
@@ -466,15 +478,28 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		ImGui::SetCursorScreenPos(textPos);
 		GUI::TextColoredShadow((m_space.label).c_str(), m_space.labelCol);
 
-		if (m_space.simulateLHS && m_space.trackingMatrixProgress >= 0.5f)
+		if (m_space.simulateLHS)
 		{
-			std::string str = _tbd("(Left handed)");
-			tWidth = ImGui::CalcTextSize(str.c_str()).x;
+			if (m_space.trackingSpace == Core::TransformSpace::Projection && m_space.trackingMatrixProgress >= 0.5f)
+			{
+				std::string str = _tbd("(Left handed)");
+				tWidth = ImGui::CalcTextSize(str.c_str()).x;
 
-			textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
-			           axesPosition.y + axesSize + ImGui::GetTextLineHeightWithSpacing()};
-			ImGui::SetCursorScreenPos(textPos);
-			GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
+				textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
+				           axesPosition.y + axesSize + ImGui::GetTextLineHeight()};
+				ImGui::SetCursorScreenPos(textPos);
+				GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
+			}
+			if (m_space.trackingSpace == Core::TransformSpace::Screen)
+			{
+				std::string str = _tbd("(Left handed)");
+				tWidth = ImGui::CalcTextSize(str.c_str()).x;
+
+				textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
+				           axesPosition.y + axesSize + ImGui::GetTextLineHeight() * 2};
+				ImGui::SetCursorScreenPos(textPos);
+				GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
+			}
 		}
 	}
 

@@ -35,10 +35,13 @@ protected:
 	// The projection and view getters could probably just use raw pointers
 	Ptr<Sequence> m_projection{nullptr};
 	Ptr<Sequence> m_view{nullptr};
-	DIWNE::NodeList m_projAndView;
+	Ptr<Sequence> m_viewport{nullptr};
+	DIWNE::NodeList m_sequences;
+
+	bool m_viewportEnabled{false}; ///< Whether the viewport sequence is visible, if not it's ignored.
 
 public:
-	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
+	std::weak_ptr<Vp::SceneCamera> m_viewportCamera; ///< Reference to the Scene View (3D Viewport) representation
 
 	Camera(DIWNE::NodeEditor& diwne);
 	~Camera();
@@ -62,6 +65,10 @@ public:
 	{
 		return m_view;
 	}
+	const Ptr<Sequence>& getViewport() const
+	{
+		return m_viewport;
+	}
 
 	void initialize(DIWNE::DrawInfo& context) override;
 
@@ -82,9 +89,14 @@ public:
 	void onSelection(bool selected) override;
 	void onDestroy(bool logEvent) override;
 
+	/// Enable or disable the viewport transformation sequence.
+	void setViewportEnabled(bool val);
+	bool getViewportEnabled() const;
+
 private:
 	glm::vec4 calculateFrustumColor(glm::vec3 color, float alpha);
 
 	void updateTrackedCamera();
+	void setupInnerSequence(Ptr<Sequence>& sequence, const std::string& label);
 };
 } // namespace Workspace

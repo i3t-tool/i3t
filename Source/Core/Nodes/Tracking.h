@@ -16,6 +16,8 @@
 
 #include "Iterators.h"
 
+#define TRACKING_VIEWPORT_SCALING_FACTOR 100
+
 namespace Core
 {
 class Transform;
@@ -204,6 +206,7 @@ public:
 		bool active{false};
 
 		// Projection metadata
+		TransformSpace space;
 		/// Indicates that space after applying this matrix should use the left handed coordinate system
 		bool useLHS = false;
 		NDCType ndcType = NDCType::OneToMinusOne;
@@ -211,22 +214,40 @@ public:
 		float cameraNDCOffset = 0.f;
 
 		/// Tracked matrix representing matrix data of a tracked transform.
-		TrackedMatrix(TrackedTransform* transform) : transform(transform) {}
+		TrackedMatrix(TrackedTransform* transform) : transform(transform), space(transform->data.space) {}
 
 		/// Tracked matrix holding an independent matrix
 		TrackedMatrix(TrackedTransform* transform, const glm::mat4& matrix)
-		    : transform(transform), matrix(matrix), useOwnData(true)
+		    : transform(transform), matrix(matrix), useOwnData(true), space(transform->data.space)
 		{}
 
-		[[nodiscard]] const glm::mat4& getMat() const
+		[[nodiscard]] glm::mat4 getMat() const
 		{
 			if (!useOwnData)
-				return transform->getMat();
-			return matrix;
+				return modify(transform->getMat());
+			return modify(matrix);
 		}
 
 	private:
 		bool useOwnData{false};
+
+		glm::mat4 modify(const glm::mat4& matrix) const
+		{
+			if (space == TransformSpace::Screen)
+			{
+				glm::mat4 m = matrix;
+				m[3][0] = -1 * m[3][0]; // Flip X as we're in LHS [OGL-VULKAN]
+				// Divide the whole viewport transform by a 100x scale to keep NDC and screen space roughly similar in
+				// size
+				float scalingFactor = 1.f / TRACKING_VIEWPORT_SCALING_FACTOR;
+				m[0][0] *= scalingFactor;
+				m[1][1] *= scalingFactor;
+				m[3][0] *= scalingFactor;
+				m[3][1] *= scalingFactor;
+				return m;
+			}
+			return matrix;
+		}
 	};
 
 private:
@@ -283,10 +304,11 @@ private:
 	glm::mat4 m_modelSubtreeRoot{1.f};
 
 public:
-	// When false, view nad projections transformations are excluded from the tracked matrix accumulation/interpolation
-	// and instead are saved into the m_iViewMatrix and m_iProjMatrix fields. These fields can be then applied globally
-	// to the whole world to visualize their local spaces.
-	// When enabled, view and projection matrices are accumulated and interpolated like any other world space matrix.
+	// When false, view and projection (and optionally viewport) transformations are excluded from the tracked matrix
+	// accumulation/interpolation and instead are saved into the m_iViewMatrix and m_iProjMatrix (and m_iViewportMatrix)
+	// fields. These fields can be then applied globally to the whole world to visualize their local spaces. When
+	// enabled, view and projection (and viewport) matrices are accumulated and interpolated like any other world space
+	// matrix.
 	bool m_trackInWorldSpace{false};
 
 	// TODO: Implement, Docs
@@ -301,9 +323,10 @@ public:
 
 	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};
-
 	/// Interpolated projection matrix, relevant when m_trackInWorldSpace is false.
 	glm::mat4 m_iProjMatrix{1.0f};
+	/// Interpolated viewport matrix, relevant when m_trackInWorldSpace is false.
+	glm::mat4 m_iViewportMatrix{1.0f};
 
 private:
 	float m_newParam = 0.0f; ///< Newly set tracking time parameter last set by setProgress().
@@ -434,7 +457,9 @@ private:
 	/// Handle smart decomposition of a projection transform
 	/// This method must initialize and add at least one TrackedMatrix object to the m_matrices list.
 	/// @return Number of added matrices
-	int handleProjectionTransform(const std::shared_ptr<TrackedTransform>& value);
+	int handleProjectionTransform(const Ptr<TrackedTransform>& transform);
+
+	int handleViewportTransform(const Ptr<TrackedTransform>& transform);
 
 	void accumulateMatrix(glm::mat4& accMatrix, const TrackedTransform& trackedTransform,
 	                      const glm::mat4& transformMatrix);

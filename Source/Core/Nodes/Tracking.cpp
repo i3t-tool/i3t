@@ -222,6 +222,10 @@ void MatrixTracker::updateProgress()
 		{
 			createdMatrices = handleProjectionTransform(transform);
 		}
+		else if (transform->data.space == TransformSpace::Screen)
+		{
+			createdMatrices = handleViewportTransform(transform);
+		}
 
 		// Create matrix representing the transform
 		if (createdMatrices == 0)
@@ -255,6 +259,7 @@ void MatrixTracker::updateProgress()
 	glm::mat4 accMatrix(1.0f);
 	m_iViewMatrix = glm::identity<glm::mat4>();
 	m_iProjMatrix = glm::identity<glm::mat4>();
+	m_iViewportMatrix = glm::identity<glm::mat4>();
 
 	// Accumulate matrices up to the interpolation point
 	for (int i = 0; i < matricesBefore; ++i)
@@ -419,6 +424,10 @@ void MatrixTracker::accumulateMatrix(glm::mat4& accMatrix, const TrackedTransfor
 	else if (!m_trackInWorldSpace && trackedTransform.data.space == TransformSpace::Projection)
 	{
 		m_iProjMatrix = transformMatrix * m_iProjMatrix;
+	}
+	else if (!m_trackInWorldSpace && trackedTransform.data.space == TransformSpace::Screen)
+	{
+		m_iViewportMatrix = transformMatrix * m_iViewportMatrix;
 	}
 	else
 	{
@@ -622,6 +631,19 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
 		return 2;
 	}
+}
+
+int MatrixTracker::handleViewportTransform(const Ptr<TrackedTransform>& transform)
+{
+	assert(m_direction != TrackingDirection::LeftToRight && "Left to right camera tracking isn't supported!");
+	assert(transform->data.space == TransformSpace::Screen);
+	assert(m_trackedCamera != nullptr);
+
+	m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get()));
+	m_matrices.back()->useLHS = true; // [OGL-VULKAN]
+	m_matrices.back()->cameraNDCOffset = 3.f;
+	m_matrices.back()->ndcType = NDCType::MinusOneToOne;
+	return 1;
 }
 
 Ptr<Sequence> MatrixTracker::getSequence() const

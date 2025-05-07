@@ -793,7 +793,7 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	const int matricesCount = trackedMatrices.size();
 	const float matStep = 1.0f / (float) matricesCount;
 
-	static std::array spaceColors = {ImVec4(0, 0, 1, 1), ImVec4(0, 1, 0, 1), ImVec4(1, 0, 0, 1)};
+	static std::array spaceColors = {ImVec4(0, 0, 1, 1), ImVec4(0, 1, 0, 1), ImVec4(1, 0, 0, 1), ImVec4(1, 1, 0, 1)};
 
 	// Draw solid progress bg
 	TrackingSlider_drawProgress(grab_bb, tOuterRect, rounding, progressBg, frame_col_after, leftToRight);

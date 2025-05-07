@@ -79,9 +79,6 @@ public:
 
 	bool m_fixed{false}; ///< Whether the object can be moved by user operations @see isFixed()
 
-	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
-	bool m_rendered{true};
-
 	/// Read-only flag thats updated on each drawDiwne().
 	/// Essentially just a way to avoid passing this along everywhere as it should stay constant for each object.
 	DrawMode m_drawMode{DrawMode_Interactive};
@@ -97,6 +94,9 @@ public:
 	bool m_justHidden{false};     ///< Read only flag indicating that this object was drawn last frame, but not this one
 
 protected:
+	/// Whether the object should be drawn, this is a general flag that overrides behavior of the allowDrawing() method.
+	bool m_rendered{true};
+
 	// Tooltips and popups
 	// TODO: Do we need to retain this as a member variable? Its just constant prefix + label
 	std::string m_popupLabelDiwne; ///< ImGui popup identifier

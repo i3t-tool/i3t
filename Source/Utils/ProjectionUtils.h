@@ -49,4 +49,14 @@ std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m);
 
 glm::vec4 divide(const glm::vec4& v);
 
+inline glm::mat4 viewport(float x, float y, float width, float height, float n, float f)
+{
+	float widthDiv2 = width / 2.f;
+	float heightDiv2 = height / 2.f;
+	return glm::mat4({{widthDiv2, 0, 0, 0},
+	                  {0, heightDiv2, 0, 0},
+	                  {0, 0, (f - n) / 2.f, 0},
+	                  {x + widthDiv2, y + heightDiv2, (f + n) / 2.f, 1}});
+}
+
 }; // namespace ProjectionUtils
