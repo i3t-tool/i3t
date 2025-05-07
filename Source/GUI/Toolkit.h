@@ -102,14 +102,14 @@ void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size,
 void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
                  float thickness = 1.0f);
 
-inline void Tooltip(const char* header, const char* description)
+inline void Tooltip(const char* header, const char* description = nullptr)
 {
 	if (ImGui::BeginTooltip())
 	{
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 		ImGui::TextUnformatted(header);
 
-		if (strlen(description) != 0)
+		if (description != nullptr && strlen(description) != 0)
 		{
 			ImGui::Dummy({0.0f, 1.0f * ImGui::GetWindowDpiScale()});
 			ImGui::TextDisabled(description);
@@ -128,7 +128,7 @@ inline void Tooltip(const char* header, const char* description)
  * Tooltip hover delay (what normal / short delay means) can be set in ImGuiStyle.
  * @return If the tooltip is showing.
  */
-inline bool ItemTooltip(const char* header, const char* description,
+inline bool ItemTooltip(const char* header, const char* description = nullptr,
                         ImGuiHoveredFlags hoverFlags = ImGuiHoveredFlags_ForTooltip)
 {
 	if (!ImGui::IsItemHovered(hoverFlags))

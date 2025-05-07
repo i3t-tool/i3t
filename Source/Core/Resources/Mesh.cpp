@@ -25,14 +25,22 @@ using namespace Core;
 const unsigned FACE_VERT_COUNT = 3; // triangles
 
 Mesh::Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords,
-           bool useTangents, bool useColors)
+           bool useTangents, bool useColors, BufferType bufferType)
     : m_primitiveType(primitiveType), m_drawType(drawType), m_useNormals(useNormals), m_useTexcoords(useTexcoords),
-      m_useTangents(useTangents), m_useColors(useColors)
+      m_useTangents(useTangents), m_useColors(useColors), m_bufferType(bufferType)
 {
 	// Empty
 }
+Mesh::~Mesh()
+{
+	if (!m_disposed)
+	{
+		LOG_ERROR("[MESH] Mesh was destroyed without freeing its memory!");
+		// assert(false && "Mesh was destroyed without freeing its memory");
+	}
+}
 
-void Mesh::dispose() const
+void Mesh::dispose()
 {
 	glDeleteBuffers(1, &m_vertex_vbo);
 	if (m_useNormals)
@@ -47,12 +55,13 @@ void Mesh::dispose() const
 	{
 		glDeleteBuffers(1, &m_ebo);
 	}
+	m_disposed = true;
 }
 
 Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
-                   const float* colors, const unsigned int nColors)
+                   const float* colors, const unsigned int nColors, BufferType bufferType)
 {
-	Mesh* mesh = new Mesh(primitiveType, ARRAYS, false, false, false, true);
+	Mesh* mesh = new Mesh(primitiveType, ARRAYS, false, false, false, true, bufferType);
 
 	mesh->m_useNormals = false;
 	mesh->m_useTexcoords = false;
@@ -64,12 +73,12 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const 
 	// vertices
 	glGenBuffers(1, &mesh->m_vertex_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertex_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, bufferTypeToUsage(bufferType));
 
 	// colors
 	glGenBuffers(1, &mesh->m_color_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, bufferTypeToUsage(bufferType));
 
 	createVaoAndBindAttribs(mesh);
 
@@ -84,10 +93,9 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const 
 
 Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
                    const unsigned int* indices, const unsigned int nIndices, const float* colors,
-                   const unsigned int nColors)
+                   const unsigned int nColors, BufferType bufferType)
 {
-	// TODO: (DR) Test
-	Mesh* mesh = new Mesh(primitiveType, ARRAYS, false, false, false, true);
+	Mesh* mesh = new Mesh(primitiveType, ARRAYS, false, false, false, true, bufferType);
 
 	mesh->m_useNormals = false;
 	mesh->m_useTexcoords = false;
@@ -100,17 +108,17 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const 
 	// vertices
 	glGenBuffers(1, &mesh->m_vertex_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertex_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, bufferTypeToUsage(bufferType));
 
 	// colors
 	glGenBuffers(1, &mesh->m_color_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, bufferTypeToUsage(bufferType));
 
 	// EBO
 	glGenBuffers(1, &mesh->m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int), indices, bufferTypeToUsage(bufferType));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	createVaoAndBindAttribs(mesh);
@@ -123,6 +131,47 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const 
 	mesh->m_meshParts.push_back(meshPart);
 
 	return mesh;
+}
+
+void Mesh::update(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+                  const float* colors, const unsigned int nColors)
+{
+	m_primitiveType = primitiveType;
+	m_nVertices = nVertices;
+
+	// vertices
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_vbo);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), nullptr, bufferTypeToUsage(m_bufferType));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nVertices * 3 * sizeof(float), verts);
+
+	// colors
+	glBindBuffer(GL_ARRAY_BUFFER, m_color_vbo);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), nullptr, bufferTypeToUsage(m_bufferType));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nColors * 3 * sizeof(float), colors);
+}
+
+void Mesh::update(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+                  const unsigned int* indices, const unsigned int nIndices, const float* colors,
+                  const unsigned int nColors)
+{
+	m_primitiveType = primitiveType;
+	m_nVertices = nVertices;
+	m_nIndices = nIndices;
+
+	// vertices
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_vbo);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), nullptr, bufferTypeToUsage(m_bufferType));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nVertices * 3 * sizeof(float), verts);
+
+	// colors
+	glBindBuffer(GL_ARRAY_BUFFER, m_color_vbo);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, bufferTypeToUsage(m_bufferType));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nColors * 3 * sizeof(float), colors);
+
+	// EBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int), indices, bufferTypeToUsage(m_bufferType));
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, nIndices * sizeof(unsigned int), indices);
 }
 
 void Mesh::render() const
@@ -206,7 +255,7 @@ void Mesh::renderMeshPartInstanced(const MeshPart& meshPart, int instances) cons
 Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 {
 	Assimp::Importer importer;
-	Mesh* mesh = new Mesh(TRIANGLES, ELEMENTS, true, true, true, false);
+	Mesh* mesh = new Mesh(TRIANGLES, ELEMENTS, true, true, true, false, STATIC);
 	mesh->m_normalized = normalize;
 
 	fs::path modelRootPath = fs::path(path).parent_path();
@@ -718,4 +767,18 @@ GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mip
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CHECK_GL_ERROR();
 	return tex;
+}
+
+GLenum Mesh::bufferTypeToUsage(BufferType bufferType)
+{
+	switch (bufferType)
+	{
+	case DYNAMIC:
+		return GL_DYNAMIC_DRAW;
+	case STREAM:
+		return GL_STREAM_DRAW;
+	default:
+	case STATIC:
+		return GL_STATIC_DRAW;
+	}
 }

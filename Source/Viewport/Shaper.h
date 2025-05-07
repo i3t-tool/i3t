@@ -17,6 +17,8 @@
 
 #include "pgr.h"
 
+#include "Core/Resources/Mesh.h"
+
 namespace Core
 {
 class Mesh;
@@ -122,7 +124,9 @@ public:
 	 * @note Dynamic meshes should not provide an alias, as they would persist in ResourceManager.
 	 * @return
 	 */
-	Core::Mesh* createLineMesh(const std::string& alias = "");
+	Core::Mesh* createLineMesh(const std::string& alias = "",
+	                           Core::Mesh::BufferType bufferType = Core::Mesh::BufferType::STATIC);
+	void updateLineMesh(Core::Mesh* mesh);
 
 	/**
 	 * Create a triangle mesh from current shaper state.
@@ -130,7 +134,9 @@ public:
 	 * @note Dynamic meshes should not provide an alias, as they would persist in ResourceManager.
 	 * @return
 	 */
-	Core::Mesh* createMesh(const std::string& alias = "");
+	Core::Mesh* createMesh(const std::string& alias = "",
+	                       Core::Mesh::BufferType bufferType = Core::Mesh::BufferType::STATIC);
+	void updateMesh(Core::Mesh* mesh);
 
 public:
 	const std::vector<float>& getVertices() const;

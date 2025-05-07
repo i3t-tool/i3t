@@ -64,6 +64,13 @@ public:
 		TRIANGLES
 	};
 
+	enum BufferType
+	{
+		STATIC,
+		DYNAMIC,
+		STREAM
+	};
+
 	/**
 	 * \brief A set of textures for multi-mapping.
 	 */
@@ -113,6 +120,7 @@ public:
 
 	DrawType m_drawType;
 	PrimitiveType m_primitiveType;
+	BufferType m_bufferType{BufferType::STATIC};
 
 	/// Whether the normal vbo is used
 	bool m_useNormals{false};
@@ -149,6 +157,8 @@ public:
 
 	GLuint m_vao;
 
+	bool m_disposed{false}; ///< Whether the mesh has been deallocated
+
 	// Filesystem
 	std::string m_path;                      ///< If applicable, file path to the primary source file
 	std::set<std::string> m_textureFileList; ///< List of texture file paths this mesh requires
@@ -156,10 +166,12 @@ public:
 
 	int m_textureCount{0}; ///< Number of loaded textures for this mesh (files or embedded)
 
+	~Mesh() override;
+
 private:
 	Mesh() = default;
 	Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords,
-	     bool useTangents, bool useColors);
+	     bool useTangents, bool useColors, BufferType bufferType);
 
 public:
 	/**
@@ -182,7 +194,7 @@ public:
 
 	void renderMeshPartInstanced(const MeshPart& meshPart, int instances) const;
 
-	void dispose() const;
+	void dispose();
 
 	/**
 	 * Create mesh from vertices and colors.
@@ -191,7 +203,7 @@ public:
 	 * externally)
 	 */
 	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
-	                    const float* colors, const unsigned int nColors);
+	                    const float* colors, const unsigned int nColors, BufferType bufferType = BufferType::STATIC);
 
 	/**
 	 * Create mesh from indexed vertices and colors;
@@ -201,7 +213,22 @@ public:
 	 */
 	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
 	                    const unsigned int* indices, const unsigned int nIndices, const float* colors,
-	                    const unsigned int nColors);
+	                    const unsigned int nColors, BufferType bufferType = BufferType::STATIC);
+
+	/**
+	 * Update mesh vertices and colors.
+	 * Only fills the color vertex buffer.
+	 */
+	void update(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+	            const float* colors, const unsigned int nColors);
+
+	/**
+	 * Update mesh indexed vertices and colors.
+	 * Only fills the color vertex buffer.
+	 */
+	void update(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+	            const unsigned int* indices, const unsigned int nIndices, const float* colors,
+	            const unsigned int nColors);
 
 	/**
 	 * Load mesh from a model file using assimp
@@ -241,5 +268,7 @@ private:
 	{
 		return glm::vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
 	}
+
+	static GLenum bufferTypeToUsage(BufferType bufferType);
 };
 } // namespace Core

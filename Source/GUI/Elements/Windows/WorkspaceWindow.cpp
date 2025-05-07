@@ -231,9 +231,11 @@ bool WorkspaceWindow::showTrackingTimeline()
 	ImGui::BeginGroup();
 
 	float trackingTitleScale = 1.2f;
-	std::string trackingTitle = fmt::format(_tbd(ICON_FA_CROSSHAIRS " "
-	                                                                "Tracking") " {:.2f}%",
-	                                        tracker->getProgress() * 100.f);
+
+	std::string trackingTitle = fmt::format(
+	    "{} {} {:.2f}%",
+	    tracker->getDirection() == Core::TrackingDirection::RightToLeft ? ICON_FA_ARROW_LEFT : ICON_FA_ARROW_RIGHT,
+	    _tbd("Tracking"), tracker->getProgress() * 100.f);
 	ImVec2 trackingTitleSize = ImGui::CalcTextSize(trackingTitle.c_str());
 
 	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
@@ -243,6 +245,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 		tracker->reverseDirection();
 		interacted = true;
 	}
+	GUI::ItemTooltip(_tbd("Switch direction"));
 
 	ImGui::SameLine();
 
@@ -287,6 +290,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
 			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
 			                   ImGuiSliderFlags_Logarithmic);
+			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
 			                            &tracker->m_decomposeProjection))
 				tracker->requestProgressUpdate();
@@ -299,6 +303,10 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_RIGHT_LEFT " ", "Switch direction"), nullptr,
+			                            &tracker->m_trackInWorldSpace))
+				tracker->reverseDirection();
+			ImGui::PopItemFlag();
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_XMARK " ", "Stop tracking"), "Esc", nullptr))
 				Core::GraphManager::stopTracking();
 

@@ -35,10 +35,15 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 	m_contentSpacing = 0;
 	m_drawContextMenuButton = true;
 
-	// Setup tooltip for the model matrix output
-	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)
-	    ->setTooltip("Model matrix of the sequence.\nResult of multiplying matrices of all connected sequences.");
+	// Setup sequence tooltips
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MAT)->setTooltip(_tbd("Matrix in this sequence"));
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MAT)->setTooltipEnabled(true);
+
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltip(_tbd("Composite matrix of all matrices to the left"));
 	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltipEnabled(true);
+
+	m_workspaceInputs.at(Core::I3T_SEQ_IN_MAT)->setTooltip(_tbd("Matrix replacing this sequence content"));
+	m_workspaceInputs.at(Core::I3T_SEQ_IN_MAT)->setTooltipEnabled(true);
 }
 
 void Sequence::moveNodeToSequence(Ptr<CoreNode> dragedNode, int index)

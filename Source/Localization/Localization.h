@@ -44,6 +44,13 @@
 #define _tbd(key) key
 
 /**
+ * \def _tbds(key)
+ * \return std::string
+ * No-op macro for a key that doesn't have translations filled in yet.
+ */
+#define _tbds(key) std::string(key)
+
+/**
  * \def ICON_T(icon, key)
  * Macro for concatenating an icon with a translated string.
  * \return const char*
