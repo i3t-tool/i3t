@@ -1,0 +1,185 @@
+---
+title: 1. Starting with I3T
+description: Learn how to navigate the I3T program and tutorials, and perform your first operations.
+thumbnail: thumbnail.png
+language: en
+---
+
+headline: Welcome to I3T!
+
+*I3T* is an interactive program for learning *3D transformations*.
+
+In this tutorial, you will learn:
+- How to *navigate* the tutorials.
+- How the program is *structured*.
+- How to *use* the basic interface.
+
+Before we begin working, let's see how to move through the tutorials, start by clicking the *Next* button below.
+
+--
+headline: How Tutorials Work
+
+Tutorials are *interactive*. You will find *Tasks* you should do immediately when you see them.
+
+You move inside the tutorial using:
+- *Next* to move forward.
+- *Back* to move back.
+
+If you skip a Task the next steps might not work correctly. It is important to *follow and complete* all Tasks.
+
+You will also find *Tips* that explain what to do if you get stuck.
+
+task: Go to the next slide.
+
+hint: Try clicking the *Next* button now to continue.
+
+--
+headline: Manual and Help
+
+If you ever get stuck or want to learn more, you can find the full manual here:
+
+[Open the I3T Manual](https://i3t-tool.org/manual.html)
+
+The manual includes:
+- Controls and shortcuts
+- Detailed node descriptions
+- Tips for troubleshooting
+- Many more!
+
+Throughout this tutorial, you will also find direct links to specific manual sections.
+
+It is a good idea to keep the manual open while you learn!
+
+--
+headline: Pictures
+
+- *Pictures* are used to illustrate tasks or layouts.
+- When you *hover* over a picture, you may see an extra *Note* explaining details.
+
+--
+headline: Main Windows
+
+The I3T interface consists mainly of two windows:
+
+- [Workspace](https://i3t-tool.org/manual.html#workspace): Where you build and connect *blocks*.
+- [Scene View](https://i3t-tool.org/manual.html#scene-view): Where you *see* the resulting 3D scene.
+
+There is also a Top Bar with menus (File, Edit, Windows, etc.) where you can:
+- Open/save scenes.
+- Change settings.
+- Manage windows.
+- Save and load workspace layouts.
+
+Windows can be *moved* and *resized*, but we recommend keeping the default layout for now.
+
+--
+headline: Basic Controls
+
+Workspace Controls
+- *Left-click* on a block: Select a single block.
+- *Left-click and drag* on a block: Move the block around.
+- *Left-click and drag* on empty space: Box-select multiple blocks.
+- *Right-click* on empty space: Open the *Add/Context Menu*.
+- *Middle mouse button (hold and drag)*: Move in the workspace.
+- *Mouse wheel*: Zoom in/out.
+
+Scene View Controls
+- *Left-click* on a model: Select the model.
+- *Right-click and drag*: Rotate the camera view.
+- *Middle mouse button (hold and drag)*: Move the view.
+- *Mouse wheel*: Zoom in/out.
+
+Keyboard [shortcuts](https://i3t-tool.org/manual.html#shortcuts) are available but are not necessary.
+
+--
+headline: Nodes and Adding Blocks
+
+The core of I3T is working with blocks called *nodes*.
+
+Nodes can represent:
+- Transformations (Translate, Rotate, Scale),
+- 3D models,
+- Cameras,
+- Math and logic operations,
+- Time-based functions,
+- Other utilities.
+
+To [add a block](https://i3t-tool.org/manual.html#adding-nodes):
+- *Right-click* on empty Workspace and choose from the *Add Menu*.
+
+hint: Right-click in empty Workspace to open the Add Menu and choose the blocks.
+
+task:
+Right-click in Workspace and add:
+    - One Model block
+    - One Sequence block
+    - One Scale Transformation block
+
+scriptFile: Adding.lua
+
+--
+headline: Understanding Basic Blocks
+
+You have added:
+
+- *Model*: A 3D object block (a cube by default).
+- *Sequence*: Groups multiple transformations together.
+- *Scale*: A transformation node that resizes the object.
+
+These blocks work together to apply transformations to a model.
+
+--
+headline: Connecting Blocks
+
+Each node has:
+- *Inputs* (left side),
+- *Outputs* (right side).
+
+Only nodes with *compatible data types* can be connected.
+
+To [connect nodes](https://i3t-tool.org/manual.html#connecting-nodes):
+- *Click and drag* from an *output* to a *matching input*.
+
+task: Connect Sequence to Model.
+
+hint: Drag from the output icon on Sequence to the input icon on Model.
+
+--
+headline: Using Transformations
+
+[Transformation blocks](https://i3t-tool.org/manual.html#transformations) (like Scale) must be *inserted into Sequences*.
+
+Otherwise, they do nothing by themselves.
+
+task: Drag the *Scale block* into the *Sequence block*.
+
+hint: Grab the Scale block by its title bar and drop it onto the Sequence.
+
+--
+headline: Editing Values
+
+You can [modify transformation values](https://i3t-tool.org/manual.html#modifying-values):
+
+- *Click and drag* a matrix value left or right to adjust it.
+- *Double-click* a value to type an exact number.
+
+For Scale transformations:
+- Changing one value changes all three axes together (*synergy*).
+- This ensures *uniform scaling* by default.
+- You can disable synergy by *right-clicking* the Scale matrix block and unchecking *Synergies*.
+
+task: Set the Scale matrix to scale by 2.
+
+hint: Click and drag sideways over a matrix value or double-click to type the number.
+
+--
+headline: You are ready!
+
+Congratulations, you finished your first tutorial!
+
+You now know:
+- How tutorials and tasks work.
+- How to move and control the view.
+- How to add, connect, and edit basic blocks.
+
+Press *Finish* to return to the main menu and continue with more tutorials.
