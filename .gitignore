@@ -71,7 +71,6 @@ ReportCppCheck.txt
 Test/State/TestScene.json
 /UserData/
 Global.json
-Data/imgui.ini
 Data/I3T.ini
 [L|l]ogs/
 Test/State/EmptyScene.json

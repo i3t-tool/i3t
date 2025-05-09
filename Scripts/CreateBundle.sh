@@ -111,7 +111,7 @@ function create_bundle() {
 
     local archive_name="I3T${ARCHIVE_NAME_SUFFIX}-${git_version}.zip"
 
-    cp Data/imgui_default.ini Data/imgui.ini
+    cp Data/I3T_default.ini Data/I3T.ini
     local binaries=$(find "$binaries_directory" -name "*.so" -o -name "*.so.*" -o -name "*.dll" -o -name "I3T" -o -name "I3T.exe")
     for binary in $binaries; do
         local binary_name=$(basename $binary)

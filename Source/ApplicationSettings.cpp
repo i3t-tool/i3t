@@ -30,7 +30,8 @@ RTTR_REGISTRATION
 	    .property("shouldLimitFPS", &AppLoopSettings::shouldLimitFPS)
 	    .property("targetFPS", &AppLoopSettings::targetFPS)
 	    .property("shouldLimitFPSOnIdle", &AppLoopSettings::shouldLimitFPSOnIdle)
-	    .property("targetFPSOnIdle", &AppLoopSettings::targetFPSOnIdle);
+	    .property("targetFPSOnIdle", &AppLoopSettings::targetFPSOnIdle)
+	    .property("secondsBeforeIdle", &AppLoopSettings::secondsBeforeIdle);
 
 	rttr::registration::class_<ApplicationSettings>("ApplicationSettings")
 	    .property("appLoopSettings", &ApplicationSettings::appLoopSettings)

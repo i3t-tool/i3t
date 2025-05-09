@@ -19,8 +19,9 @@ struct AppLoopSettings
 	bool shouldLimitFPS{false};
 	int targetFPS{60};
 
-	bool shouldLimitFPSOnIdle = false;
+	bool shouldLimitFPSOnIdle = true;
 	int targetFPSOnIdle{20};
+	int secondsBeforeIdle{5};
 };
 
 struct WindowSettings

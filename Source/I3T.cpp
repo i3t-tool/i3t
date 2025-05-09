@@ -140,9 +140,9 @@ void I3TApplication::loadGlobal(const Memento& memento)
 void I3TApplication::clearGlobal()
 {
 	g_settings.appLoopSettings = AppLoopSettings();
-	m_appLoopManager =
-	    AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS, g_settings.appLoop().targetFPS,
-	                   g_settings.appLoop().shouldLimitFPSOnIdle, g_settings.appLoop().targetFPSOnIdle);
+	m_appLoopManager = AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS,
+	                                  g_settings.appLoop().targetFPS, g_settings.appLoop().shouldLimitFPSOnIdle,
+	                                  g_settings.appLoop().targetFPSOnIdle, g_settings.appLoop().secondsBeforeIdle);
 	m_window->setVSync(g_settings.appLoop().vsync);
 }
 
@@ -152,6 +152,7 @@ void I3TApplication::saveSettings()
 	g_settings.appLoop().shouldLimitFPS = m_appLoopManager.shouldLimitFPS();
 	g_settings.appLoop().targetFPS = m_appLoopManager.getTargetFPS();
 	g_settings.appLoop().shouldLimitFPSOnIdle = m_appLoopManager.shouldLimitFPSOnIdle();
+	g_settings.appLoop().secondsBeforeIdle = m_appLoopManager.getSecondsBeforeIdle();
 	g_settings.appLoop().targetFPSOnIdle = m_appLoopManager.getTargetFPSOnIdle();
 
 	m_window->getWindowPosAndSize(g_settings.window().windowPosX, g_settings.window().windowPosY,
@@ -161,9 +162,9 @@ void I3TApplication::saveSettings()
 
 void I3TApplication::loadSettings()
 {
-	m_appLoopManager =
-	    AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS, g_settings.appLoop().targetFPS,
-	                   g_settings.appLoop().shouldLimitFPSOnIdle, g_settings.appLoop().targetFPSOnIdle);
+	m_appLoopManager = AppLoopManager(g_settings.appLoop().vsync, g_settings.appLoop().shouldLimitFPS,
+	                                  g_settings.appLoop().targetFPS, g_settings.appLoop().shouldLimitFPSOnIdle,
+	                                  g_settings.appLoop().targetFPSOnIdle, g_settings.appLoop().secondsBeforeIdle);
 	m_window->setVSync(g_settings.appLoop().vsync);
 	m_window->setWindowPosAndSize(g_settings.window().windowPosX, g_settings.window().windowPosY,
 	                              g_settings.window().windowWidth, g_settings.window().windowHeight,
