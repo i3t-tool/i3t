@@ -17,6 +17,7 @@
 #include "Viewport/data/RenderOptions.h"
 
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
+#include "Viewport/entity/nodes/SceneScreen.h"
 
 namespace Vp
 {
@@ -27,7 +28,6 @@ namespace Workspace
 {
 class Screen : public CoreNodeWithPins
 {
-private:
 	// variables of the workspace box
 	GLuint m_textureID = 0;            // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
 	ImVec2 m_textureSize = {100, 100}; // initial render texture size in pixels
@@ -36,29 +36,33 @@ private:
 	Vp::DisplayOptions m_displayOptions;
 	Vp::RenderOptions m_renderOptions;
 
+	std::weak_ptr<Vp::SceneScreen> m_viewportScreen; ///< Reference to the Scene View (3D Viewport) representation
 public:
-	Screen(DIWNE::NodeEditor& diwne);
+	explicit Screen(DIWNE::NodeEditor& diwne);
+	~Screen() override;
 
-	//===-- Double dispatch
-	//---------------------------------------------------===//
-	void accept(NodeVisitor& visitor) override
-	{
-		visitor.visit(std::static_pointer_cast<Screen>(shared_from_this()));
-	}
-	//===----------------------------------------------------------------------===//
+	void centerContent(DIWNE::DrawInfo& context) override;
+	void finalize(DIWNE::DrawInfo& context) override;
 
-	int maxLengthOfData() override;                        // todo
-	void centerContent(DIWNE::DrawInfo& context) override; // the most important function
+	void onSelection(bool selected) override;
 
-	void drawMenuLevelOfDetail() override; // todo
+	int maxLengthOfData() override;
+	void drawMenuLevelOfDetail() override;
 	void popupContent(DIWNE::DrawInfo& context) override;
 
 	/////////////////////////////////////////////////////////////
 
-	ImVec2 getAspect() const;
-	void setAspect(ImVec2 aspect);
+	ImVec2 getScreenSize() const;
+	void setScreenSize(ImVec2 aspect);
+
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<Screen>(shared_from_this()));
+	}
 
 private:
-	bool drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize);
+	bool drawResizeHandle(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize);
+	void updateCoreData();
+	void updateTrackedScreen(); ///< Updates the 3D Scene view representation of the screen
 };
 } // namespace Workspace

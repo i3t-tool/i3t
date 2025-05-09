@@ -568,9 +568,12 @@ void CoreNode::onReleased(bool justReleased, DIWNE::DrawInfo& context)
 	Super::onReleased(justReleased, context);
 }
 
-void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay) const
+void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay, bool round) const
 {
 	assert(t != nullptr);
+
+	ImVec2 lineOfst =
+	    ImVec2(0.f, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y) * (round ? 1.f : 2.f));
 
 	ImVec2 min = rect.Min;
 	ImVec2 max = rect.Max;
@@ -605,20 +608,24 @@ void CoreNode::drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, b
 	}
 
 	const ImVec4& inactiveCol = I3T::getColor(EColor::Nodes_Tracking_OverlayInactive);
-	if (inactiveCol.w > 0.f && inactiveOverlay)
-		diwne.canvas().AddRectFilledDiwne(iMin, iMax, inactiveCol);
+	if (progress < 1.f && inactiveCol.w > 0.f && inactiveOverlay)
+		diwne.canvas().AddRectFilledDiwne(iMin, iMax, inactiveCol, round ? I3T::getSize(ESize::Nodes_Rounding) : 0,
+		                                  ImDrawFlags_RoundCornersBottom);
 
 	const ImVec4& activeCol = I3T::getColor(EColor::Nodes_Tracking_OverlayActive);
-	if (activeCol.w > 0.f)
-		diwne.canvas().AddRectFilledDiwne(fMin, fMax, activeCol);
+	if (progress > 0.f && activeCol.w > 0.f)
+		diwne.canvas().AddRectFilledDiwne(fMin, fMax, activeCol, round ? I3T::getSize(ESize::Nodes_Rounding) : 0,
+		                                  ImDrawFlags_RoundCornersBottom);
 
 	const ImVec4& cursorCol = I3T::getColor(EColor::Nodes_Tracking_Cursor);
 	const float lW = 1;
-	diwne.canvas().AddLine(ImVec2(fMin.x, fMin.y + lW / 2), {fMax.x, fMin.y + lW / 2}, cursorCol, lW);
-	diwne.canvas().AddLine(ImVec2(fMin.x, fMax.y - lW / 2), {fMax.x, fMax.y - lW / 2}, cursorCol, lW);
+	diwne.canvas().AddLine(ImVec2(fMin.x, fMin.y + lW / 2) + lineOfst, ImVec2(fMax.x, fMin.y + lW / 2) + lineOfst,
+	                       cursorCol, lW);
+	diwne.canvas().AddLine(ImVec2(fMin.x, fMax.y - lW / 2) - lineOfst, ImVec2(fMax.x, fMax.y - lW / 2) - lineOfst,
+	                       cursorCol, lW);
 	if (t->mIndex == 0)
 	{
-		diwne.canvas().AddLine(ImVec2(startX, fMin.y), {startX, fMax.y}, cursorCol, lW);
+		diwne.canvas().AddLine(ImVec2(startX, fMin.y + lineOfst.y), {startX, fMax.y - lineOfst.y}, cursorCol, lW);
 	}
 
 	if (t->interpolating)

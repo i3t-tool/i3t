@@ -547,8 +547,8 @@ private:
 		m_stream << fmt::format("local node_{} = Screen.new()\n", node->getId());
 		dumpCommon(node);
 
-		m_stream << fmt::format("node_{}:set_aspect({})\n", node->getId(),
-		                        LuaSerializer::toConstructor(node->getAspect()));
+		m_stream << fmt::format("node_{}:set_screen_size({})\n", node->getId(),
+		                        LuaSerializer::toConstructor(node->getScreenSize()));
 	}
 
 	void visit(const Ptr<GuiModel>& node) override
@@ -891,8 +891,8 @@ LUA_REGISTRATION
 
 			return screen;
 		},
-		"set_aspect", [](Workspace::Screen& self, const ImVec2& value) {
-			self.setAspect(value);
+		"set_screen_size", [](Workspace::Screen& self, const ImVec2& value) {
+			self.setScreenSize(value);
 		}
 	);
 

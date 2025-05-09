@@ -2,7 +2,7 @@
  * \file
  * \brief
  * \author Dan Rakušan <rakusan.dan@gmail.com>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -35,8 +35,6 @@ protected:
 	std::weak_ptr<ColoredObject> m_frustumNear; ///< Lines from the camera to the near plane, hidden during tracking
 	std::shared_ptr<Core::Mesh> m_frustumNearMesh;
 
-	/// Lines from the camera to the near plane, adjusted to ignore reference space, only visible during tracking
-	std::weak_ptr<ColoredObject> m_trackedFrustumNear;
 	std::shared_ptr<Core::Mesh> m_trackedFrustumNearMesh;
 
 	bool m_isTracking{false};
@@ -57,6 +55,9 @@ public:
 	/// When tracking projection, the model of the camera is hidden and is replaced by this model, which ignores
 	/// reference space and is positioned in a special manner.
 	std::weak_ptr<TexturedObject> m_trackedCameraModel;
+
+	/// Lines from the camera to the near plane, adjusted to ignore reference space, only visible during tracking
+	std::weak_ptr<ColoredObject> m_trackedFrustumNear;
 
 	SceneCamera(Core::Mesh* mesh, PhongShader* shader);
 	~SceneCamera() override;

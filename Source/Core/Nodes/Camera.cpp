@@ -52,14 +52,15 @@ void Camera::createComponents()
 
 void Camera::updateValues(int inputIndex)
 {
-	const auto& projMat = m_proj->data(I3T_OUTPUT1).getMat4();
-	const auto& viewMat = m_view->data(I3T_OUTPUT1).getMat4();
-	const auto& viewportMat = m_viewport->data(I3T_OUTPUT1).getMat4();
+	const auto& projMat = m_proj->data(I3T_SEQ_OUT_MAT).getMat4();
+	const auto& viewMat = m_view->data(I3T_SEQ_OUT_MAT).getMat4();
+	const auto& viewportMat = m_viewport->data(I3T_SEQ_OUT_MAT).getMat4();
+	bool implicitViewportEnabled = !m_viewportEnabled || m_viewport->isEmpty();
 
-	// TODO: (DR) [T-VIEWPORT] I assume the screen should be passed the viewport transform if enabled?
-	setInternalValue(std::make_pair(projMat, viewMat), I3T_CAMERA_OUT_SCREEN);
-	setInternalValue(projMat * viewMat, I3T_CAMERA_OUT_MATRIX);
-	setInternalValue(glm::mat4(1.f), I3T_CAMERA_OUT_MUL);
+	setInternalValue(ScreenData{projMat, viewMat, viewportMat, implicitViewportEnabled}, I3T_CAMERA_OUT_SCREEN);
+	setInternalValue(implicitViewportEnabled ? projMat * viewMat : viewportMat * projMat * viewMat,
+	                 I3T_CAMERA_OUT_MATRIX);
+	setInternalValue(glm::mat4(1.f), I3T_CAMERA_OUT_MUL); // Camera matrix mul is a no-op, unlike the out matrix
 
 	m_projectionMatrix = projMat;
 	m_viewMatrix = viewMat;

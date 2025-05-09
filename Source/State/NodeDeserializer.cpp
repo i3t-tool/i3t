@@ -154,10 +154,15 @@ std::vector<Ptr<DIWNE::Node>> createFrom(const Memento& memento, bool selectAll)
 		NodeDeserializer::assignCommon(value, screen, selectAll);
 		createdNodes[value["id"].GetInt()] = {screen, false};
 
-		if (value.HasMember("aspect"))
+		// Load screen size, "aspect" is the legacy name for screen size
+		if (value.HasMember("screenSize") || value.HasMember("aspect"))
 		{
-			const auto aspect = JSON::getVec2(value["aspect"].GetArray());
-			screen->setAspect(aspect);
+			ImVec2 screenSize;
+			if (value.HasMember("aspect"))
+				screenSize = JSON::getVec2(value["aspect"].GetArray());
+			if (value.HasMember("screenSize"))
+				screenSize = JSON::getVec2(value["screenSize"].GetArray());
+			screen->setScreenSize(screenSize);
 		}
 	}
 

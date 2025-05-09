@@ -307,9 +307,7 @@ void ViewportWindow::updateSpace()
 			}
 			break;
 			case Core::TransformSpace::Screen:
-				m_space.label = std::string(_tbd("Screen space\n(1:") +
-				                            std::to_string(TRACKING_VIEWPORT_SCALING_FACTOR) + " scale)");
-
+				m_space.label = std::string(_tbd("Screen space"));
 				stg.global().grid.programShow = false;              // Disabling world grid for projection spaces
 				m_displayOptions.showTracking = true;               // Show manually controlled camera
 				if (tracker->getInterpolatedMatrixObject()->useLHS) // Switch view axes to LHS mode
@@ -472,35 +470,67 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		                                                       m_camera->getProjection(), axisFactors);
 		ImGui::PopStyleColor();
 
-		tWidth = ImGui::CalcTextSize(m_space.label.c_str()).x;
+		ImGui::SetCursorScreenPos(ImVec2{axesPosition.x, axesPosition.y + axesSize});
+		ImGui::BeginGroup();
 
-		ImVec2 textPos = {axesPosition.x + axesSize / 2 - tWidth / 2, axesPosition.y + axesSize};
-		ImGui::SetCursorScreenPos(textPos);
-		GUI::TextColoredShadow((m_space.label).c_str(), m_space.labelCol);
+		GUI::TextColoredShadowCentered(m_space.label.c_str(), m_space.labelCol, axesSize);
 
 		if (m_space.simulateLHS)
 		{
-			if (m_space.trackingSpace == Core::TransformSpace::Projection && m_space.trackingMatrixProgress >= 0.5f)
+			if ((m_space.trackingSpace == Core::TransformSpace::Projection && m_space.trackingMatrixProgress >= 0.5f) ||
+			    m_space.trackingSpace == Core::TransformSpace::Screen)
 			{
 				std::string str = _tbd("(Left handed)");
 				tWidth = ImGui::CalcTextSize(str.c_str()).x;
-
-				textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
-				           axesPosition.y + axesSize + ImGui::GetTextLineHeight()};
-				ImGui::SetCursorScreenPos(textPos);
-				GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
-			}
-			if (m_space.trackingSpace == Core::TransformSpace::Screen)
-			{
-				std::string str = _tbd("(Left handed)");
-				tWidth = ImGui::CalcTextSize(str.c_str()).x;
-
-				textPos = {axesPosition.x + axesSize / 2 - tWidth / 2,
-				           axesPosition.y + axesSize + ImGui::GetTextLineHeight() * 2};
+				ImVec2 textPos = {axesPosition.x + axesSize / 2 - tWidth / 2, ImGui::GetCursorScreenPos().y};
 				ImGui::SetCursorScreenPos(textPos);
 				GUI::TextColoredShadow(str.c_str(), m_space.labelCol);
 			}
 		}
+
+		if (m_space.trackingSpace == Core::TransformSpace::Screen)
+		{
+			bool xyScaleEqZ = Core::MatrixTracker::g_trackingViewportScalingFactorXY ==
+			                  Core::MatrixTracker::g_trackingViewportScalingFactorZ;
+			std::string str = std::string("(1:") +
+			                  std::to_string((int) Core::MatrixTracker::g_trackingViewportScalingFactorXY) +
+			                  (xyScaleEqZ ? " scale)" : " XY scale)");
+			GUI::TextColoredShadowCentered(str.c_str(), m_space.labelCol, axesSize);
+
+			str = xyScaleEqZ
+			          ? ""
+			          : std::string("(1:") +
+			                std::to_string((int) Core::MatrixTracker::g_trackingViewportScalingFactorZ) + " Z scale)";
+			GUI::TextColoredShadowCentered(str.c_str(), m_space.labelCol, axesSize);
+		}
+
+		if (m_space.trackingSpace == Core::TransformSpace::Screen)
+		{
+			ImGui::Spacing();
+
+			float sliderWidth = ImGui::GetFontSize() * 2.5f;
+			float sliderWidthTotal = sliderWidth * 2 + ImGui::GetStyle().ItemSpacing.x;
+			ImGui::Dummy(ImVec2(std::max((axesSize - sliderWidthTotal) / 2.f, 0.f), 0.f));
+			ImGui::SameLine(0, 0);
+
+			if (ImGui::VSliderFloat("###XYscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 10),
+			                        &Core::MatrixTracker::g_trackingViewportScalingFactorXY, 1.0f, 100.0f,
+			                        "%.2f\n  XY"))
+			{
+				if (Core::GraphManager::isTracking())
+					Core::GraphManager::getTracker()->requestProgressUpdate();
+			}
+			ImGui::SameLine();
+			if (ImGui::VSliderFloat("###Zscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 10),
+			                        &Core::MatrixTracker::g_trackingViewportScalingFactorZ, 1.0f, 100.0f, "%.2f\n   Z",
+			                        ImGuiSliderFlags_Logarithmic))
+			{
+				if (Core::GraphManager::isTracking())
+					Core::GraphManager::getTracker()->requestProgressUpdate();
+			}
+		}
+
+		ImGui::EndGroup();
 	}
 
 	ImGui::GetStyle().Alpha = oldAlpha;
@@ -595,7 +625,7 @@ bool ViewportWindow::showViewportButtons()
 
 	if (m_displayOptions.showGrids)
 	{
-		if (m_space.trackingSpace != Core::TransformSpace::Projection)
+		if (m_space.trackingSpace < Core::TransformSpace::Projection)
 		{
 			// World grid is always hidden during projection tracking
 			interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridBtn", m_displayOptions.grid.show);

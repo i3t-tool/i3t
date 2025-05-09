@@ -93,6 +93,7 @@ public:
 	bool m_forceReload{false};         /// If true any resource fetches will not be cached
 	bool m_forceMinimumLoad{false};    /// If true just the bare minimum of resources is loaded
 	bool m_forceModelNormalize{false}; /// If true loaded models will be normalized
+	bool m_forceClampToEdge{false};    /// If true, loaded texture will use GL_CLAMP_TO_EDGE
 
 	~ResourceManager();
 

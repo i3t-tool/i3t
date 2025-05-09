@@ -60,6 +60,14 @@ inline void TextColoredShadow(const char* text, const ImVec4& color)
 	ImGui::TextColored(color, text);
 }
 
+inline void TextColoredShadowCentered(const char* text, const ImVec4& color, float width)
+{
+	float tWidth = ImGui::CalcTextSize(text).x;
+	ImGui::Dummy(ImVec2((width - tWidth) / 2.f, 0.f));
+	ImGui::SameLine(0, 0);
+	TextColoredShadow(text, color);
+}
+
 inline void TextShadow(const char* text)
 {
 	TextColoredShadow(text, ImGui::GetStyleColorVec4(ImGuiCol_Text));

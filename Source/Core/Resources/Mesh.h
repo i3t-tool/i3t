@@ -253,7 +253,8 @@ private:
 	                           const fs::path& rootPath, bool minimalLoad);
 	static GLuint loadTexture(aiTextureType type, const aiMaterial* material, const aiScene* scene, Mesh* mesh,
 	                          const fs::path& rootPath, bool minimalLoad);
-	static GLuint loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap = true);
+	static GLuint loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap = true,
+	                                  bool clampToEdge = false);
 	static void loadMaterial(Material& meshMaterial, const aiMaterial* material);
 
 	static inline glm::vec3 convertVec3(const aiVector3D& v)

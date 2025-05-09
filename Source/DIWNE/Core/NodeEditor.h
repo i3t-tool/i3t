@@ -116,7 +116,7 @@ protected:
 public:
 	// Editor interaction
 	// =============================================================================================================
-	virtual bool allowZoom(); // TODO: Rename to allowZoom()
+	virtual bool allowZoom();
 	virtual bool isZoomingDiwne();
 	virtual bool processZoom();
 	virtual void onZoom(){}; ///< Called by Canvas::setZoom() when the zoom level changes.
@@ -185,6 +185,7 @@ public:
 
 	// TODO: I probably need const versions of node ranges <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//  Non-mutable Iterators now take a const pointer to the node vector meaning they can be created in const methods
+	//  A: I likely don't *need* const version, nice to have but not crucial
 	/**
 	 * Get a view of all nodes in the node editor which can be iterated over.
 	 * The object returned is a trivial container wrapper around a node iterator.
@@ -203,7 +204,7 @@ public:
 	// TODO: Docs
 	virtual void deselectAllNodes();
 
-	// TODO: Docs
+	// TODO: Docs, should override the virtual base method (right now it just hides it)
 	void addNode(const std::shared_ptr<Node>& node);
 
 	// TODO: Docs

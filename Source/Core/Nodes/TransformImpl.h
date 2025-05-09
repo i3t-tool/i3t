@@ -446,6 +446,8 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
+bool isViewportValid(const glm::mat4& mat);
+
 /**
  * Same as perspective projection node, but all values are locked.
  */

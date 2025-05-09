@@ -29,7 +29,7 @@ bool loadTexImage2D(const std::string& fileName, GLenum target)
 	return result;
 }
 
-GLuint createTexture(const std::string& fileName, bool mipmap)
+GLuint createTexture(const std::string& fileName, bool mipmap, bool clampToEdge)
 {
 	// generate and bind one texture
 	GLuint tex = 0;
@@ -38,6 +38,9 @@ GLuint createTexture(const std::string& fileName, bool mipmap)
 	// set linear filtering
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// set clamping
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	// upload our image data to OpenGL
 	if (!loadTexImage2D(fileName, GL_TEXTURE_2D))
 	{

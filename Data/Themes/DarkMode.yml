@@ -142,7 +142,7 @@ colors:
   nscr_Nodes Screen resizeBtn bgInner: [0.400, 0.200, 0.200, 0.600]
   nscr_Nodes Screen resizeBtn fgShape: [0.400, 0.400, 0.600, 0.600]
   nscr_Nodes Screen resizeBtn fgInner: [0.400, 0.400, 0.600, 0.600]
-  nscr_Nodes_Screen_noInput_background: [0.000, 0.000, 0.000, 0.650]
+  nscr_Nodes_Screen_background: [0.000, 0.000, 0.000, 0.650]
   nscr_Nodes_Screen_noInput_text: [1.000, 1.000, 1.000, 0.650]
   ntrs_Nodes Tracking Color Active: [0.647, 0.048, 0.865, 0.843]
   ntrs_Nodes Tracking Color Inactive: [0.460, 0.165, 0.645, 0.643]

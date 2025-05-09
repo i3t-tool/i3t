@@ -10,6 +10,9 @@
  *
  * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
  */
+#include "Core/Nodes/Screen.h"
+
+
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
@@ -24,7 +27,7 @@ class ScreenTest : public GraphManagerTestFixtureSuite
 
 TEST_F(ScreenTest, _)
 {
-	auto screen = Builder::createOperator<EOperatorType::Screen>();
+	auto screen = Builder::createScreen();
 	auto camera = GraphManager::createCamera();
 
 	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();

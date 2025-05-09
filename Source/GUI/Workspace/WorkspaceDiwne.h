@@ -58,7 +58,9 @@ public:
 
 	bool m_updateDataItemsWidth{false}; ///< Indicates a change in zoom level this frame
 
-	bool smoothTracking{true};
+	// Tracking
+	bool m_smoothTracking{true};
+	bool m_highlightTrackedModels{true};
 	ImVec2 m_trackingCursorPos;
 
 	/**
@@ -108,6 +110,7 @@ public:
 	void onZoom() override;
 
 	void manipulatorStartCheck3D();
+	void processTrackingInput();
 
 	// Tracking
 	// =============================================================================================================
@@ -238,8 +241,8 @@ public:
 
 	DIWNE::FilteredNodeRange<Camera> getAllCameras();
 	DIWNE::FilteredNodeRange<Model> getAllModels();
-	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence();
-	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();
+	DIWNE::FilteredNodeRange<Sequence> getAllInputFreeSequence(); // Unused
+	DIWNE::FilteredNodeRange<Model> getAllInputFreeModel();       // Unused
 	DIWNE::FilteredRecursiveNodeRange<ScriptingNode> getAllScriptingNodes();
 
 	// =============================================================================================================

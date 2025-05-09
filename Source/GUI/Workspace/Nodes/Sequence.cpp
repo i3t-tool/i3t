@@ -269,7 +269,7 @@ void Sequence::popupContentTracking()
 		{
 			workspaceDiwne.stopTracking();
 		}
-		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.m_smoothTracking, true))
 		{
 			workspaceDiwne.trackingModeSwitch();
 		}
@@ -365,9 +365,11 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 		{
 			const ImRect& center = m_center.getRect();
 			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);
+			// ImVec2 ofst = ImVec2(ceil(dropZoneMargin.x), ceil(dropZoneMargin.y));
+			ImVec2 ofst = ImVec2(0, 0);
 			// dropZoneMargin += {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
-			drawTrackingCursor(ImRect(center.Min + dropZoneMargin, center.Max - dropZoneMargin), t,
-			                   coreSeq->getMatrices().size() != 0);
+			drawTrackingCursor(ImRect(center.Min + ofst, center.Max - ofst), t, coreSeq->getMatrices().size() != 0,
+			                   false);
 		}
 		if (t->chain || t->modelSubtree)
 			drawTrackingBorder(t->active, t->interpolating, t->progress);

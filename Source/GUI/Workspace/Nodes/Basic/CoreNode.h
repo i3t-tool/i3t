@@ -127,7 +127,7 @@ public:
 	// Tracking
 	// =============================================================================================================
 public:
-	void drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay) const;
+	void drawTrackingCursor(ImRect rect, const Core::TrackedNodeData* t, bool inactiveOverlay, bool round) const;
 	void drawTrackingBorder(bool active, bool interpolating, float progress) const;
 
 	// =============================================================================================================

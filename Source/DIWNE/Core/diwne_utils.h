@@ -216,6 +216,10 @@ inline void Tooltip(const char* header, const char* description, const ImColor& 
 } // namespace DGui
 namespace DMath
 {
+inline ImVec2 abs(const ImVec2& v)
+{
+	return ImVec2(::abs(v.x), ::abs(v.y));
+}
 template <typename T>
 T clamp(T value, T low, T high)
 {

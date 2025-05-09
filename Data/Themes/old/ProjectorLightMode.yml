@@ -349,7 +349,7 @@ colors:
     y: 0.400000006
     z: 0.600000024
     w: 0.600000024
-  nscr_Nodes_Screen_noInput_background:
+  nscr_Nodes_Screen_background:
     x: 0
     y: 0
     z: 0

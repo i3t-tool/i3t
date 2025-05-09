@@ -705,7 +705,8 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 				{
 					// Texture is compressed (As per assimp docs, mWidth contains the length)
 					LOG_INFO("[MESH] Loading an embedded texture of type '{}'", aiTextureTypeToString(type));
-					texId = loadEmbeddedTexture((unsigned char*) &*aiTex->pcData, aiTex->mWidth);
+					texId = loadEmbeddedTexture((unsigned char*) &*aiTex->pcData, aiTex->mWidth, true,
+					                            RMI.m_forceClampToEdge);
 				}
 			}
 			else
@@ -724,7 +725,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 	}
 }
 
-GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap)
+GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap, bool clampToEdge)
 {
 	// generate and bind one texture
 	GLuint tex = 0;
@@ -733,6 +734,9 @@ GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mip
 	// set linear filtering
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// set clamping
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	// upload our image data to OpenGL
 	bool result = false;
 

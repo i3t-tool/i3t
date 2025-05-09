@@ -6,7 +6,7 @@ namespace GLUtils
 {
 bool loadTexImage2D(const std::string& fileName, GLenum target);
 
-GLuint createTexture(const std::string& fileName, bool mipmap = true);
+GLuint createTexture(const std::string& fileName, bool mipmap = true, bool clampToEdge = false);
 
 /** helper function for shader compiling
  *

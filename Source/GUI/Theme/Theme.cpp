@@ -307,7 +307,7 @@ void Theme::initDefaultClassic()
 	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.70f, 0.70f, 0.70f, 0.5f));
 	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
 	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
-	set(EColor::Nodes_Screen_noInput_background, ImVec4(0.0f, 0.0f, 0.0f, 0.65f));
+	set(EColor::Nodes_Screen_background, ImVec4(0.0f, 0.0f, 0.0f, 0.65f));
 	set(EColor::Nodes_Screen_noInput_text, ImVec4(1.0f, 1.0f, 1.0f, 0.65f));
 
 	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -791,7 +791,7 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Screen_resizeBtn_bgInner, "Nodes Screen resizeBtn bgInner")
 	    .add(EColor::Nodes_Screen_resizeBtn_fgShape, "Nodes Screen resizeBtn fgShape")
 	    .add(EColor::Nodes_Screen_resizeBtn_fgInner, "Nodes Screen resizeBtn fgInner")
-	    .add(EColor::Nodes_Screen_noInput_background, "Nodes_Screen_noInput_background")
+	    .add(EColor::Nodes_Screen_background, "Nodes_Screen_background")
 	    .add(EColor::Nodes_Screen_noInput_text, "Nodes_Screen_noInput_text")
 	    .add(ESizeVec2::Nodes_Screen_resizeButtonSize, "Screen Resize Button Size")
 	    .add(ESizeVec2::Nodes_ScreenTextureSize, "Nodes Screen Texture Size");

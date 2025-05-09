@@ -214,7 +214,7 @@ enum class EColor
 	Nodes_Screen_resizeBtn_fgShape,
 	Nodes_Screen_resizeBtn_fgInner,
 
-	Nodes_Screen_noInput_background,
+	Nodes_Screen_background,
 	Nodes_Screen_noInput_text,
 
 	Nodes_Tracking_ColorActive,

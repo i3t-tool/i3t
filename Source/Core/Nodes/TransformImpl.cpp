@@ -1646,8 +1646,23 @@ SetValueResult TransformImpl<ETransformType::Viewport>::setValue(float val, glm:
 
 bool TransformImpl<ETransformType::Viewport>::isValid() const
 {
+	return isViewportValid(m_internalData[0].getMat4());
+}
+
+bool isViewportValid(const glm::mat4& mat)
+{
+	if (!validateValues(g_ViewportMask, mat))
+		return false;
+
+	// Check that width and height are positive
+	if (mat[0][0] < 0.f)
+		return false;
+	if (mat[1][1] < 0.f)
+		return false;
+
 	return true;
 }
+
 void TransformImpl<ETransformType::Viewport>::initDefaults()
 {
 	setDefaultValueNoUpdate("x", 0.f);
