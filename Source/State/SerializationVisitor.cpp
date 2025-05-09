@@ -12,6 +12,7 @@
  */
 #include "SerializationVisitor.h"
 
+#include "Core/Nodes/Screen.h"
 #include "GUI/Workspace/Nodes/Basic/CoreNodeWithPins.h"
 #include "GUI/Workspace/Nodes/Camera.h"
 #include "GUI/Workspace/Nodes/Cycle.h"
@@ -165,7 +166,7 @@ void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
 
 void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 {
-	const auto& coreNode = node->getNodebase()->as<Core::Operator<Core::EOperatorType::Screen>>();
+	const auto& coreNode = node->getNodebase()->as<Core::Screen>();
 	auto& alloc = m_memento.GetAllocator();
 	auto& screens = m_memento["workspace"]["screens"];
 	auto& edges = m_memento["workspace"]["edges"];
@@ -173,8 +174,7 @@ void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 	rapidjson::Value screen(rapidjson::kObjectType);
 	dumpCommon(screen, node);
 
-	// screen.AddMember("aspect", node->, alloc);
-	JSON::addVector(screen, "aspect", node->getAspect(), m_memento.GetAllocator());
+	JSON::addVector(screen, "screenSize", node->getScreenSize(), m_memento.GetAllocator());
 
 	screens.PushBack(screen, alloc);
 

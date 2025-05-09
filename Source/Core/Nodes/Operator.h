@@ -65,7 +65,6 @@ public:
 	 * or output names are assigned here.
 	 */
 	Operator();
-	~Operator() override = default;
 
 	void updateValues(int inputIndex) override
 	{
@@ -1702,17 +1701,6 @@ FORCE_INLINE bool Operator<EOperatorType::MakeViewport>::updateValuesImpl(int in
 		setInternalValue(ProjectionUtils::viewport(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
 		                                           m_inputs[2].data().getFloat(), m_inputs[3].data().getFloat(),
 		                                           m_inputs[4].data().getFloat(), m_inputs[5].data().getFloat()));
-		return true;
-	}
-	return false;
-}
-
-template <>
-FORCE_INLINE bool Operator<EOperatorType::Screen>::updateValuesImpl(int inputIndex)
-{
-	if (areAllInputsPlugged())
-	{
-		setInternalValue(m_inputs[inputIndex].data().getScreen());
 		return true;
 	}
 	return false;

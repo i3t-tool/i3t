@@ -1,8 +1,10 @@
 ``/Source/Commands/`` - Martin Herich
 
-``/Source/Core/`` - Martin Herich
+``/Source/Core/`` - Martin Herich, Dan Rakušan
 
 ``/Source/GUI/`` - Jaroslav Holeček, Martin Herich, Dan Rakušan
+
+``/Source/DIWNE/`` - Jaroslav Holeček, Dan Rakušan
 
 ``/Source/Logger/`` - Filip Uhlík, Martin Herich
 
@@ -12,4 +14,4 @@
 
 ``/Source/Viewport/`` - Dan Rakušan
 
-``/Test/`` - Martin Herich
+``/Test/`` - Martin Herich, Dan Rakušan

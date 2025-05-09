@@ -43,16 +43,8 @@ protected:
 public:
 	std::weak_ptr<Vp::SceneCamera> m_viewportCamera; ///< Reference to the Scene View (3D Viewport) representation
 
-	Camera(DIWNE::NodeEditor& diwne);
-	~Camera();
-
-	//===-- Double dispatch
-	//---------------------------------------------------===//
-	void accept(NodeVisitor& visitor) override
-	{
-		visitor.visit(std::static_pointer_cast<Camera>(shared_from_this()));
-	}
-	//===----------------------------------------------------------------------===//
+	explicit Camera(DIWNE::NodeEditor& diwne);
+	~Camera() override;
 
 	DIWNE::NodeRange<> getNodes() const override;
 	DIWNE::NodeList& getNodeList() override;
@@ -92,6 +84,11 @@ public:
 	/// Enable or disable the viewport transformation sequence.
 	void setViewportEnabled(bool val);
 	bool getViewportEnabled() const;
+
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<Camera>(shared_from_this()));
+	}
 
 private:
 	glm::vec4 calculateFrustumColor(glm::vec3 color, float alpha);

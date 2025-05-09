@@ -13,6 +13,7 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
+#include "Core/Nodes/Screen.h"
 #include "Core/Nodes/Transform.h"
 
 #include "../Utils.h"
@@ -163,7 +164,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 
 TEST(NodeInterfaceTest, SetValueWithIndex)
 {
-	auto screen = GraphManager::createNode<EOperatorType::Screen>();
+	auto screen = Builder::createScreen();
 
 	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
 	EXPECT_EQ(result.status, SetValueResult::Status::Ok);

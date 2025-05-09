@@ -76,6 +76,10 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, c
                                     const glm::mat4& view, const glm::mat4& proj)
 {
 	// TODO: Implement reference model matrix <<<<<<<<<<<<<<<<<<<<<<<<<
+	//  It doesnt make much sense to apply projective transformations to manipulators, would glitch them
+	//  So manipulators should be disabled when tracking in projection or further
+	//  I am not sure how to handle manipulators in multiple windows
+	//  But they should work fine in standard-ish reference spaces
 
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);

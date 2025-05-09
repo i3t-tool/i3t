@@ -34,6 +34,7 @@ public:
 	/// Returns the underlying std::vector node list of the container.
 	NodeList& getNodeList() override;
 
+	// TODO: Should be virtual?
 	/**
 	 * Adds a node to the end of the list (O(1))
 	 * The new node has this container set as its parent.

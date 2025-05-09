@@ -23,6 +23,7 @@
 #include "Viewport/scene/SceneRenderTarget.h"
 #include "Viewport/scene/scenes/MainScene.h"
 #include "Viewport/shader/Shaders.h"
+#include "entity/nodes/SceneScreen.h"
 
 using namespace Vp;
 
@@ -175,6 +176,16 @@ WPtr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 	sceneCamera->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneCamera);
 	return sceneCamera;
+}
+
+WPtr<SceneScreen> Viewport::createScreen(Core::ID guiNodeId)
+{
+	RMI.m_forceClampToEdge = true;
+	auto sceneScreen = std::make_shared<SceneScreen>();
+	RMI.m_forceClampToEdge = false;
+	sceneScreen->m_guiNodeId = guiNodeId;
+	m_mainScene->addEntity(sceneScreen);
+	return sceneScreen;
 }
 
 ViewportSettings& Viewport::getSettings()

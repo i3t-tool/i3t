@@ -16,8 +16,6 @@
 
 #include "Iterators.h"
 
-#define TRACKING_VIEWPORT_SCALING_FACTOR 100
-
 namespace Core
 {
 class Transform;
@@ -134,6 +132,9 @@ class MatrixTracker final
 	friend struct TrackedNodeData;
 
 public:
+	static float g_trackingViewportScalingFactorXY;
+	static float g_trackingViewportScalingFactorZ;
+
 	/**
 	 * Internal wrapper of core nodes for managing tracking data for each node involved in the tracking operation.
 	 * Sets and unsets the node's tracking data pointer using RAII. Is NOT copyable.
@@ -239,11 +240,14 @@ public:
 				m[3][0] = -1 * m[3][0]; // Flip X as we're in LHS [OGL-VULKAN]
 				// Divide the whole viewport transform by a 100x scale to keep NDC and screen space roughly similar in
 				// size
-				float scalingFactor = 1.f / TRACKING_VIEWPORT_SCALING_FACTOR;
-				m[0][0] *= scalingFactor;
-				m[1][1] *= scalingFactor;
-				m[3][0] *= scalingFactor;
-				m[3][1] *= scalingFactor;
+				float scalingFactorXY = 1.f / g_trackingViewportScalingFactorXY;
+				float scalingFactorZ = 1.f / g_trackingViewportScalingFactorZ;
+				m[0][0] *= scalingFactorXY;
+				m[1][1] *= scalingFactorXY;
+				m[3][0] *= scalingFactorXY;
+				m[3][1] *= scalingFactorXY;
+				m[2][2] *= scalingFactorZ;
+				m[3][2] *= scalingFactorZ;
 				return m;
 			}
 			return matrix;

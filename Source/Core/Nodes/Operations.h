@@ -28,7 +28,7 @@
 
 #include "NodeData.h"
 
-; // namespace Core
+// namespace Core
 namespace Core
 {
 using PinGroup = std::vector<EValueType>;
@@ -173,9 +173,8 @@ enum class EOperatorType
 	MakePerspective,
 	MakeFrustum,
 	MakeLookAt,
-	MakeViewport,
+	MakeViewport
 
-	Screen,
 	// todo trackball (trackcube)
 };
 
@@ -210,10 +209,6 @@ static const std::array<std::string, 9> defaultIoNames = {
     "screen", // SCREEN		MN dodelat
     "pointer" // Ptr
 };
-
-constexpr size_t I3T_SCREEN_IN_S = 0;       // screen in
-constexpr size_t I3T_SCREEN_OUT_S = 0;      // screen out (unused?)
-constexpr size_t I3T_SCREEN_OUT_ASPECT = 1; // float aspect ratio
 
 // variants of input and output pins
 static const PinGroup matrixInput = {EValueType::Matrix};
@@ -258,7 +253,6 @@ static const PinGroup floatMatrixInput = {EValueType::Float, EValueType::Matrix}
 static const PinGroup floatVectorInput = {EValueType::Float, EValueType::Vec4};
 static const PinGroup floatVector3Input = {EValueType::Float, EValueType::Vec3};
 static const PinGroup floatQuatInput = {EValueType::Float, EValueType::Quat};
-static const PinGroup screenFloatInput = {EValueType::Screen, EValueType::Float}; // FIXME: This is used as output
 // static const PinGroup quatVector3Input = {EValueType::Quat, EValueType::Vec3};
 
 static const PinGroup matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
@@ -399,9 +393,7 @@ static const std::vector<Operation> operations = {
      PerspectiveInputNames}, // perspective
     {n(EOperatorType::MakeFrustum), "frustum", sixFloatInput, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", threeVector3Input, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
-    {n(EOperatorType::MakeViewport), "viewport", sixFloatInput, matrixInput, NO_TAG, viewportInputNames},
-    {n(EOperatorType::Screen), "screen", screenInput, screenFloatInput, NO_TAG, DEFAULT_NAMES, DEFAULT_NAMES, false,
-     true}};
+    {n(EOperatorType::MakeViewport), "viewport", sixFloatInput, matrixInput, NO_TAG, viewportInputNames}};
 
 
 /**
@@ -437,6 +429,11 @@ inline const Operation g_sequence = {
 inline const Operation g_cameraProperties = {
     "Camera", "camera", {}, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
 // names of inner matrices (projection and view) are defined in the WorkspaceCamera constructor
+
+inline const Operation g_screen = {
+    "Screen", "screen",      screenInput,   {EValueType::Float, EValueType::Float, EValueType::Float},
+    NO_TAG,   DEFAULT_NAMES, DEFAULT_NAMES, false,
+    true};
 
 inline static const Operation g_modelProperties = {
     "Model",
@@ -573,17 +570,17 @@ static inline const std::vector<TransformOperation> g_transforms = {
         },
         true
     },
-	{
-		{n(ETransformType::Viewport), "viewport"}, 0b1001010100110000,
-		{
+    {
+        {n(ETransformType::Viewport), "viewport"}, 0b1001010100110000,
+        {
             {"x", EValueType::Float},
-			{"y", EValueType::Float},
-			{"width", EValueType::Float},
-			{"height", EValueType::Float},
-			{"near", EValueType::Float},
-			{"far", EValueType::Float}
-		}
-	},
+            {"y", EValueType::Float},
+            {"width", EValueType::Float},
+            {"height", EValueType::Float},
+            {"near", EValueType::Float},
+            {"far", EValueType::Float}
+        }
+    },
 };
 // clang-format on
 

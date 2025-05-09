@@ -503,7 +503,7 @@ GLuint ResourceManager::loadTexture(const std::string& path)
 {
 	std::string absPath = path;
 	LOG_INFO("[TEXTURE] Loading texture file: {}", absPath);
-	GLuint id = pgr::createTexture(absPath);
+	GLuint id = GLUtils::createTexture(absPath, true, m_forceClampToEdge);
 	if (id == 0)
 	{
 		LOG_ERROR("[TEXTURE] Failed to load texture!");

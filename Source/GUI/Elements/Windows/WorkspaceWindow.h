@@ -48,7 +48,6 @@ public:
 public:
 	Application& m_wholeApplication;
 
-	void processTrackingInput();
 	void render() override;
 
 private:

@@ -86,7 +86,6 @@ void WorkspaceWindow::render()
 		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
 		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
-			processTrackingInput();
 			if (!menuInteraction)
 				drawMode = DIWNE::DrawMode_Interactive;
 		}
@@ -104,39 +103,6 @@ void WorkspaceWindow::render()
 	ImGui::End();
 
 	// Statistics::stopTimer("WorkspaceWindow::render");
-}
-
-void WorkspaceWindow::processTrackingInput()
-{
-	if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
-		WorkspaceModule::g_editor->stopTracking();
-	// if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
-	// 	WorkspaceModule::g_editor->trackingSmoothLeft();
-	// if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
-	// 	WorkspaceModule::g_editor->trackingSmoothRight();
-	if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
-		WorkspaceModule::g_editor->trackingJaggedLeft();
-	else if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
-		WorkspaceModule::g_editor->trackingJaggedRight();
-	// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
-	// 	this->trackingModeSwitch();
-	// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
-	// 	this->trackingSwitch();
-	// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
-	// 	this->trackingSwitchOn();
-	// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
-	// 	this->trackingSwitchOff();
-	if (WorkspaceModule::g_editor->isTracking())
-	{
-		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
-		{
-			WorkspaceModule::g_editor->trackingSmoothLeft();
-		}
-		else if (InputManager::isAxisActive("trackingSmoothRight") != 0)
-		{
-			WorkspaceModule::g_editor->trackingSmoothRight();
-		}
-	}
 }
 
 bool WorkspaceWindow::showQuickAddButtons()
@@ -306,6 +272,8 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_RIGHT_LEFT " ", "Switch direction"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->reverseDirection();
+			I3TGui::MenuItemWithLog(_tbd("Highlight tracked models"), nullptr,
+			                        &WorkspaceModule::g_editor->m_highlightTrackedModels);
 			ImGui::PopItemFlag();
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_XMARK " ", "Stop tracking"), "Esc", nullptr))
 				Core::GraphManager::stopTracking();

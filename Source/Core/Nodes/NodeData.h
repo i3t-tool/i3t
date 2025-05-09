@@ -78,6 +78,16 @@ enum class EValueState
 	LockedSyn = 0x0001,   ///< 01
 };
 
+struct ScreenData
+{
+	glm::mat4 m_projection{1.f};
+	glm::mat4 m_view{1.f};
+	glm::mat4 m_viewport{1.f};
+
+	/// When true, correct viewport transformation is automatically generated and the passed viewport matrix is ignored.
+	bool m_implicitViewportEnabled{true};
+};
+
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
@@ -91,8 +101,7 @@ class Data
 public:
 	EValueType valueType; ///< wire type, such as Float or 4x4 Matrix
 
-	using Storage =
-	    std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3, glm::vec4, glm::quat, float, void*>;
+	using Storage = std::variant<bool, glm::mat4, ScreenData, glm::vec3, glm::vec4, glm::quat, float, void*>;
 
 public:
 	/** Default constructor constructs a signal of type valueType::MATRIX and
@@ -135,7 +144,7 @@ public:
 	{
 		m_value = val;
 	}
-	explicit Data(const std::pair<glm::mat4, glm::mat4> val) : valueType(EValueType::Screen)
+	explicit Data(const ScreenData val) : valueType(EValueType::Screen)
 	{
 		m_value = val;
 	}
@@ -160,9 +169,9 @@ public:
 		return std::get<glm::mat4>(m_value);
 	}
 
-	[[nodiscard]] const std::pair<glm::mat4, glm::mat4>& getScreen() const
+	[[nodiscard]] const ScreenData& getScreen() const
 	{
-		return std::get<std::pair<glm::mat4, glm::mat4>>(m_value);
+		return std::get<ScreenData>(m_value);
 	}
 
 	[[nodiscard]] const glm::vec3& getVec3() const

@@ -86,7 +86,7 @@ colors:
   nscr_Nodes Screen resizeBtn bgInner: [0.400, 0.200, 0.200, 0.600]
   nscr_Nodes Screen resizeBtn fgShape: [0.400, 0.400, 0.600, 0.600]
   nscr_Nodes Screen resizeBtn fgInner: [0.400, 0.400, 0.600, 0.600]
-  nscr_Nodes_Screen_noInput_background: [0.000, 0.000, 0.000, 0.650]
+  nscr_Nodes_Screen_background: [0.000, 0.000, 0.000, 0.650]
   nscr_Nodes_Screen_noInput_text: [1.000, 1.000, 1.000, 0.650]
   ntrs_Nodes Tracking Overlay Inactive: [0.300, 0.300, 0.100, 0.600]
   ntrs_Nodes Transformation ValidIcon bgShape: [1.000, 0.000, 0.000, 1.000]

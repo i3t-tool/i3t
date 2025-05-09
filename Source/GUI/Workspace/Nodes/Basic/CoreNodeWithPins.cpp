@@ -53,7 +53,7 @@ void CoreNodeWithPins::begin(DIWNE::DrawInfo& context)
 	CoreNode::begin(context);
 
 	// Pin drag assist
-	if (context.inputFullyAvailable())
+	if (context.inputFullyAvailable() && !(m_drawMode & DIWNE::DrawMode_JustDraw))
 		processPinDragAssist();
 }
 
@@ -190,6 +190,14 @@ void CoreNodeWithPins::rightContent(DIWNE::DrawInfo& context)
 		// TODO: (DR) (zoom-aware) Uncomment perhaps
 		// ImGui::Dummy(I3T::getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
+}
+
+void CoreNodeWithPins::unplugAll()
+{
+	for (auto& pin : m_workspaceInputs)
+		pin->unplug();
+	for (auto& pin : m_workspaceOutputs)
+		pin->unplug();
 }
 
 void CoreNodeWithPins::drawInputPins(DIWNE::DrawInfo& context)

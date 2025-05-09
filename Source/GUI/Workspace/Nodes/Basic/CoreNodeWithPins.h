@@ -86,6 +86,8 @@ public:
 		return m_workspaceOutputs;
 	}
 
+	void unplugAll();
+
 	virtual void drawInputPins(DIWNE::DrawInfo& context);
 	virtual void drawOutputPins(DIWNE::DrawInfo& context);
 

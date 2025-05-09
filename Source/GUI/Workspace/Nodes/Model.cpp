@@ -85,8 +85,10 @@ void Model::initialize(DIWNE::DrawInfo& context)
 		trackedPtr = m_trackedModel.lock();
 		trackedPtr->m_showAxes = modelPtr->m_showAxes;
 		trackedPtr->m_modelMatrix = t->modelData->m_interpolatedMatrix;
-		trackedPtr->setHighlightColor(GUI::imToGlm(I3T::getColor(EColor::Nodes_Tracking_ColorActive)));
-		trackedPtr->setHighlighted(true);
+		bool trackingHighlight = static_cast<WorkspaceDiwne&>(diwne).m_highlightTrackedModels;
+		if (trackingHighlight)
+			trackedPtr->setHighlightColor(GUI::imToGlm(I3T::getColor(EColor::Nodes_Tracking_ColorActive)));
+		trackedPtr->setHighlighted(m_selected || trackingHighlight);
 		trackedPtr->setModel(modelPtr->getModel());
 
 		modelPtr->m_opaque = false;
@@ -188,6 +190,11 @@ void Model::onSelection(bool selected)
 	{
 		model->m_highlight = true;
 		model->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+		if (auto trackedModel = m_trackedModel.lock())
+		{
+			trackedModel->m_highlight = true;
+			trackedModel->m_highlightColor = I3T::getViewport()->getSettings().global().highlight.selectionColor;
+		}
 	}
 	else
 	{
@@ -199,6 +206,10 @@ void Model::onSelection(bool selected)
 		else
 		{
 			model->m_highlight = false;
+		}
+		if (auto trackedModel = m_trackedModel.lock())
+		{
+			trackedModel->m_highlight = false;
 		}
 	}
 }

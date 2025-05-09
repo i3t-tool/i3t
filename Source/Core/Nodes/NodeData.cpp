@@ -22,8 +22,10 @@ Data::Data(EValueType valueType) : valueType(valueType)
 		setValue(false);
 		break;
 	case EValueType::Ptr:
+		setValue(nullptr);
+		break;
 	case EValueType::Screen:
-		setValue(std::make_pair(glm::mat4(1.0f), glm::mat4(1.0f)));
+		setValue(ScreenData());
 		break;
 	case EValueType::Float:
 		setValue(0.0f);

@@ -111,8 +111,10 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
 	if (t)
 	{
-		const ImVec2 ofst = {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
-		drawTrackingCursor(ImRect(m_center.getRect().Min - ofst, m_center.getRect().Max + ofst), t, true);
+		drawTrackingCursor(
+		    {m_middle.getRect().Min - ImVec2(0.f, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)),
+		     m_middle.getRect().Max},
+		    t, true, true);
 	}
 }
 

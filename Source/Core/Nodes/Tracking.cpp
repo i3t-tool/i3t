@@ -22,6 +22,9 @@
 
 namespace Core
 {
+float MatrixTracker::g_trackingViewportScalingFactorXY = 50.f;
+float MatrixTracker::g_trackingViewportScalingFactorZ = 50.f;
+
 MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, TrackingDirection direction)
     : MatrixTracker(beginSequence, nullptr, direction)
 {}

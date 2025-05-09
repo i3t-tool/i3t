@@ -15,51 +15,32 @@
 #include "SceneSelectable.h"
 #include "Viewport/entity/TexturedObject.h"
 
-// For debug purposes, enables bounding box drawing
-#define SHOW_BOUNDING_BOX 0
-
 namespace Vp
 {
 class PhongShader;
-class ColoredObject;
 
 /**
- * Viewport entity representing a Model node in Core/GUI
+ * Viewport entity representing a screen node. Only visible when visualizing screen space.
+ * Monitor 3D model credits: LiveToWin34 (https://skfb.ly/otsCS) (CC Attribution 4.0) (modified)
  */
-class SceneModel : public TexturedObject, public SceneSelectable
+class SceneScreen : public TexturedObject, public SceneSelectable
 {
+	float m_zOffset{0.f}; ///< Tiny random z offset to prevent z-fighting
+
 public:
-	std::string m_modelAlias{};
+	std::weak_ptr<TexturedObject> m_screenBase;
 
 	float m_scale{1.f};          ///< Optional scaling factor of the model, eg. an implicit model transformation.
 	float m_programOpacity{1.f}; ///< Runtime opacity factor
 
-	bool m_showAxes{true};
-	std::weak_ptr<ColoredObject> m_axes; ///< Visualisation of the basis vectors
+	SceneScreen();
 
-#if SHOW_BOUNDING_BOX
-	std::weak_ptr<ColoredObject> m_boundingBox; ///< For debug purposes
-#endif
+	void updateModelTransform(float width, float height, float scaleFactor);
 
-	SceneModel(Core::Mesh* mesh, PhongShader* shader);
-
-	/**
-	 * Load mesh using an alias.
-	 */
-	SceneModel(std::string modelAlias, PhongShader* shader);
-
-	void setModel(std::string modelAlias);
-	std::string getModel();
-
-	void render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,
-	            const RenderContext& context) override;
 	void update(Scene& scene) override;
-
-#if SHOW_BOUNDING_BOX
-	void updateBoundingBox();
-#endif
 
 	void onSceneAdd(Scene& scene) override;
 	void onSceneRemove(Scene& scene) override;
 };
+
 } // namespace Vp

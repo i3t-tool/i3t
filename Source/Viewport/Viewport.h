@@ -39,6 +39,7 @@ class Entity;
 class GameObject;
 class SceneModel;
 class SceneCamera;
+class SceneScreen;
 class AggregateCamera;
 
 class ColorShader;
@@ -219,6 +220,8 @@ public:
 	 * @return Weak pointer to it.
 	 */
 	WPtr<SceneCamera> createCamera(Core::ID guiNodeId);
+
+	WPtr<SceneScreen> createScreen(Core::ID guiNodeId);
 
 	/**
 	 * Remove an entity from the main scene.

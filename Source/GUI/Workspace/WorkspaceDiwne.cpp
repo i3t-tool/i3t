@@ -68,7 +68,7 @@ void WorkspaceDiwne::content(DIWNE::DrawInfo& context)
 
 	// TODO: Figure out what to do about all this
 	//  I feel like we are on the verge of removing this anyway so its not a priority
-	//  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//  A: We will likely just keep this removed, cameras don't need implicit links
 
 	//		/* Cameras To Sequences links */
 	//		if (m_cameraLink == nullptr)
@@ -143,7 +143,7 @@ void WorkspaceDiwne::finalize(DIWNE::DrawInfo& context)
 		bool validSelection = false;
 		if (m_viewportLastSelectedEntity != nullptr)
 		{
-			if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(m_viewportLastSelectedEntity))
+			if (Vp::SceneSelectable* sceneObject = dynamic_cast<Vp::SceneSelectable*>(m_viewportLastSelectedEntity))
 			{
 				auto nodeOpt = Tools::findNodeById(this->getAllCoreNodes().collect(), sceneObject->m_guiNodeId);
 				if (nodeOpt)
@@ -227,6 +227,41 @@ void WorkspaceDiwne::processInteractions(DIWNE::DrawInfo& context)
 			this->duplicateSelectedNodes();
 		if (InputManager::isActionTriggered("toggleNodeWorkspaceVisibility", EKeyState::Pressed))
 			this->toggleSelectedNodesVisibility();
+
+		processTrackingInput();
+	}
+}
+
+void WorkspaceDiwne::processTrackingInput()
+{
+	if (InputManager::isActionTriggered("trackingEscOff", EKeyState::Pressed))
+		WorkspaceModule::g_editor->stopTracking();
+	// if (InputManager::isActionTriggered("trackingSmoothLeft", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothLeft();
+	// if (InputManager::isActionTriggered("trackingSmoothRight", EKeyState::Pressed))
+	// 	WorkspaceModule::g_editor->trackingSmoothRight();
+	if (InputManager::isActionTriggered("trackingJaggedLeft", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedLeft();
+	else if (InputManager::isActionTriggered("trackingJaggedRight", EKeyState::Pressed))
+		WorkspaceModule::g_editor->trackingJaggedRight();
+	// if (InputManager::isActionTriggered("trackingModeSwitch", EKeyState::Pressed))
+	// 	this->trackingModeSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitch", EKeyState::Pressed))
+	// 	this->trackingSwitch();
+	// if (InputManager::isActionTriggered("trackingSwitchOn", EKeyState::Pressed))
+	// 	this->trackingSwitchOn();
+	// if (InputManager::isActionTriggered("trackingSwitchOff", EKeyState::Pressed))
+	// 	this->trackingSwitchOff();
+	if (WorkspaceModule::g_editor->isTracking())
+	{
+		if (InputManager::isAxisActive("trackingSmoothLeft") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothLeft();
+		}
+		else if (InputManager::isAxisActive("trackingSmoothRight") != 0)
+		{
+			WorkspaceModule::g_editor->trackingSmoothRight();
+		}
 	}
 }
 
@@ -551,7 +586,7 @@ bool WorkspaceDiwne::isTrackingFromLeft() const
 
 void WorkspaceDiwne::trackingSmoothLeft()
 {
-	if (isTracking() && smoothTracking)
+	if (isTracking() && m_smoothTracking)
 	{
 		Core::MatrixTracker* tracking = getTracker();
 		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
@@ -562,7 +597,7 @@ void WorkspaceDiwne::trackingSmoothLeft()
 
 void WorkspaceDiwne::trackingSmoothRight()
 {
-	if (isTracking() && smoothTracking)
+	if (isTracking() && m_smoothTracking)
 	{
 		Core::MatrixTracker* tracking = getTracker();
 		float delta = ImGui::GetIO().DeltaTime * WorkspaceModule::g_settings.tracking_smoothScrollSpeed *
@@ -574,7 +609,7 @@ void WorkspaceDiwne::trackingSmoothRight()
 void WorkspaceDiwne::trackingJaggedLeft()
 {
 	Core::MatrixTracker* tracking = getTracker();
-	if (tracking->isTracking() && !smoothTracking)
+	if (tracking->isTracking() && !m_smoothTracking)
 	{
 		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
 		if (isTrackingFromLeft())
@@ -586,7 +621,7 @@ void WorkspaceDiwne::trackingJaggedLeft()
 
 void WorkspaceDiwne::trackingJaggedRight()
 {
-	if (isTracking() && !smoothTracking)
+	if (isTracking() && !m_smoothTracking)
 	{
 		Core::MatrixTracker* tracking = getTracker();
 		float step = WorkspaceModule::g_settings.tracking_jaggedScrollSpeed / tracking->getTransformCount();
@@ -600,7 +635,7 @@ void WorkspaceDiwne::trackingJaggedRight()
 
 void WorkspaceDiwne::trackingModeSwitch()
 {
-	smoothTracking = !smoothTracking;
+	m_smoothTracking = !m_smoothTracking;
 }
 
 void WorkspaceDiwne::popupContent(DIWNE::DrawInfo& context)

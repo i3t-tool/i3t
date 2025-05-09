@@ -14,6 +14,7 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "Core/Nodes/Screen.h"
 #include "Utils.h"
 
 using namespace Core;
@@ -21,7 +22,7 @@ using namespace Core;
 TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 {
 	auto cameraNode = GraphManager::createCamera();
-	auto screenNode = Builder::createOperator<EOperatorType::Screen>();
+	auto screenNode = Builder::createScreen();
 
 	auto perspectiveProj = Builder::createTransform<ETransformType::Perspective>();
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
@@ -59,7 +60,7 @@ TEST(CameraNodeTest, CameraAndSequenceCanBeConnected)
 TEST(CameraNodeTest, AllowedCameraScreenProjectionLoop)
 {
 	auto camera = GraphManager::createCamera();
-	auto screen = Builder::createOperator<EOperatorType::Screen>();
+	auto screen = Builder::createScreen();
 	auto perspective = Builder::createOperator<EOperatorType::MakePerspective>();
 
 	plug_expectOk(camera, screen, 0, 0);

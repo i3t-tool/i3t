@@ -22,6 +22,7 @@
 
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
+#include "Viewport/entity/ColoredObject.h"
 
 using namespace Workspace;
 
@@ -218,9 +219,15 @@ void Camera::onDestroy(bool logEvent)
 void Camera::setViewportEnabled(bool val)
 {
 	m_viewportEnabled = val;
-	auto* coreSeq = getNodebase()->asRaw<Core::Camera>();
-	coreSeq->m_viewportEnabled = m_viewportEnabled;
+	auto* coreCam = getNodebase()->asRaw<Core::Camera>();
+	coreCam->m_viewportEnabled = m_viewportEnabled;
 	m_viewport->setRendered(m_viewportEnabled);
+
+	if (!m_viewportEnabled)
+	{
+		// Disconnect all pins from the viewport seq, to avoid having to deal with any invisible wires
+		m_viewport->unplugAll();
+	}
 }
 bool Camera::getViewportEnabled() const
 {
@@ -276,6 +283,19 @@ void Camera::updateTrackedCamera()
 				    Math::lerp(glm::mat4(1.f), neg, trackedMatrix->space == Core::TransformSpace::Screen ? 1.f : mt,
 				               false) *
 				    cameraPtr->m_modelMatrix;
+			}
+			// Hide the camera and near frustum indicators gradually when tracking screen space
+			if (transform->data.space >= Core::TransformSpace::Screen)
+			{
+				cameraPtr->m_opaque = false;
+				cameraPtr->m_opacity = 1.f - mt;
+				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f - mt;
+			}
+			else
+			{
+				cameraPtr->m_opaque = true;
+				cameraPtr->m_opacity = 1.f;
+				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f;
 			}
 		}
 	}
@@ -416,7 +436,7 @@ void Camera::popupContentTracking()
 		{
 			workspaceDiwne.stopTracking();
 		}
-		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.smoothTracking, true))
+		if (I3TGui::MenuItemWithLog(_t("Smooth tracking"), "", workspaceDiwne.m_smoothTracking, true))
 		{
 			workspaceDiwne.trackingModeSwitch();
 		}
