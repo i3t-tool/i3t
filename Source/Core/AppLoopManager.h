@@ -47,8 +47,10 @@ public:
 	 * \param targetFPS Target frames per second when active.
 	 * \param shouldLimitFPSOnIdle Enable (true) or disable (false) idle frame rate limiting.
 	 * \param targetFPSOnIdle Target frames per second when idle.
+	 * \param secondsBeforeIdle Seconds before idle frame limiting kicks in.
 	 */
-	AppLoopManager(bool vsync, bool shouldLimitFPS, int targetFPS, bool shouldLimitFPSOnIdle, int targetFPSOnIdle);
+	AppLoopManager(bool vsync, bool shouldLimitFPS, int targetFPS, bool shouldLimitFPSOnIdle, int targetFPSOnIdle,
+	               int secondsBeforeIdle);
 
 private:
 	/**
@@ -186,6 +188,22 @@ public:
 	}
 
 	/**
+	 * \brief Sets the number of seconds before idle frame limiting kicks in.
+	 * \param seconds Number of seconds before idle limiting starts.
+	 */
+	void setSecondsBeforeIdle(int seconds);
+
+	/**
+	 * \brief Gets the number of seconds before idle frame limiting kicks in.
+	 * \return Seconds before idle limiting starts.
+	 */
+	[[nodiscard]] int getSecondsBeforeIdle() const
+	{
+		return m_secondsBeforeIdle;
+	}
+
+
+	/**
 	 * \brief Calculates time remaining until next idle frame.
 	 *
 	 * Updates internal timestamp and returns remaining seconds.
@@ -205,6 +223,7 @@ private:
 
 	bool m_shouldLimitFPSOnIdle = true;                             ///< Idle FPS limiting flag.
 	int m_targetFPSOnIdle{20};                                      ///< Target FPS when idle.
+	int m_secondsBeforeIdle{5};                                     ///< Seconds before idle frame limiting kicks in.
 	duration m_frameDurationOnIdle{0};                              ///< Duration between idle frames.
 	std::chrono::time_point<clock, duration> m_nextFrameTimeOnIdle; ///< Next timestamp for idle frame.
 };

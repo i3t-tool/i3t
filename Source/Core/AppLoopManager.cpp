@@ -37,9 +37,10 @@ AppLoopManager::AppLoopManager()
 }
 
 AppLoopManager::AppLoopManager(bool vsync, bool shouldLimitFPS, int targetFPS, bool shouldLimitFPSOnIdle,
-                               int targetFPSOnIdle)
+                               int targetFPSOnIdle, int secondsBeforeIdle)
     : m_vsync(vsync), m_shouldLimitFPS(shouldLimitFPS), m_targetFPS(targetFPS),
-      m_shouldLimitFPSOnIdle(shouldLimitFPSOnIdle), m_targetFPSOnIdle(targetFPSOnIdle)
+      m_shouldLimitFPSOnIdle(shouldLimitFPSOnIdle), m_targetFPSOnIdle(targetFPSOnIdle),
+      m_secondsBeforeIdle(secondsBeforeIdle)
 {
 	init();
 }
@@ -122,13 +123,31 @@ void AppLoopManager::setTargetFPSOnIdle(int fps)
 	m_frameDurationOnIdle = duration(1.0 / m_targetFPSOnIdle);
 }
 
+void AppLoopManager::setSecondsBeforeIdle(int seconds)
+{
+	if (m_secondsBeforeIdle == seconds)
+		return;
+
+	m_secondsBeforeIdle = seconds;
+}
+
 double AppLoopManager::getFrameDurationOnIdle()
 {
+	if (!m_shouldLimitFPSOnIdle)
+		return 0.0;
+
+	static auto elapsedTime = duration(0.0);
+	elapsedTime += m_deltaTime;
+
 	auto now = clock::now();
 	if (m_nextFrameTimeOnIdle - now > m_frameDurationOnIdle)
 	{
+		elapsedTime = duration(0.0);
 		m_nextFrameTimeOnIdle = now + m_frameDurationOnIdle;
 	}
+
+	if (elapsedTime < std::chrono::seconds{m_secondsBeforeIdle})
+		return 0.0;
 
 	auto remaining = m_nextFrameTimeOnIdle - now;
 	m_nextFrameTimeOnIdle += m_frameDurationOnIdle;
@@ -139,9 +158,5 @@ double AppLoopManager::getFrameDurationOnIdle()
 		m_nextFrameTimeOnIdle += m_frameDurationOnIdle;
 	}
 
-	if (!m_shouldLimitFPSOnIdle || remaining < duration::zero())
-		return 0.0;
-
-	// Convert nanoseconds to seconds
-	return remaining.count() / 1e9;
+	return (remaining < duration::zero()) ? 0.0 : (remaining.count() / 1e9); // Convert nanoseconds to seconds
 }

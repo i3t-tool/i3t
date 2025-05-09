@@ -71,33 +71,58 @@ void PreferencesWindow::showUISettings()
 		{
 			App::get().setVSync(vsync);
 		}
-		if (!vsync)
+		ImGui::SameLine();
+		showHelpTip(
+		    _tbd("Vertical Synchronization") "\n" _tbd("Synchronizes the frame rate with the monitor refresh rate."));
+
+		ImGui::BeginDisabled(vsync);
 		{
 			auto shouldLimitFPS = App::get().getAppLoopManager().shouldLimitFPS();
 			if (ImGui::Checkbox(_tbd("Limit FPS"), &shouldLimitFPS))
 			{
 				App::get().getAppLoopManager().enableFPSLimit(shouldLimitFPS);
 			}
+			if (vsync)
+			{
+				ImGui::SameLine();
+				showHelpTip(_tbd("Cannot be enabled with VSync"));
+			}
 
 			if (shouldLimitFPS)
 			{
 				int fpsLimit = App::get().getAppLoopManager().getTargetFPS();
-				if (ImGui::SliderInt(_tbd("FPS Limit"), &fpsLimit, 10, 500))
+				if (ImGui::SliderInt(_tbd("FPS Limit"), &fpsLimit, 10, 500, "%d", ImGuiSliderFlags_AlwaysClamp))
 				{
 					App::get().getAppLoopManager().setTargetFPS(fpsLimit);
 				}
 			}
 		}
+		ImGui::EndDisabled();
+		ImGui::Spacing();
 
 		auto shouldLimitFPSOnIdle = App::get().getAppLoopManager().shouldLimitFPSOnIdle();
-		if (ImGui::Checkbox(_tbd("Limit FPS during idle time"), &shouldLimitFPSOnIdle))
+		if (ImGui::Checkbox(_tbd("Limit FPS during Idle time"), &shouldLimitFPSOnIdle))
 		{
 			App::get().getAppLoopManager().setShouldLimitFPSOnIdle(shouldLimitFPSOnIdle);
 		}
+		ImGui::SameLine();
+		// clang-format off
+		showHelpTip(_tbd("Limits the frame rate when the user is not interacting with the application.") "\n"
+						_tbd("This helps reduce CPU and GPU usage during idle time."));
+		// clang-format on
+
 		if (shouldLimitFPSOnIdle)
 		{
+			int secondsBeforeIdle = App::get().getAppLoopManager().getSecondsBeforeIdle();
+			if (ImGui::SliderInt(_tbd("Seconds before Idle"), &secondsBeforeIdle, 0, 60, "%d",
+			                     ImGuiSliderFlags_AlwaysClamp))
+			{
+				App::get().getAppLoopManager().setSecondsBeforeIdle(secondsBeforeIdle);
+			}
+
 			int fpsLimitOnIdle = App::get().getAppLoopManager().getTargetFPSOnIdle();
-			if (ImGui::SliderInt(_tbd("FPS Limit during idle time"), &fpsLimitOnIdle, 5, 500))
+			if (ImGui::SliderInt(_tbd("FPS Limit during Idle time"), &fpsLimitOnIdle, 5, 500, "%d",
+			                     ImGuiSliderFlags_AlwaysClamp))
 			{
 				App::get().getAppLoopManager().setTargetFPSOnIdle(fpsLimitOnIdle);
 			}

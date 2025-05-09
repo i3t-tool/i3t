@@ -45,6 +45,13 @@ void SelectLayoutDialog::render()
 
 void SelectLayoutDialog::showSelectLayoutMenu()
 {
+	// clang-format off
+	ImGui::TextWrapped(_tbd("Use this panel to manage window layouts."));
+	ImGui::TextWrapped(_tbd("You can switch between existing layouts,") "\n"
+						_tbd("create new ones to save your preferred window arrangement,") "\n"
+						_tbd("or delete layouts you no longer need."));
+	// clang-format on
+
 	static std::set<std::string> userLayouts = getFilesInDirectory("Data/Layouts");
 	static std::set<std::string> nonRemovableLayouts = getFilesInDirectory("Data/Layouts/NonRemovable");
 	static std::string selectedFile;
