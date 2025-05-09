@@ -25,6 +25,7 @@ class FrustumObject : public ColoredObject
 public:
 	glm::mat4 m_frustumProjectionViewMatrixInv{1.f};
 	glm::mat4 m_frustumViewMatrixInv{1.f};
+	bool m_visualizeDepth{false};
 
 	FrustumObject(Core::Mesh* mesh, FrustumShader* shader);
 

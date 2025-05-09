@@ -251,50 +251,53 @@ void Camera::onSelection(bool selected)
 
 void Camera::updateTrackedCamera()
 {
+	auto cameraPtr = m_viewportCamera.lock();
+	cameraPtr->m_visualizeDepth = false;
+
 	// Camera model must be placed in a special manner when projection transform is tracked
 	if (auto t = this->getNodebase()->getTrackingData())
 	{
+		cameraPtr->m_visualizeDepth = static_cast<WorkspaceDiwne&>(diwne).m_visualizeDepth;
 		Core::MatrixTracker* tracker = t->tracker;
 		const Core::MatrixTracker::TrackedTransform* transform = tracker->getInterpolatedTransform();
 		if (transform->data.space >= Core::TransformSpace::Projection)
 		{
-			auto cameraPtr = m_viewportCamera.lock()->m_trackedCameraModel.lock();
+			auto tCameraPtr = m_viewportCamera.lock()->m_trackedCameraModel.lock();
 			const Core::MatrixTracker::TrackedMatrix* trackedMatrix = tracker->getInterpolatedMatrixObject();
 
 			float tt = transform->data.progress;
 			float mt = trackedMatrix->progress;
 
 			// Modify camera position so that it doesn't intefere with the frustum and is facing the near plane
-			// TODO: Modify tracking camera, not the world one
-			cameraPtr->m_modelMatrix = glm::mat4(1.f);
+			tCameraPtr->m_modelMatrix = glm::mat4(1.f);
 			if (abs(trackedMatrix->cameraNDCOffset > 0))
 			{
 				float zPos = trackedMatrix->moveCameraOutOfNDC ? mt * trackedMatrix->cameraNDCOffset
 				                                               : trackedMatrix->cameraNDCOffset;
-				cameraPtr->m_modelMatrix = glm::translate(cameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
+				tCameraPtr->m_modelMatrix = glm::translate(tCameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
 			}
 			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
 			{
-				// cameraPtr->m_modelMatrix = Math::flipAxis(cameraPtr->m_modelMatrix, 2);
+				// tCameraPtr->m_modelMatrix = Math::flipAxis(tCameraPtr->m_modelMatrix, 2);
 				glm::mat4 neg(1.f);
 				neg[2][2] = -1;
-				// cameraPtr->m_modelMatrix = neg * cameraPtr->m_modelMatrix;
-				cameraPtr->m_modelMatrix =
+				// tCameraPtr->m_modelMatrix = neg * tCameraPtr->m_modelMatrix;
+				tCameraPtr->m_modelMatrix =
 				    Math::lerp(glm::mat4(1.f), neg, trackedMatrix->space == Core::TransformSpace::Screen ? 1.f : mt,
 				               false) *
-				    cameraPtr->m_modelMatrix;
+				    tCameraPtr->m_modelMatrix;
 			}
 			// Hide the camera and near frustum indicators gradually when tracking screen space
 			if (transform->data.space >= Core::TransformSpace::Screen)
 			{
-				cameraPtr->m_opaque = false;
-				cameraPtr->m_opacity = 1.f - mt;
+				tCameraPtr->m_opaque = false;
+				tCameraPtr->m_opacity = 1.f - mt;
 				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f - mt;
 			}
 			else
 			{
-				cameraPtr->m_opaque = true;
-				cameraPtr->m_opacity = 1.f;
+				tCameraPtr->m_opaque = true;
+				tCameraPtr->m_opacity = 1.f;
 				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f;
 			}
 		}

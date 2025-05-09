@@ -62,6 +62,7 @@ public:
 	bool m_smoothTracking{true};
 	bool m_highlightTrackedModels{true};
 	ImVec2 m_trackingCursorPos;
+	bool m_visualizeDepth{false};
 
 	/**
 	 * A map connecting Core node id's with equivalent gui nodes.

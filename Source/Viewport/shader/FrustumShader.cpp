@@ -26,6 +26,7 @@ void FrustumShader::init(bool initSuperclass)
 		ColorShader::init(true);
 
 	inverseProjectionMatrixId = glGetUniformLocation(m_id, "projectionInverseMatrix");
+	visualizeDepthId = glGetUniformLocation(m_id, "u_visualizeDepth");
 }
 
 void FrustumShader::setUniforms()
@@ -33,4 +34,5 @@ void FrustumShader::setUniforms()
 	ColorShader::setUniforms();
 
 	glUniformMatrix4fv(inverseProjectionMatrixId, 1, GL_FALSE, glm::value_ptr(m_projectionViewMatrixInv));
+	glUniform1i(visualizeDepthId, m_visualizeDepth ? GL_TRUE : GL_FALSE);
 }

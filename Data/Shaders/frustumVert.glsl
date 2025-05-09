@@ -16,9 +16,12 @@ uniform vec3 singleColor;
 uniform mat4 projectionInverseMatrix;
 
 out vec3 Color;
+out vec3 ClipPos;
 
 void main()
 {
+	ClipPos = aPos;
+
 	gl_Position = projectionInverseMatrix * vec4(aPos, 1.0);
 	gl_Position /= gl_Position.w;
 
