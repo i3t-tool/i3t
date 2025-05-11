@@ -1049,6 +1049,9 @@ bool TransformImpl<ETransformType::Ortho>::isValid() const
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_OrthoMask, mat);
 
+	if (m_coordinateSystem == g_vulkan)
+		return result; // TODO: Proper vulkan vaidation
+
 	const float left = getDefaultValue("left").getFloat();
 	const float right = getDefaultValue("right").getFloat();
 	const float bottom = getDefaultValue("bottom").getFloat();
@@ -1111,9 +1114,18 @@ void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
-	setInternalValue(glm::ortho(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
-	                            getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
-	                            getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	if (m_coordinateSystem == g_vulkan)
+	{
+		setInternalValue(glm::orthoRH_ZO(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+		                                 getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+		                                 getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
+	else
+	{
+		setInternalValue(glm::ortho(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+		                            getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+		                            getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
 	notifySequence();
 }
 
@@ -1251,6 +1263,9 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_PerspectiveMask, mat); // checks 0,0,-1,0 in the last row
 
+	if (m_coordinateSystem == g_vulkan)
+		return result; // TODO: Proper vulkan vaidation
+
 	// matrix inner consistency - nonzero scale and z-translate
 	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2] != 0.0f);
 
@@ -1285,11 +1300,18 @@ void TransformImpl<ETransformType::Perspective>::initDefaults()
 void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-	// m_hasSynergies = true; // perspective has a symmetrical frustum from
-	// definition \todo We must decide
+	// m_hasSynergies = true; // perspective has a symmetrical frustum from definition \todo We must decide
 
-	setInternalValue(glm::perspective(getDefaultValue("fovy").getFloat(), getDefaultValue("aspect").getFloat(),
-	                                  getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	if (m_coordinateSystem == g_vulkan)
+	{
+		setInternalValue(glm::perspectiveRH_ZO(getDefaultValue("fovy").getFloat(), getDefaultValue("aspect").getFloat(),
+		                                       getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
+	else
+	{
+		setInternalValue(glm::perspective(getDefaultValue("fovy").getFloat(), getDefaultValue("aspect").getFloat(),
+		                                  getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
 	notifySequence();
 }
 
@@ -1383,6 +1405,9 @@ bool TransformImpl<ETransformType::Frustum>::isValid() const
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_FrustumMask, mat); // checks -1 in the last row too
 
+	if (m_coordinateSystem == g_vulkan)
+		return result; // TODO: Proper vulkan vaidation
+
 	// nonzero scale and z-translate
 	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2] != 0.0f);
 
@@ -1462,9 +1487,18 @@ void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
-	setInternalValue(glm::frustum(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
-	                              getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
-	                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	if (m_coordinateSystem == g_vulkan)
+	{
+		setInternalValue(glm::frustumRH_ZO(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+		                                   getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+		                                   getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
+	else
+	{
+		setInternalValue(glm::frustum(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+		                              getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+		                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
 	notifySequence();
 }
 
@@ -1677,9 +1711,20 @@ void TransformImpl<ETransformType::Viewport>::resetMatrixFromDefaults()
 	m_isLocked = true;
 	// TODO: (DR) [T-VIEWPORT] Synergies?
 
-	setInternalValue(ProjectionUtils::viewport(
-	    getDefaultValue("x").getFloat(), getDefaultValue("y").getFloat(), getDefaultValue("width").getFloat(),
-	    getDefaultValue("height").getFloat(), getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	if (m_coordinateSystem == g_vulkan)
+	{
+		setInternalValue(
+		    ProjectionUtils::viewportVulkan(getDefaultValue("x").getFloat(), getDefaultValue("y").getFloat(),
+		                                    getDefaultValue("width").getFloat(), getDefaultValue("height").getFloat(),
+		                                    getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
+	else
+	{
+		setInternalValue(
+		    ProjectionUtils::viewport(getDefaultValue("x").getFloat(), getDefaultValue("y").getFloat(),
+		                              getDefaultValue("width").getFloat(), getDefaultValue("height").getFloat(),
+		                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
+	}
 	notifySequence();
 }
 

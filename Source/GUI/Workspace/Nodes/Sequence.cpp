@@ -276,7 +276,7 @@ void Sequence::popupContentTracking()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_TRACKING " ", "Tracking")))
 		{
 			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
 			{
@@ -302,24 +302,25 @@ void Sequence::popupContentReferenceSpace()
 		auto viewportWindow = viewportModule.getWindow(0);
 		if (!viewportWindow->m_space.customSource)
 		{
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Set as reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Set as reference space")))
 			{
 				viewportWindow->m_space.customSource = true;
 				viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+				m_referenceSpaceSource = true;
 			}
 		}
 		else
 		{
 			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
 			{
-				viewportWindow->m_space.customSource = false;
-				viewportWindow->m_space.sourceNode.reset();
+				viewportWindow->m_space.resetReferenceSpace();
+				m_referenceSpaceSource = false;
 			}
 		}
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_SOLAR_PANEL " ", "Reference space")))
+		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Reference space")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 			ImGui::TextDisabled(_tbd("Set as reference space in scene view"));
@@ -332,14 +333,15 @@ void Sequence::popupContentReferenceSpace()
 					{
 						viewportWindow->m_space.customSource = true;
 						viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
+						m_referenceSpaceSource = true;
 					}
 				}
 				else
 				{
 					if (I3TGui::MenuItemWithLog((_ts("Reset ") + _ts(viewportWindow->getTitle())).c_str()))
 					{
-						viewportWindow->m_space.customSource = false;
-						viewportWindow->m_space.sourceNode.reset();
+						viewportWindow->m_space.resetReferenceSpace();
+						m_referenceSpaceSource = false;
 					}
 				}
 			}

@@ -64,5 +64,6 @@ private:
 	bool drawResizeHandle(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize);
 	void updateCoreData();
 	void updateTrackedScreen(); ///< Updates the 3D Scene view representation of the screen
+	Core::Camera* getConnectedCoreCamera();
 };
 } // namespace Workspace

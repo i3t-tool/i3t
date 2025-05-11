@@ -16,6 +16,7 @@
 #include "misc/cpp/imgui_stdlib.h" // for changable text
 
 #include "Core/Input/InputManager.h"
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
 #include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
 #include "GUI/Fonts/Bindings/IconsFontAwesome6_I3T.h"
 #include "GUI/Toolkit.h"
@@ -109,46 +110,21 @@ void CoreNode::topContent(DIWNE::DrawInfo& context)
 
 	ImGui::SameLine(0, 0);
 	ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
-
-	// const float widthSoFar =
-	//     I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize).x + ((2 * style.FramePadding.x + labelWidth) / zoom);
+	ImGui::SameLine(0, 0);
 
 	// TODO: Handle extra header space using DiwnePanels and some rudimentary layouting
 	//   DiwnePanels should possibly have an optional forced minimum fixed size (minimum minimum size?)
 
-	// Header extra space
-	// float trailingDummyWidth = style.FramePadding.x / zoom;
-	// if (m_headerMinWidth > 0)
-	// {
-	// 	const float diff = m_headerMinWidth - widthSoFar;
-	// 	if (diff > 0)
-	// 	{
-	// 		trailingDummyWidth += diff;
-	// 	}
-	// }
-	// ImGui::SameLine(0, 0);
-	// ImGui::Dummy(ImVec2(style.FramePadding.x, 0));
-	// ImGui::Dummy(ImVec2(trailingDummyWidth * zoom, 0));
 
-	// Right corner context menu button
 	// TODO: Rename Nodes_LODButtonSize to something like "HeaderButtonSize" as the buttons must have the same height
 
+	// Right corner custom content (error validity icons, reference space icon, tracking icon, coord system icon etc.)
+	// This call must add a horizontal spring
+	topRightHeaderContent(context);
+
+	// Right corner context menu button
 	if (m_drawContextMenuButton)
 	{
-		ImGui::SameLine(0, 0);
-		m_top.spring(1.0f);
-
-		auto coreNode = this->getNodebase();
-		if (auto t = coreNode->getTrackingData())
-		{
-			if (t->tracker->getSequenceID() == coreNode->getId())
-			{
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted(ICON_FA_CROSSHAIRS);
-				ImGui::SameLine();
-			}
-		}
-
 		drawContextMenuButton(context, contextButtonCornerFlag);
 	}
 }
@@ -173,6 +149,32 @@ void CoreNode::endDiwne(DIWNE::DrawInfo& context)
 		        .c_str());
 	});
 }
+void CoreNode::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	m_top.spring(1.0f);
+
+	auto coreNode = this->getNodebase();
+
+	// Tracking indicator
+	if (auto t = coreNode->getTrackingData())
+	{
+		if (t->tracker->getSequenceID() == coreNode->getId())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::TextUnformatted(ICON_I3T_TRACKING);
+			ImGui::SameLine();
+		}
+	}
+
+	// Reference space indicator
+	if (m_referenceSpaceSource)
+	{
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted(ICON_I3T_REF_SPACE);
+		ImGui::SameLine();
+	}
+}
+
 bool CoreNode::allowDrawing()
 {
 	auto* t = getNodebase()->getTrackingData();

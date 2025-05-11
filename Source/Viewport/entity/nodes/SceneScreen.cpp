@@ -31,12 +31,15 @@ SceneScreen::SceneScreen()
 	m_zOffset = Math::randomf() * 0.01f;
 }
 
-void SceneScreen::updateModelTransform(float width, float height, float scaleFactor)
+void SceneScreen::updateModelTransform(float width, float height, float scaleFactor, bool yUp)
 {
 	float xScale = -width / scaleFactor;
 	float yScale = height / scaleFactor;
 	float zScale = xScale;
-	m_modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, -m_zOffset));
+	m_modelMatrix = glm::mat4(1.0f);
+	if (!yUp)
+		m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.f, -height / scaleFactor, 0.f));
+	m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.f, 0.0f, -m_zOffset));
 	m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(xScale, yScale, zScale));
 
 	auto basePtr = m_screenBase.lock();
@@ -44,7 +47,11 @@ void SceneScreen::updateModelTransform(float width, float height, float scaleFac
 	xScale = -std::max(abs(xScale), abs(yScale));
 	yScale = -xScale;
 	zScale = xScale;
-	basePtr->m_modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-(width / 2.f) / scaleFactor, 0.0f, -m_zOffset));
+	basePtr->m_modelMatrix = glm::mat4(1.0f);
+	if (!yUp)
+		basePtr->m_modelMatrix = glm::translate(basePtr->m_modelMatrix, glm::vec3(0.f, -height / scaleFactor, 0.f));
+	basePtr->m_modelMatrix =
+	    glm::translate(basePtr->m_modelMatrix, glm::vec3(-(width / 2.f) / scaleFactor, 0.0f, -m_zOffset));
 	basePtr->m_modelMatrix = glm::scale(basePtr->m_modelMatrix, glm::vec3(xScale, yScale, zScale));
 }
 

@@ -129,17 +129,7 @@ void ViewportWindow::render()
 	// Update title if necessary
 	if (m_instanceIndex == 1)
 	{
-		bool showNum = false;
-		for (int i = 1; i < m_module->getWindowCount(); i++)
-		{
-			auto& window = m_module->getWindow(i);
-			if (window->isVisible())
-			{
-				showNum = true;
-				break;
-			}
-		}
-		if (showNum)
+		if (m_module->isMoreThanOneWindowVisible())
 			setTitle(ICON_TS(ICON_I3T_SCENE " ", "Scene View") + " " + std::to_string(m_instanceIndex));
 		else
 			setTitle(ICON_TS(ICON_I3T_SCENE " ", "Scene View"));
@@ -164,6 +154,8 @@ void ViewportWindow::render()
 		// Update background according to color
 		ImVec4 bgColor = I3T::getUI()->getTheme().get(EColor::SceneViewBackground);
 		m_renderOptions.clearColor = glm::vec3(bgColor.x, bgColor.y, bgColor.z);
+
+		bool windowFocused = InputManager::isInputActive(getInput());
 
 		bool menuInteraction = false;
 		if (ImGui::BeginMenuBar())
@@ -191,8 +183,8 @@ void ViewportWindow::render()
 		bool manipulatorInteraction = false;
 		// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
 		// interacting with them, hence we draw them beforehand using a channel splitter
-		if (m_settings.manipulator_enabled && m_instanceIndex == 1)
-		// if (m_settings.manipulator_enabled)
+		if (m_settings.manipulator_enabled && (!m_module->isMoreThanOneWindowVisible() || windowFocused) &&
+		    m_space.standard)
 		{
 			manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(
 			    m_windowPos, m_windowSize, &m_space.m_referenceSpace, view, m_camera->getProjection());
@@ -200,8 +192,6 @@ void ViewportWindow::render()
 
 		// Viewport channel
 		m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
-
-		bool windowFocused = InputManager::isInputActive(getInput());
 
 		// Process viewport input
 		// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but
@@ -260,7 +250,7 @@ void ViewportWindow::updateSpace()
 	m_space.tracking = Core::GraphManager::isTracking() && m_instanceIndex == 1;
 	m_space.trackingSpaceParam = 0.f;
 	m_space.trackingSpace = Core::TransformSpace::Model;
-	m_space.simulateLHS = false;
+	m_space.coordinateSystem = Core::g_i3t;
 	m_space.trackingMatrixProgress = 0.f;
 
 	m_displayOptions.showTracking = false;
@@ -300,18 +290,16 @@ void ViewportWindow::updateSpace()
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
 				m_space.label = _tbd("NDC space");
 
-				stg.global().grid.programShow = false;              // Disabling world grid for projection spaces
-				m_displayOptions.showTracking = true;               // Show manually controlled camera
-				if (tracker->getInterpolatedMatrixObject()->useLHS) // Switch view axes to LHS mode
-					m_space.simulateLHS = true;
+				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
+				m_displayOptions.showTracking = true;  // Show manually controlled camera
+				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
 			}
 			break;
 			case Core::TransformSpace::Screen:
 				m_space.label = std::string(_tbd("Screen space"));
-				stg.global().grid.programShow = false;              // Disabling world grid for projection spaces
-				m_displayOptions.showTracking = true;               // Show manually controlled camera
-				if (tracker->getInterpolatedMatrixObject()->useLHS) // Switch view axes to LHS mode
-					m_space.simulateLHS = true;
+				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
+				m_displayOptions.showTracking = true;  // Show manually controlled camera
+				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
 				break;
 			}
 			labelSet = true;
@@ -324,8 +312,7 @@ void ViewportWindow::updateSpace()
 		{
 			if (m_space.sourceNode.expired())
 			{
-				m_space.customSource = false;
-				m_space.sourceNode.reset();
+				m_space.resetReferenceSpace();
 			}
 			else
 			{
@@ -446,22 +433,19 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 
 		ImGui::PushStyleColor(ImGuiCol_Text, theme.get(EColor::TextDark));
 
-		// glm::mat4* viewPtr = &view;
-		// glm::mat4 viewMod;
-		// if (m_space.simulateLHS)
-		// {
-		// 	viewMod = Math::flipAxis(view, 0);
-		// 	viewPtr = &viewMod;
-		// }
-
 		glm::vec3 aFacs;
 		float* axisFactors = nullptr;
-		if (m_space.simulateLHS)
+		bool xFlip = m_space.coordinateSystem.isXFlipped();
+		bool yFlip = !m_space.coordinateSystem.yUp;
+		if (m_space.trackingSpace == Core::TransformSpace::Projection)
 		{
-			if (m_space.trackingSpace == Core::TransformSpace::Projection)
-				aFacs = glm::vec3(Math::range(m_space.trackingMatrixProgress, 0, 1, 1, -1), 1.f, 1.f);
-			else if (m_space.trackingSpace == Core::TransformSpace::Screen)
-				aFacs = glm::vec3(-1.f, 1.f, 1.f);
+			float axisProgress = Math::range(m_space.trackingMatrixProgress, 0, 1, 1, -1);
+			aFacs = glm::vec3(xFlip ? axisProgress : 1.f, yFlip ? axisProgress : 1.f, 1.f);
+			axisFactors = glm::value_ptr(aFacs);
+		}
+		else if (m_space.trackingSpace == Core::TransformSpace::Screen)
+		{
+			aFacs = glm::vec3(xFlip ? -1.f : 1.f, yFlip ? -1.f : 1.f, 1.f);
 			axisFactors = glm::value_ptr(aFacs);
 		}
 
@@ -475,7 +459,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 
 		GUI::TextColoredShadowCentered(m_space.label.c_str(), m_space.labelCol, axesSize);
 
-		if (m_space.simulateLHS)
+		if (m_space.coordinateSystem.isLeftHanded())
 		{
 			if ((m_space.trackingSpace == Core::TransformSpace::Projection && m_space.trackingMatrixProgress >= 0.5f) ||
 			    m_space.trackingSpace == Core::TransformSpace::Screen)
@@ -508,22 +492,22 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 		{
 			ImGui::Spacing();
 
-			float sliderWidth = ImGui::GetFontSize() * 2.5f;
+			float sliderWidth = ImGui::GetFontSize() * 1.5f;
 			float sliderWidthTotal = sliderWidth * 2 + ImGui::GetStyle().ItemSpacing.x;
-			ImGui::Dummy(ImVec2(std::max((axesSize - sliderWidthTotal) / 2.f, 0.f), 0.f));
+			ImGui::Dummy(ImVec2(std::max((axesSize - sliderWidthTotal - ImGui::GetStyle().ItemSpacing.x), 0.f), 0.f));
 			ImGui::SameLine(0, 0);
 
-			if (ImGui::VSliderFloat("###XYscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 10),
-			                        &Core::MatrixTracker::g_trackingViewportScalingFactorXY, 1.0f, 100.0f,
-			                        "%.2f\n  XY"))
+			if (ImGui::VSliderFloat("###XYscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 9),
+			                        &Core::MatrixTracker::g_trackingViewportScalingFactorXY, 1.0f, 100.0f, "%2.0f\nXY",
+			                        ImGuiSliderFlags_NoRoundToFormat))
 			{
 				if (Core::GraphManager::isTracking())
 					Core::GraphManager::getTracker()->requestProgressUpdate();
 			}
 			ImGui::SameLine();
-			if (ImGui::VSliderFloat("###Zscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 10),
-			                        &Core::MatrixTracker::g_trackingViewportScalingFactorZ, 1.0f, 100.0f, "%.2f\n   Z",
-			                        ImGuiSliderFlags_Logarithmic))
+			if (ImGui::VSliderFloat("###Zscale", ImVec2(sliderWidth, ImGui::GetFontSize() * 9),
+			                        &Core::MatrixTracker::g_trackingViewportScalingFactorZ, 1.0f, 100.0f, "%2.0f\n Z",
+			                        ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoRoundToFormat))
 			{
 				if (Core::GraphManager::isTracking())
 					Core::GraphManager::getTracker()->requestProgressUpdate();
@@ -609,19 +593,22 @@ bool ViewportWindow::showViewportButtons()
 		ImGui::SameLine();
 	}
 
-	if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", m_settings.manipulator_enabled))
+	if (m_space.standard)
 	{
-		interacted = true;
-	}
-	else
-	{
-		if (ImGui::IsItemHovered())
+		if (GUI::FloatingToggleButton(ICON_I3T_MANIPULATOR "###ManipulatorButton", m_settings.manipulator_enabled))
 		{
 			interacted = true;
-			GUI::Tooltip(_t("Toggle manipulators"), "");
 		}
+		else
+		{
+			if (ImGui::IsItemHovered())
+			{
+				interacted = true;
+				GUI::Tooltip(_t("Toggle manipulators"), "");
+			}
+		}
+		ImGui::SameLine();
 	}
-	ImGui::SameLine();
 
 	if (m_displayOptions.showGrids)
 	{
@@ -671,6 +658,23 @@ bool ViewportWindow::showViewportButtons()
 		{
 			m_space.m_referenceSpace[col][row] = val;
 		}
+
+		ImGui::SameLine();
+		// Show reset reference space button
+		float oldScale = GUI::PushFontScale(1.2f);
+		if (GUI::FloatingButtonDark(ICON_FA_XMARK))
+		{
+			if (m_space.tracking)
+				Core::GraphManager::stopTracking();
+			else
+				m_space.resetReferenceSpace();
+		}
+		GUI::PopFontScale(oldScale);
+		if (m_space.tracking)
+			GUI::ItemTooltip(_tbd("Stop tracking"));
+		else
+			GUI::ItemTooltip(_tbd("Reset reference space"));
+
 		ImGui::EndGroup();
 	}
 

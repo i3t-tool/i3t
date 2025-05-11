@@ -106,10 +106,25 @@ void SceneCamera::updateNearFrustumIndicator(const glm::mat4& model, const glm::
 	// Construct a new mesh and replace the old one
 	glm::vec3 worldCameraPos = m_modelMatrix[3];
 
-	glm::vec4 ntl = glm::vec4(-1, 1, -1, 1.f);
-	glm::vec4 ntr = glm::vec4(1, 1, -1, 1.f);
-	glm::vec4 nbr = glm::vec4(1, -1, -1, 1.f);
-	glm::vec4 nbl = glm::vec4(-1, -1, -1, 1.f);
+	glm::vec4 ntl, ntr, nbr, nbl;
+	if (m_coordinateSystem.clipRange == Core::ClipRange::MinusOneToOne)
+	{
+		ntl = glm::vec4(-1, m_coordinateSystem.yUp ? 1 : -1, -1, 1.f);
+		ntr = glm::vec4(1, m_coordinateSystem.yUp ? 1 : -1, -1, 1.f);
+		nbr = glm::vec4(1, m_coordinateSystem.yUp ? -1 : 1, -1, 1.f);
+		nbl = glm::vec4(-1, m_coordinateSystem.yUp ? -1 : 1, -1, 1.f);
+	}
+	else if (m_coordinateSystem.clipRange == Core::ClipRange::ZeroToOne)
+	{
+		ntl = glm::vec4(-1, m_coordinateSystem.yUp ? 1 : -1, 0, 1.f);
+		ntr = glm::vec4(1, m_coordinateSystem.yUp ? 1 : -1, 0, 1.f);
+		nbr = glm::vec4(1, m_coordinateSystem.yUp ? -1 : 1, 0, 1.f);
+		nbl = glm::vec4(-1, m_coordinateSystem.yUp ? -1 : 1, 0, 1.f);
+	}
+	else
+	{
+		throw std::runtime_error("Not implemented");
+	}
 
 	ntl = ProjectionUtils::divide(projViewInv * ntl);
 	ntr = ProjectionUtils::divide(projViewInv * ntr);
@@ -205,4 +220,22 @@ void SceneCamera::onSceneRemove(Vp::Scene& scene)
 
 	scene.removeEntity(m_trackedFrustumNear);
 	scene.removeEntity(m_trackedCameraModel);
+}
+
+void SceneCamera::setCoordinateSystem(Core::CameraCoordSystem& coordinateSystem)
+{
+	m_coordinateSystem = coordinateSystem;
+	auto frustumPtr = m_frustum.lock();
+	auto frustumOutlinePtr = m_frustumOutline.lock();
+
+	if (coordinateSystem.clipRange == Core::ClipRange::MinusOneToOne)
+	{
+		frustumPtr->m_mesh = RMI.meshByAlias(Shaper::unitCube);
+		frustumOutlinePtr->m_mesh = RMI.meshByAlias(Shaper::unitLineCube);
+	}
+	else if (coordinateSystem.clipRange == Core::ClipRange::ZeroToOne)
+	{
+		frustumPtr->m_mesh = RMI.meshByAlias(Shaper::vulkanNdcCube);
+		frustumOutlinePtr->m_mesh = RMI.meshByAlias(Shaper::vulkanNdcLineCube);
+	}
 }

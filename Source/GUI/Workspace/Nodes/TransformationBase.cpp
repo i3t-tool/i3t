@@ -30,22 +30,26 @@ bool TransformationBase::allowDrawing()
 	return isInSequence() || Super::allowDrawing();
 }
 
-void TransformationBase::topContent(DIWNE::DrawInfo& context)
+
+void TransformationBase::topRightHeaderContent(DIWNE::DrawInfo& context)
 {
+	bool matrixInvalid = !isMatrixValid();
+
 	ImGuiStyle& style = ImGui::GetStyle();
-	Super::topContent(context);
-	ImGui::SameLine(0, 0);
 
-	// TODO: Similary how we create the validity icon, a lock icon can be shown for locked data
-
-	if (!isMatrixValid())
+	ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
+	if (matrixInvalid)
 	{
-		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
-
 		if (m_wasValid) // Prevent layout flickering
 			m_top.expectWidthChangeThisFrame(diwne.canvas().screen2diwneSize(iconSize.x + 2 * style.FramePadding.x));
+	}
 
-		m_top.spring(1.0f);
+	CoreNode::topRightHeaderContent(context);
+
+	// TODO: Similary how we create the validity icon, a lock icon can be shown for locked data
+	if (matrixInvalid)
+	{
+		// m_top.spring(1.0f);
 
 		// Drawing the validity icon and moving it down vertically by FramePadding.y
 		DIWNE::DGui::BeginVerticalAlign(style.FramePadding.y);
@@ -63,12 +67,6 @@ void TransformationBase::topContent(DIWNE::DrawInfo& context)
 		ImGui::SameLine(0, 0);
 		ImGui::Dummy(ImVec2(2 * style.FramePadding.x, 0));
 		DIWNE::DGui::EndVerticalAlign();
-
-		// case Core::ETransformState::Unknown:
-		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
-		// ImColor(255, 0, 255), DIWNE::IconType::Cross, 	               ImColor(0,
-		// 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
-		// false); /* \todo JH Icon setting from Theme? */
 
 		m_wasValid = false;
 	}
@@ -131,8 +129,9 @@ void TransformationBase::popupContent(DIWNE::DrawInfo& context)
 	drawMenuStorevalues();
 	Super::drawMenuSetPrecision();
 	drawMenuSetDataMap();
-
 	ImGui::Separator();
+
+	drawMenuExtra();
 
 	Super::drawMenuDuplicate(context);
 

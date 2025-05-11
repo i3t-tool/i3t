@@ -86,7 +86,7 @@ void Model::initialize(DIWNE::DrawInfo& context)
 		trackedPtr->m_showAxes = modelPtr->m_showAxes;
 		trackedPtr->m_modelMatrix = t->modelData->m_interpolatedMatrix;
 		bool trackingHighlight = static_cast<WorkspaceDiwne&>(diwne).m_highlightTrackedModels;
-		if (trackingHighlight)
+		if (trackingHighlight && !m_selected)
 			trackedPtr->setHighlightColor(GUI::imToGlm(I3T::getColor(EColor::Nodes_Tracking_ColorActive)));
 		trackedPtr->setHighlighted(m_selected || trackingHighlight);
 		trackedPtr->setModel(modelPtr->getModel());

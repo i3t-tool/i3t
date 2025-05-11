@@ -145,6 +145,19 @@ inline bool ItemTooltip(const char* header, const char* description = nullptr,
 	return true;
 }
 
+inline float PushFontScale(float newScale)
+{
+
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	float oldScale = window->FontWindowScale;
+	ImGui::SetWindowFontScale(newScale);
+	return oldScale;
+}
+inline void PopFontScale(float oldScale)
+{
+	ImGui::SetWindowFontScale(oldScale);
+}
+
 // A trick to make hover delay even longer?
 // IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal) && g.HoveredIdTimer > 0.5f
 

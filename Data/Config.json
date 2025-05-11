@@ -69,11 +69,6 @@
       "name": "Wooden Box",
       "path": "Data/Models/box_wooden.gltf",
       "type": "Model"
-    },
-    {
-      "name": "ModelShader",
-      "path": "Data/Shaders/Model.glsl",
-      "type": "Shader"
     }
   ]
 }

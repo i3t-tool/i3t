@@ -35,11 +35,14 @@ class Shaper
 {
 public:
 	// Some generic default shapes
-	static std::string xyzAxes; ///< Simple three color line axes
-	static std::string unitLineCube;
-	static std::string unitCube;
+	static std::string xyzAxes;      ///< Simple three color line axes
+	static std::string unitLineCube; ///< Equivalent to standard OpenGL ndc space
+	static std::string unitCube;     ///< Equivalent to standard OpenGL ndc space
 	static std::string plane;
 	static std::string screenQuad; ///< Screen quad for post processing
+
+	static std::string vulkanNdcLineCube;
+	static std::string vulkanNdcCube;
 
 	static void initDefaultShapes();
 

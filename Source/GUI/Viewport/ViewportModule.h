@@ -39,7 +39,8 @@ public:
 
 	int getWindowCount() const;
 	const std::vector<Ptr<UI::ViewportWindow>> getWindows();
-	const Ptr<UI::ViewportWindow>& getWindow(int index);
+	const Ptr<UI::ViewportWindow>& getWindow(int index) const;
+	bool isMoreThanOneWindowVisible() const;
 
 	/////////////////////////////////////////
 	// State save/load

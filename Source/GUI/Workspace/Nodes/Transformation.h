@@ -12,6 +12,8 @@
  */
 #pragma once
 
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6_I3T.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
@@ -35,6 +37,12 @@ public:
 	void init()
 	{
 		// Used in templated specializations
+	}
+
+	void topRightHeaderContent(DIWNE::DrawInfo& context) override
+	{
+		// Used in template specializations
+		Super::topRightHeaderContent(context);
 	}
 
 	/**
@@ -193,6 +201,11 @@ public:
 	{
 		TransformationBase::drawMenuSetDataMap();
 	} /* thus we can specify it for Core::ETransformType::Free  */
+
+	void drawMenuExtra() override
+	{
+		TransformationBase::drawMenuExtra();
+	}
 };
 
 template <>
@@ -378,6 +391,118 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
+}
+
+inline void drawMenuCoordinateSystem(Core::Transform* transform, Core::CameraCoordSystem& coordinateSystem)
+{
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+	if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
+	{
+		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_OGL " "
+		                                            "OpenGL",
+		                            NULL, coordinateSystem == Core::g_openGL))
+		{
+			coordinateSystem = Core::g_openGL;
+			transform->resetMatrixFromDefaults();
+			if (Core::GraphManager::isTracking())
+				Core::GraphManager::getTracker()->requestProgressUpdate();
+		}
+		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_VULKAN " "
+		                                               "Vulkan",
+		                            NULL, coordinateSystem == Core::g_vulkan))
+		{
+			coordinateSystem = Core::g_vulkan;
+			transform->resetMatrixFromDefaults();
+			if (Core::GraphManager::isTracking())
+				Core::GraphManager::getTracker()->requestProgressUpdate();
+		}
+		ImGui::EndMenu();
+	}
+	ImGui::PopItemFlag();
+
+	ImGui::Separator();
+}
+
+inline void drawCoordinateSystemIndicator(DIWNE::DrawInfo& context, Core::CameraCoordSystem& coordinateSystem)
+{
+	if (coordinateSystem == Core::g_vulkan)
+	{
+		// Undo the node label trailing padding, so that the indicator follows the text without extra gap
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImGui::SetCursorScreenPos(ImVec2(pos.x - ImGui::GetStyle().FramePadding.x, pos.y));
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted(ICON_FA_I3T_VULKAN);
+		ImGui::SameLine();
+	}
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Ortho>::drawMenuExtra()
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Ortho>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Ortho>>();
+	drawMenuCoordinateSystem(coreTransform, coreTransform->m_coordinateSystem);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Perspective>::drawMenuExtra()
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Perspective>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Perspective>>();
+	drawMenuCoordinateSystem(coreTransform, coreTransform->m_coordinateSystem);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Frustum>::drawMenuExtra()
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Frustum>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Frustum>>();
+	drawMenuCoordinateSystem(coreTransform, coreTransform->m_coordinateSystem);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Viewport>::drawMenuExtra()
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Viewport>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Viewport>>();
+	drawMenuCoordinateSystem(coreTransform, coreTransform->m_coordinateSystem);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Ortho>::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Ortho>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Ortho>>();
+	drawCoordinateSystemIndicator(context, coreTransform->m_coordinateSystem);
+	Super::topRightHeaderContent(context);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Perspective>::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Perspective>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Perspective>>();
+	drawCoordinateSystemIndicator(context, coreTransform->m_coordinateSystem);
+	Super::topRightHeaderContent(context);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Frustum>::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Frustum>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Frustum>>();
+	drawCoordinateSystemIndicator(context, coreTransform->m_coordinateSystem);
+	Super::topRightHeaderContent(context);
+}
+
+template <>
+inline void Transformation<Core::ETransformType::Viewport>::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	assert(dynamic_cast<Core::TransformImpl<Core::ETransformType::Viewport>*>(this->m_nodebase.get()));
+	auto* coreTransform = m_nodebase->asRaw<Core::TransformImpl<Core::ETransformType::Viewport>>();
+	drawCoordinateSystemIndicator(context, coreTransform->m_coordinateSystem);
+	Super::topRightHeaderContent(context);
 }
 
 template <>

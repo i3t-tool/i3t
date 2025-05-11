@@ -16,12 +16,14 @@
 #include "Iterators.h"
 
 #include "Camera.h"
+#include "Core/Input/KeyCodes.h"
 #include "Model.h"
 #include "Sequence.h"
 #include "Utils/ProjectionUtils.h"
 
 namespace Core
 {
+
 float MatrixTracker::g_trackingViewportScalingFactorXY = 50.f;
 float MatrixTracker::g_trackingViewportScalingFactorZ = 50.f;
 
@@ -564,12 +566,17 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 	assert(transform->data.space == TransformSpace::Projection);
 	assert(m_trackedCamera != nullptr);
 
+	auto* camera = m_trackedCamera.get()->node.lock()->asRaw<Camera>();
+	const auto& coordSystem = camera->m_coordinateSystem;
+
+	bool isStandardOGL = coordSystem == g_openGL;
+	bool isVulkan = coordSystem == g_vulkan;
+
 	if (!m_decomposeProjection)
 	{
 		// Apply defaults
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get()));
-		m_matrices.back()->useLHS = false;
-		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
+		m_matrices.back()->coordinateSystem = coordSystem;
 		m_matrices.back()->moveCameraOutOfNDC = true;
 		m_matrices.back()->cameraNDCOffset = 3.f;
 		return 1;
@@ -593,7 +600,7 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 
 	bool isPerspective = transformMat[2][3] != 0.f;
 
-	if (isPerspective && m_decomposePerspectiveBrown)
+	if (isStandardOGL && isPerspective && m_decomposePerspectiveBrown)
 	{
 		auto [ortho1, persp1, persp2, ortho2, neg] = ProjectionUtils::decomposePerspectiveBrown(transformMat);
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), ortho1));
@@ -606,11 +613,10 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 		m_matrices.back()->cameraNDCOffset = 3.f;
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
 		m_matrices.back()->cameraNDCOffset = 3.f;
-		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
-		m_matrices.back()->useLHS = true;
+		m_matrices.back()->coordinateSystem = g_openGL;
 		return 5;
 	}
-	if (isPerspective && m_decomposePerspectiveShirley)
+	if (isStandardOGL && isPerspective && m_decomposePerspectiveShirley)
 	{
 		auto [persp, ortho, neg] = ProjectionUtils::decomposePerspectiveShirley(transformMat);
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), persp));
@@ -618,20 +624,19 @@ int MatrixTracker::handleProjectionTransform(const Ptr<TrackedTransform>& transf
 		m_matrices.back()->moveCameraOutOfNDC = true;
 		m_matrices.back()->cameraNDCOffset = 3.f;
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
-		m_matrices.back()->useLHS = true;
+		m_matrices.back()->coordinateSystem = g_openGL;
 		m_matrices.back()->cameraNDCOffset = 3.f;
 		return 3;
 	}
 	{
-		auto [neg, proj] = ProjectionUtils::constructZFlippedProjection(transformMat);
+		// Default "decompose" handling, only flips the X/Y to achieve better visualization
+		auto [neg, proj] = ProjectionUtils::constructZFlippedProjection(transformMat, true);
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), proj));
 		m_matrices.back()->moveCameraOutOfNDC = true;
-		m_matrices.back()->cameraNDCOffset = 3.f;
+		m_matrices.back()->cameraNDCOffset = isStandardOGL ? 3.f : 2.f;
 		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), neg));
-		m_matrices.back()->cameraNDCOffset = 3.f;
-		m_matrices.back()->useLHS = true;
-		m_matrices.back()->ndcType = NDCType::MinusOneToOne;
+		m_matrices.back()->cameraNDCOffset = isStandardOGL ? 3.f : 2.f;
+		m_matrices.back()->coordinateSystem = coordSystem;
 		return 2;
 	}
 }
@@ -642,10 +647,28 @@ int MatrixTracker::handleViewportTransform(const Ptr<TrackedTransform>& transfor
 	assert(transform->data.space == TransformSpace::Screen);
 	assert(m_trackedCamera != nullptr);
 
-	m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get()));
-	m_matrices.back()->useLHS = true; // [OGL-VULKAN]
-	m_matrices.back()->cameraNDCOffset = 3.f;
-	m_matrices.back()->ndcType = NDCType::MinusOneToOne;
+	auto* camera = m_trackedCamera.get()->node.lock()->asRaw<Camera>();
+	const auto& coordSystem = camera->m_coordinateSystem;
+
+	bool isStandardOGL = coordSystem == g_openGL;
+	bool isVulkan = coordSystem == g_vulkan;
+
+	if (isVulkan)
+	{
+		// Vulkan has Y flipped, we work with unflipped NDC (because we only "emulate" other coord systems)
+		// hence we can't just flip the Y, as that would flip the image
+		// so we emulate Y flip by flipping the Y viewport translation.
+		glm::mat4 viewport = transform->getMat();
+		viewport[3][1] = -viewport[3][1];
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get(), viewport));
+	}
+	else
+	{
+		m_matrices.emplace_back(std::make_unique<TrackedMatrix>(transform.get()));
+	}
+
+	m_matrices.back()->cameraNDCOffset = isStandardOGL ? 3.f : 2.f;
+	m_matrices.back()->coordinateSystem = coordSystem;
 	return 1;
 }
 
