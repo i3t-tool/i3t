@@ -56,13 +56,14 @@ std::array<float, 6> decomposePerspective(const glm::mat4& m)
 	return {left, right, bottom, top, n, f};
 }
 
-std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m)
+std::array<glm::mat4, 2> constructZFlippedProjection(const glm::mat4& m, bool flipX)
 {
 	glm::mat4 negZ(1.f);
 	negZ[2][2] = -1; // Flip Z (NDC is +z forward)
-	glm::mat4 negX(1.f);
-	negX[0][0] = -1; // Flip X (NDC ls LHS)
-	return {negX * negZ, negZ * m};
+	glm::mat4 neg(1.f);
+	if (flipX)
+		neg[0][0] = -1; // Flip X (NDC ls LHS)
+	return {neg * negZ, negZ * m};
 }
 
 std::array<glm::mat4, 3> decomposePerspectiveShirley(const glm::mat4& m)
@@ -156,6 +157,27 @@ std::array<glm::mat4, 5> decomposePerspectiveBrown(const glm::mat4& m)
 glm::vec4 divide(const glm::vec4& v)
 {
 	return v / v.w;
+}
+
+glm::mat4 viewport(float x, float y, float width, float height, float n, float f)
+{
+	float widthDiv2 = width / 2.f;
+	float heightDiv2 = height / 2.f;
+	return glm::mat4({{widthDiv2, 0, 0, 0},
+	                  {0, heightDiv2, 0, 0},
+	                  {0, 0, (f - n) / 2.f, 0},
+	                  {x + widthDiv2, y + heightDiv2, (f + n) / 2.f, 1}});
+}
+
+glm::mat4 viewportVulkan(float x, float y, float width, float height, float n, float f)
+{
+	// Z range is remapped from 0..1, instead of -1..1
+	float widthDiv2 = width / 2.f;
+	float heightDiv2 = height / 2.f;
+	return glm::mat4({{widthDiv2, 0, 0, 0},  //
+	                  {0, heightDiv2, 0, 0}, //
+	                  {0, 0, f - n, 0},      //
+	                  {x + widthDiv2, y + heightDiv2, n, 1}});
 }
 
 } // namespace ProjectionUtils

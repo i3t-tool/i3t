@@ -43,6 +43,10 @@ public:
 
 	ViewportModule* m_module;
 
+	/**
+	 * Helper struct containing various information about the current scene view space.
+	 * Has information about current reference space, current tracking status and coordinate system.
+	 */
 	struct ViewportSpace
 	{
 		glm::mat4 m_referenceSpace{1.f};
@@ -59,11 +63,19 @@ public:
 		float trackingSpaceParam = 0.f;     ///< 0..1 indicating progress through current space
 		float trackingMatrixProgress = 0.f; ///< 0..1 progress through the current matrix (can be != transform progress)
 
-		bool simulateLHS = false;
+		Core::CameraCoordSystem coordinateSystem;
 
 		// Reference space is set from a sequence node
 		bool customSource = false;
 		WPtr<Workspace::Sequence> sourceNode;
+
+		void resetReferenceSpace()
+		{
+			customSource = false;
+			if (auto node = sourceNode.lock())
+				node->m_referenceSpaceSource = false;
+			sourceNode.reset();
+		}
 	};
 	ViewportSpace m_space;
 

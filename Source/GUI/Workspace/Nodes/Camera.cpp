@@ -12,7 +12,9 @@
  */
 #include "Camera.h"
 
+#include "GUI/Fonts/Bindings/BindingFontAwesome.h"
 #include "GUI/Fonts/Bindings/IconsFontAwesome6.h"
+#include "GUI/Fonts/Bindings/IconsFontAwesome6_I3T.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
 #include "GUI/Workspace/WorkspaceDiwne.h"
@@ -139,6 +141,22 @@ void Camera::centerContent(DIWNE::DrawInfo& context)
 		m_view->drawDiwne(context, m_drawMode);
 	}
 }
+void Camera::topRightHeaderContent(DIWNE::DrawInfo& context)
+{
+	auto* coreCam = getNodebase()->asRaw<Core::Camera>();
+	if (coreCam->m_coordinateSystem == Core::g_vulkan)
+	{
+		// Undo the node label trailing padding, so that the indicator follows the text without extra gap
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImGui::SetCursorScreenPos(ImVec2(pos.x - ImGui::GetStyle().FramePadding.x, pos.y));
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted(ICON_FA_I3T_VULKAN);
+		ImGui::SameLine();
+	}
+	CoreNodeWithPins::topRightHeaderContent(context);
+}
+
 void Camera::afterDraw(DIWNE::DrawInfo& context)
 {
 	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
@@ -276,12 +294,11 @@ void Camera::updateTrackedCamera()
 				                                               : trackedMatrix->cameraNDCOffset;
 				tCameraPtr->m_modelMatrix = glm::translate(tCameraPtr->m_modelMatrix, glm::vec3(0.0f, 0.0f, zPos));
 			}
-			if (trackedMatrix->ndcType == Core::NDCType::MinusOneToOne)
+			auto clipRange = trackedMatrix->coordinateSystem.clipRange;
+			if (clipRange == Core::ClipRange::MinusOneToOne || clipRange == Core::ClipRange::ZeroToOne)
 			{
-				// tCameraPtr->m_modelMatrix = Math::flipAxis(tCameraPtr->m_modelMatrix, 2);
 				glm::mat4 neg(1.f);
 				neg[2][2] = -1;
-				// tCameraPtr->m_modelMatrix = neg * tCameraPtr->m_modelMatrix;
 				tCameraPtr->m_modelMatrix =
 				    Math::lerp(glm::mat4(1.f), neg, trackedMatrix->space == Core::TransformSpace::Screen ? 1.f : mt,
 				               false) *
@@ -292,13 +309,14 @@ void Camera::updateTrackedCamera()
 			{
 				tCameraPtr->m_opaque = false;
 				tCameraPtr->m_opacity = 1.f - mt;
-				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f - mt;
+				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity =
+				    cameraPtr->m_frustumNearLinesOpacity * (1.f - mt);
 			}
 			else
 			{
 				tCameraPtr->m_opaque = true;
 				tCameraPtr->m_opacity = 1.f;
-				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = 1.f;
+				m_viewportCamera.lock()->m_trackedFrustumNear.lock()->m_opacity = cameraPtr->m_frustumNearLinesOpacity;
 			}
 		}
 	}
@@ -306,6 +324,8 @@ void Camera::updateTrackedCamera()
 
 void Camera::popupContent(DIWNE::DrawInfo& context)
 {
+	auto* coreCam = getNodebase()->asRaw<Core::Camera>();
+
 	drawMenuSetEditable();
 
 	ImGui::Separator();
@@ -420,8 +440,34 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		}
 		ImGui::EndMenu();
 	}
-	ImGui::PopItemFlag();
+
 	ImGui::Separator();
+
+	if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
+	{
+		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_OGL " "
+		                                            "OpenGL",
+		                            NULL, coreCam->m_coordinateSystem == Core::g_openGL))
+		{
+			coreCam->m_coordinateSystem = Core::g_openGL;
+			if (Core::GraphManager::isTracking())
+				Core::GraphManager::getTracker()->requestProgressUpdate();
+			m_viewportCamera.lock()->setCoordinateSystem(coreCam->m_coordinateSystem);
+		}
+		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_VULKAN " "
+		                                               "Vulkan",
+		                            NULL, coreCam->m_coordinateSystem == Core::g_vulkan))
+		{
+			coreCam->m_coordinateSystem = Core::g_vulkan;
+			if (Core::GraphManager::isTracking())
+				Core::GraphManager::getTracker()->requestProgressUpdate();
+			m_viewportCamera.lock()->setCoordinateSystem(coreCam->m_coordinateSystem);
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+	ImGui::PopItemFlag();
 
 	CoreNode::drawMenuDuplicate(context);
 
@@ -446,7 +492,7 @@ void Camera::popupContentTracking()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_CROSSHAIRS " ", "Tracking")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_TRACKING " ", "Tracking")))
 		{
 			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_LEFT " ", "Start tracking from right"), ""))
 			{

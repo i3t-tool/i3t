@@ -17,6 +17,7 @@
 
 namespace Core
 {
+
 Ptr<Camera> Builder::createCamera()
 {
 	auto ret = std::make_shared<Core::Camera>();
@@ -26,6 +27,10 @@ Ptr<Camera> Builder::createCamera()
 
 	return ret;
 }
+
+CameraCoordSystem g_i3t = CameraCoordSystem();
+CameraCoordSystem g_openGL = CameraCoordSystem{ClipRange::MinusOneToOne, DepthRange::ZeroToOne, true};
+CameraCoordSystem g_vulkan = CameraCoordSystem{ClipRange::ZeroToOne, DepthRange::ZeroToOne, false};
 
 Camera::Camera() : Node(g_cameraProperties) {}
 

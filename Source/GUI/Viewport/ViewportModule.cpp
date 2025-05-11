@@ -70,11 +70,27 @@ const std::vector<Ptr<UI::ViewportWindow>> ViewportModule::getWindows()
 {
 	return m_viewportWindows;
 }
-const Ptr<UI::ViewportWindow>& ViewportModule::getWindow(int index)
+const Ptr<UI::ViewportWindow>& ViewportModule::getWindow(int index) const
 {
 	if (index < 0 || index >= m_viewportWindows.size())
 		throw std::invalid_argument("Invalid viewport window index");
 	return m_viewportWindows[index];
+}
+
+bool ViewportModule::isMoreThanOneWindowVisible() const
+{
+	int cnt = 0;
+	for (int i = 0; i < getWindowCount(); i++)
+	{
+		auto& window = getWindow(i);
+		if (window->isVisible())
+		{
+			cnt++;
+			if (cnt > 1)
+				return true;
+		}
+	}
+	return false;
 }
 
 void ViewportModule::collectScene(UI::ViewportWindow* window)

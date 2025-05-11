@@ -12,6 +12,7 @@
  */
 #pragma once
 
+#include "Core/Nodes/Camera.h"
 #include "SceneModel.h"
 
 #include "Viewport/shader/PhongShader.h"
@@ -38,6 +39,7 @@ protected:
 	std::shared_ptr<Core::Mesh> m_trackedFrustumNearMesh;
 
 	bool m_isTracking{false};
+	Core::CameraCoordSystem m_coordinateSystem{Core::g_openGL};
 
 public:
 	bool m_showCamera{true}; ///< Show/Hide the camera model, use this instead of this->m_visible.
@@ -70,6 +72,8 @@ public:
 
 	void onSceneAdd(Scene& scene) override;
 	void onSceneRemove(Scene& scene) override;
+
+	void setCoordinateSystem(Core::CameraCoordSystem& coordinateSystem);
 
 protected:
 	void updateNearFrustumIndicator(const glm::mat4& model, const glm::mat4& projViewInv);

@@ -29,16 +29,6 @@ class CoreNode : public Node, public IVisitable
 	using Super = Node;
 
 protected:
-	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
-	float m_dataItemsWidth{32.f};
-	bool m_updateDataItemsWidth{true};
-	// float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
-	bool m_drawContextMenuButton = false;
-	bool m_isLabelBeingEdited = false;
-	bool m_isFirstDraw = true;
-	bool m_topBottomSpacingDefault = true; ///< Whether this node has spacing between content and header / end.
-	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};
-	LevelOfDetail m_levelOfDetail{LevelOfDetail::Full};
 	/**
 	 * @brief Reference to the I3T Core node
 	 * @description Each Workspace GUI node represents a single I3T Core node.
@@ -49,8 +39,23 @@ protected:
 	 */
 	const Ptr<Core::Node> m_nodebase;
 
+	int m_numberOfVisibleDecimal; ///< number of decimal places used while display floats in the workspace
+	float m_dataItemsWidth{32.f};
+	bool m_updateDataItemsWidth{true};
+	// float m_headerMinWidth{0}; ///< Can be used to specify the minimum header width of the node.
+	bool m_drawContextMenuButton = false;
+	bool m_isLabelBeingEdited = false;
+	bool m_isFirstDraw = true;
+	bool m_topBottomSpacingDefault = true; ///< Whether this node has spacing between content and header / end.
+	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};
+	LevelOfDetail m_levelOfDetail{LevelOfDetail::Full};
+
 public:
 	constexpr static char CORE_NODE_FLAG = 16; // Index of the CoreNode DIWNE flag (16th bit from the right)
+
+	/// Indicates that this node is the source of a custom scene view reference space
+	/// TODO: What if it's a source for multiple windows? Would be nice to keep track of that
+	bool m_referenceSpaceSource{false};
 
 	CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase);
 	~CoreNode() override;
@@ -65,6 +70,10 @@ public:
 	void begin(DIWNE::DrawInfo& context) override;
 	void topContent(DIWNE::DrawInfo& context) override;
 	void endDiwne(DIWNE::DrawInfo& context) override;
+
+	/// Special method to fill contents between the node label and the top right menu button (if present)
+	/// The method call must include a `m_top.spring(1.0f);` call somewhere in it.
+	virtual void topRightHeaderContent(DIWNE::DrawInfo& context);
 
 	bool allowDrawing() override;
 

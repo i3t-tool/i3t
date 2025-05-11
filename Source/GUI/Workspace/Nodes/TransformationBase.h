@@ -34,7 +34,7 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	void topContent(DIWNE::DrawInfo& context) override;
+	void topRightHeaderContent(DIWNE::DrawInfo& context) override;
 	void centerContent(DIWNE::DrawInfo& context) override;
 	void end(DIWNE::DrawInfo& context) override;
 
@@ -63,6 +63,7 @@ public:
 	virtual bool isMatrixValid() = 0; ///{return true;}; // todo = 0
 
 	virtual void drawMenuSetDataMap();
+	virtual void drawMenuExtra() {}
 
 	virtual bool drawDataFull(DIWNE::DrawInfo& context);
 	virtual bool drawDataSetValues(DIWNE::DrawInfo& context)

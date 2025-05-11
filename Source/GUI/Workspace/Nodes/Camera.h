@@ -65,6 +65,7 @@ public:
 	void initialize(DIWNE::DrawInfo& context) override;
 
 	void centerContent(DIWNE::DrawInfo& context) override;
+	void topRightHeaderContent(DIWNE::DrawInfo& context) override;
 	void afterDraw(DIWNE::DrawInfo& context) override;
 
 	void drawOutputPins(DIWNE::DrawInfo& context) override;

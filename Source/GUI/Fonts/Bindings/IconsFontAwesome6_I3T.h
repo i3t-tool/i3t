@@ -26,3 +26,6 @@
 #define ICON_FA_I3T_NSPACE_4 "\xee\xb8\x8A" // U+ee0A
 
 #define ICON_FA_I3T_MAT_DECOMPOSE "\xee\xb9\x8C" // U+ee4c
+#define ICON_FA_I3T_OGL "\xee\xb9\xb2"           // U+ee72
+#define ICON_FA_I3T_VULKAN "\xee\xb9\xb3"        // U+ee73
+#define ICON_FA_I3T_COORD_SYSTEM "\xee\xb8\x8b"  // U+ee0b

@@ -14,6 +14,7 @@
 
 #include "Core/Nodes/Screen.h"
 
+#include "Camera.h"
 #include "GUI/I3TGui.h"
 #include "GUI/Toolkit.h"
 #include "GUI/Workspace/Nodes/Basic/DataRenderer.h"
@@ -49,6 +50,9 @@ Screen::Screen(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder
 
 	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_HEIGHT)->setTooltipEnabled(true);
 	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_HEIGHT)->setTooltip(_tbd("Screen height"));
+
+	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_ASPECT)->setTooltipEnabled(true);
+	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_ASPECT)->setTooltip(_tbd("Aspect ratio"));
 
 	m_viewportScreen = I3T::getViewport()->createScreen(getNodebase()->getId());
 
@@ -91,6 +95,13 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 		ImVec2 textureSize = m_textureSize;
 		ImVec2 screenTextureOffset = ImVec2(0, 0);
 
+		bool isVulkan = false;
+		auto* camera = getConnectedCoreCamera();
+		if (camera)
+		{
+			isVulkan = camera->m_coordinateSystem == Core::g_vulkan;
+		}
+
 		// Draw the screen
 		// Figure out what effect the viewport transformation has
 		if (coreScreen->isViewportExplicit())
@@ -101,18 +112,36 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 			// the transformed points, a "real" width and height is determined, rendered into a framebuffer and then the
 			// framebuffer is drawn at an offset based on the x,y offset of the (0, 0) point.
 			const glm::mat4& viewportMat = coreScreen->getViewport();
-			glm::vec4 hVec = viewportMat * glm::vec4(-1.f, -1.f, -1.f, 1.f);
-			ImVec2 bottomLeft = ImVec2(hVec.x, hVec.y);
-			hVec = viewportMat * glm::vec4(1.f, 1.f, -1.f, 1.f);
-			ImVec2 topRight = ImVec2(hVec.x, hVec.y);
-			ImVec2 realSize = topRight - bottomLeft;
+			if (!isVulkan)
+			{
+				glm::vec4 hVec = viewportMat * glm::vec4(-1.f, -1.f, -1.f, 1.f);
+				ImVec2 bottomLeft = ImVec2(hVec.x, hVec.y);
+				hVec = viewportMat * glm::vec4(1.f, 1.f, -1.f, 1.f);
+				ImVec2 topRight = ImVec2(hVec.x, hVec.y);
+				ImVec2 realSize = topRight - bottomLeft;
 
-			// Check if the viewport transformation is valid
-			invalid = !Core::isViewportValid(viewportMat);
+				// Check if the viewport transformation is valid
+				invalid = !Core::isViewportValid(viewportMat);
 
-			textureSize = realSize;
-			screenTextureOffset = bottomLeft * diwne.getZoom();
-			zoomedTextureSize = textureSize * diwne.getZoom();
+				textureSize = realSize;
+				screenTextureOffset = bottomLeft * diwne.getZoom();
+				zoomedTextureSize = textureSize * diwne.getZoom();
+			}
+			else
+			{
+				glm::vec4 hVec = viewportMat * glm::vec4(-1.f, -1.f, 0.f, 1.f);
+				ImVec2 topLeft = ImVec2(hVec.x, hVec.y);
+				hVec = viewportMat * glm::vec4(1.f, 1.f, 0.f, 1.f);
+				ImVec2 bottomRight = ImVec2(hVec.x, hVec.y);
+				ImVec2 realSize = bottomRight - topLeft;
+
+				// Check if the viewport transformation is valid
+				invalid = !Core::isViewportValid(viewportMat);
+
+				textureSize = realSize;
+				screenTextureOffset = topLeft * diwne.getZoom();
+				zoomedTextureSize = textureSize * diwne.getZoom();
+			}
 		}
 
 		if (!invalid)
@@ -136,10 +165,17 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 					    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_background)));
 				}
 
-				// TODO: [OGL-VULKAN]
-				// Texture min must be flipped as OGL origin is in bottom left, not top left like ImGui
-				screenTextureOffset =
-				    ImVec2(screenTextureOffset.x, zoomedScreenSize.y - screenTextureOffset.y - zoomedTextureSize.y);
+				if (isVulkan)
+				{
+					// screenTextureOffset = ImVec2(screenTextureOffset.x, screenTextureOffset.y - zoomedTextureSize.y -
+					// zoomedScreenSize.y);
+				}
+				else
+				{
+					// Texture min must be flipped as OGL origin is in bottom left, not top left like ImGui
+					screenTextureOffset =
+					    ImVec2(screenTextureOffset.x, zoomedScreenSize.y - screenTextureOffset.y - zoomedTextureSize.y);
+				}
 
 				ImVec2 textureMin = screenMin + screenTextureOffset;
 				ImVec2 textureMax = textureMin + zoomedTextureSize;
@@ -301,12 +337,12 @@ void Screen::updateTrackedScreen()
 		return;
 
 	// Check if we're connected to tracked camera
-	auto coreScreen = getNodebase();
-	auto* parentDisplayPin = coreScreen->getInput(Core::I3T_SCREEN_IN_DISPLAY).getParentPin();
-	if (!parentDisplayPin)
+	auto* camera = getConnectedCoreCamera();
+	if (!camera)
 		return;
 
-	if (!tracker->getTrackedCamera() || *tracker->getTrackedCamera()->node.lock() != *parentDisplayPin->getOwner())
+	auto& trackedCamera = tracker->getTrackedCamera();
+	if (!trackedCamera || *tracker->getTrackedCamera()->node.lock() != *camera)
 		return;
 
 	// Update visuals
@@ -317,9 +353,27 @@ void Screen::updateTrackedScreen()
 	screenModel->m_opaque = mt == 1.f;
 	screenModel->m_opacity = mt;
 
+	bool yUp = trackedCamera->node.lock()->asRaw<Core::Camera>()->m_coordinateSystem.yUp;
+
 	// Transform the screen model so it matches screen dimensions in scene view, take into account the tracker
-	// viewport scaling factor
-	screenModel->updateModelTransform(m_textureSize.x, m_textureSize.y, tracker->g_trackingViewportScalingFactorXY);
+	// viewport scaling factor and y axis direction
+	screenModel->updateModelTransform(m_textureSize.x, m_textureSize.y, tracker->g_trackingViewportScalingFactorXY,
+	                                  yUp);
+}
+
+Core::Camera* Screen::getConnectedCoreCamera()
+{
+	// Check if we're connected to tracked camera
+	auto coreScreen = getNodebase();
+	auto* parentDisplayPin = coreScreen->getInput(Core::I3T_SCREEN_IN_DISPLAY).getParentPin();
+	if (!parentDisplayPin)
+		return nullptr;
+
+	if (auto cameraNode = parentDisplayPin->getOwner())
+	{
+		return cameraNode->as<Core::Camera>().get();
+	}
+	return nullptr;
 }
 
 ImVec2 Screen::getScreenSize() const

@@ -35,7 +35,7 @@ public:
 
 	SceneScreen();
 
-	void updateModelTransform(float width, float height, float scaleFactor);
+	void updateModelTransform(float width, float height, float scaleFactor, bool yUp);
 
 	void update(Scene& scene) override;
 

@@ -95,12 +95,6 @@ enum class TrackingDirection
 	RightToLeft = 1
 };
 
-enum class NDCType
-{
-	MinusOneToOne, // Standard OpenGL NDC space (-1, 1)
-	OneToMinusOne, // OpenGL NDC space prior to applying the projection, -z depth
-};
-
 // TODO: (DR) Implement camera tracking
 /**
  * The main tracking object, responsible for tracking a single chain of sequences.
@@ -208,9 +202,10 @@ public:
 
 		// Projection metadata
 		TransformSpace space;
-		/// Indicates that space after applying this matrix should use the left handed coordinate system
-		bool useLHS = false;
-		NDCType ndcType = NDCType::OneToMinusOne;
+		CameraCoordSystem coordinateSystem; ///< Relevant when TransformSpace is >= Projection
+		// /// Indicates that space after applying this matrix should use the left handed coordinate system
+		// bool useLHS = false;
+		// NDCType ndcType = NDCType::OneToMinusOne;
 		bool moveCameraOutOfNDC = false;
 		float cameraNDCOffset = 0.f;
 
@@ -237,7 +232,8 @@ public:
 			if (space == TransformSpace::Screen)
 			{
 				glm::mat4 m = matrix;
-				m[3][0] = -1 * m[3][0]; // Flip X as we're in LHS [OGL-VULKAN]
+				// Flip X as we are in emulated inverted Z
+				m[3][0] = -1 * m[3][0];
 				// Divide the whole viewport transform by a 100x scale to keep NDC and screen space roughly similar in
 				// size
 				float scalingFactorXY = 1.f / g_trackingViewportScalingFactorXY;
@@ -321,7 +317,7 @@ public:
 	///
 	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
 	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
-	bool m_decomposeProjection{true};
+	bool m_decomposeProjection{true};         /// Maybe rename to "Raw tracking" in GUI
 	bool m_decomposePerspectiveShirley{true}; // TODO: Docs
 	bool m_decomposePerspectiveBrown{false};  // TODO: Docs
 

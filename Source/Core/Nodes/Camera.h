@@ -24,6 +24,57 @@ namespace Builder
 Ptr<Camera> createCamera();
 }
 
+enum class ClipRange
+{
+	MinusOneToOne,  // Standard OpenGL NDC space (-1, 1)
+	OneToMinusOne,  // OpenGL NDC space prior to applying the projection, -z depth
+	ZeroToOne,      // Standard Vulkan NDC space (0, 1)
+	ZeroToMinusOne, // Vulkan NDC space prior to applying the projection, -z depth
+	                // TODO: OneToZero (Reversed) [OGL-VULKAN]
+};
+
+enum class DepthRange
+{
+	ZeroToOne
+};
+
+struct CameraCoordSystem
+{
+	ClipRange clipRange{ClipRange::OneToMinusOne};
+	DepthRange depthRange{DepthRange::ZeroToOne};
+	bool yUp{true};
+
+	friend bool operator==(const CameraCoordSystem& lhs, const CameraCoordSystem& rhs)
+	{
+		return lhs.clipRange == rhs.clipRange && lhs.depthRange == rhs.depthRange && lhs.yUp == rhs.yUp;
+	}
+	friend bool operator!=(const CameraCoordSystem& lhs, const CameraCoordSystem& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	bool isLeftHanded() const
+	{
+		if (clipRange == ClipRange::MinusOneToOne && yUp)
+			return true;
+		return false;
+	}
+
+	/// Whether to flip the X coordinate (of the standard I3T right handed coord system)
+	bool isXFlipped() const
+	{
+		if (clipRange == ClipRange::MinusOneToOne && yUp)
+			return true;
+		if (clipRange == ClipRange::ZeroToOne && !yUp)
+			return true;
+		return false;
+	}
+};
+
+extern CameraCoordSystem g_i3t; ///< The initial I3T specific "world" coordinate system (right handed, view towards -Z)
+extern CameraCoordSystem g_openGL; ///< The standard OpenGL coord system
+extern CameraCoordSystem g_vulkan; ///< The standard Vulkan coord system
+
 constexpr unsigned I3T_CAMERA_OUT_SCREEN = 0;
 constexpr unsigned I3T_CAMERA_OUT_MATRIX = 1;
 constexpr unsigned I3T_CAMERA_OUT_MUL = 2;
@@ -52,6 +103,10 @@ public:
 
 	/// Whether the viewport transformation should be taken into account (it is optional)
 	bool m_viewportEnabled = false;
+
+	/// Coordinate system used during camera tracking
+	CameraCoordSystem m_coordinateSystem{g_openGL};
+	// TODO: Coordinate system serialization, same goes for relevant transforms
 
 	Camera();
 

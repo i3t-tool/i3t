@@ -24,6 +24,9 @@ std::string Shaper::unitCube;
 std::string Shaper::plane;
 std::string Shaper::screenQuad;
 
+std::string Shaper::vulkanNdcLineCube;
+std::string Shaper::vulkanNdcCube;
+
 void Shaper::initDefaultShapes()
 {
 	{
@@ -76,6 +79,48 @@ void Shaper::initDefaultShapes()
 
 		unitCube = "shape_unitCubeFilled";
 		shaper.createMesh(unitCube);
+	}
+	{
+		glm::vec3 unitCubeArrV[24] = {
+		    glm::vec3(1.0f, -1.0f, 1.0f),  glm::vec3(1.0f, -1.0f, 0.0f),  glm::vec3(1.0f, -1.0f, 0.0f),
+		    glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 1.0f),
+		    glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(1.0f, -1.0f, 1.0f),  glm::vec3(1.0f, 1.0f, 1.0f),
+		    glm::vec3(1.0f, 1.0f, 0.0f),   glm::vec3(1.0f, 1.0f, 0.0f),   glm::vec3(-1.0f, 1.0f, 0.0f),
+		    glm::vec3(-1.0f, 1.0f, 0.0f),  glm::vec3(-1.0f, 1.0f, 1.0f),  glm::vec3(-1.0f, 1.0f, 1.0f),
+		    glm::vec3(1.0f, 1.0f, 1.0f),   glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(-1.0f, 1.0f, 1.0f),
+		    glm::vec3(1.0f, -1.0f, 1.0f),  glm::vec3(1.0f, 1.0f, 1.0f),   glm::vec3(1.0f, -1.0f, 0.0f),
+		    glm::vec3(1.0f, 1.0f, 0.0f),   glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(-1.0f, 1.0f, 0.0f),
+		};
+
+		Shaper shaper;
+		for (int i = 0; i < 24; i += 2)
+		{
+			shaper.line(glm::vec3(glm::vec4(unitCubeArrV[i], 1.0f)), glm::vec3(glm::vec4(unitCubeArrV[i + 1], 1.0f)));
+		}
+		vulkanNdcLineCube = "shape_ndcCubeVulkan";
+		shaper.createLineMesh(vulkanNdcLineCube);
+	}
+	{
+		Shaper shaper;
+		glm::vec3 c1 = glm::vec3(-1, -1, 0.0f);
+		glm::vec3 c2 = glm::vec3(1, -1, 0.0f);
+		glm::vec3 c3 = glm::vec3(-1, -1, 1.0f);
+		glm::vec3 c4 = glm::vec3(1, -1, 1.0f);
+		glm::vec3 c5 = glm::vec3(-1, 1, 0.0f);
+		glm::vec3 c6 = glm::vec3(1, 1, 0.0f);
+		glm::vec3 c7 = glm::vec3(-1, 1, 1.0f);
+		glm::vec3 c8 = glm::vec3(1, 1, 1.0f);
+
+
+		shaper.quad(c2, c1, c6, c5);
+		shaper.quad(c4, c3, c2, c1);
+		shaper.quad(c3, c7, c1, c5);
+		shaper.quad(c6, c5, c8, c7);
+		shaper.quad(c4, c8, c3, c7);
+		shaper.quad(c4, c2, c8, c6);
+
+		vulkanNdcCube = "shape_ndcCubeFilledVulkan";
+		shaper.createMesh(vulkanNdcCube);
 	}
 	{
 		Shaper shaper;

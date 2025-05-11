@@ -244,9 +244,7 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 {
 	bool useIndices = indices != nullptr && nIndices != 0;
 
-	// TODO: (DR) Compute hash of data arrays as well but only when necessary
-	//	Currently meshes from direct data are thus NOT CACHED AT ALL, perhaps I
-	// didn't think this through enough
+	// TODO: (DR) Better way of hashing data meshes? Maybe some kind of additional string identifier?
 
 	size_t seed = 0;
 	hash_combine(seed, static_cast<int>(primitiveType));
@@ -254,6 +252,14 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 	if (useIndices)
 		hash_combine(seed, nIndices);
 	hash_combine(seed, nColors);
+	// Sample a few vertices as a quick way of hashing vert array content
+	for (int i = 0; i < std::min(10, (int) nVertices); i++)
+		hash_combine(seed, verts[i]);
+	hash_combine(seed, verts[(int) (nVertices / 2)]);
+	hash_combine(seed, verts[nVertices - 1]);
+	hash_combine(seed, colors[0]);
+	hash_combine(seed, colors[(int) (nColors / 2)]);
+	hash_combine(seed, colors[nColors - 1]);
 	size_t id = seed;
 
 	bool success = false;

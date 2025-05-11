@@ -292,14 +292,14 @@ bool WorkspaceWindow::showTrackingTimeline()
 		tracker->setProgress(m_trackingSliderProgress);
 	}
 	ImRect sliderRect = ImGui::GetCurrentContext()->LastItemData.Rect;
-	bool sliderActive = ImGui::IsItemHovered() || ImGui::IsItemActive();
+	bool sliderHovered = ImGui::IsItemHovered();
+	bool sliderActive = ImGui::IsItemActive();
 
 	ImGui::EndGroup();
 	m_trackingBox = ImGui::GetCurrentContext()->LastItemData.Rect;
 
-	if (sliderActive)
+	if (sliderHovered || sliderActive)
 	{
-		interacted = true;
 		bool leftToRight = tracker->getDirection() == Core::TrackingDirection::LeftToRight;
 		ImGui::GetWindowDrawList()->AddLine(
 		    ImVec2(sliderRect.Min.x +
@@ -309,6 +309,8 @@ bool WorkspaceWindow::showTrackingTimeline()
 		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Tracking_Cursor) * ImVec4(1.f, 1.f, 1.f, 0.7f)),
 		    dpiScale);
 	}
+	if (sliderActive)
+		interacted = true;
 
 	return interacted;
 }

@@ -107,6 +107,7 @@ initDefaults(), resetMatrixFromDefaults use default|
  */
 #pragma once
 
+#include "Camera.h"
 #include "Transform.h"
 
 namespace Core
@@ -375,6 +376,8 @@ template <>
 class TransformImpl<ETransformType::Ortho> : public Transform
 {
 public:
+	CameraCoordSystem m_coordinateSystem{g_openGL};
+
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Ortho))
 	{
 		m_hasMenuSynergies = true;
@@ -398,6 +401,8 @@ template <>
 class TransformImpl<ETransformType::Perspective> : public Transform
 {
 public:
+	CameraCoordSystem m_coordinateSystem{g_openGL};
+
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Perspective)) {}
 
 	bool isValid() const override;
@@ -412,6 +417,8 @@ template <>
 class TransformImpl<ETransformType::Frustum> : public Transform
 {
 public:
+	CameraCoordSystem m_coordinateSystem{g_openGL};
+
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Frustum))
 	{
 		m_hasMenuSynergies = true;
@@ -437,6 +444,8 @@ class TransformImpl<ETransformType::Viewport> : public Transform
 {
 public:
 	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Viewport)) {}
+
+	CameraCoordSystem m_coordinateSystem{g_openGL};
 
 	bool isValid() const override;
 	void initDefaults() override;
