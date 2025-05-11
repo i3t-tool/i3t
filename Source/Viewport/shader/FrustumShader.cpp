@@ -27,6 +27,7 @@ void FrustumShader::init(bool initSuperclass)
 
 	inverseProjectionMatrixId = glGetUniformLocation(m_id, "projectionInverseMatrix");
 	visualizeDepthId = glGetUniformLocation(m_id, "u_visualizeDepth");
+	vulkanId = glGetUniformLocation(m_id, "u_vulkan");
 }
 
 void FrustumShader::setUniforms()
@@ -35,4 +36,5 @@ void FrustumShader::setUniforms()
 
 	glUniformMatrix4fv(inverseProjectionMatrixId, 1, GL_FALSE, glm::value_ptr(m_projectionViewMatrixInv));
 	glUniform1i(visualizeDepthId, m_visualizeDepth ? GL_TRUE : GL_FALSE);
+	glUniform1i(vulkanId, m_vulkan ? GL_TRUE : GL_FALSE);
 }

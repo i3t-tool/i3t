@@ -29,6 +29,7 @@ void FrustumObject::prepareRenderContext(RenderContext& context, const DisplayOp
 	FrustumShader* frustumShader = static_cast<FrustumShader*>(context.m_shader);
 	frustumShader->m_projectionViewMatrixInv = m_frustumProjectionViewMatrixInv;
 	frustumShader->m_visualizeDepth = m_visualizeDepth;
+	frustumShader->m_vulkan = m_vulkan;
 }
 
 void FrustumObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,

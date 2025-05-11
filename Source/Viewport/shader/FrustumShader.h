@@ -26,9 +26,11 @@ class FrustumShader : public ColorShader
 public:
 	GLint inverseProjectionMatrixId;
 	GLint visualizeDepthId;
+	GLint vulkanId;
 
 	glm::mat4 m_projectionViewMatrixInv{1.f};
 	bool m_visualizeDepth{false};
+	bool m_vulkan{false}; ///< Determines the visualized depth range
 
 	explicit FrustumShader(GLuint id);
 
