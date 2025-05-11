@@ -18,6 +18,7 @@ namespace Vp
 {
 /**
  * Options specifying how a scene should be rendered.
+ * Specifically these options are mainly used in creation of a SceneRenderTarget, the framebuffer(s) used for rendering.
  */
 class RenderOptions
 {

@@ -47,6 +47,7 @@ public:
 	glm::mat4 m_modMatrix{1.f};
 	/// When true, the "global"/"reference space" model matrix passed to viewport drawing methods is ignored
 	bool m_ignoreReferenceSpace{false};
+	bool m_ignoreUserClipping{false}; ///< Whether to ignore user clip planes defined in DisplayOptions
 
 	// Some basic properties
 	bool m_backFaceCull;

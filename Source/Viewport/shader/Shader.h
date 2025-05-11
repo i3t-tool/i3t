@@ -42,9 +42,13 @@ public:
 	bool m_wboit = false;
 	int m_wboitFunc = 0;
 
+	const std::array<glm::vec4, 6>* m_clippingPlanes{nullptr};
+
 protected:
 	GLint m_wboitFlagId{-1}; ///< Uniform id of the wboit enable/disable flag
 	GLint m_wboitFuncId{-1};
+
+	std::array<GLint, 6> m_clippingPlanesId;
 
 public:
 	explicit Shader(GLuint id);
@@ -69,11 +73,13 @@ public:
 	void bindTexture2DMS(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
 	void bindTexture2DArray(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
 
-	bool hasUniform(GLint location);
+	bool hasUniform(GLint location) const;
 
 	/**
 	 * @return Whether this shader supports output to wboit buffers
 	 */
-	bool supportsWboit();
+	bool supportsWboit() const;
+
+	bool supportsUserClipping() const;
 };
 } // namespace Vp

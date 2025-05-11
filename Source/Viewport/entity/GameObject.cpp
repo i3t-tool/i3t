@@ -12,6 +12,7 @@
  */
 #include "GameObject.h"
 
+#include "Viewport/data/DisplayOptions.h"
 #include "Viewport/shader/ObjectShader.h"
 #include "Viewport/shader/Shaders.h"
 
@@ -67,6 +68,18 @@ void GameObject::render(const glm::mat4& model, const glm::mat4& view, const glm
 	if (!m_ignoreReferenceSpace)
 		m_lastModelMatrix = model * m_lastModelMatrix;
 
+	// Handle user clipping
+	objectShader->m_clippingPlanes = nullptr;
+	if (context.displayOptions)
+	{
+		if (context.displayOptions->userClipping && !m_ignoreUserClipping)
+		{
+			objectShader->m_clippingPlanes = &context.displayOptions->clippingPlanes;
+			for (int i = 0; i < objectShader->m_clippingPlanes->size(); ++i)
+				glEnable(GL_CLIP_DISTANCE0 + i);
+		}
+	}
+
 	objectShader->setWorldTransform(m_lastModelMatrix, view, projection);
 	objectShader->setUniforms();
 
@@ -84,6 +97,13 @@ void GameObject::render(const glm::mat4& model, const glm::mat4& view, const glm
 		}
 	}
 	glBindVertexArray(0);
+
+	// Disable user clipping
+	if (objectShader->m_clippingPlanes != nullptr)
+	{
+		for (int i = 0; i < objectShader->m_clippingPlanes->size(); ++i)
+			glDisable(GL_CLIP_DISTANCE0 + i);
+	}
 }
 
 void GameObject::update(Scene& scene)

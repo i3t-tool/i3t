@@ -26,6 +26,7 @@ SceneScreen::SceneScreen()
 {
 	setDisplayType(DisplayType::Tracking);
 	m_ignoreReferenceSpace = true;
+	m_ignoreUserClipping = true;
 	m_backFaceCull = true;
 	m_selectable = true;
 	m_zOffset = Math::randomf() * 0.01f;
@@ -73,6 +74,7 @@ void SceneScreen::onSceneAdd(Vp::Scene& scene)
 	base->m_visible = false;
 	base->setDisplayType(DisplayType::Tracking);
 	base->m_ignoreReferenceSpace = true;
+	base->m_ignoreUserClipping = true;
 	m_screenBase = scene.addEntity(base);
 }
 
