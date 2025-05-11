@@ -16,6 +16,16 @@ out vec3 Normal;
 out vec3 Tangent;
 out vec3 Binormal;
 
+// CLIPPING
+#define CLIP_PLANE_COUNT 6
+out gl_PerVertex
+{
+	vec4 gl_Position;
+	float gl_ClipDistance[CLIP_PLANE_COUNT];
+};
+uniform vec4 u_clippingPlanes[CLIP_PLANE_COUNT];
+// END CLIPPING
+
 //Normal mapping stuff largely inspired from 
 //https://lettier.github.io/3d-game-shaders-for-beginners/normal-mapping.html
 //and
@@ -23,8 +33,8 @@ out vec3 Binormal;
 
 void main() {
 	gl_Position = pvmMatrix * vec4(aPos, 1.0);
-
-	FragPos = (viewMatrix * modelMatrix * vec4(aPos, 1.0)).xyz;
+	vec4 worldPos = modelMatrix * vec4(aPos, 1.0);
+	FragPos = (viewMatrix * worldPos).xyz;
 	
 	Normal = normalize(viewMatrix * normalMatrix * vec4(aNormal, 0.0)).xyz;
 	
@@ -34,4 +44,10 @@ void main() {
 	Binormal = cross(Normal, Tangent); //Get third basis vector as a cross of the two existing orthogonal ones
 
 	TexCoords = aTexCoords;
+
+	// CLIPPING
+	for (int i = 0; i < CLIP_PLANE_COUNT; i++) {
+		gl_ClipDistance[i] = dot(u_clippingPlanes[i], worldPos);
+	}
+	// END CLIPPING
 }

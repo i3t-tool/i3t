@@ -16,11 +16,16 @@ using namespace Vp;
 
 Shader::Shader(GLuint id) : m_id(id)
 {
-	init(false);
+	Shader::init(false);
 }
 
 void Shader::init(bool initSuperclass)
 {
+	for (int i = 0; i < m_clippingPlanesId.size(); i++)
+	{
+		m_clippingPlanesId[i] =
+		    glGetUniformLocation(m_id, (std::string("u_clippingPlanes[") + std::to_string(i) + "]").c_str());
+	}
 	m_wboitFlagId = glGetUniformLocation(m_id, "u_wboitFlag");
 	m_wboitFuncId = glGetUniformLocation(m_id, "u_wboitFunc");
 }
@@ -38,6 +43,13 @@ void Shader::setUniforms()
 		if (m_wboit)
 		{
 			glUniform1i(m_wboitFuncId, m_wboitFunc);
+		}
+	}
+	if (supportsUserClipping() && m_clippingPlanes)
+	{
+		for (int i = 0; i < m_clippingPlanesId.size(); i++)
+		{
+			glUniform4fv(m_clippingPlanesId[i], 1, glm::value_ptr((*m_clippingPlanes)[i]));
 		}
 	}
 }
@@ -61,12 +73,17 @@ void Shader::bindTexture2DMS(GLuint textureUnit, GLuint textureID, GLint sampler
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 }
 
-bool Shader::hasUniform(GLint location)
+bool Shader::hasUniform(GLint location) const
 {
 	return location != -1;
 }
 
-bool Shader::supportsWboit()
+bool Shader::supportsWboit() const
 {
 	return hasUniform(m_wboitFlagId);
+}
+
+bool Shader::supportsUserClipping() const
+{
+	return hasUniform(m_clippingPlanesId[0]);
 }

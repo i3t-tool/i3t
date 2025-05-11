@@ -66,7 +66,6 @@ void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int
                             const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
 {
 	prepareRenderTarget(renderTarget, renderOptions);
-	SceneRenderTarget& rt = *renderTarget;
 	m_mainScene->draw(width, height, model, *renderTarget, displayOptions);
 }
 

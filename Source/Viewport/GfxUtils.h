@@ -38,5 +38,18 @@ inline std::pair<glm::vec3, glm::vec3> createBoundingBox(std::vector<glm::vec3> 
 	glm::vec3 max(xExtremes.second->x, yExtremes.second->y, zExtremes.second->z);
 	return std::make_pair(min, max);
 }
+
+inline glm::vec4 computePlane(glm::vec3 normal, glm::vec3 point)
+{
+	normal = glm::normalize(normal);
+	return glm::vec4(normal.x, normal.y, normal.z, -glm::dot(normal, point));
+}
+
+inline glm::vec3 computeNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c)
+{
+	glm::vec3 dir = glm::cross((b - a), (c - a));
+	return glm::normalize(dir);
+}
+
 } // namespace GfxUtils
 } // namespace Vp

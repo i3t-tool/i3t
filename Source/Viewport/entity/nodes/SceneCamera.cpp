@@ -195,6 +195,7 @@ void SceneCamera::onSceneAdd(Vp::Scene& scene)
 		auto trackedFrustumNear = std::make_shared<ColoredObject>(nullptr, SHADERS.getShaderPtr<ColorShader>());
 		trackedFrustumNear->setDisplayType(DisplayType::Tracking);
 		trackedFrustumNear->m_ignoreReferenceSpace = true;
+		trackedFrustumNear->m_ignoreUserClipping = true;
 		trackedFrustumNear->m_opaque = false;
 		trackedFrustumNear->m_opacity = m_frustumNearLinesOpacity;
 		m_trackedFrustumNear = scene.addEntity(trackedFrustumNear);
@@ -204,6 +205,7 @@ void SceneCamera::onSceneAdd(Vp::Scene& scene)
 		auto trackedCamera = std::make_shared<TexturedObject>(m_mesh, SHADERS.getShaderPtr<PhongShader>());
 		trackedCamera->setDisplayType(DisplayType::Tracking);
 		trackedCamera->m_ignoreReferenceSpace = true; // Tracked camera cannot be affected by the referenece space
+		trackedCamera->m_ignoreUserClipping = true;
 		m_trackedCameraModel = scene.addEntity(trackedCamera);
 	}
 

@@ -22,6 +22,7 @@
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "I3T.h"
 #include "Localization/Localization.h"
+#include "Viewport/GfxUtils.h"
 
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
@@ -254,6 +255,7 @@ void ViewportWindow::updateSpace()
 	m_space.trackingMatrixProgress = 0.f;
 
 	m_displayOptions.showTracking = false;
+	m_displayOptions.userClipping = false;
 
 	// TODO: Dim scene view background when tracking or using ref space
 
@@ -262,6 +264,7 @@ void ViewportWindow::updateSpace()
 	// React to active tracking
 	if (m_space.tracking)
 	{
+		// Don't do anything when tracking in world space, otherwise setup the space depending on the tracking stage
 		if (!tracker->m_trackInWorldSpace)
 		{
 			spaceSet = true;
@@ -289,10 +292,14 @@ void ViewportWindow::updateSpace()
 				// TODO: Apply fade out shaders
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
 				m_space.label = _tbd("NDC space");
-
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
 				m_displayOptions.showTracking = true;  // Show manually controlled camera
 				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
+				if (m_settings.clipFrustum)
+				{
+					m_displayOptions.userClipping = true;
+					computeClippingPlanes(tracker, Core::TransformSpace::Projection);
+				}
 			}
 			break;
 			case Core::TransformSpace::Screen:
@@ -300,6 +307,11 @@ void ViewportWindow::updateSpace()
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
 				m_displayOptions.showTracking = true;  // Show manually controlled camera
 				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
+				if (m_settings.clipFrustum)
+				{
+					m_displayOptions.userClipping = true;
+					computeClippingPlanes(tracker, Core::TransformSpace::Screen);
+				}
 				break;
 			}
 			labelSet = true;
@@ -525,6 +537,100 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 	return interacted;
 }
 
+void ViewportWindow::computeClippingPlanes(Core::MatrixTracker* tracker, Core::TransformSpace space)
+{
+	assert(space == Core::TransformSpace::Projection || space == Core::TransformSpace::Screen);
+
+	auto& trackedCamera = tracker->getTrackedCamera();
+	auto* coreCam = trackedCamera->node.lock()->asRaw<Core::Camera>();
+	bool useVulkanNDC = coreCam->m_coordinateSystem == Core::g_vulkan;
+
+	using namespace Vp::GfxUtils;
+
+	// We define OpenGL or Vulkan NDC points
+	// The points get transformed to form world space clipping planes
+	// In projection stage, we compute the projection inverse and apply it on NDC to get world space coords
+	// In viewport stage we apply the viewport transform and compute clip planes from that
+
+	float ndcNearZ = useVulkanNDC ? 0.0f : -1.0f;
+	float ndcFarZ = 1.0f;
+	float ndcTop = useVulkanNDC ? -1.f : 1.f;
+	float ndcBottom = useVulkanNDC ? 1.f : -1.f;
+
+	glm::vec3 ndcCorners[8] = {
+	    {-1, ndcBottom, ndcNearZ}, // near bottom-left
+	    {1, ndcBottom, ndcNearZ},  // near bottom-right
+	    {1, ndcTop, ndcNearZ},     // near top-right
+	    {-1, ndcTop, ndcNearZ},    // near top-left
+	    {-1, ndcBottom, ndcFarZ},  // far bottom-left
+	    {1, ndcBottom, ndcFarZ},   // far bottom-right
+	    {1, ndcTop, ndcFarZ},      // far top-right
+	    {-1, ndcTop, ndcFarZ}      // far top-left
+	};
+
+	bool flipNormal = false;
+	glm::vec3 ndcWorldCorners[8];
+	if (space == Core::TransformSpace::Projection)
+	{
+		// The interpolated projection inverse cannot be applied to NDC coords, but rather world (view) coordinates.
+		// Since we're interpolating from the right, we need to first get the original uninterpolated NDC world space
+		// coordinates, to do that we first apply the inverse of the unmodified projection matrix, and then
+		// apply the interpolated projection matrix.
+
+		// The inverse of the whole camera projection matrix
+		glm::mat4 projInv = glm::inverse(coreCam->getProj()->data(Core::I3T_SEQ_MAT).getMat4());
+		// The currently interpolated projection matrix
+		glm::mat4 iProj = tracker->m_iProjMatrix;
+		glm::mat4 combinedProjInv = iProj * projInv;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			glm::vec4 corner = glm::vec4(ndcCorners[i], 1.0f);
+			glm::vec4 world = combinedProjInv * corner;
+			world /= world.w;
+			ndcWorldCorners[i] = glm::vec3(world);
+		}
+	}
+	else if (space == Core::TransformSpace::Screen)
+	{
+		for (int i = 0; i < 8; ++i)
+		{
+			glm::vec4 corner = glm::vec4(ndcCorners[i], 1.0f);
+			glm::vec4 world = tracker->m_iViewportMatrix * corner;
+			ndcWorldCorners[i] = glm::vec3(world);
+		}
+		flipNormal = true;
+	}
+	else
+	{
+		assert(false);
+	}
+
+	float nF = flipNormal ? -1.f : 1.f;
+	if (useVulkanNDC)
+		nF = -nF;
+
+	// Construct planes using normals derived from three points per face
+	// Left plane
+	m_displayOptions.clippingPlanes[0] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[0], ndcWorldCorners[4], ndcWorldCorners[7]), ndcWorldCorners[0]);
+	// Right plane
+	m_displayOptions.clippingPlanes[1] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[2], ndcWorldCorners[6], ndcWorldCorners[5]), ndcWorldCorners[2]);
+	// Bottom plane
+	m_displayOptions.clippingPlanes[2] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[1], ndcWorldCorners[5], ndcWorldCorners[4]), ndcWorldCorners[1]);
+	// Top plane
+	m_displayOptions.clippingPlanes[3] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[3], ndcWorldCorners[7], ndcWorldCorners[6]), ndcWorldCorners[3]);
+	// Near plane
+	m_displayOptions.clippingPlanes[4] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[0], ndcWorldCorners[3], ndcWorldCorners[2]), ndcWorldCorners[0]);
+	// Far plane
+	m_displayOptions.clippingPlanes[5] = computePlane(
+	    nF * computeNormal(ndcWorldCorners[5], ndcWorldCorners[6], ndcWorldCorners[7]), ndcWorldCorners[5]);
+}
+
 bool ViewportWindow::showViewportButtons()
 {
 	bool interacted = false;
@@ -635,6 +741,13 @@ bool ViewportWindow::showViewportButtons()
 		interacted |= GUI::FloatingToggleButton(" Z ###VisualizeDepth", WorkspaceModule::g_editor->m_visualizeDepth);
 		interacted |= GUI::ItemTooltip(_tbd("Toggle depth visualization"), "");
 		ImGui::SameLine();
+
+		if (m_space.trackingSpace >= Core::TransformSpace::Projection)
+		{
+			interacted |= GUI::FloatingToggleButton(ICON_FA_CROP_SIMPLE "###ToggleClipping", m_settings.clipFrustum);
+			interacted |= GUI::ItemTooltip(_tbd("Toggle frustum clipping"), "");
+			ImGui::SameLine();
+		}
 	}
 
 	ImGui::PopItemFlag();

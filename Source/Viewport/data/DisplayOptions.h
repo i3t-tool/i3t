@@ -12,12 +12,18 @@
  */
 #pragma once
 
+#include <array>
+#include <glm/vec4.hpp>
+
 namespace Vp
 {
 class Entity;
 
 /**
- * Various viewport display settings.
+ * Options specifying various display settings for rendering a scene.
+ * Mainly which objects or their parts are displayed.
+ * DisplayOptions are passed to entities during rendering, unlike RenderOptions which mainly group options
+ * related to render targets.
  */
 class DisplayOptions
 {
@@ -42,6 +48,9 @@ public:
 
 	GridOptions grid;
 	GridOptions localGrid;
+
+	bool userClipping{false};
+	std::array<glm::vec4, 6> clippingPlanes;
 
 	DisplayOptions() = default;
 

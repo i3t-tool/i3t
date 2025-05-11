@@ -100,5 +100,7 @@ private:
 	bool showViewportButtons();
 	bool showViewportMenu();
 	bool showSpaceIndicators(glm::mat4& view);
+
+	void computeClippingPlanes(Core::MatrixTracker* tracker, Core::TransformSpace space);
 };
 } // namespace UI
