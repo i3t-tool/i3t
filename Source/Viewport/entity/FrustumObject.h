@@ -26,6 +26,7 @@ public:
 	glm::mat4 m_frustumProjectionViewMatrixInv{1.f};
 	glm::mat4 m_frustumViewMatrixInv{1.f};
 	bool m_visualizeDepth{false};
+	bool m_vulkan{false}; ///< Determines the visualized depth range
 
 	FrustumObject(Core::Mesh* mesh, FrustumShader* shader);
 

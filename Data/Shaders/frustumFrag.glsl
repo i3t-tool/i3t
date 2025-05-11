@@ -20,6 +20,7 @@ const vec3 depthColors[DEPTH_COLOR_COUNT] = vec3[DEPTH_COLOR_COUNT](vec3(0., 1.,
 uniform float u_opacity;
 
 uniform bool u_visualizeDepth = false;
+uniform bool u_vulkan = false;
 
 float map(float value, float min1, float max1, float min2, float max2) {
 	return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
@@ -29,8 +30,8 @@ void main()
 {
 	FragColor = vec4(Color, u_opacity);
 
-	if (u_visualizeDepth && gl_FrontFacing) {
-		int depthIndex = int(map(ClipPos.z, -1.0, 1.0, 0.0, float(DEPTH_COLOR_COUNT)));
+	if (u_visualizeDepth && ((!u_vulkan && gl_FrontFacing) || (u_vulkan && !gl_FrontFacing))) {
+		int depthIndex = int(map(ClipPos.z, u_vulkan ? 0.0 : -1.0, 1.0, 0.0, float(DEPTH_COLOR_COUNT)));
 		depthIndex = min(depthIndex, DEPTH_COLOR_COUNT - 1);
 		FragColor = vec4(depthColors[depthIndex], 0.86);
 	}
