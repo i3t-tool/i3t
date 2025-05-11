@@ -38,7 +38,7 @@ bool Shaders::load()
 	// ok &= createShader<DepthShader>("Data/Shaders/depthVert.glsl", "");
 	ok &= createShader<GridShader>("Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl");
 	ok &= createShader<GridShaderGeneric>("Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl", "", "#define GENERIC_GRID");
-	ok &= createShader<FrustumShader>("Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl");
+	ok &= createShader<FrustumShader>("Data/Shaders/frustumVert.glsl", "Data/Shaders/frustumFrag.glsl");
 	ok &= createShader<WBOITCompositeShader>("Data/Shaders/basicVert.glsl", "Data/Shaders/wboitCompositeFrag.glsl");
 	ok &= createShader<BoxBlurShader>("Data/Shaders/basicVert.glsl", "Data/Shaders/boxBlurFrag.glsl");
 	ok &= createShader<SelectionCompositeShader>("Data/Shaders/basicVert.glsl", "Data/Shaders/selectionCompositeFrag.glsl");

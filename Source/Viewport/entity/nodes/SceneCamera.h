@@ -44,6 +44,8 @@ public:
 	bool m_showFrustum{true};
 	bool m_fillFrustum{true};
 
+	bool m_visualizeDepth{false};
+
 	glm::vec4 m_frustumColor{0.35f, 0.27f, 0.06f, 0.22f};
 
 	glm::vec3 m_frustumOutlineColor{1.0f, 0.0f, 0.0f};

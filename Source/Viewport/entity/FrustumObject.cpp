@@ -28,6 +28,7 @@ void FrustumObject::prepareRenderContext(RenderContext& context, const DisplayOp
 	assert(dynamic_cast<FrustumShader*>(context.m_shader) != nullptr);
 	FrustumShader* frustumShader = static_cast<FrustumShader*>(context.m_shader);
 	frustumShader->m_projectionViewMatrixInv = m_frustumProjectionViewMatrixInv;
+	frustumShader->m_visualizeDepth = m_visualizeDepth;
 }
 
 void FrustumObject::render(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection,

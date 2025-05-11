@@ -81,16 +81,18 @@ void SceneCamera::render(const glm::mat4& model, const glm::mat4& view, const gl
 	auto frustumOutlinePtr = m_frustumOutline.lock();
 	updateNearFrustumIndicator(model, frustumOutlinePtr->m_frustumProjectionViewMatrixInv);
 
-	// Only render the camera when not tracking
 	if (!context.displayOptions || !context.displayOptions->showTracking)
 	{
+		m_frustum.lock()->m_visualizeDepth = false;
 		m_frustumNear.lock()->m_visible = m_showFrustum;
 		m_axes.lock()->m_visible = m_showAxes;
+		// Only render the camera when not tracking
 		if (m_showCamera) // Avoid rendering of itself if m_showCamera is false
 			SceneModel::render(model, view, projection, context);
 	}
 	else
 	{
+		m_frustum.lock()->m_visualizeDepth = m_isTracking && m_visualizeDepth;
 		m_frustumNear.lock()->m_visible = false;
 		m_axes.lock()->m_visible = false;
 	}

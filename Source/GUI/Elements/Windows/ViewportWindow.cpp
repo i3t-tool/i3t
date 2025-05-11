@@ -643,6 +643,13 @@ bool ViewportWindow::showViewportButtons()
 		}
 	}
 
+	if (m_space.tracking)
+	{
+		interacted |= GUI::FloatingToggleButton(" Z ###VisualizeDepth", WorkspaceModule::g_editor->m_visualizeDepth);
+		interacted |= GUI::ItemTooltip(_tbd("Toggle depth visualization"), "");
+		ImGui::SameLine();
+	}
+
 	ImGui::PopItemFlag();
 	ImGui::PopStyleVar();
 
