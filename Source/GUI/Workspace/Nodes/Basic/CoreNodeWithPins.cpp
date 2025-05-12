@@ -68,7 +68,8 @@ bool CoreNodeWithPins::processPinDragAssist()
 	CorePin* closestOutput = findPinClosestToTheMouse(m_workspaceOutputs, minOutputDist);
 	CorePin* closestPin = minInputDist < minOutputDist ? closestInput : closestOutput;
 	float minDist = std::min(minInputDist, minOutputDist);
-	if (minDist > diwne.style().decimal(DIWNE::Style::PIN_DRAG_ASSIST_RADIUS))
+	float pinAssistRadius = diwne.style().decimal(DIWNE::Style::PIN_DRAG_ASSIST_RADIUS);
+	if (minDist > pinAssistRadius)
 		return false;
 	closestPin->m_forceHoverDiwne = true;
 	return true;
@@ -80,6 +81,16 @@ CorePin* CoreNodeWithPins::findPinClosestToTheMouse(const std::vector<Ptr<CorePi
 	CorePin* closestPin = nullptr;
 	for (auto& pin : pins)
 	{
+		if (pin->m_isPressed)
+		{
+			// If the pin is pressed, we declare it as the closest to retain its hover status
+			// This prevents issues with mouse being pressed near a pin, and then dragged towards another closer pin
+			// without triggering a drag operation (due to mouse drag threshold).
+			// The original pressed pin should remain the closest pin even though it is no longer, to allow its drag
+			// operation to start.
+			minDistance = 0;
+			return pin.get();
+		}
 		ImVec2 diff = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos()) - pin->getPinRect().GetCenter();
 		float dist = DIWNE::DMath::len(diff);
 		if (dist < minDistance)

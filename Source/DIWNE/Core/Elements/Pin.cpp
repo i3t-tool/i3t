@@ -102,6 +102,21 @@ void Pin::updateLayout(DrawInfo& context)
 	updateConnectionPoint();
 }
 
+void Pin::afterDraw(DrawInfo& context)
+{
+	DiwneObject::afterDraw(context);
+	DIWNE_DEBUG_INTERACTIONS(diwne, {
+		if (ImGui::IsKeyDown(ImGuiKey_R))
+		{
+			// Show drag assist radius
+			ImGui::GetWindowDrawList()->AddCircle(
+			    diwne.canvas().diwne2screen(m_pinRect.GetCenter()),
+			    diwne.canvas().diwne2screenSize(diwne.style().decimal(DIWNE::Style::PIN_DRAG_ASSIST_RADIUS)),
+			    IM_COL32(255, 0, 255, 255), 0, 1);
+		}
+	});
+}
+
 void Pin::onDestroy(bool logEvent)
 {
 	// Destroy links in reverse order as to not invalidate the iterator
@@ -455,14 +470,21 @@ void Pin::updateConnectionPoint()
 
 bool Pin::isDragAreaHovered() const
 {
-	if (!m_hovered)
+	if (!m_hovered && !m_isPressed)
 		return false;
 	if (m_forceHoverDiwne) // Special case of forced hovering
 		return true;
 	const ImVec2 mousePos = diwne.canvas().screen2diwne(diwne.input().bypassGetMousePos());
+
+	// Drag area test is done with mouse drag threshold padding so that we catch cases where the drag did actually
+	// begin within the area, but did not register as drag due to a non zero mouse drag threshold.
+	// If we're not hovered but pressed, the drag must have initially started within our bounds.
+	float dragThreshold = style().decimal(DIWNE::Style::MOUSE_DRAG_THRESHOLD);
+	ImVec2 pad = ImVec2(dragThreshold, dragThreshold);
+
 	if (style().boolean(DIWNE::Style::PIN_ENABLE_DRAG_LABEL))
-		return m_dragRect.Contains(mousePos);
-	return m_pinRect.Contains(mousePos);
+		return m_dragRect.ContainsWithPad(mousePos, pad);
+	return m_pinRect.ContainsWithPad(mousePos, pad);
 }
 
 bool Pin::canPlug(Pin* other) const

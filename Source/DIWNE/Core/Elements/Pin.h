@@ -76,6 +76,7 @@ public:
 	void content(DrawInfo& context) override;
 	void end(DrawInfo& context) override;
 	void updateLayout(DrawInfo& context) override;
+	void afterDraw(DrawInfo& context) override;
 
 	void translate(const ImVec2& vec) override;
 

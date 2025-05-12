@@ -341,16 +341,22 @@ public:
 	 * This rectangle is updated in DiwneObject::begin() can can be considered valid for the duration of the draw.
 	 * @see getRect(), m_displayRect
 	 */
-	virtual ImRect getDisplayRect() const
+	ImRect getDisplayRect() const
 	{
 		return m_displayRect;
 	}
-	virtual ImVec2 getPosition() const
+
+	/// Returns the top left corner of the object's rect.
+	ImVec2 getPosition() const
 	{
 		return m_rect.Min;
 	}
-	virtual void setPosition(const ImVec2& position);
-	virtual void translate(const ImVec2& vec);
+
+	/// Move the object's rect and any other associated positional data to the specified position
+	/// @see translate()
+	void setPosition(const ImVec2& position);
+
+	virtual void translate(const ImVec2& vec); ///< Move the object's rect and any other associated positional data
 
 	/**
 	 * Set the selection state of the object.

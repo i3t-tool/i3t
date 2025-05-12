@@ -98,6 +98,7 @@ public:
 	void translate(const ImVec2& vec) override;
 
 private:
+	/// Pin drag assist helper
 	CorePin* findPinClosestToTheMouse(const std::vector<Ptr<CorePin>>& pins, float& minDistance);
 };
 } // namespace Workspace
