@@ -268,7 +268,7 @@ bool DiwneObject::allowHover() const
 
 bool DiwneObject::allowPress(const DrawInfo& context) const
 {
-	if (!m_hovered) // Can't be pressed when not being hovered
+	if (!m_hovered && !m_isPressed) // Can't be pressed when not being hovered, unless pressed already
 		return false;
 	if (context.inputConsumed) // Can't be pressed when input is consumed
 		return false;
