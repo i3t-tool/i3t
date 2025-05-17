@@ -284,14 +284,14 @@ void ViewportWindow::updateSpace()
 				break;
 			case Core::TransformSpace::View:
 				// TODO: Maybe add the name of the camera?
-				m_space.label = _tbd("View space");
+				m_space.label = _t("View space");
 				stg.global().localGrid.programStrength = m_space.trackingSpaceParam;
 				break;
 			case Core::TransformSpace::Projection:
 			{
 				// TODO: Apply fade out shaders
 				// TODO: World grid can be shown in ortho, but with perspective the grid shader cannot be used
-				m_space.label = _tbd("NDC space");
+				m_space.label = _t("NDC space");
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
 				m_displayOptions.showTracking = true;  // Show manually controlled camera
 				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
@@ -303,7 +303,7 @@ void ViewportWindow::updateSpace()
 			}
 			break;
 			case Core::TransformSpace::Screen:
-				m_space.label = std::string(_tbd("Screen space"));
+				m_space.label = std::string(_t("Screen space"));
 				stg.global().grid.programShow = false; // Disabling world grid for projection spaces
 				m_displayOptions.showTracking = true;  // Show manually controlled camera
 				m_space.coordinateSystem = tracker->getInterpolatedMatrixObject()->coordinateSystem;
@@ -350,14 +350,14 @@ void ViewportWindow::updateSpace()
 	if (m_space.standard)
 	{
 		if (!labelSet)
-			m_space.label = _tbd("World space");
+			m_space.label = _t("World space");
 		m_space.labelCol = ImGui::GetStyleColorVec4(ImGuiCol_Text);
 		m_space.m_referenceSpaceInv = m_space.m_referenceSpace;
 	}
 	else
 	{
 		if (!labelSet)
-			m_space.label = _tbd("Local space");
+			m_space.label = _t("Local space");
 		m_space.labelCol = I3T::getTheme().get(EColor::SceneViewGridLocalColor, 1.f);
 		m_space.m_referenceSpaceInv = glm::inverse(m_space.m_referenceSpace);
 	}
@@ -476,7 +476,7 @@ bool ViewportWindow::showSpaceIndicators(glm::mat4& view)
 			if ((m_space.trackingSpace == Core::TransformSpace::Projection && m_space.trackingMatrixProgress >= 0.5f) ||
 			    m_space.trackingSpace == Core::TransformSpace::Screen)
 			{
-				std::string str = _tbd("(Left handed)");
+				std::string str = _t("(Left handed)");
 				tWidth = ImGui::CalcTextSize(str.c_str()).x;
 				ImVec2 textPos = {axesPosition.x + axesSize / 2 - tWidth / 2, ImGui::GetCursorScreenPos().y};
 				ImGui::SetCursorScreenPos(textPos);
@@ -722,7 +722,7 @@ bool ViewportWindow::showViewportButtons()
 		{
 			// World grid is always hidden during projection tracking
 			interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridBtn", m_displayOptions.grid.show);
-			interacted |= GUI::ItemTooltip(m_space.standard ? _tbd("Toggle grid") : _tbd("Toggle world grid"), "");
+			interacted |= GUI::ItemTooltip(m_space.standard ? _t("Toggle grid") : _t("Toggle world grid"), "");
 			ImGui::SameLine();
 		}
 
@@ -731,7 +731,7 @@ bool ViewportWindow::showViewportButtons()
 			ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::SceneViewGridLocalColor, 1.f));
 			interacted |= GUI::FloatingToggleButton(ICON_FA_TABLE_CELLS "###GridNLocalBtn", m_settings.showLocalGrid);
 			ImGui::PopStyleColor();
-			interacted |= GUI::ItemTooltip(_tbd("Toggle local grid"), "");
+			interacted |= GUI::ItemTooltip(_t("Toggle local grid"), "");
 			ImGui::SameLine();
 		}
 	}
@@ -739,13 +739,13 @@ bool ViewportWindow::showViewportButtons()
 	if (m_space.tracking)
 	{
 		interacted |= GUI::FloatingToggleButton(" Z ###VisualizeDepth", WorkspaceModule::g_editor->m_visualizeDepth);
-		interacted |= GUI::ItemTooltip(_tbd("Toggle depth visualization"), "");
+		interacted |= GUI::ItemTooltip(_t("Toggle depth visualization"), "");
 		ImGui::SameLine();
 
 		if (m_space.trackingSpace >= Core::TransformSpace::Projection)
 		{
 			interacted |= GUI::FloatingToggleButton(ICON_FA_CROP_SIMPLE "###ToggleClipping", m_settings.clipFrustum);
-			interacted |= GUI::ItemTooltip(_tbd("Toggle frustum clipping"), "");
+			interacted |= GUI::ItemTooltip(_t("Toggle frustum clipping"), "");
 			ImGui::SameLine();
 		}
 	}
@@ -760,7 +760,7 @@ bool ViewportWindow::showViewportButtons()
 		ImGui::Spacing();
 		DIWNE::DGui::DummyXY({topLeftButtonsOffset.x, 0.f});
 		ImGui::BeginGroup();
-		GUI::TextShadow(_tbd("Reference space matrix:"));
+		GUI::TextShadow(_t("Reference space matrix:"));
 
 		bool valChanged = false;
 		int row, col;
@@ -784,9 +784,9 @@ bool ViewportWindow::showViewportButtons()
 		}
 		GUI::PopFontScale(oldScale);
 		if (m_space.tracking)
-			GUI::ItemTooltip(_tbd("Stop tracking"));
+			GUI::ItemTooltip(_t("Stop tracking"));
 		else
-			GUI::ItemTooltip(_tbd("Reset reference space"));
+			GUI::ItemTooltip(_t("Reset reference space"));
 
 		ImGui::EndGroup();
 	}

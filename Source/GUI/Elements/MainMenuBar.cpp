@@ -286,14 +286,13 @@ void MainMenuBar::showEditMenu()
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_STYLE " ", "Style Editor"), nullptr,
 		                            I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
 		{}
+		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_LANG " ", "Change Language")))
+		{
+			App::getModule<UIModule>().getWindowManager().openModal<ChangeLanguageModal>();
+		}
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_SETTINGS " ", "Preferences")))
 		{
 			I3T::getUI()->getWindowManager().showUniqueWindow<PreferencesWindow>();
-		}
-		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_LANG " ", "Change Language")))
-		{
-			// App::getModule<UIModule>().getWindowManager().showUniqueWindow<ChangeLanguageWindow>();
-			App::getModule<UIModule>().getWindowManager().openModal<ChangeLanguageModal>();
 		}
 		ImGui::EndMenu();
 	}
@@ -317,7 +316,7 @@ void MainMenuBar::showWindowsMenu()
 				auto& window = viewportWindows[i];
 				I3TGui::MenuItemWithLog((window->getTitle()).c_str(), nullptr, window->getShowPtr());
 			}
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_PLUS " ", "New")))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_PLUS " ", "New Scene view")))
 				viewportModule.showNewViewportWindow();
 			ImGui::EndMenu();
 		}
@@ -329,7 +328,10 @@ void MainMenuBar::showWindowsMenu()
 		I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_LOG " ", "Log window"), nullptr,
 		                        I3T::getWindowPtr<LogWindow>()->getShowPtr());
 #endif
-
+		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_DEBUG " ", "Application Statistics")))
+		{
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
+		}
 		ImGui::Separator();
 		if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_GRID " ", "Layouts")))
 		{
@@ -379,18 +381,9 @@ void MainMenuBar::showHelpMenu()
 		}
 #endif
 		I3TGui::MenuItemWithLog(_t("About"), nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
-		if (I3TGui::BeginMenuWithLog(_t("Diagnostic tools")))
-		{
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_DEBUG " ", "Statistics")))
-			{
-				App::getModule<UIModule>().getWindowManager().showUniqueWindow<StatisticsWindow>();
-			}
-			ImGui::EndMenu();
-		}
-
-		ImGui::Separator();
 
 #ifdef I3T_DEBUG
+		ImGui::Separator();
 		if (I3TGui::MenuItemWithLog((_t("Show ImGui demo window")), nullptr, &m_showDemoWindow))
 		{}
 #endif

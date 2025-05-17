@@ -46,13 +46,13 @@ Screen::Screen(DIWNE::NodeEditor& diwne) : CoreNodeWithPins(diwne, Core::Builder
 
 	// Setup tooltips
 	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_WIDTH)->setTooltipEnabled(true);
-	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_WIDTH)->setTooltip(_tbd("Screen width"));
+	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_WIDTH)->setTooltip(_t("Screen width"));
 
 	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_HEIGHT)->setTooltipEnabled(true);
-	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_HEIGHT)->setTooltip(_tbd("Screen height"));
+	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_HEIGHT)->setTooltip(_t("Screen height"));
 
 	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_ASPECT)->setTooltipEnabled(true);
-	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_ASPECT)->setTooltip(_tbd("Aspect ratio"));
+	m_workspaceOutputs.at(Core::I3T_SCREEN_OUT_ASPECT)->setTooltip(_t("Aspect ratio"));
 
 	m_viewportScreen = I3T::getViewport()->createScreen(getNodebase()->getId());
 
@@ -213,8 +213,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 		ImGui::PushClipRect(rect.Min, rect.Max, true);
 		float origScale = diwne.canvas().applyZoomScalingToFont(I3T::getFont(EFont::TutorialBold), 1.25f);
 
-		const char* noInputText = _tbd("NO INPUT");
-		const char* invalidText = _tbd("  INVALID\nVIEWPORT");
+		const char* noInputText = _t("NO INPUT");
+		const char* invalidText = (_ts("  INVALID") + "\n" + _ts("VIEWPORT")).c_str();
 
 		GUI::TextCentered(invalid ? invalidText : noInputText, rect,
 		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
@@ -388,7 +388,7 @@ void Screen::setScreenSize(ImVec2 size)
 
 void Screen::popupContent(DIWNE::DrawInfo& context)
 {
-	// I3TGui::MenuItemWithLog(_tbd("Set size"));
+	// I3TGui::MenuItemWithLog(("Set size"));
 	//
 	// ImGui::Separator();
 

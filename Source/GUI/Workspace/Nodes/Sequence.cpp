@@ -36,13 +36,13 @@ Sequence::Sequence(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool isCa
 	m_drawContextMenuButton = true;
 
 	// Setup sequence tooltips
-	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MAT)->setTooltip(_tbd("Matrix in this sequence"));
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MAT)->setTooltip(_t("Matrix in this sequence"));
 	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MAT)->setTooltipEnabled(true);
 
-	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltip(_tbd("Composite matrix of all matrices to the left"));
+	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltip(_t("Composite matrix of all matrices to the left"));
 	m_workspaceOutputs.at(Core::I3T_SEQ_OUT_MOD)->setTooltipEnabled(true);
 
-	m_workspaceInputs.at(Core::I3T_SEQ_IN_MAT)->setTooltip(_tbd("Matrix replacing this sequence content"));
+	m_workspaceInputs.at(Core::I3T_SEQ_IN_MAT)->setTooltip(_t("Matrix replacing this sequence content"));
 	m_workspaceInputs.at(Core::I3T_SEQ_IN_MAT)->setTooltipEnabled(true);
 }
 
@@ -302,7 +302,7 @@ void Sequence::popupContentReferenceSpace()
 		auto viewportWindow = viewportModule.getWindow(0);
 		if (!viewportWindow->m_space.customSource)
 		{
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Set as reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_REF_SPACE " ", "Set as reference space")))
 			{
 				viewportWindow->m_space.customSource = true;
 				viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
@@ -311,7 +311,7 @@ void Sequence::popupContentReferenceSpace()
 		}
 		else
 		{
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
 			{
 				viewportWindow->m_space.resetReferenceSpace();
 				m_referenceSpaceSource = false;
@@ -320,10 +320,10 @@ void Sequence::popupContentReferenceSpace()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Reference space")))
+		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_REF_SPACE " ", "Reference space")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			ImGui::TextDisabled(_tbd("Set as reference space in scene view"));
+			ImGui::TextDisabled(_t("Set as reference space in scene view"));
 			for (int i = 0; i < viewportModule.getWindowCount(); i++)
 			{
 				auto viewportWindow = viewportModule.getWindow(i);
@@ -338,7 +338,7 @@ void Sequence::popupContentReferenceSpace()
 				}
 				else
 				{
-					if (I3TGui::MenuItemWithLog((_ts("Reset ") + _ts(viewportWindow->getTitle())).c_str()))
+					if (I3TGui::MenuItemWithLog((_ts("Reset") + " " + _ts(viewportWindow->getTitle())).c_str()))
 					{
 						viewportWindow->m_space.resetReferenceSpace();
 						m_referenceSpaceSource = false;

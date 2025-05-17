@@ -396,7 +396,7 @@ inline void Transformation<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 inline void drawMenuCoordinateSystem(Core::Transform* transform, Core::CameraCoordSystem& coordinateSystem)
 {
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-	if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
+	if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
 	{
 		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_OGL " "
 		                                            "OpenGL",

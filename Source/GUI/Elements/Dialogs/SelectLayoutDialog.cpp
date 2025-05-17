@@ -46,10 +46,10 @@ void SelectLayoutDialog::render()
 void SelectLayoutDialog::showSelectLayoutMenu()
 {
 	// clang-format off
-	ImGui::TextWrapped(_tbd("Use this panel to manage window layouts."));
-	ImGui::TextWrapped(_tbd("You can switch between existing layouts,") "\n"
-						_tbd("create new ones to save your preferred window arrangement,") "\n"
-						_tbd("or delete layouts you no longer need."));
+	ImGui::TextWrapped(_t("Use this panel to manage window layouts."));
+	ImGui::TextWrapped((_ts("You can switch between existing layouts,") + "\n" +
+						_ts("create new ones to save your preferred window arrangement,") + "\n" +
+						_ts("or delete layouts you no longer need.")).c_str());
 	// clang-format on
 
 	static std::set<std::string> userLayouts = getFilesInDirectory("Data/Layouts");
