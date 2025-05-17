@@ -59,12 +59,12 @@ CorePin::CorePin(DIWNE::NodeEditor& diwne, Core::Pin const& pin, CoreNode* node,
 	if (pin.ValueType == Core::EValueType::MatrixMul)
 	{
 		setTooltipEnabled(true);
-		setTooltip(_tbd("Matrix multiplication"));
+		setTooltip(_t("Matrix multiplication"));
 	}
 	if (pin.ValueType == Core::EValueType::Screen)
 	{
 		setTooltipEnabled(true);
-		setTooltip(_tbd("Screen display data"));
+		setTooltip(_t("Screen display data"));
 	}
 }
 
@@ -524,27 +524,27 @@ bool CorePin::preparePlug(Pin* otherPin, DIWNE::Link* link, bool hovering, DIWNE
 			            I3T::getColor(EColor::Nodes_ConnectionNotPossible), context, 20.f);
 			break;
 		}
-		showTooltip(_tbd("Mismatched pin types (matrix/float/vec/...)"),
+		showTooltip(_t("Mismatched pin types (matrix/float/vec/...)"),
 		            I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 	}
 	break;
 	case Core::ENodePlugResult::Err_MismatchedPinKind:
-		showTooltip(_tbd("Mismatched pin kinds (in/out)"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Mismatched pin kinds (in/out)"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_Loopback: /// Same nodes.
-		showTooltip(_tbd("Loop to the same node"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Loop to the same node"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_NonexistentPin:
-		showTooltip(_tbd("Pin does not exist"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Pin does not exist"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_Loop:
-		showTooltip(_tbd("Loop not allowed"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Loop not allowed"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	case Core::ENodePlugResult::Err_DisabledPin:
-		showTooltip(_tbd("Pin is disabled"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Pin is disabled"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 		break;
 	default: // unreachable - all enum values are covered
-		showTooltip(_tbd("Connection not possible"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
+		showTooltip(_t("Connection not possible"), I3T::getColor(EColor::Nodes_ConnectionNotPossible), context);
 	}
 	return false;
 }

@@ -201,7 +201,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 	std::string trackingTitle = fmt::format(
 	    "{} {} {:.2f}%",
 	    tracker->getDirection() == Core::TrackingDirection::RightToLeft ? ICON_FA_ARROW_LEFT : ICON_FA_ARROW_RIGHT,
-	    _tbd("Tracking"), tracker->getProgress() * 100.f);
+	    _t("Tracking"), tracker->getProgress() * 100.f);
 	ImVec2 trackingTitleSize = ImGui::CalcTextSize(trackingTitle.c_str());
 
 	ImVec2 btnSize = ImVec2(28.f * I3T::getTheme().getDpiScale(), 24.f * dpiScale);
@@ -211,7 +211,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 		tracker->reverseDirection();
 		interacted = true;
 	}
-	GUI::ItemTooltip(_tbd("Switch direction"));
+	GUI::ItemTooltip(_t("Switch direction"));
 
 	ImGui::SameLine();
 
@@ -245,37 +245,37 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal))
 			{
 				interacted = true;
-				GUI::Tooltip(_tbd("Tracking settings"), "");
+				GUI::Tooltip(_t("Tracking settings"), "");
 			}
 		}
 
 		if (ImGui::BeginPopup(trackingSettingsPopup))
 		{
 			interacted = true;
-			ImGui::TextDisabled(_tbd("Tracking settings"));
+			ImGui::TextDisabled(_t("Tracking settings"));
 			ImGui::Dummy({0.0f, ImGui::GetTextLineHeight() * 0.25f});
 			ImGui::SliderFloat("Speed", &WorkspaceModule::g_settings.tracking_smoothScrollModifier, 0.008f, 8.f, "%.3f",
 			                   ImGuiSliderFlags_Logarithmic);
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_I3T_MAT_DECOMPOSE " ", "Decompose projection"), nullptr,
 			                            &tracker->m_decomposeProjection))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Shirley decomposition"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_T(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Shirley decomposition"), nullptr,
 			                            &tracker->m_decomposePerspectiveShirley))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown  decomposition"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_T(" " ICON_FA_I3T_MAT_DECOMPOSE " ", "Brown decomposition"), nullptr,
 			                            &tracker->m_decomposePerspectiveBrown))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_RIGHT_LEFT " ", "Switch direction"), nullptr,
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_RIGHT_LEFT " ", "Switch direction"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->reverseDirection();
-			I3TGui::MenuItemWithLog(_tbd("Highlight tracked models"), nullptr,
+			I3TGui::MenuItemWithLog(_t("Highlight tracked models"), nullptr,
 			                        &WorkspaceModule::g_editor->m_highlightTrackedModels);
 			ImGui::PopItemFlag();
-			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_XMARK " ", "Stop tracking"), "Esc", nullptr))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_XMARK " ", "Stop tracking"), "Esc", nullptr))
 				Core::GraphManager::stopTracking();
 
 			ImGui::EndPopup();

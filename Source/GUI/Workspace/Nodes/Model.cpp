@@ -334,7 +334,7 @@ void Model::popupContent_axis_showmodel()
 		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
 
 		// TODO: (DR) Polish scale factor impl (serialization + adjust preview radius)
-		// ImGui::SliderFloat(_t("Scale"), &model->m_scale, 0.01f, 10.0f, "%.01f");
+		// ImGui::SliderFloat(("Scale"), &model->m_scale, 0.01f, 10.0f, "%.01f");
 
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{

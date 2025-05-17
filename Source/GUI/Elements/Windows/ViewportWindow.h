@@ -53,7 +53,7 @@ public:
 		glm::mat4 m_referenceSpaceInv{1.f};
 
 		bool standard = true;
-		const std::string worldSpaceLabel = _tbd("World space");
+		const std::string worldSpaceLabel = _t("World space");
 		std::string label{worldSpaceLabel};
 		ImVec4 labelCol = ImVec4(1, 1, 1, 1);
 

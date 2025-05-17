@@ -62,36 +62,37 @@ void PreferencesWindow::render()
 
 void PreferencesWindow::showUISettings()
 {
-	if (ImGui::CollapsingHeader(_tbd("Application settings"), ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_t("Application settings"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		auto vsync = App::get().getAppLoopManager().isVsync();
 
-		if (ImGui::Checkbox(_tbd("Use VSync"), &vsync))
+		if (ImGui::Checkbox(_t("Limit FPS using VSync"), &vsync))
 		{
 			App::get().setVSync(vsync);
 		}
 		ImGui::SameLine();
-		showHelpTip(
-		    _tbd("Vertical Synchronization") "\n" _tbd("Synchronizes the frame rate with the monitor refresh rate."));
+		showHelpTip((_ts("VSync - Vertical Synchronization") + "\n" +
+		             _ts("Synchronizes the frame rate with the monitor refresh rate."))
+		                .c_str());
 
 		ImGui::BeginDisabled(vsync);
 		{
 			auto shouldLimitFPS = App::get().getAppLoopManager().shouldLimitFPS();
-			if (ImGui::Checkbox(_tbd("Limit FPS"), &shouldLimitFPS))
+			if (ImGui::Checkbox(_t("Limit FPS manually"), &shouldLimitFPS))
 			{
 				App::get().getAppLoopManager().enableFPSLimit(shouldLimitFPS);
 			}
 			if (vsync)
 			{
 				ImGui::SameLine();
-				showHelpTip(_tbd("Cannot be enabled with VSync"));
+				showHelpTip(_t("Cannot be enabled with VSync"));
 			}
 
 			if (shouldLimitFPS)
 			{
 				int fpsLimit = App::get().getAppLoopManager().getTargetFPS();
-				if (ImGui::SliderInt(_tbd("FPS Limit"), &fpsLimit, 10, 500, "%d", ImGuiSliderFlags_AlwaysClamp))
+				if (ImGui::SliderInt(_t("Manual FPS Limit"), &fpsLimit, 10, 500, "%d", ImGuiSliderFlags_AlwaysClamp))
 				{
 					App::get().getAppLoopManager().setTargetFPS(fpsLimit);
 				}
@@ -101,27 +102,27 @@ void PreferencesWindow::showUISettings()
 		ImGui::Spacing();
 
 		auto shouldLimitFPSOnIdle = App::get().getAppLoopManager().shouldLimitFPSOnIdle();
-		if (ImGui::Checkbox(_tbd("Limit FPS during Idle time"), &shouldLimitFPSOnIdle))
+		if (ImGui::Checkbox(_t("Limit FPS while no interaction with the application"), &shouldLimitFPSOnIdle))
 		{
 			App::get().getAppLoopManager().setShouldLimitFPSOnIdle(shouldLimitFPSOnIdle);
 		}
 		ImGui::SameLine();
 		// clang-format off
-		showHelpTip(_tbd("Limits the frame rate when the user is not interacting with the application.") "\n"
-						_tbd("This helps reduce CPU and GPU usage during idle time."));
+		showHelpTip((_ts("Limits the frame rate when the user is not interacting with the application.") + "\n" +
+						_ts("This helps reduce CPU and GPU usage during idle time.")).c_str());
 		// clang-format on
 
 		if (shouldLimitFPSOnIdle)
 		{
 			int secondsBeforeIdle = App::get().getAppLoopManager().getSecondsBeforeIdle();
-			if (ImGui::SliderInt(_tbd("Seconds before Idle"), &secondsBeforeIdle, 0, 60, "%d",
+			if (ImGui::SliderInt(_t("Seconds before limitation"), &secondsBeforeIdle, 0, 60, "%d",
 			                     ImGuiSliderFlags_AlwaysClamp))
 			{
 				App::get().getAppLoopManager().setSecondsBeforeIdle(secondsBeforeIdle);
 			}
 
 			int fpsLimitOnIdle = App::get().getAppLoopManager().getTargetFPSOnIdle();
-			if (ImGui::SliderInt(_tbd("FPS Limit during Idle time"), &fpsLimitOnIdle, 5, 500, "%d",
+			if (ImGui::SliderInt(_t("FPS Limit while no interaction"), &fpsLimitOnIdle, 5, 500, "%d",
 			                     ImGuiSliderFlags_AlwaysClamp))
 			{
 				App::get().getAppLoopManager().setTargetFPSOnIdle(fpsLimitOnIdle);
@@ -132,7 +133,7 @@ void PreferencesWindow::showUISettings()
 		ImGui::Spacing();
 	}
 
-	if (ImGui::CollapsingHeader(_tbd("User interface"), ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_t("User interface"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 
@@ -144,23 +145,23 @@ void PreferencesWindow::showUISettings()
 			uiScaleTmp = uiModule->getUiScale();
 		}
 		ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-		GUI::SliderFloatStepped(_tbd("UI Scale"), &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
+		GUI::SliderFloatStepped(_t("UI Scale"), &uiScaleTmp, 0.05f, 1.0f, 4.0f, "{:.2f}");
 		if (uiScaleTmp != uiModule->getUiScale())
 		{
 			ImGui::SameLine();
-			if (I3TGui::ButtonWithLog(_tbd("Apply scale")))
+			if (I3TGui::ButtonWithLog(_t("Apply scale")))
 			{
 				uiModule->applyUIScalingNextFrame(uiScaleTmp);
 			}
 		}
 
-		ImGui::Checkbox(_tbd("Show window tab buttons"), &uiModule->getSettings().useWindowMenuButtons);
+		ImGui::Checkbox(_t("Show window tab buttons"), &uiModule->getSettings().useWindowMenuButtons);
 		ImGui::SameLine();
-		showHelpTip(_tbd("Requires restart"));
+		showHelpTip(_t("Requires restart"));
 
-		ImGui::Checkbox(_tbd("Auto hide tab bar"), &uiModule->getSettings().autoHideTabBars);
+		ImGui::Checkbox(_t("Auto hide tab bar"), &uiModule->getSettings().autoHideTabBars);
 		ImGui::SameLine();
-		showHelpTip(_tbd("Requires restart"));
+		showHelpTip(_t("Requires restart"));
 
 		ImGui::Unindent();
 		ImGui::Spacing();
@@ -168,14 +169,14 @@ void PreferencesWindow::showUISettings()
 }
 void PreferencesWindow::showWorkspaceSettings()
 {
-	if (ImGui::CollapsingHeader(_tbd("Workspace"), ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_t("Workspace"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
-		ImGui::Checkbox(_tbd("Show quick add menu"), &WorkspaceModule::g_settings.showQuickAddMenu);
-		ImGui::SeparatorText(_tbd("Tracking"));
-		ImGui::DragFloat(_tbd("Smooth scroll speed"), &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f,
+		ImGui::Checkbox(_t("Show quick add menu"), &WorkspaceModule::g_settings.showQuickAddMenu);
+		ImGui::SeparatorText(_t("Tracking"));
+		ImGui::DragFloat(_t("Smooth scroll speed"), &WorkspaceModule::g_settings.tracking_smoothScrollSpeed, 0.01f,
 		                 0.001f);
-		ImGui::DragFloat(_tbd("Jagged scroll speed"), &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f,
+		ImGui::DragFloat(_t("Jagged scroll speed"), &WorkspaceModule::g_settings.tracking_jaggedScrollSpeed, 0.01f,
 		                 0.001f);
 
 		ImGui::Unindent();
@@ -188,7 +189,7 @@ void PreferencesWindow::showViewportSettings()
 	Vp::Viewport* viewport = I3T::getViewport();
 	Vp::ViewportSettings& stg = viewport->getSettings();
 
-	if (ImGui::CollapsingHeader(_tbd("Scene view"), ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(_t("Scene View"), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent();
 		ImGui::SliderFloat("Model preview FOV", &stg.global().preview_fov, 5, 120, "%f");

@@ -334,7 +334,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_DISPLAY " ", "Show viewport"), NULL, &m_viewportEnabled))
+	if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_DISPLAY " ", "Show viewport"), NULL, &m_viewportEnabled))
 	{
 		setViewportEnabled(m_viewportEnabled);
 		if (Core::GraphManager::isTracking())
@@ -443,7 +443,7 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 
 	ImGui::Separator();
 
-	if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
+	if (I3TGui::BeginMenuWithLog(ICON_T(ICON_FA_I3T_COORD_SYSTEM " ", "Coordinate system")))
 	{
 		if (I3TGui::MenuItemWithLog(ICON_FA_I3T_OGL " "
 		                                            "OpenGL",
