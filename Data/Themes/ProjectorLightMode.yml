@@ -1,13 +1,16 @@
 mode: "light"
 colors:
   glob_Text: [0.000, 0.000, 0.000, 1.000]
-  glob_Disabled Text: [0.500, 0.500, 0.500, 1.000]
+  glob_Disabled Text: [0.000, 0.000, 0.000, 1.000]
   glob_Window Background: [1.000, 1.000, 1.000, 1.000]
   glob_Popup Background: [0.841, 0.841, 0.841, 1.000]
-  glob_Border: [0.000, 0.000, 0.000, 1.000]
+  glob_Border: [0.400, 0.400, 0.400, 1.000]
   glob_Frame Background: [0.160, 0.290, 0.480, 0.540]
   glob_Frame Background Hovered: [0.260, 0.590, 0.980, 0.400]
   glob_Frame Background Active: [0.260, 0.590, 0.980, 0.670]
+  glob_Window Title Background: [ 0.768, 0.768, 0.776, 1.000 ]
+  glob_Window Title Background Active: [ 0.798, 0.798, 0.806, 1.000 ]
+  glob_Window Title Background Collapsed: [ 0.100, 0.100, 0.100, 0.710 ]
   glob_Menu Bar Background: [0.914, 0.914, 0.914, 1.000]
   glob_Button: [0.668, 0.815, 0.996, 1.000]
   glob_Button Hovered: [0.260, 0.590, 0.980, 1.000]
@@ -117,6 +120,10 @@ colors:
   ncyc_RadioButtonSelectedText: [0.000, 0.000, 0.000, 1.000]
   ncyc_RadioButtonBackground: [0.129, 0.129, 0.129, 1.000]
 sizes:
+  glob_Tooltip Rounding: 10
+  glob_Window Rounding: 0
+  glob_Frame Rounding: 0
+  glob_Floating Button Rounding: 2
   ngen_Nodes Rounding: 7
   ngen_Nodes BorderWidth: 0
   ngen_Pin Label Indent: 12
@@ -124,6 +131,9 @@ sizes:
   ngen_Trackball Button Height: 20
   ngen_TrackBall Sensitivity: 5
   nflo_Float Inner Padding: 1
+  nflo_Float Character Width Multiplier: 0.409999996
+  nflo_Float Minimum Character Count: 5
+  nflo_Float Inactive Alpha Factor: 0.5
   ngen_Drag Speed fo Float: 0.0149999997
   ngen_CTRL Multiplicator: 0.100000001
   ngen_SHIFT Multiplicator: 10
@@ -134,6 +144,13 @@ sizes:
   ngen_Nodes Left Side spacing: 3
   ngen_Nodes Right Side spacing: 3
   ngen_Selected Node Border Thickness: 3
+  ngen_Hover Border Thickness: 3
+  tuts_Task Square X Padding: 10
+  tuts_Frame Rounding: 5
+  tuts_Scrollbar Size: 15
+  tuts_Scrollbar Rounding: 5
+  tuts_Back Button Width: 40
+  tuts_Main Menu Button Width: 120
   nlnk_Link Control Point Distance Scaling Factor: 0.200000003
   nlnk_Link Min Control Point X Distance: 65
   nlnk_Link Max Control Point X Distance: 350
@@ -141,13 +158,14 @@ sizes:
   nlnk_Link Thickness when selected: 7
   nlnk_Link Selected Alpha: 0.800000012
   npin_Pin Icon Padding: 2
+  npin_Pin Drag Assist Radius: 29
   ngen_Nodes Operators Rounding: 7
   ngen_Nodes Sequence Rounding: 7
   ngen_Nodes LOD Button Rounding: 7
   ngen_Nodes Border Rounding: 7
   ngen_Nodes Border Thickness: 2
   ngen_Nodes Transformation TrackingMarkSize: 5
-  nflo_Float Inactive Alpha Factor: 0.5
+  ngen_Nodes Tracking Link Width: 9
   ngen_Nodes Default Visible Precision: 1
   ngen_Nodes Default Visible Precision For Quaternions: 4
   ngen_Nodes Default Inactive Part Marker: 0
@@ -169,20 +187,24 @@ sizes:
   ncyc_ButtonRounding: 3
   ncyc_RadioButtonRounding: 5
 size vectors:
-  glob_Window Frame Padding: [5, 5]
-  ngen_Nodes Items Spacing: [4, 4]
-  nflo_Nodes Float Padding: [0, 1]
-  ngen_Nodes LOD Button Size: [27, 27]
-  npin_Nodes Pin Size: [15, 15]
-  nflo_Nodes Float Cycle Button Size: [32, 32]
-  nscr_Nodes Screen Texture Size: [130, 130]
-  nscr_Screen Resize Button Size: [20, 20]
-  ntrs_Sequence Dummy Space Size: [100, 1]
-  ngen_New Node Position Shift: [10, 0]
-  star_Window Size: [1020, 800]
-  star_Logo Offset: [5, -20]
-  star_Window Padding: [0, 0]
-  star_Left Window Padding: [30, 30]
-  star_Right Window OuterPadding: [10, 10]
-  star_Right Window InnerPadding: [10, 10]
-  ncyc_ButtonSize: [40, 40]
+  glob_Window Frame Padding: [ 5, 5 ]
+  glob_Window Padding: [ 8, 8 ]
+  tuts_Window Padding: [ 30, 35 ]
+  glob_Tooltip Padding: [ 10, 10 ]
+  ngen_Nodes Items Spacing: [ 4, 4 ]
+  nflo_Nodes Float Padding: [ 0, 1 ]
+  ngen_Nodes LOD Button Size: [ 27, 27 ]
+  npin_Nodes Pin Size: [ 15, 15 ]
+  npin_Nodes Pin Size Matrix Mul: [ 16, 16 ]
+  nflo_Nodes Float Cycle Button Size: [ 32, 32 ]
+  nscr_Nodes Screen Texture Size: [ 130, 130 ]
+  nscr_Screen Resize Button Size: [ 20, 20 ]
+  ntrs_Sequence Dummy Space Size: [ 100, 1 ]
+  ngen_New Node Position Shift: [ 10, 0 ]
+  star_Window Size: [ 1020, 800 ]
+  star_Logo Offset: [ 5, -20 ]
+  star_Window Padding: [ 0, 0 ]
+  star_Left Window Padding: [ 30, 30 ]
+  star_Right Window OuterPadding: [ 10, 10 ]
+  star_Right Window InnerPadding: [ 10, 10 ]
+  ncyc_ButtonSize: [ 40, 40 ]
