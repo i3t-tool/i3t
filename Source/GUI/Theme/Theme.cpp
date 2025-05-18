@@ -245,6 +245,7 @@ void Theme::initDefaultClassic()
 	set(EColor::NodeEditorBackground, ImVec4(0.439f, 0.439f, 0.455f, 1.00f));
 	set(EColor::NodeEditorGridColor, ImColor(57, 57, 57, 120));
 	set(EColor::NodeEditorGridDotsColor, ImColor(200, 200, 200, 40));
+	set(EColor::NodeDropZoneBackground, ImColor(25, 25, 25, 102));
 	//	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f,
 	// 255.0f / 255.0f, 1.00f)); 	set(EColor::NodeEditorBg, ImVec4(112.0f /
 	// 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
@@ -256,7 +257,9 @@ void Theme::initDefaultClassic()
 	set(EColor::Workspace_HoverBorder, createColor(0, 0, 0, 50));          // TODO: Missing name!
 
 	set(EColor::DisabledPinColor, createColor(93, 93, 93, 85));
+	set(EColor::PinHoverBackground, createColor(0, 0, 0, 36));
 	set(EColor::PinHoverColorShift, createColor(26, 26, 26, 0));
+	set(EColor::PinSocketBackground, createColor(0, 0, 0, 79));
 
 	// pin colors (background)
 	set(EColor::PulsePin, createColor(164, 58, 190, 255));
@@ -281,6 +284,8 @@ void Theme::initDefaultClassic()
 	// General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
 	set(EColor::NodeHeader, createColor(0, 0, 0, 30));
+	set(EColor::NodeFg, createColor(255, 255, 255, 255));
+	set(EColor::NodeHeaderFg, createColor(255, 255, 255, 255));
 	set(EColor::NodeFont, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// Folta operator color set
@@ -514,14 +519,6 @@ void Theme::initNames()
 	    .add(EColor::Header, "Header")
 	    .add(EColor::HeaderHovered, "Header Hovered")
 	    .add(EColor::HeaderActive, "Header Active")
-	    .add(EColor::SliderGrab, "Slider Grab")
-	    .add(EColor::SliderGrabActive, "Slider Grab Active")
-	    .add(EColor::Button, "Button")
-	    .add(EColor::ButtonHovered, "Button Hovered")
-	    .add(EColor::ButtonActive, "Button Active")
-	    .add(EColor::Header, "Header", "Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem")
-	    .add(EColor::HeaderHovered, "Header Hovered")
-	    .add(EColor::HeaderActive, "Header Active")
 	    .add(EColor::Separator, "Separator")
 	    .add(EColor::SeparatorHovered, "Separator Hovered")
 	    .add(EColor::SeparatorActive, "Separator Active")
@@ -662,8 +659,11 @@ void Theme::initNames()
 	    .add(EColor::NodeEditorGridDotsColor, "Node Editor Grid Dots Color")
 	    .add(EColor::NodeBg, "General Node Background")
 	    .add(EColor::NodeHeader, "General Node Header")
+	    .add(EColor::NodeFg, "General Node Foreground", "The text color of node content")
+	    .add(EColor::NodeHeaderFg, "General Node Header Foreground", "The text color of node headers")
 	    .add(EColor::NodeFont, "General Node Font (text)")
 	    .add(EColor::NodeBorder, "Node Border")
+	    .add(EColor::NodeDropZoneBackground, "Node Drop Zone Background")
 	    .add(EColor::Workspace_HoverBorder, "Hover Border Color")
 	    .add(EColor::SelectionRectFull, "Selection rectangle full")
 	    .add(EColor::SelectionRectTouch, "Selection rectangle touch")
@@ -724,7 +724,9 @@ void Theme::initNames()
 	         "node editor coordinates.")
 	    .add(ESizeVec2::Nodes_PinSquareHoverEnlarge, "Nodes Pin Square Hover Enlarge")
 	    .add(EColor::DisabledPinColor, "Disabled Pin Color")
+	    .add(EColor::PinHoverBackground, "Pin Hover Background")
 	    .add(EColor::PinHoverColorShift, "Pin Hover Color Shift")
+	    .add(EColor::PinSocketBackground, "Pin Socket Background")
 	    .add(EColor::PulsePin, "Pulse Pin")
 	    .add(EColor::FloatPin, "Float Pin")
 	    .add(EColor::MatrixPin, "Matrix Pin")
@@ -863,6 +865,11 @@ void Theme::updateDiwneStyleFromTheme() const
 	style.set(Style::NODE_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeBg));
 	style.set(Style::NODE_HEADER_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeHeader));
 
+	style.set(Style::NODE_FG, I3T::getUI()->getTheme().getPtr(EColor::NodeFg));
+	style.set(Style::NODE_HEADER_FG, I3T::getUI()->getTheme().getPtr(EColor::NodeHeaderFg));
+
+	style.set(Style::DROP_ZONE_BG, I3T::getUI()->getTheme().getPtr(EColor::NodeDropZoneBackground));
+
 	style.set(Style::NODE_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Rounding), true);
 
 	style.set(Style::SELECTION_ROUNDING, I3T::getUI()->getTheme().getPtr(ESize::Nodes_Border_Rounding), true);
@@ -876,9 +883,11 @@ void Theme::updateDiwneStyleFromTheme() const
 	style.set(Style::LINK_SELECTED_WIDTH, I3T::getUI()->getTheme().getPtr(ESize::Links_ThicknessSelected), true);
 
 	style.set(Style::PIN_DRAG_ASSIST_RADIUS, I3T::getUI()->getTheme().getPtr(ESize::Pins_DragAssistRadius), false);
+	style.set(Style::PIN_BG_COLOR, I3T::getUI()->getTheme().getPtr(EColor::PinHoverBackground));
 	style.set(Style::PIN_HOVER_COLOR_SHIFT, I3T::getUI()->getTheme().getPtr(EColor::PinHoverColorShift));
 	style.set(Style::PIN_SQUARE_HOVER_ENLARGE, I3T::getUI()->getTheme().getPtr(ESizeVec2::Nodes_PinSquareHoverEnlarge),
 	          false);
+	style.set(Style::PIN_SOCKET_BG, I3T::getUI()->getTheme().getPtr(EColor::PinSocketBackground));
 
 	style.set(Style::SELECTION_RECT_FULL_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectFull));
 	style.set(Style::SELECTION_RECT_TOUCH_COLOR, I3T::getUI()->getTheme().getPtr(EColor::SelectionRectTouch));

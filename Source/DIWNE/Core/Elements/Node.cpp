@@ -30,6 +30,8 @@ void Node::begin(DrawInfo& context)
 {
 	m_forceDraw = false; // Reset the force draw flag, it is valid between draws
 
+	ImGui::PushStyleColor(ImGuiCol_Text, diwne.style().color(Style::NODE_FG));
+
 	ImGui::PushID(m_labelDiwne.c_str());
 	DGui::BeginGroup(); /* Begin of node */
 }
@@ -55,6 +57,7 @@ void Node::end(DrawInfo& context)
 	});
 	ImGui::EndGroup();
 	// Node ImGui ID gets popped later in afterDrawDiwne, see explanation there.
+	ImGui::PopStyleColor();
 }
 
 void Node::updateLayout(DrawInfo& context)

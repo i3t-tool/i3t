@@ -15,6 +15,8 @@ StyleBase::StyleBase()
 
 	set<ImVec4>(NODE_BG, {0.195, 0.195, 0.195, 0.6});
 	set<ImVec4>(NODE_HEADER_BG, {0.020, 0.341, 0.012, 0.9});
+	set<ImVec4>(NODE_FG, {1.0, 1.0, 1.0, 1.0});
+	set<ImVec4>(NODE_HEADER_FG, {1.0, 1.0, 1.0, 1.0});
 
 	set<float>(NODE_ROUNDING, 0, true);
 	set<ImVec2>(NODE_PADDING, {8.0f, 4.0f}, true);

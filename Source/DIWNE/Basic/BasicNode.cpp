@@ -22,11 +22,15 @@ void BasicNode::content(DrawInfo& context)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 
+	ImGui::PushStyleColor(ImGuiCol_Text, diwne.style().color(Style::NODE_HEADER_FG));
+
 	m_top.begin();
 	topContent(context);
 	m_top.end();
 	if (!m_headerSpacing)
 		DGui::NewLine(); // No vertical spacing
+
+	ImGui::PopStyleColor();
 
 	m_middle.begin();
 	m_left.begin();

@@ -1033,11 +1033,6 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Debug"))
-	{
-
-		ImGui::EndMenu();
-	}
 	ImGui::PopItemFlag();
 
 	return userInteractedWithMenus;
