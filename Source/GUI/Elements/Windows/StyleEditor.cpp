@@ -141,6 +141,7 @@ void renderVariables()
 
 	for (const auto& group : Theme::getVariables())
 	{
+		ImGui::PushID(group.id);
 		ImGui::Spacing();
 		ImGui::Spacing();
 		if (group.indent > 0)
@@ -204,6 +205,7 @@ void renderVariables()
 			for (int i = 0; i < group.indent; i++)
 				ImGui::Unindent();
 		}
+		ImGui::PopID();
 	}
 }
 

@@ -48,7 +48,7 @@ glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool use
 		// rotation part mat3x3
 		auto q1 = glm::quat_cast(lhs);
 		auto q2 = glm::quat_cast(rhs);
-		result = glm::mat4_cast(glm::mix(q1, q2, alpha));
+		result = glm::mat4_cast(glm::mix(q1, q2, alpha)); // FIX ME: Maybe we'd rather use glm::slerp?
 
 		// translation part
 		glm::vec4 r = glm::mix(lhs[3], rhs[3], alpha);

@@ -27,6 +27,9 @@ public:
 		NODE_BG,        // ImVec4
 		NODE_HEADER_BG, // ImVec4
 
+		NODE_FG,        // ImVec4, node foreground (text color)
+		NODE_HEADER_FG, // ImVec4, node header foreground (text color)
+
 		NODE_ROUNDING, // int
 		NODE_PADDING,  // float // TODO: Review in example app
 

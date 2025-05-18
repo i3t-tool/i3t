@@ -162,10 +162,13 @@ enum class EColor
 	NodeEditorBackground,
 	NodeEditorGridColor,
 	NodeEditorGridDotsColor,
+	NodeDropZoneBackground,
 
 	// Pins
 	DisabledPinColor,
 	PinHoverColorShift,
+	PinHoverBackground,
+	PinSocketBackground,
 	PulsePin,
 	FloatPin,
 	Vec3Pin,
@@ -187,6 +190,8 @@ enum class EColor
 	// General unspecified node
 	NodeBg,
 	NodeHeader,
+	NodeFg,
+	NodeHeaderFg,
 	NodeFont,
 
 	// 3. Operator

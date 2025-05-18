@@ -28,7 +28,6 @@ class MatrixTracker;
 /// Data object holding extra information about a currently tracked model.
 struct TrackedModelData
 {
-	// TODO: I might need to separate interpolatedMatrix into P, V and M. As V might be omitted in view space 3d scene.
 	glm::mat4 m_interpolatedMatrix{1.f}; ///< Model matrix of the tracked model (result of tracker interpolation).
 	glm::mat4 m_referenceSpace{1.f};     ///< Reference space of the model, its "default" transformation.
 	                                     ///< This is applicable when the begin sequence of tracking is not
@@ -95,7 +94,6 @@ enum class TrackingDirection
 	RightToLeft = 1
 };
 
-// TODO: (DR) Implement camera tracking
 /**
  * The main tracking object, responsible for tracking a single chain of sequences.
  *
@@ -227,6 +225,7 @@ public:
 	private:
 		bool useOwnData{false};
 
+		/// Applies scene view specific modification of the given matrix
 		glm::mat4 modify(const glm::mat4& matrix) const
 		{
 			if (space == TransformSpace::Screen)
@@ -234,8 +233,8 @@ public:
 				glm::mat4 m = matrix;
 				// Flip X as we are in emulated inverted Z
 				m[3][0] = -1 * m[3][0];
-				// Divide the whole viewport transform by a 100x scale to keep NDC and screen space roughly similar in
-				// size
+				// Divide the whole viewport transform by a configurable scale to keep NDC and screen space roughly
+				// similar in size
 				float scalingFactorXY = 1.f / g_trackingViewportScalingFactorXY;
 				float scalingFactorZ = 1.f / g_trackingViewportScalingFactorZ;
 				m[0][0] *= scalingFactorXY;
@@ -311,21 +310,17 @@ public:
 	// matrix.
 	bool m_trackInWorldSpace{false};
 
-	// TODO: Implement, Docs
-	/// If the camera projection sequence has a single transform in it, we can make educated or user directed
-	/// assumptions about the matrix data and separate it into multiple transforms to be interpolated separately.
-	///
-	/// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
-	/// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
-	bool m_decomposeProjection{true};         /// Maybe rename to "Raw tracking" in GUI
+	// For starters, the NDC z-coordinate range is inverted in OpenGL, so at the very least we want to flip the third
+	// row of the matrix to prevent "flipping" of the space along the z axis during interpolation.
+	bool m_decomposeProjection{true};         // TODO: Docs, Maybe rename to "Raw tracking" in GUI
 	bool m_decomposePerspectiveShirley{true}; // TODO: Docs
 	bool m_decomposePerspectiveBrown{false};  // TODO: Docs
 
-	/// Interpolated view matrix, relevant when m_trackInWorldSpace is false.
+	/// Interpolated view matrix, relevant during camera tracking when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewMatrix{1.0f};
-	/// Interpolated projection matrix, relevant when m_trackInWorldSpace is false.
+	/// Interpolated projection matrix, relevant during camera tracking when m_trackInWorldSpace is false.
 	glm::mat4 m_iProjMatrix{1.0f};
-	/// Interpolated viewport matrix, relevant when m_trackInWorldSpace is false.
+	/// Interpolated viewport matrix, relevant during camera tracking when m_trackInWorldSpace is false.
 	glm::mat4 m_iViewportMatrix{1.0f};
 
 private:

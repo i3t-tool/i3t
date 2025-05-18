@@ -12,12 +12,11 @@
  */
 #pragma once
 
-#include "Core/Nodes/NodeData.h"
-
-
 #include <array>
 
 #include <glm/matrix.hpp>
+
+#include "Core/Nodes/NodeData.h"
 
 namespace ProjectionUtils
 {
