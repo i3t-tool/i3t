@@ -14,6 +14,8 @@ In this tutorial, you will learn:
 - How the program is *structured*.
 - How to *use* the basic interface.
 
+![Interactive Tool for Teaching Transformations](logoi3t.png)
+
 Before we begin working, let's see how to move through the tutorials, start by clicking the *Next* button below.
 
 --
@@ -56,6 +58,8 @@ headline: Pictures
 - *Pictures* are used to illustrate tasks or layouts.
 - When you *hover* over a picture, you may see an extra *Note* explaining details.
 
+![This is a bunny](bunny.png)
+
 --
 headline: Main Windows
 
@@ -63,6 +67,8 @@ The I3T interface consists mainly of two windows:
 
 - [Workspace](https://i3t-tool.org/manual.html#workspace): Where you build and connect *blocks*.
 - [Scene View](https://i3t-tool.org/manual.html#scene-view): Where you *see* the resulting 3D scene.
+
+![These are the two main windows](ui.png)
 
 There is also a Top Bar with menus (File, Edit, Windows, etc.) where you can:
 - Open/save scenes.
@@ -104,6 +110,8 @@ Nodes can represent:
 - Time-based functions,
 - Other utilities.
 
+![Menu to add nodes](adding.png)
+
 To [add a block](https://i3t-tool.org/manual.html#adding-nodes):
 - *Right-click* on empty Workspace and choose from the *Add Menu*.
 
@@ -126,6 +134,8 @@ You have added:
 - *Sequence*: Groups multiple transformations together.
 - *Scale*: A transformation node that resizes the object.
 
+![Added nodes](nodes.png)
+
 These blocks work together to apply transformations to a model.
 
 --
@@ -136,6 +146,8 @@ Each node has:
 - *Outputs* (right side).
 
 Only nodes with *compatible data types* can be connected.
+
+![Connecting nodes](connect.png)
 
 To [connect nodes](https://i3t-tool.org/manual.html#connecting-nodes):
 - *Click and drag* from an *output* to a *matching input*.
