@@ -2,7 +2,7 @@
  * \file
  * \brief
  * \author Dan Rakušan <rakusan.dan@gmail.com>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -80,11 +80,11 @@ public:
 	/**
 	 * @param windowPos
 	 * @param windowSize
-	 * @param model Reference space matrix
+	 * @param referenceFrame Reference frame matrix
 	 * @return Whether manipulators have been interacted with.
 	 */
-	bool drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4* model, const glm::mat4& view,
-	                      const glm::mat4& proj);
+	bool drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4* referenceFrame,
+	                      const glm::mat4& view, const glm::mat4& proj);
 
 	// WIP method to set the active manipulator
 	void clearManipulators();

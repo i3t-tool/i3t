@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -107,7 +107,7 @@ void TransformationBase::end(DIWNE::DrawInfo& context)
 	Super::end(context);
 
 	const Core::TrackedNodeData* t = this->getNodebase()->getTrackingData();
-	if (t)
+	if (t && !t->modelSubtree)
 	{
 		drawTrackingCursor(
 		    {m_middle.getRect().Min - ImVec2(0.f, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)),

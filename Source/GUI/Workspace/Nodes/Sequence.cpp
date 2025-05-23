@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -302,7 +302,7 @@ void Sequence::popupContentReferenceSpace()
 		auto viewportWindow = viewportModule.getWindow(0);
 		if (!viewportWindow->m_space.customSource)
 		{
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_REF_SPACE " ", "Set as reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Set as reference frame")))
 			{
 				viewportWindow->m_space.customSource = true;
 				viewportWindow->m_space.sourceNode = this->sharedPtr<Sequence>();
@@ -311,7 +311,7 @@ void Sequence::popupContentReferenceSpace()
 		}
 		else
 		{
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference space")))
+			if (I3TGui::MenuItemWithLog(ICON_TBD(ICON_FA_ARROW_ROTATE_LEFT " ", "Reset reference frame")))
 			{
 				viewportWindow->m_space.resetReferenceSpace();
 				m_referenceSpaceSource = false;
@@ -320,10 +320,10 @@ void Sequence::popupContentReferenceSpace()
 	}
 	else
 	{
-		if (I3TGui::BeginMenuWithLog(ICON_T(ICON_I3T_REF_SPACE " ", "Reference space")))
+		if (I3TGui::BeginMenuWithLog(ICON_TBD(ICON_I3T_REF_SPACE " ", "Reference frame")))
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-			ImGui::TextDisabled(_t("Set as reference space in scene view"));
+			ImGui::TextDisabled(_tbd("Set as reference frame in scene view"));
 			for (int i = 0; i < viewportModule.getWindowCount(); i++)
 			{
 				auto viewportWindow = viewportModule.getWindow(i);
@@ -363,15 +363,14 @@ void Sequence::afterDraw(DIWNE::DrawInfo& context)
 	const Core::TrackedNodeData* t = coreSeq->getTrackingData();
 	if (t)
 	{
-		if (t->isSequenceTransform() || t->getChildCount() == 0)
+		if ((t->isSequenceTransform() || t->getChildCount() == 0) && !t->modelSubtree)
 		{
 			const ImRect& center = m_center.getRect();
 			ImVec2 dropZoneMargin = diwne.style().size(DIWNE::Style::DROP_ZONE_MARGIN);
 			// ImVec2 ofst = ImVec2(ceil(dropZoneMargin.x), ceil(dropZoneMargin.y));
 			ImVec2 ofst = ImVec2(0, 0);
 			// dropZoneMargin += {0, diwne.canvas().screen2diwneSize(ImGui::GetStyle().ItemSpacing.y)};
-			drawTrackingCursor(ImRect(center.Min + ofst, center.Max - ofst), t, coreSeq->getMatrices().size() != 0,
-			                   false);
+			drawTrackingCursor(ImRect(center.Min + ofst, center.Max - ofst), t, true, false);
 		}
 		if (t->chain || t->modelSubtree)
 			drawTrackingBorder(t->active, t->interpolating, t->progress);

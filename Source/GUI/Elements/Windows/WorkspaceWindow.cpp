@@ -1,8 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
- * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -187,8 +186,10 @@ bool WorkspaceWindow::showTrackingTimeline()
 	{
 		float rounding = 6;
 		const ImVec2 boxPadding = ImVec2(ImGui::GetFontSize() * 0.5f, ImGui::GetFontSize() * 0.5f);
-		ImGui::GetWindowDrawList()->AddRectFilled(m_trackingBox.Min - boxPadding, m_trackingBox.Max + boxPadding,
-		                                          ImColor(0.f, 0.f, 0.f, 0.4f), rounding, ImDrawFlags_RoundCornersAll);
+		ImGui::GetWindowDrawList()->AddRectFilled(
+		    m_trackingBox.Min - boxPadding, m_trackingBox.Max + boxPadding,
+		    ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Tracking_WorkspaceBg)), rounding,
+		    ImDrawFlags_RoundCornersAll);
 		ImGui::GetWindowDrawList()->AddRect(m_trackingBox.Min - boxPadding, m_trackingBox.Max + boxPadding,
 		                                    ImGui::GetColorU32(ImGuiCol_Border, 0.7f), rounding,
 		                                    ImDrawFlags_RoundCornersAll);
@@ -269,8 +270,7 @@ bool WorkspaceWindow::showTrackingTimeline()
 			if (I3TGui::MenuItemWithLog(ICON_T(ICON_I3T_EARTH " ", "Track in world space"), nullptr,
 			                            &tracker->m_trackInWorldSpace))
 				tracker->requestProgressUpdate();
-			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_RIGHT_LEFT " ", "Switch direction"), nullptr,
-			                            &tracker->m_trackInWorldSpace))
+			if (I3TGui::MenuItemWithLog(ICON_T(ICON_FA_RIGHT_LEFT " ", "Switch direction")))
 				tracker->reverseDirection();
 			I3TGui::MenuItemWithLog(_t("Highlight tracked models"), nullptr,
 			                        &WorkspaceModule::g_editor->m_highlightTrackedModels);
@@ -752,8 +752,8 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	// const ImU32 frame_col = ImGui::ColorConvertFloat4ToU32(g.ActiveId == id    ? cursorColActive
 	//                                                        : g.HoveredId == id ? cursorColHovered
 	//                                                                            : cursorCol);
-	const ImU32 progressBg = ImColor(0.7f, 0.7f, 0.f, 1.0f);
-	const ImU32 progressOverlay = ImColor(0.75, 0.75f, 0.f, 0.4f);
+	const ImU32 progressBg = ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Tracking_SliderProgressBg));
+	const ImU32 progressOverlay = ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Tracking_SliderProgressOverlay));
 	const ImU32 frame_col_after = ImColor(0, 0, 0, 0);
 	// const ImU32 frame_col_after = ImGui::GetColorU32(g.ActiveId == id    ? ImGuiCol_FrameBgActive
 	//                                                  : g.HoveredId == id ? ImGuiCol_FrameBgHovered
@@ -764,7 +764,7 @@ bool WorkspaceWindow::TrackingSlider(Core::MatrixTracker* tracker, const char* l
 	Core::TrackingDirection dir = tracker->getDirection();
 	bool leftToRight = dir == Core::TrackingDirection::LeftToRight;
 	auto& trackedMatrices = tracker->getMatrices();
-	ImVec4 tickColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
+	ImVec4 tickColor = I3T::getColor(EColor::Tracking_SliderTickColor);
 	ImRect trackRect = frame_bb;
 	ImVec2 trackSize = trackRect.GetSize();
 	float tParam = tracker->getProgress();

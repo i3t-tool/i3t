@@ -3,7 +3,7 @@
  * \brief Main API class for the 3D viewport
  * \date 27.12.2022
  * \author Dan Rakušan <rakusan.dan@gmail.com>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -114,14 +114,14 @@ public:
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
-	 * @param model Implicit model matrix, multiplies all model transforms from the left.
+	 * @param referenceFrame Implicit model matrix, multiplies all model transforms from the left.
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
 	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
+	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& referenceFrame,
 	                  const RenderOptions& renderOptions = RenderOptions(),
 	                  const DisplayOptions& displayOptions = DisplayOptions());
 
@@ -133,7 +133,7 @@ public:
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
 	 * @param camera The camera to render the viewport with
-	 * @param model Implicit model matrix, multiplies all model transforms from the left.
+	 * @param referenceFrame Implicit model matrix, multiplies all model transforms from the left.
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
@@ -141,7 +141,7 @@ public:
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
 	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
-	                  const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+	                  const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& referenceFrame,
 	                  const RenderOptions& renderOptions = RenderOptions(),
 	                  const DisplayOptions& displayOptions = DisplayOptions());
 
@@ -152,7 +152,7 @@ public:
 	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
-	 * @param model Implicit model matrix, multiplies all model transforms from the left.
+	 * @param referenceFrame Implicit model matrix, multiplies all model transforms from the left.
 	 * @param view View matrix of the camera
 	 * @param projection Projection matrix of the camera
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
@@ -161,7 +161,7 @@ public:
 	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	void drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
+	void drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& referenceFrame,
 	                const glm::mat4& view, const glm::mat4& projection,
 	                const RenderOptions& renderOptions = RenderOptions(),
 	                const DisplayOptions& displayOptions = DisplayOptions());

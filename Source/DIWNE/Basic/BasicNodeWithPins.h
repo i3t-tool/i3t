@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
+ * \author Dan Rakušan <rakusan.dan@gmail.com>, Jaroslav Holeček <holecek.jaroslav@email.cz>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -12,47 +12,43 @@
  */
 #pragma once
 
+#include "BasicNode.h"
 #include "Core/Nodes/GraphManager.h"
 
-#include "CoreNode.h"
-#include "CorePins.h"
 #include "DIWNE/Core/Layout/VStack.h"
 
-namespace Workspace
+namespace DIWNE
 {
-// TODO: Make this node inherit from DIWNE::BasicNodeWithPins
-class CoreNodeWithPins : public CoreNode
+class BasicNodeWithPins : public BasicNode
 {
-	using Super = CoreNode;
+	using Super = BasicNode;
 
 	float m_minRightAlignOfRightPins{0};
 
 protected:
-	std::vector<Ptr<CorePin>> m_workspaceInputs;
-	std::vector<Ptr<CorePin>> m_workspaceOutputs;
+	std::vector<std::shared_ptr<Pin>> m_inputs;
+	std::vector<std::shared_ptr<Pin>> m_outputs;
 
-	std::vector<CorePin*> m_leftPins;
-	std::vector<CorePin*> m_rightPins;
+	std::vector<Pin*> m_leftPins;
+	std::vector<Pin*> m_rightPins;
 
-	bool m_showDataOnPins; //< default true, false for Camera and Sequence - they do not show data on their output pins
-
-	DIWNE::VStack m_outputPinsVstack{diwne, &m_right};
+	VStack m_outputPinsVstack{diwne, &m_right};
 
 public:
-	CoreNodeWithPins(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
+	BasicNodeWithPins(NodeEditor& diwne, std::string label);
 
 	// Lifecycle
 	// =============================================================================================================
-	void begin(DIWNE::DrawInfo& context) override;
-	void leftContent(DIWNE::DrawInfo& context) override;
-	void rightContent(DIWNE::DrawInfo& context) override;
-	void afterDraw(DIWNE::DrawInfo& context) override;
+	void begin(DrawInfo& context) override;
+	void leftContent(DrawInfo& context) override;
+	void rightContent(DrawInfo& context) override;
+	void afterDraw(DrawInfo& context) override;
 
 	void onDestroy(bool logEvent) override;
 
 	// Interaction
 	// =============================================================================================================
-	bool allowPress(const DIWNE::DrawInfo& context) const override;
+	bool allowPress(const DrawInfo& context) const override;
 
 protected:
 	/**
@@ -69,28 +65,26 @@ public:
 	/**
 	 * @brief get vector of input pins
 	 * @note Input pins don't always have to be on the left side of the node!
-	 * @return m_workspaceInputs
+	 * @return m_inputs
 	 */
-	const std::vector<Ptr<CorePin>>& getInputs() const
+	const std::vector<std::shared_ptr<Pin>>& getInputs() const
 	{
-		return m_workspaceInputs;
+		return m_inputs;
 	};
 	/**
 	 * @brief get vector of output pins
 	 * @note Output pins don't always have to be on the right side of the node!
-	 * @return m_workspaceOutputs
+	 * @return m_outputs
 	 */
-	const std::vector<Ptr<CorePin>>& getOutputs() const
+	const std::vector<std::shared_ptr<Pin>>& getOutputs() const
 	{
-		return m_workspaceOutputs;
+		return m_outputs;
 	}
 
 	void unplugAll();
 
-	virtual void drawInputPins(DIWNE::DrawInfo& context);
-	virtual void drawOutputPins(DIWNE::DrawInfo& context);
-
-	void updatePinStyle(CorePin& pin);
+	virtual void drawInputPins(DrawInfo& context);
+	virtual void drawOutputPins(DrawInfo& context);
 
 	// =============================================================================================================
 
@@ -98,6 +92,6 @@ public:
 
 private:
 	/// Pin drag assist helper
-	CorePin* findPinClosestToTheMouse(const std::vector<Ptr<CorePin>>& pins, float& minDistance);
+	Pin* findPinClosestToTheMouse(const std::vector<std::shared_ptr<Pin>>& pins, float& minDistance);
 };
-} // namespace Workspace
+} // namespace DIWNE

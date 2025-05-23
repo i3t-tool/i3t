@@ -105,7 +105,11 @@ colors:
   ngen_Node Editor Background: [0.135, 0.135, 0.135, 1.000]
   ngen_Node Editor Grid Color: [0.223, 0.223, 0.223, 0.470]
   ngen_Node Editor Grid Dots Color: [0.784, 0.784, 0.784, 0.156]
+  ngen_Node Drop Zone Background: [0.098, 0.098, 0.098, 0.400]
   npin_Disabled Pin Color: [0.365, 0.365, 0.365, 0.333]
+  npin_Pin Hover Color Shift: [0.102, 0.102, 0.102, 0.000]
+  npin_Pin Hover Background: [0.000, 0.000, 0.000, 0.141]
+  npin_Pin Socket Background: [0.000, 0.000, 0.000, 0.310]
   npin_Pulse Pin: [0.657, 0.075, 0.799, 1.000]
   npin_Float Pin: [0.039, 0.702, 0.027, 1.000]
   npin_Vector 3 Pin: [0.227, 0.329, 0.733, 1.000]
@@ -124,6 +128,8 @@ colors:
   npin_Inner Color Screen: [0.000, 0.000, 0.000, 0.630]
   ngen_General Node Background: [0.216, 0.216, 0.216, 0.784]
   ngen_General Node Header: [0.020, 0.341, 0.012, 1.000]
+  ngen_General Node Foreground: [1.000, 1.000, 1.000, 1.000]
+  ngen_General Node Header Foreground: [1.000, 1.000, 1.000, 1.000]
   ngen_General Node Font (text): [1.000, 1.000, 1.000, 1.000]
   nops_Operator Background: [0.216, 0.216, 0.216, 0.784]
   nops_Operator Header: [0.004, 0.400, 0.490, 1.000]
@@ -151,6 +157,11 @@ colors:
   ntrs_Nodes Tracking Cursor Active: [0.860, 0.860, 0.000, 1.000]
   ntrs_Nodes Tracking Overlay Active: [0.302, 0.302, 0.102, 0.196]
   ntrs_Nodes Tracking Overlay Inactive: [0.161, 0.161, 0.161, 0.761]
+  ntrs_Tracking Model Tint Multiplier: [0.745, 0.745, 0.745, 0.800]
+  ntrs_Tracking Box Background: [0.000, 0.000, 0.000, 0.400]
+  ntrs_Tracking Slider Progress Background: [0.700, 0.700, 0.000, 1.000]
+  ntrs_Tracking Slider Progress Overlay: [0.750, 0.750, 0.000, 0.400]
+  ntrs_Tracking Slider Tick: [0.700, 0.700, 0.700, 1.000]
   ntrs_Nodes Transformation ValidIcon bgShape: [1.000, 0.000, 0.000, 1.000]
   ntrs_Nodes Transformation ValidIcon bgInner: [1.000, 0.000, 0.000, 1.000]
   ntrs_Nodes Transformation ValidIcon fgShape: [1.000, 1.000, 1.000, 1.000]
@@ -190,6 +201,7 @@ sizes:
   glob_Window Rounding: 0
   glob_Frame Rounding: 0
   glob_Floating Button Rounding: 2
+  glob_Mouse Drag Threshold: 6
   ngen_Nodes Rounding: 7
   ngen_Nodes BorderWidth: 0
   ngen_Pin Label Indent: 12
@@ -262,6 +274,7 @@ size vectors:
   ngen_Nodes LOD Button Size: [27, 27]
   npin_Nodes Pin Size: [15, 15]
   npin_Nodes Pin Size Matrix Mul: [16, 16]
+  npin_Nodes Pin Square Hover Enlarge: [1, 1]
   nflo_Nodes Float Cycle Button Size: [32, 32]
   nscr_Nodes Screen Texture Size: [130, 130]
   nscr_Screen Resize Button Size: [20, 20]

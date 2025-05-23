@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \authors Martin Herich, Petr Felkel, Dan Rakušan
+ * \authors Martin Herich, Petr Felkel, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -92,8 +92,9 @@ void Model::initialize(DIWNE::DrawInfo& context)
 		trackedPtr->setModel(modelPtr->getModel());
 
 		modelPtr->m_opaque = false;
-		modelPtr->m_opacity = std::min(m_opacity, 0.8f);
-		modelPtr->m_tint = m_tint * glm::vec3(0.28f);
+		glm::vec4 trackingTintMod = GUI::imToGlm(I3T::getColor(EColor::Tracking_ModelTintMultiplier));
+		modelPtr->m_opacity = std::min(m_opacity, trackingTintMod.w);
+		modelPtr->m_tint = m_tint * glm::vec3(trackingTintMod);
 		// modelPtr->m_tintStrength = std::max(m_tintStrength, 1.0f);
 	}
 	else
