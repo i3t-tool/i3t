@@ -98,9 +98,9 @@ enum class TrackingDirection
  * The main tracking object, responsible for tracking a single chain of sequences.
  *
  * This object assignes and manages TrackedNodeData objects accessible via Core::Node::getTrackingData().
- * Tracking data is assigned to all transformations, sequences and possibly operators involved in a tracking operation.
- * Models don't get tracking data assigned but they instead have a special TrackedModel reference. In both cases a null
- * pointer indicates that no tracking operation is active.
+ * Tracking data is assigned to all transformations, sequences, models and possibly cameras involved in the tracking
+ * operation. Tracking data of models contains an additional TrackedModelData object containg the interpolated matrix
+ * data. A null pointer indicates that no tracking operation is active.
  *
  * The MatrixTracker does not rebuild the sequence chain every frame, but reacts to value updates in any nodes that
  * have tracking data assigned (so transformations, sequences and possibly their external operators).

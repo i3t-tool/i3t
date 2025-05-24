@@ -2,7 +2,7 @@
  * \file
  * \brief
  * \author Dan Rakušan <rakusan.dan@gmail.com>
- * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
  * This file is part of I3T - An Interactive Tool for Teaching Transformations
@@ -62,27 +62,28 @@ void Viewport::init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
-                            const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
+void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
+                            const glm::mat4& referenceFrame, const RenderOptions& renderOptions,
+                            const DisplayOptions& displayOptions)
 {
 	prepareRenderTarget(renderTarget, renderOptions);
-	m_mainScene->draw(width, height, model, *renderTarget, displayOptions);
+	m_mainScene->draw(width, height, referenceFrame, *renderTarget, displayOptions);
 }
 
 void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
-                            const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& model,
+                            const std::shared_ptr<AbstractCamera>& camera, const glm::mat4& referenceFrame,
                             const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
 {
 	prepareRenderTarget(renderTarget, renderOptions);
-	m_mainScene->draw(width, height, camera, model, *renderTarget, displayOptions);
+	m_mainScene->draw(width, height, camera, referenceFrame, *renderTarget, displayOptions);
 }
 
-void Viewport::drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& model,
+void Viewport::drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, const glm::mat4& referenceFrame,
                           const glm::mat4& view, const glm::mat4& projection, const RenderOptions& renderOptions,
                           const DisplayOptions& displayOptions)
 {
 	prepareRenderTarget(renderTarget, renderOptions);
-	m_mainScene->draw(width, height, model, view, projection, *renderTarget, displayOptions);
+	m_mainScene->draw(width, height, referenceFrame, view, projection, *renderTarget, displayOptions);
 }
 
 void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject,

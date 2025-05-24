@@ -1,8 +1,22 @@
+/**
+ * \file
+ * \brief
+ * \author Dan Rakušan <rakusan.dan@gmail.com>
+ * \copyright Copyright (C) 2016-2025 I3T team, Department of Computer Graphics
+ * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
+ *
+ * This file is part of I3T - An Interactive Tool for Teaching Transformations
+ * http://www.i3t-tool.org
+ *
+ * GNU General Public License v3.0 (see LICENSE.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+ */
 #pragma once
 
 namespace DIWNE
 {
-/** \brief Storage of all values
+/**
+ * Collection of various node editor settings. Style related options are handled by the style subsystem
+ * @see DIWNE::Style
  */
 struct SettingsDiwne
 {
@@ -31,11 +45,6 @@ struct SettingsDiwne
 	float linkInteractionWidthDiwne = 7;
 	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0); // TODO: Turn into style variable, move calc from Worksp
 	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);  // TODO: Turn into style variable
-
-	float linkAlphaHovered = 1;         // TODO: Reimplement
-	float linkAlpha = 0.2;              // TODO: Reimplement
-	float linkAlphaSelectedHovered = 1; // TODO: Reimplement
-	float linkAlphaSelected = 0.5;      // TODO: Reimplement
 
 	// Some new flags that are yet to be truly finalized, subject to be moved to a different place
 	bool selectNodeOnDrag = false;

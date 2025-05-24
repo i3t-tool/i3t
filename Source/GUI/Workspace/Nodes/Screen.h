@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Screen box in the workspace
- * \authors Jaroslav Holeček, Petr Felkel, Martin Herich, Dan Rakušan
+ * \authors Jaroslav Holeček, Petr Felkel, Martin Herich, Dan Rakušan <rakusan.dan@gmail.com>
  * \date 25.09.2023
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic

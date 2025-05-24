@@ -760,7 +760,7 @@ bool ViewportWindow::showViewportButtons()
 		ImGui::Spacing();
 		DIWNE::DGui::DummyXY({topLeftButtonsOffset.x, 0.f});
 		ImGui::BeginGroup();
-		GUI::TextShadow(_t("Reference space matrix:"));
+		GUI::TextShadow(_tbd("Reference frame matrix:"));
 
 		bool valChanged = false;
 		int row, col;
@@ -786,7 +786,7 @@ bool ViewportWindow::showViewportButtons()
 		if (m_space.tracking)
 			GUI::ItemTooltip(_t("Stop tracking"));
 		else
-			GUI::ItemTooltip(_t("Reset reference space"));
+			GUI::ItemTooltip(_tbd("Reset reference frame"));
 
 		ImGui::EndGroup();
 	}

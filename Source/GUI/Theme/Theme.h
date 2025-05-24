@@ -222,6 +222,7 @@ enum class EColor
 	Nodes_Screen_background,
 	Nodes_Screen_noInput_text,
 
+	// Tracking
 	Nodes_Tracking_ColorActive,
 	Nodes_Tracking_ColorInactive,
 	Nodes_Tracking_Cursor,
@@ -229,6 +230,12 @@ enum class EColor
 	Nodes_Tracking_CursorActive,
 	Nodes_Tracking_OverlayActive,
 	Nodes_Tracking_OverlayInactive,
+
+	Tracking_ModelTintMultiplier,
+	Tracking_WorkspaceBg,
+	Tracking_SliderProgressBg,
+	Tracking_SliderProgressOverlay,
+	Tracking_SliderTickColor,
 
 	Nodes_Transformation_ValidIcon_bgShape,
 	Nodes_Transformation_ValidIcon_bgInner,

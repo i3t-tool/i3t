@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Common defines and includes for the DIWNE library.
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \author Dan Rakusan <rakusan.dan.jaroslav@email.cz>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *

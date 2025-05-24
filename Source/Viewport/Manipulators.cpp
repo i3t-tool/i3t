@@ -72,7 +72,7 @@ bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize, const
 	return false;
 }
 
-bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4* model,
+bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize, const glm::mat4* referenceFrame,
                                     const glm::mat4& view, const glm::mat4& proj)
 {
 	// TODO: Implement reference model matrix <<<<<<<<<<<<<<<<<<<<<<<<<

@@ -1,12 +1,5 @@
-// Dear ImGui: standalone example application for GLFW + OpenGL 3, using programmable pipeline
-// (GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan/Metal graphics context
-// creation, etc.)
-
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
+// DIWNE: standalone example application for GLFW + OpenGL 3, using programmable pipeline
+// Based on the Dear ImGui standalone example application.
 
 #include <stdio.h>
 
@@ -46,22 +39,6 @@ void diwneInit()
 	editor->addNode(std::make_shared<DIWNE::SequenceNodeContainer>(*editor, "Sequence 3"), ImVec2(200, 300));
 }
 
-void buttonHoverTest()
-{
-	ImGui::Dummy(ImVec2(50, 50));
-	std::cout << ImGui::IsItemHovered() << ",";
-	ImGui::Button("test", ImVec2(50, 50));
-	std::cout << ImGui::IsItemHovered() << ",";
-	ImGui::BeginDisabled(true);
-	ImGui::InvisibleButton("test2", ImVec2(50, 50));
-	ImGui::EndDisabled();
-	std::cout << ImGui::IsItemHovered() << ",";
-	ImGui::SetCursorPos(ImVec2(0, 0));
-	ImGui::Button("blocker", ImVec2(100, 200));
-	std::cout << ImGui::IsItemHovered();
-	std::cout << std::endl << std::endl;
-}
-
 void diwneWindow()
 {
 	ImGui::Begin("DIWNE example", NULL, ImGuiWindowFlags_MenuBar);
@@ -80,7 +57,6 @@ void diwneWindow()
 		ImGui::EndMenuBar();
 	}
 
-	//	buttonHoverTest();
 	editor->draw();
 
 	ImGui::End();

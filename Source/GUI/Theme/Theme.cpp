@@ -332,6 +332,12 @@ void Theme::initDefaultClassic()
 	set(EColor::Nodes_Tracking_OverlayActive, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
 	set(EColor::Nodes_Tracking_OverlayInactive, ImVec4(0.16f, 0.16f, 0.16f, 0.7f));
 
+	set(EColor::Tracking_ModelTintMultiplier, ImVec4(0.28f, 0.28, 0.28, 0.8f));
+	set(EColor::Tracking_WorkspaceBg, ImVec4(0.f, 0.f, 0.f, 0.4f));
+	set(EColor::Tracking_SliderProgressBg, ImVec4(0.7f, 0.7f, 0.f, 1.0f));
+	set(EColor::Tracking_SliderProgressOverlay, ImVec4(0.75, 0.75f, 0.f, 0.4f));
+	set(EColor::Tracking_SliderTickColor, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+
 	set(EColor::StartWindow_DescriptionBackground, createColor(255, 255, 255, 255));
 	set(EColor::StartWindow_WindowBackground, createColor(232, 232, 232, 255));
 	set(EColor::StartWindow_ScrollbarBackground, createColor(232, 232, 232, 255));
@@ -764,7 +770,12 @@ void Theme::initNames()
 	    .add(EColor::Nodes_Tracking_CursorHovered, "Nodes Tracking Cursor Hovered")
 	    .add(EColor::Nodes_Tracking_CursorActive, "Nodes Tracking Cursor Active")
 	    .add(EColor::Nodes_Tracking_OverlayActive, "Nodes Tracking Overlay Active")
-	    .add(EColor::Nodes_Tracking_OverlayInactive, "Nodes Tracking Overlay Inactive");
+	    .add(EColor::Nodes_Tracking_OverlayInactive, "Nodes Tracking Overlay Inactive")
+	    .add(EColor::Tracking_WorkspaceBg, "Tracking Box Background")
+	    .add(EColor::Tracking_SliderProgressBg, "Tracking Slider Progress Background")
+	    .add(EColor::Tracking_SliderProgressOverlay, "Tracking Slider Progress Overlay")
+	    .add(EColor::Tracking_SliderTickColor, "Tracking Slider Tick")
+	    .add(EColor::Tracking_ModelTintMultiplier, "Tracking Model Tint Multiplier");
 
 	group("Node Editor Popups", "npop", 1)
 	    .add(EColor::Nodes_ConnectionPossible, "Connection is possible (text)")

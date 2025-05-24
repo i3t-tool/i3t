@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief
- * \author Jaroslav Holeček <holecek.jaroslav@email.cz>
+ * \author Jaroslav Holeček <holecek.jaroslav@email.cz>, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
@@ -27,8 +27,6 @@
 // DIWNE Refactoring todos:
 // TODO: (DR) Refactor and revise the whole bypass/input/action trigger system thats going on here
 
-// TODO: Eventually NodeEditor should inherit from NodeContainer (or equivalent with links)
-
 namespace DIWNE
 {
 class Node;
@@ -36,11 +34,8 @@ class Pin;
 class Link;
 
 /**
- * // TODO: Update docs
- * \brief The node editor object
- * In ancestor of this object you will probably store your nodes (links, pins)
- * It store inter-object interactions
- * Every DiwneObject has reference to this object
+ * The DIWNE node editor object.
+ * Every DiwneObject has a reference to this object.
  */
 class NodeEditor : public DiwneObject, public NodeContainer
 {
@@ -53,8 +48,8 @@ public:
 
 	InteractionState interactionState; ///< State of multi-frame user operations
 
-	bool m_takeSnap{false}; // TODO: Rename or at least add documentation,
-	//  this feature shouldn't be specific to our undo/redo system if it were to remain here
+	// NOTE: The take snap functionality is very barebones, it should be expanded to for example give the change reason.
+	bool m_takeSnap{false}; ///< Indicates that a state change has occurred, can be used for undo/redo systems.
 
 	DIWNE_DEBUG_VARS()
 
@@ -63,16 +58,14 @@ protected:
 	std::unique_ptr<NodeEditorInputAdapter> m_input = std::make_unique<NodeEditorInputAdapter>(*this);
 	std::unique_ptr<StyleBase> m_style = std::make_unique<StyleBase>();
 
-	ImDrawListSplitter m_channelSplitter;
+	ImDrawListSplitter m_channelSplitter; ///< Channel splitter used to call nodes draw methods in reverse order.
 
 	std::weak_ptr<Node> mp_lastActiveNode; ///< Last node that requested focus (had a logical update)
 	bool m_lastActiveNodeChanged{false};
 
 	bool m_nodesSelectionChanged{false};
 
-	ImVec2 m_popupPosition;
-
-	ImDrawListSplitter m_splitter; ///< Every nodes should be draw to its own channel
+	ImVec2 m_popupPosition; ///< Position of the last popup in screen coordinates.
 
 public:
 	/**

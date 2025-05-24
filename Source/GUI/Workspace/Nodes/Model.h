@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief Model box in the workspace
- * \authors Martin Herich, Petr Felkel, Dan Rakušan
+ * \authors Martin Herich, Petr Felkel, Dan Rakušan <rakusan.dan@gmail.com>
  * \copyright Copyright (C) 2016-2023 I3T team, Department of Computer Graphics
  * and Interaction, FEE, Czech Technical University in Prague, Czech Republic
  *
