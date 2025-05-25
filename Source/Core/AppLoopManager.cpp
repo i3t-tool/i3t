@@ -140,7 +140,8 @@ double AppLoopManager::getFrameDurationOnIdle()
 	elapsedTime += m_deltaTime;
 
 	auto now = clock::now();
-	if (m_nextFrameTimeOnIdle - now > m_frameDurationOnIdle)
+	static constexpr auto epsilon = std::chrono::milliseconds{1};
+	if (m_nextFrameTimeOnIdle - now > m_frameDurationOnIdle + epsilon)
 	{
 		elapsedTime = duration(0.0);
 		m_nextFrameTimeOnIdle = now + m_frameDurationOnIdle;
@@ -158,5 +159,6 @@ double AppLoopManager::getFrameDurationOnIdle()
 		m_nextFrameTimeOnIdle += m_frameDurationOnIdle;
 	}
 
-	return (remaining < duration::zero()) ? 0.0 : (remaining.count() / 1e9); // Convert nanoseconds to seconds
+	double seconds = duration(remaining).count();
+	return (seconds > 0.0 ? seconds : 0.0);
 }
