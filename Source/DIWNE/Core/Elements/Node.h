@@ -22,7 +22,7 @@ class StyleOverride;
 using NodeFlag = uint64_t;
 
 /**
- * TODO: Docs
+ * \todo Docs
  */
 class Node : public DiwneObject
 {

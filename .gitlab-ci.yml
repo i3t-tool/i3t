@@ -97,7 +97,7 @@ build-app:
     expire_in: 1 week
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  dependencies:
+  needs:
     - check-format
 
 build-tests:
@@ -114,7 +114,7 @@ build-tests:
     expire_in: 1 week
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  dependencies:
+  needs:
     - check-format
 
 ###
@@ -126,19 +126,38 @@ test:
     - !reference [.changes-rules, cpp]
   script:
     - xvfb-run Binaries/Debug/I3TTest
-  dependencies:
+  needs:
     - build-tests
 
 test-e2e:
-    stage: test
-    rules:
-      - !reference [ .changes-rules, cpp ]
-    variables:
-      I3T_TEST_AUTO_RUN: "1"
-    script:
-        - xvfb-run Binaries/Debug/I3T
-    dependencies:
-        - build-app
+  stage: test
+  rules:
+  - !reference [ .changes-rules, cpp ]
+  variables:
+    I3T_TEST_AUTO_RUN: "1"
+  script:
+    - xvfb-run Binaries/Debug/I3T
+  needs:
+    - build-app
+
+test-docs-generation:
+  stage: test
+  image: node:24-bookworm-slim
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "Docs/**/*"
+        - "Scripts/**/*"
+        - ".gitlab-ci.yml"
+  before_script:
+    - apt update && apt install -y doxygen python3 unzip wget
+    - wget https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
+    - unzip doxybook2-linux-amd64-v1.5.0.zip
+    - cp bin/doxybook2 /usr/bin
+  script:
+    - bash ./Scripts/CreateCppDocs.sh
+    - npm ci
+    - npm run docs:build
 
 ###
 
