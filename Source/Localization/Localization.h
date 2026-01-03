@@ -127,7 +127,6 @@ public:
 
 	/**
 	 * \brief Translates a given key.
-	 * If a string literal is passed as key, the result should NOT be assigned to a const char*, but an std::string.
 	 * \param key The key to be translated.
 	 * \return Translated string corresponding to the key.
 	 */

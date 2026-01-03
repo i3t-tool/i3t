@@ -124,8 +124,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 				invalid = !Core::isViewportValid(viewportMat);
 
 				textureSize = realSize;
-				screenTextureOffset = diwne.canvas().diwne2screenSize(bottomLeft);
-				zoomedTextureSize = diwne.canvas().diwne2screenSize(textureSize);
+				screenTextureOffset = bottomLeft * diwne.getZoom();
+				zoomedTextureSize = textureSize * diwne.getZoom();
 			}
 			else
 			{
@@ -139,8 +139,8 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 				invalid = !Core::isViewportValid(viewportMat);
 
 				textureSize = realSize;
-				screenTextureOffset = diwne.canvas().diwne2screenSize(topLeft);
-				zoomedTextureSize = diwne.canvas().diwne2screenSize(textureSize);
+				screenTextureOffset = topLeft * diwne.getZoom();
+				zoomedTextureSize = textureSize * diwne.getZoom();
 			}
 		}
 
@@ -213,10 +213,10 @@ void Screen::centerContent(DIWNE::DrawInfo& context)
 		ImGui::PushClipRect(rect.Min, rect.Max, true);
 		float origScale = diwne.canvas().applyZoomScalingToFont(I3T::getFont(EFont::TutorialBold), 1.25f);
 
-		const std::string noInputText = _ts("NO INPUT");
-		const std::string invalidText = (_ts("  INVALID") + "\n" + _ts("VIEWPORT")).c_str();
+		const char* noInputText = _t("NO INPUT");
+		const char* invalidText = (_ts("  INVALID") + "\n" + _ts("VIEWPORT")).c_str();
 
-		GUI::TextCentered((invalid ? invalidText : noInputText).c_str(), rect,
+		GUI::TextCentered(invalid ? invalidText : noInputText, rect,
 		                  ImGui::ColorConvertFloat4ToU32(I3T::getColor(EColor::Nodes_Screen_noInput_text)));
 		diwne.canvas().stopZoomScalingToFont(I3T::getFont(EFont::TutorialBold), origScale);
 		ImGui::PopClipRect();
@@ -271,7 +271,7 @@ bool Screen::drawResizeHandle(ImVec2 topLeftCursorPos, ImVec2 zoomedScreenSize)
 	buttonSize = ImMax(ImVec2(1, 1), buttonSize);
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getZoom();
 
-	ImVec2 zoomedButtonSize = diwne.canvas().diwne2screenSize(buttonSize);
+	ImVec2 zoomedButtonSize = buttonSize * diwne.getZoom();
 
 	// NOTE: Prefer to use AddRectFilled as opposed to AddRect for debugging pixel positions
 	//   AddRect offsets coordinates by 0.5f

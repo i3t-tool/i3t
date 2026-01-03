@@ -4,70 +4,64 @@
         "imported": []
     },
     "viewport": {
-        "views": [
-            {
-                "manipulator_enabled": false,
-                "camera": {
-                    "mode": "ORBIT",
-                    "orbitCameraRotationX": -39.0700569152832,
-                    "orbitCameraRotationY": 23.909975051879883,
-                    "trackballCameraRotation": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "iorbitCameraRadius": 43.84381484985352,
-                    "iorbitCameraPivot": [
-                        0.505338191986084,
-                        0.16493858397006989,
-                        -3.584646463394165
-                    ],
-                    "fov": 13.699999809265137,
-                    "zNear": 0.20000000298023224,
-                    "zFar": 270.0
-                }
+        "manipulator_enabled": true,
+        "mainScene": {
+            "lightFollowsCamera": true,
+            "camera": {
+                "mode": "ORBIT",
+                "orbitCameraRotationX": -65.63983917236328,
+                "orbitCameraRotationY": 27.96995544433594,
+                "trackballCameraRotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "iorbitCameraRadius": 8.406620979309082,
+                "iorbitCameraPivot": [
+                    1.3748935461044312,
+                    1.2937798500061036,
+                    -2.212559938430786
+                ],
+                "fov": 90.0,
+                "zNear": 0.20000000298023225,
+                "zFar": 270.0
             }
-        ],
-        "scene": {
-            "lightFollowsCamera": true
         }
     },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1204,
+                "id": 149,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
-                "selected": false,
                 "position": [
-                    796.5455932617188,
-                    123.3636245727539
+                    806.0,
+                    287.0
                 ],
                 "transforms": [
                     {
-                        "id": 1210,
+                        "id": 155,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
-                        "selected": false,
                         "position": [
-                            827.9959106445313,
-                            156.91709899902344
+                            825.4505615234375,
+                            317.6444091796875
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -113,55 +107,34 @@
         "cycles": [],
         "cameras": [
             {
-                "id": 1211,
+                "id": 156,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
-                "selected": false,
                 "position": [
                     277.9273376464844,
                     62.10908508300781
                 ],
-                "showCamera": true,
-                "showAxes": true,
-                "showViewport": false,
-                "frustum": {
-                    "show": true,
-                    "fill": true,
-                    "fillColor4": [
-                        0.3499999940395355,
-                        0.27000001072883606,
-                        0.05999999865889549,
-                        0.2199999988079071
-                    ],
-                    "outlineColor": [
-                        1.0,
-                        0.0,
-                        0.0
-                    ]
-                },
                 "sequences": [
                     {
-                        "id": 1227,
+                        "id": 166,
                         "label": "view",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
-                        "selected": false,
                         "position": [
-                            472.08685302734375,
-                            92.1898193359375
+                            486.814208984375,
+                            92.91716003417969
                         ],
                         "transforms": [
                             {
-                                "id": 1233,
+                                "id": 172,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "SetValues",
-                                "selected": false,
                                 "position": [
-                                    502.177734375,
-                                    126.37164306640625
+                                    506.1778259277344,
+                                    123.46263122558594
                                 ],
                                 "type": "LookAt",
                                 "defaultValues": {
@@ -214,26 +187,24 @@
                         ]
                     },
                     {
-                        "id": 1221,
+                        "id": 160,
                         "label": "projection",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
-                        "selected": false,
                         "position": [
-                            299.9959411621094,
-                            92.1898193359375
+                            285.4505615234375,
+                            92.91716003417969
                         ],
                         "transforms": [
                             {
-                                "id": 1234,
+                                "id": 173,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "SetValues",
-                                "selected": false,
                                 "position": [
-                                    330.5413818359375,
-                                    126.37164306640625
+                                    305.4505615234375,
+                                    123.46263122558594
                                 ],
                                 "type": "Frustum",
                                 "defaultValues": {
@@ -275,35 +246,21 @@
                                 "locked": true
                             }
                         ]
-                    },
-                    {
-                        "id": 1215,
-                        "label": "viewport",
-                        "render": false,
-                        "numberOfDecimals": 1,
-                        "LOD": "Full",
-                        "selected": false,
-                        "position": [
-                            0.0,
-                            0.0
-                        ],
-                        "transforms": []
                     }
                 ]
             }
         ],
         "screens": [
             {
-                "id": 1235,
+                "id": 174,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
-                "selected": false,
                 "position": [
-                    -114.5455322265625,
-                    62.27272033691406
+                    804.0,
+                    -1.0
                 ],
-                "screenSize": [
+                "aspect": [
                     282.0,
                     226.0
                 ]
@@ -311,14 +268,13 @@
         ],
         "models": [
             {
-                "id": 1240,
+                "id": 178,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
-                "selected": false,
                 "position": [
-                    1037.054443359375,
-                    142.07273864746094
+                    1029.78173828125,
+                    286.79998779296877
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -334,38 +290,30 @@
             }
         ],
         "transforms": [],
-        "scriptingNodes": [],
         "edges": [
             [
-                1211,
+                156,
                 0,
-                1235,
+                174,
                 0
             ],
             [
-                1204,
+                149,
                 0,
-                1240,
+                178,
                 0
             ]
         ],
         "zoom": 1.375,
         "workArea": {
             "Min": [
-                -161.094970703125,
-                -23.446537017822266
+                259.26873779296877,
+                -165.99192810058595
             ],
             "Max": [
-                1235.2686767578125,
-                375.8262023925781
+                1216.359619140625,
+                571.4625854492188
             ]
         }
-    },
-    "layout": {
-        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1382\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,805\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,833\nSize=1920,549\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=2358,-566 Size=1920,1356 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,805 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,549 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
-    },
-    "tutorialData": {
-        "LanguageId": 0,
-        "CurrentStep": 0
     }
 }
