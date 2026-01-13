@@ -354,7 +354,8 @@ void Camera::popupContent(DIWNE::DrawInfo& context)
 		}
 		if (I3TGui::MenuItemWithLog(_t("Show camera"), NULL, cameraPtr->m_showCamera))
 		{
-			cameraPtr->m_visible = !cameraPtr->m_visible;
+			// cameraPtr->m_visible = !cameraPtr->m_visible;
+			cameraPtr->m_showCamera = !cameraPtr->m_showCamera;
 		}
 		if (I3TGui::MenuItemWithLog(_t("Show frustum"), NULL, cameraPtr->m_showFrustum))
 		{
