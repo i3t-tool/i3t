@@ -763,6 +763,22 @@ LUA_REGISTRATION
 	    "Sequence",
 	    sol::base_classes, sol::bases<GuiNode, Workspace::CoreNodeWithPins>(),
 		"get_mat4", &getValue<Workspace::Sequence, glm::mat4>,
+		//returns single transformation from sequence node at given index
+		"get_tranform", [](GuiSequence& self, int index) -> Ptr<GuiTransform> {
+			return std::dynamic_pointer_cast<GuiTransform>(self.getTransform(index).value_or(nullptr));
+		},
+		//returns all transformations from sequence node 
+		"get_transforms", [](GuiSequence& self) -> std::vector<Ptr<GuiTransform>> {
+			std::vector<Ptr<GuiTransform>> transforms;
+			for (const auto& node : self.getInnerWorkspaceNodes().collect())
+			{
+				if (auto transform = std::dynamic_pointer_cast<GuiTransform>(node))
+				{
+					transforms.push_back(transform);
+				}
+			}
+			return transforms;
+		},
 	    "push", sol::overload(
 			[](GuiSequence& self, Ptr<GuiTransform> transform) {
 				self.moveNodeToSequence(transform);
