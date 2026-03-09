@@ -1,0 +1,642 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
+    "viewport": {
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -90.0,
+                    "orbitCameraRotationY": 30.0,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 12.0,
+                    "iorbitCameraPivot": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 161,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1025.94287109375,
+                    154.0858917236328
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 165,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1026.142822265625,
+                    -11.314277648925781
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 169,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1027.3421630859375,
+                    71.48560333251953
+                ],
+                "type": "VectorDotVector"
+            },
+            {
+                "id": 173,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1161.7437744140625,
+                    153.8856964111328
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 176,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1296.5433349609375,
+                    -48.91427993774414
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 179,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1148.5430908203125,
+                    -47.314231872558594
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 182,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1157.944091796875,
+                    44.48569869995117
+                ],
+                "type": "VectorToVector3"
+            },
+            {
+                "id": 185,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1303.34326171875,
+                    17.08570671081543
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 188,
+                "render": true,
+                "numberOfDecimals": 3,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1309.9429931640625,
+                    82.88569641113281
+                ],
+                "type": "Vector3Length"
+            },
+            {
+                "id": 191,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1439.9991455078125,
+                    154.399658203125
+                ],
+                "type": "Determinant"
+            },
+            {
+                "id": 194,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    305.96612548828125,
+                    -271.0117492675781
+                ],
+                "type": "Vector3ToVector3",
+                "value": [
+                    1.0,
+                    0.8333333134651184,
+                    1.2000000476837158
+                ]
+            },
+            {
+                "id": 197,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -217.2451934814453,
+                    -344.49652099609375
+                ],
+                "type": "FloatToFloat",
+                "value": 1.0
+            },
+            {
+                "id": 200,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -41.711814880371094,
+                    -313.3248596191406
+                ],
+                "type": "FloatDivFloat"
+            },
+            {
+                "id": 204,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -37.792686462402344,
+                    -230.0421905517578
+                ],
+                "type": "FloatMulFloat"
+            },
+            {
+                "id": 216,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    763.7431030273438,
+                    -28.914306640625
+                ],
+                "type": "MatrixToVectors"
+            },
+            {
+                "id": 222,
+                "label": " asymetric scale k, 1/k - no change in determinant and dot",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    440.34771728515625,
+                    -252.57742309570313
+                ],
+                "type": "MakeScale"
+            },
+            {
+                "id": 213,
+                "label": "CHANGE THIS",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -246.11424255371094,
+                    -117.20204162597656
+                ],
+                "type": "FloatToFloat",
+                "value": 1.2000000476837158
+            },
+            {
+                "id": 208,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    151.6818084716797,
+                    -358.03167724609375
+                ],
+                "type": "FloatsToVector3"
+            }
+        ],
+        "sequences": [
+            {
+                "id": 225,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    319.313720703125,
+                    234.2866973876953
+                ],
+                "transforms": []
+            },
+            {
+                "id": 231,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -249.8933563232422,
+                    -26.77411460876465
+                ],
+                "transforms": [
+                    {
+                        "id": 237,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -220.20199584960938,
+                            5.37542724609375
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "angle": 0.6435011029243469
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.800000011920929,
+                                0.0,
+                                -0.6000000238418579,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.6000000238418579,
+                                0.0,
+                                0.800000011920929,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": false
+                    }
+                ]
+            },
+            {
+                "id": 238,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    40.062644958496094,
+                    -23.575620651245117
+                ],
+                "transforms": []
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 244,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    584.5798950195313,
+                    -23.25857162475586
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            },
+            {
+                "id": 246,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    581.7854614257813,
+                    126.46543884277344
+                ],
+                "model": "Axes",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 1.0
+            }
+        ],
+        "transforms": [
+            {
+                "id": 248,
+                "render": true,
+                "numberOfDecimals": 4,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    956.9974365234375,
+                    -299.4244079589844
+                ],
+                "type": "Scale",
+                "defaultValues": {
+                    "scale": [
+                        1.3350000381469727,
+                        0.7149999737739563,
+                        1.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.3350000381469727,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.7149999737739563,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            }
+        ],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                216,
+                1,
+                161,
+                0
+            ],
+            [
+                216,
+                2,
+                161,
+                1
+            ],
+            [
+                216,
+                0,
+                165,
+                0
+            ],
+            [
+                216,
+                1,
+                165,
+                1
+            ],
+            [
+                216,
+                0,
+                169,
+                0
+            ],
+            [
+                216,
+                2,
+                169,
+                1
+            ],
+            [
+                216,
+                2,
+                173,
+                0
+            ],
+            [
+                179,
+                0,
+                176,
+                0
+            ],
+            [
+                216,
+                0,
+                179,
+                0
+            ],
+            [
+                216,
+                1,
+                182,
+                0
+            ],
+            [
+                182,
+                0,
+                185,
+                0
+            ],
+            [
+                173,
+                0,
+                188,
+                0
+            ],
+            [
+                238,
+                2,
+                191,
+                0
+            ],
+            [
+                208,
+                0,
+                194,
+                0
+            ],
+            [
+                197,
+                0,
+                200,
+                0
+            ],
+            [
+                213,
+                0,
+                200,
+                1
+            ],
+            [
+                197,
+                0,
+                204,
+                0
+            ],
+            [
+                213,
+                0,
+                204,
+                1
+            ],
+            [
+                238,
+                2,
+                216,
+                0
+            ],
+            [
+                238,
+                2,
+                225,
+                1
+            ],
+            [
+                238,
+                0,
+                244,
+                0
+            ],
+            [
+                238,
+                0,
+                246,
+                0
+            ],
+            [
+                194,
+                0,
+                222,
+                0
+            ],
+            [
+                197,
+                0,
+                208,
+                0
+            ],
+            [
+                200,
+                0,
+                208,
+                1
+            ],
+            [
+                204,
+                0,
+                208,
+                2
+            ],
+            [
+                231,
+                0,
+                238,
+                0
+            ]
+        ],
+        "zoom": 0.8333337306976318,
+        "workArea": {
+            "Min": [
+                -303.80206298828125,
+                -707.024169921875
+            ],
+            "Max": [
+                1558.59716796875,
+                594.9752197265625
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1902,1111\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=348,1085\nCollapsed=0\nDockId=0x00000009,0\n\n[Window][###WorkspaceWindow]\nPos=350,26\nSize=1552,1085\nCollapsed=0\nDockId=0x0000000A,0\n\n[Window][###ModalWindow]\nPos=776,500\nSize=368,128\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=0,26\nSize=392,1391\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=1040,516\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nViewportPos=4209,17\nViewportId=0x4943A9B6\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=60,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=963,283\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=2758,-258 Size=1902,1085 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=392,1391 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=2166,1391 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 Split=X Selected=0x8535E254\n      DockNode  ID=0x00000009 Parent=0x00000006 SizeRef=348,492 Selected=0x8535E254\n      DockNode  ID=0x0000000A Parent=0x00000006 SizeRef=1570,492 CentralNode=1 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
+    }
+}

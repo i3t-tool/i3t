@@ -1,53 +1,57 @@
 {
-    "readOnly": true,
     "resources": {
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": false,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": -114.35995483398438,
-                "orbitCameraRotationY": 21.589988708496099,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 35.46453475952149,
-                "iorbitCameraPivot": [
-                    2.5759239196777345,
-                    1.3171708583831788,
-                    -0.8443679213523865
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -96.95979309082033,
+                    "orbitCameraRotationY": 26.230058670043945,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 12.283635139465332,
+                    "iorbitCameraPivot": [
+                        0.08415853977203369,
+                        0.25509199500083923,
+                        -0.14727742969989777
+                    ],
+                    "fov": 41.5,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
         }
     },
     "workspace": {
         "operators": [
             {
-                "id": 1,
+                "id": 301,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
+                "selected": false,
                 "position": [
                     -573.7328491210938,
                     -105.97779083251953
@@ -55,10 +59,11 @@
                 "type": "Inversion"
             },
             {
-                "id": 4,
+                "id": 304,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
+                "selected": false,
                 "position": [
                     -615.73291015625,
                     4.022227764129639
@@ -68,63 +73,67 @@
         ],
         "sequences": [
             {
-                "id": 7,
+                "id": 307,
                 "label": "B",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    -335.17779541015627,
+                    -335.17779541015625,
                     108.24443054199219
                 ],
                 "transforms": []
             },
             {
-                "id": 31,
+                "id": 313,
                 "label": "A",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    -324.26678466796877,
-                    -178.28880310058595
+                    -324.26678466796875,
+                    -178.28880310058594
                 ],
                 "transforms": []
             },
             {
-                "id": 37,
+                "id": 319,
                 "label": "B",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
+                "selected": false,
                 "position": [
                     -669.1331176757813,
                     -46.32383728027344
                 ],
                 "transforms": [
                     {
-                        "id": 43,
+                        "id": 325,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             -147.844482421875,
-                            38.911102294921878
+                            38.911102294921875
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
-                            "angle": 0.45102688670158389
+                            "angle": 0.45102688670158386
                         },
                         "savedDefaults": {},
                         "value": [
                             [
                                 0.8999999761581421,
-                                0.43588995933532717,
+                                0.43588995933532715,
                                 0.0,
                                 0.0
                             ],
                             [
-                                -0.43588995933532717,
+                                -0.43588995933532715,
                                 0.8999999761581421,
                                 0.0,
                                 0.0
@@ -146,13 +155,14 @@
                         "locked": true
                     },
                     {
-                        "id": 44,
+                        "id": 326,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             28.155517578125,
-                            38.911102294921878
+                            38.911102294921875
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -193,13 +203,14 @@
                         "locked": true
                     },
                     {
-                        "id": 45,
+                        "id": 327,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             204.155517578125,
-                            38.911102294921878
+                            38.911102294921875
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -236,13 +247,14 @@
                         "locked": true
                     },
                     {
-                        "id": 46,
+                        "id": 328,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             380.155517578125,
-                            38.911102294921878
+                            38.911102294921875
                         ],
                         "type": "Scale",
                         "defaultValues": {
@@ -285,39 +297,41 @@
                 ]
             },
             {
-                "id": 47,
+                "id": 329,
                 "label": "A",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Label",
+                "selected": false,
                 "position": [
                     -684.1331176757813,
                     -156.3238067626953
                 ],
                 "transforms": [
                     {
-                        "id": 53,
+                        "id": 335,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             -162.844482421875,
                             -71.08889770507813
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
-                            "angle": -0.30469265580177309
+                            "angle": -0.30469265580177307
                         },
                         "savedDefaults": {},
                         "value": [
                             [
                                 0.9539391994476318,
-                                -0.30000001192092898,
+                                -0.30000001192092896,
                                 0.0,
                                 0.0
                             ],
                             [
-                                0.30000001192092898,
+                                0.30000001192092896,
                                 0.9539391994476318,
                                 0.0,
                                 0.0
@@ -339,10 +353,11 @@
                         "locked": true
                     },
                     {
-                        "id": 54,
+                        "id": 336,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             13.155517578125,
                             -71.08889770507813
@@ -386,10 +401,11 @@
                         "locked": true
                     },
                     {
-                        "id": 55,
+                        "id": 337,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             189.155517578125,
                             -71.08889770507813
@@ -401,7 +417,7 @@
                         "savedDefaults": {},
                         "value": [
                             [
-                                0.20000000298023225,
+                                0.20000000298023224,
                                 0.0,
                                 0.9797958731651306,
                                 0.0
@@ -415,7 +431,7 @@
                             [
                                 -0.9797958731651306,
                                 0.0,
-                                0.20000000298023225,
+                                0.20000000298023224,
                                 0.0
                             ],
                             [
@@ -429,10 +445,11 @@
                         "locked": true
                     },
                     {
-                        "id": 56,
+                        "id": 338,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
                             365.155517578125,
                             -71.08889770507813
@@ -478,47 +495,64 @@
                 ]
             },
             {
-                "id": 57,
+                "id": 339,
                 "label": "B^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    -335.17779541015627,
+                    -335.17779541015625,
                     249.244384765625
                 ],
                 "transforms": []
             },
             {
-                "id": 63,
+                "id": 345,
                 "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    -325.17779541015627,
+                    -325.17779541015625,
                     -54.75554656982422
                 ],
                 "transforms": []
             },
             {
-                "id": 19,
+                "id": 351,
                 "label": "matice modelu",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1344.4410400390626,
+                    1344.4410400390625,
                     204.4351043701172
                 ],
                 "transforms": []
             },
             {
-                "id": 13,
+                "id": 363,
+                "label": "BA^(-1)",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1003.822509765625,
+                    345.1491394042969
+                ],
+                "transforms": []
+            },
+            {
+                "id": 357,
                 "label": "B",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     669.155517578125,
                     171.91110229492188
@@ -526,38 +560,28 @@
                 "transforms": []
             },
             {
-                "id": 25,
-                "label": "BA^(-1)",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    910.4894409179688,
-                    354.4825134277344
-                ],
-                "transforms": []
-            },
-            {
-                "id": 75,
-                "label": "A",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    1146.068359375,
-                    -74.28883361816406
-                ],
-                "transforms": []
-            },
-            {
-                "id": 69,
+                "id": 369,
                 "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    866.155517578125,
-                    5.911102294921875
+                    832.8224487304688,
+                    -8.755565643310547
+                ],
+                "transforms": []
+            },
+            {
+                "id": 375,
+                "label": "A",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": true,
+                "position": [
+                    1146.068359375,
+                    -74.28883361816406
                 ],
                 "transforms": []
             }
@@ -567,10 +591,11 @@
         "screens": [],
         "models": [
             {
-                "id": 81,
+                "id": 381,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -659.219482421875,
                     148.56201171875
@@ -588,13 +613,14 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 83,
+                "id": 383,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -83.93338775634766,
-                    -179.46673583984376
+                    -179.46673583984375
                 ],
                 "model": "Axes",
                 "visible": true,
@@ -609,10 +635,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 85,
+                "id": 385,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -106.21940612792969,
                     110.89524841308594
@@ -630,10 +657,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 87,
+                "id": 387,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     40.711181640625,
                     -189.5334014892578
@@ -651,10 +679,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 89,
+                "id": 389,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     1408.711181640625,
                     -73.86666870117188
@@ -673,114 +702,116 @@
             }
         ],
         "transforms": [],
+        "scriptingNodes": [],
         "edges": [
             [
-                47,
+                329,
                 1,
-                1,
+                301,
                 0
             ],
             [
-                37,
+                319,
                 1,
-                4,
+                304,
                 0
             ],
             [
-                37,
+                319,
                 1,
-                7,
+                307,
                 1
             ],
             [
-                47,
+                329,
                 1,
-                31,
+                313,
                 1
             ],
             [
-                4,
+                304,
                 0,
-                57,
+                339,
                 1
             ],
             [
-                1,
+                301,
                 0,
-                63,
+                345,
                 1
             ],
             [
-                31,
-                0,
-                83,
-                0
-            ],
-            [
-                7,
-                0,
-                85,
-                0
-            ],
-            [
-                31,
-                0,
-                87,
-                0
-            ],
-            [
-                75,
+                375,
                 2,
-                19,
+                351,
                 1
             ],
             [
-                7,
-                1,
-                13,
-                1
-            ],
-            [
-                69,
+                369,
                 2,
-                25,
+                363,
                 1
             ],
             [
-                69,
+                313,
                 0,
-                75,
+                383,
                 0
             ],
             [
-                31,
+                307,
+                0,
+                385,
+                0
+            ],
+            [
+                313,
+                0,
+                387,
+                0
+            ],
+            [
+                375,
+                0,
+                389,
+                0
+            ],
+            [
+                307,
                 1,
-                75,
+                357,
                 1
             ],
             [
-                13,
-                0,
-                69,
-                0
+                345,
+                1,
+                369,
+                1
             ],
             [
-                63,
+                313,
                 1,
-                69,
+                375,
                 1
             ]
         ],
         "zoom": 0.75,
         "workArea": {
             "Min": [
-                -771.2728881835938,
-                -238.99371337890626
+                -697.939697265625,
+                -220.3269805908203
             ],
             "Max": [
-                1767.393798828125,
-                599.6729736328125
+                1838.060302734375,
+                563.6730346679688
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1902,1111\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1902,495\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,523\nSize=1902,588\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ModalWindow]\nPos=763,500\nSize=393,128\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=0,26\nSize=499,1103\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nPos=-1270,75\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\nDockId=0x00000002,1\n\n[Window][###ImportedModelsDialog]\nPos=1040,516\nSize=360,293\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,251\n\n[Window][###ChangeLanguageWindow]\nViewportPos=4209,17\nViewportId=0x4943A9B6\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=963,283\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=3398,-28 Size=1902,1085 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=499,751 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=779,751 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=2126,1391 Split=Y\n      DockNode  ID=0x00000001 Parent=0x00000006 SizeRef=1920,801 CentralNode=1 Selected=0x8535E254\n      DockNode  ID=0x00000002 Parent=0x00000006 SizeRef=1920,588 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
     }
 }
