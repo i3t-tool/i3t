@@ -1,0 +1,77 @@
+---
+title: Cvičení - Bludiště
+description: Pomozte kachničce najít cestu do vany!
+thumbnail: thumbnailexc3.png
+language: cs
+scene: EXC3/exc3.scene
+---
+headline: Bludiště
+
+task: Pomozte kachničce překonat překážky na cestě do koupele. 
+
+
+Vaším úkolem je seřadit kroky ve správném pořadí.
+
+Abyste dosáhli svého cíle, musíte se naučit, co je to *algoritmus*. 
+
+--
+headline: Algoritmus
+
+*Algoritmus* - proces nebo soubor pravidel, které je třeba dodržovat při výpočtech nebo jiných operacích řešení problémů, zejména pomocí počítače.
+
+Jinými slovy, algoritmus je jen honosný výraz pro *seznam kroků*, které je třeba dodržet, aby bylo dosaženo určitého cíle!
+
+![Algoritmus](algorithm.png)
+
+--
+headline: Důležitost pořadí
+
+Představme si, že se oblékáte do školy.  
+
+Váš *"algoritmus oblékání"* může vypadat takto:
+
+- *První krok:* obléknout si spodní prádlo
+- *Druhý krok:* obléknout si ponožky
+- *Třetí krok:* obléknout si košili
+- *Čtvrtý krok:* obléknout si kalhoty
+- *Pátý krok:* obout si boty  
+
+![Algoritmus oblékání](clothes.png)
+
+Musíte postupovat v správném *pořadí*! 
+
+Neobujete si přece boty před ponožkami ani si neobléknete spodní prádlo po kalhotách.
+
+Proto je *pořadí důležité*.
+
+--
+headline: Začněme
+
+task: Nyní se pokuste pomoci kachně dosáhnout jejího cíle!
+
+Klikněte na krok a přetáhněte jej do *algoritmického pole* a poté jej tam pusťte. 
+
+![Přetažení uzlu](drag_and_drop.png)
+
+hint: Kachna je již otočena správným směrem, takže vaším prvním krokem bude pohyb.
+
+scriptFile: Algorithm.lua
+
+--
+headline: Dobrá práce!
+
+Kachna ti poděkovala za pomoc!
+
+Aby ti vyjádřila svou vděčnost, předvede ti tanec!
+
+Najdi uzel *DANCE!* a klikni na tři tečky.
+
+![Tři tečky](dance.png)
+
+Poté klikněte na tlačítko start, aby se objevila šťastná kachna.
+
+![Animace start](start_dance.png)
+
+Nyní již víte, co je to *algoritmus* a jak jej použít při různých úkolech.
+
+Zkuste vymyslet další věci, pro které byste mohli vytvořit algoritmus.

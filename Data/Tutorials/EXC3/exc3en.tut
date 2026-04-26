@@ -1,0 +1,80 @@
+---
+title: Exercise - Maze
+description: Help the duckling find its way to the bathtub!
+thumbnail: thumbnailexc3.png
+language: en
+scene: EXC3/exc3.scene
+---
+headline: Maze 
+
+task: Help the duckling overcome the obstacles on its way to the bathtub.
+
+Your task is to arrange the steps in the correct order.
+
+To reach your goal, you need to learn what an *algorithm* is.
+
+--
+headline: Algorithm
+
+An *algorithm* is a set of instructions that describe a sequence of actions for a performer to follow in order to achieve a result in a finite number of steps.
+
+In other words, an algorithm is just a fancy word for a *sequence of steps* you follow to get something done!
+
+![Algorithm](algorithm.png)
+
+--
+headline: Importance of Order
+
+Imagine you are getting dressed for school.
+
+Your *«dressing algorithm»* might look like this:
+
+- *Step one:* put on your underwear
+
+- *Step two:* put on your socks
+
+- *Step three:* put on your shirt
+
+- *Step four:* put on your pants
+
+- *Step five:* put on your shoes
+
+![Getting dressed algorithm](clothes.png)
+
+You must perform the steps in the correct *order*!
+
+You wouldn't put on your shoes before your socks, or put on your underwear after your pants.
+
+That is why *order matters*.
+
+--
+headline: Let's Begin
+
+task: Now try to help the duck reach its goal!
+
+Click on the desired step and drag it into the *algorithm box*, then release.
+
+![Drag and drop a node](drag_and_drop.png)
+
+hint: The duckling is already facing the right direction, so your first step will be to move a certain number of cells.
+
+scriptFile: Algorithm.lua
+
+--
+headline: Well done!
+
+The duckling says thank you for your help!
+
+To express its gratitude, it will perform a dance!
+
+Find the DANCE! button and click on the three dots.
+
+![Three dots](dance.png)
+
+Then click the *"Start"* button to see the happy duck.
+
+![Animation start](start_dance.png)
+
+Now you know what an algorithm is and how to apply it to different tasks.
+
+Try to think of other things you could create an algorithm for.

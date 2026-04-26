@@ -1,0 +1,1397 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": [
+            {
+                "name": "maze(6x6)",
+                "path": "scene_data/maze(6x6)/maze(6x6).fbx",
+                "type": "Model",
+                "normalize": false
+            },
+            {
+                "name": "pool",
+                "path": "scene_data/pool/pool.fbx",
+                "type": "Model",
+                "normalize": false
+            },
+            {
+                "name": "maze(4x4)",
+                "path": "scene_data/maze(4x4)/maze(4x4).fbx",
+                "type": "Model",
+                "normalize": false
+            }
+        ]
+    },
+    "viewport": {
+        "views": [
+            {
+                "manipulator_enabled": false,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -89.8891830444336,
+                    "orbitCameraRotationY": 88.00001525878906,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 27.567886352539063,
+                    "iorbitCameraPivot": [
+                        -1.4158254861831665,
+                        -5.762480735778809,
+                        -11.203250885009766
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 9,
+                "label": "0",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1138.7303466796875,
+                    181.41314697265625
+                ],
+                "type": "ClampFloat"
+            },
+            {
+                "id": 14,
+                "label": "0",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1269.8907470703125,
+                    181.41363525390625
+                ],
+                "type": "MakeEulerY"
+            },
+            {
+                "id": 17,
+                "label": "0",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1104.138916015625,
+                    227.1123504638672
+                ],
+                "type": "FloatToFloat",
+                "value": -10.0
+            }
+        ],
+        "sequences": [
+            {
+                "id": 20,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1747.2650146484375,
+                    -2696.92626953125
+                ],
+                "transforms": [
+                    {
+                        "id": 26,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1536.753662109375,
+                            -2642.5498046875
+                        ],
+                        "type": "EulerZ",
+                        "defaultValues": {
+                            "angle": 1.5707963705062866
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                -4.371138828673793e-8,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -1.0,
+                                -4.371138828673793e-8,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.9999999403953552,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 27,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1356.503173828125,
+                            -2642.5498046875
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                60.0,
+                                60.0,
+                                60.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                60.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                60.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                60.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 28,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1176.252685546875,
+                            -2642.5498046875
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                -0.30000001192092896,
+                                0.0,
+                                -0.20000000298023224
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                -0.30000001192092896,
+                                0.0,
+                                -0.20000000298023224,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 29,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1746.9908447265625,
+                    -2728.96728515625
+                ],
+                "transforms": [
+                    {
+                        "id": 35,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1309.309326171875,
+                            1072.404541015625
+                        ],
+                        "type": "EulerZ",
+                        "defaultValues": {
+                            "angle": 1.5707963705062866
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                -4.371138828673793e-8,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -1.0,
+                                -4.371138828673793e-8,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.9999999403953552,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 36,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1133.013427734375,
+                            1072.404541015625
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                1.0,
+                                5.699999809265137,
+                                3.5999999046325684
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                5.699999809265137,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                3.5999999046325684,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 37,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -956.7177124023438,
+                            1072.404541015625
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.10000000149011612,
+                                0.5,
+                                -6.699999809265137
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.10000000149011612,
+                                0.5,
+                                -6.699999809265137,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 38,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1745.11376953125,
+                    -2762.61865234375
+                ],
+                "transforms": [
+                    {
+                        "id": 44,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1649.280029296875,
+                            -2715.1259765625
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "angle": 1.5707963705062866
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                -4.371138828673793e-8,
+                                0.0,
+                                -1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.9999999403953552,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                1.0,
+                                0.0,
+                                -4.371138828673793e-8,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 45,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1469.029541015625,
+                            -2715.1259765625
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                0.4000000059604645,
+                                0.4000000059604645,
+                                0.4000000059604645
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.4000000059604645,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.4000000059604645,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.4000000059604645,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    },
+                    {
+                        "id": 46,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            -1288.779052734375,
+                            -2715.1259765625
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                60.0,
+                                -7.900000095367432,
+                                -7.099999904632568
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                60.0,
+                                -7.900000095367432,
+                                -7.099999904632568,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 47,
+                "label": "magic",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    1487.3775634765625,
+                    192.49124145507813
+                ],
+                "transforms": []
+            },
+            {
+                "id": 53,
+                "label": "Algorithm",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    -2069.1435546875,
+                    269.2986145019531
+                ],
+                "transforms": []
+            }
+        ],
+        "cycles": [
+            {
+                "id": 59,
+                "label": "DANCE!",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -371.4148864746094,
+                    181.1920623779297
+                ],
+                "from": 0.0,
+                "to": -10.0,
+                "manualStep": 0.10000000149011612,
+                "step": 0.20000000298023224,
+                "stepDuration": 0.10000000149011612,
+                "smooth": true,
+                "isRunning": false,
+                "mode": 2
+            }
+        ],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 76,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1599.0137939453125,
+                    -2657.194580078125
+                ],
+                "model": "maze(4x4)",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            },
+            {
+                "id": 78,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1601.1468505859375,
+                    -2728.427001953125
+                ],
+                "model": "Plane",
+                "visible": true,
+                "showAxes": false,
+                "opaque": false,
+                "opacity": 0.4099999964237213,
+                "tint": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "tintStrength": 0.9399999976158142
+            },
+            {
+                "id": 80,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1600.879638671875,
+                    -2696.716796875
+                ],
+                "model": "Plane",
+                "visible": true,
+                "showAxes": false,
+                "opaque": false,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    0.5,
+                    0.0
+                ],
+                "tintStrength": 0.9300000071525574
+            },
+            {
+                "id": 82,
+                "label": "pool",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1602.3394775390625,
+                    -2761.688720703125
+                ],
+                "model": "pool",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            },
+            {
+                "id": 84,
+                "label": "DUCK",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1748.5582275390625,
+                    135.79669189453125
+                ],
+                "model": "Duck",
+                "visible": true,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            },
+            {
+                "id": 86,
+                "label": "maze",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1471.4666748046875,
+                    -2762.2900390625
+                ],
+                "model": "maze(6x6)",
+                "visible": false,
+                "showAxes": false,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            }
+        ],
+        "transforms": [
+            {
+                "id": 91,
+                "label": "1 step",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1743.030029296875,
+                    522.9017333984375
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        5.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        5.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 98,
+                "label": "turn left",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1759.9022216796875,
+                    589.5385131835938
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "angle": 1.5707963705062866
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        -4.371138828673793e-8,
+                        0.0,
+                        -1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.9999999403953552,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        1.0,
+                        0.0,
+                        -4.371138828673793e-8,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true
+            },
+            {
+                "id": 95,
+                "label": "END",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1943.0296630859375,
+                    639.48974609375
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        6.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        6.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 96,
+                "label": "2 steps",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1995.2117919921875,
+                    567.2322387695313
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        10.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        10.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 89,
+                "label": "turn right",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1837.169921875,
+                    648.2374877929688
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "angle": -1.5707950592041016
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        0.0000012675908465098473,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        -1.0,
+                        0.0,
+                        0.0000012675908465098473,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true
+            },
+            {
+                "id": 90,
+                "label": "turn right",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -2081.896728515625,
+                    616.2645874023438
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "angle": -1.5707950592041016
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        0.0000012675908465098473,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        -1.0,
+                        0.0,
+                        0.0000012675908465098473,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true
+            },
+            {
+                "id": 93,
+                "label": "1 step",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -2060.9267578125,
+                    521.1837158203125
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        5.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        5.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 88,
+                "label": "turn right",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1898.2474365234375,
+                    516.3622436523438
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "angle": -1.5707950592041016
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        0.0000012675908465098473,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        -1.0,
+                        0.0,
+                        0.0000012675908465098473,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true
+            },
+            {
+                "id": 97,
+                "label": "turn left",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1628.65380859375,
+                    547.1109619140625
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "angle": 1.5707963705062866
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        -4.371138828673793e-8,
+                        0.0,
+                        -1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.9999999403953552,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        1.0,
+                        0.0,
+                        -4.371138828673793e-8,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true
+            },
+            {
+                "id": 92,
+                "label": "1 step",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1695.9652099609375,
+                    656.14794921875
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        5.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        5.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 94,
+                "label": "1 step",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1618.00390625,
+                    599.8185424804688
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        5.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        5.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            },
+            {
+                "id": 99,
+                "label": "START",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Label",
+                "selected": false,
+                "position": [
+                    -1879.3380126953125,
+                    577.7063598632813
+                ],
+                "type": "Free",
+                "value": [
+                    [
+                        -1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        -1.0,
+                        0.0
+                    ],
+                    [
+                        1.0,
+                        0.0,
+                        -2.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true
+            }
+        ],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                59,
+                0,
+                9,
+                0
+            ],
+            [
+                17,
+                0,
+                9,
+                1
+            ],
+            [
+                9,
+                0,
+                14,
+                0
+            ],
+            [
+                53,
+                0,
+                47,
+                0
+            ],
+            [
+                14,
+                0,
+                47,
+                1
+            ],
+            [
+                29,
+                0,
+                78,
+                0
+            ],
+            [
+                20,
+                0,
+                80,
+                0
+            ],
+            [
+                38,
+                0,
+                82,
+                0
+            ],
+            [
+                47,
+                0,
+                84,
+                0
+            ]
+        ],
+        "zoom": 0.5625010132789612,
+        "workArea": {
+            "Min": [
+                -2342.447998046875,
+                -511.1802978515625
+            ],
+            "Max": [
+                -136.229736328125,
+                1789.2598876953125
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=2560,1334\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=577,40\nSize=739,1294\nCollapsed=0\nDockId=0x00000006,0\n\n[Window][###WorkspaceWindow]\nPos=1319,40\nSize=1241,1294\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ModalWindow]\nPos=973,568\nSize=613,197\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=0,40\nSize=574,1294\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=504,127\nSize=688,744\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nPos=797,156\nSize=272,279\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=905,367\nSize=750,600\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,536\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Docking][Data]\nDockSpace         ID=0x09EF459F Window=0x9A404470 Pos=0,74 Size=2560,1294 Split=X Selected=0x8535E254\n  DockNode        ID=0x00000001 Parent=0x09EF459F SizeRef=1316,1294 Split=X\n    DockNode      ID=0x00000007 Parent=0x00000001 SizeRef=574,1391 Selected=0xEF3485CE\n    DockNode      ID=0x00000008 Parent=0x00000001 SizeRef=739,1391 Split=X\n      DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 CentralNode=1 Selected=0x8535E254\n      DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n        DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n        DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n  DockNode        ID=0x00000002 Parent=0x09EF459F SizeRef=1241,1294 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=1\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 1,
+        "CurrentTutorial": "Data/Tutorials/EXC3\\exc3en.tut",
+        "CurrentStep": 0
+    }
+}
