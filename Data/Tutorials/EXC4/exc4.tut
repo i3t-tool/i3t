@@ -1,0 +1,76 @@
+---
+title: Cvičení - Ortogonální matice 
+description: Naučte se, co jsou ortogonální matice a jaké mají vlastnosti. 
+thumbnail: thumbnailexc4.png 
+language: cs 
+scene: EXC4/exc4.scene
+---
+headline: Nastavení scény
+
+task: Přidejte do scény sekvenci matic (matrix sequence) a rotační matici (eulerAngleY). Vložte rotační matici do sekvence a nastavte její hodnotu na 30 stupňů.
+
+hint: Right click -> Transformations -> rotate -> eulerAngleY
+
+![eulerAngleY](seq_rotate.png)
+
+task: Přidejte do scény operátory inverze (inversion) a transpozice (transpose). Připojte k nim sekvenci s rotací.
+
+hint: Right click -> Operator -> matrix -> inversion / transpose
+
+![Inversion/Transpose](invtrans.png)
+
+--
+headline: Rotace
+
+Jakmile je vše připraveno, zkuste k sekvenci nejprve připojit inverzi a poté transpozici.
+
+![Connect](connect.png)
+
+Zajímavé, že? Výsledek je stejný, ale provádíme dvě různé operace.
+
+--
+headline: Scale
+
+Nyní zkusíme stejný proces, ale s jinou transformační maticí.
+
+task: Přidejte scale matrix namísto rotační matice a nastavte její hodnotu na 2. Poté zkuste připojit operátory stejným způsobem jako předtím.
+
+hint: Right click -> Transformations -> scale
+
+![Scale](scale.png)
+
+--
+headline: Moment pravdy
+
+U scale matice se inverze a transpozice sobě nerovnají.
+
+Proč to u rotace funguje a u měřítka ne?
+
+Odpovědí je, že rotační matice je *ortogonální* a scale matice nikoliv.
+
+--
+headline: Ortogonalita
+
+V lineární algebře je *ortogonální matice* nebo *ortonormální matice Q* reálná čtvercová matice, jejíž sloupce a řádky jsou ortonormální vektory.
+
+Množina vektorů je ortonormální, pokud má každý vektor v množině *délku 1* a každý vektor je *kolmý* ke každému jinému vektoru v množině.
+
+Díky těmto vlastnostem vidíme, že:
+
+![Inverse = Transpose](transinv.png)
+
+--
+headline: Rotace VS Scale
+
+Obě matice projdou testem ortogonality (všechny vektory v matici jsou kolmé ke všem ostatním vektorům v matici), ale scale matice *selže* v "normálovém" testu.
+
+Vektory v scale matici nejsou normalizované (jejich délka se nerovná 1). Protože selže i v jednom z těchto dvou pravidel, není ortonormální.
+
+!["Normal" test](xyz.png)
+
+--
+headline: Čas na kvíz
+
+Odpovězte na tyto otázky, abyste si procvičili své znalosti.
+
+scriptFile: quiz_cs.lua

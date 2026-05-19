@@ -1,0 +1,101 @@
+---
+title: Cvičení - Projekční stroj 
+description: Naučte se koncepty změny báze a diagonalizace. 
+thumbnail: exc5_thumbnail.png 
+language: cs 
+scene: EXC5/exc5.scene
+---
+headline: Nastavení scény
+
+Všechny hlavní komponenty potřebné pro tento úkol jsou již v pracovním prostoru. Všechny objekty jsou ve startovní pozici na (0,0,0).
+
+task: Přidejte do sekvence M transformace axisAngle (otočení kolem osy) a translation (posun).
+
+Nezapomeňte na skutečnost, že násobení matic není komutativní. První v sekvenci musí být matice rotace (axisAngle).
+
+![TRS](matrix_M.png)
+
+Pro lepší přehled a ovládání sbalte uzly. Můžete to udělat jedním kliknutím na tři tečky v levém horním rohu transformace.
+
+![Collapse](collapse_nodes.png)
+
+--
+headline: Nastavení scény
+
+task: Zkuste změnit hodnoty v těchto maticích.
+
+Uzel sekvence funguje jako násobení matic, takže na výstupu získáte jedinou transformační matici.
+
+Hodnoty matice můžete měnit také pomocí manipulátorů přímo v okně scény (Scene View).
+
+Chcete-li to provést, klikněte na matici v pracovním prostoru (Workspace) a poté v okně scény uvidíte manipulátory, které můžete přímo použít.
+
+![Manipulators](manipulators.png)
+
+--
+headline: Operace s vlastními čísly
+
+Tato matice S je diagonální matice vlastních čísel, kde 1 znamená zachovaný rozměr (vektory v rovině) a 0 znamená anihilovaný (zaniklý) rozměr (normálový vektor).
+
+![Scale](scale.png)
+
+--
+headline: Inverzní transformace
+
+Nyní potřebujeme inverzi transformace roviny, abychom transformovali souřadnice z obecné báze do vlastní báze (Eigenbasis).
+
+task: Připojte výstup transformace roviny (M) ke vstupu inverzního uzlu (M^-1).
+
+![Inverse](connect_inv.png)
+
+--
+headline: Sestavení projektoru
+
+Celý projekční operátor vznikne zřetězením těchto matic.
+
+Tato struktura je podobnostní transformace (diagonalizace), která dává výslednou projekční matici.
+
+task: Připojte výstupy S a M^-1 k násobičce matic S * M^-1.
+
+![S*M^-1](first_mult.png)
+
+task: Připojte výstupy transformace roviny a násobičky matic (S * M^-1) k násobičce matic M * (S * M^-1).
+
+![M*S*M^-1](second_mult.png)
+
+Násobení M * S * M^-1 transformuje jednoduchou projekci (S) z vlastní báze zpět do báze obecné.
+
+--
+headline: Transformace objektu
+
+Projekční operátor je nyní kompletní. Musíme definovat transformaci objektu, který je projektován.
+
+task: Přidejte do sekvence C transformace axisAngle a translation.
+
+Matice C definuje polohu operandu (množiny vektorů), na který bude projekční operátor působit.
+
+--
+headline: Aplikace projekce
+
+Posledním krokem je spojení transformace objektu (C) s projekčním operátorem.
+
+task: Připojte výstup projekčního operátoru M * (S * M^-1) a transformace kostky C k výslednému uzlu násobení M * (S * M^-1) * C. Zapojte výstup do projekční sekvence.
+
+![M*S*M^-1*C](third_mult.png)
+
+Pořadí M * (S * M^-1) * C znamená, že operace M * (S * M^-1) je aplikována na transformované souřadnice objektu C.
+
+--
+headline: Čas na hraní
+
+Výsledná transformace funguje, protože:
+
+- M * (S * M^-1) vytvoří operátor založený na jednoduchých vlastních číslech (S) a vlastních vektorech (M).
+
+- Násobení C aplikuje tento operátor na správnou výchozí množinu vektorů (polohu kostky).
+
+- Celý proces je aplikací lineárního zobrazení definovaného podobnostní transformací na vektory definované transformací objektu (C).
+
+task: Změňte polohu kostky a roviny, jak chcete.
+
+Nyní se tato matematická konstrukce bude chovat jako simulátor projekce, bavte se!

@@ -1,0 +1,80 @@
+---
+title: Exercise - Orthogonal Matrix
+description: Learn what orthogonal matrices are and their properties.
+thumbnail: thumbnailexc4.png
+language: en
+scene: EXC4/exc4.scene
+---
+headline: Setting up a scene
+
+task: Add a matrix sequence and a rotation matrix (eulerAngleY) to a scene. Drop rotation matrix into sequence and set it's value to 30 degrees. 
+
+hint: *Right click -> Transformations -> rotate -> eulerAngleY*
+
+![eulerAngleY](seq_rotate.png)
+
+task: Add an inversion and transpose operators to scene. Connect sequence with rotation to them.
+
+hint: *Right click -> Operator -> matrix -> inversion / transpose*
+
+![Inversion/Transpose](invtrans.png)
+
+--
+headline: Rotation 
+
+Once everything is ready, try connecting the inversion to sequence first, and then try the transpose.
+
+![Connect](connect.png)
+
+Interesting isn't it ? The result is same, but we are preforming two different operations.
+
+--
+headline: Scale
+
+Now let's try the same process but with a different transformation matrix.
+
+task: Add scale matrix instead of rotation matrix and set it's value to 2. After that, try connecting the operators in the same way you did before.
+
+hint: *Right click -> Transformations -> scale*
+
+![Scale](scale.png)
+
+--
+headline: Moment of truth
+
+For a scale matrix inverse and transpose are not equal.
+
+Why is it works for rotation and not for scaling ?
+
+Answer is that rotation matrix is *orthogonal* and scale matrix is not.
+
+--
+headline: Orthogonality
+
+In linear algebra, an *orthogonal matrix* or *orthonormal matrix Q*, is a real square matrix whose columns and rows are orthonormal vectors. 
+
+A set of vectors is orthonormal if every vector in the set has a *length of 1*, and every vector is *perpendicular* to every other vector in the set.
+
+Because we have those properties we can see that : 
+
+![Inverse = Transpose](transinv.png)
+
+--
+headline: Rotation VS Scaling
+
+They both pass ortoghonality test (all vectors in matrix are perpendicular to every other vector in matrix) but scale matrix *fails* the "normal" test. 
+
+Vectors in scale matrix aren't normalized (their length is not equal to 1). Because it fails even one of the two rules, it is not orthonormal.
+
+!["Normal" test](xyz.png)
+
+--
+headline: Quiz time
+
+Answer these questions to train your knowledge.
+
+scriptFile: quiz.lua
+
+
+
+

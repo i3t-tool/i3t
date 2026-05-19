@@ -1,0 +1,128 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": [
+            {
+                "name": "apple",
+                "path": "scene_data/apple/apple.fbx",
+                "type": "Model",
+                "normalize": false
+            }
+        ]
+    },
+    "viewport": {
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -9.379606246948242,
+                    "orbitCameraRotationY": 5.349911689758301,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 40.16502380371094,
+                    "iorbitCameraPivot": [
+                        -11.514700889587402,
+                        8.89833927154541,
+                        -1.251957654953003
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
+        }
+    },
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 9,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    336.4990539550781,
+                    74.00288391113281
+                ],
+                "transforms": []
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 15,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    591.2459716796875,
+                    93.59877014160156
+                ],
+                "model": "apple",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            }
+        ],
+        "transforms": [],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                9,
+                0,
+                15,
+                0
+            ]
+        ],
+        "zoom": 0.8437502980232239,
+        "workArea": {
+            "Min": [
+                -269.1928405761719,
+                -125.5001220703125
+            ],
+            "Max": [
+                2118.954345703125,
+                636.5736694335938
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=2560,1334\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=545,40\nSize=2015,648\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=545,691\nSize=2015,643\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###TutorialWindow]\nPos=0,40\nSize=542,1294\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=504,127\nSize=688,744\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nPos=797,156\nSize=272,279\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=901,707\nSize=750,600\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,536\n\n[Window][###ModalWindow]\nPos=973,568\nSize=613,197\nCollapsed=0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,74 Size=2560,1294 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=542,1391 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=2015,1391 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 Split=Y\n      DockNode  ID=0x00000001 Parent=0x00000006 SizeRef=1920,648 CentralNode=1 Selected=0x8535E254\n      DockNode  ID=0x00000002 Parent=0x00000006 SizeRef=1920,643 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=1\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentTutorial": "Data/Tutorials/EXC4\\exc4en.tut",
+        "CurrentStep": 0
+    }
+}

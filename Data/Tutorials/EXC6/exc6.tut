@@ -1,0 +1,164 @@
+---
+title: Cvičení - Regularita 
+description: Dokažte, že pokud jsou matice A a B regulární, jejich součin AB je také regulární. 
+thumbnail: exc6_thumbnail.png 
+language: cs 
+scene: EXC6/exc6.scene
+---
+headline: Nastavení scény
+
+Nechť A a B jsou matice typu n×n. Pokud je A regulární a B je regulární, pak součin AB je regulární.
+
+task: Přidejte do pracovního prostoru dva samostatné uzly matic. Pojmenujte je A a B. Změňte jejich hodnoty podle obrázku níže.
+
+![Add matrices and rename them](add_matrices.png)
+
+![Matrices](ab_matrices.png)
+
+Pamatujte, že hodnoty slouží pouze pro demonstrační účely; vše, co potřebujeme vědět, je, že matice A a B jsou regulární.
+
+hint: Kliknutím pravým tlačítkem na hodnotu se zobrazí nabídka s předdefinovanými hodnotami. Tažením myši se hodnoty mění plynule.
+
+--
+headline: Transformace
+
+Abychom zjistili, jaké transformace se za těmito maticemi skrývají, připojíme je k uzlu sekvence (sequence node).
+
+task: Připojte nejprve matici A k uzlu sekvence, poté připojte matici B.
+
+![Connect matrix to sequence](connect_mtx.png)
+
+hint: Připojte matici k sekvenci tažením drátu mezi piny.
+
+--
+headline: Metoda determinantu
+
+task: Přidejte determinant do pracovního prostoru. Připojte výstup matice A a poté matice B k uzlu determinantu.
+
+![Add determinant](det.png)
+
+Podívejte se na hodnoty. Abychom mohli pokračovat v tomto důkazu, musíme předpokládat, že A a B jsou *regulární*. Jaká hodnota je pro tyto determinanty přísně zakázána?
+
+hint: Pokud je hodnota 0, matice je *singulární*. Ujistěte se, že vaše matice mají nenulové determinanty.
+
+--
+headline: Singularita
+
+task: Zkopírujte matici A a změňte jednu z hodnot na diagonále z 1 na 0. Připojte ji nejprve k uzlu determinantu a poté k uzlu sekvence.
+
+Podívejte se na hodnotu *determinantu*. Klesla na 0. Nyní se podívejte do okna Scene View. Kostka zmizela nebo se zploštila!
+
+Právě jste vytvořili *Singulární Matici*.
+
+*Algebraicky:* Když je determinant 0, matici nelze invertovat, protože nelze dělit nulou.
+
+*Geometricky:* Matice právě ztratila jeden rozměr. Vzala 3D objem a „zploštila“ jej do 2D roviny (nebo 1D přímky, pokud by na diagonále byly dvě nuly). Objem je nyní nulový.
+
+Aby náš důkaz „regularity součinu“ fungoval, musíme se takovým singulárním maticím vyhnout. Regulární matice zachovává rozměr, zatímco singulární matice jej ničí.
+
+task: Smažte singulární matici z Workspace.
+
+--
+headline: Pravidlo o součinu
+
+task: Přidejte do Workspace operátor násobení matic. Přejmenujte jej na AB. Připojte výstup matice A a matice B.
+
+![Add matrix multiplication](mtx_mult.png)
+
+Nyní se podívejme na výslednou matici AB.
+
+task: Vypočítejte det(AB) pomocí uzlu determinantu na výsledné matici.
+
+![Determinant of a product](AB_det.png)
+
+Výsledek je také nenulový. Proč tomu tak je?
+
+task: Připojte součin k uzlu sekvence.
+
+Jasně vidíme, že stále máme objem.
+
+--
+headline: Pravidlo o součinu
+
+Podle Cauchy-Binetovy věty souvisí determinant součinu s determinanty jeho částí.
+
+![det(AB)](detAB.png)
+
+Protože součin dvou nenulových čísel je vždy nenulový, dokázali jsme, že
+
+![Proof](proofAB.png)
+
+Proto je AB regulární.
+
+--
+headline: Část 2: Metoda inverze
+
+Nyní k algebraickému důkazu. *Definice*:
+
+![Regularity](defreg_cs.png)
+
+Potřebujeme najít inverzi součinu AB.
+
+task: Přidejte dva uzly inverze pro A a B. Přejmenujte je na inverze A a inverze B.
+
+![Inverse of two matrices](inv_ab.png)
+
+Potřebujeme vynásobit (AB) nějakou maticí X, abychom získali *Identitu*.
+
+![ABX](ABX.png)
+
+--
+headline: Část 2: Metoda inverze
+
+task: Připojte nejprve matici A a poté invertovanou matici A k uzlu sekvence.
+
+Podívejte se na výsledek. Matice A kostku zkosila a deformovala její tvar.
+
+*Nyní si všimněte, co dělá inverze:* Inverze matice A zkosí kostku na *opačnou stranu*.
+
+hint: Inverze ne vždy jen nakloní objekt na "opačnou stranu". Pokud má matice na diagonále záporné hodnoty, inverze musí zohlednit převrácenou orientaci. V těchto případech není vizuální výsledek pouhým opačným zkosením.
+
+Abychom se dostali k jednotkové matici, musíme matice "odlupovat" zevnitř ven.
+
+Které uspořádání úspěšně vrátí deformovaný objekt zpět na dokonalou jednotkovou kostku?
+
+hint: Nejdříve musíme eliminovat B. Která matice po vynásobení s B vytvoří jednotkovou matici?
+
+--
+headline: Obrácené pořadí
+
+task: Přidejte do pracovního prostoru operátor násobení matic. Připojte k němu výstup invertované matice B a A.
+
+![Inverse of product](inversemult.png)
+
+Nezapomeňte na pořadí. Násobení matic není komutativní.
+
+Jen pro vyjasnění:
+
+task: Přejmenujte operátor násobení na B^(-1)A^(-1).
+
+--
+headline: Ověření
+
+Nyní otestujeme naši hypotézu.
+
+task: Přidejte do pracovního prostoru operátor násobení matic. Připojte výstup AB a B^(-1)A^(-1).
+
+![Result](res.png)
+
+![Proof by inverse](proofinv_cs.png)
+
+Protože jsme úspěšně našli matici, která mění AB na jednotkovou matici, dokázali jsme, že AB je *invertibilní a regulární*.
+
+--
+headline: Shrnutí
+
+Právě jsme dokázali, že součin regulárních matic je vždy regulární. Abychom to udělali, podívali jsme se na problém třemi různými pohledy:
+
+- *Vizuální test:* Viděli jsme, že singulární matice funguje jako drtič, „zplošťuje“ 3D kostku do 2D roviny, čímž ničí její objem. Vzhledem k tomu, že regulární matice mají vždy nenulový objem, jejich kombinace nikdy nezpůsobí tento kolaps.
+
+- *Determinanty:* Protože regulární matice působí jako nenulové faktory měřítka, jejich součin působí jako nenulový faktor měřítka. Je matematicky nemožné získat nulový determinant z nenulových částí.
+
+- *Inverze:* Sestavili jsme inverzní matici. Pokud můžete „vrátit“ A a můžete „vrátit“ B, můžete „vrátit“ i jejich kombinaci obrácením kroků.
+
+Regularita je stabilní vlastnost. Dokud kombinujete platné, invertibilní transformace, výsledek se nikdy nezhroutí do singularity.

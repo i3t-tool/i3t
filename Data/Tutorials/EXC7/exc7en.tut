@@ -1,0 +1,53 @@
+---
+title: Tutorial For Testing
+description: Testing new scripting methods.
+thumbnail: test.png
+language: en
+scene: EXC7/test.scene
+---
+headline: Set label locked
+
+Locks the labels of the nodes that are in the scene.
+
+scriptFile: set_label_locked.lua
+
+--
+headline: Is wired to
+
+Checks if sequence node is connected to the model node.
+
+scriptFile: is_wired_to.lua
+--
+headline: Get transform
+
+Tries to find node with label "MyRotation" in the sequence.
+
+scriptFile: get_transform.lua
+
+--
+headline: Get model name
+
+Checks if the model is bunny.
+
+scriptFile: get_model_name.lua
+
+--
+headline: Set highlight
+
+Turn on the highlight for model node.
+
+scriptFile: set_highlight.lua
+
+--
+headline: Stir feature
+
+Will stir all of the nodes in the scene and zoom out\in to see them all.
+
+scriptFile: stir.lua
+
+--
+headline: Target
+
+Compares two matrices (target and student answer).
+
+scriptFile: target.lua

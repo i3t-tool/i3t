@@ -1,0 +1,329 @@
+{
+    "readOnly": true,
+    "resources": {
+        "imported": [
+            {
+                "name": "xzplane",
+                "path": "scene_data/xzplane/xzplane.fbx",
+                "type": "Model",
+                "normalize": false
+            }
+        ]
+    },
+    "viewport": {
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": 2.508023738861084,
+                    "orbitCameraRotationY": 22.1709041595459,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 7.149405002593994,
+                    "iorbitCameraPivot": [
+                        -0.1902425587177277,
+                        1.4233365058898926,
+                        0.4532551169395447
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
+            }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
+        }
+    },
+    "workspace": {
+        "operators": [
+            {
+                "id": 55,
+                "label": "M * (S * M^-1)",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1239.2991943359375,
+                    255.17669677734375
+                ],
+                "type": "MatrixMulMatrix"
+            },
+            {
+                "id": 59,
+                "label": "S * M^-1",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    984.4532470703125,
+                    250.5126495361328
+                ],
+                "type": "MatrixMulMatrix"
+            },
+            {
+                "id": 63,
+                "label": "M^(-1)",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    980.5488891601563,
+                    105.73738861083984
+                ],
+                "type": "Inversion"
+            },
+            {
+                "id": 66,
+                "label": "M * (S * M^-1) * C",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1238.931884765625,
+                    106.77344512939453
+                ],
+                "type": "MatrixMulMatrix"
+            }
+        ],
+        "sequences": [
+            {
+                "id": 70,
+                "label": "M",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    302.92889404296875,
+                    93.2891616821289
+                ],
+                "transforms": []
+            },
+            {
+                "id": 76,
+                "label": "C",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1603.5751953125,
+                    351.6823425292969
+                ],
+                "transforms": []
+            },
+            {
+                "id": 82,
+                "label": "Projection of cube onto plane XZ",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1822.680908203125,
+                    160.07098388671875
+                ],
+                "transforms": []
+            },
+            {
+                "id": 88,
+                "label": "S",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    615.8153686523438,
+                    331.92291259765625
+                ],
+                "transforms": [
+                    {
+                        "id": 94,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            647.0299072265625,
+                            365.53082275390625
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                1.0,
+                                0.0010000000474974513,
+                                1.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0010000000474974513,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 95,
+                "label": "XZ plane",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    713.0504760742188,
+                    111.19863891601563
+                ],
+                "model": "xzplane",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5899999737739563,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            },
+            {
+                "id": 97,
+                "label": "Cube",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    2144.047607421875,
+                    374.3517761230469
+                ],
+                "model": "Cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            },
+            {
+                "id": 99,
+                "label": "Projection",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    2141.345947265625,
+                    178.4533233642578
+                ],
+                "model": "Cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": false,
+                "opacity": 1.0,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "tintStrength": 0.5
+            }
+        ],
+        "transforms": [],
+        "scriptingNodes": [],
+        "edges": [
+            [
+                70,
+                0,
+                95,
+                0
+            ],
+            [
+                76,
+                0,
+                97,
+                0
+            ],
+            [
+                82,
+                0,
+                99,
+                0
+            ]
+        ],
+        "zoom": 0.5839307308197021,
+        "workArea": {
+            "Min": [
+                124.12863159179688,
+                -116.26971435546875
+            ],
+            "Max": [
+                3574.88037109375,
+                1127.0283203125
+            ]
+        }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=2560,1334\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=545,40\nSize=2015,565\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=545,608\nSize=2015,726\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###TutorialWindow]\nPos=0,40\nSize=542,1294\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=504,127\nSize=688,744\nCollapsed=0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][###ChangeLanguageWindow]\nPos=797,156\nSize=272,279\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=968,695\nSize=750,600\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,536\n\n[Window][###ModalWindow]\nPos=973,568\nSize=613,197\nCollapsed=0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,74 Size=2560,1294 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=542,1391 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=2015,1391 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 Split=Y\n      DockNode  ID=0x00000001 Parent=0x00000006 SizeRef=1920,565 CentralNode=1 Selected=0x8535E254\n      DockNode  ID=0x00000002 Parent=0x00000006 SizeRef=1920,726 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=1\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentTutorial": "Data/Tutorials/EXC5\\exc5en.tut",
+        "CurrentStep": 0
+    }
+}

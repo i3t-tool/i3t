@@ -1,0 +1,101 @@
+---
+title: Exercise - The Projection Machine
+description: Learn concepts of Change of Basis and Diagonalization.
+thumbnail: exc5_thumbnail.png
+language: en
+scene: EXC5/exc5.scene
+---
+headline: Setting up a scene
+
+All the main components needed for the task are already in the workspace. All object are in the start position at (0,0,0).
+
+task: Add to M sequence axisAngle and translation transformations. 
+
+Don't forget about a fact that matrix multiplication is not commutative. First in sequence must be rotation matrix (axisAngle).
+
+![TRS](matrix_M.png)
+
+For better view and control collapse nodes. You can do it by click on three dots in the top left corner of transformation once.
+
+![Collapse](collapse_nodes.png)
+
+--
+headline: Setting up a scene
+
+task: Try to change values in those matrices.
+
+The sequence node works like matrix multiplication, so you get a single transformation matrix at the output.
+
+You can also change the matrix values using manipulators directly in the Scene View.
+
+To do this, click on the matrix in the Workspace, and then in the Scene View you will see manipulators that you can use directly.
+
+![Manipulators](manipulators.png)
+
+--
+headline: The Eigenvalue Operation
+
+This S matrix is the diagonal matrix of Eigenvalues, where 1 signifies a preserved dimension (vectors on the plane) and 0 signifies an annihilated dimension (the normal vector).
+
+![Scale](scale.png)
+
+--
+headline: The Inverse Transformation
+
+Now we need the inverse of the plane's transformation to transform coordinates from the general basis to the Eigenbasis.
+
+task: Connect the output of the Plane Transform (M) to the input of the Inversion node (M^-1).
+
+![Inverse](connect_inv.png)
+
+--
+headline: Constructing the Projector
+
+The full projection operator is formed by chaining these matrices. 
+
+This structure is a Similarity Transformation (Diagonalization) that yields the final projection matrix.
+
+task: Connect S and M^-1 outputs to a matrix multiplicator S * M^-1.
+
+![S*M^-1](first_mult.png)
+
+task: Connect a plane transformation and a matrix multiplicator (S * M^-1) outputs to a matrix multiplicator M * (S * M^-1).
+
+![M*S*M^-1](second_mult.png)
+
+The multiplication M * S * M^-1 transforms the simple projection (S) from the Eigenbasis back to the general basis.
+
+--
+headline: The Object Transformation
+
+The projection operator is now complete. We must define the transformation of the object being projected.
+
+task: Add to C sequence axisAngle and translation transformations. 
+
+Matrix C defines the position of the Operand (the vector set) that the projection Operator will act upon.
+
+--
+headline: Applying the Projection
+
+The final step is to combine the object's transformation (C) with the projection operator.
+
+task: Connect the output of the Projector Operator M * (S * M^-1) and the Cube Transform C to the final multiplication node M * (S * M^-1) * C. Plug the output into the projection sequence.
+
+![M*S*M^-1*C](third_mult.png)
+
+The order is M * (S * M^-1) * C means the operation M * (S * M^-1) is applied to the object's transformed coordinates C.
+
+--
+headline: Play time 
+
+The final transformation *works* because:
+- M * (S * M^-1) creates Operator based on simple Eigenvalues (S) and Eigenvectors (M).
+
+- *Multiplication by C* applies this operator to the correct starting vector set (cube position).
+
+- The entire process is the application of a linear map defined by a Similarity Transformation to the vectors defined by the object's transformation (C).
+
+task: Change position of cube and plane as you want. 
+
+Now this math construction will behave as a projection simulator, have fun! 
+

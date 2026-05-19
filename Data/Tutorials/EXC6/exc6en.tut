@@ -1,0 +1,165 @@
+---
+title: Exercise - Regularity
+description: Prove that if matrices A and B are regular, their product AB is also regular.
+thumbnail: exc6_thumbnail.png
+language: en
+scene: EXC6/exc6.scene
+---
+headline: Setting up a scene
+
+Let A and B be n×n matrices. If A is regular and B is regular, then the product AB is regular.
+
+task: Add two separate matrix nodes to the workspace. Name them A and B. Change their values accordingly to the image below.
+
+![Add matrices and rename them](add_matrices.png)
+
+![Matrices](ab_matrices.png)
+
+Remember that the values are for demonstration purposes only; all we need to know is that matrices A and B are regular. 
+
+hint: Right-clicking on the value displays a menu with predefined values. And dragging the mouse changes the values smoothly.
+
+--
+headline: Transformations
+
+To find out what transformations are hidden behind these matrices, let's connect them to the sequence node.
+
+task: Connect at first matrix A to a sequence node then connect matrix B.
+
+![Connect matrix to sequence](connect_mtx.png)
+
+hint: Connect matrix to sequence by dragging a wire between the pins.
+
+--
+headline: The Determinant Method
+
+task: Add a determinant to the workspace. Connect the output of matrix A and then matrix B to determinant node.
+
+![Add determinant](det.png)
+
+Look at the values. To proceed with this proof, we must assume A and B are *regular*. What value is strictly forbidden for these determinants?
+
+hint: If the value is 0, the matrix is *singular*. Ensure your matrices have non-zero determinants.
+
+--
+headline: Singularity
+
+task: Copy matrix A and change one of the diagonal value from 1 to 0. Connect it firstly to a determinant node and then to a sequence node.
+
+Look at the *determinant* value. It has dropped to 0. Now, look at the Scene View window. The cube has vanished or flattened!
+
+You have just created a *Singular Matrix*.
+
+*Algebraically:* When the determinant is 0, the matrix cannot be inverted because you cannot divide by zero.
+
+*Geometrically:* The matrix has just lost one dimension. It has taken a 3D volume and "flattened" it into a 2D plane (or a 1D line, if there were two zeros on the diagonal). The volume is now zero.
+
+For our proof of "Product Regularity" to work, we must avoid such singular matrices. A regular matrix preserves dimension while a singular matrix destroys it.
+
+task: Delete the singular matrix from the workspace.
+
+--
+headline: The Product Rule
+
+task: Add a matrix multiplication operator to the workspace. Rename it to AB. Connect the output of matrix A and matrix B.
+
+![Add matrix multiplication](mtx_mult.png)
+
+Now let's look at the product matrix AB. 
+
+task: Calculate det(AB) using a determinant node on the product matrix.
+
+![Determinant of a product](AB_det.png)
+
+Result is also a non zero. Why so? 
+
+task: Connect product to a sequence node.
+
+We can clearly see that we still have volume.
+
+--
+headline: The Product Rule
+
+According to the Cauchy-Binet formula, the determinant of a product is related to the determinants of its parts.
+
+![det(AB)](detAB.png)
+
+Because the product of two non-zero numbers is always non-zero, we have proven that
+
+![Proof](proofAB.png)
+
+Therefore, AB is regular.
+
+--
+headline: Part 2: The Inverse Method
+
+Now for the algebraic proof. *Definition:*
+
+![Regularity](defreg.png)
+
+We need to find the inverse of the product AB. 
+
+task: Add two *inversion* nodes for A and B. Rename them to inversion A and inversion B.
+
+![Inverse of two matrices](inv_ab.png)
+
+We need to multiply (AB) by some matrix X to get *Identity*.
+
+![ABX](ABX.png)
+
+--
+headline: Part 2: The Inverse Method
+
+task: Connect at first matrix A than inverted matrix A to a sequence node.
+
+Look at the result. Matrix A sheared the cube, distorting its shape.
+
+*Now, notice what the Inverse does:* The inverse of A shears the cube to the *opposite side*.
+
+hint: The inverse doesn't always just tilt an object to the "opposite side". If the matrix has negative values on the diagonal, the inverse must account for the flipped orientation. In these cases, the visual result is not a simple opposite shear.
+
+To get to the identity, we must "peel away" the matrices from the inside out. 
+
+Which arrangement successfully snaps the distorted object back to the perfect Unit Cube?
+
+hint: We need to eliminate B first. Which matrix, when multiplied by B, turns it into identity?
+
+--
+headline: Reverse Order
+
+task: Add a matrix multiplication operator to the workspace. Connect the output of inverted matrix B and A to it.
+
+![Inverse of product](inversemult.png)
+
+Don't forget about the order. Matrix multiplication is non-commutative
+
+Just for clarity :
+
+task: Rename multiplication operator B^(-1)A^(-1).
+
+--
+headline: Verification 
+
+Now we test our hypothesis.
+
+task: Add a matrix multiplication operator to the workspace. Connect the output of AB and B^(-1)A^(-1).
+
+![Result](res.png)
+
+![Proof by inverse](proofinv.png)
+
+Since we successfully found a matrix that turns AB into Identity, we have proven that AB is *invertible and regular*.
+
+-- 
+headline: Wrap up
+
+We have just proven that the product of regular matrices is always regular. To do this, we looked at the problem through three different lenses:
+
+- *The Visual Test*: We saw that a singular matrix acts like a crusher, it "flattens" the 3D cube into a 2D plane, destroying its volume. Since regular matrices always have non-zero volume, combining them never causes this collapse.
+
+- *Determinants*: Since regular matrices act as non-zero scaling factors, their product acts as a non-zero scaling factor. It is mathematically impossible to get a zero determinant from non-zero parts.
+
+- *Inverse*: We built the inverse matrix. If you can "undo" A, and you can "undo" B, you can "undo" the combination by reversing the steps.
+
+Regularity is a stable property. As long as you combine valid, invertible transformations, the result will never collapse into singularity.
+
