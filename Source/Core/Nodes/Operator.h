@@ -18,6 +18,8 @@
 
 #include "Core/Nodes/Node.h"
 #include "Utils/ProjectionUtils.h"
+#include "Eigen/Dense"
+#include "Eigen/Eigenvalues"
 
 namespace Core
 {
@@ -540,7 +542,7 @@ FORCE_INLINE bool Operator<EOperatorType::Vector3Length>::updateValuesImpl(int i
 // Should be used with the VectorX model to show the input vector.
 template <>
 FORCE_INLINE bool Operator<EOperatorType::ShowVector3>::updateValuesImpl(int inputIndex)
-{
+{	
 	if (m_inputs[0].isPluggedIn())
 	{
 
@@ -1716,4 +1718,188 @@ FORCE_INLINE bool Operator<EOperatorType::PulseToPulse>::updateValuesImpl(int in
 	}
 	return false;
 }
+
+// EigenVal and EigenVec
+template <>
+FORCE_INLINE bool Operator<EOperatorType::EigenVals>::updateValuesImpl(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		glm::mat4 inputMat = m_inputs[0].data().getMat4();
+
+		// convert glm matrix to eigen matrix
+		Eigen::Matrix4f eMat;
+		for (int col = 0; col < 4; col++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				eMat(row, col) = inputMat[col][row];
+			}
+		}
+
+	
+		Eigen::EigenSolver<Eigen::Matrix4f> solver(eMat);
+		glm::vec4 eigenVals(0.0f);
+		float epsilon = glm::epsilon<float>();
+
+		for (int i = 0; i < 4; i++)
+		{
+			// if imaginary part is significant, output NaN
+			if (std::abs(solver.eigenvalues()(i).imag()) > epsilon)
+			{
+				eigenVals[i] = std::numeric_limits<float>::quiet_NaN();
+			}
+			else
+			{
+				eigenVals[i] = solver.eigenvalues()(i).real();
+			}
+		}
+
+		setInternalValue(eigenVals);
+	}
+	else
+	{
+		setInternalValue(glm::vec4());
+	}
+	return true;
+}
+
+template <>
+FORCE_INLINE bool Operator<EOperatorType::EigenVecs>::updateValuesImpl(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		glm::mat4 inputMat = m_inputs[0].data().getMat4();
+
+		Eigen::Matrix4f eMat;
+		for (int col = 0; col < 4; col++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				eMat(row, col) = inputMat[col][row];
+			}
+		}
+
+		Eigen::EigenSolver<Eigen::Matrix4f> solver(eMat);
+		glm::mat4 eigenVecs(1.0f);
+		float epsilon = glm::epsilon<float>();
+
+		for (int col = 0; col < 4; col++)
+		{
+			if (std::abs(solver.eigenvalues()(col).imag()) > epsilon)
+			{
+				for (int row = 0; row < 4; row++)
+				{
+					eigenVecs[col][row] = std::numeric_limits<float>::quiet_NaN();
+				}
+			}
+			else
+			{
+				for (int row = 0; row < 4; row++)
+				{
+					eigenVecs[col][row] = solver.eigenvectors()(row, col).real();
+				}
+			}
+		}
+
+		setInternalValue(eigenVecs);
+	}
+	else
+	{
+		setInternalValue(glm::mat4(1.0));
+	}
+	return true;
+}
+
+// SVD node
+template <>
+FORCE_INLINE bool Operator<EOperatorType::SVD>::updateValuesImpl(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		glm::mat4 inputMat = m_inputs[0].data().getMat4();
+
+		Eigen::Matrix4f eMat;
+		for (int col = 0; col < 4; col++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				eMat(row, col) = inputMat[col][row];
+			}
+		}
+
+		Eigen::JacobiSVD<Eigen::Matrix4f> svd(eMat, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+		glm::mat4 outU(1.0f);
+		glm::mat4 outSigma(0.0f);
+		glm::mat4 outVt(1.0f);
+
+		Eigen::Matrix4f matU = svd.matrixU();
+		Eigen::Matrix4f matVt = svd.matrixV().transpose();
+		Eigen::Vector4f singVals = svd.singularValues();
+
+		for (int col = 0; col < 4; col++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				outU[col][row] = matU(row, col);
+				outVt[col][row] = matVt(row, col);
+			}
+
+			outSigma[col][col] = singVals(col);
+		}
+
+		setInternalValue(outU, 0);     
+		setInternalValue(outSigma, 1); 
+		setInternalValue(outVt, 2); 
+	}
+	else
+	{
+		setInternalValue(glm::mat4(1.0f), 0); 
+		setInternalValue(glm::mat4(0.0f), 1); 
+		setInternalValue(glm::mat4(1.0f), 2); 
+	}
+	return true;
+}
+
+// Gram-Schmidt orthogonalization node
+template <>
+FORCE_INLINE bool Operator<EOperatorType::GramSchmidt>::updateValuesImpl(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		glm::mat4 inMat = m_inputs[0].data().getMat4();
+		glm::mat4 outMat(0.0f);
+
+		for (int i = 0; i < 4; ++i)
+		{
+			glm::vec4 v = inMat[i];
+
+			for (int j = 0; j < i; ++j)
+			{
+				float proj = glm::dot(v, outMat[j]);
+				v -= proj * outMat[j];
+			}
+
+			float len = glm::length(v);
+			float epsilon = glm::epsilon<float>();
+			if (len > epsilon)
+			{
+				outMat[i] = v / len;
+			}
+			else
+			{
+				outMat[i] = glm::vec4(0.0f);
+			}
+		}
+
+		setInternalValue(outMat);
+	}
+	else
+	{
+		setInternalValue(glm::mat4(1.0f));
+	}
+	return true;
+}
+
 } // namespace Core

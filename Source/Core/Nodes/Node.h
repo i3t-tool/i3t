@@ -511,5 +511,7 @@ protected:
 	TrackedNodeData* m_trackingData{nullptr};
 
 	bool finalized = false; /// Internal helper flag to keep track of Node::finalize() calls
+
 };
+
 } // namespace Core

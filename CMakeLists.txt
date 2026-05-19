@@ -32,6 +32,8 @@ include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
 include_directories(Dependencies/ImGuiColorTextEdit)
 include_directories(Dependencies/ImGuizmo/ImGuizmo)
+
+include_directories(Dependencies)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # ========== BUILD CONFIGURATION ==============================
@@ -153,6 +155,8 @@ list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/DIWNE/diwne_example.cpp")
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
+list(APPEND I3T_SOURCE "Source/GUI/Workspace/SearchNodesMenu.cpp")
+list(APPEND I3T_SOURCE "Source/GUI/Workspace/SearchNodesMenu.h")
 # =============================================================
 
 # ======== Configuration for building tests.  =================

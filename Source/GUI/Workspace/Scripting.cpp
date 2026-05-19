@@ -19,6 +19,7 @@
 #include "GUI/Workspace/WorkspaceModule.h"
 #include "Scripting/Utils.h"
 #include "Viewport/entity/nodes/SceneModel.h"
+#include "Core/Nodes/GraphManager.h"
 
 static Workspace::OperatorBuilder g_OperatorBuilder;
 static Workspace::TransformBuilder g_TransformBuilder;
@@ -626,7 +627,37 @@ LUA_REGISTRATION
 		"as_camera", &cast<GuiCamera>,
 		"as_cycle", &cast<GuiCycle>,
 		"as_screen", &cast<GuiScreen>,
-		"as_model", &cast<GuiModel>
+		"as_model", &cast<GuiModel>,
+		"is_wired_to", [](GuiNode& self, GuiNode& target) -> bool {
+			auto selfCore = self.getNodebase();
+			auto targetID = target.getNodebase()->getId();
+
+			for (const auto& outputPin : selfCore->getOutputPins()) 
+			{
+				for (const auto& inputPin : outputPin.getOutComponents()) 
+				{
+					if (inputPin->Owner.getId() == targetID) 
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		},
+		"set_highlight", [](GuiNode& self, bool enable) {
+			self.setSelected(enable);
+		},
+		"set_label_locked", [](GuiNode& self, bool locked) {
+			if (auto coreNode = dynamic_cast<Workspace::CoreNode*>(&self)) {
+				coreNode->setLabelLocked(locked);
+			}
+		},
+		"is_label_locked", [](GuiNode& self) -> bool {
+			if (auto coreNode = dynamic_cast<Workspace::CoreNode*>(&self)) {
+				return coreNode->isLabelLocked();	
+			}
+			return false;
+		}
 	);
 
 	L.new_usertype<GuiOperator>(
@@ -851,6 +882,12 @@ LUA_REGISTRATION
 		},
 		"set_tint_strength", [](GuiModel& self, float value) {
 			self.m_tintStrength = value;
+		},
+		"get_model_name", [](GuiModel& self) -> std::string {
+			if (auto model = self.m_viewportModel.lock()) {
+				return model->getModel(); 
+			}
+			return "";
 		}
 	);
 
@@ -1084,4 +1121,57 @@ LUA_REGISTRATION
 	};
 
 	// clang-format on
+
+	// stirring 
+	workspace["stir"] = []() {
+		auto nodes = getWorkspaceNodes();
+
+		std::srand(static_cast<unsigned int>(std::time(nullptr)));
+		float range = 600.0f;
+
+		for (auto& guiNode : nodes)
+		{
+			if (auto nodeWithPins = std::dynamic_pointer_cast<Workspace::CoreNodeWithPins>(guiNode))
+			{
+				// unplug all inputs
+				for (auto& input : nodeWithPins->getInputs())
+				{
+					if (input->isConnected())
+					{
+						input->unplug();
+					}
+				}
+				// unplug all outputs
+				for (auto& output : nodeWithPins->getOutputs())
+				{
+					if (output->isConnected())
+					{
+						output->unplug();
+					}
+				}
+			}
+
+			float rx = (static_cast<float>(std::rand()) / RAND_MAX) * range - (range / 2.0f);
+			float ry = (static_cast<float>(std::rand()) / RAND_MAX) * range - (range / 2.0f);
+			guiNode->setPosition(ImVec2(rx, ry));
+		}
+
+		getNodeEditor().zoomToAll();
+	};
+
+	// compare matrices
+	api["matrices_match"] = [](const glm::mat4& m1, const glm::mat4& m2) -> bool {
+		float epsilon = glm::epsilon<float>();
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				if (std::abs(m1[i][j] - m2[i][j]) > epsilon)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	};
 };

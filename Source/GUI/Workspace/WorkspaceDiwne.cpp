@@ -909,6 +909,22 @@ void WorkspaceDiwne::addMenu()
 			{
 				addNodeToPositionOfPopup<Operator<Core::EOperatorType::MatrixMulFloat>>();
 			}
+			if (I3TGui::MenuItemWithLog("eigenvalues"))
+			{
+				addNodeToPositionOfPopup<Operator<Core::EOperatorType::EigenVals>>();
+			}
+			if (I3TGui::MenuItemWithLog("eigenvectors"))
+			{
+				addNodeToPositionOfPopup<Operator<Core::EOperatorType::EigenVecs>>();
+			}
+			if (I3TGui::MenuItemWithLog("svd"))
+			{
+				addNodeToPositionOfPopup<Operator<Core::EOperatorType::SVD>>();
+			}
+			if (I3TGui::MenuItemWithLog("gram-schmidt"))
+			{
+				addNodeToPositionOfPopup<Operator<Core::EOperatorType::GramSchmidt>>();
+			}
 			ImGui::EndMenu();
 		}
 		if (I3TGui::BeginMenuWithLog("vec3"))

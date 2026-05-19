@@ -50,6 +50,8 @@ protected:
 	FloatPopupMode m_floatPopupMode{FloatPopupMode::Value};
 	LevelOfDetail m_levelOfDetail{LevelOfDetail::Full};
 
+	bool m_labelLocked = false;
+
 public:
 	constexpr static char CORE_NODE_FLAG = 16; // Index of the CoreNode DIWNE flag (16th bit from the right)
 
@@ -88,6 +90,12 @@ public:
 	// =============================================================================================================
 	void drawMenuSetEditable();
 	void drawMenuSetPrecision();
+
+	virtual void setLabelLocked(bool locked);
+	bool isLabelLocked() const
+	{
+		return m_labelLocked;
+	}
 
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);

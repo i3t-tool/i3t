@@ -26,6 +26,9 @@
 #include "State/SerializationVisitor.h"
 // #include "Utils/Statistics.h"
 
+
+#include "GUI/Workspace/SearchNodesMenu.h"
+
 using namespace Workspace;
 
 WorkspaceWindow::WorkspaceWindow(bool show)
@@ -90,6 +93,15 @@ void WorkspaceWindow::render()
 		}
 
 		WorkspaceModule::g_editor->draw(drawMode);
+
+		SearchNodesMenu::getInstance().init();
+
+		if (ImGui::IsWindowHovered() && ImGui::IsKeyPressed(ImGuiKey_F) && ImGui::GetIO().KeyCtrl)
+		{
+			SearchNodesMenu::getInstance().open();
+		}
+
+		SearchNodesMenu::getInstance().render(ImGui::GetMousePos());
 
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}

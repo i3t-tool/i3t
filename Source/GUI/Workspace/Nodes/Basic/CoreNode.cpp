@@ -25,6 +25,8 @@
 #include "Localization/Localization.h"
 #include "State/StateManager.h"
 
+#include "DataRenderer.h"
+
 using namespace Workspace;
 
 CoreNode::CoreNode(DIWNE::NodeEditor& diwne, Ptr<Core::Node> nodebase)
@@ -444,6 +446,14 @@ int CoreNode::getLODCount()
 
 void CoreNode::drawMenuSetEditable()
 {
+	if (m_labelLocked)
+	{
+		ImGui::BeginDisabled();
+		I3TGui::MenuItemWithLog(_t("Rename"), nullptr, m_isLabelBeingEdited);
+		ImGui::EndDisabled();
+		return;
+	}
+
 	if (I3TGui::MenuItemWithLog(_t("Rename"), nullptr, m_isLabelBeingEdited))
 	{
 		m_isLabelBeingEdited = !m_isLabelBeingEdited;
@@ -684,4 +694,13 @@ void CoreNode::onSelection(bool selected)
 {
 	Node::onSelection(selected);
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
+}
+
+void CoreNode::setLabelLocked(bool locked)
+{
+	m_labelLocked = locked;
+	if (locked)
+	{
+		m_isLabelBeingEdited = false; 
+	}
 }

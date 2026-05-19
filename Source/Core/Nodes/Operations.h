@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file
  * \brief
  * \author Martin Herich <martin.herich@phire.cz>
@@ -173,9 +173,15 @@ enum class EOperatorType
 	MakePerspective,
 	MakeFrustum,
 	MakeLookAt,
-	MakeViewport
+	MakeViewport,
 
 	// todo trackball (trackcube)
+
+	// new nodes
+	EigenVals,
+	EigenVecs,
+	SVD,
+	GramSchmidt
 };
 
 // IMPORTANT: The enum value DETERMINES the index of the transform within the g_transforms vector! TransformOperation
@@ -258,6 +264,9 @@ static const PinGroup floatQuatInput = {EValueType::Float, EValueType::Quat};
 static const PinGroup matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
 static const PinGroup matrixMulInput = {EValueType::MatrixMul};
 
+// new pin group for SVD
+static const PinGroup threeMatrixOutput = {EValueType::Matrix, EValueType::Matrix, EValueType::Matrix};
+
 // explicitly defined pin names
 static const PinNames mixInputNames = {"from", "to", "t"};
 static const PinNames AngleAxisToQuatInputNames = {"angle", "angle / 2", "vec3"};
@@ -274,6 +283,9 @@ static const PinNames orthoFrustrumInputNames = {"left", "right", "bottom", "top
 static const PinNames PerspectiveInputNames = {"fovy", "aspect", "near", "far"};
 static const PinNames lookAtInputNames = {"eye", "center", "up"};
 static const PinNames viewportInputNames = {"x", "y", "width", "height", "near", "far"};
+
+// name for group SVD
+static const PinNames svdOutputNames = {"U ", "S ", "V'"};
 
 /**
  * \brief Table with configuration parameters for OPERATORS. Must be in the same order as in EOperatorType!!!
@@ -393,7 +405,19 @@ static const std::vector<Operation> operations = {
      PerspectiveInputNames}, // perspective
     {n(EOperatorType::MakeFrustum), "frustum", sixFloatInput, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustum
     {n(EOperatorType::MakeLookAt), "lookAt", threeVector3Input, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
-    {n(EOperatorType::MakeViewport), "viewport", sixFloatInput, matrixInput, NO_TAG, viewportInputNames}};
+    {n(EOperatorType::MakeViewport), "viewport", sixFloatInput, matrixInput, NO_TAG, viewportInputNames},
+
+
+    // eigendecomposition
+    {n(EOperatorType::EigenVals), "eigenvalues", matrixInput, vectorInput},
+    {n(EOperatorType::EigenVecs), "eigenvectors", matrixInput, matrixInput},
+
+    // SVD
+    {n(EOperatorType::SVD), "svd", matrixInput, threeMatrixOutput, NO_TAG, DEFAULT_NAMES, svdOutputNames},
+
+    // Gram-Schmidt
+    {n(EOperatorType::GramSchmidt), "gram-schmidt", matrixInput, matrixInput}};
+
 
 
 /**
