@@ -36,6 +36,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Download', link: 'https://github.com/i3t-tool/i3t/releases/latest' },
+      { text: 'Paper and Videos', link: 'https://dcgi.fel.cvut.cz/home/felkepet/SEFI2026/' },
       // { text: 'Examples', link: '/markdown-examples' }
     ],
 
