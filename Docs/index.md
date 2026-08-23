@@ -13,6 +13,9 @@ hero:
       text: Download
       link: https://github.com/i3t-tool/i3t/releases/latest
     - theme: alt
+      text: Videos
+      link: https://dcgi.fel.cvut.cz/home/felkepet/SEFI2026/
+    - theme: alt
       text: Manual
       link: /introduction
     - theme: alt
