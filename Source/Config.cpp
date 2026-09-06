@@ -19,7 +19,10 @@
 
 // statics
 
-std::string Config::VERSION = "v006";
+// HACK: kept in sync with project(I3T VERSION ...) in CMakeLists.txt by hand.
+// Replace with I3T_VERSION from the generated ConfigVersion.h once the build
+// directory is on the include path.
+std::string Config::VERSION = "2.1.1";
 std::string Config::AUTHOR = "Michal Folta";
 std::string Config::MAIL = "michal.fol@gmail.com";
 std::string Config::SUPERVISOR = "Petr Felkel";

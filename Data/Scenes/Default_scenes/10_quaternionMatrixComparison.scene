@@ -1,52 +1,58 @@
 {
+    "readOnly": true,
     "resources": {
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": true,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": -79.849853515625,
-                "orbitCameraRotationY": 19.849952697753908,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 9.258784294128418,
-                "iorbitCameraPivot": [
-                    1.4058935642242432,
-                    -0.4827897250652313,
-                    -1.566558599472046
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": false,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": 59.23986053466797,
+                    "orbitCameraRotationY": 27.099946975708008,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 34.63692092895508,
+                    "iorbitCameraPivot": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "fov": 13.699999809265137,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
         }
     },
     "workspace": {
         "operators": [
             {
-                "id": 529,
+                "id": 689,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     549.2839965820313,
                     485.1256103515625
@@ -54,46 +60,50 @@
                 "type": "FloatSinCos"
             },
             {
-                "id": 533,
+                "id": 693,
                 "label": "dělitel 2",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    168.96510314941407,
-                    494.86102294921877
+                    168.96510314941406,
+                    494.86102294921875
                 ],
                 "type": "FloatToFloat",
                 "value": 2.0
             },
             {
-                "id": 536,
+                "id": 696,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     687.7691040039063,
-                    -18.364276885986329
+                    -18.364276885986328
                 ],
                 "type": "Vector3ToFloats"
             },
             {
-                "id": 541,
+                "id": 701,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     246.4626007080078,
-                    -16.713502883911134
+                    -16.713502883911133
                 ],
                 "type": "NormalizeVector3"
             },
             {
-                "id": 544,
+                "id": 704,
                 "label": "Úhel / 2",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     386.794677734375,
                     484.1256103515625
@@ -101,13 +111,14 @@
                 "type": "FloatDivFloat"
             },
             {
-                "id": 548,
+                "id": 708,
                 "label": "Osa otáčení",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    53.371795654296878,
+                    53.371795654296875,
                     -17.16640853881836
                 ],
                 "type": "Vector3ToVector3",
@@ -118,11 +129,12 @@
                 ]
             },
             {
-                "id": 551,
+                "id": 711,
                 "label": " rotace jako rotační matice",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     900.5963134765625,
                     518.9528198242188
@@ -130,43 +142,47 @@
                 "type": "MakeAxisAngle"
             },
             {
-                "id": 555,
+                "id": 715,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    510.03619384765627,
-                    -19.430946350097658
+                    510.03619384765625,
+                    -19.430946350097656
                 ],
                 "type": "Vector3MulFloat"
             },
             {
-                "id": 559,
+                "id": 719,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     899.0370483398438,
-                    -19.097614288330079
+                    -19.097614288330078
                 ],
                 "type": "FloatsToQuat"
             },
             {
-                "id": 565,
+                "id": 725,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     913.8718872070313,
-                    176.28651428222657
+                    176.28651428222656
                 ],
                 "type": "QuatToMatrix"
             },
             {
-                "id": 568,
+                "id": 728,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     909.8727416992188,
                     114.61984252929688
@@ -176,46 +192,50 @@
         ],
         "sequences": [
             {
-                "id": 571,
+                "id": 731,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1170.5333251953126,
+                    1170.5333251953125,
                     157.86679077148438
                 ],
                 "transforms": []
             },
             {
-                "id": 577,
+                "id": 737,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1453.4251708984376,
+                    1453.4251708984375,
                     499.5332946777344
                 ],
                 "transforms": []
             },
             {
-                "id": 583,
+                "id": 743,
                 "label": "Společný posun obou kostek",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     863.5327758789063,
                     326.5333557128906
                 ],
                 "transforms": [
                     {
-                        "id": 589,
+                        "id": 749,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            922.5615234375,
-                            356.5291748046875
+                            903.5946044921875,
+                            359.6108703613281
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -258,24 +278,26 @@
                 ]
             },
             {
-                "id": 590,
+                "id": 750,
                 "label": "Relativní posun zelené",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1185.1168212890626,
+                    1185.1168212890625,
                     328.1996765136719
                 ],
                 "transforms": [
                     {
-                        "id": 596,
+                        "id": 756,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            1224.427490234375,
-                            358.98834228515627
+                            1215.912109375,
+                            360.8404235839844
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -320,14 +342,15 @@
         ],
         "cycles": [
             {
-                "id": 597,
+                "id": 757,
                 "label": "cycle - Úhel natočení",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    53.792789459228519,
-                    159.11614990234376
+                    53.792789459228516,
+                    159.11614990234375
                 ],
                 "from": 0.0,
                 "to": 6.283180236816406,
@@ -343,12 +366,13 @@
         "screens": [],
         "models": [
             {
-                "id": 615,
+                "id": 774,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1667.9876708984376,
+                    1667.9876708984375,
                     496.615966796875
                 ],
                 "model": "default_cube",
@@ -364,10 +388,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 613,
+                "id": 776,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     1528.06591796875,
                     142.2666473388672
@@ -386,150 +411,158 @@
             }
         ],
         "transforms": [],
+        "scriptingNodes": [],
         "edges": [
             [
-                544,
+                704,
                 0,
-                529,
+                689,
                 0
             ],
             [
-                555,
+                715,
                 0,
-                536,
+                696,
                 0
             ],
             [
-                548,
+                708,
                 0,
-                541,
+                701,
                 0
             ],
             [
-                597,
+                757,
                 0,
-                544,
+                704,
                 0
             ],
             [
-                533,
+                693,
                 0,
-                544,
+                704,
                 1
             ],
             [
-                597,
+                757,
                 0,
-                551,
+                711,
                 0
             ],
             [
-                541,
+                701,
                 0,
-                551,
+                711,
                 1
             ],
             [
-                529,
+                689,
                 0,
-                555,
+                715,
                 0
             ],
             [
-                541,
+                701,
                 0,
-                555,
+                715,
                 1
             ],
             [
-                536,
+                696,
                 0,
-                559,
+                719,
                 0
             ],
             [
-                536,
+                696,
                 1,
-                559,
+                719,
                 1
             ],
             [
-                536,
+                696,
                 2,
-                559,
+                719,
                 2
             ],
             [
-                529,
+                689,
                 1,
-                559,
+                719,
                 3
             ],
             [
-                568,
+                728,
                 0,
-                565,
+                725,
                 0
             ],
             [
-                559,
+                719,
                 0,
-                568,
+                728,
                 0
             ],
             [
-                583,
+                743,
                 0,
-                571,
+                731,
                 0
             ],
             [
-                565,
+                725,
                 0,
-                571,
+                731,
                 1
             ],
             [
-                590,
+                750,
                 0,
-                577,
+                737,
                 0
             ],
             [
-                551,
+                711,
                 0,
-                577,
+                737,
                 1
             ],
             [
-                583,
+                743,
                 0,
-                590,
+                750,
                 0
             ],
             [
-                577,
+                737,
                 0,
-                615,
+                774,
                 0
             ],
             [
-                571,
+                731,
                 0,
-                613,
+                776,
                 0
             ]
         ],
         "zoom": 0.8132750391960144,
         "workArea": {
             "Min": [
-                37.336517333984378,
-                -309.91204833984377
+                -83.16393280029297,
+                -153.75326538085938
             ],
             "Max": [
-                1675.1588134765626,
-                936.8986206054688
+                2277.6611328125,
+                641.7955322265625
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1382\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,707\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,735\nSize=1920,647\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=2358,-566 Size=1920,1356 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,707 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,394 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
     }
 }
