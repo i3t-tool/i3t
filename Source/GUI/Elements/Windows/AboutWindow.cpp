@@ -83,7 +83,8 @@ void AboutWindow::render()
 				    "The Department of Computer Graphics and Interaction of the Faculty of Electrical Engineering,");
 				ImGui::BulletText("The Department of Computer Science of the Faculty of Electrical Engineering,");
 				ImGui::BulletText("The Faculty of Information Technology.");
-				ImGui::TextWrapped("\nThe first version was created by Michal Folta in 2018.\n\n");
+				ImGui::TextWrapped("\nThe first version was created by Michal Folta in 2018. This is v%s.\n\n",
+				                   Config::VERSION.c_str());
 
 				ImGui::PushFont(I3T::getFont(EFont::TutorialTitle));
 				ImGui::PushStyleColor(ImGuiCol_Text, I3T::getUI()->getTheme().get(EColor::TutorialTitleText));

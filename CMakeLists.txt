@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # Set project name.
-project(I3T VERSION 2.1.0)
+project(I3T VERSION 2.1.1)
 
 # Required packages.
 find_package(OpenGL REQUIRED)

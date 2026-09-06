@@ -7,6 +7,23 @@ workflow:
 
 image: cvutdcgi/i3t-ci
 
+# Submodule handling, applied to every job.
+#
+# GIT_SUBMODULE_STRATEGY is deliberately "normal", not "recursive". Every
+# submodule I3T builds is a top-level entry in .gitmodules; the only nested one
+# is imgui_test_engine/imgui_test_suite/thirdparty/implot, which belongs to
+# upstream's standalone test-suite app and is never compiled here (see
+# CMake/ImGui.cmake, which globs only imgui_test_engine/imgui_test_engine).
+# Fetching it fails with "transport 'file' not allowed" - git's CVE-2022-39253
+# protection - and aborts the whole submodule fetch.
+#
+# GIT_STRATEGY is "clone" so each job starts from a clean workspace. A reused
+# workspace can still have implot populated, and fetch.recurseSubmodules
+# defaults to on-demand, which would recurse into it even without --recursive.
+variables:
+  GIT_STRATEGY: clone
+  GIT_SUBMODULE_STRATEGY: normal
+
 stages:
   - lint
   - localization
@@ -47,8 +64,6 @@ clang-tidy:
   allow_failure: true
   rules:
     - !reference [.changes-rules, cpp]
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
   script:
     - bash Scripts/RunClangTidy.sh
 
@@ -57,8 +72,6 @@ cppcheck:
   allow_failure: true
   rules:
     - !reference [ .changes-rules, cpp ]
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
   script:
     - bash Scripts/RunCppCheck.sh
 
@@ -95,8 +108,6 @@ build-app:
     paths:
       - Binaries
     expire_in: 1 week
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
   needs:
     - check-format
 
@@ -112,8 +123,6 @@ build-tests:
     paths:
       - Binaries
     expire_in: 1 week
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
   needs:
     - check-format
 
