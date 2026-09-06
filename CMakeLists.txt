@@ -6,6 +6,18 @@ cmake_minimum_required(VERSION 3.20)
 # Set project name.
 project(I3T VERSION 2.1.1)
 
+# Link every target against the dynamic MSVC runtime (/MD, /MDd).
+#
+# This is what I3T and all other dependencies already use by default, but
+# yaml-cpp overrides CMAKE_MSVC_RUNTIME_LIBRARY to the *static* runtime (/MT)
+# when it is built as a static library, which it is here. Mixing the two makes
+# the link fail with LNK2038/LNK2005 and finally LNK1169.
+#
+# yaml-cpp guards its override with `if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)`,
+# so defining it here - before add_subdirectory(Dependencies/yaml-cpp) - is the
+# intended way to opt out. Requires policy CMP0091 (NEW since CMake 3.15).
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
 # Required packages.
 find_package(OpenGL REQUIRED)
 
