@@ -19,8 +19,14 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
+      # CMAKE_POLICY_VERSION_MINIMUM is needed because the GitHub runners ship
+      # CMake 4.x, which removed compatibility with cmake_minimum_required
+      # below 3.5. Two dependencies we add_subdirectory() still declare one:
+      # rttr (3.0) and gtest (2.8.12). Harmless on older CMake, which just
+      # reports it as an unused cache variable. Remove once both dependencies
+      # declare 3.5 or newer.
       run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ inputs.cmake_build_type }} ${{ inputs.cmake_extra_args }}
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ inputs.cmake_build_type }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ${{ inputs.cmake_extra_args }}
         cmake --build build \
             --config ${{ inputs.cmake_build_type }} \
             --target ${{ inputs.target }} \
