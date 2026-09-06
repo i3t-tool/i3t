@@ -11,6 +11,12 @@ jobs:
   release:
     name: Release
     strategy:
+      # Let each platform finish and report on its own. With the default
+      # (fail-fast: true) a failure on one platform cancels the other mid-build,
+      # so a Windows error destroys the Linux result before it completes. These
+      # release builds are the only place Windows and RelWithDebInfo are tested
+      # at all, so losing half the evidence to an unrelated failure is costly.
+      fail-fast: false
       matrix:
         kind: ['Linux', 'Windows'] # , 'macOS']
         include:
