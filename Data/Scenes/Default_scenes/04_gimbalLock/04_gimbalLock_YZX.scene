@@ -4,83 +4,89 @@
         "imported": [
             {
                 "name": "gimbal_inner_x",
-                "path": "scene_data\\gimbal_inner_x\\gimbal_inner_x.glb",
+                "path": "scene_data/gimbal_inner_x/gimbal_inner_x.glb",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "gimbal_middle_z",
-                "path": "scene_data\\gimbal_middle_z\\gimbal_middle_z.glb",
+                "path": "scene_data/gimbal_middle_z/gimbal_middle_z.glb",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "gimbal_outer_y",
-                "path": "scene_data\\gimbal_outer_y\\gimbal_outer_y.glb",
+                "path": "scene_data/gimbal_outer_y/gimbal_outer_y.glb",
                 "type": "Model",
                 "normalize": false
             }
         ]
     },
     "viewport": {
-        "manipulator_enabled": true,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": -55.19993209838867,
-                "orbitCameraRotationY": 21.299991607666017,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 8.46720027923584,
-                "iorbitCameraPivot": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -67.37970733642578,
+                    "orbitCameraRotationY": -152.1199188232422,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 24.451749801635746,
+                    "iorbitCameraPivot": [
+                        0.11757229268550871,
+                        0.23353001475334167,
+                        0.2681201696395874
+                    ],
+                    "fov": 19.700000762939453,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
         }
     },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1,
+                "id": 231,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    -45.476192474365237,
+                    -45.476192474365234,
                     203.14285278320313
                 ],
                 "transforms": [
                     {
-                        "id": 7,
+                        "id": 237,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -26.111083984375,
-                            233.5555419921875
+                            -14.37115478515625,
+                            236.7862091064453
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
@@ -95,7 +101,7 @@
                                 0.0
                             ],
                             [
-                                0.0,
+                                -0.0,
                                 1.0,
                                 0.0,
                                 0.0
@@ -119,23 +125,25 @@
                 ]
             },
             {
-                "id": 8,
+                "id": 238,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     230.04757690429688,
-                    202.61903381347657
+                    202.61903381347656
                 ],
                 "transforms": [
                     {
-                        "id": 14,
+                        "id": 244,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            249.4444580078125,
-                            233.5555419921875
+                            261.060302734375,
+                            235.6975555419922
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -174,23 +182,25 @@
                 ]
             },
             {
-                "id": 15,
+                "id": 245,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -322.1903076171875,
-                    202.76185607910157
+                    202.76185607910156
                 ],
                 "transforms": [
                     {
-                        "id": 21,
+                        "id": 251,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -302.5555419921875,
-                            233.5555419921875
+                            -290.89129638671875,
+                            236.7862091064453
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -234,13 +244,14 @@
         "screens": [],
         "models": [
             {
-                "id": 22,
+                "id": 252,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -34.0000114440918,
-                    368.52398681640627
+                    368.52398681640625
                 ],
                 "model": "gimbal_outer_y",
                 "visible": true,
@@ -255,13 +266,14 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 24,
+                "id": 254,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": true,
                 "position": [
                     514.6187744140625,
-                    203.14288330078126
+                    203.14288330078125
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -276,10 +288,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 26,
+                "id": 256,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     229.90481567382813,
                     365.9522399902344
@@ -297,10 +310,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 28,
+                "id": 258,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     514.7620849609375,
                     363.2856750488281
@@ -319,54 +333,62 @@
             }
         ],
         "transforms": [],
+        "scriptingNodes": [],
         "edges": [
             [
-                15,
+                245,
                 0,
-                1,
+                231,
                 0
             ],
             [
-                1,
+                231,
                 0,
-                8,
+                238,
                 0
             ],
             [
-                15,
+                245,
                 0,
-                22,
+                252,
                 0
             ],
             [
-                8,
+                238,
                 0,
-                24,
+                254,
                 0
             ],
             [
-                1,
+                231,
                 0,
-                26,
+                256,
                 0
             ],
             [
-                8,
+                238,
                 0,
-                28,
+                258,
                 0
             ]
         ],
-        "zoom": 1.125,
+        "zoom": 0.9185587167739868,
         "workArea": {
             "Min": [
-                -350.111083984375,
-                -49.111114501953128
+                -363.12237548828125,
+                -167.4867706298828
             ],
             "Max": [
-                865.0,
-                852.22216796875
+                681.9932250976563,
+                954.9237670898438
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=962,26\nSize=958,1031\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###WorkspaceWindow]\nPos=0,26\nSize=960,1031\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=X\n  DockNode    ID=0x00000002 Parent=0x09EF459F SizeRef=643,1103 Selected=0xEF3485CE\n  DockNode    ID=0x00000003 Parent=0x09EF459F SizeRef=1275,1103 Split=X Selected=0xCDB9512A\n    DockNode  ID=0x00000001 Parent=0x00000003 SizeRef=960,1031 CentralNode=1 Selected=0xCDB9512A\n    DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=958,1031 Selected=0x8535E254\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
     }
 }

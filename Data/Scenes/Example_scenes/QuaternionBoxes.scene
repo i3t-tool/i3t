@@ -1,52 +1,58 @@
 {
+    "readOnly": true,
     "resources": {
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": true,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": -90.0,
-                "orbitCameraRotationY": 30.0,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 12.0,
-                "iorbitCameraPivot": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "TRACKBALL",
+                    "orbitCameraRotationX": -144.23007202148438,
+                    "orbitCameraRotationY": 24.489992141723633,
+                    "trackballCameraRotation": [
+                        0.9977794289588928,
+                        0.05681114643812179,
+                        -0.03474391996860504,
+                        0.0,
+                        -0.03831044957041741,
+                        0.9164513945579528,
+                        0.3983064591884613,
+                        0.0,
+                        0.054469406604766846,
+                        -0.3960916996002197,
+                        0.9165945649147034,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 4.614287853240967,
+                    "iorbitCameraPivot": [
+                        3.665891408920288,
+                        3.2524685859680176,
+                        -0.08376520127058029
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": false
         }
     },
     "workspace": {
         "operators": [
             {
-                "id": 703,
+                "id": 4966,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2354.2138671875,
                     671.8270874023438
@@ -60,10 +66,11 @@
                 ]
             },
             {
-                "id": 641,
+                "id": 4969,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2355.478515625,
                     134.9857635498047
@@ -71,10 +78,11 @@
                 "type": "QuatToFloatVec"
             },
             {
-                "id": 637,
+                "id": 4973,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2337.534423828125,
                     32.01821517944336
@@ -82,10 +90,11 @@
                 "type": "FloatVecToQuat"
             },
             {
-                "id": 648,
+                "id": 4977,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2528.0283203125,
                     136.99435424804688
@@ -93,10 +102,11 @@
                 "type": "QuatToAngleAxis"
             },
             {
-                "id": 674,
+                "id": 4981,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2507.88671875,
                     318.694091796875
@@ -104,21 +114,23 @@
                 "type": "FloatsToQuat"
             },
             {
-                "id": 718,
+                "id": 4987,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2355.57373046875,
-                    491.07672119140627
+                    491.07672119140625
                 ],
                 "type": "QuatLerp"
             },
             {
-                "id": 661,
+                "id": 4992,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3013.156494140625,
                     34.35456466674805
@@ -126,33 +138,36 @@
                 "type": "FloatMulQuat"
             },
             {
-                "id": 656,
+                "id": 4996,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3329.238525390625,
-                    39.875267028808597
+                    39.875267028808594
                 ],
                 "type": "QuatToEuler"
             },
             {
-                "id": 632,
+                "id": 5001,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2654.23291015625,
-                    32.026283264160159
+                    32.026283264160156
                 ],
                 "type": "AngleAxisToQuat",
                 "halfAngle": false
             },
             {
-                "id": 685,
+                "id": 5006,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2994.847900390625,
                     491.6795349121094
@@ -160,10 +175,11 @@
                 "type": "QuatLongWaySlerp"
             },
             {
-                "id": 697,
+                "id": 5011,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2674.277099609375,
                     588.1634521484375
@@ -171,10 +187,11 @@
                 "type": "NormalizeQuat"
             },
             {
-                "id": 706,
+                "id": 5014,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2671.389892578125,
                     671.2301635742188
@@ -182,10 +199,11 @@
                 "type": "MatrixToQuat"
             },
             {
-                "id": 700,
+                "id": 5017,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2993.2333984375,
                     587.208740234375
@@ -193,21 +211,23 @@
                 "type": "ConjQuat"
             },
             {
-                "id": 680,
+                "id": 5020,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2670.982177734375,
-                    493.59295654296877
+                    493.59295654296875
                 ],
                 "type": "QuatSlerp"
             },
             {
-                "id": 665,
+                "id": 5025,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2365.712158203125,
                     319.5218505859375
@@ -215,10 +235,11 @@
                 "type": "QuatToFloats"
             },
             {
-                "id": 694,
+                "id": 5031,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2356.770751953125,
                     585.5725708007813
@@ -226,10 +247,11 @@
                 "type": "QuatInverse"
             },
             {
-                "id": 714,
+                "id": 5034,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     2990.69580078125,
                     671.4071655273438
@@ -237,10 +259,11 @@
                 "type": "QuatMulQuat"
             },
             {
-                "id": 652,
+                "id": 5038,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3350.71044921875,
                     551.315185546875
@@ -248,10 +271,11 @@
                 "type": "QuatVecConjQuat"
             },
             {
-                "id": 645,
+                "id": 5042,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3344.72021484375,
                     418.3883056640625
@@ -259,10 +283,11 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 671,
+                "id": 5045,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3338.92041015625,
                     345.9112548828125
@@ -270,10 +295,11 @@
                 "type": "QuatLength"
             },
             {
-                "id": 709,
+                "id": 5048,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3143.308837890625,
                     150.2311553955078
@@ -281,10 +307,11 @@
                 "type": "EulerToQuat"
             },
             {
-                "id": 690,
+                "id": 5053,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     3162.84326171875,
                     257.353515625
@@ -299,13 +326,14 @@
         "models": [],
         "transforms": [
             {
-                "id": 723,
+                "id": 5057,
                 "render": true,
                 "numberOfDecimals": 4,
                 "LOD": "SetValues",
+                "selected": false,
                 "position": [
                     2985.672119140625,
-                    313.04437255859377
+                    313.04437255859375
                 ],
                 "type": "Quat",
                 "defaultValues": {
@@ -347,17 +375,25 @@
                 "locked": true
             }
         ],
+        "scriptingNodes": [],
         "edges": [],
-        "zoom": 1.2006715536117554,
+        "zoom": 1.200671672821045,
         "workArea": {
             "Min": [
-                2258.521728515625,
-                -20.653533935546876
+                2131.92724609375,
+                -15.656303405761719
             ],
             "Max": [
-                3556.9619140625,
-                823.8739013671875
+                3731.0322265625,
+                774.734619140625
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,80\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,108\nSize=1920,949\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ModalWindow]\nViewportPos=685,1530\nViewportId=0x50C70AB6\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=0,26\nSize=392,1320\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=1040,481\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nViewportPos=4209,17\nViewportId=0x4943A9B6\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=963,283\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=392,1391 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=2166,1391 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 Split=Y Selected=0x8535E254\n      DockNode  ID=0x00000001 Parent=0x00000006 SizeRef=1920,80 CentralNode=1 Selected=0x8535E254\n      DockNode  ID=0x00000002 Parent=0x00000006 SizeRef=1920,949 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 1,
+        "CurrentStep": 0
     }
 }

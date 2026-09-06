@@ -60,6 +60,20 @@
                 "type": "FloatSinCos"
             },
             {
+                "id": 855,
+                "label": "dělitel 2",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    168.96510314941406,
+                    494.86102294921875
+                ],
+                "type": "FloatToFloat",
+                "value": 2.0
+            },
+            {
                 "id": 858,
                 "render": true,
                 "numberOfDecimals": 1,
@@ -82,6 +96,50 @@
                     -16.713502883911133
                 ],
                 "type": "NormalizeVector3"
+            },
+            {
+                "id": 866,
+                "label": "Úhel / 2",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    386.794677734375,
+                    484.1256103515625
+                ],
+                "type": "FloatDivFloat"
+            },
+            {
+                "id": 870,
+                "label": "Osa otáčení",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    53.371795654296875,
+                    -17.16640853881836
+                ],
+                "type": "Vector3ToVector3",
+                "value": [
+                    2.5,
+                    -2.5,
+                    1.5
+                ]
+            },
+            {
+                "id": 873,
+                "label": " rotace jako rotační matice",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    900.5963134765625,
+                    518.9528198242188
+                ],
+                "type": "MakeAxisAngle"
             },
             {
                 "id": 877,
@@ -120,77 +178,31 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 870,
-                "label": "Axis of rotation",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    53.371795654296875,
-                    -17.16640853881836
-                ],
-                "type": "Vector3ToVector3",
-                "value": [
-                    2.5,
-                    -2.5,
-                    1.5
-                ]
-            },
-            {
                 "id": 890,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    911.1023559570313,
-                    101.09425354003906
+                    909.8727416992188,
+                    114.61984252929688
                 ],
                 "type": "NormalizeQuat"
-            },
-            {
-                "id": 873,
-                "label": " rotation as matrix directly",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    900.5963134765625,
-                    518.9528198242188
-                ],
-                "type": "MakeAxisAngle"
-            },
-            {
-                "id": 855,
-                "label": "divizor 2",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    168.96510314941406,
-                    494.86102294921875
-                ],
-                "type": "FloatToFloat",
-                "value": 2.0
-            },
-            {
-                "id": 866,
-                "label": "Angle / 2",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    386.794677734375,
-                    484.1256103515625
-                ],
-                "type": "FloatDivFloat"
             }
         ],
         "sequences": [
+            {
+                "id": 893,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    1170.5333251953125,
+                    157.86679077148438
+                ],
+                "transforms": []
+            },
             {
                 "id": 899,
                 "render": true,
@@ -205,7 +217,7 @@
             },
             {
                 "id": 905,
-                "label": "Common translation of both boxes",
+                "label": "Společný posun obou kostek",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -222,7 +234,7 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            922.0386962890625,
+                            903.5947875976563,
                             359.6108703613281
                         ],
                         "type": "Translation",
@@ -267,7 +279,7 @@
             },
             {
                 "id": 912,
-                "label": "Rellative move of the green box",
+                "label": "Relativní posun zelené",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -284,7 +296,7 @@
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            1234.356201171875,
+                            1215.9122314453125,
                             360.8404235839844
                         ],
                         "type": "Translation",
@@ -326,25 +338,12 @@
                         "locked": true
                     }
                 ]
-            },
-            {
-                "id": 893,
-                "label": "rotation using quaternions",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "selected": false,
-                "position": [
-                    1170.5333251953125,
-                    157.86679077148438
-                ],
-                "transforms": []
             }
         ],
         "cycles": [
             {
                 "id": 919,
-                "label": "cycle - Angle of rotation",
+                "label": "cycle - Úhel natočení",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -433,6 +432,30 @@
                 0
             ],
             [
+                919,
+                0,
+                866,
+                0
+            ],
+            [
+                855,
+                0,
+                866,
+                1
+            ],
+            [
+                919,
+                0,
+                873,
+                0
+            ],
+            [
+                863,
+                0,
+                873,
+                1
+            ],
+            [
                 851,
                 0,
                 877,
@@ -475,52 +498,10 @@
                 0
             ],
             [
-                912,
-                0,
-                899,
-                0
-            ],
-            [
-                873,
-                0,
-                899,
-                1
-            ],
-            [
-                899,
-                0,
-                936,
-                0
-            ],
-            [
-                893,
-                0,
-                938,
-                0
-            ],
-            [
                 881,
                 0,
                 890,
                 0
-            ],
-            [
-                905,
-                0,
-                912,
-                0
-            ],
-            [
-                919,
-                0,
-                873,
-                0
-            ],
-            [
-                863,
-                0,
-                873,
-                1
             ],
             [
                 905,
@@ -535,16 +516,34 @@
                 1
             ],
             [
-                919,
+                912,
                 0,
-                866,
+                899,
                 0
             ],
             [
-                855,
+                873,
                 0,
-                866,
+                899,
                 1
+            ],
+            [
+                905,
+                0,
+                912,
+                0
+            ],
+            [
+                899,
+                0,
+                936,
+                0
+            ],
+            [
+                893,
+                0,
+                938,
+                0
             ]
         ],
         "zoom": 0.8132750391960144,
