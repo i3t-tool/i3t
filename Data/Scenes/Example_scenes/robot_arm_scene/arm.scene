@@ -4,101 +4,107 @@
         "imported": [
             {
                 "name": "arm1",
-                "path": "scene_data\\arm1\\arm1.gltf",
+                "path": "scene_data/arm1/arm1.gltf",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "arm2",
-                "path": "scene_data\\arm2\\arm2.gltf",
+                "path": "scene_data/arm2/arm2.gltf",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "armbase",
-                "path": "scene_data\\armbase\\armbase.gltf",
+                "path": "scene_data/armbase/armbase.gltf",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "arm3",
-                "path": "scene_data\\arm3\\arm3.gltf",
+                "path": "scene_data/arm3/arm3.gltf",
                 "type": "Model",
                 "normalize": false
             },
             {
                 "name": "claw",
-                "path": "scene_data\\claw\\claw.gltf",
+                "path": "scene_data/claw/claw.gltf",
                 "type": "Model",
                 "normalize": false
             }
         ]
     },
     "viewport": {
-        "manipulator_enabled": true,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": 12.660059928894045,
-                "orbitCameraRotationY": 32.89993667602539,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 6.930369377136231,
-                "iorbitCameraPivot": [
-                    -0.1264478713274002,
-                    0.1282463371753693,
-                    -0.2592717111110687
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "TRACKBALL",
+                    "orbitCameraRotationX": -144.23007202148438,
+                    "orbitCameraRotationY": 24.489992141723633,
+                    "trackballCameraRotation": [
+                        0.9977794289588928,
+                        0.05681114643812179,
+                        -0.03474391996860504,
+                        0.0,
+                        -0.03831044957041741,
+                        0.9164513945579528,
+                        0.3983064591884613,
+                        0.0,
+                        0.054469406604766846,
+                        -0.3960916996002197,
+                        0.9165945649147034,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 4.614287853240967,
+                    "iorbitCameraPivot": [
+                        3.665891408920288,
+                        3.2524685859680176,
+                        -0.08376520127058029
+                    ],
+                    "fov": 90.0,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": false
         }
     },
     "workspace": {
         "operators": [],
         "sequences": [
             {
-                "id": 1629,
+                "id": 4906,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -338.0,
                     518.666748046875
                 ],
                 "transforms": [
                     {
-                        "id": 1635,
+                        "id": 4912,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -319.5794677734375,
-                            548.9334716796875
+                            -307.8519287109375,
+                            551.2838745117188
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
                                 0.0,
-                                0.32149410247802737,
+                                0.32149410247802734,
                                 0.0
                             ]
                         },
@@ -124,7 +130,7 @@
                             ],
                             [
                                 0.0,
-                                0.32149410247802737,
+                                0.32149410247802734,
                                 0.0,
                                 1.0
                             ]
@@ -133,13 +139,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1636,
+                        "id": 4913,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -147.5794677734375,
-                            548.9334716796875
+                            -135.8519287109375,
+                            551.2838745117188
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -178,23 +185,25 @@
                 ]
             },
             {
-                "id": 1637,
+                "id": 4914,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     79.42868041992188,
                     332.6666564941406
                 ],
                 "transforms": [
                     {
-                        "id": 1643,
+                        "id": 4920,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            98.4205322265625,
-                            362.9334411621094
+                            110.14794921875,
+                            365.28387451171875
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -235,13 +244,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1644,
+                        "id": 4921,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            270.4205322265625,
-                            362.9334411621094
+                            282.14794921875,
+                            365.28387451171875
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -257,14 +267,14 @@
                             ],
                             [
                                 0.0,
-                                -0.27338340878486636,
+                                -0.27338340878486633,
                                 -0.9619051218032837,
                                 0.0
                             ],
                             [
                                 0.0,
                                 0.9619051218032837,
-                                -0.27338340878486636,
+                                -0.27338340878486633,
                                 0.0
                             ],
                             [
@@ -280,23 +290,25 @@
                 ]
             },
             {
-                "id": 1645,
+                "id": 4922,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     937.97998046875,
                     -11.990219116210938
                 ],
                 "transforms": [
                     {
-                        "id": 1651,
+                        "id": 4928,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            956.4205322265625,
-                            18.933441162109376
+                            968.14794921875,
+                            21.283920288085938
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -337,13 +349,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1652,
+                        "id": 4929,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            1128.4205322265626,
-                            18.933441162109376
+                            1140.14794921875,
+                            21.283920288085938
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -380,13 +393,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1653,
+                        "id": 4930,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            1317.4205322265626,
-                            18.933441162109376
+                            1312.14794921875,
+                            21.283920288085938
                         ],
                         "type": "EulerZ",
                         "defaultValues": {
@@ -425,23 +439,25 @@
                 ]
             },
             {
-                "id": 1654,
+                "id": 4931,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    500.57159423828127,
+                    500.57159423828125,
                     155.5239715576172
                 ],
                 "transforms": [
                     {
-                        "id": 1660,
+                        "id": 4937,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            520.4205322265625,
-                            184.93344116210938
+                            532.14794921875,
+                            189.28390502929688
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -482,13 +498,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1661,
+                        "id": 4938,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            692.4205322265625,
-                            184.93344116210938
+                            704.14794921875,
+                            189.28390502929688
                         ],
                         "type": "EulerX",
                         "defaultValues": {
@@ -527,28 +544,30 @@
                 ]
             },
             {
-                "id": 1614,
+                "id": 4939,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -1001.0,
                     879.666748046875
                 ],
                 "transforms": [
                     {
-                        "id": 1620,
+                        "id": 4945,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -981.5794677734375,
-                            908.9334716796875
+                            -969.8518676757813,
+                            913.2838134765625
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
-                                0.20000000298023225,
+                                0.20000000298023224,
                                 0.0,
                                 0.0
                             ]
@@ -574,7 +593,7 @@
                                 0.0
                             ],
                             [
-                                0.20000000298023225,
+                                0.20000000298023224,
                                 0.0,
                                 0.0,
                                 1.0
@@ -586,23 +605,25 @@
                 ]
             },
             {
-                "id": 1621,
+                "id": 4946,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -759.0,
                     704.6666259765625
                 ],
                 "transforms": [
                     {
-                        "id": 1627,
+                        "id": 4952,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -739.5794677734375,
-                            734.9334716796875
+                            -727.8519287109375,
+                            737.2838134765625
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -643,13 +664,14 @@
                         "locked": true
                     },
                     {
-                        "id": 1628,
+                        "id": 4953,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            -567.5794677734375,
-                            734.9334716796875
+                            -555.8519287109375,
+                            737.2838134765625
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -660,7 +682,7 @@
                             [
                                 1.0,
                                 0.0,
-                                -0.0,
+                                0.0,
                                 0.0
                             ],
                             [
@@ -693,10 +715,11 @@
         "screens": [],
         "models": [
             {
-                "id": 1662,
+                "id": 4954,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -762.3330688476563,
                     880.0001831054688
@@ -714,10 +737,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1664,
+                "id": 4956,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     -335.0,
                     704.0
@@ -735,10 +759,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1666,
+                "id": 4958,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     88.00030517578125,
                     518.8568115234375
@@ -756,12 +781,13 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1668,
+                "id": 4960,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    505.11431884765627,
+                    505.11431884765625,
                     333.1716613769531
                 ],
                 "model": "arm2",
@@ -777,10 +803,11 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1670,
+                "id": 4962,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     936.326416015625,
                     157.25222778320313
@@ -798,13 +825,14 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 1672,
+                "id": 4964,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    1548.7142333984376,
-                    -12.571460723876954
+                    1548.7142333984375,
+                    -12.571460723876953
                 ],
                 "model": "claw",
                 "visible": true,
@@ -820,84 +848,92 @@
             }
         ],
         "transforms": [],
+        "scriptingNodes": [],
         "edges": [
             [
-                1614,
+                4946,
                 0,
-                1662,
+                4906,
                 0
             ],
             [
-                1621,
+                4906,
                 0,
-                1664,
+                4914,
                 0
             ],
             [
-                1629,
+                4931,
                 0,
-                1666,
+                4922,
                 0
             ],
             [
-                1637,
+                4914,
                 0,
-                1668,
+                4931,
                 0
             ],
             [
-                1654,
+                4939,
                 0,
-                1670,
+                4946,
                 0
             ],
             [
-                1645,
+                4939,
                 0,
-                1672,
+                4954,
                 0
             ],
             [
-                1621,
+                4946,
                 0,
-                1629,
+                4956,
                 0
             ],
             [
-                1629,
+                4906,
                 0,
-                1637,
+                4958,
                 0
             ],
             [
-                1654,
+                4914,
                 0,
-                1645,
+                4960,
                 0
             ],
             [
-                1637,
+                4931,
                 0,
-                1654,
+                4962,
                 0
             ],
             [
-                1614,
+                4922,
                 0,
-                1621,
+                4964,
                 0
             ]
         ],
-        "zoom": 0.5,
+        "zoom": 0.5000000596046448,
         "workArea": {
             "Min": [
-                -1055.5794677734376,
-                -231.06655883789063
+                -1591.851806640625,
+                -122.716064453125
             ],
             "Max": [
-                1284.4205322265626,
-                1796.9334716796876
+                2248.147705078125,
+                1075.2838134765625
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,430\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,458\nSize=1920,599\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###ModalWindow]\nViewportPos=685,1530\nViewportId=0x50C70AB6\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=0,26\nSize=392,1320\nCollapsed=0\nDockId=0x00000007,0\n\n[Window][###Console]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000004,0\n\n[Window][###LogWindow]\nPos=2128,26\nSize=432,1391\nCollapsed=0\nDockId=0x00000005,0\n\n[Window][###StyleEditor]\nViewportPos=60,83\nViewportId=0x670E6227\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nPos=1810,41\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=857,389\nSize=705,325\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=1040,481\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nViewportPos=4209,17\nViewportId=0x4943A9B6\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=963,283\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace       ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=X Selected=0x8535E254\n  DockNode      ID=0x00000007 Parent=0x09EF459F SizeRef=392,1391 Selected=0xEF3485CE\n  DockNode      ID=0x00000008 Parent=0x09EF459F SizeRef=2166,1391 Split=X\n    DockNode    ID=0x00000006 Parent=0x00000008 SizeRef=1732,1391 Split=Y Selected=0x8535E254\n      DockNode  ID=0x00000001 Parent=0x00000006 SizeRef=1920,430 CentralNode=1 Selected=0x8535E254\n      DockNode  ID=0x00000002 Parent=0x00000006 SizeRef=1920,599 Selected=0xCDB9512A\n    DockNode    ID=0x00000003 Parent=0x00000008 SizeRef=432,1391 Split=Y\n      DockNode  ID=0x00000004 Parent=0x00000003 SizeRef=432,819 Selected=0x230535F5\n      DockNode  ID=0x00000005 Parent=0x00000003 SizeRef=432,570 Selected=0xF5ADFC09\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 1,
+        "CurrentStep": 0
     }
 }

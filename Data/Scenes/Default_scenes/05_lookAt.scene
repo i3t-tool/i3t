@@ -9,8 +9,8 @@
                 "manipulator_enabled": false,
                 "camera": {
                     "mode": "ORBIT",
-                    "orbitCameraRotationX": -121.4302215576172,
-                    "orbitCameraRotationY": 28.259950637817383,
+                    "orbitCameraRotationX": -113.89020538330078,
+                    "orbitCameraRotationY": 26.519954681396484,
                     "trackballCameraRotation": [
                         1.0,
                         0.0,
@@ -51,7 +51,7 @@
         "cycles": [],
         "cameras": [
             {
-                "id": 1097,
+                "id": 384,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -80,25 +80,25 @@
                 },
                 "sequences": [
                     {
-                        "id": 1113,
+                        "id": 400,
                         "label": "view",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            433.0001220703125,
-                            106.88893127441406
+                            433.0,
+                            106.88892364501953
                         ],
                         "transforms": [
                             {
-                                "id": 1119,
+                                "id": 406,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "SetValues",
                                 "selected": false,
                                 "position": [
-                                    462.44451904296875,
+                                    462.4444580078125,
                                     140.6667022705078
                                 ],
                                 "type": "LookAt",
@@ -152,25 +152,25 @@
                         ]
                     },
                     {
-                        "id": 1107,
+                        "id": 394,
                         "label": "projection",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            197.5556640625,
-                            106.88893127441406
+                            197.5555419921875,
+                            106.88892364501953
                         ],
                         "transforms": [
                             {
-                                "id": 1120,
+                                "id": 407,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "Full",
                                 "selected": false,
                                 "position": [
-                                    227.77789306640625,
+                                    227.77777099609375,
                                     140.6667022705078
                                 ],
                                 "type": "Perspective",
@@ -213,7 +213,7 @@
                         ]
                     },
                     {
-                        "id": 1101,
+                        "id": 388,
                         "label": "viewport",
                         "render": false,
                         "numberOfDecimals": 1,
@@ -230,14 +230,14 @@
         ],
         "screens": [
             {
-                "id": 1121,
+                "id": 408,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    -208.55548095703125,
-                    73.00000762939453
+                    -209.44436645507813,
+                    77.44445037841797
                 ],
                 "screenSize": [
                     286.0,
@@ -247,7 +247,7 @@
         ],
         "models": [
             {
-                "id": 1126,
+                "id": 413,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -273,26 +273,26 @@
         "scriptingNodes": [],
         "edges": [
             [
-                1097,
+                384,
                 0,
-                1121,
+                408,
                 0
             ]
         ],
         "zoom": 1.125,
         "workArea": {
             "Min": [
-                -408.66656494140625,
-                -68.22218322753906
+                -385.5555419921875,
+                18.888925552368164
             ],
             "Max": [
-                1298.0,
-                447.3333740234375
+                1321.111083984375,
+                370.0000305175781
             ]
         }
     },
     "layout": {
-        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1382\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,774\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,802\nSize=1920,580\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=2358,-566 Size=1920,1356 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,774 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,580 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,634\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,662\nSize=1920,395\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,634 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,395 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
     },
     "tutorialData": {
         "LanguageId": 0,

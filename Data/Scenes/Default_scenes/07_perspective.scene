@@ -31,9 +31,9 @@
                     ],
                     "iorbitCameraRadius": 34.63692092895508,
                     "iorbitCameraPivot": [
-                        -1.6249010562896729,
-                        1.3728820085525513,
-                        -1.8579035997390747
+                        -1.1425825357437134,
+                        0.4576270580291748,
+                        -0.9865576028823853
                     ],
                     "fov": 13.699999809265137,
                     "zNear": 0.20000000298023224,
@@ -49,32 +49,32 @@
         "operators": [],
         "sequences": [
             {
-                "id": 1166,
+                "id": 453,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    751.8907470703125,
-                    97.18191528320313
+                    673.3444213867188,
+                    92.09101104736328
                 ],
                 "transforms": [
                     {
-                        "id": 1172,
+                        "id": 459,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            783.6325073242188,
-                            130.73532104492188
+                            705.0872802734375,
+                            125.6444091796875
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
                                 0.0,
                                 0.0,
-                                -3.0
+                                -2.200000047683716
                             ]
                         },
                         "savedDefaults": {},
@@ -100,11 +100,55 @@
                             [
                                 0.0,
                                 0.0,
-                                -3.0,
+                                -2.200000047683716,
                                 1.0
                             ]
                         ],
                         "synergies": false,
+                        "locked": true
+                    },
+                    {
+                        "id": 491,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "selected": false,
+                        "position": [
+                            877.4508666992188,
+                            125.6444091796875
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "angle": 0.7953988313674927
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.699999988079071,
+                                0.0,
+                                -0.7141428589820862,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.7141428589820862,
+                                0.0,
+                                0.699999988079071,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
                         "locked": true
                     }
                 ]
@@ -113,14 +157,14 @@
         "cycles": [],
         "cameras": [
             {
-                "id": 1173,
+                "id": 460,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "selected": false,
                 "position": [
-                    219.6000213623047,
-                    75.19999694824219
+                    207.9635467529297,
+                    75.9272689819336
                 ],
                 "showCamera": true,
                 "showAxes": true,
@@ -142,33 +186,33 @@
                 },
                 "sequences": [
                     {
-                        "id": 1189,
+                        "id": 476,
                         "label": "view",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            427.723388671875,
-                            105.2807846069336
+                            416.0872802734375,
+                            106.00804138183594
                         ],
                         "transforms": [
                             {
-                                "id": 1195,
+                                "id": 482,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "SetValues",
                                 "selected": false,
                                 "position": [
-                                    457.8143310546875,
-                                    139.46261596679688
+                                    446.17816162109375,
+                                    140.18984985351563
                                 ],
                                 "type": "LookAt",
                                 "defaultValues": {
                                     "eye": [
                                         0.0,
-                                        0.0,
-                                        1.0
+                                        0.4000000059604645,
+                                        3.700000047683716
                                     ],
                                     "center": [
                                         0.0,
@@ -191,20 +235,20 @@
                                     ],
                                     [
                                         -0.0,
-                                        1.0,
-                                        -0.0,
+                                        0.9942070245742798,
+                                        0.10748183727264404,
                                         0.0
                                     ],
                                     [
                                         0.0,
-                                        0.0,
-                                        1.0,
+                                        -0.10748183727264404,
+                                        0.9942070245742798,
                                         0.0
                                     ],
                                     [
                                         -0.0,
                                         -0.0,
-                                        -1.0,
+                                        -3.7215588092803955,
                                         1.0
                                     ]
                                 ],
@@ -214,26 +258,26 @@
                         ]
                     },
                     {
-                        "id": 1183,
+                        "id": 470,
                         "label": "projection",
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "selected": false,
                         "position": [
-                            241.81431579589844,
-                            105.2807846069336
+                            230.1781768798828,
+                            106.00804138183594
                         ],
                         "transforms": [
                             {
-                                "id": 1196,
+                                "id": 483,
                                 "render": true,
                                 "numberOfDecimals": 1,
                                 "LOD": "SetValues",
                                 "selected": false,
                                 "position": [
-                                    272.3597412109375,
-                                    139.46261596679688
+                                    260.7236328125,
+                                    140.18984985351563
                                 ],
                                 "type": "Perspective",
                                 "defaultValues": {
@@ -275,7 +319,7 @@
                         ]
                     },
                     {
-                        "id": 1177,
+                        "id": 464,
                         "label": "viewport",
                         "render": false,
                         "numberOfDecimals": 1,
@@ -292,7 +336,7 @@
         ],
         "screens": [
             {
-                "id": 1197,
+                "id": 484,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
@@ -309,14 +353,14 @@
         ],
         "models": [
             {
-                "id": 1202,
+                "id": 489,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
-                "selected": false,
+                "selected": true,
                 "position": [
-                    991.9639282226563,
-                    116.03662109375
+                    1084.327392578125,
+                    106.58208465576172
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -335,32 +379,32 @@
         "scriptingNodes": [],
         "edges": [
             [
-                1173,
+                460,
                 0,
-                1197,
+                484,
                 0
             ],
             [
-                1166,
+                453,
                 0,
-                1202,
+                489,
                 0
             ]
         ],
         "zoom": 1.375,
         "workArea": {
             "Min": [
-                -224.3675079345703,
-                -21.264671325683594
+                -177.8218231201172,
+                24.553495407104492
             ],
             "Max": [
-                1171.99609375,
-                400.5534973144531
+                1218.5418701171875,
+                352.5534973144531
             ]
         }
     },
     "layout": {
-        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1382\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,774\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,802\nSize=1920,580\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=2358,-566 Size=1920,1356 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,774 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,580 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,578\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,606\nSize=1920,451\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,578 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,451 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
     },
     "tutorialData": {
         "LanguageId": 0,

@@ -4,64 +4,70 @@
         "imported": []
     },
     "viewport": {
-        "manipulator_enabled": true,
-        "mainScene": {
-            "lightFollowsCamera": true,
-            "camera": {
-                "mode": "ORBIT",
-                "orbitCameraRotationX": -80.42993927001953,
-                "orbitCameraRotationY": 54.94001388549805,
-                "trackballCameraRotation": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "iorbitCameraRadius": 10.817585945129397,
-                "iorbitCameraPivot": [
-                    -3.068179130554199,
-                    -1.0157248973846436,
-                    1.6152154207229617
-                ],
-                "fov": 90.0,
-                "zNear": 0.20000000298023225,
-                "zFar": 270.0
+        "views": [
+            {
+                "manipulator_enabled": true,
+                "camera": {
+                    "mode": "ORBIT",
+                    "orbitCameraRotationX": -62.73969650268555,
+                    "orbitCameraRotationY": -139.65005493164065,
+                    "trackballCameraRotation": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "iorbitCameraRadius": 14.21872329711914,
+                    "iorbitCameraPivot": [
+                        0.6120968461036682,
+                        -0.543943464756012,
+                        0.5210887789726257
+                    ],
+                    "fov": 19.700000762939453,
+                    "zNear": 0.20000000298023224,
+                    "zFar": 270.0
+                }
             }
+        ],
+        "scene": {
+            "lightFollowsCamera": true
         }
     },
     "workspace": {
         "operators": [
             {
-                "id": 1,
+                "id": 198,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     660.3330078125,
-                    27.761863708496095
+                    27.761863708496094
                 ],
                 "type": "Inversion"
             }
         ],
         "sequences": [
             {
-                "id": 4,
+                "id": 201,
                 "label": "A^(-1)",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     894.3804931640625,
                     162.71426391601563
@@ -69,67 +75,12 @@
                 "transforms": []
             },
             {
-                "id": 17,
-                "label": "Rotation with respect to reference frame",
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    500.3330078125,
-                    161.31422424316407
-                ],
-                "transforms": [
-                    {
-                        "id": 23,
-                        "render": true,
-                        "numberOfDecimals": 1,
-                        "LOD": "Full",
-                        "position": [
-                            590.5555419921875,
-                            191.44451904296876
-                        ],
-                        "type": "EulerY",
-                        "defaultValues": {
-                            "angle": 0.45102688670158389
-                        },
-                        "savedDefaults": {},
-                        "value": [
-                            [
-                                0.8999999761581421,
-                                0.0,
-                                -0.43588995933532717,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.43588995933532717,
-                                0.0,
-                                0.8999999761581421,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        ],
-                        "synergies": true,
-                        "locked": true
-                    }
-                ]
-            },
-            {
-                "id": 24,
+                "id": 214,
                 "label": "A",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     282.76171875,
                     159.6666259765625
@@ -137,30 +88,32 @@
                 "transforms": []
             },
             {
-                "id": 10,
+                "id": 220,
                 "label": "Reference point",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     10.238182067871094,
                     -66.28573608398438
                 ],
                 "transforms": [
                     {
-                        "id": 16,
+                        "id": 226,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
+                        "selected": false,
                         "position": [
-                            30.111114501953126,
-                            -36.111053466796878
+                            41.88592529296875,
+                            -32.2637939453125
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
-                                -3.0999999046325685,
-                                0.0,
+                                -3.0999999046325684,
+                                0.699999988079071,
                                 3.5
                             ]
                         },
@@ -185,13 +138,71 @@
                                 0.0
                             ],
                             [
-                                -3.0999999046325685,
-                                0.0,
+                                -3.0999999046325684,
+                                0.699999988079071,
                                 3.5,
                                 1.0
                             ]
                         ],
                         "synergies": false,
+                        "locked": true
+                    }
+                ]
+            },
+            {
+                "id": 207,
+                "label": "Rotation with respect to reference frame",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "selected": false,
+                "position": [
+                    500.3330078125,
+                    161.31422424316406
+                ],
+                "transforms": [
+                    {
+                        "id": 213,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "SetValues",
+                        "selected": true,
+                        "position": [
+                            586.2169189453125,
+                            195.26657104492188
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "angle": 6.5
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.9765876531600952,
+                                0.0,
+                                -0.21511998772621155,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.21511998772621155,
+                                0.0,
+                                0.9765876531600952,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
                         "locked": true
                     }
                 ]
@@ -202,10 +213,11 @@
         "screens": [],
         "models": [
             {
-                "id": 30,
+                "id": 227,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
                     1119.9521484375,
                     157.7142791748047
@@ -223,13 +235,14 @@
                 "tintStrength": 1.0
             },
             {
-                "id": 32,
+                "id": 229,
                 "label": "Reference coorfinate frame",
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
+                "selected": false,
                 "position": [
-                    293.65594482421877,
+                    293.65594482421875,
                     -186.89541625976563
                 ],
                 "model": "Axes",
@@ -246,60 +259,68 @@
             }
         ],
         "transforms": [],
+        "scriptingNodes": [],
         "edges": [
             [
-                17,
-                0,
-                4,
+                220,
+                1,
+                198,
                 0
             ],
             [
-                1,
+                207,
                 0,
-                4,
+                201,
+                0
+            ],
+            [
+                198,
+                0,
+                201,
                 1
             ],
             [
-                24,
-                0,
-                17,
-                0
-            ],
-            [
-                10,
+                220,
                 1,
-                24,
+                214,
                 1
             ],
             [
-                4,
+                201,
                 0,
-                30,
+                227,
                 0
             ],
             [
-                10,
+                220,
                 0,
-                32,
+                229,
                 0
             ],
             [
-                10,
-                1,
-                1,
+                214,
+                0,
+                207,
                 0
             ]
         ],
-        "zoom": 1.125,
+        "zoom": 0.9185587167739868,
         "workArea": {
             "Min": [
-                -3.2222177982330324,
-                -302.7777099609375
+                -204.5310516357422,
+                -263.4394836425781
             ],
             "Max": [
-                1272.3333740234376,
-                598.5556030273438
+                1885.7001953125,
+                352.7432556152344
             ]
         }
+    },
+    "layout": {
+        "iniData": "[Window][DockSpace]\nPos=0,0\nSize=1920,1057\nCollapsed=0\n\n[Window][Debug##Default]\nPos=60,60\nSize=400,400\nCollapsed=0\n\n[Window][###ViewportWindow]\nPos=0,26\nSize=1920,463\nCollapsed=0\nDockId=0x00000001,0\n\n[Window][###WorkspaceWindow]\nPos=0,491\nSize=1920,566\nCollapsed=0\nDockId=0x00000003,0\n\n[Window][###ModalWindow]\nPos=763,627\nSize=16,42\nCollapsed=0\n\n[Window][###TutorialWindow]\nPos=-2059,590\nSize=643,802\nCollapsed=0\nDockId=0x00000002,0\n\n[Window][###Console]\nPos=848,26\nSize=432,442\nCollapsed=0\n\n[Window][###LogWindow]\nPos=848,26\nSize=432,751\nCollapsed=0\n\n[Window][###StyleEditor]\nPos=25,472\nSize=694,1434\nCollapsed=0\n\n[Window][Dear ImGui Demo]\nViewportPos=2429,-148\nViewportId=0xE927CF2F\nSize=607,722\nCollapsed=0\n\n[Window][###SetupDialog]\nPos=0,139\nSize=846,638\nCollapsed=0\n\n[Window][###ImportedModelsDialog]\nPos=720,372\nSize=480,384\nCollapsed=0\n\n[Window][###ImportedModelsDialog/ModelList_D20283F3]\nIsChild=1\nSize=150,342\n\n[Window][###ChangeLanguageWindow]\nPos=823,541\nSize=272,263\nCollapsed=0\n\n[Window][Dear ImGui Test Engine]\nPos=55,60\nSize=800,640\nCollapsed=0\n\n[Window][###PreferencesWindow]\nPos=60,60\nSize=1113,905\nCollapsed=0\n\n[Window][###DescriptionDialog]\nPos=60,60\nSize=344,248\nCollapsed=0\n\n[Window][###StatisticsWindow]\nPos=60,60\nSize=400,480\nCollapsed=0\n\n[Window][###ViewportWindow2]\nViewportPos=2894,3\nViewportId=0xC69F2639\nSize=935,902\nCollapsed=0\n\n[Table][0x52E825D7,3]\nRefScale=16\nColumn 0  Width=54\nColumn 1  Width=72\nColumn 2  Weight=1.0000\n\n[Docking][Data]\nDockSpace     ID=0x09EF459F Window=0x9A404470 Pos=0,49 Size=1920,1031 Split=Y\n  DockNode    ID=0x00000001 Parent=0x09EF459F SizeRef=1102,463 Selected=0x8535E254\n  DockNode    ID=0x00000004 Parent=0x09EF459F SizeRef=1102,566 Split=X\n    DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=643,1103 Selected=0xEF3485CE\n    DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=1275,1103 CentralNode=1 Selected=0xCDB9512A\n\n[Layout][TutorialWindow]\nIsOpen=0\n\n[Layout][StartWindow]\nIsOpen=0\n\n[Layout][ViewportWindow]\nIsOpen=1\n\n[Layout][WorkspaceWindow]\nIsOpen=1\n\n[Layout][Console]\nIsOpen=0\n\n[Layout][LogWindow]\nIsOpen=0\n\n[Layout][StyleEditor]\nIsOpen=0\n\n[Layout][AboutWindow]\nIsOpen=0\n\n"
+    },
+    "tutorialData": {
+        "LanguageId": 0,
+        "CurrentStep": 0
     }
 }
