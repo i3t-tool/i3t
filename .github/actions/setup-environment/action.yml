@@ -15,9 +15,6 @@ runs:
           libxinerama-dev \
           libxcursor-dev \
           libxi-dev \
-          xvfb \
-          libwayland-dev \
-          wayland-protocols \
-          libxkbcommon-dev
+          xvfb
         sudo rm -f /usr/bin/g++
         sudo ln /usr/bin/g++-12 /usr/bin/g++
