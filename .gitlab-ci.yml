@@ -158,6 +158,10 @@ test-docs-generation:
         - "Docs/**/*"
         - "Scripts/**/*"
         - ".gitlab-ci.yml"
+        # The docs site is built from these, so a dependency bump must be
+        # verified by this job - otherwise a VitePress upgrade ships untested.
+        - "package.json"
+        - "package-lock.json"
   before_script:
     - apt update && apt install -y doxygen python3 unzip wget
     - wget https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
